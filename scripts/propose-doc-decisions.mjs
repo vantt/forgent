@@ -5,7 +5,7 @@ import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, loadDecisionShards, reviewReportAuthor, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, reviewReportAuthor, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -186,7 +186,7 @@ export function independentReviewer(reviewer, author) {
 }
 
 function requireVerifiedShard(context, shard) {
-  if (shard.authorshipRequired && !shard.authorSession?.trim()) throw new Error('authorshipRequired needs authorSession');
+  if (!isLegacyDecisionShard(shard) && shard.claims?.length && !shard.authorSession?.trim()) throw new Error('manual decisions need authorSession');
   const reportOf = context.repoRoot && context.inventory.commit ? buildCommittedReviewReportLookup(context.repoRoot, context.inventory.commit) : () => null;
   for (const row of shard.claims || []) {
     if (row.reviewStatus !== 'reviewed') continue;
@@ -197,7 +197,7 @@ function requireVerifiedShard(context, shard) {
 
 export function buildReviewPack(context, shard, { author = shard.authorSession } = {}) {
   requireVerifiedShard(context, shard);
-  const legacy = shard.authorshipRequired !== true;
+  const legacy = isLegacyDecisionShard(shard);
   if (legacy && !reviewReportAuthor('Author session: ' + author)) throw new Error('old-shape pack requires a typed --author review identity');
   if (!legacy && author !== shard.authorSession) throw new Error('pack author differs from the shard authorSession');
   const reportOf = context.repoRoot ? buildCommittedReviewReportLookup(context.repoRoot, context.inventory.commit) : () => null;
@@ -344,7 +344,7 @@ export function parseReviewVerdicts(text, reviewer, binding = null) {
 
 export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, pack, seedProof, reviewedAt = new Date().toISOString().slice(0, 10) }) {
   requireVerifiedShard(context, shard);
-  const legacy = shard.authorshipRequired !== true;
+  const legacy = isLegacyDecisionShard(shard);
   const author = shard.authorSession || (legacy ? pack?.authorSession : null);
   if (!reportPath || !independentReviewer(reviewer, author)) throw new Error('review application requires a report and an independent reviewer');
   const pending = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed');
@@ -388,7 +388,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     for (let i = 0; i < claims.length; i++) {
       if (claims[i].reviewStatus !== 'reviewed' || shard.claims[i].reviewStatus === 'reviewed') continue;
       claims[i].reviewReportCommit = reportCommit;
-      const findings = validateManualReview(claims[i], legacy ? { ...shard, authorSession: author } : shard, reportOf);
+      const findings = validateManualReview(claims[i], shard, reportOf);
       if (findings.length) throw new Error('review application requires matching committed review evidence: ' + findings.map((finding) => finding.type).join(', '));
     }
   }

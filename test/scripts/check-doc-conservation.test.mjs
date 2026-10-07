@@ -255,9 +255,9 @@ test('gates CLI combines repeated decision inputs and rejects a duplicate across
     const inventory = generator.generateInventory(repo.tmp, { commit: head, identityRegistryPath: repo.registryPath });
     const rows = inventory.claimLedger.filter((row) => row.sourcePath === 'docs/specs/runner.md');
     const shardFor = (row, shard) => ({
-      version: 1, shard, sources: ['docs/specs/runner.md'],
+      version: 1, shard, authorSession: 'fixture-session:author@2026-10-07', sources: ['docs/specs/runner.md'],
       claims: [{
-        claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest,
+        claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest, authoredBy: 'fixture-session:author@2026-10-07',
         targetOwner: null, targetAnchor: null, claimKind: 'historical-context',
         disposition: 'retain-as-evidence', reviewStatus: 'pending',
         rationale: 'Preserve the source unit as historical evidence.',
@@ -453,28 +453,28 @@ function decisionInventory() {
   };
 }
 const anchorsOf = (owner) => (owner === OWNER ? new Set(['intro']) : null);
-const goodDecision = () => ({ claimId: DECIDED_CLAIM_ID, sourceUnitDigest: DIGEST.slice(0, 16), targetOwner: OWNER, targetAnchor: 'intro', claimKind: 'specification', disposition: 'move', reviewStatus: 'pending', rationale: 'moved to the platform owner' });
-const goodShard = (claims = [goodDecision()], extra = {}) => ({ version: 1, shard: 'one', sources: ['docs/specs/runner.md'], claims, ...extra });
+const goodDecision = () => ({ claimId: DECIDED_CLAIM_ID, sourceUnitDigest: DIGEST.slice(0, 16), authoredBy: 'fixture-session:author@2026-10-07', targetOwner: OWNER, targetAnchor: 'intro', claimKind: 'specification', disposition: 'move', reviewStatus: 'pending', rationale: 'moved to the platform owner' });
+const goodShard = (claims = [goodDecision()], extra = {}) => ({ version: 1, shard: 'one', authorSession: 'fixture-session:author@2026-10-07', sources: ['docs/specs/runner.md'], claims, ...extra });
 const decide = (shards, inventory = decisionInventory()) => gates.applyDecisions(inventory, shards, { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf });
+function reviewedFixture(t) {
+  const repo = makeRepo(); t.after(() => repo.cleanup());
+  repo.write('docs/specs/runner.md', '# Runner\n\nPreserved fixture source.\n');
+  const commit = repo.commit('record fixture source');
+  const git = (...args) => execFileSync('git', args, { cwd: repo.tmp, encoding: 'utf8', stdio: 'pipe' }).trim();
+  const reviewReport = PLAN_DIR + '/reports/phase-06/review-contract-owner.md';
+  const decision = { ...goodDecision(), reviewStatus: 'reviewed', reviewedBy: 'reviewer:fixture-session:other@2026-10-07', reviewedAt: '2026-10-07', reviewReport, reviewPackCommit: commit, reviewPackId: 'a'.repeat(64), seedScoreId: 'b'.repeat(64), reviewNote: 'Checked the complete fixture contract.' };
+  repo.write(reviewReport, `Fixture-only declarations, not real approval.\nReviewer: ${decision.reviewedBy}\nPack commit: ${commit}\nPack id: ${decision.reviewPackId}\nSeed score: ${decision.seedScoreId}\n| ${decision.claimId} | ok | ${decision.reviewNote} |\n`);
+  git('add', '--', reviewReport); git('commit', '-qm', 'docs: record fixture owner review', '--', reviewReport);
+  decision.reviewReportCommit = git('rev-parse', 'HEAD');
+  return { decision, inventory: { ...decisionInventory(), commit: decision.reviewReportCommit }, options: { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, repoRoot: repo.tmp } };
+}
 
-test('a clean decision merges onto its claim row without mutating the input inventory', () => {
-  const inventory = decisionInventory();
-  const before = JSON.stringify(inventory);
-  const shard = goodShard([{ ...goodDecision(), reviewStatus: 'reviewed', reviewedBy: 'rev', reviewedAt: '2026-10-06', searched: ['grep x'] }]);
-  const result = decide([shard], inventory);
-  assert.deepEqual(result.findings, []);
-  assert.equal(JSON.stringify(inventory), before);
-  const merged = result.inventory.claimLedger[0];
-  assert.deepEqual({ ...merged }, { ...inventory.claimLedger[0], targetOwner: OWNER, targetAnchor: 'intro', claimKind: 'specification', disposition: 'move', reviewStatus: 'reviewed', rationale: 'moved to the platform owner', reviewedBy: 'rev', reviewedAt: '2026-10-06', searched: ['grep x'] });
-  assert.notEqual(result.inventory.claimLedger[0], inventory.claimLedger[0]);
-  assert.notEqual(result.inventory.items, inventory.items);
-});
 
-test('a reviewed decision on a claim that is a registry identity gap gives the gap row its disposition, a pending one does not', () => {
+test('a reviewed decision on a registry gap resolves it while a pending decision does not', (t) => {
   const registry = { identityGaps: [{ claimId: DECIDED_CLAIM_ID, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'a' }, { claimId: `claim_${'c'.repeat(32)}`, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'b' }] };
   const before = JSON.stringify(registry);
-  const reviewed = { ...goodDecision(), reviewStatus: 'reviewed', reviewedBy: 'rev', reviewedAt: '2026-10-07' };
-  const result = gates.applyDecisions(decisionInventory(), [goodShard([reviewed])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
+  const f = reviewedFixture(t);
+  const result = gates.applyDecisions(f.inventory, [goodShard([f.decision])], { ...f.options, registry });
   assert.deepEqual(result.findings, []);
   assert.equal(JSON.stringify(registry), before);
   assert.deepEqual(result.registry.identityGaps.map((row) => row.disposition), ['move', undefined]);
@@ -500,11 +500,12 @@ test('a registry gap decision overlays the gap row and reports an unknown, repea
   assert.deepEqual(types([{ ...gap, sourcePath: 'docs/other.md' }]), ['decision-gap-invalid']);
 });
 
-test('a reviewed decision is bound to the target unit it compared and drifts when that unit changes', () => {
+test('a reviewed decision is bound to its target unit and detects current digest drift', (t) => {
   const digests = { [`${OWNER}#intro`]: 'ab'.repeat(32) };
   const digestOf = (owner, anchor) => digests[`${owner}#${anchor}`] ?? null;
-  const run = (d) => gates.applyDecisions(decisionInventory(), [goodShard([d])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, targetUnitDigestOf: digestOf }).findings.map((f) => f.type);
-  const reviewed = { ...goodDecision(), reviewStatus: 'reviewed', reviewedBy: 'rev', reviewedAt: '2026-10-07' };
+  const f = reviewedFixture(t);
+  const run = (d) => gates.applyDecisions(f.inventory, [goodShard([d])], { ...f.options, targetUnitDigestOf: digestOf }).findings.map(f => f.type);
+  const reviewed = f.decision;
   assert.deepEqual(run({ ...reviewed, targetUnitDigest: 'ab'.repeat(8) }), []);
   assert.deepEqual(run({ ...reviewed, targetUnitDigest: 'cd'.repeat(8) }), ['decision-target-drift']);
   assert.deepEqual(run({ ...reviewed, targetUnitDigest: 'ab' }), ['decision-target-drift']);

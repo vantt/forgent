@@ -238,3 +238,14 @@ Both invocation-only conservation proofs pass and their complete JSON remains id
 Portable structural probe: `node plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs`. It creates an isolated committed fixture, invokes the actual scoped strict CLI with that fixture's previous registry, accepts the clean copy with zero findings, and rejects all 11 mutations: removed row, missing anchor, duplicate row, unknown id, missing reviewer, stale source, stale target, self-review, unequal mirror, changed exact digest, restore without anchor. Fixture reports are synthetic proofs, never real batch reviews. This is not a real-batch E closure; real-batch E must later run separately against each of the two owner-specified prior registries.
 
 Independent full tooling review remains UNPROVEN. No real batch authoring, first-use vocabulary promotion, area-map freeze, route change, approval or authority cutover has occurred.
+
+## Mandatory authorship correction under A5
+
+Owner amendment `a7ec5054a` freezes tooling at `1ec3ceca6` plus H1 only and supersedes A4. Every non-legacy human-decision shard requires its author session; reviewed judgment rows require row authorship and a matching committed independent report regardless of the optional legacy flag. Compatibility is limited to the seven fingerprinted original legacy cohorts, not arbitrary authorless shards.
+
+H1 red commit `7667c4754`: 15 tests, 8 pass, 7 fail. Corrected scripts suite: 51 discovered files, 861/861 pass, no failures/skips/todo. Existing reviewed fixtures now carry committed report evidence; no production gate is bypassed. Frozen structural CLI probe: clean zero findings, all eleven defects rejected.
+
+Non-H1 regression changes were reverted in `ab69e3d6b`. H2, M1–M5 and Low changes are withdrawn; released-key replay, extra normalization and other withdrawn safeguards are not claimed. Their fixture-only earlier evidence is not evidence for this cutover. No further tooling re-review is requested.
+
+A5 requires ordinary content reviews to read every judgment row, sample 100 random script-proven exact rows, run gates and commit a report. Seeded packs and reviewer red-team are reserved for the checkpoints after Steps 3 and 6 and in Step 10. Compatibility of this unseeded procedure with the frozen approval guards is being exercised before content authoring; no real approval has been produced.
+

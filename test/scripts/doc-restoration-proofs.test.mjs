@@ -46,7 +46,7 @@ test('a deferred decision cannot name a nonexistent stub or omit its fields', (t
   const row = { claimId: 'claim_fixture', sourcePath, sourceAnchor: 'contract', sourceUnitDigest: '1'.repeat(64), claimKind: 'contract', disposition: 'unknown-blocking', reviewStatus: 'blocking', targetOwner: null, targetAnchor: null };
   const inventory = { items: [{ path: sourcePath }, { path: f.owner }], claimLedger: [row] };
   const decision = { ...row, targetOwner: f.owner, targetAnchor: f.unit.anchor, disposition: 'defer-with-owner', reviewStatus: 'pending', rationale: 'The unit is deferred to a named restoration task, not claimed as carried.', stubOwner: f.owner, stubAnchor: f.unit.anchor };
-  const apply = (d) => applyDecisions(inventory, [{ version: 1, shard: 'deferred-fixture', sources: [sourcePath], claims: [d] }], { vocabulary, unitsOf: f.unitsOf });
+  const apply = (d) => applyDecisions(inventory, [{ version: 1, shard: 'deferred-fixture', authorSession: 'fixture-session:author@2026-10-07', sources: [sourcePath], claims: [{ ...d, authoredBy: 'fixture-session:author@2026-10-07' }] }], { vocabulary, unitsOf: f.unitsOf });
   assert.deepEqual(apply(decision).findings, []);
   for (const change of [{ stubOwner: '' }, { stubAnchor: '' }, { stubAnchor: 'missing' }, { stubOwner: 'docs/specs/source.md' }]) assert.ok(apply({ ...decision, ...change }).findings.some((row) => row.type === 'decision-stub-invalid'));
   assert.equal(apply(decision).inventory.claimLedger[0].stubOwner, f.owner);

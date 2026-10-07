@@ -7,8 +7,8 @@ const target = 'docs/platform/example.md';
 const digest = 'a'.repeat(64);
 const row = { claimId: `claim_${'1'.repeat(32)}`, sourceId: `src_${'2'.repeat(32)}`, sourcePath: source, sourceAnchor: 'old', sourceDigest: digest, sourceUnitDigest: digest, sourceLocation: { start: 1, end: 2 }, targetOwner: null, targetAnchor: null, claimKind: 'implementation-fact', authorityKind: 'legacy', status: 'current', relations: [], decisionRefs: [], evidenceLinks: [], disposition: 'unknown-blocking', reviewStatus: 'blocking', identityUnitDigest: digest, identityFingerprint: digest, identityStatus: 'stable' };
 const context = { inventory: { version: 1, commit: 'b'.repeat(40), claimLedger: [row], items: [{ path: source, proposedDisposition: 'unknown-blocking', corpus: 'platform-authority', authorityStatus: 'legacy-current' }, { path: target, proposedDisposition: 'promote', corpus: 'platform-authority', authorityStatus: 'candidate' }] }, unitsOf: () => [{ anchor: 'current', textDigest: digest, text: 'The entire implementation contract is retained verbatim.', ancestry: [] }] };
-const decision = { ...row, targetOwner: target, targetAnchor: 'current', disposition: 'promote', rationale: 'The whole contract is carried.', reviewStatus: 'pending' };
-const shard = { version: 1, shard: 'example', sources: [source], claims: [decision] };
+const decision = { ...row, authoredBy: 'fixture-session:author@2026-10-07', targetOwner: target, targetAnchor: 'current', disposition: 'promote', rationale: 'The whole contract is carried.', reviewStatus: 'pending' };
+const shard = { version: 1, shard: 'example', authorSession: 'fixture-session:author@2026-10-07', sources: [source], claims: [decision] };
 const vocabulary = { claimKinds: [{ id: 'implementation-fact' }], sourceDispositions: [{ id: 'promote', requiresTargetOwner: true, requiresRationale: true }, { id: 'unknown-blocking' }] };
 const schema = { required: Object.keys(row), properties: Object.fromEntries([...Object.keys(row), 'rationale'].map((name) => [name, {}])) };
 

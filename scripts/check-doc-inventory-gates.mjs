@@ -566,6 +566,24 @@ function committedStubExists(row, unitsOf) {
     typeof unitsOf === 'function' && (unitsOf(row.stubOwner) || []).some((unit) => unit.anchor === row.stubAnchor);
 }
 
+const legacyDecisionFingerprints = new Map([
+  ['b-decisions-first', ['89e021edc595d03ab5556d242b86b35af51ab0dcc855ead639bccbed8cc8343d', '0a114d4dcb41e6b517c58d3792d32cf0fb1192e028579b488beba17301c5a89f']],
+  ['b-io-contract', ['d96d8829168d5bdb61e95171ebeede8f5a0a37b06946a55d0fba3c41de150fdf', 'bd78b0b940b100c5dc6c8b2ecc9c058fb72ddc382f6a458aa7a8672f38b55061']],
+  ['b-data-dictionary', ['b99b04a9cf7768c0dc9f4b4c496f119b8b1ba0caddbfb5216d78ee21b2a0b66f', '582ff7a2c9f4aa5d989b5ca07871298fdd47e4542499b1cccc9a8dd360ca9990']],
+  ['b-decisions-second', ['11799e76689ca8047a593734c42c8d5cf492dfd56d1b8818ff202dc9b87d375d', 'baef6147f4db4c81c2af358f264faf79b56a62a488808c64feff0f2c75b21f62']],
+  ['b-entry-actors-rules-pointers', ['7caf075d40105b921989df5262894666b5adc907207d9c9105fba9fa079a45b9', '86f3eb35dff1402702243355933804b3232aca708dacc0752ad623e9ea2a6ecf']],
+  ['b-behaviors', ['23a837435d5279c9cf0525e1470b6e551dc7693a874466dfee6d8e55d35ddaa0', 'a0eadbfe0347d2c28f6b84a5d16f32a4a9426009e687490d292c7e85ce912d19']],
+  ['b-files', ['78d5cbda94a92d68a2ef9b6ebf25f660311024ce16b4ab4bde3decd24a1b48c0', 'd4caeaed2359f9b369094503c1a239f0ae0c2ffb50055cc2411e4b4031cc32bb']],
+]);
+const decisionFingerprint = value => sha256Buffer(Buffer.from(JSON.stringify(value)));
+export function isLegacyDecisionShard(shard, { unchanged = false } = {}) {
+  const expected = legacyDecisionFingerprints.get(shard?.shard);
+  if (!expected) return false;
+  if (unchanged) return decisionFingerprint(shard) === expected[0];
+  if (shard.authorSession || shard.claims.some(row => row.authoredBy) || ['exact', 'mirrors', 'corpusRules'].some(field => shard[field]?.length)) return false;
+  return decisionFingerprint({ shard: shard.shard, sources: shard.sources, claims: shard.claims.map(({ claimId, sourceUnitDigest }) => ({ claimId, sourceUnitDigest })) }) === expected[1];
+}
+
 export function reviewSessionIdentity(identity) {
   return typeof identity === 'string' ? identity.replace(/^reviewer:/, '').replace(/@[^@]+$/, '') : '';
 }
@@ -603,7 +621,7 @@ export function validateManualReview(row, shard, reportOf) {
   if ([row.authoredBy, row.reviewedBy].some((identity) => typeof identity === 'string' && identity.startsWith('script:'))) fail('decision-script-identity', 'manual rows cannot use script identities');
   if (row.reviewStatus !== 'reviewed') return findings;
   const report = reportOf(row.reviewReport, row.reviewReportCommit);
-  const legacy = shard.authorshipRequired !== true;
+  const legacy = isLegacyDecisionShard(shard);
   const reportAuthor = legacy ? reviewReportAuthor(report) : null;
   const author = row.authoredBy || reportAuthor;
   const shardAuthor = shard.authorSession || reportAuthor;
@@ -703,7 +721,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
 
   for (const shard of shards || []) {
     const sources = new Set(shard.sources || []);
-    if (shard.authorshipRequired === true && !nonEmpty(shard.authorSession)) fail('decision-author-session-missing', `shard ${shard.shard}: authorshipRequired needs authorSession`);
+    if (!isLegacyDecisionShard(shard) && shard.claims?.length && !nonEmpty(shard.authorSession)) fail('decision-author-session-missing', `shard ${shard.shard}: manual decisions need authorSession`);
     const mirrorClaims = [];
     const mirrorFiles = [];
     for (const rule of shard.corpusRules || []) {
@@ -787,7 +805,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
         });
       }
     }
-    if (shard.authorshipRequired === true) for (const row of shard.claims || []) findings.push(...validateManualReview(row, shard, reviewReportOf));
+    if (!isLegacyDecisionShard(shard, { unchanged: true })) for (const row of shard.claims || []) findings.push(...validateManualReview(row, shard, reviewReportOf));
     for (const d of [...mirrorClaims, ...(shard.claims || [])]) {
       const id = d?.claimId;
       const idx = claimIndex.get(id);
