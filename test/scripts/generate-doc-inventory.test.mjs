@@ -1488,3 +1488,11 @@ test('extractMarkdownConservationUnits: consecutive short blocks before the firs
   const blocks = extractMarkdownConservationUnits(md).filter((u) => u.unitKind !== 'heading');
   assert.deepEqual(blocks.map((u) => [u.startLine, u.endLine]), [[3, 8], [10, 10]]);
 });
+
+test('extractMarkdownConservationUnits: a short label ending in a colon joins the block it introduces, not the fence before it', () => {
+  const md = ['## Rules', '', '```json', '{ "key": "a value long enough to count as a block" }', '```', '', 'Rules:', '', '- the first rule is long enough to be a unit', '- the second rule', '', 'Tail short', ''].join('\n');
+  const blocks = extractMarkdownConservationUnits(md).filter((u) => u.unitKind !== 'heading');
+  assert.deepEqual(blocks.map((u) => [u.startLine, u.endLine]), [[3, 5], [7, 12]]);
+  const covered = new Set(extractMarkdownConservationUnits(md).flatMap((u) => Array.from({ length: u.endLine - u.startLine + 1 }, (_, i) => u.startLine + i)));
+  md.split('\n').forEach((text, i) => { if (text.trim()) assert.ok(covered.has(i + 1), `line ${i + 1}`); });
+});

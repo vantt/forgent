@@ -526,8 +526,9 @@ export function extractMarkdownConservationUnits(content) {
   let headingCount = 0;
 
   // A block shorter than 20 non-space characters without a normative keyword is not a unit of its
-  // own: it is merged into the previous block of the same section (or the next one when it comes
-  // first), so no non-blank line of the source is outside every unit. It becomes its own unit only
+  // own: a label ending in a colon is merged into the block it introduces (the next one of the
+  // section), any other short block into the previous block of the section (or the next one when
+  // it comes first), so no non-blank line of the source is outside every unit. It becomes its own unit only
   // when its section has no other block.
   function flushUnheaded(endLine) {
     const raw = unheaded.join('\n').trim();
@@ -588,9 +589,11 @@ export function extractMarkdownConservationUnits(content) {
   const kept = [];
   for (const b of blocks) {
     if (!b.short) { kept.push(b); continue; }
+    const label = /:\s*$/.test(lines.slice(b.startLine - 1, b.endLine).join('\n').trim());
+    const next = blocks.find((k) => k.section === b.section && !k.short && k.originalStart > b.endLine);
+    if (label && next) { next.startLine = Math.min(next.startLine, b.startLine); continue; }
     const previous = [...kept].reverse().find((k) => k.section === b.section);
     if (previous) { previous.endLine = b.endLine; continue; }
-    const next = blocks.find((k) => k.section === b.section && !k.short && k.originalStart > b.endLine);
     if (next) { next.startLine = Math.min(next.startLine, b.startLine); continue; }
     kept.push(b);
   }
