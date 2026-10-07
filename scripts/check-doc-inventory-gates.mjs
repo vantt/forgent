@@ -222,7 +222,8 @@ export function buildTargetAnchorLookup(repoRoot, commitSha) {
     let anchors = null;
     try {
       const content = readBlobAtCommit(commitSha, owner, repoRoot);
-      anchors = new Set(extractMarkdownConservationUnits(content).flatMap((u) => [u.anchor, u.githubAnchor, u.stableAnchor]).filter(Boolean));
+      const units = owner.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(owner, content);
+      anchors = new Set(units.flatMap((u) => [u.anchor, u.githubAnchor, u.stableAnchor]).filter(Boolean));
     } catch { anchors = null; }
     cache.set(owner, anchors);
     return anchors;
@@ -240,7 +241,9 @@ export function buildTargetUnitDigestLookup(repoRoot, commitSha) {
       let byAnchor = null;
       try {
         byAnchor = new Map();
-        for (const u of extractMarkdownConservationUnits(readBlobAtCommit(commitSha, owner, repoRoot))) for (const a of [u.anchor, u.githubAnchor, u.stableAnchor]) if (a && !byAnchor.has(a)) byAnchor.set(a, u.textDigest);
+        const content = readBlobAtCommit(commitSha, owner, repoRoot);
+        const units = owner.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(owner, content);
+        for (const u of units) for (const a of [u.anchor, u.githubAnchor, u.stableAnchor]) if (a && !byAnchor.has(a)) byAnchor.set(a, u.textDigest);
       } catch { byAnchor = null; }
       cache.set(owner, byAnchor);
     }
@@ -518,7 +521,7 @@ export function loadDecisionShards(target) {
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
     }
-    for (const field of ['sources', 'claims', ...['files', 'registryGaps'].filter((field) => field in shard)]) {
+    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors'].filter((field) => field in shard)]) {
       if (!Array.isArray(shard[field])) throw new Error(`decision shard ${file}: "${field}" must be an array`);
     }
     return shard;
@@ -528,7 +531,10 @@ export function loadDecisionShards(target) {
 /** Owners decided by the shards that are promoted or candidate platform documents of the inventory. */
 export function decidedPlatformOwners(inventory, shards) {
   const platform = new Set((inventory.items || []).filter((i) => ['promoted', 'candidate'].includes(i.authorityStatus) && typeof i.path === 'string' && i.path.startsWith('docs/platform/')).map((i) => i.path));
-  return new Set((shards || []).flatMap((shard) => shard.claims || []).map((d) => d?.targetOwner).filter((owner) => platform.has(owner)));
+  return new Set((shards || []).flatMap((shard) => [
+    ...(shard.claims || []).map((d) => d?.targetOwner),
+    ...(shard.mirrors || []).map((mirror) => mirror?.target),
+  ]).filter((owner) => platform.has(owner)));
 }
 
 export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, targetUnitDigestOf = null, registry = null } = {}) {
@@ -544,10 +550,45 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
   const decidedGaps = new Set();
   const decidedFiles = new Set();
   const fail = (type, message, extra = {}) => findings.push({ type, message, ...extra });
+  const itemIndex = new Map(items.map((item) => [item.path, item]));
+  const rowsBySource = new Map();
+  for (const row of claimLedger) {
+    const rows = rowsBySource.get(row.sourcePath) || [];
+    rows.push(row);
+    rowsBySource.set(row.sourcePath, rows);
+  }
 
   for (const shard of shards || []) {
     const sources = new Set(shard.sources || []);
-    for (const d of shard.claims || []) {
+    const mirrorClaims = [];
+    const mirrorFiles = [];
+    for (const mirror of shard.mirrors || []) {
+      const source = itemIndex.get(mirror?.path);
+      const target = itemIndex.get(mirror?.target);
+      const sourceRows = rowsBySource.get(mirror?.path) || [];
+      const targetRows = rowsBySource.get(mirror?.target) || [];
+      const areaRoot = String(mirror?.path || '').replace(/^docs\/architect\//, 'docs/platform/').split('/verification/')[0];
+      if (!source || !target || !sources.has(mirror.path) ||
+          !mirror.path.startsWith('docs/architect/') || !isEvidenceMirrorPath(mirror.path) ||
+          !mirror.target.startsWith(`${areaRoot}/verification/`) || !isEvidenceMirrorPath(mirror.target) ||
+          !/^[0-9a-f]{40}$/.test(mirror.blobSha || '') ||
+          source.blobSha !== mirror.blobSha || target.blobSha !== mirror.blobSha ||
+          sourceRows.length === 0 || sourceRows.some((row) => !targetRows.some((other) => other.sourceAnchor === row.sourceAnchor && other.sourceUnitDigest === row.sourceUnitDigest))) {
+        fail('decision-mirror-invalid', `shard ${shard.shard}: mirror ${mirror?.path} -> ${mirror?.target} is not a pinned byte-identical evidence copy with all source units`, { path: mirror?.path });
+        continue;
+      }
+      const rationale = `The evidence copy at ${mirror.target} has the identical pinned blob ${mirror.blobSha}; it carries every source unit.`;
+      for (const row of sourceRows) mirrorClaims.push({
+        claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest,
+        targetOwner: mirror.target, targetAnchor: row.sourceAnchor, targetUnitDigest: row.sourceUnitDigest,
+        claimKind: row.claimKind, disposition: 'delete-as-duplicate', reviewStatus: 'reviewed',
+        authoredBy: 'script:propose-doc-decisions', reviewedBy: 'script:check-doc-inventory-gates',
+        reviewedAt: String(inventory.generatedAt || '').slice(0, 10), rationale,
+        searched: [`blob:${mirror.blobSha}`, mirror.path, mirror.target],
+      });
+      mirrorFiles.push({ path: mirror.path, disposition: 'delete-as-duplicate', rationale, targets: [mirror.target] });
+    }
+    for (const d of [...mirrorClaims, ...(shard.claims || [])]) {
       const id = d?.claimId;
       const idx = claimIndex.get(id);
       if (idx === undefined) { fail('decision-claim-unknown', `shard ${shard.shard}: claim ${id} is not in the claim ledger`); continue; }
@@ -587,7 +628,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (d.disposition !== 'partial-carry' && d.disposition !== 'unknown-blocking' && !String(d.disposition).startsWith('delete-') && LOSS_LANGUAGE.test(String(d.rationale || '')) && !nonEmpty(d.remainder)) fail('decision-loss-without-partial-carry', `claim ${id}: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not ${d.disposition}`, at);
 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
-      for (const field of ['reviewedBy', 'reviewedAt', 'searched', 'remainder']) if (d[field] !== undefined) merged[field] = d[field];
+      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
       if (gapIdx >= 0 && d.reviewStatus === 'reviewed' && d.disposition !== 'unknown-blocking') gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
@@ -606,7 +647,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (gapRows[idx].sourcePath !== g.sourcePath) fail('decision-gap-invalid', `registry gap ${g.claimId}: sourcePath ${g.sourcePath} is not the registry's ${gapRows[idx].sourcePath}`, at);
       if (g.disposition !== 'unknown-blocking') gapRows[idx] = { ...gapRows[idx], disposition: g.disposition, targetOwner: g.targetOwner ?? null, targetAnchor: g.targetAnchor ?? null, dispositionRationale: g.rationale, ...(g.remainder ? { remainder: g.remainder } : {}) };
     }
-    for (const f of shard.files || []) {
+    for (const f of [...mirrorFiles, ...(shard.files || [])]) {
       if (decidedFiles.has(f?.path)) { fail('decision-file-duplicate', `file ${f?.path} is decided more than once (again in shard ${shard.shard})`, { path: f?.path }); continue; }
       decidedFiles.add(f?.path);
       const idx = items.findIndex((i) => i.path === f?.path);

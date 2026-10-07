@@ -15,6 +15,20 @@
       "items": { "type": "string", "minLength": 1 },
       "description": "Repository-relative paths of the source files this shard decides. Every claim of the shard must belong to one of them."
     },
+    "mirrors": {
+      "type": "array",
+      "description": "Script-proven legacy evidence copies; the gate rechecks both committed blobs and expands every source unit.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "target", "blobSha"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "minLength": 1 },
+          "blobSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+        }
+      }
+    },
     "files": {
       "type": "array",
       "description": "File-level decisions. They replace the inventory item's proposedDisposition, proposedRationale and proposedTargetOwner (the first entry of targets).",

@@ -23,3 +23,24 @@ Impact: GitNexus bound to `/home/vantt/projects/forgentX-phase00-documentation-a
 - D on the frozen Step 0 scratch inventory with the whole pilot directory: exit 0; parsed JSON exactly equal to `/tmp/phase06/gate-baseline.json` (no normalization needed).
 
 No target, extractor, authority status or legacy-root content changed. Tests/code remain subject to the separate committed tooling review. Remaining tools, sensitivity mutations and area maps are UNPROVEN and not complete. The allowed report is the documentation of this repository-only CLI change; CHANGELOG.md is outside the phase's allowed paths and was not changed.
+
+## Evidence mirror entries
+
+Contract: shard version 1 adds `mirrors: [{path, target, blobSha}]`. Both paths must be inventory documents with the same full 40-character pinned blob id; the source must be legacy evidence under `docs/architect/<area>/verification/<collection>/`, listed in shard sources, and the target must be evidence in the same platform area. Every source unit must match a target unit at the same anchor and digest. The existing commit-blob integrity check rechecks inventory blob ids and content on every gate run. Normal claim/file duplicate checks also apply to expanded entries.
+
+Expansion: every source row becomes `delete-as-duplicate`, `reviewed`, with the verified platform copy as owner, the corresponding unit anchor/digest, its own proof rationale and searched paths. Identities are `script:propose-doc-decisions` and `script:check-doc-inventory-gates`. The source file gets the matching disposition. Target rows are not implicitly reviewed. This channel implements Q1 a and Q2b yes, not a permission to hand-write script-reviewed claims.
+
+Existing target lookup functions reuse the frozen mixed-file extractor for non-Markdown payloads, including the `file-block` anchor and digest. Markdown behavior is unchanged. No extractor function was edited. Mirror owners are registered through the same candidate/promoted inventory-owner rule as manual claim owners.
+
+Prior art: `git log -S 'mirrors' -- scripts/check-doc-inventory-gates.mjs` returned no earlier mirror channel; the existing loader, normal claim validation, duplicate validation and committed blob verification were reused. GitNexus upstream calls for applyDecisions, both target lookup functions, loadDecisionShards and decidedPlatformOwners returned UNKNOWN/not-found from the old index. Scoped callsite evidence identifies checkInventory/CLI and the conservation tests. No graph result is claimed as a complete blast-radius certificate.
+
+Verification:
+
+- Red commit `abc229123`: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-mirrors.test.mjs`: 1 pass, 4 fail, proving missing mirror expansion/proof and missing mixed-file target anchor support.
+- After implementation: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-mirrors.test.mjs test/scripts/check-doc-conservation.test.mjs`: 39 pass, 0 fail.
+- Real working-tree smoke: D with both the pilot directory and `/tmp/phase06/mirror-smoke.json`, against the byte-identical `docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md` / platform copy, and `--previous-registry reports/identity-registry.json`: exit 0, 0 fatal findings. An initial smoke caught missing expanded-owner registration; the in-scope fix was verified by the passing smoke. No mirror decision shard is committed during this tooling step.
+- D without the throwaway mirror shard, once per A1 prior-registry path: both exit 0, and both parsed results exactly equal the Step 0 baseline JSON.
+- Full scripts suite at default concurrency: 791 tests, 790 pass, 1 fail. The existing canary-overhead test measured median 509.73 ms against its 250 ms limit. The failed test does not import the changed gate; its threshold and implementation were not edited.
+- Scheduling-isolation run: `env -u CLAUDE_CODE_SESSION_ID node --test --test-concurrency=1 test/scripts/*.test.mjs` (43 paths expanded by Node): 791 pass, 0 fail, 35.63 seconds. This exercises every test without changing the threshold or excluding any path. Concurrency contention is an inference from this comparison, not a proven cause. Logs: `/tmp/phase06/mirror-suite.log`, `/tmp/phase06/mirror-suite-serial.log`.
+
+Full tooling independent review, all later tools and the final mutation run remain UNPROVEN.
