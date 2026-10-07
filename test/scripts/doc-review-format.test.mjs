@@ -44,6 +44,10 @@ test('the public seeded Markdown can be scored without exposing the seed or priv
   const normal = f.run('--pack', 'shard.json', '--inventory', 'inventory.json', '--out', 'review.md');
   assert.equal(normal.status, 0, normal.stderr);
   const seed = 'fixture-private-selection', reviewer = 'reviewer:fixture-session:other@2026-10-07';
+  const collision = f.run('--seed-pack', 'review.md.json', '--out', 'shared.md', '--key', 'shared.md.json', '--seed', seed, '--reviewer', reviewer);
+  assert.equal(collision.status, 1);
+  assert.equal(fs.existsSync(path.join(f.root, 'shared.md')), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'shared.md.json')), false);
   const seeded = f.run('--seed-pack', 'review.md.json', '--out', 'seeded.md', '--key', 'key.json', '--seed', seed, '--reviewer', reviewer);
   assert.equal(seeded.status, 0, seeded.stderr);
   const publicText = fs.readFileSync(path.join(f.root, 'seeded.md'), 'utf8'), key = JSON.parse(fs.readFileSync(path.join(f.root, 'key.json'), 'utf8'));

@@ -3,7 +3,7 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, Markdown diff-pack regression demonstrated
+Step: 1, reviewer-facing Markdown and machine-sidecar flow pass
 State: authoring
 Last green conservation commit: f2e0e4bb3
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit the Markdown regression, render human-readable forward/reverse packs and seeded packs while retaining bound machine sidecars, then prove the actual CLI surface. Investigate old-shape re-review before requesting independent tooling review; no real batch or frozen-rule change.
+Next action: commit the Markdown correction, refresh both prior-registry conservation proofs, then investigate source-proposal sensitivity controls and old-shape re-review before requesting independent tooling review. No real batch or frozen-rule change.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -41,3 +41,4 @@ Restoration/stub corrected evidence: targeted restoration/mirror probes 10/10; f
 Structural mutation evidence: clean fixture 0 findings, all 11 defects rejected by actual scoped strict CLI. Post-restoration dd77ceb4e: 849/849, both D proofs baseline-identical. A3 accounts exactly five pairs; A/B/C/I pass; ratchet 995 files, 24 edits/1 new accounted; placement unchanged; retirement and candidate baseline findings unchanged. Valid-prefix red: actual pack rejects a 16-character source digest allowed by the shard schema; `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-review.test.mjs`: 12 pass/1 fail. Prefix correction and independent review remain UNPROVEN.
 Source-prefix corrected evidence: 13/13 review tests and 850/850 across all 50 scripts test files; actual pack now accepts the same 11-row scratch proposal and retains full source hashes. Shorter and stale prefixes still fail. Gate code and legacy decisions unchanged. Markdown diff output, old-shape re-review and full independent review remain UNPROVEN.
 Diff-pack red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 0 pass/2 fail. Normal --pack writes JSON instead of the required Markdown/unified diff; the seeded CLI cannot consume a machine sidecar. Prefix green f2e0e4bb3: both prior-registry D proofs exit 0 and exactly match baseline. The unmodified old I/O shard is rejected by --pack for missing author/session/committed report evidence; its rebind/re-review flow remains UNPROVEN.
+Diff-pack corrected evidence: full scripts suite 852/852 in 51 files; real CLI fixture pack/seed/score flow passes with 6/6 detected and 0 false flags. Public Markdown/key-sidecar collision protection passes. Actual scratch pack renders full source/target/diff and reverse units, exit 0, with machine sidecar retained for binding. No genuine seeded review is run by this author session. Automatic-proposal sensitivity controls, old-shape re-review and full tooling review remain UNPROVEN.

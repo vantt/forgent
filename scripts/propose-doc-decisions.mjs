@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
@@ -14,8 +15,8 @@ export const HELP = `Usage: node scripts/propose-doc-decisions.mjs <mode> [optio
 Modes:
   --summary                  Report per-area/class counts and unresolved groups.
   --propose                  Propose exact entries and pending weaker rows.
-  --pack <shard>             Full-text forward pack and unmatched reverse units.
-  --seed-pack <pack>         Reviewer-only 30-row sensitivity pack; --key required.
+  --pack <shard>             Markdown full-text/diff pack and reverse units.
+  --seed-pack <pack.json>    Reviewer-only Markdown sensitivity pack; --key required.
   --score-pack <key>         Score the reviewer's markdown --verdicts.
   --apply-review <shard>     Apply independent markdown verdicts to the shard.
   --coverage                 Legacy-source coverage by Source tables and mirrors.
@@ -27,6 +28,9 @@ Modes:
 Committed reports bind Reviewer, Pack commit, Pack id, Seed score and each
 claim's ok verdict/note. Approvals pin their own report commit; existing
 reviewed rows must verify before pack/apply, including earlier rounds.
+Pack modes write Markdown. With --out <pack.md>, a bound <pack.md>.json
+sidecar is also written for --seed-pack and --review-pack. The reviewer
+reads the Markdown, not the machine sidecar. Other modes retain JSON output.
 
 Inputs:
   --inventory <manifest>     Required inventory; units read at its pinned commit.
@@ -450,6 +454,52 @@ export function verifyClaimSnapshot(context, shards, snapshot, options) {
   return { ok, rows: expected.rows.length, sha256: expected.sha256 };
 }
 
+function renderReviewPack(pack) {
+  const escape = (value) => String(typeof value === 'object' ? JSON.stringify(value) : value).replace(/[\\`*_<>[\]!]/g, '\\$&').replace(/\|/g, '\\|').replace(/\r?\n/g, '<br>');
+  const fullText = (unit) => unit ? (unit.sectionText || unit.text) : '';
+  const fenced = (text, language = 'text') => {
+    const runs = text.match(/`{3,}/g) || [];
+    const fence = '`'.repeat(Math.max(3, ...runs.map((run) => run.length + 1)));
+    return `${fence}${language}\n${text}\n${fence}`;
+  };
+  const temporaryRoot = path.join(os.tmpdir(), 'fgos-work');
+  fs.mkdirSync(temporaryRoot, { recursive: true });
+  const temporary = fs.mkdtempSync(path.join(temporaryRoot, 'doc-review-'));
+  const sourceFile = path.join(temporary, 'source'), targetFile = path.join(temporary, 'target');
+  const diff = (row) => {
+    const source = fullText(row.source), target = fullText(row.target);
+    if (source === target) return 'No text difference.';
+    fs.writeFileSync(sourceFile, source); fs.writeFileSync(targetFile, target);
+    let patch;
+    try { patch = execFileSync('git', ['diff', '--no-index', '--no-ext-diff', '--no-textconv', '--text', '--no-color', '--', sourceFile, targetFile], { encoding: 'utf8', stdio: 'pipe', maxBuffer: 32 * 1024 * 1024 }); }
+    catch (error) { if (error.status !== 1 || typeof error.stdout !== 'string') throw error; patch = error.stdout; }
+    const lines = patch.trimEnd().split('\n');
+    const headerEnd = lines.findIndex((line) => line.startsWith('@@ '));
+    for (let i = 0; i < headerEnd; i++) {
+      if (lines[i].startsWith('--- ')) lines[i] = '--- ' + JSON.stringify(`${row.source.path}#${row.source.anchor}`);
+      if (lines[i].startsWith('+++ ')) lines[i] = '+++ ' + (row.target ? JSON.stringify(`${row.target.path}#${row.target.anchor}`) : '/dev/null');
+    }
+    return lines.filter((line, i) => i >= headerEnd || !/^(diff --git |index )/.test(line)).join('\n');
+  };
+  try {
+    const sections = [`# Review pack: ${escape(pack.shard)}`];
+    if (pack.commit) sections.push(`Pack commit: ${pack.commit}\n\nPack id: ${jsonDigest(pack)}`);
+    for (const row of pack.rows) {
+      sections.push(`## ${row.claimId}\n\nSource: ${escape(row.source.path)}#${escape(row.source.anchor)}\n\nTarget: ${row.target ? `${escape(row.target.path)}#${escape(row.target.anchor)}` : 'No target proposed'}`);
+      sections.push('### Proposed decision\n\n| Field | Value |\n|---|---|\n' + Object.entries(row.decision).map(([field, value]) => `| ${escape(field)} | ${escape(value)} |`).join('\n'));
+      sections.push('### Source unit\n\n' + fenced(fullText(row.source)));
+      sections.push('### Target unit\n\n' + fenced(fullText(row.target)));
+      sections.push('### Unified diff\n\n' + fenced(diff(row), 'diff'));
+    }
+    if (pack.unmatchedCandidateUnits) {
+      sections.push('## Unmatched candidate units');
+      for (const { owner, unit } of pack.unmatchedCandidateUnits) sections.push(`### ${escape(owner)}#${escape(unit.anchor)}\n\n` + fenced(fullText(unit)));
+      if (!pack.unmatchedCandidateUnits.length) sections.push('None.');
+    }
+    return sections.join('\n\n') + '\n';
+  } finally { fs.rmSync(temporary, { recursive: true, force: true }); }
+}
+
 export function runCli(argv, cwd = process.cwd()) {
   if (argv.includes('--help')) { console.log(HELP); return 0; }
   const booleanModes = ['--summary', '--propose', '--coverage', '--snapshot'];
@@ -481,7 +531,7 @@ export function runCli(argv, cwd = process.cwd()) {
       const key = jsonInput('--score-pack');
       result = scoreReviewPack(key, parseReviewVerdicts(fs.readFileSync(resolve('--verdicts'), 'utf8'), key.reviewer));
     } else if (modes[0] === '--seed-pack') {
-      if (!values.has('--out') || resolve('--out') === resolve('--key')) throw new Error('--seed-pack requires distinct --out and --key');
+      if (!values.has('--out') || [resolve('--out'), resolve('--out') + '.json'].includes(resolve('--key'))) throw new Error('--seed-pack requires distinct --out, sidecar and --key');
       const seeded = seedReviewPack(jsonInput('--seed-pack'), { seed: values.get('--seed'), reviewer: values.get('--reviewer') });
       fs.writeFileSync(resolve('--key'), JSON.stringify(seeded.key, null, 2) + '\n');
       result = seeded.pack;
@@ -525,8 +575,13 @@ export function runCli(argv, cwd = process.cwd()) {
       }
     }
     const json = JSON.stringify(result, null, 2) + '\n';
-    if (values.has('--out')) fs.writeFileSync(path.resolve(cwd, values.get('--out')), json);
-    else console.log(json.trimEnd());
+    const reviewMode = modes[0] === '--pack' || modes[0] === '--seed-pack';
+    const output = reviewMode ? renderReviewPack(result) : json;
+    if (values.has('--out')) {
+      const out = path.resolve(cwd, values.get('--out'));
+      fs.writeFileSync(out, output);
+      if (reviewMode) fs.writeFileSync(out + '.json', json);
+    } else console.log(output.trimEnd());
     return (modes[0] === '--score-pack' && !result.pass) || (modes[0] === '--verify' && !result.ok) ? 1 : 0;
   } catch (err) { console.error(`propose-doc-decisions: ${err.message}`); return 1; }
 }

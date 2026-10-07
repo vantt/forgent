@@ -201,3 +201,15 @@ Red abba648f6: the review test suite has 12 pass/1 fail; an actual CLI pack reje
 
 Verification: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-review.test.mjs` has 13/13 passing tests; all 50 scripts test files have 850/850. The actual scratch proposal pack accepts all 11 pending rows with 16-character source prefixes and full 64-character source bindings (exit 0). No gate invariant, previous-registry loader or legacy decision record changes.
 
+## Human-readable diff artifacts
+
+Red 25529054c: 0 pass/2 fail. The initial JSON-only pack interface above is superseded. Normal and seeded pack modes now write Markdown: full source/target text, proposed-decision table and a Git unified diff per row; the normal pack also shows unmatched reverse units. Nested code fences are enclosed safely. The bound JSON representation stays unchanged and is written to `<out>.json` beside a named Markdown output. Seed scoring and review application read that machine sidecar; reviewers read the Markdown.
+
+```sh
+node scripts/propose-doc-decisions.mjs --pack <shard.json> --inventory <inventory.json> --out <pack.md>
+node scripts/propose-doc-decisions.mjs --seed-pack <pack.md.json> --reviewer <reviewer> --seed <private-seed> --out <seeded.md> --key <private-key.json>
+node scripts/propose-doc-decisions.mjs --apply-review <shard.json> --inventory <inventory.json> --reviewer <reviewer> --verdicts <committed-report.md> --review-pack <pack.md.json> --seed-key <private-key.json> --seed-verdicts <seed-verdicts.md>
+```
+
+Verification: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs` exercises the real CLI in isolated committed fixtures: readable numeric difference, nested source code fences, public seeded Markdown, private-key/sidecar collision rejection before any output write, and 6/6 caught with 0 false flags. All 51 scripts test files: 852/852. Actual working-tree-source scratch pack: exit 0, 11 pending rows and a reverse section; observed Markdown and full-hash machine sidecar. No real reviewer or approval is claimed. JSON output of other modes and both source/target unit hash definitions remain unchanged.
+
