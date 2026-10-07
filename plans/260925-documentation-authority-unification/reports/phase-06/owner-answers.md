@@ -16,3 +16,7 @@ N2 executor may author the next batch while one waits for review: no (Lead-decid
 Plan B rule: right before work on `docs/specs/distribution.md`, `docs/specs/system-overview.md` or `docs/platform/component-boundary.md`, re-check the source digests and redo the affected rows if Plan B landed in the meantime.
 Review sessions: started by the owner; reviewer identity format: reviewer:<model>-session:<id>@<date>
 Authored/reviewed separation (authoredBy gate check, review report per batch): decided 2026-10-07, yes
+
+## Command amendments
+
+A1 (2026-10-07, Lead-decided under the owner's standing rule; owner informed): checks D and E keep their scratch `--identity-registry` and add the existing `--previous-registry` flag, run twice per check: once with `--previous-registry plans/260925-documentation-authority-unification/reports/identity-registry.json` (the registry committed at HEAD) and once with `--previous-registry plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json` (the sealed first generation). Both runs must pass for the check to pass, so both conservation obligations stay in force. Invocation-only: `loadPreviousRegistries` and the meaning of a missing conservation input are not changed, and the alternative loader fix is not authorized. Evidence: `reports/phase-06/strict-registry-blocker.md`.
