@@ -43,12 +43,23 @@ import { normalizePosix } from './generate-shipped-path-inventory.mjs';
 
 export const LEGACY_ROOTS = ['docs/specs/', 'docs/architect/'];
 export const DEFAULT_CONFLICT_RESOLUTIONS_PATH = path.posix.join(path.posix.dirname(DEFAULT_CONSTITUTION_PATH), 'ledger/conflict-resolutions.json');
+export const DEFAULT_RETIRING_ROOTS_PATH = path.posix.join(path.posix.dirname(DEFAULT_CONSTITUTION_PATH), 'ledger/retiring-roots.json');
 // Consumers under these prefixes are history or evidence, not authority readers.
 const NON_AUTHORITY_CONSUMER_PREFIXES = ['docs/history/', 'archive/', 'plans/', '.fgos/'];
 
 const isLegacyPath = (p) => typeof p === 'string' && LEGACY_ROOTS.some((root) => p.startsWith(root));
 const isHistoryConsumer = (p) => typeof p === 'string' && NON_AUTHORITY_CONSUMER_PREFIXES.some((prefix) => p.startsWith(prefix));
-const isAuthorityConsumer = (p) => typeof p === 'string' && !isLegacyPath(p) && !isHistoryConsumer(p);
+const isAuthorityConsumer = (p, isRetiring = isLegacyPath) => typeof p === 'string' && !isRetiring(p) && !isHistoryConsumer(p);
+
+function retiringPathPredicate(data = null) {
+  if (data === null) return isLegacyPath;
+  if (data?.version !== 1 || !Array.isArray(data.documents) || Object.keys(data).some((key) => !['version', 'documents'].includes(key)) ||
+      data.documents.some((file) => typeof file !== 'string' || path.posix.normalize(file) !== file || !/^docs\/.+\.[a-z0-9]+$/.test(file) || file.startsWith('docs/platform/') || file === 'docs/decisions/index.md')) {
+    throw new Error('retiring document data must name exact docs files, never directory roots, candidates, instruction files or the kept decision projection');
+  }
+  const documents = new Set(data.documents);
+  return (file) => isLegacyPath(file) || documents.has(file);
+}
 
 const pass = (measure) => ({ status: 'pass', measure });
 const blocked = (measure) => ({ status: 'blocked', measure });
@@ -60,23 +71,25 @@ const openCount = (open, type) => open.find((o) => o.type === type)?.count ?? 0;
  * path and that no bare-path alias resolves. An alias recorded for one anchor
  * covers only references to that anchor, not the document.
  */
-export function uncoveredHistoryReferences(inventory, aliasTable) {
+export function uncoveredHistoryReferences(inventory, aliasTable, retiringRoots = null) {
+  const isRetiring = retiringPathPredicate(retiringRoots);
   const aliased = new Set((aliasTable?.entries || []).map((e) => e.fromPath).filter((from) => typeof from === 'string' && !from.includes('#')));
   const targets = new Set();
-  for (const edge of inventory?.consumerEdges || []) if (isLegacyPath(edge?.targetPath) && isHistoryConsumer(edge?.path)) targets.add(edge.targetPath);
+  for (const edge of inventory?.consumerEdges || []) if (isRetiring(edge?.targetPath) && isHistoryConsumer(edge?.path)) targets.add(edge.targetPath);
   return { targets: targets.size, uncovered: [...targets].filter((t) => !aliased.has(t)).sort() };
 }
 
 /** Consumer edges that read a legacy path from outside the legacy roots and outside history, by consumer kind. */
-export function unrewrittenConsumerEdges(inventory) {
+export function unrewrittenConsumerEdges(inventory, retiringRoots = null) {
+  const isRetiring = retiringPathPredicate(retiringRoots);
   const byKind = {};
   let total = 0;
   for (const edge of inventory?.consumerEdges || []) {
-    if (!isLegacyPath(edge?.targetPath) || !isAuthorityConsumer(edge?.path)) continue;
+    if (!isRetiring(edge?.targetPath) || !isAuthorityConsumer(edge?.path, isRetiring)) continue;
     byKind[edge.kind] = (byKind[edge.kind] || 0) + 1;
     total += 1;
   }
-  const unresolvedDynamic = (inventory?.consumerEdges || []).filter((e) => e?.identityStatus === 'unresolved-dynamic-pattern' && isAuthorityConsumer(e?.path)).length;
+  const unresolvedDynamic = (inventory?.consumerEdges || []).filter((e) => e?.identityStatus === 'unresolved-dynamic-pattern' && isAuthorityConsumer(e?.path, isRetiring)).length;
   return { total, byKind, unresolvedDynamic };
 }
 
@@ -124,13 +137,13 @@ const EVALUATORS = {
   'claims-reviewed': ({ conservation }) => verdict(openCount(conservation.open, 'claims-not-reviewed'), 'claim rows whose reviewStatus is not reviewed'),
   'owner-per-claim': ({ conservation, cutoverRows }) => verdict(conservation.invariant.filter((f) => /^retained-claim-/.test(f.type)).length + (cutoverRows.byReason['retained-without-owner'] || 0) + (cutoverRows.byReason['unknown-blocking'] || 0) + (cutoverRows.byReason['partial-carry'] || 0), 'owner violations of retained rows, retained rows without an owner and unknown-blocking rows'),
   'dropped-claims-resolved': ({ conservation }) => verdict(openCount(conservation.open, 'dropped-claims-unreviewed'), 'dropped-claims register entries without a reviewed disposition'),
-  'aliases-cover-immutable-refs': ({ inventory, aliasTable, aliasFindings }) => {
+  'aliases-cover-immutable-refs': ({ inventory, aliasTable, aliasFindings, retiringRoots }) => {
     if (aliasFindings.length > 0) return blocked(`alias table invalid: ${aliasFindings.length} finding(s)`);
-    const { targets, uncovered } = uncoveredHistoryReferences(inventory, aliasTable);
+    const { targets, uncovered } = uncoveredHistoryReferences(inventory, aliasTable, retiringRoots);
     return uncovered.length === 0 ? pass(`all ${targets} legacy paths that history reads by path resolve through the alias table`) : blocked(`${uncovered.length} of ${targets} legacy paths that history reads by path have no bare-path alias (alias table holds ${(aliasTable?.entries || []).length} entries)`);
   },
-  'consumers-rewritten': ({ inventory }) => {
-    const { total, byKind, unresolvedDynamic } = unrewrittenConsumerEdges(inventory);
+  'consumers-rewritten': ({ inventory, retiringRoots }) => {
+    const { total, byKind, unresolvedDynamic } = unrewrittenConsumerEdges(inventory, retiringRoots);
     return verdict(total, `consumer edges read a legacy path from outside the legacy roots and history (upper bound, not yet proven non-authority; by kind ${JSON.stringify(byKind)}; ${unresolvedDynamic} unresolved dynamic patterns from authority consumers are not counted)`);
   },
   'evidence-digests': () => blocked('no evidence relocation manifest and no verifier exist; this dry run does not execute one'),
@@ -218,6 +231,8 @@ function gatherInputs({ repoRoot, argv, cwd }) {
   const reviewRecords = reviewIdx >= 0 ? loadJson(path.resolve(cwd, argv[reviewIdx + 1])) : {};
   const conflictPath = option('--conflict-resolutions', DEFAULT_CONFLICT_RESOLUTIONS_PATH);
   const conflictResolutions = argv.includes('--conflict-resolutions') || fs.existsSync(conflictPath) ? loadJson(conflictPath) : null;
+  const retiringPath = option('--retiring-roots', DEFAULT_RETIRING_ROOTS_PATH);
+  const retiringRoots = argv.includes('--retiring-roots') || fs.existsSync(retiringPath) ? loadJson(retiringPath) : null;
   const inventory = loadInventory(inventoryPath, { inventoryPath, identityRegistryPath, cwd });
   const registryBytes = fs.readFileSync(identityRegistryPath);
   const registry = JSON.parse(registryBytes.toString('utf8'));
@@ -245,6 +260,7 @@ function gatherInputs({ repoRoot, argv, cwd }) {
     candidateStatus: checkCandidateMetadata({ files, readFile, switchboard, constitution, repoRoot }),
     reviewRecords,
     conflictResolutions,
+    retiringRoots,
     constitution,
   };
 }
