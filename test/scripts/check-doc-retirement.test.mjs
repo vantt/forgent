@@ -190,3 +190,36 @@ test('cli: an unreadable inventory is fatal and names the regenerate command', (
     assert.match(errors.join('\n'), /generate-doc-inventory\.mjs --refresh --commit/);
   } finally { console.error = original; fs.rmSync(dir, { recursive: true, force: true }); }
 });
+
+const duplicateKey = 'a'.repeat(40);
+const conflictInventory = {
+  duplicateContentGroups: [{ blobSha: duplicateKey, paths: ['docs/specs/a.md', 'docs/platform/a.md'] }],
+  semanticConflictGroups: [{ key: 'runner:contract', paths: ['docs/specs/a.md', 'docs/specs/b.md'] }],
+};
+const resolution = (kind, key) => ({ kind, key, resolution: 'One maintained owner carries the contract.', rule: 'Other sources retain no maintained authority.', evidence: ['reports/owner-review.md'] });
+
+test('recorded duplicate and semantic resolutions close only their named conflict groups', () => {
+  const records = { version: 1, groups: [resolution('duplicate', duplicateKey), resolution('semantic', 'runner:contract')] };
+  assert.deepEqual(openConflictGroups(conflictInventory, records), { duplicates: 0, mirrors: 0, semantic: 0 });
+  const more = { duplicateContentGroups: [...conflictInventory.duplicateContentGroups, { blobSha: 'b'.repeat(40), paths: ['docs/specs/c.md', 'docs/platform/c.md'] }], semanticConflictGroups: [...conflictInventory.semanticConflictGroups, { key: 'runner:state', paths: ['docs/specs/c.md', 'docs/specs/d.md'] }] };
+  assert.deepEqual(openConflictGroups(more, records), { duplicates: 1, mirrors: 0, semantic: 1 });
+});
+
+test('the retirement acceptance gate consumes conflict decisions without removing any remaining conflict', () => {
+  const inputs = { ...cleanInputs(), inventory: conflictInventory, conflictResolutions: { version: 1, groups: [resolution('duplicate', duplicateKey)] } };
+  assert.equal(evaluateRetirement(inputs, constitution).find((result) => result.id === 'no-unresolved-conflicts').status, 'blocked');
+  inputs.conflictResolutions.groups.push(resolution('semantic', 'runner:contract'));
+  assert.equal(evaluateRetirement(inputs, constitution).find((result) => result.id === 'no-unresolved-conflicts').status, 'pass');
+});
+
+test('malformed, stale and duplicate conflict decisions fail instead of granting closure', () => {
+  const valid = resolution('duplicate', duplicateKey);
+  const invalid = [
+    { version: 2, groups: [valid] },
+    { version: 1, groups: {} },
+    ...[{ ...valid, kind: 'other' }, { ...valid, key: 'c'.repeat(40) }, { ...valid, resolution: '' }, { ...valid, rule: '' }, { ...valid, evidence: [] }, { ...valid, evidence: [''] }].map((entry) => ({ version: 1, groups: [entry] })),
+    { version: 1, groups: [valid, valid] },
+  ];
+  for (const records of invalid) assert.throws(() => openConflictGroups(conflictInventory, records), /conflict resolution/i);
+  assert.deepEqual(openConflictGroups(conflictInventory), { duplicates: 1, mirrors: 0, semantic: 1 });
+});
