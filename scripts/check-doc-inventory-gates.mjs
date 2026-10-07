@@ -592,19 +592,29 @@ export function buildCommittedReviewReportLookup(repoRoot, commitSha) {
   };
 }
 
+export function reviewReportAuthor(report) {
+  const author = typeof report === 'string' ? report.match(/^Author session:\s*(.+)$/mi)?.[1].trim() : null;
+  return /^[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(author || '') && !/^(script:|reviewer:)/.test(author) ? author : null;
+}
+
 export function validateManualReview(row, shard, reportOf) {
   const findings = [];
   const fail = (type, message) => findings.push({ type, message: `claim ${row.claimId}: ${message}` });
   if ([row.authoredBy, row.reviewedBy].some((identity) => typeof identity === 'string' && identity.startsWith('script:'))) fail('decision-script-identity', 'manual rows cannot use script identities');
   if (row.reviewStatus !== 'reviewed') return findings;
-  if (!nonEmpty(row.authoredBy)) fail('decision-authored-by-missing', 'a reviewed manual row needs authoredBy');
-  if (!nonEmpty(shard.authorSession)) fail('decision-author-session-missing', 'a reviewed manual row needs its shard authorSession');
-  if ([row.authoredBy, shard.authorSession].some((author) => nonEmpty(author) && reviewSessionIdentity(author) === reviewSessionIdentity(row.reviewedBy))) fail('decision-self-review', 'reviewer and author must be different sessions, regardless of date or prefix');
   const report = reportOf(row.reviewReport, row.reviewReportCommit);
+  const legacy = shard.authorshipRequired !== true;
+  const reportAuthor = legacy ? reviewReportAuthor(report) : null;
+  const author = row.authoredBy || reportAuthor;
+  const shardAuthor = shard.authorSession || reportAuthor;
+  if (!nonEmpty(author)) fail('decision-authored-by-missing', 'a reviewed manual row needs authoredBy or committed legacy review-author provenance');
+  if (!nonEmpty(shardAuthor)) fail('decision-author-session-missing', 'a reviewed manual row needs its shard or committed legacy review author');
+  if ([author, shardAuthor].some((identity) => nonEmpty(identity) && reviewSessionIdentity(identity) === reviewSessionIdentity(row.reviewedBy))) fail('decision-self-review', 'reviewer and author must be different sessions, regardless of date or prefix');
   const header = (name) => typeof report === 'string' ? report.match(new RegExp(`^${name}:\\s*(.+)$`, 'mi'))?.[1].trim() : null;
   const bound = typeof report === 'string' &&
     /^reviewer:[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(row.reviewedBy || '') &&
     header('Reviewer') === row.reviewedBy &&
+    (!legacy || nonEmpty(row.authoredBy) || (reportAuthor && (!shard.authorSession || reportAuthor === shard.authorSession))) &&
     /^[0-9a-f]{40}$/.test(row.reviewPackCommit || '') && header('Pack commit') === row.reviewPackCommit &&
     /^[0-9a-f]{64}$/.test(row.reviewPackId || '') && header('Pack id') === row.reviewPackId &&
     /^[0-9a-f]{64}$/.test(row.seedScoreId || '') && header('Seed score') === row.seedScoreId &&

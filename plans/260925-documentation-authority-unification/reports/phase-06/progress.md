@@ -3,9 +3,9 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, old-shape review author regression demonstrated
-State: authoring
-Last green conservation commit: 26ba5c82c
+Step: 1, final tooling compatibility verified
+State: preparing full independent tooling review
+Last green conservation commit: 26ba5c82c; working-tree compatibility proofs pass against both priors
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit the old-shape regression, bind an explicitly declared current review author in the pack and committed report while leaving legacy row authorship fields absent and the shard flag off. Keep new-shard author requirements and self-review/report gates unchanged; then request independent tooling review.
+Next action: commit the verified legacy review compatibility fix, finalize the full tooling review request and prerequisite proofs, then stop for the owner-started independent reviewer. Review brief, area maps/routes and baseline counts follow the committed tooling verdict; no real batch starts beforehand.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -45,3 +45,5 @@ Diff-pack corrected evidence: full scripts suite 852/852 in 51 files; real CLI f
 Sensitivity-control red: actual isolated --propose -> --pack -> --seed-pack flow fails with insufficient eligible rows for swapped-number after valid exact carries are removed from the pending-only pack. `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 2 pass/1 fail. Both prior-registry D proofs after eff2f6557 exit 0 and remain baseline-identical. No genuine seed selection is made on repository source rows.
 Sensitivity controls corrected: 854/854 across 51 scripts test files; automatic fixture proposals seed successfully using re-proven exact units without reopening accepted decisions. Poisoned exact proofs and invented controls fail closed. Actual committed modern CLI accepts 61 fixture rows, rejects uncommitted reports, and then accepts a one-row rationale rework using 60 unchanged controls while preserving earlier report pins and 0 unchanged-overlay findings. Legacy compatibility and full tooling review remain UNPROVEN.
 Old-shape red: isolated CLI accepts --author but ignores it for a legacy pack; seed then rejects missing identities. `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 3 pass/1 fail. The frozen legacy format stays untouched; author provenance must reside in the new review artifacts, not be fabricated into old rows. Both prior-registry D proofs at 26ba5c82c pass and exactly match baseline. Compatibility and full review remain UNPROVEN.
+Legacy compatibility green: 26/26 targeted and 855/855 scripts tests. Explicit current review author is bound in legacy pack/report without adding historical row authorship or enabling the legacy shard flag. Actual old I/O scratch clone renders 41 rows and keeps the old shape; repository rows are not seeded or approved.
+Complete suite: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered files>`; existing runner environment, checkout-local Cargo/host artifacts. Exit 0: 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo behavior remains UNPROVEN. Both current D runs exit 0 and produce baseline-identical JSON. Portable strict structural fixture: clean zero findings; all 11 defects rejected against both previous registries.

@@ -5,7 +5,7 @@ import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, loadDecisionShards, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, loadDecisionShards, reviewReportAuthor, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -28,6 +28,10 @@ Modes:
 Committed reports bind Reviewer, Pack commit, Pack id, Seed score and each
 claim's ok verdict/note. Approvals pin their own report commit; existing
 reviewed rows must verify before pack/apply, including earlier rounds.
+Legacy shards keep their original shape. Their --pack requires an explicit
+--author codex-session:<id>@<date>; the committed report must repeat that
+identity in an Author session header. This records the current review author,
+not invented historical authorship. New shards retain mandatory row authorship.
 Pack modes write Markdown. With --out <pack.md>, a bound <pack.md>.json
 sidecar is also written for --seed-pack and --review-pack. The reviewer
 reads the Markdown, not the machine sidecar. Other modes retain JSON output.
@@ -38,7 +42,7 @@ Inputs:
   --source <path>            Source document for --propose.
   --target <path>            Counterpart document for --propose.
   --shard <name>             Required proposed shard identity (version stays 1).
-  --author <identity>        Required author for pending rows; not a script identity.
+  --author <identity>        Proposal author; explicit current author for legacy packs.
   --out <path>               Write JSON to this path; otherwise print JSON.
   --reviewer <identity>      reviewer:<model>-session:<id>@<date>; independent.
   --verdicts <report.md>     Reviewer header and claimId/verdict/note table.
@@ -191,8 +195,12 @@ function requireVerifiedShard(context, shard) {
   }
 }
 
-export function buildReviewPack(context, shard) {
+export function buildReviewPack(context, shard, { author = shard.authorSession } = {}) {
   requireVerifiedShard(context, shard);
+  const legacy = shard.authorshipRequired !== true;
+  if (legacy && !reviewReportAuthor('Author session: ' + author)) throw new Error('old-shape pack requires a typed --author review identity');
+  if (!legacy && author !== shard.authorSession) throw new Error('pack author differs from the shard authorSession');
+  const reportOf = context.repoRoot ? buildCommittedReviewReportLookup(context.repoRoot, context.inventory.commit) : () => null;
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const targets = new Set();
   const named = new Set();
@@ -204,7 +212,8 @@ export function buildReviewPack(context, shard) {
     const targetUnit = decision.targetOwner ? (context.unitsOf(decision.targetOwner) || []).find((unit) => unit.anchor === decision.targetAnchor) : null;
     if (decision.targetOwner && !targetUnit) throw new Error(`missing target unit ${decision.claimId}`);
     if (targetUnit) { targets.add(decision.targetOwner); named.add(`${decision.targetOwner}#${targetUnit.anchor}`); }
-    return { claimId: decision.claimId, sourceUnitDigest: source.sourceUnitDigest, targetUnitDigest: targetUnit?.textDigest ?? null, decision: { ...decision }, source: { path: source.sourcePath, ...sourceUnit }, target: targetUnit ? { path: decision.targetOwner, ...targetUnit } : null };
+    const reviewAuthor = decision.authoredBy || (legacy ? (decision.reviewStatus === 'reviewed' ? reviewReportAuthor(reportOf(decision.reviewReport, decision.reviewReportCommit)) : author) : null);
+    return { claimId: decision.claimId, sourceUnitDigest: source.sourceUnitDigest, targetUnitDigest: targetUnit?.textDigest ?? null, reviewAuthor, decision: { ...decision }, source: { path: source.sourcePath, ...sourceUnit }, target: targetUnit ? { path: decision.targetOwner, ...targetUnit } : null };
   };
   const rows = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed').map(reviewRow);
   const sensitivityControls = (shard.claims || []).filter((row) => row.reviewStatus === 'reviewed').map(reviewRow).filter((row) => row.target && typeof row.decision.targetUnitDigest === 'string' && row.decision.targetUnitDigest.length >= 16 && row.target.textDigest.startsWith(row.decision.targetUnitDigest) && JSON.stringify(row.decision.targetAncestry) === JSON.stringify(row.target.ancestry));
@@ -241,7 +250,7 @@ export function buildReviewPack(context, shard) {
   }
   const unmatchedCandidateUnits = [];
   for (const owner of [...targets].sort()) for (const unit of context.unitsOf(owner) || []) if (!named.has(`${owner}#${unit.anchor}`)) unmatchedCandidateUnits.push({ owner, unit });
-  return { version: 1, commit: context.inventory.commit, shard: shard.shard, authorSession: shard.authorSession, rows, sensitivityControls, unmatchedCandidateUnits };
+  return { version: 1, commit: context.inventory.commit, shard: shard.shard, authorSession: author, authorshipRequired: !legacy, rows, sensitivityControls, unmatchedCandidateUnits };
 }
 
 function shuffle(rows, seed) {
@@ -261,7 +270,7 @@ function jsonDigest(value) {
 
 export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession, nonce = randomBytes(32).toString('hex') }) {
   const batchRows = [...pack.rows, ...(pack.sensitivityControls || [])];
-  if (!seed || !independentReviewer(reviewer, authorSession) || batchRows.some((row) => !independentReviewer(reviewer, row.decision.authoredBy))) throw new Error('seed pack requires a seed and an independent reviewer');
+  if (!seed || !independentReviewer(reviewer, authorSession) || batchRows.some((row) => !independentReviewer(reviewer, row.decision.authoredBy || row.reviewAuthor))) throw new Error('seed pack requires a seed and an independent reviewer');
   if (new Set(batchRows.map((row) => row.claimId)).size !== batchRows.length) throw new Error('sensitivity batch contains duplicate claim ids');
   if (!/^[0-9a-f]{64}$/.test(nonce)) throw new Error('seed replay nonce must be 32 secret bytes');
   const secretSeed = seed + ':' + nonce;
@@ -335,11 +344,14 @@ export function parseReviewVerdicts(text, reviewer, binding = null) {
 
 export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, pack, seedProof, reviewedAt = new Date().toISOString().slice(0, 10) }) {
   requireVerifiedShard(context, shard);
-  if (!reportPath || !independentReviewer(reviewer, shard.authorSession)) throw new Error('review application requires a report and an independent reviewer');
+  const legacy = shard.authorshipRequired !== true;
+  const author = shard.authorSession || (legacy ? pack?.authorSession : null);
+  if (!reportPath || !independentReviewer(reviewer, author)) throw new Error('review application requires a report and an independent reviewer');
   const pending = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed');
   const index = indexVerdicts(verdicts, new Set(pending.map((row) => row.claimId)));
   if (!pack || !seedProof?.key || !Array.isArray(seedProof.verdicts)) throw new Error('review application requires a passing sensitivity proof and the shown pack');
   if (pack.commit !== context.inventory.commit || pack.shard !== shard.shard) throw new Error('review pack commit or shard changed');
+  if (pack.authorshipRequired !== !legacy || pack.authorSession !== author) throw new Error('review pack author or authorship scope changed');
   const expectedKey = seedReviewPack(pack, { seed: seedProof.key.seed, nonce: seedProof.key.nonce, reviewer }).key;
   if (JSON.stringify(expectedKey) !== JSON.stringify(seedProof.key)) throw new Error('sensitivity key does not bind this exact review pack and reviewer');
   const score = scoreReviewPack(seedProof.key, seedProof.verdicts);
@@ -348,11 +360,13 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const claims = shard.claims.map((row) => {
     if (row.reviewStatus === 'reviewed') return { ...row };
-    if (!row.authoredBy || !independentReviewer(reviewer, row.authoredBy)) throw new Error(`independent reviewer required for ${row.claimId}`);
+    const rowAuthor = row.authoredBy || (legacy ? author : null);
+    if (!rowAuthor || !independentReviewer(reviewer, rowAuthor)) throw new Error(`independent reviewer required for ${row.claimId}`);
     const source = sourceRows.get(row.claimId);
     if (!source || typeof row.sourceUnitDigest !== 'string' || row.sourceUnitDigest.length < 16 || !source.sourceUnitDigest.startsWith(row.sourceUnitDigest)) throw new Error(`missing or stale source ${row.claimId}`);
     const shown = shownRows.get(row.claimId);
     if (!shown || shown.sourceUnitDigest !== source.sourceUnitDigest || shown.source.path !== source.sourcePath || shown.source.anchor !== source.sourceAnchor) throw new Error(`review pack source binding changed for ${row.claimId}`);
+    if (shown.reviewAuthor !== rowAuthor || shown.decision.authoredBy !== row.authoredBy) throw new Error(`review pack author binding changed for ${row.claimId}`);
     const verdict = index.get(row.claimId);
     const updated = { ...row, reviewStatus: row.disposition === 'unknown-blocking' ? 'blocking' : 'pending', reviewNote: verdict.note };
     delete updated.reviewedBy; delete updated.reviewedAt; delete updated.targetUnitDigest;
@@ -367,14 +381,14 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     }
     return updated;
   });
-  if (jsonDigest(pack.sensitivityControls || []) !== jsonDigest(buildReviewPack(context, shard).sensitivityControls)) throw new Error('review pack sensitivity controls do not match the committed batch proofs');
+  if (jsonDigest(pack.sensitivityControls || []) !== jsonDigest(buildReviewPack(context, shard, { author }).sensitivityControls)) throw new Error('review pack sensitivity controls do not match the committed batch proofs');
   if (context.repoRoot && claims.some((row, i) => row.reviewStatus === 'reviewed' && shard.claims[i].reviewStatus !== 'reviewed')) {
     const reportCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: context.repoRoot, encoding: 'utf8' }).trim();
     const reportOf = buildCommittedReviewReportLookup(context.repoRoot, reportCommit);
     for (let i = 0; i < claims.length; i++) {
       if (claims[i].reviewStatus !== 'reviewed' || shard.claims[i].reviewStatus === 'reviewed') continue;
       claims[i].reviewReportCommit = reportCommit;
-      const findings = validateManualReview(claims[i], shard, reportOf);
+      const findings = validateManualReview(claims[i], legacy ? { ...shard, authorSession: author } : shard, reportOf);
       if (findings.length) throw new Error('review application requires matching committed review evidence: ' + findings.map((finding) => finding.type).join(', '));
     }
   }
@@ -511,6 +525,7 @@ function renderReviewPack(pack) {
   try {
     const sections = [`# Review pack: ${escape(pack.shard)}`];
     if (pack.commit) sections.push(`Pack commit: ${pack.commit}\n\nPack id: ${jsonDigest(pack)}`);
+    if (pack.authorSession) sections.push(`Author session: ${escape(pack.authorSession)}`);
     for (const row of pack.rows) {
       sections.push(`## ${row.claimId}\n\nSource: ${escape(row.source.path)}#${escape(row.source.anchor)}\n\nTarget: ${row.target ? `${escape(row.target.path)}#${escape(row.target.anchor)}` : 'No target proposed'}`);
       sections.push('### Proposed decision\n\n| Field | Value |\n|---|---|\n' + Object.entries(row.decision).map(([field, value]) => `| ${escape(field)} | ${escape(value)} |`).join('\n'));
@@ -573,7 +588,7 @@ export function runCli(argv, cwd = process.cwd()) {
         result = modes.includes('--summary') ? { ...summarizeInventory(context), coverage } : coverage;
       } else if (modes[0] === '--summary') result = summarizeInventory(context);
       else if (modes[0] === '--propose') result = proposeExactDecisions(context, { source: values.get('--source'), target: values.get('--target'), shard: values.get('--shard'), author: values.get('--author') });
-      else if (modes[0] === '--pack') result = buildReviewPack(context, jsonInput('--pack'));
+      else if (modes[0] === '--pack') result = buildReviewPack(context, jsonInput('--pack'), { author: values.get('--author') });
       else if (modes[0] === '--rebind') {
         result = rebindReviewedDecisions(context, jsonInput('--rebind'));
         fs.writeFileSync(resolve('--rebind'), JSON.stringify(result.shard, null, 2) + '\n');

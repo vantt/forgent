@@ -221,3 +221,20 @@ The proposal pack fails closed on a poisoned exact proof. Applying a verdict reb
 
 Verification: 854/854 across 51 scripts test files. Actual isolated modern CLI: 61 units; uncommitted approval rejected (exit 1), committed fixture report accepted (exit 0), subsequent pack accepted, unchanged decision invariants 0. A one-row rationale rework then uses 60 unchanged reviewed controls, seeds/scores successfully, commits a separate fixture-only report, reapplies only that row and preserves the other rows' original report pins; unchanged overlay again has 0 findings. These are synthetic mechanical proofs, not genuine batch approvals. Legacy-row compatibility and full independent tooling review remain UNPROVEN.
 
+## Legacy re-review without fabricated row authorship
+
+Red a10b3dba4: the real isolated CLI regression has 3 pass/1 fail because a declared legacy pack author was ignored. Legacy shards now require an explicit current review author in `--pack --author codex-session:<id>@<date>` and an identical `Author session:` header in the committed review report. This is current re-review provenance, not a claim about the historical row author. The old shard keeps its original shape: no invented `authoredBy`, no added `authorSession`, no enabled `authorshipRequired`. New shards still require their original author identities. Same-session comparison, committed-report binding and sensitivity thresholds remain mandatory.
+
+The reviewer must specifically check this compatibility interpretation against the frozen legacy-shape exception and the new-shard authorship requirements. A missing, malformed, self-reviewing or mismatched report author is not an approval. Existing legacy rows marked reviewed without valid committed review proof remain rejected by pack/apply.
+
+Verification: targeted review/format/authorship tests 26/26; all 51 scripts test files 855/855. The real legacy fixture rejects an uncommitted report, accepts the matching committed independent report, preserves absent legacy author fields, repacks verified rows, and rejects a forged same-session report author. A scratch clone of the actual old I/O shard rebinds and renders 41 rows with explicit current author and unchanged legacy shape; no genuine seed or approval was produced for repository rows.
+
+## Complete suite and structural gate proof
+
+The complete existing test discovery selected 389 files. Command: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered test files>`. Environment uses the existing runner's `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` and checkout-local `CARGO_TARGET_DIR`/`FGOS_HOST_BIN`; no new skip branch or test filter. Result: exit 0; 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo cases are not claimed as proven. Scratch log: `/tmp/phase06/full-suite.log`.
+
+Both invocation-only conservation proofs pass and their complete JSON remains identical to the saved baseline: run the gate once with `reports/identity-registry.json`, once with `reports/phase-02-identity-registry.json`. The previous-registry loader and default gate invariants are unchanged.
+
+Portable structural probe: `node plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs`. It creates an isolated committed fixture, invokes the actual scoped strict CLI against both prior registries, accepts the clean copy with zero findings, and rejects all 11 mutations: removed row, missing anchor, duplicate row, unknown id, missing reviewer, stale source, stale target, self-review, unequal mirror, changed exact digest, restore without anchor. Fixture reports are synthetic proofs, never real batch reviews.
+
+Independent full tooling review remains UNPROVEN. No real batch authoring, first-use vocabulary promotion, area-map freeze, route change, approval or authority cutover has occurred.
