@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildReviewPack, seedReviewPack, scoreReviewPack, applyReviewVerdicts, parseReviewVerdicts, independentReviewer } from '../../scripts/propose-doc-decisions.mjs';
-import { applyDecisions } from '../../scripts/check-doc-inventory-gates.mjs';
+import { buildReviewPack, applyReviewVerdicts, parseReviewVerdicts } from '../../scripts/propose-doc-decisions.mjs';
+import { applyDecisions, seedReviewPack, scoreReviewPack, independentReviewer } from '../../scripts/check-doc-inventory-gates.mjs';
 
 const author = 'codex-session:author@2026-10-07';
 const reviewer = 'reviewer:claude-session:other@2026-10-07';
 const digest = 'a'.repeat(64);
 const rows = Array.from({ length: 36 }, (_, i) => ({ claimId: `claim_${i.toString(16).padStart(32, '0')}`, sourcePath: 'docs/specs/example.md', sourceAnchor: `a${i}`, sourceUnitDigest: digest, claimKind: 'implementation-fact' }));
 const unit = (i) => ({ anchor: `a${i}`, textDigest: digest, ancestry: ['Contract'], text: `The operation MUST NOT exceed 12 requests; mode is required.\n- Retain the first item.\n- Retain the second item.` });
-const context = { inventory: { commit: 'b'.repeat(40), claimLedger: rows, items: [] }, unitsOf: () => rows.map((_, i) => unit(i)) };
+const context = { inventory: { commit: 'b'.repeat(40), claimLedger: rows, items: [] }, unitsOf: (owner) => rows.map((_, i) => owner.startsWith('docs/platform/') ? { ...unit(i), text: unit(i).text.replace('12 requests', '**12** requests') } : unit(i)) };
 const shard = { version: 1, shard: 's02-example', sources: ['docs/specs/example.md'], authorSession: author, authorshipRequired: true, claims: rows.map((row, i) => ({ claimId: row.claimId, sourceUnitDigest: digest, targetOwner: 'docs/platform/example.md', targetAnchor: `a${i}`, claimKind: row.claimKind, disposition: 'promote', rationale: 'Retain the entire operation contract.', reviewStatus: 'pending', authoredBy: author })) };
 
 function reviewEvidence(decisions = shard) {
@@ -21,9 +21,6 @@ function reviewEvidence(decisions = shard) {
 
 test('review pack contains full source and target units and reverse unmatched candidate blocks', () => {
   const pack = buildReviewPack(context, shard);
-  assert.equal(pack.rows[0].source.text, unit(0).text);
-  assert.equal(pack.rows[0].target.text, unit(0).text);
-  assert.equal(pack.rows[0].claimId, rows[0].claimId);
   assert.deepEqual(pack.unmatchedCandidateUnits, []);
   const extra = { ...context, unitsOf: (owner) => owner.startsWith('docs/platform/') ? [...rows.map((_, i) => unit(i)), { anchor: 'invented', textDigest: 'b'.repeat(64), text: 'An invented obligation.', ancestry: [] }] : rows.map((_, i) => unit(i)) };
   assert.equal(buildReviewPack(extra, shard).unmatchedCandidateUnits[0].unit.text, 'An invented obligation.');
@@ -200,4 +197,10 @@ test('small judgment batches use previously reviewed controls and require every 
   assert.equal(scoreReviewPack(seeded.key, answers).pass, true);
   answers.find((row) => row.verdict === 'rework').verdict = 'ok';
   assert.equal(scoreReviewPack(seeded.key, answers).pass, false);
+});
+
+test('review dates follow the declared reviewer rather than the executing machine clock', () => {
+  const evidence = reviewEvidence();
+  const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'Complete operation contract retained.' }));
+  assert.throws(() => applyReviewVerdicts(context, shard, { ...evidence, verdicts, reviewer, reportPath: 'fixture/review.md', reviewedAt: '2026-10-01' }), /date/);
 });

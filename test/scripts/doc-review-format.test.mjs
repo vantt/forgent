@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { buildConservationUnitLookup } from '../../scripts/check-doc-inventory-gates.mjs';
+import { runCli } from '../../scripts/propose-doc-decisions.mjs';
 const cli = new URL('../../scripts/propose-doc-decisions.mjs', import.meta.url).pathname;
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-review-format-'));
@@ -116,4 +117,27 @@ test('old-shape re-review binds an explicit report author without adding row aut
   for (const row of approved.claims) row.reviewReportCommit = inventory.commit;
   fs.writeFileSync(path.join(f.root, 'inventory.json'), JSON.stringify(inventory)); fs.writeFileSync(path.join(f.root, 'shard.json'), JSON.stringify(approved));
   assert.equal(f.run('--pack', 'shard.json', '--author', f.author, '--inventory', 'inventory.json', '--out', 'self.md').status, 1);
+});
+
+test('decision inputs cannot be silently ignored by proposal or rebind modes', (t) => {
+  const f = fixture(t);
+  const proposed = f.run('--propose', '--source', f.source, '--target', f.target, '--shard', 'operation', '--author', f.author, '--inventory', 'inventory.json', '--decisions', 'shard.json');
+  assert.equal(proposed.status, 1);
+  assert.match(proposed.stderr, /decisions.*(supported|earlier|mode)/i);
+  const rebound = f.run('--rebind', 'shard.json', '--inventory', 'inventory.json', '--decisions', 'shard.json');
+  assert.equal(rebound.status, 1);
+  assert.match(rebound.stderr, /decisions.*(supported|earlier|mode)/i);
+});
+
+test('a failed atomic replacement keeps the original decision file intact', (t) => {
+  const f = fixture(t);
+  const file = path.join(f.root, 'shard.json');
+  const before = fs.readFileSync(file, 'utf8');
+  const originalRename = fs.renameSync, originalError = console.error;
+  fs.renameSync = () => { throw Object.assign(new Error('fixture replacement failed'), { code: 'EIO' }); };
+  console.error = () => {};
+  try {
+    assert.equal(runCli(['--rebind', 'shard.json', '--inventory', 'inventory.json'], f.root), 1);
+    assert.equal(fs.readFileSync(file, 'utf8'), before);
+  } finally { fs.renameSync = originalRename; console.error = originalError; }
 });
