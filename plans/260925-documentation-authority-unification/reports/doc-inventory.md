@@ -11,11 +11,11 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `b02a5d8294c13c470eb9a28742298fa0f23826d2`
-- **Files scanned:** 4317
-- **Claim rows:** 86504
-- **Headings / unheaded blocks / mixed-file blocks:** 26369 / 58958 / 1177
-- **Gaps:** 1054 (1054 file/routing gap(s), 0 claim identity-gap blocker(s))
+- **Commit:** `332effba6d5a904c9b6f458228c15f75d336c866`
+- **Files scanned:** 4318
+- **Claim rows:** 86517
+- **Headings / unheaded blocks / mixed-file blocks:** 26371 / 58969 / 1177
+- **Gaps:** 1062 (1054 file/routing gap(s), 8 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
 
@@ -26,7 +26,7 @@ Related:
 | Value | Count |
 |---|---:|
 | `platform-authority` | 2058 |
-| `history-evidence` | 1704 |
+| `history-evidence` | 1705 |
 | `user-knowledge` | 515 |
 | `consumer-project` | 40 |
 
@@ -34,7 +34,7 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `non-authority` | 2266 |
+| `non-authority` | 2267 |
 | `legacy-current` | 1026 |
 | `candidate` | 1008 |
 | `unclassified` | 14 |
@@ -45,7 +45,7 @@ Related:
 | Value | Count |
 |---|---:|
 | `maintained-authority` | 2536 |
-| `history-evidence` | 1704 |
+| `history-evidence` | 1705 |
 | `retained-source` | 57 |
 | `unclassified` | 14 |
 | `generated` | 6 |
@@ -54,7 +54,7 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `retain-as-evidence` | 1703 |
+| `retain-as-evidence` | 1704 |
 | `unknown-blocking` | 1389 |
 | `merge` | 665 |
 | `reclassify-out-of-platform-scope` | 553 |
@@ -65,11 +65,11 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `literal` | 3196 |
-| `glob` | 2430 |
-| `executable-proof` | 1324 |
+| `literal` | 3199 |
+| `glob` | 2431 |
+| `executable-proof` | 1326 |
+| `fixture` | 268 |
 | `dynamic` | 148 |
-| `fixture` | 102 |
 | `shipped-contract` | 43 |
 
 ## Duplicate And Conflict Findings
@@ -2107,6 +2107,14 @@ Related:
 
 | Claim | Source | Anchor | Identity status | Disposition |
 |---|---|---|---|---|
+| `claim_identity_gap_c92dd298c25ad49208dbaee2` | `docs/specs/runner.md` | `unheaded-block-143` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_56cbece25fae2ca97acd9d88` | `docs/specs/runner.md` | `unheaded-block-148` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7050a625aea2402aa2e4a66d` | `docs/specs/runner.md` | `unheaded-block-160` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8fa5eed3b5f78cc73010df0b` | `docs/specs/runner.md` | `unheaded-block-169` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3eb8a16dfa852ed2424e543b` | `docs/specs/runner.md` | `unheaded-block-234` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d4730d311cfaf872087fc04c` | `docs/specs/runner.md` | `unheaded-block-243` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7979438d0e28d786c298c01d` | `docs/specs/runner.md` | `unheaded-block-267` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e27dfc95d38d94e129218b18` | `docs/specs/runner.md` | `unheaded-block-279` | `ambiguous-registry-gap` | `unknown-blocking` |
 
 ## Claim Ledger Sample (first 500 rows)
 
@@ -2117,7 +2125,7 @@ Related:
 | `claim_9651770c2d3f7530312292fe3e96176b` | `AGENTS.md` | `unheaded-block-2` | `unclassified` | `unknown-blocking` |  |
 | `claim_2d6f7d92e02f721eb5133494e12686e0` | `AGENTS.md` | `unheaded-block-3` | `unclassified` | `unknown-blocking` |  |
 | `claim_dadecacb903167be7252b40d75033a56` | `AGENTS.md` | `product-priority-order-d-adr0030-docsspecsrunnermd` | `unclassified` | `unknown-blocking` |  |
-| `claim_f3d9a6f6cc27c52855bc0ce2a3706e2c` | `AGENTS.md` | `unheaded-block-4` | `unclassified` | `unknown-blocking` |  |
+| `claim_39027736ba305981f20a973555300669` | `AGENTS.md` | `unheaded-block-4` | `unclassified` | `unknown-blocking` |  |
 | `claim_0b999bb17fb999e00f51a138af84c8a2` | `AGENTS.md` | `unheaded-block-5` | `unclassified` | `unknown-blocking` |  |
 | `claim_77dd0bf33d012bb3b23d9a8e8f0f7d3e` | `AGENTS.md` | `unheaded-block-6` | `unclassified` | `unknown-blocking` |  |
 | `claim_2c843f49586c14b6d70149ae591d47f9` | `AGENTS.md` | `ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd` | `unclassified` | `unknown-blocking` |  |
@@ -2128,60 +2136,64 @@ Related:
 | `claim_3de04e2fc7142ed6f2d1d6639e4c3dda` | `AGENTS.md` | `unheaded-block-10` | `specification` | `unknown-blocking` |  |
 | `claim_22c44c85aa5a35949e59c1fa1a36bd1a` | `AGENTS.md` | `definition-of-done-platform-foundations-l5` | `unclassified` | `unknown-blocking` |  |
 | `claim_8ce5210314473b1e660025261f39ae5a` | `AGENTS.md` | `unheaded-block-11` | `historical-context` | `unknown-blocking` |  |
-| `claim_d8880e475680012ef18a447f529e9d4f` | `AGENTS.md` | `unheaded-block-12` | `specification` | `unknown-blocking` |  |
+| `claim_d0e83fdb2650d447afd25c0f61efc4ec` | `AGENTS.md` | `unheaded-block-12` | `specification` | `unknown-blocking` |  |
+| `claim_12e5db9cba7b51a5d83d737740f873f3` | `AGENTS.md` | `scratch-artifacts` | `unclassified` | `unknown-blocking` |  |
+| `claim_ad994bc3d2c97fb0d69e749535454434` | `AGENTS.md` | `unheaded-block-13` | `unclassified` | `unknown-blocking` |  |
 | `claim_ccf1acf857fc4e9757a933ca22ed34f1` | `AGENTS.md` | `legacy-node-cli-ownership-boundary` | `contract` | `unknown-blocking` |  |
-| `claim_903d53d47d24348c7f74569a2b68db7e` | `AGENTS.md` | `unheaded-block-13` | `unclassified` | `unknown-blocking` |  |
+| `claim_251b389b227a62ef26b0fd3e1f0bebd9` | `AGENTS.md` | `unheaded-block-14` | `unclassified` | `unknown-blocking` |  |
+| `claim_bb94912817abe39b4f476ea70b22d3ae` | `AGENTS.md` | `unheaded-block-15` | `unclassified` | `unknown-blocking` |  |
+| `claim_01354c596b32d883dcceda730047e156` | `AGENTS.md` | `unheaded-block-16` | `unclassified` | `unknown-blocking` |  |
 | `claim_ac6849769045271a57023dd684980fe6` | `AGENTS.md` | `installsetupdoctor-gate` | `unclassified` | `unknown-blocking` |  |
-| `claim_143633192ebdc23ebdd1b38df0ae42b0` | `AGENTS.md` | `unheaded-block-14` | `vision` | `unknown-blocking` |  |
-| `claim_423281216eb15889f63560a84ca0959a` | `AGENTS.md` | `unheaded-block-15` | `unclassified` | `unknown-blocking` |  |
+| `claim_143633192ebdc23ebdd1b38df0ae42b0` | `AGENTS.md` | `unheaded-block-17` | `vision` | `unknown-blocking` |  |
+| `claim_423281216eb15889f63560a84ca0959a` | `AGENTS.md` | `unheaded-block-18` | `unclassified` | `unknown-blocking` |  |
 | `claim_00ee16658d1baf1ac05b8e371408fd01` | `AGENTS.md` | `changing-a-locked-law` | `unclassified` | `unknown-blocking` |  |
-| `claim_2240f88d1d1a961cc8ce6c8517572f36` | `AGENTS.md` | `unheaded-block-16` | `decision` | `unknown-blocking` |  |
+| `claim_2240f88d1d1a961cc8ce6c8517572f36` | `AGENTS.md` | `unheaded-block-19` | `decision` | `unknown-blocking` |  |
 | `claim_c3ef3a4ddc116883db10a70d55ba7bd5` | `AGENTS.md` | `rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd` | `unclassified` | `unknown-blocking` |  |
-| `claim_8e643b64b72bef823e75904425fc6d07` | `AGENTS.md` | `unheaded-block-17` | `unclassified` | `unknown-blocking` |  |
-| `claim_442a4d4d948d6535b15da70f73519395` | `AGENTS.md` | `unheaded-block-18` | `unclassified` | `unknown-blocking` |  |
+| `claim_8e643b64b72bef823e75904425fc6d07` | `AGENTS.md` | `unheaded-block-20` | `unclassified` | `unknown-blocking` |  |
+| `claim_442a4d4d948d6535b15da70f73519395` | `AGENTS.md` | `unheaded-block-21` | `unclassified` | `unknown-blocking` |  |
 | `claim_67eb8d55ba3230adf56b929b3b549cdc` | `AGENTS.md` | `dispatch-routing-work-to-an-executor` | `unclassified` | `unknown-blocking` |  |
-| `claim_5c520fcb1a68ba27e2093341834258c7` | `AGENTS.md` | `unheaded-block-19` | `unclassified` | `unknown-blocking` |  |
-| `claim_0bf7d168f64e5d7bf9add3470f4b6ec4` | `AGENTS.md` | `unheaded-block-20` | `unclassified` | `unknown-blocking` |  |
-| `claim_2e415bdb6f89215b30a9306f2b525bf7` | `AGENTS.md` | `unheaded-block-21` | `unclassified` | `unknown-blocking` |  |
-| `claim_47e8159f8179edd8e17fd67c744d1e89` | `AGENTS.md` | `unheaded-block-22` | `unclassified` | `unknown-blocking` |  |
-| `claim_c43cebec858362eb7b73975080dba714` | `AGENTS.md` | `unheaded-block-23` | `unclassified` | `unknown-blocking` |  |
-| `claim_664343a3da26204b9baf654b1ca4cb58` | `AGENTS.md` | `unheaded-block-24` | `unclassified` | `unknown-blocking` |  |
-| `claim_500d588a939fd6109cf102b8343484bb` | `AGENTS.md` | `unheaded-block-25` | `unclassified` | `unknown-blocking` |  |
-| `claim_30f4d7e2306cb4ecdad78086848d139f` | `AGENTS.md` | `unheaded-block-26` | `unclassified` | `unknown-blocking` |  |
+| `claim_5c520fcb1a68ba27e2093341834258c7` | `AGENTS.md` | `unheaded-block-22` | `unclassified` | `unknown-blocking` |  |
+| `claim_0bf7d168f64e5d7bf9add3470f4b6ec4` | `AGENTS.md` | `unheaded-block-23` | `unclassified` | `unknown-blocking` |  |
+| `claim_2e415bdb6f89215b30a9306f2b525bf7` | `AGENTS.md` | `unheaded-block-24` | `unclassified` | `unknown-blocking` |  |
+| `claim_47e8159f8179edd8e17fd67c744d1e89` | `AGENTS.md` | `unheaded-block-25` | `unclassified` | `unknown-blocking` |  |
+| `claim_c43cebec858362eb7b73975080dba714` | `AGENTS.md` | `unheaded-block-26` | `unclassified` | `unknown-blocking` |  |
+| `claim_664343a3da26204b9baf654b1ca4cb58` | `AGENTS.md` | `unheaded-block-27` | `unclassified` | `unknown-blocking` |  |
+| `claim_500d588a939fd6109cf102b8343484bb` | `AGENTS.md` | `unheaded-block-28` | `unclassified` | `unknown-blocking` |  |
+| `claim_1c85e6258b0455d9b44d738f833e1bb9` | `AGENTS.md` | `unheaded-block-29` | `unclassified` | `unknown-blocking` |  |
 | `claim_9dd28187a839e2ce10f2e9dd3f020cdf` | `AGENTS.md` | `starting-the-fgos-gateway-one-door-never-a-raw-process` | `unclassified` | `unknown-blocking` |  |
-| `claim_adc150a41d48dfde06422405a5b0f277` | `AGENTS.md` | `unheaded-block-27` | `unclassified` | `unknown-blocking` |  |
+| `claim_adc150a41d48dfde06422405a5b0f277` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
 | `claim_2e45cfdcd3f2bf602787b37feac667f3` | `AGENTS.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
-| `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-28` | `unclassified` | `unknown-blocking` |  |
+| `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
 | `claim_9f129b46b75d0c4d4e7119da265c74b0` | `AGENTS.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
-| `claim_6a2cb3a88c1fb4c7faf143fa5ec076f3` | `AGENTS.md` | `unheaded-block-29` | `unclassified` | `unknown-blocking` |  |
-| `claim_d18c939cc9436e830dae9214808c21ae` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
-| `claim_74542e8562e9dd16128fadd8a2dbfaca` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
+| `claim_6a2cb3a88c1fb4c7faf143fa5ec076f3` | `AGENTS.md` | `unheaded-block-32` | `unclassified` | `unknown-blocking` |  |
+| `claim_d18c939cc9436e830dae9214808c21ae` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
+| `claim_74542e8562e9dd16128fadd8a2dbfaca` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
 | `claim_33fda3508cbed38745f7b6796ea65709` | `AGENTS.md` | `using-cli-fallback` | `unclassified` | `unknown-blocking` |  |
-| `claim_351eb1f4f67c8aaee59631dad24f99d8` | `AGENTS.md` | `unheaded-block-32` | `unclassified` | `unknown-blocking` |  |
+| `claim_351eb1f4f67c8aaee59631dad24f99d8` | `AGENTS.md` | `unheaded-block-35` | `unclassified` | `unknown-blocking` |  |
 | `claim_73ca3e1b87514a160d7114e22318f1e9` | `AGENTS.md` | `when-to-render` | `unclassified` | `unknown-blocking` |  |
-| `claim_95164f1150b3c485deff5673f7b4ef15` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
-| `claim_7e77c676144c5ca6cdc3351f5a5ef632` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
+| `claim_95164f1150b3c485deff5673f7b4ef15` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
+| `claim_7e77c676144c5ca6cdc3351f5a5ef632` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
 | `claim_fd05edc9de6352f95be164482329687d` | `AGENTS.md` | `gitnexus-code-intelligence` | `unclassified` | `unknown-blocking` |  |
-| `claim_08f8581721e89c08f589e3bb8002b6ce` | `AGENTS.md` | `unheaded-block-35` | `unclassified` | `unknown-blocking` |  |
-| `claim_d6a9e43c0997b6993a5d9670af469258` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
+| `claim_08f8581721e89c08f589e3bb8002b6ce` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
+| `claim_d6a9e43c0997b6993a5d9670af469258` | `AGENTS.md` | `unheaded-block-39` | `unclassified` | `unknown-blocking` |  |
 | `claim_0a800ae3d8a50ecdf22bf6c4604167d5` | `AGENTS.md` | `always-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_f2afc3a44e09eb918aa8c59d42ffe195` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
+| `claim_f2afc3a44e09eb918aa8c59d42ffe195` | `AGENTS.md` | `unheaded-block-40` | `unclassified` | `unknown-blocking` |  |
 | `claim_133b6f931d35a06604813e97ac11bd8f` | `AGENTS.md` | `never-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_3ca28ff7ed502c1bfd8e695a7387f753` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
+| `claim_3ca28ff7ed502c1bfd8e695a7387f753` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
 | `claim_42108ffe5c72a9f3ca2c7ef904fd14ec` | `AGENTS.md` | `resources` | `unclassified` | `unknown-blocking` |  |
-| `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-39` | `unclassified` | `unknown-blocking` |  |
+| `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
 | `claim_7b36640f7d6ced0d3f089a419f5d26ff` | `AGENTS.md` | `cli` | `unclassified` | `unknown-blocking` |  |
-| `claim_839bc9774b75e893f078d20ecbbb39f0` | `AGENTS.md` | `unheaded-block-40` | `architecture` | `unknown-blocking` |  |
-| `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
+| `claim_839bc9774b75e893f078d20ecbbb39f0` | `AGENTS.md` | `unheaded-block-43` | `architecture` | `unknown-blocking` |  |
+| `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-44` | `unclassified` | `unknown-blocking` |  |
 | `claim_6acc93d03a89146ebf7f4903938fabd9` | `AGENTS.md` | `fgos-effective-instructions` | `unclassified` | `unknown-blocking` |  |
 | `claim_9474ae42b4d6e079fcf33fec49e746fa` | `AGENTS.md` | `law` | `unclassified` | `unknown-blocking` |  |
 | `claim_fde89656fbadabacb69e8f793b223377` | `AGENTS.md` | `platform-operating-laws` | `unclassified` | `unknown-blocking` |  |
-| `claim_b70e7c39975314f130e9a2501156721d` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
+| `claim_b70e7c39975314f130e9a2501156721d` | `AGENTS.md` | `unheaded-block-45` | `unclassified` | `unknown-blocking` |  |
 | `claim_8231e682b35899eed43b85ce92dbc6ba` | `AGENTS.md` | `platform-operating-laws-1` | `unclassified` | `unknown-blocking` |  |
-| `claim_cace4724d966bb5a40bc0b17768520c1` | `AGENTS.md` | `unheaded-block-43` | `unclassified` | `unknown-blocking` |  |
-| `claim_07e83f30731906c4f25c96625cd95e26` | `AGENTS.md` | `unheaded-block-44` | `specification` | `unknown-blocking` |  |
-| `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-45` | `verification` | `unknown-blocking` |  |
-| `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-46` | `unclassified` | `unknown-blocking` |  |
+| `claim_cace4724d966bb5a40bc0b17768520c1` | `AGENTS.md` | `unheaded-block-46` | `unclassified` | `unknown-blocking` |  |
+| `claim_07e83f30731906c4f25c96625cd95e26` | `AGENTS.md` | `unheaded-block-47` | `specification` | `unknown-blocking` |  |
+| `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-48` | `verification` | `unknown-blocking` |  |
+| `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-49` | `unclassified` | `unknown-blocking` |  |
 | `claim_0d2c13615099d78c5e38533379ecf7cc` | `CLAUDE.md` | `project-rules` | `unclassified` | `unknown-blocking` |  |
 | `claim_2c95402110cb9a2551ee02f61dde7da6` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
 | `claim_a18fb2712669f362c16aa39841718116` | `CLAUDE.md` | `impact-analysis-capability-gate` | `unclassified` | `unknown-blocking` |  |
@@ -2608,7 +2620,3 @@ Related:
 | `claim_c0db062aa922f74c1b85aee8479a608d` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `forbidden-inferences` | `architecture` | `unknown-blocking` |  |
 | `claim_8e5f6cce78f0590a9ee66586d2de208e` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-12` | `architecture` | `unknown-blocking` |  |
 | `claim_19d239a2b1605ac96d2ee658bdc5fdc0` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `stability-direction` | `architecture` | `unknown-blocking` |  |
-| `claim_fb7117148388d6f7204601d1ed75fe1e` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-13` | `architecture` | `unknown-blocking` |  |
-| `claim_fae400884309c195b210acb2d447ec5a` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-14` | `architecture` | `unknown-blocking` |  |
-| `claim_6ba0183167280a716dbb2280c15a7a07` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-15` | `architecture` | `unknown-blocking` |  |
-| `claim_2dcf2c49b82067ffb247f7aadc2e118b` | `docs/architect/agent-coordination/architecture/work-integration.md` | `work-integration-boundaries` | `architecture` | `unknown-blocking` |  |
