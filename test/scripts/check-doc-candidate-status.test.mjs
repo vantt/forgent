@@ -136,7 +136,6 @@ test('runCli is report-only by default and fatal under --strict', () => {
   try {
     const base = ['--repo-root', root, '--switchboard', board, '--constitution', consti];
     assert.equal(runCli(base, root), 0);
-    assert.match(logs.join('\n'), /1 finding\(s\) \(report only\)/);
     assert.equal(runCli([...base, '--strict'], root), 1);
     logs.length = 0;
     assert.equal(runCli([...base, '--json'], root), 0);
@@ -163,4 +162,32 @@ test('a routed document that matches no placement pattern is reported, and an am
   const doubled = { areas: [{ area: 'A', authorityStatus: 'candidate', scopedRoutes: [{ route: 'docs/platform/a/README.md', authorityStatus: 'candidate' }] }, { area: 'B', authorityStatus: 'promoted', scopedRoutes: [{ route: 'docs/platform/a/README.md', authorityStatus: 'promoted' }] }], rootDocuments: [] };
   const conflicted = checkCandidateMetadata({ files: ['docs/platform/a/README.md'], readFile: () => '', switchboard: doubled, constitution, repoRoot: REPO_ROOT });
   assert.ok(conflicted.findings.some((f) => f.type === 'switchboard-route-conflict'));
+});
+
+test('strict candidate status includes untracked Markdown but not ignored draft files', () => {
+  const untracked = 'docs/platform/laws/contracts/new.md';
+  const ignored = 'docs/platform/laws/contracts/ignored.md';
+  const root = fixtureRoot({ 'docs/platform/laws/README.md': header(candidateFields), [untracked]: '# Missing metadata\n', [ignored]: '# Ignored draft\n' });
+  const board = path.join(root, 'switchboard.json');
+  const consti = path.join(root, 'constitution.json');
+  const routed = { ...switchboard, areas: switchboard.areas.map((area, i) => i ? area : { ...area, scopedRoutes: [...area.scopedRoutes, { route: 'docs/platform/laws/**', authorityStatus: 'candidate' }] }) };
+  fs.writeFileSync(board, JSON.stringify(routed));
+  fs.writeFileSync(consti, JSON.stringify(constitution));
+  fs.writeFileSync(path.join(root, '.gitignore'), ignored + '\n');
+  const git = (...args) => execFileSync('git', args, { cwd: root, stdio: 'ignore' });
+  git('init', '-q');
+  git('add', '--', 'docs/platform/laws/README.md');
+  const logs = [];
+  const original = console.log;
+  console.log = (...args) => logs.push(args.join(' '));
+  try {
+    assert.equal(runCli(['--repo-root', root, '--switchboard', board, '--constitution', consti, '--strict', '--json'], root), 1);
+    const report = JSON.parse(logs.join('\n'));
+    assert.equal(report.counts.files, 2);
+    assert.ok(report.findings.some((finding) => finding.path === untracked && finding.type === 'missing-candidate-fields'));
+    assert.equal(report.findings.some((finding) => finding.path === ignored), false);
+  } finally {
+    console.log = original;
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });

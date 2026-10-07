@@ -5,6 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writeShardedJsonArtifact } from '../../scripts/doc-inventory-artifact.mjs';
+import { execFileSync } from 'node:child_process';
+import { bootstrapIdentityRegistry, generateInventory, IDENTITY_REGISTRY_PATH } from '../../scripts/generate-doc-inventory.mjs';
 import {
   DEFAULT_VOCABULARY_PATH,
   DEFAULT_CONSTITUTION_PATH,
@@ -706,4 +708,58 @@ test('cli: --cutover is fatal while any row is blocking or unreviewed, and a rev
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('constitution CLI merges every decision input and rejects a stale source proof', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'constitution-decisions-'));
+  const write = (file, text) => {
+    fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    fs.writeFileSync(path.join(root, file), text);
+  };
+  const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+  try {
+    fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+    fs.copyFileSync(path.join(REPO_ROOT, 'docs/doc-governance.md'), path.join(root, 'docs/doc-governance.md'));
+    for (const by of [...constitution.promotionGate.checks, ...constitution.retirementGate.checks].map((check) => check.enforcedBy).filter((by) => by.kind === 'script')) {
+      fs.mkdirSync(path.dirname(path.join(root, by.path)), { recursive: true });
+      fs.copyFileSync(path.join(REPO_ROOT, by.path), path.join(root, by.path));
+    }
+    const source = 'docs/specs/fixture.md';
+    const target = 'docs/platform/fixture/spec.md';
+    const text = '# Fixture\n\nThe consumer must preserve the documented protocol.\n\n## Errors\n\nThe consumer must report a failure rather than silently ignoring it.\n';
+    write(source, text); write(target, text);
+    const plan = 'plans/260925-documentation-authority-unification';
+    write(plan + '/transitional-switchboard.json', JSON.stringify({ rootDocuments: [], areas: [{ area: 'Fixture', authorityStatus: 'legacy-current', entryPoint: target, canonicalRoute: source, scopedRoutes: [{ route: source, authorityStatus: 'legacy-current', fileClass: 'maintained-authority' }, { route: target, authorityStatus: 'candidate', fileClass: 'maintained-authority' }] }] }));
+    git('init', '-q');
+    git('config', 'user.name', 'Fixture');
+    git('config', 'user.email', 'fixture@example.invalid');
+    git('add', '--', 'docs', 'scripts', plan + '/transitional-switchboard.json');
+    git('commit', '-qm', 'docs: add conservation fixture');
+    const first = git('rev-parse', 'HEAD');
+    write(IDENTITY_REGISTRY_PATH, JSON.stringify(bootstrapIdentityRegistry(root, { commit: first })));
+    git('add', '--', IDENTITY_REGISTRY_PATH);
+    git('commit', '-qm', 'docs: bind source identities', '--', IDENTITY_REGISTRY_PATH);
+    const inventory = generateInventory(root, { commit: git('rev-parse', 'HEAD'), identityRegistryPath: path.join(root, IDENTITY_REGISTRY_PATH) });
+    const rows = inventory.claimLedger.filter((row) => row.sourcePath === source);
+    const manifest = path.join(root, 'inventory.json');
+    writeShardedJsonArtifact(manifest, inventory);
+    const base = ['--repo-root', root, '--inventory', manifest, '--json', '--cutover'];
+    const before = JSON.parse(captureCli(base).out);
+    const midpoint = Math.ceil(rows.length / 2);
+    const files = [rows.slice(0, midpoint), rows.slice(midpoint)].map((part, i) => {
+      const file = path.join(root, 'decision-' + i + '.json');
+      fs.writeFileSync(file, JSON.stringify({ version: 1, shard: 'fixture-' + i, authorSession: 'fixture-session:author@2026-10-07', authorshipRequired: true, sources: [source], claims: part.map((row) => ({ claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest, targetOwner: target, targetAnchor: row.sourceAnchor, targetUnitDigest: row.sourceUnitDigest, claimKind: 'specification', disposition: 'promote', reviewStatus: 'pending', rationale: 'The target retains the entire protocol unit.', authoredBy: 'fixture-session:author@2026-10-07' })) }));
+      return file;
+    });
+    const after = JSON.parse(captureCli([...base, ...files.flatMap((file) => ['--decisions', file])]).out);
+    assert.deepEqual(after.fatalFindings, []);
+    assert.equal(after.ledger.cutover.byReason['unknown-blocking'], before.ledger.cutover.byReason['unknown-blocking'] - rows.length);
+    assert.equal(after.ledger.usage.sourceDispositions.promote, (before.ledger.usage.sourceDispositions.promote || 0) + rows.length);
+    const stale = JSON.parse(fs.readFileSync(files[1], 'utf8'));
+    stale.claims[0].sourceUnitDigest = 'f'.repeat(64);
+    fs.writeFileSync(files[1], JSON.stringify(stale));
+    const rejected = captureCli([...base, ...files.flatMap((file) => ['--decisions', file])]);
+    assert.equal(rejected.code, 1);
+    assert.ok(JSON.parse(rejected.out).fatalFindings.some((finding) => finding.type === 'decision-digest-stale'));
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
