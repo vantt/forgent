@@ -21,11 +21,11 @@ function fixture(t) {
   const sources = unitsOf(source).filter(unit => unit.kind !== 'heading'), targets = unitsOf(target).filter(unit => unit.kind !== 'heading');
   const rows = sources.map((unit, i) => ({ claimId: 'claim_' + i.toString(16).padStart(32, '0'), sourcePath: source, sourceAnchor: unit.anchor, sourceUnitDigest: unit.textDigest, claimKind: 'contract' }));
   const author = 'fixture-session:author@2026-10-07';
-  const shard = { version: 1, shard: 'operation', sources: [source], authorSession: author, authorshipRequired: true, claims: rows.map((row, i) => ({ claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest, targetOwner: target, targetAnchor: targets[i].anchor, claimKind: 'normative-rule', disposition: 'promote', rationale: 'Retain the complete operation rule.', reviewStatus: 'pending', authoredBy: author })) };
+  const shard = { version: 1, shard: 'operation', sources: [source], authorSession: author, authorshipRequired: true, claims: rows.map((row, i) => ({ claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest, targetOwner: target, targetAnchor: targets[i].anchor, claimKind: 'contract', disposition: 'promote', rationale: 'Retain the complete operation rule.', reviewStatus: 'pending', authoredBy: author })) };
   const inventory = { commit, generatedAt: '2026-10-07T00:00:00.000Z', items: [{ path: source, corpus: 'platform-authority', authorityStatus: 'legacy-current' }, { path: target, corpus: 'platform-authority', authorityStatus: 'candidate' }], claimLedger: rows };
   fs.writeFileSync(path.join(root, 'inventory.json'), JSON.stringify(inventory)); fs.writeFileSync(path.join(root, 'shard.json'), JSON.stringify(shard));
   const run = (...args) => spawnSync(process.execPath, [cli, ...args], { cwd: root, encoding: 'utf8' });
-  return { root, run, source, target, author };
+  return { root, run, source, target, author, git };
 }
 test('reviewers receive full text and a unified diff in Markdown with safely nested fences', (t) => {
   const f = fixture(t), out = path.join(f.root, 'review.md');
@@ -80,4 +80,40 @@ test('script-proven carries supply batch sensitivity controls without reopening 
   const rejected = f.run('--pack', 'broken.json', '--inventory', 'inventory.json', '--out', 'broken.md');
   assert.equal(rejected.status, 1);
   assert.equal(fs.existsSync(path.join(f.root, 'broken.md')), false);
+});
+
+test('old-shape re-review binds an explicit report author without adding row authorship fields', (t) => {
+  const f = fixture(t);
+  const shard = JSON.parse(fs.readFileSync(path.join(f.root, 'shard.json'), 'utf8'));
+  delete shard.authorSession; delete shard.authorshipRequired;
+  for (const row of shard.claims) { delete row.authoredBy; row.sourceUnitDigest = row.sourceUnitDigest.slice(0, 16); }
+  fs.writeFileSync(path.join(f.root, 'shard.json'), JSON.stringify(shard));
+  const normal = f.run('--pack', 'shard.json', '--author', f.author, '--inventory', 'inventory.json', '--out', 'legacy.md');
+  assert.equal(normal.status, 0, normal.stderr);
+  const reviewer = 'reviewer:fixture-session:other@2026-10-07';
+  const seeded = f.run('--seed-pack', 'legacy.md.json', '--out', 'legacy-seeded.md', '--key', 'legacy-key.json', '--seed', 'fixture-old-shape', '--reviewer', reviewer);
+  assert.equal(seeded.status, 0, seeded.stderr);
+  const key = JSON.parse(fs.readFileSync(path.join(f.root, 'legacy-key.json'), 'utf8'));
+  fs.writeFileSync(path.join(f.root, 'seed-verdicts.md'), `Reviewer: ${reviewer}\n` + key.rows.map(row => `| ${row.claimId} | ${row.mutated ? 'rework' : 'ok'} | Compared fixture text. |`).join('\n'));
+  const scored = f.run('--score-pack', 'legacy-key.json', '--verdicts', 'seed-verdicts.md');
+  assert.equal(scored.status, 0, scored.stderr);
+  const score = JSON.parse(scored.stdout), reportPath = 'plans/fixture/reports/phase-06/review-contract-legacy.md';
+  const report = `Fixture only: mechanical authentication, not semantic approval.\nReviewer: ${reviewer}\nAuthor session: ${f.author}\nPack commit: ${score.commit}\nPack id: ${score.packId}\nSeed score: ${score.scoreId}\n` + shard.claims.map(row => `| ${row.claimId} | ok | Checked the entire fixture unit. |`).join('\n');
+  fs.mkdirSync(path.dirname(path.join(f.root, reportPath)), { recursive: true }); fs.writeFileSync(path.join(f.root, reportPath), report);
+  const args = ['--apply-review', 'shard.json', '--inventory', 'inventory.json', '--verdicts', reportPath, '--reviewer', reviewer, '--review-pack', 'legacy.md.json', '--seed-key', 'legacy-key.json', '--seed-verdicts', 'seed-verdicts.md'];
+  assert.equal(f.run(...args).status, 1);
+  f.git('add', '--', reportPath); f.git('commit', '-qm', 'docs: record old-shape review fixture', '--', reportPath);
+  const applied = f.run(...args); assert.equal(applied.status, 0, applied.stderr);
+  const approved = JSON.parse(fs.readFileSync(path.join(f.root, 'shard.json'), 'utf8'));
+  assert.equal('authorshipRequired' in approved, false); assert.equal('authorSession' in approved, false);
+  assert.ok(approved.claims.every(row => !('authoredBy' in row) && row.reviewStatus === 'reviewed'));
+  const inventory = JSON.parse(fs.readFileSync(path.join(f.root, 'inventory.json'), 'utf8'));
+  inventory.commit = f.git('rev-parse', 'HEAD'); fs.writeFileSync(path.join(f.root, 'inventory.json'), JSON.stringify(inventory));
+  assert.equal(f.run('--pack', 'shard.json', '--author', f.author, '--inventory', 'inventory.json', '--out', 'repeat-legacy.md').status, 0);
+  fs.writeFileSync(path.join(f.root, reportPath), report.replace(`Author session: ${f.author}`, 'Author session: fixture-session:other@2026-10-08'));
+  f.git('add', '--', reportPath); f.git('commit', '-qm', 'docs: record self-review counterexample', '--', reportPath);
+  inventory.commit = f.git('rev-parse', 'HEAD');
+  for (const row of approved.claims) row.reviewReportCommit = inventory.commit;
+  fs.writeFileSync(path.join(f.root, 'inventory.json'), JSON.stringify(inventory)); fs.writeFileSync(path.join(f.root, 'shard.json'), JSON.stringify(approved));
+  assert.equal(f.run('--pack', 'shard.json', '--author', f.author, '--inventory', 'inventory.json', '--out', 'self.md').status, 1);
 });

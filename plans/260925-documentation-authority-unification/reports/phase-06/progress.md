@@ -3,9 +3,9 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, verified same-batch controls and one-row rework pass
+Step: 1, old-shape review author regression demonstrated
 State: authoring
-Last green conservation commit: eff2f6557
+Last green conservation commit: 26ba5c82c
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit verified sensitivity controls and refresh both prior-registry conservation proofs, then prove old-shape re-review compatibility without changing frozen row shape or gate rules. Request independent tooling review only after that proof; no real batch.
+Next action: commit the old-shape regression, bind an explicitly declared current review author in the pack and committed report while leaving legacy row authorship fields absent and the shard flag off. Keep new-shard author requirements and self-review/report gates unchanged; then request independent tooling review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -44,3 +44,4 @@ Diff-pack red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/
 Diff-pack corrected evidence: full scripts suite 852/852 in 51 files; real CLI fixture pack/seed/score flow passes with 6/6 detected and 0 false flags. Public Markdown/key-sidecar collision protection passes. Actual scratch pack renders full source/target/diff and reverse units, exit 0, with machine sidecar retained for binding. No genuine seeded review is run by this author session. Automatic-proposal sensitivity controls, old-shape re-review and full tooling review remain UNPROVEN.
 Sensitivity-control red: actual isolated --propose -> --pack -> --seed-pack flow fails with insufficient eligible rows for swapped-number after valid exact carries are removed from the pending-only pack. `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 2 pass/1 fail. Both prior-registry D proofs after eff2f6557 exit 0 and remain baseline-identical. No genuine seed selection is made on repository source rows.
 Sensitivity controls corrected: 854/854 across 51 scripts test files; automatic fixture proposals seed successfully using re-proven exact units without reopening accepted decisions. Poisoned exact proofs and invented controls fail closed. Actual committed modern CLI accepts 61 fixture rows, rejects uncommitted reports, and then accepts a one-row rationale rework using 60 unchanged controls while preserving earlier report pins and 0 unchanged-overlay findings. Legacy compatibility and full tooling review remain UNPROVEN.
+Old-shape red: isolated CLI accepts --author but ignores it for a legacy pack; seed then rejects missing identities. `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 3 pass/1 fail. The frozen legacy format stays untouched; author provenance must reside in the new review artifacts, not be fabricated into old rows. Both prior-registry D proofs at 26ba5c82c pass and exactly match baseline. Compatibility and full review remain UNPROVEN.
