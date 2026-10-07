@@ -228,3 +228,44 @@ test('historical decisions remain recordable after a group disappears and never 
   const records = { version: 1, groups: [resolution('duplicate', 'c'.repeat(40)), resolution('semantic', 'retired:old-contract')] };
   assert.deepEqual(openConflictGroups(conflictInventory, records), { duplicates: 1, mirrors: 0, semantic: 1 });
 });
+
+test('named retiring files participate in history alias coverage without swallowing neighboring paths or kept projections', () => {
+  const inventory = { consumerEdges: [
+    { path: 'plans/history.md', targetPath: 'docs/io-contract.md', kind: 'markdown-link' },
+    { path: 'plans/history.md', targetPath: 'docs/io-contract.md.bak', kind: 'markdown-link' },
+    { path: 'plans/history.md', targetPath: 'docs/decisions/index.md', kind: 'markdown-link' },
+    { path: 'plans/history.md', targetPath: 'docs/specs/runner.md', kind: 'markdown-link' },
+  ] };
+  const roots = { version: 1, documents: ['docs/io-contract.md'] };
+  const aliasTable = { entries: [{ fromPath: 'docs/specs/runner.md' }, { fromPath: 'docs/io-contract.md#contract' }] };
+  assert.deepEqual(uncoveredHistoryReferences(inventory, aliasTable, roots), { targets: 2, uncovered: ['docs/io-contract.md'] });
+  aliasTable.entries.push({ fromPath: 'docs/io-contract.md' });
+  assert.deepEqual(uncoveredHistoryReferences(inventory, aliasTable, roots), { targets: 2, uncovered: [] });
+});
+
+test('root-file consumers are counted while both fixed legacy directories and retiring-file readers remain legacy', () => {
+  const inventory = { consumerEdges: [
+    { path: 'src/io.mjs', targetPath: 'docs/io-contract.md', kind: 'code-string' },
+    { path: 'docs/io-contract.md', targetPath: 'docs/specs/runner.md', kind: 'markdown-link' },
+    { path: 'src/runner.mjs', targetPath: 'docs/specs/runner.md', kind: 'code-string' },
+    { path: 'src/architecture.mjs', targetPath: 'docs/architect/runner.md', kind: 'code-string' },
+    { path: 'src/project.mjs', targetPath: 'docs/decisions/index.md', kind: 'code-string' },
+  ] };
+  const roots = { version: 1, documents: ['docs/io-contract.md'] };
+  assert.deepEqual(unrewrittenConsumerEdges(inventory, roots), { total: 3, byKind: { 'code-string': 3 }, unresolvedDynamic: 0 });
+  const inputs = { ...cleanInputs(), inventory, retiringRoots: roots };
+  assert.equal(evaluateRetirement(inputs, constitution).find((result) => result.id === 'consumers-rewritten').status, 'blocked');
+});
+
+test('retiring-file data cannot redefine directory roots, retire instruction files, candidates or the kept decision projection', () => {
+  const invalid = [
+    { version: 2, documents: [] },
+    { version: 1, documents: {} },
+    { version: 1, roots: ['docs/'], documents: [] },
+    ...['docs/', 'AGENTS.md', 'CLAUDE.md', 'docs/../AGENTS.md', 'docs/platform/candidate.md', 'docs/decisions/index.md'].map((value) => ({ version: 1, documents: [value] })),
+  ];
+  for (const roots of invalid) {
+    assert.throws(() => uncoveredHistoryReferences({ consumerEdges: [] }, { entries: [] }, roots), /retiring/i);
+    assert.throws(() => unrewrittenConsumerEdges({ consumerEdges: [] }, roots), /retiring/i);
+  }
+});

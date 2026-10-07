@@ -3,9 +3,9 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, conflict-resolution tooling verified; retiring-root data next
+Step: 1, retiring-file data regressions demonstrated; implementation next
 State: authoring
-Last green conservation commit: c18c11357
+Last green conservation commit: aec1b2e8e
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit conflict-resolution tooling, run post-commit suite and both D inputs, then implement T5 tests first and continue sequentially; close pre-reviewed evidence through T8; stop at full independent review.
+Next action: commit retiring-file data red regressions, implement exact named roots while retaining the two frozen directories and kept projection, then continue T6 onward sequentially; close pre-reviewed evidence through T8; stop at full independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -30,3 +30,4 @@ Corpus-rule red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/script
 Corpus-rule corrected evidence: red f86f26c3b (0/6), pending boundary ed37e57cb (1 pass/6 fail); targeted 7/7, full scripts suite 822/822 in 47 files. Actual gate with scratch pending corpus rule: exit 0, baseline-identical JSON; claiming review without a committed report: exit 1 with decision-corpus-review-invalid. No real corpus rule or approval is committed. Remaining tools/maps/full review remain UNPROVEN.
 Conflict-resolution red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-doc-retirement.test.mjs`: 29 pass, 3 fail. Recorded closure is ignored, the acceptance evaluator cannot consume it, and malformed/stale/duplicate records are not rejected. Post-corpus c18c11357: 822/822 and both D proofs baseline-identical. No real conflict group is closed; remaining tools/maps/review remain UNPROVEN.
 Conflict-resolution corrected evidence: targeted 33/33, full 826/826. Historical-record boundary 72bffade8 retains receipts for disappeared groups without closing any other current group. Actual retirement baseline remains 15 blocked/4 pass/1 review, 0 invariants; scratch records reduce only named groups from 4 duplicate/151 semantic to 3/150. Explicit missing input fails with its path. No real resolution ledger is committed. Remaining tools/maps/full review remain UNPROVEN.
+Retiring-file red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-doc-retirement.test.mjs`: 33 pass, 3 fail. Root-file history coverage and consumer classification are missing; invalid root data is ignored. Post-conflict aec1b2e8e: 826/826 and both D proofs baseline-identical. No retiring-root ledger or legacy edit is authored; remaining tools/maps/review remain UNPROVEN.
