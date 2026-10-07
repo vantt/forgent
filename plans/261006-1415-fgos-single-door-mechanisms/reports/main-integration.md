@@ -69,3 +69,19 @@ Final documentation-only staged detection also returned `No changes detected`
 despite the three staged handoff/plan files. This separate tool inconsistency
 was reported; the explicit documentation ownership list, not that response,
 defines the final evidence commit's scope.
+
+## Subsequent owner-requested post-merge cleanup
+
+Removed the clean, fully merged execution worktree
+`/home/vantt/projects/worktrees/forgentX-single-door-execution`
+and local branch `feat/single-door-execution` with ordinary
+`git worktree remove` and `git branch -d`, without force.
+No process had its cwd inside that checkout. Directory, branch and worktree
+registry absence were verified; main HEAD was unchanged by those operations.
+
+Kept the original planning worktree and `feat/single-door-mechanisms`:
+its18 modified/untracked planning files remain byte-identical to the cleanup
+baseline. Main's11 user-owned files, activation, shared Cargo target and all
+three preservation/verification tags remain intact. Other worktrees and
+live Workflow state were not cleaned. Local dependency files in the removed
+checkout were removed with it; its target symlink did not delete main's target.
