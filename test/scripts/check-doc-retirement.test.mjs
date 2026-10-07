@@ -212,14 +212,19 @@ test('the retirement acceptance gate consumes conflict decisions without removin
   assert.equal(evaluateRetirement(inputs, constitution).find((result) => result.id === 'no-unresolved-conflicts').status, 'pass');
 });
 
-test('malformed, stale and duplicate conflict decisions fail instead of granting closure', () => {
+test('malformed and duplicate conflict decisions fail instead of granting closure', () => {
   const valid = resolution('duplicate', duplicateKey);
   const invalid = [
     { version: 2, groups: [valid] },
     { version: 1, groups: {} },
-    ...[{ ...valid, kind: 'other' }, { ...valid, key: 'c'.repeat(40) }, { ...valid, resolution: '' }, { ...valid, rule: '' }, { ...valid, evidence: [] }, { ...valid, evidence: [''] }].map((entry) => ({ version: 1, groups: [entry] })),
+    ...[{ ...valid, kind: 'other' }, { ...valid, key: '' }, { ...valid, resolution: '' }, { ...valid, rule: '' }, { ...valid, evidence: [] }, { ...valid, evidence: [''] }].map((entry) => ({ version: 1, groups: [entry] })),
     { version: 1, groups: [valid, valid] },
   ];
   for (const records of invalid) assert.throws(() => openConflictGroups(conflictInventory, records), /conflict resolution/i);
   assert.deepEqual(openConflictGroups(conflictInventory), { duplicates: 1, mirrors: 0, semantic: 1 });
+});
+
+test('historical decisions remain recordable after a group disappears and never close another group', () => {
+  const records = { version: 1, groups: [resolution('duplicate', 'c'.repeat(40)), resolution('semantic', 'retired:old-contract')] };
+  assert.deepEqual(openConflictGroups(conflictInventory, records), { duplicates: 1, mirrors: 0, semantic: 1 });
 });
