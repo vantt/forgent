@@ -1,0 +1,933 @@
+{
+ "commit": "57f3e7fe7af86adee1e805925cca82cf7a894164",
+ "method": "see consumer-survey.md section 2",
+ "groups": [
+  {
+   "id": "A",
+   "label": "Always-loaded instructions",
+   "members": [
+    "AGENTS.md",
+    "core/instructions/platform-laws.md (source of the generated \"fgOS Effective Instructions\" block of AGENTS.md)",
+    "CLAUDE.md (no legacy path in hand-written part)",
+    ".claude/rules/** (gitignored, untracked; no legacy path found)"
+   ],
+   "rewrite": "edit source (AGENTS.md hand-written lines; core/instructions/platform-laws.md then regenerate the projected block); never the generated blocks (mdview, gitnexus, fgos:instruction-projection)",
+   "shipped": "partly: the projected block of core/instructions is copied into consumer-project AGENTS.md by setup; AGENTS.md itself is repository-local",
+   "contract": "repository-local doctrine (AGENTS.md); shipped text (platform-laws block)",
+   "overlap": "Plan A phase 06 (done, on main); Plan B phase 06 (pending, writes AGENTS.md); Plan C phase 05 (draft)",
+   "timing": "wait for cutover; prepare exact replacement text and owner-review it earlier; apply after Plan B (plan 7.5)",
+   "measured": {
+    "coreSet": {
+     "files": 1,
+     "edgesAll": 10,
+     "edgesReference": 8,
+     "edgesGlob": 2,
+     "filesWithReference": 1,
+     "distinctFileTargetPairs": 5,
+     "byKind": {
+      "literal": 8
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 28,
+     "edgesReference": 28
+    }
+   },
+   "lineKinds": {
+    "markdown code-span path": 28,
+    "markdown prose/table path": 7,
+    "shipped-contract record": 1
+   }
+  },
+  {
+   "id": "B1",
+   "label": "Skill sources",
+   "members": [
+    "core/skills/**",
+    "domains/*/skills/**"
+   ],
+   "rewrite": "edit source, then npm run build:skills",
+   "shipped": "yes (package.json files: core, domains)",
+   "contract": "repository-local-contract in the shipped-path inventory (every legacy doc path found there is classified repository-local)",
+   "overlap": "Plan A phase 02 done (render header); none pending",
+   "timing": "apply at cutover; prepare and review earlier",
+   "measured": {
+    "coreSet": {
+     "files": 11,
+     "edgesAll": 32,
+     "edgesReference": 18,
+     "edgesGlob": 14,
+     "filesWithReference": 10,
+     "distinctFileTargetPairs": 12,
+     "byKind": {
+      "literal": 7,
+      "shipped-contract": 11
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 3,
+     "edgesReference": 3
+    }
+   },
+   "lineKinds": {
+    "markdown link": 1,
+    "shipped-contract record": 12,
+    "markdown prose/table path": 2,
+    "markdown code-span path": 6
+   }
+  },
+  {
+   "id": "B2",
+   "label": "Other core sources",
+   "members": [
+    "core/task-specs/**",
+    "core/prompt-templates/**",
+    "core/coordination-protocols/**",
+    "core/agents/**",
+    "core/workflows/**"
+   ],
+   "rewrite": "edit source",
+   "shipped": "yes (core)",
+   "contract": "repository-local-contract",
+   "overlap": "none known",
+   "timing": "apply at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 2,
+     "edgesAll": 3,
+     "edgesReference": 3,
+     "edgesGlob": 0,
+     "filesWithReference": 2,
+     "distinctFileTargetPairs": 2,
+     "byKind": {
+      "shipped-contract": 2,
+      "literal": 1
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 0,
+     "edgesReference": 0
+    }
+   },
+   "lineKinds": {
+    "shipped-contract record": 2,
+    "markdown code-span path": 1
+   }
+  },
+  {
+   "id": "C",
+   "label": "Generated skill renders",
+   "members": [
+    ".agents/skills/**",
+    "plugins/fgOS/skills/**",
+    ".claude/skills/<fgos-*> wrappers"
+   ],
+   "rewrite": "regenerate with npm run build:skills after the B1/B2 edit; never edit by hand; plugin copies carry a relative link that already resolves to a nonexistent plugins/docs path",
+   "shipped": "yes (.agents in package files; plugins/fgOS via the plugin channel)",
+   "contract": "generated mirror of B1",
+   "overlap": "Plan A phase 02/04: render header and active-release drift doctor check",
+   "timing": "regenerate inside the cutover change after B1",
+   "measured": {
+    "coreSet": {
+     "files": 21,
+     "edgesAll": 63,
+     "edgesReference": 35,
+     "edgesGlob": 28,
+     "filesWithReference": 19,
+     "distinctFileTargetPairs": 23,
+     "byKind": {
+      "literal": 13,
+      "shipped-contract": 22
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 8,
+     "edgesReference": 8
+    }
+   },
+   "lineKinds": {
+    "markdown link": 1,
+    "shipped-contract record": 25,
+    "markdown prose/table path": 4,
+    "markdown code-span path": 13
+   }
+  },
+  {
+   "id": "D1",
+   "label": "Documentation-migration gate scripts and data",
+   "members": [
+    "scripts/check-legacy-docs-ratchet.{mjs,baseline.json,exceptions.json}",
+    "scripts/check-doc-*.mjs",
+    "scripts/generate-doc-inventory.mjs",
+    "scripts/generate-shipped-path-inventory.mjs",
+    "scripts/verify-phase-0{1,2}.mjs (frozen)",
+    "scripts/knowledge-migration.mjs"
+   ],
+   "rewrite": "exempt-tool-data (1,020 of 1,026 edges are the ratchet baseline and exceptions data) or retire-with-the-gate; a few code literals and comments need an edit",
+   "shipped": "yes (package files: scripts) but repository-only tools",
+   "contract": "repository-local",
+   "overlap": "none",
+   "timing": "owner decides which gates survive the cutover (question Q8-4); retirement edits are applied at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 6,
+     "edgesAll": 1026,
+     "edgesReference": 1026,
+     "edgesGlob": 0,
+     "filesWithReference": 6,
+     "distinctFileTargetPairs": 1024,
+     "byKind": {
+      "literal": 958,
+      "executable-proof": 66,
+      "fixture": 2
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 16,
+     "edgesReference": 16
+    }
+   },
+   "lineKinds": {
+    "data-literal (json)": 1020,
+    "code comment": 4,
+    "code literal": 20
+   }
+  },
+  {
+   "id": "D2",
+   "label": "Other scripts",
+   "members": [
+    "scripts/check-decision-citation-drift.{mjs,baseline.json}",
+    "scripts/herdr-cockpit.sh",
+    "scripts/backfill-status-category.mjs"
+   ],
+   "rewrite": "behavior reader: check-decision-citation-drift defaults to the docs/specs directory (scripts/check-decision-citation-drift.mjs:428); change the root with the doc move",
+   "shipped": "yes",
+   "contract": "repository-local",
+   "overlap": "none",
+   "timing": "apply at cutover with a test run",
+   "measured": {
+    "coreSet": {
+     "files": 2,
+     "edgesAll": 18,
+     "edgesReference": 2,
+     "edgesGlob": 16,
+     "filesWithReference": 1,
+     "distinctFileTargetPairs": 1,
+     "byKind": {
+      "literal": 2
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 22,
+     "edgesReference": 2
+    }
+   },
+   "lineKinds": {
+    "code comment": 2,
+    "data-literal (json)": 2
+   }
+  },
+  {
+   "id": "E",
+   "label": "Tests and fixtures",
+   "members": [
+    "test/**",
+    "dogfood-fixture/**"
+   ],
+   "rewrite": "three kinds: (1) gate-tool tests that use legacy paths as synthetic data (136 reference edges in 9 files; exempt, they test the tools that retire or change with the cutover); (2) recorded run fixtures (json and jsonl data literals, 43 edges in 7 files; never rewrite, they are recorded history); (3) real-file readers that must move with the docs in the same commit: test/docs/rul11-anchor-phrase.test.mjs (reads docs/specs/platform-foundations.md), test/docs/decisions-corpus-retired.test.mjs (asserts the ADR narratives live in docs/specs/<area>.md), test/runner/dead-vocabulary-guard.test.mjs (walks docs/specs and docs/architect/agent-coordination/contracts); 26 further edges in 17 files are comments or one-off literals",
+   "shipped": "no",
+   "contract": "proof: a path assertion is coupled to its test",
+   "overlap": "none",
+   "timing": "apply at cutover in the same commit as the doc move; rehearse before",
+   "measured": {
+    "coreSet": {
+     "files": 37,
+     "edgesAll": 334,
+     "edgesReference": 215,
+     "edgesGlob": 119,
+     "filesWithReference": 35,
+     "distinctFileTargetPairs": 61,
+     "byKind": {
+      "fixture": 45,
+      "executable-proof": 161,
+      "dynamic": 9
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 43,
+     "edgesReference": 13
+    }
+   },
+   "lineKinds": {
+    "data-literal (json)": 43,
+    "code literal (executable-proof)": 148,
+    "code comment": 26,
+    "code literal": 11,
+    "markdown code-span path": 1
+   }
+  },
+  {
+   "id": "F",
+   "label": "Source and runtime code",
+   "members": [
+    "src/**",
+    "bin/**",
+    "apps/**",
+    "packages/**",
+    ".github/**",
+    "herdr-dashboard/**"
+   ],
+   "rewrite": "49 of 50 reference edges are code comments; 1 code literal. Plus three CLI help strings (src/cli/command-registry.mjs lines 473, 1411; bin/fgos.mjs help) that name docs/specs/<area>.md and docs/specs/distribution.md",
+   "shipped": "yes (bin, src); apps and packages are repository components",
+   "contract": "shipped text (help strings) and comments",
+   "overlap": "Plan A phase 04/05 (doctor, hook), Plan B phase 02-05 (new convention component and enforcement) touch src/setup/registrations.mjs and .githooks",
+   "timing": "comments and help text can be prepared; apply at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 32,
+     "edgesAll": 52,
+     "edgesReference": 48,
+     "edgesGlob": 4,
+     "filesWithReference": 31,
+     "distinctFileTargetPairs": 38,
+     "byKind": {
+      "literal": 48
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 14,
+     "edgesReference": 2
+    }
+   },
+   "lineKinds": {
+    "code comment": 49,
+    "code literal": 1
+   }
+  },
+  {
+   "id": "G1a",
+   "label": "docs/platform evidence payloads",
+   "members": [
+    "docs/platform/**/verification/<collection>/** (867 files; byte-identical to the legacy copy)"
+   ],
+   "rewrite": "never rewritten: digest contract (plan 3 item 10, evidence policy section 4 rule 3); legacy path mentions inside are covered by the alias table",
+   "shipped": "no",
+   "contract": "evidence, not authority",
+   "overlap": "none",
+   "timing": "verify digests with the Phase 8 verifier; delete the legacy copy at cutover step 6",
+   "measured": {
+    "coreSet": {
+     "files": 134,
+     "edgesAll": 714,
+     "edgesReference": 539,
+     "edgesGlob": 175,
+     "filesWithReference": 128,
+     "distinctFileTargetPairs": 338,
+     "byKind": {
+      "literal": 495,
+      "executable-proof": 39,
+      "dynamic": 2,
+      "fixture": 3
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 38,
+     "edgesReference": 17
+    }
+   },
+   "lineKinds": {
+    "markdown code-span path": 234,
+    "markdown prose/table path": 209,
+    "data-literal (json)": 112,
+    "markdown link": 1
+   }
+  },
+  {
+   "id": "G1b",
+   "label": "docs/platform candidate and promoted documents",
+   "members": [
+    "docs/platform/** outside evidence payloads"
+   ],
+   "rewrite": "Phase 6 Step 10 item 2 repoints candidate-to-candidate links; what remains afterwards is provenance text in history, ledger and verification documents (names legacy paths on purpose) and links of the three promoted portals; classify as exempt-provenance or rewrite",
+   "shipped": "no",
+   "contract": "candidate and promoted authority",
+   "overlap": "Phase 6 (re-measure after it closes); Plan B writes component-boundary.md and a new convention area; Plan C writes packaging-distribution",
+   "timing": "re-measure after Phase 6; promoted portals only at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 91,
+     "edgesAll": 1170,
+     "edgesReference": 754,
+     "edgesGlob": 416,
+     "filesWithReference": 86,
+     "distinctFileTargetPairs": 585,
+     "byKind": {
+      "literal": 372,
+      "executable-proof": 375,
+      "dynamic": 2,
+      "fixture": 5
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 80,
+     "edgesReference": 78
+    }
+   },
+   "lineKinds": {
+    "markdown code-span path": 437,
+    "markdown link": 268,
+    "markdown prose/table path": 130
+   }
+  },
+  {
+   "id": "G2",
+   "label": "End-user docs",
+   "members": [
+    "docs/knowledge/**",
+    "docs/how-to/**",
+    "docs/explanation/**",
+    "docs/reference/**",
+    "docs/tutorials/**"
+   ],
+   "rewrite": "edit the document; regenerate the index; knowledge documents are registry-managed (writer gating), so use the registry door or a reviewed exception",
+   "shipped": "how-to and explanation yes (package files); knowledge no",
+   "contract": "user knowledge corpus, not platform authority (plan 2.3)",
+   "overlap": "none",
+   "timing": "apply at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 72,
+     "edgesAll": 250,
+     "edgesReference": 160,
+     "edgesGlob": 90,
+     "filesWithReference": 66,
+     "distinctFileTargetPairs": 96,
+     "byKind": {
+      "literal": 154,
+      "executable-proof": 2,
+      "dynamic": 4
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 55,
+     "edgesReference": 15
+    }
+   },
+   "lineKinds": {
+    "markdown code-span path": 111,
+    "markdown link": 20,
+    "markdown prose/table path": 44
+   }
+  },
+  {
+   "id": "G3",
+   "label": "Other docs",
+   "members": [
+    "docs/*.md root documents",
+    "docs/decisions/index.md (generated)",
+    "docs/backlog.md (generated)",
+    "docs/doc-registry.* (generated)",
+    "docs/enduser-docs-index.json (generated, shipped)",
+    "docs/templates/**",
+    "docs/contracts/**",
+    "docs/distillery/**",
+    "docs/generated/**"
+   ],
+   "rewrite": "generated files: regenerate (decision-index, docs-index, backlog and registry generators); hand-written: edit; docs/distillery is a reference-learning area (history-like) to be classified",
+   "shipped": "docs/enduser-docs-index.json yes",
+   "contract": "mixed",
+   "overlap": "Plan B (reading-map, system-overview lines), advisory plan",
+   "timing": "depends on the retiring-root list of the Phase 6 area maps",
+   "measured": {
+    "coreSet": {
+     "files": 25,
+     "edgesAll": 243,
+     "edgesReference": 96,
+     "edgesGlob": 147,
+     "filesWithReference": 20,
+     "distinctFileTargetPairs": 40,
+     "byKind": {
+      "literal": 84,
+      "executable-proof": 4,
+      "dynamic": 8
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 168,
+     "edgesReference": 53
+    }
+   },
+   "lineKinds": {
+    "markdown code-span path": 98,
+    "markdown prose/table path": 44,
+    "data-literal (json)": 3,
+    "code literal": 10
+   }
+  },
+  {
+   "id": "H1",
+   "label": "Immutable history",
+   "members": [
+    "archive/**",
+    ".fgos/** (events and state)",
+    "CHANGELOG.md",
+    "docs/history/**",
+    "docs/journals/**"
+   ],
+   "rewrite": "alias only, never rewritten",
+   "shipped": "CHANGELOG no",
+   "contract": "history",
+   "overlap": "none",
+   "timing": "alias table at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 469,
+     "edgesAll": 3091,
+     "edgesReference": 2008,
+     "edgesGlob": 1083,
+     "filesWithReference": 447,
+     "distinctFileTargetPairs": 846,
+     "byKind": {
+      "executable-proof": 547,
+      "literal": 1401,
+      "fixture": 27,
+      "dynamic": 33
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 690,
+     "edgesReference": 307
+    }
+   },
+   "lineKinds": null
+  },
+  {
+   "id": "H2",
+   "label": "Plans and reports",
+   "members": [
+    "plans/**"
+   ],
+   "rewrite": "alias only; the active unification plan and its reports are history by the moment of cutover",
+   "shipped": "no",
+   "contract": "history",
+   "overlap": "none",
+   "timing": "alias table at cutover",
+   "measured": {
+    "coreSet": {
+     "files": 317,
+     "edgesAll": 4519,
+     "edgesReference": 3326,
+     "edgesGlob": 1193,
+     "filesWithReference": 300,
+     "distinctFileTargetPairs": 1513,
+     "byKind": {
+      "literal": 3003,
+      "executable-proof": 261,
+      "dynamic": 51,
+      "fixture": 11
+     }
+    },
+    "rootAuthoritySet": {
+     "edgesAll": 421,
+     "edgesReference": 256
+    }
+   },
+   "lineKinds": null
+  }
+ ],
+ "reconciliation": {
+  "P6 planning def (target in 1,040 legacy files; consumer outside history incl CHANGELOG, outside legacy roots)": {
+   "edges": 5059,
+   "files": 627,
+   "byKind": {
+    "literal": 2907,
+    "dynamic": 74,
+    "fixture": 71,
+    "executable-proof": 748,
+    "glob": 1222,
+    "shipped-contract": 37
+   }
+  },
+  "P4 retirement-check def (target specs|architect; consumer outside legacy roots and history)": {
+   "edges": 3908,
+   "files": 433,
+   "byKind": {
+    "literal": 2149,
+    "executable-proof": 647,
+    "glob": 997,
+    "shipped-contract": 35,
+    "fixture": 55,
+    "dynamic": 25
+   }
+  },
+  "P4 def minus glob edges": {
+   "edges": 2911,
+   "files": 412,
+   "byKind": {
+    "literal": 2149,
+    "executable-proof": 647,
+    "shipped-contract": 35,
+    "fixture": 55,
+    "dynamic": 25
+   }
+  },
+  "P4 def minus glob minus platform evidence-payload consumers": {
+   "edges": 2373,
+   "files": 285,
+   "byKind": {
+    "literal": 1655,
+    "executable-proof": 608,
+    "shipped-contract": 35,
+    "fixture": 52,
+    "dynamic": 23
+   }
+  }
+ },
+ "topTargets": [
+  {
+   "target": "docs/specs/runner.md",
+   "edges": 269,
+   "files": 80,
+   "groups": {
+    "C": 18,
+    "A": 1,
+    "F": 2,
+    "B1": 9,
+    "G3": 32,
+    "G2": 49,
+    "G1": 17,
+    "D2": 2,
+    "D1": 3,
+    "E": 136
+   }
+  },
+  {
+   "target": "docs/specs/work-state.md",
+   "edges": 89,
+   "files": 42,
+   "groups": {
+    "G3": 20,
+    "G2": 39,
+    "G1": 21,
+    "E": 5,
+    "D1": 2,
+    "F": 2
+   }
+  },
+  {
+   "target": "docs/platform-foundations.md",
+   "edges": 60,
+   "files": 16,
+   "groups": {
+    "A": 24,
+    "G3": 6,
+    "G2": 2,
+    "G1": 20,
+    "D2": 1,
+    "D1": 1,
+    "E": 6
+   }
+  },
+  {
+   "target": "docs/specs/distribution.md",
+   "edges": 48,
+   "files": 26,
+   "groups": {
+    "A": 1,
+    "F": 6,
+    "G3": 4,
+    "G2": 14,
+    "G1": 19,
+    "D1": 2,
+    "E": 2
+   }
+  },
+  {
+   "target": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+   "edges": 41,
+   "files": 13,
+   "groups": {
+    "G1": 40,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/specs/platform-foundations.md",
+   "edges": 39,
+   "files": 19,
+   "groups": {
+    "A": 2,
+    "G3": 6,
+    "G2": 8,
+    "G1": 11,
+    "D1": 3,
+    "E": 9
+   }
+  },
+  {
+   "target": "docs/doc-governance.md",
+   "edges": 36,
+   "files": 15,
+   "groups": {
+    "G3": 9,
+    "G1": 19,
+    "D1": 6,
+    "E": 2
+   }
+  },
+  {
+   "target": "docs/specs/reading-map.md",
+   "edges": 31,
+   "files": 18,
+   "groups": {
+    "C": 4,
+    "A": 3,
+    "B1": 2,
+    "B2": 2,
+    "G3": 13,
+    "G2": 1,
+    "G1": 3,
+    "D1": 3
+   }
+  },
+  {
+   "target": "docs/architecture-map.md",
+   "edges": 30,
+   "files": 15,
+   "groups": {
+    "G3": 13,
+    "G2": 5,
+    "G1": 7,
+    "D1": 1,
+    "E": 4
+   }
+  },
+  {
+   "target": "docs/architect/doing-coordination-redesign.md",
+   "edges": 26,
+   "files": 19,
+   "groups": {
+    "G2": 1,
+    "D1": 1,
+    "F": 6,
+    "E": 18
+   }
+  },
+  {
+   "target": "docs/distribution-vision.md",
+   "edges": 26,
+   "files": 15,
+   "groups": {
+    "F": 2,
+    "A": 2,
+    "G2": 4,
+    "G1": 16,
+    "G3": 1,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/knowledge-registry-redesign.md",
+   "edges": 25,
+   "files": 11,
+   "groups": {
+    "C": 4,
+    "F": 10,
+    "G2": 2,
+    "B1": 2,
+    "D1": 4,
+    "E": 3
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/contracts/coordination-session.md",
+   "edges": 24,
+   "files": 18,
+   "groups": {
+    "C": 4,
+    "B1": 2,
+    "G2": 4,
+    "G1": 5,
+    "D1": 2,
+    "E": 7
+   }
+  },
+  {
+   "target": "docs/io-contract.md",
+   "edges": 24,
+   "files": 9,
+   "groups": {
+    "G3": 6,
+    "G2": 6,
+    "G1": 9,
+    "D1": 1,
+    "E": 2
+   }
+  },
+  {
+   "target": "docs/id-systems-audit.md",
+   "edges": 23,
+   "files": 8,
+   "groups": {
+    "C": 6,
+    "B1": 3,
+    "G3": 12,
+    "D1": 1,
+    "E": 1
+   }
+  },
+  {
+   "target": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+   "edges": 22,
+   "files": 8,
+   "groups": {
+    "G1": 21,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+   "edges": 20,
+   "files": 9,
+   "groups": {
+    "G1": 19,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+   "edges": 20,
+   "files": 8,
+   "groups": {
+    "G1": 19,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+   "edges": 18,
+   "files": 8,
+   "groups": {
+    "G1": 17,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/specs/confinement-authority.md",
+   "edges": 16,
+   "files": 16,
+   "groups": {
+    "G3": 2,
+    "G2": 2,
+    "G1": 3,
+    "D1": 2,
+    "F": 5,
+    "E": 2
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/proposals/dag-request-scheduler.md",
+   "edges": 12,
+   "files": 9,
+   "groups": {
+    "G1": 6,
+    "D1": 1,
+    "E": 5
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+   "edges": 12,
+   "files": 7,
+   "groups": {
+    "G1": 11,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+   "edges": 12,
+   "files": 11,
+   "groups": {
+    "G1": 7,
+    "F": 4,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/reading-map.md",
+   "edges": 12,
+   "files": 8,
+   "groups": {
+    "G3": 6,
+    "G1": 3,
+    "D1": 2,
+    "E": 1
+   }
+  },
+  {
+   "target": "docs/specs/system-overview.md",
+   "edges": 12,
+   "files": 9,
+   "groups": {
+    "A": 1,
+    "G3": 6,
+    "G2": 2,
+    "D1": 2,
+    "E": 1
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/contracts/assignment-run-runresult.md",
+   "edges": 11,
+   "files": 7,
+   "groups": {
+    "G1": 10,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/contracts/flow-definition.md",
+   "edges": 11,
+   "files": 11,
+   "groups": {
+    "C": 2,
+    "B1": 1,
+    "G1": 4,
+    "D1": 2,
+    "F": 2
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+   "edges": 10,
+   "files": 6,
+   "groups": {
+    "G1": 9,
+    "D1": 1
+   }
+  },
+  {
+   "target": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+   "edges": 10,
+   "files": 5,
+   "groups": {
+    "G1": 1,
+    "D1": 1,
+    "E": 8
+   }
+  },
+  {
+   "target": "docs/transitional-switchboard.md",
+   "edges": 10,
+   "files": 6,
+   "groups": {
+    "G3": 2,
+    "G1": 6,
+    "D1": 2
+   }
+  }
+ ],
+ "inventoryMissedFiles": 80
+}
