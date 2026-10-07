@@ -42,6 +42,7 @@ import { checkCandidateMetadata, DEFAULT_SWITCHBOARD_PATH } from './check-doc-ca
 import { normalizePosix } from './generate-shipped-path-inventory.mjs';
 
 export const LEGACY_ROOTS = ['docs/specs/', 'docs/architect/'];
+export const DEFAULT_CONFLICT_RESOLUTIONS_PATH = path.posix.join(path.posix.dirname(DEFAULT_CONSTITUTION_PATH), 'ledger/conflict-resolutions.json');
 // Consumers under these prefixes are history or evidence, not authority readers.
 const NON_AUTHORITY_CONSUMER_PREFIXES = ['docs/history/', 'archive/', 'plans/', '.fgos/'];
 
@@ -84,10 +85,27 @@ export function unrewrittenConsumerEdges(inventory) {
  * are all evidence-payload mirrors resolves by deduplication, not by choosing
  * an owner.
  */
-export function openConflictGroups(inventory) {
+export function openConflictGroups(inventory, resolutions = null) {
   const all = inventory?.duplicateContentGroups || [];
   const duplicates = all.filter((g) => !(g?.paths || []).every(isEvidenceMirrorPath));
-  return { duplicates: duplicates.length, mirrors: all.length - duplicates.length, semantic: (inventory?.semanticConflictGroups || []).length };
+  const semantic = inventory?.semanticConflictGroups || [];
+  const closed = new Set();
+  if (resolutions !== null) {
+    if (resolutions?.version !== 1 || !Array.isArray(resolutions.groups)) throw new Error('conflict resolution data must be version 1 with a groups array');
+    for (const entry of resolutions.groups) {
+      const id = `${entry?.kind}:${entry?.key}`;
+      if (!['duplicate', 'semantic'].includes(entry?.kind) || typeof entry.key !== 'string' || !entry.key.trim() ||
+          !['resolution', 'rule'].every((field) => typeof entry[field] === 'string' && entry[field].trim()) ||
+          !Array.isArray(entry.evidence) || entry.evidence.length === 0 || entry.evidence.some((value) => typeof value !== 'string' || !value.trim()) ||
+          closed.has(id)) throw new Error(`conflict resolution ${id} is malformed or recorded twice`);
+      closed.add(id);
+    }
+  }
+  return {
+    duplicates: duplicates.filter((group) => !closed.has(`duplicate:${group.blobSha}`)).length,
+    mirrors: all.length - duplicates.length,
+    semantic: semantic.filter((group) => !closed.has(`semantic:${group.key}`)).length,
+  };
 }
 
 const countsOfCandidateStatus = (candidateStatus) => {
@@ -171,7 +189,7 @@ export function evaluateRetirement(inputs, constitution) {
     if (!listed.has(id)) results.push({ gate: 'constitution', id, rule: 'A check this script evaluates is missing from the constitution.', enforcedBy: 'script', status: 'blocked', measure: 'the constitution no longer lists this check; a gate was dropped or renamed' });
   }
   // Acceptance of the migration: no unresolved claim conflict remains.
-  const groups = openConflictGroups(inputs.inventory);
+  const groups = openConflictGroups(inputs.inventory, inputs.conflictResolutions ?? null);
   results.push({ gate: 'migration-acceptance', id: 'no-unresolved-conflicts', rule: 'No unresolved claim conflict remains.', enforcedBy: 'script', ...verdict(groups.duplicates + groups.semantic, `duplicate-content groups (${groups.duplicates}, excluding ${groups.mirrors} evidence mirrors that resolve by deduplication) and semantic-conflict groups (${groups.semantic}) still open`) });
   return results;
 }
@@ -198,6 +216,8 @@ function gatherInputs({ repoRoot, argv, cwd }) {
   const aliasTable = loadJson(option('--alias-table', DEFAULT_ALIAS_TABLE_PATH));
   const reviewIdx = argv.indexOf('--review-record');
   const reviewRecords = reviewIdx >= 0 ? loadJson(path.resolve(cwd, argv[reviewIdx + 1])) : {};
+  const conflictPath = option('--conflict-resolutions', DEFAULT_CONFLICT_RESOLUTIONS_PATH);
+  const conflictResolutions = argv.includes('--conflict-resolutions') || fs.existsSync(conflictPath) ? loadJson(conflictPath) : null;
   const inventory = loadInventory(inventoryPath, { inventoryPath, identityRegistryPath, cwd });
   const registryBytes = fs.readFileSync(identityRegistryPath);
   const registry = JSON.parse(registryBytes.toString('utf8'));
@@ -224,6 +244,7 @@ function gatherInputs({ repoRoot, argv, cwd }) {
     promotion: checkPromotion(files, constitution, readFile, repoRoot),
     candidateStatus: checkCandidateMetadata({ files, readFile, switchboard, constitution, repoRoot }),
     reviewRecords,
+    conflictResolutions,
     constitution,
   };
 }
@@ -233,13 +254,14 @@ export function runCli(argv, cwd = process.cwd()) {
   const repoRoot = path.resolve(cwd, repoRootIdx >= 0 ? argv[repoRootIdx + 1] : cwd);
   const cutover = argv.includes('--cutover');
   let inputs;
+  let results;
   try {
     inputs = gatherInputs({ repoRoot, argv, cwd });
+    results = evaluateRetirement(inputs, inputs.constitution);
   } catch (err) {
     console.error(`check-doc-retirement error loading input: ${err.message}`);
     return 1;
   }
-  const results = evaluateRetirement(inputs, inputs.constitution);
   const counts = summarizeResults(results);
   const invariantFailures = inputs.gateFatalFindings;
   if (argv.includes('--json')) {
