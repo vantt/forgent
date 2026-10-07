@@ -107,6 +107,11 @@ export function validateAliasTable(table, { repoRoot, constitution } = {}) {
 
   if (repoRoot) {
     for (const entry of wellFormed) {
+      const { path: fromPath, anchor: fromAnchor } = splitRef(entry.fromPath);
+      const old = fromAnchor === null ? null : readOldDocument(repoRoot, fromPath);
+      if (old !== null && !anchorSpellings(old).has(fromAnchor)) add('from-anchor-missing', `${entry.aliasId}: fromPath anchor "${fromAnchor}" is not a heading or block anchor of ${fromPath}`, entry.aliasId);
+    }
+    for (const entry of wellFormed) {
       if (!entry.toOwner) continue;
       const ownerPath = path.resolve(repoRoot, entry.toOwner);
       if (!fs.existsSync(ownerPath)) { add('owner-missing', `${entry.aliasId}: toOwner "${entry.toOwner}" does not exist`, entry.aliasId); continue; }
@@ -126,20 +131,108 @@ export function validateAliasTable(table, { repoRoot, constitution } = {}) {
   return findings;
 }
 
-/** Resolves `path` or `path#anchor` by exact match: the full reference first, then the bare path. */
-export function resolveAlias(table, ref) {
+const LINE_RANGE = /^(.+?\.md):(\d+)(?:-(\d+))?$/;
+const LINE_FRAGMENT = /^(.+?\.md)#L(\d+)(?:-L?(\d+))?$/;
+
+/** GitHub's slug of a heading: lower case, punctuation removed, every space a hyphen (no collapsing). */
+function githubSlug(title) {
+  return title.trim().toLowerCase().replace(/[^\p{L}\p{N}\- _]/gu, '').replace(/ /g, '-');
+}
+
+function readOldDocument(repoRoot, refPath) {
+  if (!repoRoot || !refPath.toLowerCase().endsWith('.md')) return null;
+  try { return fs.readFileSync(path.resolve(repoRoot, refPath), 'utf8'); } catch { return null; }
+}
+
+/** Every spelling of a heading anchor of the old document (extractor anchors and GitHub's own slug) mapped to the extractor anchor. */
+function anchorSpellings(content) {
+  const spellings = new Map();
+  for (const u of extractMarkdownConservationUnits(content)) {
+    for (const a of [u.anchor, u.githubAnchor, u.stableAnchor]) if (a && !spellings.has(a)) spellings.set(a, u.anchor);
+    if (u.unitKind === 'heading' && !spellings.has(githubSlug(u.title))) spellings.set(githubSlug(u.title), u.anchor);
+  }
+  return spellings;
+}
+
+/** The headings enclosing a line of the old document, nearest first (the heading on the line itself first when the line is a heading). */
+function enclosingHeadings(content, line) {
+  const units = extractMarkdownConservationUnits(content).sort((a, b) => a.startLine - b.startLine);
+  let idx = -1;
+  for (let k = 0; k < units.length; k += 1) if (units[k].startLine <= line) idx = k;
+  if (idx < 0) return [];
+  const chain = [];
+  let level = Infinity;
+  for (let k = idx; k >= 0; k -= 1) {
+    if (units[k].unitKind === 'heading' && units[k].level < level) { chain.push(units[k].anchor); level = units[k].level; }
+  }
+  return chain;
+}
+
+/** Normalizes a reference written in a consumer: relative links are resolved against the consumer's directory. */
+function normalizeReference(ref, consumerPath) {
+  if (!/^\.{1,2}\//.test(ref)) return { ref };
+  if (!consumerPath) return { error: 'relative-reference-needs-consumer' };
+  const joined = path.posix.normalize(path.posix.join(path.posix.dirname(consumerPath), ref));
+  return joined.startsWith('../') ? { error: 'relative-reference-leaves-repository' } : { ref: joined };
+}
+
+/**
+ * Resolves `path`, `path#anchor`, `path:line`, `path:line-line`, `path#L12` or a relative link by exact match.
+ * An exact full-reference hit comes first. With a repo root the anchor of the old document is checked:
+ * an anchor that is not in it is unresolved (`unknown-anchor`), never a silent fallback to the bare-path
+ * alias. A line form maps the line to the enclosing headings of the old document (line numbers drift, so the
+ * result says `precision: 'line-to-section'`). A reference whose own anchor has no alias falls back to the
+ * nearest enclosing heading that has one, or to the bare path, and says so in `precision`.
+ */
+export function resolveAlias(table, rawRef, { repoRoot = null, consumerPath = null } = {}) {
   const entries = Array.isArray(table?.entries) ? table.entries : [];
-  const { path: refPath, anchor } = splitRef(String(ref));
-  const hit = entries.find((e) => e.fromPath === ref) || (anchor !== null ? entries.find((e) => e.fromPath === refPath) : null);
-  if (!hit) return { resolved: false };
-  return {
+  const normalized = normalizeReference(String(rawRef), consumerPath);
+  if (normalized.error) return { resolved: false, reason: normalized.error };
+  let ref = normalized.ref;
+  let lineForm = null;
+  const lineMatch = ref.match(LINE_RANGE) || ref.match(LINE_FRAGMENT);
+  if (lineMatch) { lineForm = { path: lineMatch[1], line: Number(lineMatch[2]) }; ref = lineMatch[1]; }
+  const { path: refPath, anchor } = splitRef(ref);
+  const found = (hit, extra = {}) => ({
     resolved: true,
     toOwner: hit.toOwner,
     toAnchor: hit.toAnchor,
     kind: hit.kind,
     via: hit.aliasId,
     ...(hit.evidenceRef ? { evidenceRef: hit.evidenceRef } : {}),
-  };
+    ...extra,
+  });
+  const byFrom = (from) => entries.find((e) => e.fromPath === from);
+  const old = readOldDocument(repoRoot, refPath);
+
+  if (lineForm) {
+    if (old === null) return { resolved: false, reason: 'line-reference-needs-old-document' };
+    const total = old.split(/\r?\n/).length;
+    if (lineForm.line < 1 || lineForm.line > total) return { resolved: false, reason: 'line-out-of-range' };
+    for (const heading of enclosingHeadings(old, lineForm.line)) {
+      const hit = byFrom(`${refPath}#${heading}`);
+      if (hit) return found(hit, { precision: 'line-to-section', viaAnchor: heading });
+    }
+    const bare = byFrom(refPath);
+    return bare ? found(bare, { precision: 'line-to-section', viaAnchor: null }) : { resolved: false, reason: 'no-alias' };
+  }
+
+  const exact = byFrom(ref);
+  if (exact) return found(exact);
+  if (anchor === null) return { resolved: false, reason: 'no-alias' };
+  if (old !== null) {
+    const canonical = anchorSpellings(old).get(anchor);
+    if (canonical === undefined) return { resolved: false, reason: 'unknown-anchor' };
+    const spelled = byFrom(`${refPath}#${canonical}`);
+    if (spelled) return found(spelled);
+    for (const heading of enclosingHeadings(old, extractMarkdownConservationUnits(old).find((u) => u.anchor === canonical)?.startLine ?? 1)) {
+      const hit = byFrom(`${refPath}#${heading}`);
+      if (hit) return found(hit, { precision: 'ancestor-section', viaAnchor: heading });
+    }
+  }
+  const bare = byFrom(refPath);
+  if (!bare) return { resolved: false, reason: 'no-alias' };
+  return found(bare, { precision: 'bare-path', anchorVerified: old !== null });
 }
 
 export function runCli(argv, cwd = process.cwd()) {
@@ -150,6 +243,7 @@ export function runCli(argv, cwd = process.cwd()) {
   const asJson = argv.includes('--json');
   const tablePath = path.resolve(cwd, option('--table') ?? DEFAULT_ALIAS_TABLE_PATH);
   const ref = option('--resolve');
+  const consumerPath = option('--from') ?? null;
   let table;
   try {
     table = JSON.parse(fs.readFileSync(tablePath, 'utf8'));
@@ -165,7 +259,7 @@ export function runCli(argv, cwd = process.cwd()) {
     return 1;
   }
   const findings = validateAliasTable(table, { repoRoot: cwd, constitution });
-  const resolution = ref === undefined ? null : resolveAlias(table, ref);
+  const resolution = ref === undefined ? null : resolveAlias(table, ref, { repoRoot: cwd, consumerPath });
   const failed = findings.length > 0 || (resolution !== null && !resolution.resolved);
   if (asJson) {
     console.log(JSON.stringify({ findings, resolution }, null, 2));
@@ -178,8 +272,8 @@ export function runCli(argv, cwd = process.cwd()) {
     console.log(`doc-alias-resolver: alias table is valid (${table.entries.length} entries).`);
   }
   if (resolution) {
-    if (resolution.resolved) console.log(`${ref} -> ${resolution.toOwner ?? '(retired)'}${resolution.toAnchor ? `#${resolution.toAnchor}` : ''} [${resolution.kind}, via ${resolution.via}]`);
-    else console.error(`${ref}: no alias`);
+    if (resolution.resolved) console.log(`${ref} -> ${resolution.toOwner ?? '(retired)'}${resolution.toAnchor ? `#${resolution.toAnchor}` : ''} [${resolution.kind}, via ${resolution.via}${resolution.precision ? `, ${resolution.precision}` : ''}]`);
+    else console.error(`${ref}: unresolved (${resolution.reason})`);
   }
   return failed ? 1 : 0;
 }

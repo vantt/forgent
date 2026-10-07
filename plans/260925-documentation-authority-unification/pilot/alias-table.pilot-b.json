@@ -1,9 +1,19 @@
 {
   "version": 1,
-  "description": "Pilot B alias table for the work-state area: one split alias per H2 section of docs/specs/work-state.md, a bare-path redirect of that document to the area portal, and a bare-path move of docs/io-contract.md to its contract document. Candidate content only; the live alias table stays empty.",
+  "description": "Pilot alias table for the work-state candidate area: one entry per heading of docs/specs/work-state.md (117) and docs/io-contract.md (11), generated from the independently reviewed decision rows, plus the two bare-path entries (a split document resolves a bare reference to the area portal). Not the platform alias table.",
   "entries": [
     {
-      "aliasId": "work-state-spec-entry-points-triggers",
+      "aliasId": "work-state-heading-001",
+      "fromPath": "docs/specs/work-state.md#spec-work-state-tầng-quản-việc-của-forgent",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "1-purpose-and-scope",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-002",
       "fromPath": "docs/specs/work-state.md#entry-points-triggers",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "2-entry-points-and-triggers",
@@ -13,7 +23,7 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-data-dictionary",
+      "aliasId": "work-state-heading-003",
       "fromPath": "docs/specs/work-state.md#data-dictionary",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "3-work-item-data-dictionary",
@@ -23,7 +33,187 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-behaviors-operations",
+      "aliasId": "work-state-heading-004",
+      "fromPath": "docs/specs/work-state.md#bản-ghi-kết-quả-outcome-dự-đoán-thực-tế",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "outcome-record",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-005",
+      "fromPath": "docs/specs/work-state.md#bản-ghi-friction-kênh-2-của-capture-phase-3-slice-2",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "friction-record",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-006",
+      "fromPath": "docs/specs/work-state.md#bản-ghi-settlement-kênh-1-của-capture-2-kênh-phase-3-s3-closeout",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "settlement-record",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-007",
+      "fromPath": "docs/specs/work-state.md#danh-tính-người-ghi-writer-cá-thể-tách-bạch-khỏi-vai-str46-io-contract",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "writer-identity",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-008",
+      "fromPath": "docs/specs/work-state.md#bài-học-lúc-đóng-câu-6-tự-động-phase-3-s3-closeout",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "close-lesson-record",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-009",
+      "fromPath": "docs/specs/work-state.md#bản-ghi-cổng-người-gate-câu-hỏi-câu-trả-lời-ảnh-chụp-gốc",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "human-gate-record",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-010",
+      "fromPath": "docs/specs/work-state.md#work-không-còn-stage-bước-đến-từ-workflow-đường-đọc-dữ-liệu-cũ",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "workflow-step-replaces-stage",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-011",
+      "fromPath": "docs/specs/work-state.md#giai-đoạn-soi-rõ-bước-discovery-và-đào-sâu-bước-exploring",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "discovery-and-exploring-stages",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-012",
+      "fromPath": "docs/specs/work-state.md#bản-ghi-cổng-discovery",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "discovery-gate-record",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-013",
+      "fromPath": "docs/specs/work-state.md#giai-đoạn-lập-kế-hoạch-stage-planning",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "planning-stage",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-014",
+      "fromPath": "docs/specs/work-state.md#mô-hình-domain-base-workflow-domain-extension",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "6-domain-model",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-015",
+      "fromPath": "docs/specs/work-state.md#cửa-pull-giaonhận-việc-takereturn",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "7-pull-door-take-and-return",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-016",
+      "fromPath": "docs/specs/work-state.md#cửa-pull-mở-rộng-hoàn-tất-một-đề-xuất-nguồn-nhánh-bị-đỗ",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "branch-proposal-completion",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-017",
+      "fromPath": "docs/specs/work-state.md#phong-bì-output-envelope-chuẩn-máy-đọc-của-mọi-verb-per-d-b2d18cc7-b0da87aa",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "envelope-shape",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-018",
+      "fromPath": "docs/specs/work-state.md#sổ-verb-máy-đọc-manifest---help---json",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "manifest-shape",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-019",
+      "fromPath": "docs/specs/work-state.md#trợ-giúp-theo-từng-verb-fgos---help",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "9-per-verb-help",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-020",
+      "fromPath": "docs/specs/work-state.md#sổ-đăng-ký-công-cụ-tool-registry-hai-chiều-tách-chuẩn-đăng-ký-khỏi-đang-hiện-diện",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "registry-projection-and-registration-standard",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-021",
+      "fromPath": "docs/specs/work-state.md#đăng-kýgỡprobehỏi-công-cụ-tool-register-check-query-remove",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "tool-registry-verbs",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-022",
       "fromPath": "docs/specs/work-state.md#behaviors-operations",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "9-behaviors-and-operations",
@@ -33,7 +223,237 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-actors-access",
+      "aliasId": "work-state-heading-023",
+      "fromPath": "docs/specs/work-state.md#khởi-tạo-init",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "init-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-024",
+      "fromPath": "docs/specs/work-state.md#khai-việc-add-bề-mặt-nội-bộ",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "add-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-025",
+      "fromPath": "docs/specs/work-state.md#nộp-vấn-đề-tự-do-submit",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "submit-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-026",
+      "fromPath": "docs/specs/work-state.md#chạy-context-discovery-discover",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "discover-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-027",
+      "fromPath": "docs/specs/work-state.md#chạy-phán-chia-việc-plan",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "plan-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-028",
+      "fromPath": "docs/specs/work-state.md#chuyển-trạng-thái-move",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "move-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-029",
+      "fromPath": "docs/specs/work-state.md#sửa-việc-edit-luôn-ghi-đè-được-str23-per-work-item-verb-surface",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "edit-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-030",
+      "fromPath": "docs/specs/work-state.md#ghi-quyết-định-decision",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "decision-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-031",
+      "fromPath": "docs/specs/work-state.md#đưa-vào-chờ-người-ask",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "ask-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-032",
+      "fromPath": "docs/specs/work-state.md#trả-lời-answer",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "answer-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-033",
+      "fromPath": "docs/specs/work-state.md#ghi-kết-quả-dự-đoánthực-tế-outcome",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "outcome-recording",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-034",
+      "fromPath": "docs/specs/work-state.md#đọc-kết-quả-check",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "check-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-035",
+      "fromPath": "docs/specs/work-state.md#sinh-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-docs-index",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "docs-index-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-036",
+      "fromPath": "docs/specs/work-state.md#xem-tiến-độ-theo-bộ-rollup",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "rollup-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-037",
+      "fromPath": "docs/specs/work-state.md#xếp-hạng-tác-động-backlog-triage",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "triage-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-038",
+      "fromPath": "docs/specs/work-state.md#cầm-việc-qua-cửa-pull-take",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "take-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-039",
+      "fromPath": "docs/specs/work-state.md#cầm-việc-dựng-workspace-pick",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "pick-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-040",
+      "fromPath": "docs/specs/work-state.md#trả-việc-qua-cửa-pull-return",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "return-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-041",
+      "fromPath": "docs/specs/work-state.md#dựng-lại-rebuild-thao-tác-phục-hồi",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "rebuild-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-042",
+      "fromPath": "docs/specs/work-state.md#đọc-list-ready",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "list-and-ready-verbs",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-043",
+      "fromPath": "docs/specs/work-state.md#đọc-metrics-đồ-thị-graph-bề-mặt-đọc-thuần-str43",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "graph-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-044",
+      "fromPath": "docs/specs/work-state.md#cố-vấn-item-kẹt-ở-doing-stale-đọc-thuần-không-tự-thu-hồi-s8",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "stale-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-045",
+      "fromPath": "docs/specs/work-state.md#cố-vấn-xung-đột-dấu-chân-file-conflicts-chống-đụng-độ-fan-out-song-song-s9",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "conflicts-verb",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-046",
       "fromPath": "docs/specs/work-state.md#actors-access",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "10-actors-and-access",
@@ -43,7 +463,7 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-business-rules",
+      "aliasId": "work-state-heading-047",
       "fromPath": "docs/specs/work-state.md#business-rules",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "11-business-rules",
@@ -53,7 +473,7 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-edge-cases-settled",
+      "aliasId": "work-state-heading-048",
       "fromPath": "docs/specs/work-state.md#edge-cases-settled",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "12-edge-cases-settled",
@@ -63,7 +483,7 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-open-gaps",
+      "aliasId": "work-state-heading-049",
       "fromPath": "docs/specs/work-state.md#open-gaps",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "13-known-gaps-and-deferred-work",
@@ -73,7 +493,7 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-visuals",
+      "aliasId": "work-state-heading-050",
       "fromPath": "docs/specs/work-state.md#visuals",
       "toOwner": "docs/platform/work-state/spec.md",
       "toAnchor": "14-presentation-surface",
@@ -83,7 +503,7 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-pointers-implementation",
+      "aliasId": "work-state-heading-051",
       "fromPath": "docs/specs/work-state.md#pointers-implementation",
       "toOwner": "docs/platform/work-state/architecture/implementation-pointers.md",
       "toAnchor": "2-implementation-pointers",
@@ -93,11 +513,771 @@
       "recordedAt": "2026-10-07"
     },
     {
-      "aliasId": "work-state-spec-retired-decision-history",
+      "aliasId": "work-state-heading-052",
       "fromPath": "docs/specs/work-state.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
       "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "toAnchor": "1-provenance-of-retired-decisions",
       "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-053",
+      "fromPath": "docs/specs/work-state.md#0002-mô-hình-việc-phẳng",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "2-adr-0002-flat-work-model",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-054",
+      "fromPath": "docs/specs/work-state.md#0002-mô-hình-việc-phẳng-1",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "2-adr-0002-flat-work-model",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-055",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0002-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-056",
+      "fromPath": "docs/specs/work-state.md#quyết-định",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0002-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-057",
+      "fromPath": "docs/specs/work-state.md#hệ-quả",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0002-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-058",
+      "fromPath": "docs/specs/work-state.md#0003-đặt-tên-bố-cục-dữ-liệu",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "3-adr-0003-naming-and-data-layout",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-059",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-1",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0003-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-060",
+      "fromPath": "docs/specs/work-state.md#quyết-định-1",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0003-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-061",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-1",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0003-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-062",
+      "fromPath": "docs/specs/work-state.md#0004-phạm-vi-non-goal",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "4-adr-0004-scope-and-non-goals",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-063",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-2",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0004-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-064",
+      "fromPath": "docs/specs/work-state.md#quyết-định-2",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0004-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-065",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-2",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0004-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-066",
+      "fromPath": "docs/specs/work-state.md#0006-trạng-thái-proposed",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "5-adr-0006-proposed-status",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-067",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-3",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0006-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-068",
+      "fromPath": "docs/specs/work-state.md#quyết-định-3",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0006-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-069",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-3",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0006-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-070",
+      "fromPath": "docs/specs/work-state.md#0007-tiến-hoá-schema-event",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "6-adr-0007-schema-and-event-evolution",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-071",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-4",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0007-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-072",
+      "fromPath": "docs/specs/work-state.md#quyết-định-4",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0007-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-073",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-4",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0007-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-074",
+      "fromPath": "docs/specs/work-state.md#0011-version-tường-minh-cho-mọi-contract",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "7-adr-0011-explicit-version-for-every-contract",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-075",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-5",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0011-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-076",
+      "fromPath": "docs/specs/work-state.md#quyết-định-5",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0011-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-077",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-5",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0011-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-078",
+      "fromPath": "docs/specs/work-state.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-079",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-6",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0012-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-080",
+      "fromPath": "docs/specs/work-state.md#quyết-định-6",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0012-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-081",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-6",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0012-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-082",
+      "fromPath": "docs/specs/work-state.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-083",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-7",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0013-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-084",
+      "fromPath": "docs/specs/work-state.md#quyết-định-7",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0013-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-085",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-7",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0013-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-086",
+      "fromPath": "docs/specs/work-state.md#ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0013-trust-boundary",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-087",
+      "fromPath": "docs/specs/work-state.md#bảo-đảm-giao-nhận-bổ-chú-2026-07-18-review-fix-s11",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0013-delivery-guarantee",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-088",
+      "fromPath": "docs/specs/work-state.md#phương-án-đã-cân-nhắc-và-bỏ",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0013-alternatives-considered",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-089",
+      "fromPath": "docs/specs/work-state.md#0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-090",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-8",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0019-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-091",
+      "fromPath": "docs/specs/work-state.md#quyết-định-8",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0019-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-092",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-8",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0019-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-093",
+      "fromPath": "docs/specs/work-state.md#0024-đổi-tên-status-proposed-thành-awaiting-approval",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "11-adr-0024-rename-proposed-status-to-awaiting-approval",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-094",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-9",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0024-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-095",
+      "fromPath": "docs/specs/work-state.md#quyết-định-9",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0024-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-096",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-9",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0024-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-097",
+      "fromPath": "docs/specs/work-state.md#0027-domain-sở-hữu-vocabularytransition-status-đoạn-trước-delivered-supersede-base-workflow-model",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-098",
+      "fromPath": "docs/specs/work-state.md#bối-cảnh-10",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-context",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-099",
+      "fromPath": "docs/specs/work-state.md#quyết-định-10",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-decision",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-100",
+      "fromPath": "docs/specs/work-state.md#audit-mọi-consumer-thật-của-status-fsmmjsstatusestransitionsliteral-status-hôm-nay",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-consumer-audit",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-101",
+      "fromPath": "docs/specs/work-state.md#1-nguồn-sự-thật-định-nghĩa-statusestransitions",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-audit-1-status-source-of-truth",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-102",
+      "fromPath": "docs/specs/work-state.md#2-resolved_statuses-tập-giống-category-viết-tay-trộn-cả-2-nhóm",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-audit-2-resolved-statuses-set",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-103",
+      "fromPath": "docs/specs/work-state.md#3-literal-status-trong-verb-logic-của-binfgosmjs-tầng-clistore-chính-là-bảng-transition-của-domain-coding-hôm-nay",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-audit-3-cli-status-literals",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-104",
+      "fromPath": "docs/specs/work-state.md#4-runner-vòng-tự-hành-tiêu-thụ-nặng-nhóm-đầu",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-audit-4-runner-consumers",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-105",
+      "fromPath": "docs/specs/work-state.md#5-cơ-chế-domain-agnostic-khác-được-discussionmd-liệt-tường-minh",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-audit-5-other-domain-agnostic-mechanisms",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-106",
+      "fromPath": "docs/specs/work-state.md#6-gap-liên-quan-nhưng-không-phải-phạm-vi-audit-status-literal-ghi-nhận-để-không-lặp-lại-công-sức",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-audit-6-adjacent-gaps",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-107",
+      "fromPath": "docs/specs/work-state.md#hệ-quả-10",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0027-consequences",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-108",
+      "fromPath": "docs/specs/work-state.md#0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "13-adr-0032-multi-role-team-harness",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-109",
+      "fromPath": "docs/specs/work-state.md#hành-trình",
+      "toOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "toAnchor": "2-distill-journey",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-110",
+      "fromPath": "docs/specs/work-state.md#i-kiến-trúc-nền-seq-18029-18031",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0032-foundation-architecture",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-111",
+      "fromPath": "docs/specs/work-state.md#ii-handoff-trái-tim-của-tính-uyển-chuyển-seq-18032-18070-18058",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0032-handoff",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-112",
+      "fromPath": "docs/specs/work-state.md#iii-cấu-trúc-khai-báo-seq-18059-18060-18110-18189-18232-18242",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0032-declarative-structure",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-113",
+      "fromPath": "docs/specs/work-state.md#iv-trình-tự-triển-khai-seq-18030",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0032-implementation-sequence",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-114",
+      "fromPath": "docs/specs/work-state.md#v-kết-luận-so-sánh-marketing-cockpit-vòng-fable-vẫn-đứng-vững",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0032-marketing-cockpit-comparison-conclusion",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-115",
+      "fromPath": "docs/specs/work-state.md#vi-treo-có-chủ-đích-không-phải-quên",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "0032-deliberately-deferred-questions",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-116",
+      "fromPath": "docs/specs/work-state.md#vii-trạng-thái-tại-thời-điểm-distill-2026-08-15",
+      "toOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "toAnchor": "3-state-at-distill-time",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-heading-117",
+      "fromPath": "docs/specs/work-state.md#viii-sau-distill-implement-review-độc-lập-và-verify-thật-2026-08-1516",
+      "toOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "toAnchor": "4-implementation-review-and-verification-after-distill",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-118",
+      "fromPath": "docs/io-contract.md#hợp-đồng-io-của-fgos-cửa-cli-bề-mặt-stdout-của-fgos-runner",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "1-purpose-and-scope",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-119",
+      "fromPath": "docs/io-contract.md#chiều-vào-verb-danh-tính",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "2-input-direction-verb-and-identity",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-120",
+      "fromPath": "docs/io-contract.md#chiều-ra-envelope-thống-nhất",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "3-output-direction-unified-envelope",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-121",
+      "fromPath": "docs/io-contract.md#mã-thoát-exit-code-một-nguồn-duy-nhất",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "4-exit-codes",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-122",
+      "fromPath": "docs/io-contract.md#ngoại-lệ-có-lý-do",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "5-reasoned-envelope-exceptions",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-123",
+      "fromPath": "docs/io-contract.md#phân-trang-con-trỏ-đục",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "6-cursor-pagination",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-124",
+      "fromPath": "docs/io-contract.md#sổ-verb-máy-đọc-cli-tự-mô-tả",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "7-machine-readable-verb-registry",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-125",
+      "fromPath": "docs/io-contract.md#quy-ước-cờ-nhiều-giá-trị",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "8-multi-value-flag-convention",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-126",
+      "fromPath": "docs/io-contract.md#version-token",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "10-version-tokens",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-127",
+      "fromPath": "docs/io-contract.md#ranh-giới-điều-gì-không-thuộc-hợp-đồng-này",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "11-scope-boundary",
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-heading-128",
+      "fromPath": "docs/io-contract.md#tham-chiếu",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": "12-references",
+      "kind": "moved",
       "evidenceRef": null,
       "immutableRefs": [],
       "recordedAt": "2026-10-07"

@@ -91,13 +91,14 @@ test('resolves an exact path, a path with anchor, and reports an unknown ref', (
   assert.deepEqual(resolveAlias(table, 'docs/specs/runner.md'), { resolved: true, toOwner: 'docs/platform/runner/README.md', toAnchor: null, kind: 'moved', via: 'runner-spec' });
   assert.equal(resolveAlias(table, 'docs/specs/runner.md#merge').via, 'runner-merge');
   assert.equal(resolveAlias(table, 'docs/specs/runner.md#other').via, 'runner-spec');
-  assert.deepEqual(resolveAlias(table, 'docs/specs/*.md'), { resolved: false });
-  assert.deepEqual(resolveAlias(table, 'docs/specs/unknown.md'), { resolved: false });
+  assert.equal(resolveAlias(table, 'docs/specs/runner.md#other').precision, 'bare-path');
+  assert.deepEqual(resolveAlias(table, 'docs/specs/*.md'), { resolved: false, reason: 'no-alias' });
+  assert.deepEqual(resolveAlias(table, 'docs/specs/unknown.md'), { resolved: false, reason: 'no-alias' });
   const retired = resolveAlias(table, 'docs/old-note.md');
   assert.equal(retired.toOwner, null);
   assert.equal(retired.evidenceRef, 'abc1234');
   const anchorOnly = tableOf(entry({ fromPath: 'docs/specs/runner.md#merge' }));
-  assert.deepEqual(resolveAlias(anchorOnly, 'docs/specs/runner.md'), { resolved: false });
+  assert.deepEqual(resolveAlias(anchorOnly, 'docs/specs/runner.md'), { resolved: false, reason: 'no-alias' });
 });
 
 test('runCli validates, resolves and sets the exit code', () => {
@@ -152,4 +153,68 @@ test('toAnchor must be a heading of the owner document', () => {
     assert.deepEqual(types(tableOf(entry({ toAnchor: 'dispatch-lifecycle' })), { repoRoot: root }), []);
     assert.deepEqual(types(tableOf(entry({ toAnchor: 'nonexistent-anchor' })), { repoRoot: root }), ['anchor-missing']);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+const OLD_DOC = ['# Runner', '', 'Intro paragraph that is long enough to be a unit.', '', '## Merge & Rules', '', 'Merge paragraph that is long enough to be a unit.', '', '### Deep part', '', 'Deep paragraph that is long enough to be a unit.', ''].join('\n');
+
+function withOldDocument(fn) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'alias-old-'));
+  try {
+    fs.mkdirSync(path.join(root, 'docs/specs'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'docs/specs/runner.md'), OLD_DOC);
+    fn(root);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+const sectionTable = () => tableOf(
+  entry({ aliasId: 'runner-merge', fromPath: 'docs/specs/runner.md#merge-rules', toOwner: 'docs/platform/runner/merge.md', toAnchor: null, kind: 'split' }),
+  entry({ aliasId: 'runner-bare', fromPath: 'docs/specs/runner.md', toOwner: 'docs/platform/runner/README.md', kind: 'redirected' }),
+);
+
+test('a line reference maps through the old document to the section alias and says it is approximate', () => {
+  withOldDocument((root) => {
+    const table = sectionTable();
+    const deep = resolveAlias(table, 'docs/specs/runner.md:11', { repoRoot: root });
+    assert.deepEqual([deep.resolved, deep.via, deep.precision, deep.viaAnchor], [true, 'runner-merge', 'line-to-section', 'merge-rules']);
+    assert.equal(resolveAlias(table, 'docs/specs/runner.md:7-9', { repoRoot: root }).via, 'runner-merge');
+    assert.equal(resolveAlias(table, 'docs/specs/runner.md#L7', { repoRoot: root }).via, 'runner-merge');
+    assert.equal(resolveAlias(table, 'docs/specs/runner.md:3', { repoRoot: root }).via, 'runner-bare');
+    assert.deepEqual(resolveAlias(table, 'docs/specs/runner.md:99', { repoRoot: root }), { resolved: false, reason: 'line-out-of-range' });
+    assert.deepEqual(resolveAlias(table, 'docs/specs/runner.md:7'), { resolved: false, reason: 'line-reference-needs-old-document' });
+  });
+});
+
+test('an unknown anchor is unresolved when the old document is readable, GitHub spelling and deeper anchors resolve', () => {
+  withOldDocument((root) => {
+    const table = sectionTable();
+    assert.deepEqual(resolveAlias(table, 'docs/specs/runner.md#no-such-heading', { repoRoot: root }), { resolved: false, reason: 'unknown-anchor' });
+    assert.equal(resolveAlias(table, 'docs/specs/runner.md#merge-rules', { repoRoot: root }).via, 'runner-merge');
+    assert.equal(resolveAlias(table, 'docs/specs/runner.md#merge--rules', { repoRoot: root }).via, 'runner-merge');
+    const deeper = resolveAlias(table, 'docs/specs/runner.md#deep-part', { repoRoot: root });
+    assert.deepEqual([deeper.via, deeper.precision, deeper.viaAnchor], ['runner-merge', 'ancestor-section', 'merge-rules']);
+    assert.equal(resolveAlias(table, 'docs/specs/runner.md#runner', { repoRoot: root }).via, 'runner-bare');
+  });
+});
+
+test('a relative link is normalized against the consumer and a missing consumer is explicit', () => {
+  const table = sectionTable();
+  assert.equal(resolveAlias(table, '../specs/runner.md', { consumerPath: 'docs/history/note.md' }).via, 'runner-bare');
+  assert.deepEqual(resolveAlias(table, '../specs/runner.md'), { resolved: false, reason: 'relative-reference-needs-consumer' });
+  assert.deepEqual(resolveAlias(table, '../../../x.md', { consumerPath: 'docs/a.md' }), { resolved: false, reason: 'relative-reference-leaves-repository' });
+});
+
+test('fromPath anchors are checked against the old document when it exists', () => {
+  withOldDocument((root) => {
+    const owner = path.join(root, 'docs/platform/runner');
+    fs.mkdirSync(owner, { recursive: true });
+    fs.writeFileSync(path.join(owner, 'merge.md'), '# M\n');
+    fs.writeFileSync(path.join(owner, 'README.md'), '# R\n');
+    assert.deepEqual(validateAliasTable(sectionTable(), { repoRoot: root }), []);
+    const bad = tableOf(entry({ aliasId: 'bad', fromPath: 'docs/specs/runner.md#nope', toOwner: 'docs/platform/runner/merge.md', kind: 'split' }));
+    assert.deepEqual(types(bad, { repoRoot: root }), ['from-anchor-missing']);
+    const gone = tableOf(entry({ aliasId: 'gone', fromPath: 'docs/specs/retired.md#x', toOwner: 'docs/platform/runner/merge.md', kind: 'split' }));
+    assert.deepEqual(types(gone, { repoRoot: root }), []);
+  });
 });
