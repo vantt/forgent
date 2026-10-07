@@ -55,3 +55,20 @@ YAML/status mutation or global toolkit change. Plan B remains closed: actual
 main `13d1c096b287c0b781103af70d6c1e286fd3d490` lacks the root-guard test and
 has not integrated this branch's doctrine. Source completion does not imply
 main's installed hook or activated global runtime has changed.
+
+## Subsequent owner-authorized main integration
+
+The owner later authorized landing the completed execution branch. Main merge
+`a004bb59802016d3ddd63f6b8e430fdfa599d60e` retains newer main-owned work and
+integrates all hygiene commits. The permanent root-hook test and doctrine are
+now on main; actual configured hook refusal was observed after merge.
+The earlier branch-only main barrier above is therefore satisfied, not still
+closed. This does not complete or approve Plan B/convention or advisory work.
+
+The exact merged-source full-suite gate passed in an isolated checkout:
+6879pass,0fail,8skip,65existingTODO. Two busy-main exit1 isolation failures
+remain preserved; no store guard was relaxed and no live Delphi run was stopped.
+Rust176pass and actual main native dev-list smoke passed. No remote push,
+restage or activation. See [main integration](main-integration.md) and
+[full verification evidence](main-integration-tests.md) for provenance,
+preservation, cleanup and readiness limits.
