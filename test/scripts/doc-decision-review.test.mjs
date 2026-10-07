@@ -176,3 +176,28 @@ test('reviewer normalization rejects repeated prefixes case folding and invisibl
   }
   assert.equal(independentReviewer('reviewer:reviewer:claude-session:other@2026-10-09', author), false);
 });
+
+test('sensitivity mutations and controls include judgment text rather than a byte-equal-only pool', () => {
+  const original = buildReviewPack(context, shard);
+  const scriptsOnly = { ...original, rows: [], sensitivityControls: original.rows.map((row) => ({ ...row, decision: { ...row.decision, authoredBy: 'script:proven', reviewStatus: 'reviewed' } })) };
+  assert.throws(() => seedReviewPack(scriptsOnly, { seed: 'pool', reviewer }), /judgment/);
+  const judgment = { ...original, rows: original.rows.map((row) => ({ ...row, target: { ...row.target, text: row.target.text.replace('12 requests', '**12** requests'), sectionText: undefined, textDigest: 'c'.repeat(64) } })) };
+  const seeded = seedReviewPack(judgment, { seed: 'pool', reviewer });
+  assert.equal(seeded.key.rows.filter((row) => row.mutated).length, 6);
+  const mechanical = seeded.pack.rows.map((row) => ({ claimId: row.claimId, verdict: row.source.text === row.target.text ? 'ok' : 'rework', note: 'Mechanical byte comparison.' }));
+  assert.equal(scoreReviewPack(seeded.key, mechanical).pass, false);
+});
+
+test('small judgment batches use previously reviewed controls and require every mutation detected', () => {
+  const full = buildReviewPack(context, shard);
+  const differing = full.rows.map((row) => ({ ...row, target: { ...row.target, text: row.target.text.replace('12 requests', '**12** requests'), sectionText: undefined, textDigest: 'c'.repeat(64) } }));
+  const priorControls = differing.slice(4).map((row) => ({ ...row, decision: { ...row.decision, reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt: '2026-10-07', reviewReport: 'review-earlier-fixture.md', reviewReportCommit: 'a'.repeat(40) } }));
+  const small = { ...full, rows: differing.slice(0, 4), priorControls };
+  const seeded = seedReviewPack(small, { seed: 'small', reviewer });
+  assert.equal(seeded.key.rows.length, 30);
+  assert.deepEqual(new Set(seeded.key.rows.filter((row) => row.mutated).map((row) => row.claimId)), new Set(small.rows.map((row) => row.claimId)));
+  const answers = seeded.key.rows.map((row) => ({ claimId: row.claimId, verdict: row.mutated ? 'rework' : 'ok', note: 'Reviewed the actual full text.' }));
+  assert.equal(scoreReviewPack(seeded.key, answers).pass, true);
+  answers.find((row) => row.verdict === 'rework').verdict = 'ok';
+  assert.equal(scoreReviewPack(seeded.key, answers).pass, false);
+});

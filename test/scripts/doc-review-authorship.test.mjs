@@ -108,3 +108,35 @@ test('case invisible characters and repeated reviewer prefixes cannot hide the a
     assert.ok(apply(f, { ...f.row, reviewedBy }).findings.some((r) => r.type === 'decision-self-review'), reviewedBy);
   }
 });
+
+test('committed report declarations cannot replace a released sensitivity proof', (t) => {
+  const f = fixture(t);
+  assert.ok(apply(f).findings.some((r) => r.type === 'decision-review-proof-invalid'));
+});
+
+test('contradictory duplicate committed verdict rows cannot approve a claim', (t) => {
+  const f = fixture(t);
+  fs.writeFileSync(path.join(f.root, reportPath), f.report + `| ${f.row.claimId} | hold | A conflicting verdict. |\n`);
+  f.git('add', '--', reportPath); f.git('commit', '-qm', 'docs: record contradictory fixture verdict', '--', reportPath);
+  f.row.reviewReportCommit = f.git('rev-parse', 'HEAD'); f.inventory.commit = f.row.reviewReportCommit;
+  assert.ok(apply(f).findings.some((r) => r.type === 'decision-review-report-missing'));
+});
+
+test('committed review lookup follows the report directory without hard-coded migration labels', (t) => {
+  const f = fixture(t);
+  const moved = reportPath.replace('/phase-06/', '/migration-review/');
+  fs.mkdirSync(path.dirname(path.join(f.root, moved)), { recursive: true });
+  fs.writeFileSync(path.join(f.root, moved), f.report);
+  f.git('add', '--', moved); f.git('commit', '-qm', 'docs: record review in declared directory', '--', moved);
+  f.row.reviewReport = moved; f.row.reviewReportCommit = f.git('rev-parse', 'HEAD'); f.inventory.commit = f.row.reviewReportCommit;
+  assert.ok(!apply(f).findings.some((r) => r.type === 'decision-review-report-missing'));
+});
+
+test('registry-gap deferral requires the committed stub used by ordinary decisions', (t) => {
+  const f = fixture(t);
+  const gap = { claimId: 'gap-fixture', sourcePath: 'docs/removed.md', disposition: 'unknown-blocking' };
+  const registry = { identityGaps: [gap] };
+  const shard = { version: 1, shard: 'gap-fixture', sources: [], claims: [], registryGaps: [{ ...gap, disposition: 'defer-with-owner', rationale: 'Restoration is assigned to its declared owner.' }] };
+  const result = applyDecisions(f.inventory, [shard], { vocabulary, registry, unitsOf: () => [] });
+  assert.ok(result.findings.some((r) => r.type === 'decision-stub-invalid'));
+});

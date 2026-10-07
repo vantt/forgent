@@ -113,3 +113,14 @@ test('pending corpus policy keeps rows blocking until its independent review is 
   assert.equal(result.inventory.claimLedger[0].reviewStatus, 'blocking');
   assert.equal(result.inventory.items[0].proposedDisposition, 'unknown-blocking');
 });
+
+test('a later corpus report round cannot erase a per-rule committed verdict', (t) => {
+  const f = fixture(t);
+  for (const rule of f.shard.corpusRules) rule.reviewReportCommit = f.inventory.commit;
+  fs.writeFileSync(path.join(f.root, reportPath), 'Reviewer: another-session\n');
+  f.git('add', '--', reportPath); f.git('commit', '-qm', 'docs: record later corpus round', '--', reportPath);
+  f.inventory.commit = f.git('rev-parse', 'HEAD');
+  assert.deepEqual(apply(f).findings, []);
+  const future = { ...f.shard.corpusRules[0], reviewReportCommit: 'f'.repeat(40) };
+  assert.ok(apply(f, { ...f.shard, corpusRules: [future] }).findings.some((r) => r.type === 'decision-corpus-review-invalid'));
+});
