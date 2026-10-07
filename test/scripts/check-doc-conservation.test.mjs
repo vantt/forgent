@@ -238,6 +238,75 @@ test('gates CLI: open conservation data is reported by default and fatal in stri
   } finally { console.log = log; console.error = err; repo.cleanup(); }
 });
 
+test('gates CLI combines repeated decision inputs and rejects a duplicate across inputs', () => {
+  const repo = makeRepo();
+  const log = console.log;
+  const err = console.error;
+  const out = [];
+  const errs = [];
+  try {
+    repo.write('docs/specs/runner.md', `# Runner\n\n${BODY}\n`);
+    const base = repo.commit('base');
+    const registry = generator.bootstrapIdentityRegistry(repo.tmp, { commit: base });
+    repo.write(generator.IDENTITY_REGISTRY_PATH, JSON.stringify(registry));
+    const head = repo.commit('commit the registry');
+    console.log = () => {};
+    assert.equal(generator.runCli(['--refresh', '--commit', head], repo.tmp), 0);
+    const inventory = generator.generateInventory(repo.tmp, { commit: head, identityRegistryPath: repo.registryPath });
+    const rows = inventory.claimLedger.filter((row) => row.sourcePath === 'docs/specs/runner.md');
+    const shardFor = (row, shard) => ({
+      version: 1, shard, sources: ['docs/specs/runner.md'],
+      claims: [{
+        claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest,
+        targetOwner: null, targetAnchor: null, claimKind: 'historical-context',
+        disposition: 'retain-as-evidence', reviewStatus: 'pending',
+        rationale: 'Preserve the source unit as historical evidence.',
+      }],
+    });
+    repo.write('decisions-one/a.json', JSON.stringify(shardFor(rows[0], 'a')));
+    repo.write('decisions-two/b.json', JSON.stringify(shardFor(rows[1], 'b')));
+    console.log = (...a) => out.push(a.join(' '));
+    console.error = (...a) => errs.push(a.join(' '));
+    assert.equal(gates.runCli(['--decisions', 'decisions-one', '--json'], repo.tmp), 0, errs.join('\n'));
+    const single = JSON.parse(out.pop());
+    assert.equal(gates.runCli(['--decisions', 'decisions-one', '--decisions', 'decisions-two', '--json'], repo.tmp), 0, errs.join('\n'));
+    const combined = JSON.parse(out.pop());
+    const openCount = (result) => result.conservationOpen.find((f) => f.type === 'claims-unknown-blocking')?.count || 0;
+    assert.equal(openCount(single) - openCount(combined), 1);
+    repo.write('decisions-two/b.json', JSON.stringify(shardFor(rows[0], 'b')));
+    assert.equal(gates.runCli(['--decisions', 'decisions-one', '--decisions', 'decisions-two', '--json'], repo.tmp), 1);
+    assert.equal(JSON.parse(out.pop()).fatalFindings.some((f) => f.type === 'decision-claim-duplicate'), true);
+  } finally { console.log = log; console.error = err; repo.cleanup(); }
+});
+
+test('gates CLI rejects each unreadable or empty decision input instead of ignoring later flags', () => {
+  const repo = makeRepo();
+  const log = console.log;
+  const err = console.error;
+  const errs = [];
+  try {
+    repo.write('docs/specs/runner.md', `# Runner\n\n${BODY}\n`);
+    const base = repo.commit('base');
+    repo.write(generator.IDENTITY_REGISTRY_PATH, JSON.stringify(generator.bootstrapIdentityRegistry(repo.tmp, { commit: base })));
+    const head = repo.commit('commit the registry');
+    console.log = () => {};
+    console.error = (...a) => errs.push(a.join(' '));
+    assert.equal(generator.runCli(['--refresh', '--commit', head], repo.tmp), 0);
+    repo.write('decisions/a.json', JSON.stringify({ version: 1, shard: 'a', sources: ['docs/specs/runner.md'], claims: [] }));
+    fs.mkdirSync(path.join(repo.tmp, 'empty-decisions'));
+    for (const value of ['missing-decisions', 'empty-decisions']) {
+      errs.length = 0;
+      assert.equal(gates.runCli(['--decisions', 'decisions', '--decisions', value], repo.tmp), 1);
+      assert.match(errs.join('\n'), new RegExp(value));
+    }
+    for (const suffix of [[], ['--json']]) {
+      errs.length = 0;
+      assert.equal(gates.runCli(['--decisions', 'decisions', '--decisions', ...suffix], repo.tmp), 1);
+      assert.match(errs.join('\n'), /--decisions.*path/);
+    }
+  } finally { console.log = log; console.error = err; repo.cleanup(); }
+});
+
 test('gates CLI names the refresh command with the current commit when the shards are missing', () => {
   const repo = makeRepo();
   const err = console.error;
