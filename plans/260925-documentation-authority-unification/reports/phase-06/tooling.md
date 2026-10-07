@@ -82,3 +82,9 @@ Both A1 D invocations after exact support (`db5ef01d4`) pass, 0 fatal findings, 
 Verification: red commit `7e94480f0` fails on missing helper exports. Targeted helper/review/exact tests: 12 pass, 0 fail. Coverage CLI fixture: 4,318 sources / 937 covered / 3,381 explicitly uncovered, exit 0. Rebind CLI on a throwaway pilot-shard copy: 52 reviewed rows preserved, 0 rebound, 0 pending, exit 0. Initial snapshot smoke caught missing registry input for seven gap decisions; the in-scope fix requires the pinned registry, not a loader amendment. Corrected snapshot and verify both exit 0: 68,372 rows, sha256 `4173ca0041d62dfa762fafc3763be8189ac60594436fe9be3813e84773ef0f47`. Full suite: 803 pass, 0 fail, 46 files, default concurrency; `/tmp/phase06/conservation-helper-suite.log`. No fixture map, smoke shard or snapshot is committed.
 
 Both A1 D invocations after review-pack support (`b828e4896`) pass and exactly equal baseline. Independent full tooling review and remaining tools/maps are UNPROVEN.
+
+## Stop: conflicting hold review status
+
+After `789870507`, both A1 D proofs remain baseline-identical and the complete suite remains green at 803/803. A separately exercised edge reveals a contract conflict not covered by that suite: the review procedure requires hold/rework pending, but unknown-blocking requires blocking under the existing frozen invariant. Actual fixture command `env -u CLAUDE_CODE_SESSION_ID node /tmp/phase06/hold-status-probe.mjs` exits 1 with exactly one decision-blocking-status-mismatch. No real shard changes or approvals were made.
+
+Execution stops for an owner amendment; see hold-status-blocker.md and owner-queue.md. Recommendation: retain blocking for unknown-blocking hold/rework, preserve pending for other dispositions, and leave the gate/vocabulary semantics unchanged. Full tooling review is not ready; later tools/maps remain UNPROVEN.
