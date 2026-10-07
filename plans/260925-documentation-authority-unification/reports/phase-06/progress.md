@@ -4,20 +4,20 @@ Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
 Step: 1, mandatory authorship fix only under owner amendment A5
-State: verification
-Last green conservation commit: 1ec3ceca620d0a3fb40f506ae9646f6882410877
+State: rework — stopped on unseeded ordinary review versus frozen apply/gate contracts
+Last green conservation commit: 658b4e602e92f32d4435d9173aec98eb1420b715
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
 Pending review requests: no further tooling re-review under A5; content review has not started
-Owner queue items: checking whether the frozen approval contract supports unseeded per-batch review
+Owner queue items: unseeded-ordinary-review; actual apply and gate refuse missing sensitivity proof/binding
 Archive/delete lists: none authored
 Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root-authorities batch
 Holds: none authored
 Promoted-document edits: none
 
-Next action: verify the H1-only cutover, rerun conservation, and prepare the simplified independent batch-review brief. Stop on any demonstrated frozen-gate conflict before content authoring.
+Next action: await a committed owner choice on unseeded-ordinary-review; no further tooling re-review. Then complete Step 1 maps/counts and proceed sequentially to content review checkpoints.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -49,8 +49,12 @@ Legacy compatibility green: 26/26 targeted and 855/855 scripts tests. Explicit c
 Complete suite on committed tooling 1ec3ceca6: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered files>`; existing runner environment, checkout-local Cargo/host artifacts. Exit 0: 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo behavior remains UNPROVEN. Both current D runs exit 0 and produce baseline-identical JSON; G has zero findings. Portable strict structural fixture: clean zero findings; all 11 defects rejected with its own prior registry. This does not prove actual batch E.
 Final prerequisites: A has zero violations after exactly the five A3 commit/path exemptions; B has zero extractor-closure changes; C has zero changed authority statuses; I has zero changed reader/instruction files. Ratchet exit 0: 995 files, 24 accounted edits, 1 accounted new file. Placement exit 0: 446 files, 445 matched, zero leftover/ambiguous/evidence-without-index, 1 recorded exception. Candidate exit 0: same 5 baseline findings, zero new findings. Retirement expected exit 1: 15 blocked, 4 pass, 1 review, zero invariant failures.
 Green implementation commit: 1ec3ceca6. Review package includes tooling.md, tooling-verification.json and structural-mutation-probe.mjs. Independent full review, 8 skipped/65 todo tests, real-batch E, review brief, maps/routes, baseline counts and all real batches remain UNPROVEN or not started. T7 vocabulary promotion is deliberately deferred until actual first use, not simulated by fixtures.
-Fix-round resume: review d002717e5 and amendment 472bf1612 verified committed, clean start, last green ancestor confirmed. A/B/C/I pass (five exact A3 exemptions), both D invocations remain baseline-identical, ratchet/placement/candidate unchanged. Identity red e660f8225: 22 pass/3 fail; corrected targeted 25/25. Further proof/pool/receipt regressions red 3870f871b: 32 pass/9 fail. Mandatory enforcement intentionally rejects obsolete fabricated review fixtures; these will be migrated to committed released proof, never bypassed.
+Historical A4 fix-round evidence is withdrawn by A5: red commits e660f8225, 3870f871b and 69357b19d do not define the retained cutover. No committed released-key enforcement or non-H1 fixture migration is claimed for current tooling.
 
 Amendment A5 (`a7ec5054a`) supersedes A4. Tooling and tests restored to `1ec3ceca6` plus H1 only. Non-H1 regression changes reverted in `ab69e3d6b`; own dropped-item helpers and untracked `plans/reports/promotion-ledger.json` removed. H2, Medium and Low fixes are not retained.
 
 Mandatory-enforcement red `7667c4754`: 15 tests, 8 pass, 7 fail. H1-only corrected scripts suite: 51 discovered files, 861 tests, 861 pass, 0 fail/skip/todo. Commands use `env -u CLAUDE_CODE_SESSION_ID node --test <files>`. Frozen structural probe: clean 0 findings and all 11 defects rejected. Full-suite and post-commit conservation remain UNPROVEN.
+
+H1 green implementation: `658b4e602`; full suite on committed code: 389 files, 7,324 tests, 7,251 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo paths remain UNPROVEN. Both prior-registry D runs exit 0, baseline-identical, zero fatal findings. A has zero violations after five exact A3 exemptions; B/C/I unchanged; ratchet 995 files, 24 accounted edits/1 new; placement 446/445, no gaps; candidate five baseline findings, zero new; retirement cutover expected exit 1, 15 blocked/4 pass/1 review, zero invariants.
+
+Step 1 item 2 brief written to A5's simplified review method. Disposable unseeded rehearsal proves apply refuses absent passing sensitivity proof and gate refuses absent seed binding. Evidence: mandatory-authorship-verification.json and unseeded-review-blocker.md. Stop on the demonstrated frozen-contract blocker, not at another tooling re-review. No maps/routes or real content batches authored; actual batch E and real independent reviews remain UNPROVEN. Lists routed to owner: one approval-contract question; no authored archive/delete list, holds or promoted edits; SC-1 remains owner-resolved.

@@ -247,5 +247,7 @@ H1 red commit `7667c4754`: 15 tests, 8 pass, 7 fail. Corrected scripts suite: 51
 
 Non-H1 regression changes were reverted in `ab69e3d6b`. H2, M1–M5 and Low changes are withdrawn; released-key replay, extra normalization and other withdrawn safeguards are not claimed. Their fixture-only earlier evidence is not evidence for this cutover. No further tooling re-review is requested.
 
-A5 requires ordinary content reviews to read every judgment row, sample 100 random script-proven exact rows, run gates and commit a report. Seeded packs and reviewer red-team are reserved for the checkpoints after Steps 3 and 6 and in Step 10. Compatibility of this unseeded procedure with the frozen approval guards is being exercised before content authoring; no real approval has been produced.
+A5 requires ordinary content reviews to read every judgment row, sample 100 random script-proven exact rows, run gates and commit a report. Seeded packs and reviewer red-team are reserved for the checkpoints after Steps 3 and 6 and in Step 10. The actual unseeded rehearsal demonstrates an incompatible frozen approval guard; see unseeded-review-blocker.md. No real approval has been produced.
+
+Committed H1 green `658b4e602`: full suite 7,324 tests, 7,251 pass, zero fail, 8 skip, 65 todo; both prior-registry D proofs baseline-identical with zero fatal findings. Skipped/todo paths and actual batch E remain UNPROVEN. The review brief is written to A5; ordinary approval awaits the owner decision recorded in owner-queue.md, not a tooling re-review.
 

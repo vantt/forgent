@@ -1,0 +1,60 @@
+{
+  "commit": "658b4e602e92f32d4435d9173aec98eb1420b715",
+  "red": {
+    "commit": "7667c4754231fcd75571f36aceb65d832f61e4d4",
+    "tests": 15,
+    "pass": 8,
+    "fail": 7
+  },
+  "scripts": {
+    "files": 51,
+    "tests": 861,
+    "pass": 861,
+    "fail": 0
+  },
+  "full": {
+    "files": 389,
+    "tests": 7324,
+    "pass": 7251,
+    "fail": 0,
+    "skip": 8,
+    "todo": 65,
+    "logSha256": "5d2d80f82f67e2eb4697cb9f34aa8fc3e9dd9d937c58f8204670607e662b8f1a"
+  },
+  "conservation": [
+    {
+      "prior": "identity-registry.json",
+      "exit": 0,
+      "baseline": true,
+      "fatal": 0
+    },
+    {
+      "prior": "phase-02-identity-registry.json",
+      "exit": 0,
+      "baseline": true,
+      "fatal": 0
+    }
+  ],
+  "structural": {
+    "cleanFindings": 0,
+    "rejectedDefects": 11
+  },
+  "prerequisites": {
+    "allowlistViolations": 0,
+    "exactExemptions": 5,
+    "extractorChanges": 0,
+    "authorityStatusChanges": 0,
+    "readerChanges": 0,
+    "candidateFindings": 5,
+    "newCandidateFindings": 0
+  },
+  "unseeded": {
+    "exit": 0,
+    "output": "unseeded apply: review application requires a passing sensitivity proof and the shown pack\nunseeded gate: [{\"type\":\"decision-review-report-missing\",\"message\":\"claim claim_fixture: no matching committed independent verdict with pack and sensitivity bindings\"}]\n"
+  },
+  "unproven": [
+    "skipped and todo suite paths",
+    "actual batch scoped strict E",
+    "real independent content reviews"
+  ]
+}
