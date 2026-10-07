@@ -60,3 +60,13 @@ Verification:
 - Actual `--propose` for `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` and its platform counterpart: 40 exact, 9 pending, 2 blocking. The gate with pilot decisions plus `/tmp/phase06/exact-smoke.json` exits 0 with 0 fatal findings. The smoke shard is not committed.
 
 Remaining tooling, maps and independent full tooling review are UNPROVEN.
+
+## Independent review packs and verdict application
+
+`--pack <shard> --inventory <manifest>` emits full source/target units for every pending/blocking hand row and a reverse list of unnamed candidate units; script-exact and mirror carriers are included in reverse coverage. `--seed-pack <pack> --seed <text> --reviewer <identity> --out <pack.json> --key <key.json>` is reviewer-only, rejects author identities, and separates the key. It draws 24 byte-equal controls plus six actually changed targets (added claim, swapped number, swapped enum, removed negation, dropped clause, deleted list item), shuffled reproducibly. Insufficient eligible rows is an error, never fabricated evidence. `--score-pack <key> --verdicts <report.md>` requires every row exactly once and passes only at least 5/6 caught and at most 2/24 false flags.
+
+`--apply-review <shard> --inventory <manifest> --verdicts <report.md> --reviewer <identity>` requires a matching `Reviewer:` header and `claimId | verdict | note` table. It rejects self-review, stale/missing sources, unknown/duplicate/missing verdicts, missing targets and approval of unknown-blocking. `ok` binds the current target digest; `rework` and `hold` stay pending with their note. The tool names the report in additive metadata; approval is not valid evidence until the independent report is committed and the final gate checks it. The tool edits only the shard, never a target.
+
+Verification: red commit `de2c92e81` fails on the missing review exports. Targeted review/exact tests: 9 pass, 0 fail. Actual `--pack` on the throwaway exact proposal: 11 pending/blocking rows, full unit text, 1 unnamed reverse unit, exit 0. Complete suite: 800 pass, 0 fail, 45 files, default concurrency; scratch log `/tmp/phase06/review-full-suite.log`. Seed/key and review-application behavior are tested only on deterministic fixtures, not authored batch rows. No real seeded pack or actual approval was produced by this author session.
+
+Both A1 D invocations after exact support (`db5ef01d4`) pass, 0 fatal findings, JSON exactly equal baseline. Full tooling review and remaining tools/maps remain UNPROVEN.
