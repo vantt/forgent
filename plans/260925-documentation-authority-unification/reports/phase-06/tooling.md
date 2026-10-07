@@ -98,3 +98,11 @@ Red regression commit `8eb346727`: 4 pass, 2 fail (hold and rework returned pend
 A3 (`4c10f2d50`) accounts only the exact five external commit/path pairs from `1cc92d7db`; amended check A reports zero violations, no blanket directory allowance. Both A1 D proofs at resume pass and equal baseline. B/C/I unchanged; ratchet clean; placement and expected retirement/candidate baselines unchanged.
 
 The owner supplied the independent early review at `/tmp/claude-1000/-home-vantt-projects-forgentX/4df9e88c-dcc7-4ca8-b24a-b69b112e7ced/scratchpad/early-review/tools-T0-T2x.md`, pinned to `789870507`. T0 accepted; T1/T2/T2r/T2x accepted with fixes. Session normalization, pre-reviewed-row evidence, seeded-pack secrecy/digests, score/text binding, exact source/multiplicity, ancestry-sensitive rebind and range-aware legacy-only coverage remain to be fixed with red/green proof before any real batch. No final tooling review or real approval is claimed.
+
+## Early review: session identity, fail-closed rows and seed secrecy
+
+Red commit `e14c88762`: 6 pass, 3 fail, exposing same-session/different-date review, silent pre-reviewed-row skipping and public seed leakage. Session comparison now removes reviewer: and @date; absent author identity is not independent. Pack/apply fail closed on pre-reviewed rows rather than skipping them until committed-report validation is integrated with the independence gate. Authorship-required shards require authorSession.
+
+Sensitivity selection and order use a fresh cryptographic 32-byte nonce together with the recorded seed. Neither is in the public pack; both stay in the key for replay. All shown target text digests are recomputed from the shown text, including mutated rows; no mutated target retains its original digest. Deterministic fixture replay supplies the recorded nonce; the CLI generates its nonce internally. No real seeded pack is run by the author.
+
+Targeted review tests: 9/9. Complete suite: 808/808, default concurrency; `/tmp/phase06/review-integrity-suite.log`. Actual unreviewed --pack smoke exits 0. Source/extractor/vocabulary invariants are unchanged. Passing sensitivity/text binding, final committed-report validation, exact source/multiplicity, rebind ancestry and legacy/range coverage still require their separate proofs. Full independent tooling review remains UNPROVEN.

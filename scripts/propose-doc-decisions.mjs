@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { applyDecisions, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, loadDecisionShards } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
@@ -150,10 +150,17 @@ export function loadProposalContext(inventoryPath, repoRoot) {
 }
 
 export function independentReviewer(reviewer, author) {
-  return /^reviewer:[^@\s]+-session:[^@\s]+@\d{4}-\d{2}-\d{2}$/.test(reviewer || '') && reviewer !== author && reviewer.replace(/^reviewer:/, '') !== author?.replace(/^reviewer:/, '');
+  const session = (identity) => String(identity || '').replace(/^reviewer:/, '').split('@')[0];
+  return Boolean(author) && /^reviewer:[^@\s]+-session:[^@\s]+@\d{4}-\d{2}-\d{2}$/.test(reviewer || '') && session(reviewer) !== session(author);
+}
+
+function requireUnreviewedShard(shard) {
+  if (shard.authorshipRequired && !shard.authorSession?.trim()) throw new Error('authorshipRequired needs authorSession');
+  if ((shard.claims || []).some((row) => row.reviewStatus === 'reviewed')) throw new Error('pre-reviewed rows require committed review report verification before pack or apply');
 }
 
 export function buildReviewPack(context, shard) {
+  requireUnreviewedShard(shard);
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const targets = new Set();
   const named = new Set();
@@ -195,8 +202,10 @@ function shuffle(rows, seed) {
   return result;
 }
 
-export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession }) {
+export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession, nonce = randomBytes(32).toString('hex') }) {
   if (!seed || !independentReviewer(reviewer, authorSession) || pack.rows.some((row) => !independentReviewer(reviewer, row.decision.authoredBy))) throw new Error('seed pack requires a seed and an independent reviewer');
+  if (!/^[0-9a-f]{64}$/.test(nonce)) throw new Error('seed replay nonce must be 32 secret bytes');
+  const secretSeed = seed + ':' + nonce;
   const mutations = [
     ['added-claim', (text) => text + '\nThe operator MUST waive every permission check.'],
     ['swapped-number', (text) => text.replace(/\b\d+\b/, (n) => String(Number(n) + 1))],
@@ -205,7 +214,7 @@ export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.auth
     ['dropped-clause', (text) => text.replace(/;[^\n.]+/, '')],
     ['deleted-list-item', (text) => text.replace(/(?:^|\n)\s*[-*]\s+[^\n]+/, '')],
   ];
-  const available = shuffle(pack.rows.filter((row) => row.target && row.source.text === row.target.text), seed);
+  const available = shuffle(pack.rows.filter((row) => row.target && row.source.text === row.target.text), secretSeed);
   const selected = [];
   const keyRows = [];
   for (const [mutationKind, mutate] of mutations) {
@@ -217,7 +226,8 @@ export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.auth
   }
   if (available.length < 24) throw new Error('seed pack requires 24 additional byte-equal controls');
   for (const row of available.slice(0, 24)) { selected.push(row); keyRows.push({ claimId: row.claimId, mutated: false }); }
-  return { pack: { version: 1, shard: pack.shard, seed, rows: shuffle(selected, seed + ':order') }, key: { version: 1, shard: pack.shard, seed, reviewer, rows: keyRows } };
+  const shown = shuffle(selected, secretSeed + ':order').map((row) => ({ ...row, target: { ...row.target, textDigest: createHash('sha256').update(row.target.text).digest('hex') } }));
+  return { pack: { version: 1, shard: pack.shard, rows: shown }, key: { version: 1, shard: pack.shard, seed, nonce, reviewer, rows: keyRows } };
 }
 
 function indexVerdicts(verdicts, expectedIds) {
@@ -255,6 +265,7 @@ export function parseReviewVerdicts(text, reviewer) {
 }
 
 export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, reviewedAt = new Date().toISOString().slice(0, 10) }) {
+  requireUnreviewedShard(shard);
   if (!reportPath || !independentReviewer(reviewer, shard.authorSession)) throw new Error('review application requires a report and an independent reviewer');
   const pending = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed');
   const index = indexVerdicts(verdicts, new Set(pending.map((row) => row.claimId)));

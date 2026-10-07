@@ -23,10 +23,10 @@ test('review pack contains full source and target units and reverse unmatched ca
 
 test('seeded review uses six real text mutations and scores missed defects and false flags', () => {
   const pack = buildReviewPack(context, shard);
-  const seeded = seedReviewPack(pack, { seed: 'reproducible', reviewer, authorSession: author });
+  const seeded = seedReviewPack(pack, { seed: 'reproducible', reviewer, authorSession: author, nonce: '1'.repeat(64) });
   assert.equal(seeded.pack.rows.length, 30);
   assert.equal(seeded.key.rows.filter((row) => row.mutated).length, 6);
-  assert.deepEqual(seedReviewPack(pack, { seed: 'reproducible', reviewer, authorSession: author }), seeded);
+  assert.deepEqual(seedReviewPack(pack, { seed: 'reproducible', reviewer, authorSession: author, nonce: seeded.key.nonce }), seeded);
   assert.ok(!JSON.stringify(seeded.pack).includes('mutationKind'));
   const verdicts = seeded.key.rows.map((row) => ({ claimId: row.claimId, verdict: row.mutated ? 'rework' : 'ok', note: 'Compared full units.' }));
   assert.equal(scoreReviewPack(seeded.key, verdicts).pass, true);
@@ -90,8 +90,8 @@ test('pre-reviewed hand rows without committed evidence are rejected instead of 
 
 test('a public seeded pack does not expose its replay inputs or retain original mutated digests', () => {
   const original = buildReviewPack(context, shard);
-  const first = seedReviewPack(original, { seed: 'hidden-input', reviewer });
-  const second = seedReviewPack(original, { seed: 'hidden-input', reviewer });
+  const first = seedReviewPack(original, { seed: 'hidden-input', reviewer, nonce: '1'.repeat(64) });
+  const second = seedReviewPack(original, { seed: 'hidden-input', reviewer, nonce: '2'.repeat(64) });
   assert.equal('seed' in first.pack, false);
   assert.equal('nonce' in first.pack, false);
   assert.notEqual(first.key.nonce, second.key.nonce);
