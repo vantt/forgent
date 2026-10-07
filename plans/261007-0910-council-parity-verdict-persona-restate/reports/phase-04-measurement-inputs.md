@@ -11,13 +11,13 @@ Status: drafted 2026-10-07, nothing run. Purpose: re-measure fgOS discussion out
 
 ## Questions
 
-Same question as 2026-10-04 plus three open fgOS decisions that really have two sides. Chosen so the answer is not in the repo already; the earlier mdview question ended with all seats agreeing because the feature already existed.
+Same question as 2026-10-04 plus three open fgOS decisions that really have two sides. A question whose answer the design already gives (for example whether to probe a provider before assigning a seat: account rotation, pool fallback and early login-failure detection already answer it) is not asked. Chosen so the answer is not in the repo already; the earlier mdview question ended with all seats agreeing because the feature already existed.
 
 | # | Question | Why it is contestable |
 |---|---|---|
 | Q0 | Should fgOS add a mandatory dissent or agreement gate to the `panel` pattern, or are provider-distinct panelists plus the `reviewed` red-team enough? | Reused for comparability with the first round |
 | Q1 | When a provider account is quarantined for a dead credential (`auth-token`, manual clear), should fgOS clear it by itself after a successful probe, or keep it manual until a person acts? | Safety against wrongly clearing a bad credential versus a person babysitting quotas |
-| Q2 | Should fgOS probe each provider with a real call before it assigns seats to it, given that a dead login only shows on the first model call? | Reliability versus extra cost and latency on every run |
+| Q2 | When choosing among several accounts of one provider, should fgOS prefer the account with the most remaining quota, or keep choosing by hash among the accounts that are usable? | Spreading load without needing quota numbers versus steering work to the account that can finish it; the preferred option needs a quota source fgOS does not have |
 | Q3 | Should lens persona definitions live in the project being run (`core/agents`), or ship with the installed fgOS and be read from there? | Project control versus every project getting the same lenses |
 
 Run each question once through each arm. If cost allows, run Q0 twice per arm to see run-to-run spread.
