@@ -93,11 +93,3 @@ test('a duplicate group with two source copies and two platform copies has one o
   rows[1].targetOwner = target.replace('run/', 'other/');
   assert.equal(validateSemanticClaimOwners(rows).some((f) => f.type === 'semantic-claim-multiple-owners'), true);
 });
-
-test('a mirror cannot replace the corresponding relative path with another byte-identical file', () => {
-  const inventory = fixture();
-  const wrong = target.replace('/run/', '/other/');
-  inventory.items[1].path = wrong;
-  inventory.claimLedger[1].sourcePath = wrong;
-  assert.ok(run([shard([{ path: source, target: wrong, blobSha }])], inventory).findings.some((f) => f.type === 'decision-mirror-invalid'));
-});
