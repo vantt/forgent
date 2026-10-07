@@ -13,7 +13,7 @@ const author = 'fixture-session:author@2026-10-07';
 const reviewer = 'reviewer:fixture-session:other@2026-10-07';
 const reportPath = plan + '/reports/phase-06/review-corpus-fixture.md';
 const corpora = ['history-evidence', 'user-knowledge', 'consumer-project'];
-const rule = (corpus) => ({ corpus, disposition: corpus === 'history-evidence' ? 'retain-as-evidence' : 'reclassify-out-of-platform-scope', rationale: 'The classified corpus remains outside maintained platform authority.', claimKind: 'historical-context', authoredBy: author, reviewedBy: reviewer, reviewedAt: '2026-10-07', reviewReport: reportPath });
+const rule = (corpus) => ({ corpus, disposition: corpus === 'history-evidence' ? 'retain-as-evidence' : 'reclassify-out-of-platform-scope', rationale: 'The classified corpus remains outside maintained platform authority.', claimKind: 'historical-context', reviewStatus: 'reviewed', authoredBy: author, reviewedBy: reviewer, reviewedAt: '2026-10-07', reviewReport: reportPath });
 const digestOf = ({ corpus, disposition, rationale, claimKind }) => createHash('sha256').update(JSON.stringify({ corpus, disposition, rationale, ...(claimKind === undefined ? {} : { claimKind }) })).digest('hex');
 function fixture(t, rules = corpora.map(rule)) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-corpus-rule-'));
@@ -102,4 +102,14 @@ test('loader rejects a malformed corpus-rule collection', (t) => {
   const file = path.join(f.root, 'shard.json');
   fs.writeFileSync(file, JSON.stringify({ ...f.shard, corpusRules: {} }));
   assert.throws(() => loadDecisionShards(file), /corpusRules.*array/);
+});
+
+test('pending corpus policy keeps rows blocking until its independent review is committed', (t) => {
+  const f = fixture(t);
+  const pending = { ...rule('history-evidence'), reviewStatus: 'pending' };
+  delete pending.reviewedBy; delete pending.reviewedAt; delete pending.reviewReport;
+  const result = apply(f, { ...f.shard, corpusRules: [pending] });
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.inventory.claimLedger[0].reviewStatus, 'blocking');
+  assert.equal(result.inventory.items[0].proposedDisposition, 'unknown-blocking');
 });
