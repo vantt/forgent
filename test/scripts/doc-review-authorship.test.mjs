@@ -80,3 +80,12 @@ test('authorship-required shards cannot omit their author session', (t) => {
   const shard = { ...f.shard }; delete shard.authorSession;
   assert.ok(apply(f, f.row, shard).findings.some((r) => r.type === 'decision-author-session-missing'));
 });
+test('escaped table pipes retain the exact reviewer note after parsing', (t) => {
+  const f = fixture(t);
+  f.row.reviewNote = 'Checked x|y without weakening its meaning.';
+  fs.writeFileSync(path.join(f.root, reportPath), f.report.replace('Checked the entire historical unit.', 'Checked x\\|y without weakening its meaning.'));
+  f.git('add', '--', reportPath); f.git('commit', '-qm', 'docs: record escaped review note', '--', reportPath);
+  f.row.reviewReportCommit = f.git('rev-parse', 'HEAD'); f.inventory.commit = f.row.reviewReportCommit;
+  assert.deepEqual(apply(f).findings, []);
+  assert.deepEqual(buildReviewPack(f.context, f.shard).rows, []);
+});
