@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildReviewPack, seedReviewPack, scoreReviewPack, applyReviewVerdicts, parseReviewVerdicts } from '../../scripts/propose-doc-decisions.mjs';
+import { buildReviewPack, seedReviewPack, scoreReviewPack, applyReviewVerdicts, parseReviewVerdicts, independentReviewer } from '../../scripts/propose-doc-decisions.mjs';
 import { applyDecisions } from '../../scripts/check-doc-inventory-gates.mjs';
 
 const author = 'codex-session:author@2026-10-07';
@@ -73,3 +73,33 @@ for (const verdict of ['hold', 'rework']) {
     assert.deepEqual(applyDecisions(inventory, [result], { vocabulary }).findings, []);
   });
 }
+
+test('the same reviewer session on another date is still the author session', () => {
+  assert.equal(independentReviewer('reviewer:codex-session:author@2026-10-08', author), false);
+  assert.equal(independentReviewer(reviewer, undefined), false);
+  assert.equal(independentReviewer(reviewer, author), true);
+  const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'rework', note: 'Requires a different session.' }));
+  assert.throws(() => applyReviewVerdicts(context, shard, { verdicts, reviewer: 'reviewer:codex-session:author@2026-10-08', reportPath: 'fixture/review.md' }), /independent/);
+});
+
+test('pre-reviewed hand rows without committed evidence are rejected instead of skipped', () => {
+  const forged = { ...shard, claims: [{ ...shard.claims[0], reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt: '2026-10-07', targetUnitDigest: digest }] };
+  assert.throws(() => buildReviewPack(context, forged), /committed review/);
+  assert.throws(() => applyReviewVerdicts(context, forged, { verdicts: [], reviewer, reportPath: 'fixture/review.md' }), /committed review/);
+});
+
+test('a public seeded pack does not expose its replay inputs or retain original mutated digests', () => {
+  const original = buildReviewPack(context, shard);
+  const first = seedReviewPack(original, { seed: 'hidden-input', reviewer });
+  const second = seedReviewPack(original, { seed: 'hidden-input', reviewer });
+  assert.equal('seed' in first.pack, false);
+  assert.equal('nonce' in first.pack, false);
+  assert.notEqual(first.key.nonce, second.key.nonce);
+  const replay = seedReviewPack(original, { seed: first.key.seed, reviewer, nonce: first.key.nonce });
+  assert.deepEqual(replay, first);
+  for (const keyed of first.key.rows.filter((row) => row.mutated)) {
+    const shown = first.pack.rows.find((row) => row.claimId === keyed.claimId);
+    assert.notEqual(shown.target.textDigest, digest);
+    assert.notEqual(shown.target.text, unit(0).text);
+  }
+});
