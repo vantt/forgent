@@ -173,3 +173,17 @@ Constitution accepts repeated --decisions, validates committed source blobs and 
 
 Candidate-status discovery includes tracked and untracked, nonignored Markdown under docs/platform/. Other callers of trackedPlatformDocs retain tracked-only behavior. The actual CLI in an isolated temporary repository returns 1 for an untracked candidate without required metadata, then 0 after the candidateCore fields are supplied. No candidate header semantics or frozen gate invariant was loosened. Smoke artifacts are temporary and no actual candidate material is written before independent tooling review.
 
+## Committed independent row review
+
+Red e9edcb03f: 0 pass/7 fail. Shared validateManualReview now checks manual rows in authorshipRequired shards and verifies all pre-reviewed rows before pack/apply. Script-generated mirror/exact expansions retain their re-proven provenance; reviewed corpus rules retain their separately committed rule proof. A manual script identity is fatal and cannot claim either exemption.
+
+Session comparison shares reviewSessionIdentity: reviewer: and @date cannot distinguish a session from itself. Reviewed manual rows require authoredBy and authorSession. A valid report is a normalized repository-relative review-<step>-<shard>.md under reports/phase-06, committed at the recorded tree, with a matching Reviewer, Pack commit, Pack id, Seed score, and the claim's ok verdict and own note. Missing or mismatched evidence is fatal. The report pin must be an ancestor of the inventory commit, not another branch or a future tree. The committed reader caches paths and ancestry checks.
+
+Each approval carries reviewReportCommit as well as its existing report/pack/score bindings. Apply reads committed HEAD evidence before returning an actual repository-backed approval; later rounds preserve previously approved rows and their individual pins. A working-tree report alone cannot flip a row. Legacy pilot shards leave authorshipRequired off, preserving the frozen baseline; pack/apply still fail closed on unverifiable old reviewed rows rather than silently passing them through.
+
+Verification: targeted authorship and corpus tests 15/15; full scripts suite 844/844 in 49 files. Escaped-note boundary red 9a062d31b has 7 pass/1 fail; the shared verifier now uses the existing verdict parser's escaped-pipe convention. Actual CLI rehearsal in a temporary Git fixture exercised pack, seed-pack, score-pack, apply-review and a subsequent pack: 61 distinct units, passing sensitivity score, uncommitted application exit 1, committed application exit 0, repeat pack exit 0 with no pending rows, 0 decision invariant findings. Fixture review identities are synthetic and this produces no real batch approval. No frozen conservation invariant is loosened.
+
+## First-use vocabulary timing
+
+The usage-only amendment is recorded after each reserved disposition's actual first use. Tool/test fixtures and scratch proposals do not substitute for a real authored decision. No unused disposition is prematurely marked in-use. The review brief must carry this first-use dependency into authoring; definitions and rule text remain unchanged.
+

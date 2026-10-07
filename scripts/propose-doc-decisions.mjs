@@ -2,8 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { applyDecisions, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, loadDecisionShards } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, loadDecisionShards, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -22,6 +23,10 @@ Modes:
   --snapshot                 Dry-run merged legacy ledger rows plus sha256.
   --verify <snapshot>        Recompute rows and sha256 against the same inputs.
   --help                     Print this contract.
+
+Committed reports bind Reviewer, Pack commit, Pack id, Seed score and each
+claim's ok verdict/note. Approvals pin their own report commit; existing
+reviewed rows must verify before pack/apply, including earlier rounds.
 
 Inputs:
   --inventory <manifest>     Required inventory; units read at its pinned commit.
@@ -166,17 +171,21 @@ export function loadProposalContext(inventoryPath, repoRoot) {
 }
 
 export function independentReviewer(reviewer, author) {
-  const session = (identity) => String(identity || '').replace(/^reviewer:/, '').split('@')[0];
-  return Boolean(author) && /^reviewer:[^@\s]+-session:[^@\s]+@\d{4}-\d{2}-\d{2}$/.test(reviewer || '') && session(reviewer) !== session(author);
+  return Boolean(author) && /^reviewer:[^@\s]+-session:[^@\s]+@\d{4}-\d{2}-\d{2}$/.test(reviewer || '') && reviewSessionIdentity(reviewer) !== reviewSessionIdentity(author);
 }
 
-function requireUnreviewedShard(shard) {
+function requireVerifiedShard(context, shard) {
   if (shard.authorshipRequired && !shard.authorSession?.trim()) throw new Error('authorshipRequired needs authorSession');
-  if ((shard.claims || []).some((row) => row.reviewStatus === 'reviewed')) throw new Error('pre-reviewed rows require committed review report verification before pack or apply');
+  const reportOf = context.repoRoot && context.inventory.commit ? buildCommittedReviewReportLookup(context.repoRoot, context.inventory.commit) : () => null;
+  for (const row of shard.claims || []) {
+    if (row.reviewStatus !== 'reviewed') continue;
+    const findings = validateManualReview(row, shard, reportOf);
+    if (findings.length) throw new Error('pre-reviewed rows require committed review report verification: ' + findings.map((finding) => finding.type).join(', '));
+  }
 }
 
 export function buildReviewPack(context, shard) {
-  requireUnreviewedShard(shard);
+  requireVerifiedShard(context, shard);
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const targets = new Set();
   const named = new Set();
@@ -295,7 +304,7 @@ export function parseReviewVerdicts(text, reviewer, binding = null) {
 }
 
 export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, pack, seedProof, reviewedAt = new Date().toISOString().slice(0, 10) }) {
-  requireUnreviewedShard(shard);
+  requireVerifiedShard(context, shard);
   if (!reportPath || !independentReviewer(reviewer, shard.authorSession)) throw new Error('review application requires a report and an independent reviewer');
   const pending = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed');
   const index = indexVerdicts(verdicts, new Set(pending.map((row) => row.claimId)));
@@ -317,7 +326,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     const verdict = index.get(row.claimId);
     const updated = { ...row, reviewStatus: row.disposition === 'unknown-blocking' ? 'blocking' : 'pending', reviewNote: verdict.note };
     delete updated.reviewedBy; delete updated.reviewedAt; delete updated.targetUnitDigest;
-    for (const field of ['targetAncestry', 'reviewReport', 'reviewPackCommit', 'reviewPackId', 'seedScoreId']) delete updated[field];
+    for (const field of ['targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewPackCommit', 'reviewPackId', 'seedScoreId']) delete updated[field];
     if (verdict.verdict === 'ok') {
       if (row.disposition === 'unknown-blocking') throw new Error(`unknown-blocking cannot be approved: ${row.claimId}`);
       const target = row.targetOwner ? (context.unitsOf(row.targetOwner) || []).find((unit) => unit.anchor === row.targetAnchor) : null;
@@ -328,6 +337,16 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     }
     return updated;
   });
+  if (context.repoRoot && claims.some((row, i) => row.reviewStatus === 'reviewed' && shard.claims[i].reviewStatus !== 'reviewed')) {
+    const reportCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: context.repoRoot, encoding: 'utf8' }).trim();
+    const reportOf = buildCommittedReviewReportLookup(context.repoRoot, reportCommit);
+    for (let i = 0; i < claims.length; i++) {
+      if (claims[i].reviewStatus !== 'reviewed' || shard.claims[i].reviewStatus === 'reviewed') continue;
+      claims[i].reviewReportCommit = reportCommit;
+      const findings = validateManualReview(claims[i], shard, reportOf);
+      if (findings.length) throw new Error('review application requires matching committed review evidence: ' + findings.map((finding) => finding.type).join(', '));
+    }
+  }
   return { ...shard, reviewReport: reportPath, claims };
 }
 
