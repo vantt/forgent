@@ -55,7 +55,7 @@
           "claim_bbaec409dcbaee8f33968727aa0abed5",
           "claim_e365a92a236aa909b9148185aa8f0801"
         ],
-        "artifact": "pilot/decisions/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G23",
+        "artifact": "pilot/first-round/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G23",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -87,7 +87,7 @@
         "claimIds": [
           "claim_75c780a31188a0fa1e19d03ccbd3b6b1"
         ],
-        "artifact": "pilot/decisions/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G24",
+        "artifact": "pilot/first-round/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G24",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -119,7 +119,7 @@
         "claimIds": [
           "claim_54536d1078dc6a2b6eacd17105389f2b"
         ],
-        "artifact": "pilot/decisions/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G29",
+        "artifact": "pilot/first-round/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G29",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -167,7 +167,7 @@
           "claim_66ce4edf221963b22ad02dbdf872da1c",
           "claim_8948a9c62d80ce2692687f3fcfbaf8ff"
         ],
-        "artifact": "pilot/decisions/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G36",
+        "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G36",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -205,7 +205,7 @@
           "claim_d03d06ad4a63b00a87a934ab594587c9",
           "claim_db4217b66dba7e00b2af5d10624b795d"
         ],
-        "artifact": "pilot/decisions/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G37",
+        "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G37",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -237,7 +237,7 @@
         "claimIds": [
           "claim_d1c4102dc6dea3ae86434fb12c0abf71"
         ],
-        "artifact": "pilot/decisions/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G38",
+        "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G38",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -273,7 +273,7 @@
           "claim_7e15be77fb7c4bff223728491df3e212",
           "claim_0f401249972ad0ce465e24e0932a2834"
         ],
-        "artifact": "pilot/decisions/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G40",
+        "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G40",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -307,7 +307,7 @@
           "claim_7046eb56f67c02ef82f621a3fa30286c",
           "claim_7f7b3ba83bbde945cdd80d479b9d0b19"
         ],
-        "artifact": "pilot/decisions/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G46",
+        "artifact": "pilot/first-round/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G46",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -339,7 +339,7 @@
         "claimIds": [
           "claim_6a37273a0a45d24c53e344928c3edf22"
         ],
-        "artifact": "pilot/decisions/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G47",
+        "artifact": "pilot/first-round/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G47",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -371,7 +371,7 @@
         "claimIds": [
           "claim_8c44796ac827f6b1287421778b56511c"
         ],
-        "artifact": "pilot/decisions/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G48",
+        "artifact": "pilot/first-round/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G48",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -403,7 +403,7 @@
         "claimIds": [
           "claim_2519e82bb2a6054b1b822fc266471424"
         ],
-        "artifact": "pilot/decisions/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G57",
+        "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G57",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -449,7 +449,7 @@
           "claim_50f628b5dcaf8dbdffee5607d27480f1",
           "claim_f2eb44e222e17f54c6ccc94e0af4fa3e"
         ],
-        "artifact": "pilot/decisions/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G58",
+        "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G58",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -487,7 +487,7 @@
           "claim_99bf6932b3f44681c138edf8384d652b",
           "claim_056d11e86ef88989c436bc14a24997a1"
         ],
-        "artifact": "pilot/decisions/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G60",
+        "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G60",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -519,7 +519,7 @@
         "claimIds": [
           "claim_a1c1085c9d77a84ca5e5aefe1de6d059"
         ],
-        "artifact": "pilot/decisions/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G61",
+        "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G61",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -563,7 +563,7 @@
           "claim_cea27866daa3823bc706fe737e7155d9",
           "claim_096b8a1eacd02f9b9f34e80d62ec57e3"
         ],
-        "artifact": "pilot/decisions/a-rust-cli-and-proof-components-plan.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G73",
+        "artifact": "pilot/first-round/a-rust-cli-and-proof-components-plan.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G73",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },
@@ -603,7 +603,7 @@
           "claim_245edf82638eebaa26df985249540c8c",
           "claim_ce5758286602f8062fe2c8ac0d709f22"
         ],
-        "artifact": "pilot/decisions/a-rust-cli-and-proof-components-plan.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G75",
+        "artifact": "pilot/first-round/a-rust-cli-and-proof-components-plan.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G75",
         "disposition": "unknown-blocking",
         "targetOwner": null
       },

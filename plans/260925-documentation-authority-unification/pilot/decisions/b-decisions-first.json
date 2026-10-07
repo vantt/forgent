@@ -461,17 +461,17 @@
       "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967"
     },
     {
-      "claimId": "claim_aadb6e62ef42d3ea549cc667328aa410",
-      "sourceUnitDigest": "23622b5a51f195a4",
+      "claimId": "claim_c03100e389a11a8b1198b2190e1a8956",
+      "sourceUnitDigest": "02c8b88dda473400",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "reviewed",
       "targetAnchor": "unheaded-block-20",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1447-1452, starting \"- `doing → proposed` — goal-check pass, runner ghi `proposed`.\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45"
+      "rationale": "Body of ADR 0006 (source lines 1447-1454: the transition list and its label line \"Ngữ nghĩa:\") carried line for line into its own block; text identical to the source. The unit now includes the one-line label because the extraction rule merges short blocks into the previous block of their section.",
+      "targetUnitDigest": "02c8b88dda473400c015db8455b8a7f0",
+      "reviewedBy": "independent reviewer (re-review after the extraction change)",
+      "reviewedAt": "2026-10-07"
     },
     {
       "claimId": "claim_2e390ae8e0379eae085591d9d6ff9af3",

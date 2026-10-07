@@ -11,11 +11,11 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `332effba6d5a904c9b6f458228c15f75d336c866`
+- **Commit:** `5519051da4618d5be4a22186a388a6b5712f07e5`
 - **Files scanned:** 4318
-- **Claim rows:** 86517
-- **Headings / unheaded blocks / mixed-file blocks:** 26371 / 58969 / 1177
-- **Gaps:** 1062 (1054 file/routing gap(s), 8 claim identity-gap blocker(s))
+- **Claim rows:** 87153
+- **Headings / unheaded blocks / mixed-file blocks:** 26371 / 59605 / 1177
+- **Gaps:** 1061 (1054 file/routing gap(s), 7 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
 
@@ -2107,14 +2107,13 @@ Related:
 
 | Claim | Source | Anchor | Identity status | Disposition |
 |---|---|---|---|---|
-| `claim_identity_gap_c92dd298c25ad49208dbaee2` | `docs/specs/runner.md` | `unheaded-block-143` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_56cbece25fae2ca97acd9d88` | `docs/specs/runner.md` | `unheaded-block-148` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_7050a625aea2402aa2e4a66d` | `docs/specs/runner.md` | `unheaded-block-160` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_8fa5eed3b5f78cc73010df0b` | `docs/specs/runner.md` | `unheaded-block-169` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_3eb8a16dfa852ed2424e543b` | `docs/specs/runner.md` | `unheaded-block-234` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_d4730d311cfaf872087fc04c` | `docs/specs/runner.md` | `unheaded-block-243` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_7979438d0e28d786c298c01d` | `docs/specs/runner.md` | `unheaded-block-267` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_e27dfc95d38d94e129218b18` | `docs/specs/runner.md` | `unheaded-block-279` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_902188fcdf84a149bb96630e` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_fe8972db3db2e647b2c413ef` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3c8321782f3796b9f1782681` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_432b5378ca7a2d25bc3449a5` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-13` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0b40905004b2a2ca66eae292` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_52cafe1662702962c56e0940` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4000c5c2d0f6b828a16a9ca0` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
 
 ## Claim Ledger Sample (first 500 rows)
 
@@ -2161,7 +2160,7 @@ Related:
 | `claim_500d588a939fd6109cf102b8343484bb` | `AGENTS.md` | `unheaded-block-28` | `unclassified` | `unknown-blocking` |  |
 | `claim_1c85e6258b0455d9b44d738f833e1bb9` | `AGENTS.md` | `unheaded-block-29` | `unclassified` | `unknown-blocking` |  |
 | `claim_9dd28187a839e2ce10f2e9dd3f020cdf` | `AGENTS.md` | `starting-the-fgos-gateway-one-door-never-a-raw-process` | `unclassified` | `unknown-blocking` |  |
-| `claim_adc150a41d48dfde06422405a5b0f277` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
+| `claim_1e668e7697680b80953d4a1bc8bd65e4` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
 | `claim_2e45cfdcd3f2bf602787b37feac667f3` | `AGENTS.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
 | `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
 | `claim_9f129b46b75d0c4d4e7119da265c74b0` | `AGENTS.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
@@ -2183,7 +2182,7 @@ Related:
 | `claim_42108ffe5c72a9f3ca2c7ef904fd14ec` | `AGENTS.md` | `resources` | `unclassified` | `unknown-blocking` |  |
 | `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
 | `claim_7b36640f7d6ced0d3f089a419f5d26ff` | `AGENTS.md` | `cli` | `unclassified` | `unknown-blocking` |  |
-| `claim_839bc9774b75e893f078d20ecbbb39f0` | `AGENTS.md` | `unheaded-block-43` | `architecture` | `unknown-blocking` |  |
+| `claim_1661543368ff1c7e6f57d20e2345cf4d` | `AGENTS.md` | `unheaded-block-43` | `architecture` | `unknown-blocking` |  |
 | `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-44` | `unclassified` | `unknown-blocking` |  |
 | `claim_6acc93d03a89146ebf7f4903938fabd9` | `AGENTS.md` | `fgos-effective-instructions` | `unclassified` | `unknown-blocking` |  |
 | `claim_9474ae42b4d6e079fcf33fec49e746fa` | `AGENTS.md` | `law` | `unclassified` | `unknown-blocking` |  |
@@ -2195,13 +2194,13 @@ Related:
 | `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-48` | `verification` | `unknown-blocking` |  |
 | `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-49` | `unclassified` | `unknown-blocking` |  |
 | `claim_0d2c13615099d78c5e38533379ecf7cc` | `CLAUDE.md` | `project-rules` | `unclassified` | `unknown-blocking` |  |
-| `claim_2c95402110cb9a2551ee02f61dde7da6` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
+| `claim_db83a4c14e03868fccf833f00f51f296` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
 | `claim_a18fb2712669f362c16aa39841718116` | `CLAUDE.md` | `impact-analysis-capability-gate` | `unclassified` | `unknown-blocking` |  |
 | `claim_7cff4d97b31e33a4ca0b8a4b505c8807` | `CLAUDE.md` | `unheaded-block-2` | `unclassified` | `unknown-blocking` |  |
 | `claim_34e5aadf94d955884ab6041bc388d0b0` | `CLAUDE.md` | `unheaded-block-3` | `unclassified` | `unknown-blocking` |  |
 | `claim_81adf946018de3aee151fbb350719862` | `CLAUDE.md` | `unheaded-block-4` | `verification` | `unknown-blocking` |  |
 | `claim_32f35a95feb5773ca27979295027897f` | `CLAUDE.md` | `unheaded-block-5` | `unclassified` | `unknown-blocking` |  |
-| `claim_680368f9b96bad5b9081e46ac1c15f71` | `CLAUDE.md` | `unheaded-block-6` | `unclassified` | `unknown-blocking` |  |
+| `claim_5c07823ad6d47b3e9ac91dfbf41aa56f` | `CLAUDE.md` | `unheaded-block-6` | `unclassified` | `unknown-blocking` |  |
 | `claim_8396a2952ef6cbcae93835afb0a73152` | `CLAUDE.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
 | `claim_50134455b2dca31dc4bd662b22744a21` | `CLAUDE.md` | `unheaded-block-7` | `unclassified` | `unknown-blocking` |  |
 | `claim_e6e4b2ccbaf2497ac1ff7ef374d2821b` | `CLAUDE.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
@@ -2223,7 +2222,7 @@ Related:
 | `claim_928e5b681c1bbc6c51563c78de0b4f23` | `CLAUDE.md` | `resources` | `unclassified` | `unknown-blocking` |  |
 | `claim_6bd09ad125ddd52d9563117b379ecc60` | `CLAUDE.md` | `unheaded-block-18` | `unclassified` | `unknown-blocking` |  |
 | `claim_8c2cca9caea197a0601c680f4bfcbb23` | `CLAUDE.md` | `cli` | `unclassified` | `unknown-blocking` |  |
-| `claim_b03dcaaf5e17554a35f8f92b6551bcd5` | `CLAUDE.md` | `unheaded-block-19` | `architecture` | `unknown-blocking` |  |
+| `claim_05d3c5f6af634e345b6e32290900c232` | `CLAUDE.md` | `unheaded-block-19` | `architecture` | `unknown-blocking` |  |
 | `claim_81c3b0eacf7f0ab3fbe44476b56419b6` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-1` | `architecture` | `unknown-blocking` |  |
 | `claim_826404d26de265df9c556ab61db2b488` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `coordination-recovery-planning-and-session-continuation` | `architecture` | `unknown-blocking` |  |
 | `claim_6febf72e4de937b588580a52cf4d72ca` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-2` | `architecture` | `unknown-blocking` |  |
@@ -2317,7 +2316,7 @@ Related:
 | `claim_0fc7c6e612423aa78420e2b5ad63f1bf` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `contracts` | `architecture` | `unknown-blocking` |  |
 | `claim_976c9258480b6a6549a86ce7f22c593e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-12` | `architecture` | `unknown-blocking` |  |
 | `claim_a6751b566cc04089bc1ca55950399080` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `dispatchrequest-outer-core` | `architecture` | `unknown-blocking` |  |
-| `claim_b5fc363899306910c7aea68467923c1d` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-13` | `architecture` | `unknown-blocking` |  |
+| `claim_7295b122cf1360b5194f968be018cac8` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-13` | `architecture` | `unknown-blocking` |  |
 | `claim_f551735968bce5d31f1a46aa0539221b` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-14` | `architecture` | `unknown-blocking` |  |
 | `claim_f90925846cf63161875b4657557bdf4f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-15` | `architecture` | `unknown-blocking` |  |
 | `claim_36cf2353a80eb49cb092dd4bf0df9335` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `policypatch` | `architecture` | `unknown-blocking` |  |

@@ -647,11 +647,13 @@ test('the freeze is recorded and the additive amendment carries its reason', () 
 });
 
 test('the usage amendment rests on dispositions that the committed decision shards use', () => {
-  const shardsDir = path.resolve(REPO_ROOT, 'plans/260925-documentation-authority-unification/pilot/decisions');
   const used = new Set();
   const statuses = new Set();
-  for (const name of fs.readdirSync(shardsDir).filter((n) => n.endsWith('.json'))) {
-    for (const claim of JSON.parse(fs.readFileSync(path.join(shardsDir, name), 'utf8')).claims || []) { used.add(claim.disposition); statuses.add(claim.reviewStatus); }
+  for (const dir of ['pilot/decisions', 'pilot/first-round']) {
+    const shardsDir = path.resolve(REPO_ROOT, `plans/260925-documentation-authority-unification/${dir}`);
+    for (const name of fs.readdirSync(shardsDir).filter((n) => n.endsWith('.json'))) {
+      for (const claim of JSON.parse(fs.readFileSync(path.join(shardsDir, name), 'utf8')).claims || []) { used.add(claim.disposition); statuses.add(claim.reviewStatus); }
+    }
   }
   const inUse = vocabulary.sourceDispositions.filter((d) => d.usage === 'in-use').map((d) => d.id);
   for (const id of ['split', 'supersede', 'archive-with-reason', 'delete-as-obsolete']) assert.ok(inUse.includes(id) && used.has(id), id);

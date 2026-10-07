@@ -1,6 +1,6 @@
 # Pilot A discrepancy report: new blind audit against the old preservation audit (host-invocation-routing)
 
-Scope: the six legacy sources in `docs/architect/host-invocation-routing/` (431 claim units) against the 33 promoted targets. New method: independent doers decided every unit blind (shards `pilot/decisions/a-*.json`). Old method: the coverage matrix of `verification/source-preservation-audit.md`, ledger rows HI-I001 to HI-I038 and `history/source-inventory.md`. Compared: the 303 units the new audit marked `unknown-blocking` (148) or `supersede` (155), grouped into 75 topic groups; the other 128 units (merge, promote, split, archive, delete) were not compared.
+Scope: the six legacy sources in `docs/architect/host-invocation-routing/` (431 claim units) against the 33 promoted targets. New method: independent doers decided every unit blind (shards `pilot/first-round/a-*.json`). Old method: the coverage matrix of `verification/source-preservation-audit.md`, ledger rows HI-I001 to HI-I038 and `history/source-inventory.md`. Compared: the 303 units the new audit marked `unknown-blocking` (148) or `supersede` (155), grouped into 75 topic groups; the other 128 units (merge, promote, split, archive, delete) were not compared.
 
 ## 1. Result
 
