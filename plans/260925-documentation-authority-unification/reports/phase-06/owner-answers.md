@@ -1,7 +1,7 @@
 # Phase 6 owner answers
 
 Date: 2026-10-07        Recorded by: planner, from the owner's answers and Lead decisions relayed by the team lead
-Phase 6 authorized: pending (the owner starts the phase; replace `pending` with `yes` when starting)
+Phase 6 authorized: yes (owner, 2026-10-07)
 
 Q1 evidence mirrors: a
 Q2a tooling: A (T1 to T7)
