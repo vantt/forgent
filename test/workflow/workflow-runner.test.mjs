@@ -35,12 +35,12 @@ after(() => {
 
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-wf-test-'));
+  const tmp = makeFixtureDir('fgos-wf-test-');
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
@@ -222,7 +222,7 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
 });
 
 test('translatePlanToWorkflow translates multi-phase plan into DAG Workflow', () => {
-  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'plan-trans-'));
+  const tmp = makeFixtureDir('plan-trans-');
   fs.writeFileSync(
     path.join(tmp, 'plan.md'),
     `---
@@ -1074,7 +1074,7 @@ test('integration target: declared step target, then origin/HEAD, then the check
   const plain = { steps: [{ id: 'i', kind: 'integrate' }] };
   assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: plain }), 'trunk', 'local-only repo: its own branch');
 
-  const origin = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-wf-origin-'));
+  const origin = makeFixtureDir('fgos-wf-origin-');
   execFileSync('git', ['init', '--bare', '-b', 'develop', origin], { stdio: 'ignore' });
   execFileSync('git', ['remote', 'add', 'origin', origin], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['push', '-q', 'origin', 'trunk:develop'], { cwd: tmp, stdio: 'ignore' });
@@ -1124,11 +1124,10 @@ test('validateWorkflow keeps blind only when true and rejects a non-boolean', ()
 // Executors of distinct provider families, so a panel can bind every seat.
 //
 // Each executor command is a symlink to the node binary (over 100 MB). Left as
-// untracked files, every seat's dispatch reads and hashes each of them as a
-// pre-existing dirty file, once before launch and again at settlement, and
-// keeps the bytes: one `fgos` CLI process then peaks near 2 GB of RSS. A few
-// such tests in parallel exhaust memory, the kernel kills a process mid-run, and
-// the seat is only given up at its timeout. The symlinks are excluded from git
+// untracked files, every seat's dispatch hashes each of them as a pre-existing
+// dirty file, once before launch and again at settlement. The hash streams the
+// file, so memory stays flat, but reading 100 MB per seat is still slow work
+// that a test of seat wiring does not need. The symlinks are excluded from git
 // so they are not part of the worktree the dispatch snapshots.
 //
 // `runner.timeoutMs` is bounded so a seat whose worker never answers fails the

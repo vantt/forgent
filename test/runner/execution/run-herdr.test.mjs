@@ -19,11 +19,11 @@ import { createFakeHerdr, SANDBOXED_AGENT_SOURCE } from '../../helpers/fake-herd
 seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures live outside it.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 const fixtureDirs = [];
 const fakes = [];
 const fixtureDir = (prefix) => {
-  const dir = fs.mkdtempSync(path.join(FIXTURE_ROOT, prefix));
+  const dir = makeFixtureDir(prefix);
   fixtureDirs.push(dir);
   return dir;
 };

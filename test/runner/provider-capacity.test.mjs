@@ -392,7 +392,7 @@ function handle({ runtimeDir, runId, assignmentId }) {
     // A lost lease is the property under test, not how long a contender may wait: a bound that a
     // busy disk can exhaust (the holder fsyncs inside the lock) would fail the trial for a reason
     // unrelated to whether any lease was lost.
-    lockWaitMs: 300_000,
+    lockWaitMs: 45_000,
   });
   return { runId, status: result?.status ?? null };
 }

@@ -1,61 +1,57 @@
-# Phase 03 — Canonical door: research + decision D1
+---
+title: "Canonical door read-only research"
+status: done
+dependencies: [0]
+requiresReview: true
+---
 
-Plan status: Proposed — not authorized for execution
+# Phase 03 — Canonical door: completed read-only evidence for D1=B
+
+> Historical revision note: Revision ready — read-only research completed; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** Phase03 read-only research is complete and retained unchanged. Its source/layout observations and “future Phase04” wording below describe that research snapshot, not the implementation now delivered in [Phase04 tests](reports/phase-04-tests.md) and [actual native/dev/shim proof](reports/phase-04-live.md). See [full-plan sync](reports/final-plan-sync.md) for the current whole-plan gate; research itself did not run builds or runtime acceptance.
+
+Dependencies: Phase 00. This evidence branch can run independently of 01→02; its handoff is required by Phase 04.
 
 ## Context links
 
-- [plan.md](plan.md) "Phát hiện" #3; synthesis V1 / H1c, §8 mục 5 ("cách bật kích hoạt kiểu phát triển ... chưa kiểm"); cases M23, M30, M42; S32
-- Quyết định của anh (không mở lại): **Rust `fgos` là cửa chuẩn**; `node bin/fgos.mjs` là kênh tương thích. **D1 đã chốt B** (2026-10-06): dùng dev door có sẵn, đặt tên bằng npm script `fgos:dev` (việc thuộc Phase 04). Phase này vẫn làm research Q1-Q3 để có bằng chứng; kết quả không đổi quyết định, chỉ báo anh nếu Q1 tìm ra cơ chế có sẵn làm C rẻ hơn.
-- Đọc: `docs/specs/distribution.md` (Entry Points, "Dev checkout shell helpers", Edge Cases :285-288, :300-310), `docs/distribution-vision.md`, `docs/how-to/install-fgos-in-a-project-and-use-doctor.md` (:22-34 ba ngữ cảnh, :102-115 `fgctl upgrade|stage`), `docs/how-to/measure-a-real-case.md` §5 (quy trình stage lại), `AGENTS.md:68-70` (Legacy-Node CLI Ownership Boundary)
-- Code: `scripts/fgos-shell-integration.sh` (tier 0 `.fgos/installation/bin/fgos` thắng tier 1 `bin/fgos.mjs`), `.fgos/installation/bin/fgos` (shim do `fgctl` viết, exec `releasePath/bin/fgos`), `apps/fgos/src/legacy_exec.rs:69` `resolve_payload_path` (ưu tiên `FGOS_ACTIVE_RELEASE_PATH`/`FGOS_ACTIVE_MANIFEST_PATH`, rồi dò `target/dev-manifest.json` cạnh binary), `scripts/run-rust-dev-host.mjs` (build debug, ghi `target/dev-manifest.json` với `legacyNode.root: "."`, exec với hai env), `scripts/build-rust-distribution.mjs`, `apps/fgctl/src/main.rs` (verb: `stage|status|init|upgrade|repair|verify`), `packages/distribution/rust/src/init.rs`, `store.rs`, `verify.rs`
-- Trạng thái máy (2026-10-06, đọc, không đổi): `.fgos/installation/activation.json` → `artifactDigest sha256:a1ba…`, `pinSnapshot.policy exact-digest`, `activatedAt 2026-10-04T08:31:40Z`; 8 release trong `~/.local/state/fgos/releases/`; manifest release có `components.legacyNode {root: "libexec/legacy-node", entry: "bin/fgos.mjs", digest}` và `files[]` 614 mục có digest, **không** có commit nguồn.
+- [plan.md](plan.md); [completed research report](reports/phase-03-canonical-door-research.md); [Phase 04](phase-04-doctor-active-release-drift-check.md).
+- Synthesis V1/H1c and cases M23, M30, M42 describe stale activated runtime observations, not successful acceptance of a development command.
+- D1 is owner-approved **B**: name existing Rust development host as npm `fgos:dev`; A (restage) is used when plain `fgos` must change. C (dev activation) belongs to `plans/261006-1445-fgctl-dev-activation/`; do not repeat that research or reopen D1 here.
 
 ## Requirements
 
-1. Trả lời bằng bằng chứng (file:line hoặc lệnh read-only), ba câu:
-   - Q1: `fgctl` có cách nào kích hoạt một workspace trỏ payload Node vào chính repo (dev activation, `legacyNode.root` = checkout) không? (UNPROVEN; chưa thấy trong `main.rs`.)
-   - Q2: `scripts/run-rust-dev-host.mjs` có chạy đúng mọi verb `legacy-cli` với code working tree không, chi phí mỗi lần gọi (cargo build debug incremental) bao nhiêu?
-   - Q3: quy trình stage lại (§5 measure-a-real-case) tốn bao lâu và để lại gì (release mới trong store, `previousArtifactDigest`)?
-2. Một ghi chú research và một quyết định D1 do anh chốt; kết quả D1 là đầu vào cho message của check Phase 04 và rule ở Phase 06.
-3. Không chạy lệnh đổi trạng thái (`fgctl init|upgrade|repair|stage`, `fgos setup`, `doctor --fix`) **trong lúc research**. Q2/Q3 chỉ đo nếu anh cho phép ở D1-pre (xem bước 4); nếu không, trả lời bằng đọc code và ghi "chưa đo".
+1. Preserve completed read-only answers needed by Phase 04: argument forwarding, runtime cwd versus payload source, manifest/binary paths, actual target-sharing observations, and confinement constraints.
+2. No build, host invocation, stage, upgrade, setup, activation mutation, doctor fix, or timing experiment in this phase. The former D1-pre gate is removed, not deferred.
+3. Source evidence is not runtime acceptance: no all-verbs success, performance, custom-target success, or fresh-shim success has been measured.
+4. Findings describe current code, not changes already made. In particular INIT_CWD and end-to-end CARGO_TARGET_DIR handling are **planned Phase 04 corrections**.
 
 ## Files
 
-- Create (lúc thực thi): `plans/261006-1415-fgos-single-door-mechanisms/reports/phase-03-canonical-door-research.md`
-- Modify/delete: không có trong phase này.
+- Existing evidence only: `reports/phase-03-canonical-door-research.md`.
+- No source/config/doctrine modifications. No new research plan C or activation stage.
 
-## Steps
+## Evidence and executable handoff
 
-1. Q1: đọc `init.rs` (`init_workspace`, `upgrade_workspace`, nơi ghi `release_path` :1065), `store.rs`, `verify.rs`, `docs/specs/distribution.md`. Tìm prior art: `git log -S'dev-manifest'`, `git log -S'root: "."'`, `git log -S'devActivation'`, `git log -S'dev activation'` (hôm nay: `dev-manifest` có từ `37321ec5a`/`c831811fa`, hai từ sau không có hit đáng kể; `6733de7cf` "reconcile packaging and workspace architecture" cần đọc). Kết luận: có / không có / có một phần.
-2. Q2: đọc `run-rust-dev-host.mjs` + `legacy_exec.rs`. Ghi rõ: dev host không đi qua shim workspace, nên shell function `fgos` vẫn chạy release đã kích hoạt.
-3. Q3: đọc §5 measure-a-real-case + `build-rust-distribution.mjs`.
-4. **D1-pre (gate nhỏ):** nếu cần số đo thật cho Q2/Q3, xin anh cho chạy `node scripts/run-rust-dev-host.mjs version` (ghi `target/`) và/hoặc một vòng stage+upgrade; không thì bỏ qua.
-5. Viết ghi chú research, kết thúc bằng D1:
-   - **A — Stage lại sau mỗi thay đổi** (`cargo build --release` → `build-rust-distribution.mjs --out <tmp>` → `fgctl stage` + `fgctl upgrade`). Đúng nghĩa "một cửa", không thêm cơ chế; chậm, mỗi lần thêm một release vào store.
-   - **B — Gọi tên dev door có sẵn** (`scripts/run-rust-dev-host.mjs`, thêm một npm script, ví dụ `fgos:dev`): Rust host + payload working tree; không đổi `fgctl`/shim. `fgos` trơn vẫn là release đã kích hoạt; check Phase 04 báo khi hai thứ lệch.
-   - **C — Dev activation trong `fgctl`** (workspace trỏ payload vào checkout): `fgos` trơn luôn thấy code mới; là năng lực distribution mới → spec trước (gate `AGENTS.md` Install/setup/doctor), lớn hơn phạm vi plan này, thành work item riêng.
-   - **Khuyến nghị của em: B**, kèm A cho lúc cần `fgos` trơn mới. Lý do: dùng lại thứ đã có (prior art), không mở năng lực distribution mới cho một nhu cầu chỉ có ở repo tự-host (mission #3, `AGENTS.md:27-33`), và check Phase 04 làm lệch thấy được thay vì im lặng. Nếu Q1 tìm ra cơ chế có sẵn thì C đổi thành "gọi tên cơ chế đó" và em đổi khuyến nghị.
-6. D1 đã chốt B và đã ghi ở `plan.md` (bảng Gates). Ghi lại trong research note bằng chứng ủng hộ hoặc chống B; không tự đổi quyết định.
+1. **Arguments proven by reading.** `scripts/run-rust-dev-host.mjs:91-101` forwards `process.argv.slice(2)` directly. Phase 04 can expose `npm run fgos:dev -- <verb> [args]`; no new argument parser. Existing spawn-error/status/signal propagation is retained.
+2. **Source and workspace are separate.** Script derives checkout root from its URL and runs Cargo there (`:8-17`). Runtime child currently uses `cwd: process.cwd()` (`:93-95`), **not INIT_CWD**. npm moves cwd to package root, so Phase 04 must use `process.env.INIT_CWD ?? process.cwd()` for runtime child while leaving build source at script checkout. No npm smoke run was performed here.
+3. **Artifacts currently hardcoded.** Manifest, binary hashing, binary execution, native file entries and `entries.fgos` use checkout `target/dev-manifest.json` and `target/debug/fgos` (`:28-40,69-99`). Cargo inherits `CARGO_TARGET_DIR` but the rest of wrapper does not honor it. Custom-target behavior may fail or select stale default binary [INFERENCE]; no such run occurred.
+4. **Manifest confinement is a required design constraint.** Rust verifier rejects symlink path segments and paths outside canonical release root (`packages/distribution/rust/src/verify.rs:133-163`). An external target directory cannot simply be recorded as an escaping manifest file. Phase 04 must choose a confined artifact layout for custom targets without weakening verification or creating a new distribution capability; test real consumer behavior before claiming support.
+5. **Actual filesystem finding corrects blanket sharing claim.** Read-only stat found no `target` entry in this isolated worktree, main has a real directory, and research process exported neither CARGO_TARGET_DIR nor INIT_CWD. Historical lead observation of shared symlink targets remains historical evidence, not this worktree's current state. Other worktrees/Cargo configuration were not inventoried. Where artifacts really are shared, require one development invocation at a time; symlink verification is a separate constraint, not just concurrency.
+6. **Activation remains unchanged.** Wrapper invokes its debug Rust host directly with FGOS_ACTIVE_RELEASE_PATH/FGOS_ACTIVE_MANIFEST_PATH; plain shell `fgos` still prefers activated shim/release. The documented A route builds/stages/upgrades and verifies through shim, but no command in that route was run here and no latency was measured.
+7. **Phase 04 consumes this evidence:** add npm name, correct child cwd, honor Cargo target consistently with verifier, implement Node-payload-only drift check against doctor's `dir`, catch unsafe-file errors, update registry/docs/how-to/changelog, cover all seven builder consumers. After authorized implementation, restage and run doctor through shim. All are future work, not completed research acceptance.
 
 ## Tests / validation
 
-- Ghi chú research có câu trả lời cho Q1-Q3, mỗi câu có file:line hoặc lệnh; D1 có lựa chọn của anh.
+- Completed evidence gate: report contains source references, read-only stat/environment observations and D1=B handoff. No builds/tests/lint/formatters or runtime acceptance runs.
+- Future Phase 04 must exercise subdirectory workspace resolution, custom-target selection, symlink refusal, drift check and post-restage shim behavior; this phase cannot mark them green.
 
-## Risks
+## Risks and unresolved facts
 
-| Rủi ro | L×I | Giảm thiểu |
-|---|---|---|
-| Lỡ chạy lệnh ghi trạng thái khi research | Low×Med | Bước 4 là gate riêng |
-| Kết luận Q1 sai vì đọc thiếu crate | Med×Med | Đọc cả `init.rs`, `store.rs`, `verify.rs`, `lib.rs`; ghi rõ phạm vi đã đọc |
+- External/custom Cargo target layout versus manifest containment remains an implementation design prerequisite. Keep it explicit until concrete compatible layout and behavior evidence exist; do not silently drop custom-target support or relax verifier.
+- Cold/incremental build time, development latency, staging/upgrade duration and doctor runtime remain unmeasured.
+- Argument forwarding does not prove every verb works. Historical binding/confinement evidence remains read-only provenance, not live sandbox acceptance. Early advisory runtime feasibility and installed-entry product/confinement proof belong to [advisory capability completion](../261006-1408-advisory-capability-completion/plan.md); neither was measured here, and neither is a prerequisite for this plan.
 
 ## Rollback
 
-Không có thay đổi; bỏ ghi chú research nếu D1 đổi hướng.
-
-## Hiệu chỉnh sau red-team (2026-10-06)
-
-Mục này **thắng** nội dung cũ của phase khi mâu thuẫn. Bằng chứng đã được lead tự đo lại (script hoặc `rtk proxy`), chi tiết ở bảng Red Team Review trong `plan.md`.
-
-- **Thu nhỏ còn 0,5 giờ, chỉ đọc.** D1 đã chốt B, và câu Q1 (fgctl có dev activation không) thuộc `plans/261006-1445-fgctl-dev-activation/phase-00-research-and-spec.md`, không lặp ở đây.
-- **Bỏ D1-pre** ("một vòng stage+upgrade"): nó đổi trạng thái kích hoạt thật (`activation.json`, chính sách `exact-digest`) dưới các phiên song song, mà phase này không có sản phẩm nào cần nó.
-- Giữ duy nhất việc Phase 04 cần: đọc `scripts/run-rust-dev-host.mjs` để biết (a) cú pháp truyền đối số, (b) cwd của tiến trình con (đã xác nhận: `cwd: process.cwd()`, dòng 94), (c) vị trí `target/dev-manifest.json` và chuyện `target/` được các worktree dùng chung (symlink, đã xác nhận). Kết quả nằm trong Phase 04 bước 1.
+No source/runtime changes to roll back. Retain research provenance even if a later implementation decision changes artifact layout.

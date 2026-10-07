@@ -17,6 +17,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
+   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.
 3. **DoD** — reproducibly verifiable result + evidence-linked documentation.
 4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.
 
@@ -60,14 +61,50 @@ A stranger agent with no chat history should be able to answer, for any change:
 4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,
    or existing covered behavior in the test suite? Either raises the bar.
 5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) green;
-   new or changed behavior gets a matching test.
+   new or changed behavior gets a matching test. Green must come from real
+   behavior: never add an env switch, flag, or test-only code branch that skips
+   checks to make tests pass; fix production code or the fixture instead.
 6. **What learning gets left behind?** A settled decision goes into
    `docs/decisions/`; a settled spec fact goes into the relevant
    `docs/specs/<area>.md`.
 
+## Scratch artifacts
+
+Keep draft scripts, logs, patches and dumps out of the repository root. Use
+`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.
+`.githooks/pre-commit` owns the single root-file allowlist and refuses new root
+files outside it, including linked worktrees. Legitimate root additions require
+an allowlist change in a separate commit, landed on main before the addition.
+The hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks
+that wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips only the root
+guard, never existing data-loss guards.
+
 ## Legacy-Node CLI Ownership Boundary
 
-`bin/fgos.mjs` is the `legacy-node` payload entry, staged whole under a release's `components.legacyNode.root` and exec'd by the Rust host at `components.legacyNode.entry` — never relocated, never renamed in the source tree. The Rust host resolves this file only through the release manifest's `components.legacyNode` fields, never PATH, never cwd, never hardcoded outside the manifest. Global npm `bin.fgos` and fallback `node bin/fgos.mjs` remain compatibility channels that call this file directly.
+Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the
+`legacy-node` payload entry, staged whole under a release's
+`components.legacyNode.root` and exec'd by the Rust host at
+`components.legacyNode.entry` — never relocated or renamed in the source tree.
+The host resolves it only through those manifest fields, never PATH, cwd or
+hardcoded locations outside the manifest. Global npm `bin.fgos` and fallback
+`node bin/fgos.mjs` are compatibility channels calling this entry directly.
+
+Plain `fgos` runs the activated release recorded in
+`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.
+Use `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust
+host. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and
+materializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,
+removing only its own directory after the child exits. Serialize invocations
+across worktrees only where their Cargo target is actually shared.
+
+`fgos doctor` check `active-release-matches-checkout` compares the owned source
+checkout's working-tree Node payload with its activation; it does not certify
+Rust freshness. Dependencies do not count as drift, but symlink/unsafe manifest
+entries still fail. It skips activation owned by main from a linked worktree
+and the same-checkout dev manifest. To update plain `fgos`, build/stage/activate
+the intended tree, then verify doctor through the installed shim. Old-release
+`fgos setup` can overwrite generated render headers until that release is
+restaged; activation never refreshes itself merely because source was edited.
 
 ## Install/setup/doctor gate
 
@@ -127,7 +164,7 @@ Three possible `mechanism` results, each needing a different response:
 - **`"out-of-process"`** — run `fgos dispatch execute` (or compatibility alias `node src/runner/dispatch.mjs execute`). Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result. (For a worktree-backed item, if passing explicit directory flags, pass `--cwd <worktree path>` and `--repo-root <main checkout path>` as two separate flags — never pass the main checkout as `--dir` alone). Log completed out-of-process runs via `fgos dispatch log` (or compatibility alias `node src/runner/dispatch.mjs log`).
 
 Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
-A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
+A skill that dispatches should not re-derive any of this. Reference `../_shared/executor-dispatch-fallback.md` from the skill; its canonical source is `core/skills/_shared/executor-dispatch-fallback.md`. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
 
 ## Starting the fgos gateway — one door, never a raw process
 

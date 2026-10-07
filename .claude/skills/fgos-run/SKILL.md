@@ -7,5 +7,5 @@ description: >-
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.
-The real skill content lives at `../../../.agents/skills/fgos-run/SKILL.md`, this project's own canonical skill source.
+The real skill content lives at `../../../.agents/skills/fgos-run/SKILL.md`, an assembled projection whose generated header identifies its canonical source.
 Read that file and follow it directly.

@@ -10,7 +10,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { dirDiffersFromCwdWarning } from '../../src/workflow/dir-guard.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { FIXTURE_ROOT, makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const made = [];
 after(() => {
@@ -18,7 +18,7 @@ after(() => {
 });
 
 function makeRepo(prefix) {
-  const dir = fs.realpathSync(fs.mkdtempSync(path.join(FIXTURE_ROOT, prefix)));
+  const dir = fs.realpathSync(makeFixtureDir(prefix));
   made.push(dir);
   execFileSync('git', ['init', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Dir Test'], { cwd: dir, stdio: 'ignore' });
@@ -73,7 +73,7 @@ test('no warning when the project is the working directory, a linked worktree of
 test('no warning without --dir, with an explicit --worktree, outside a repository, or in a detached child', () => {
   const here = makeRepo('fgos-dir-quiet-here-');
   const there = makeRepo('fgos-dir-quiet-there-');
-  const plain = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-dir-plain-'));
+  const plain = makeFixtureDir('fgos-dir-plain-');
   made.push(plain);
 
   assert.equal(dirDiffersFromCwdWarning({ cwd: here, env: {} }), null);

@@ -369,6 +369,23 @@ test('runSelectedTests removes the per-run temp dir even when spawning the suite
   fs.rmSync(base, { recursive: true, force: true });
 });
 
+test('runSelectedTests gives the suite a fixture root and removes it with whatever a killed file left in it', () => {
+  const base = tempBase();
+  let fixtureRoot;
+  runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => {
+      fixtureRoot = opts.env.FGOS_TEST_FIXTURE_ROOT;
+      fs.mkdirSync(path.join(fixtureRoot, 'left-by-a-killed-file'));
+      return { status: 0 };
+    },
+  });
+  assert.ok(fixtureRoot, 'the suite is told where to put its fixtures');
+  assert.equal(fs.existsSync(fixtureRoot), false);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
 // ─── .fgos Store Leak Guardrail Tests ─────────────────────────────────────────
 
 test('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {

@@ -1,0 +1,193 @@
+env -u CLAUDE_CODE_SESSION_ID node --test test/setup/active-release-drift-check.test.mjs test/rust-host/dev-host.test.mjs
+✖ dev door runs the real Node consumer from INIT_CWD with default Cargo output (243.087873ms)
+✖ dev door runs the real Node consumer from INIT_CWD with shared-default Cargo output (218.955725ms)
+✖ dev door runs the real Node consumer from INIT_CWD with relative Cargo output (211.349164ms)
+✖ dev door runs the real Node consumer from INIT_CWD with absolute Cargo output (212.208492ms)
+✔ dev door refuses symlink segment .fgos without modifying its target (82.292856ms)
+✔ dev door refuses symlink segment .fgos/runtime without modifying its target (84.416249ms)
+✔ dev door refuses symlink segment .fgos/runtime/dev-host without modifying its target (87.808982ms)
+✔ dev door refuses symlink segment .fgos/runtime/dev-host/fgos without modifying its target (91.056218ms)
+✔ dev door refuses symlink segment .fgos/runtime/dev-host/manifest.json without modifying its target (82.498112ms)
+✔ dev door refuses symlink segment bin/fgos.mjs without modifying its target (84.23419ms)
+✔ dev door propagates Cargo failure without materializing or executing a host (76.6275ms)
+✔ equal payload passes against explicit doctor dir, not cwd; check has no fix and writes nothing (8.640764ms)
+✔ working-tree edit including source bin/fgos.mjs reports changed and B/A guidance (5.051881ms)
+✔ added source is missing in release and removed source is extra in release (3.78291ms)
+✔ drift examples are deterministic and capped at five paths (4.495422ms)
+✔ outside source checkout skips even with explicit active release (2.015665ms)
+✔ source without activation skips rather than borrowing cwd activation or a staged manifest (3.824467ms)
+✔ explicit development manifest root dot pointing at checkout skips (3.926236ms)
+✔ development manifest pointing at another checkout does not skip this checkout (4.381353ms)
+✔ linked worktree skips activation owned only by main, including inherited shim environment (24.731416ms)
+✔ inherited foreign release environment cannot override a dir-owned activation (5.580403ms)
+✔ production dependencies, generated shims and neighboring legacy-root prefix are not source extras (4.901054ms)
+✔ declared dependency namespace is excluded without excluding selected source files (4.686378ms)
+✔ invalid activation JSON fails check without throwing (1.507479ms)
+✔ invalid manifest JSON fails check without throwing (0.963396ms)
+✔ unreadable manifest path fails check without throwing (0.927765ms)
+✔ missing active manifest fails check without throwing (0.89784ms)
+✔ missing manifest files fails check without throwing (3.075476ms)
+✔ invalid digest fails check without throwing (3.945812ms)
+✖ duplicate manifest source fails check without throwing (4.180877ms)
+✔ source symlink fails check without throwing (2.351677ms)
+✔ source intermediate symlink fails check without throwing (3.010431ms)
+✔ declared empty directory intermediate symlink fails check without throwing (4.379489ms)
+✔ broken source symlink fails check without throwing (3.991683ms)
+✔ broken activation symlink fails check without throwing (1.577538ms)
+✔ package symlink fails check without throwing (3.253888ms)
+✔ manifest symlink fails check without throwing (1.788109ms)
+✔ release source symlink fails check without throwing (2.724738ms)
+✔ legacy root escape fails check without throwing (2.970525ms)
+✔ manifest source escape fails check without throwing (4.275176ms)
+✔ dependency-shaped manifest escape fails check without throwing (3.839995ms)
+✔ declared source escape fails check without throwing (3.734129ms)
+✔ missing declared source fails check without throwing (3.120604ms)
+✔ missing listed release source fails check without throwing (4.046651ms)
+✖ unsafe source fails only this check and CLI doctor continues with normal and strict exits (242.055951ms)
+✔ real builder selection and staged production dependency payload agree with doctor (6.013209ms)
+ℹ tests 46
+ℹ suites 0
+ℹ pass 40
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1530.902497
+
+✖ failing tests:
+
+test at test/rust-host/dev-host.test.mjs:68:3
+✖ dev door runs the real Node consumer from INIT_CWD with default Cargo output (243.087873ms)
+  AssertionError [ERR_ASSERTION]: 
+  fgos: list: work "dev-consumer" not found.
+  
+  
+  4 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/worktrees/forgentX-single-door-execution/test/rust-host/dev-host.test.mjs:84:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/rust-host/dev-host.test.mjs:68:3
+✖ dev door runs the real Node consumer from INIT_CWD with shared-default Cargo output (218.955725ms)
+  AssertionError [ERR_ASSERTION]: 
+  fgos: list: work "dev-consumer" not found.
+  
+  
+  4 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/worktrees/forgentX-single-door-execution/test/rust-host/dev-host.test.mjs:84:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/rust-host/dev-host.test.mjs:68:3
+✖ dev door runs the real Node consumer from INIT_CWD with relative Cargo output (211.349164ms)
+  AssertionError [ERR_ASSERTION]: 
+  fgos: list: work "dev-consumer" not found.
+  
+  
+  4 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/worktrees/forgentX-single-door-execution/test/rust-host/dev-host.test.mjs:84:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/rust-host/dev-host.test.mjs:68:3
+✖ dev door runs the real Node consumer from INIT_CWD with absolute Cargo output (212.208492ms)
+  AssertionError [ERR_ASSERTION]: 
+  fgos: list: work "dev-consumer" not found.
+  
+  
+  4 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/worktrees/forgentX-single-door-execution/test/rust-host/dev-host.test.mjs:84:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/setup/active-release-drift-check.test.mjs:263:3
+✖ duplicate manifest source fails check without throwing (4.180877ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /duplicate/. Input:
+  
+  'active-release-matches-checkout could not safely compare Node payload: Duplicate manifest source path: libexec/legacy-node/bin/fgos.mjs. B: npm run fgos:dev -- <verb> runs working-tree code. A: rebuild/stage, then fgctl upgrade --from <release> in this workspace to update plain fgos.'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/worktrees/forgentX-single-door-execution/test/setup/active-release-drift-check.test.mjs:268:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'active-release-matches-checkout could not safely compare Node payload: Duplicate manifest source path: libexec/legacy-node/bin/fgos.mjs. B: npm run fgos:dev -- <verb> runs working-tree code. A: rebuild/stage, then fgctl upgrade --from <release> in this workspace to update plain fgos.',
+    expected: /duplicate/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/setup/active-release-drift-check.test.mjs:273:1
+✖ unsafe source fails only this check and CLI doctor continues with normal and strict exits (242.055951ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - true
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/worktrees/forgentX-single-door-execution/test/setup/active-release-drift-check.test.mjs:290:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+Observed exit: 1; wall seconds: 1.556

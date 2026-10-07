@@ -68,6 +68,8 @@ Current build/proof surfaces:
 
 Generated targets are not the source of truth. They may be committed for host compatibility, but edits should flow from the canonical source through the generator. Note that host trees may be mixed: `plugins/fgOS/skills/` contains hand-authored user commands (`pick`, `submit`, `cook`, `list`, etc.) alongside mirrored `fgos-*` dev skills, and `.claude/skills/` preserves hand-authored skills (`ui-spec`, `gitnexus`) without treating them as generated wrappers.
 
+Run `npm run build:skills` in the fgOS source repo after editing canonical skill sources. Every Markdown file written by assembly carries a one-line HTML generated-from header naming its repo-relative `core/skills/...` or `domains/<domain>/skills/...` source and that rebuild command. The header follows byte-identical YAML frontmatter, or is the first line when none exists. Plugin mirrors and Claude companion/reference files inherit it through copying; Claude `SKILL.md` thin wrappers retain their generated-wrapper marker and point to the assembled projection whose header identifies the canonical source. Non-Markdown bytes and hand-authored plugin CLI-wrapper skills are unchanged.
+
 ## 4. Source-Of-Truth Rule
 
 Every skill has exactly one canonical source directory.

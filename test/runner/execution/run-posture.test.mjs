@@ -16,11 +16,11 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures live outside it.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 const fixtureDirs = [];
 const fixtureDir = (prefix) => {
-  const dir = fs.mkdtempSync(path.join(FIXTURE_ROOT, prefix));
+  const dir = makeFixtureDir(prefix);
   fixtureDirs.push(dir);
   return dir;
 };

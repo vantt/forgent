@@ -1,0 +1,20 @@
+COMMAND ['node', '--test', 'test/e2e/root-file-guard-hook.test.mjs']
+✔ source checkout refuses newly staged root additions, copies and renames but accepts nested files (206.164615ms)
+✔ existing non-allowlisted root modifications and deletions remain permitted (122.274005ms)
+✔ allowlisted new root file is accepted (59.390357ms)
+✔ unrelated repository sharing the absolute hook is not root guarded (56.884192ms)
+✔ linked fgw branch is guarded before the hook-home early exit (80.267558ms)
+✔ allowlist changes cannot authorize root additions in the same commit and work after separately landing (178.115049ms)
+✔ merge commits skip only root guarding and continue to reject staged fgOS deletions (109.920872ms)
+✔ comment decoys cannot hide a real allowlist edit accompanying an allowed root addition (64.614658ms)
+✔ unrelated hook edits may accompany an already allowlisted root addition (80.488413ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 999.494915
+
+RESULT {"name": "phase-05-tests-focused-post-review", "exit": 0, "timed_out": false, "elapsed_seconds": 1.024, "log": "/home/vantt/projects/worktrees/forgentX-single-door-execution/plans/261006-1415-fgos-single-door-mechanisms/reports/phase-05-tests-focused-post-review.log", "process_group_cleanup": "SIGTERM sent to owned group; missing group already exited"}

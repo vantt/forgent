@@ -530,7 +530,12 @@ function releaseGenerationLock(lockDir, epoch) {
 // state.json write) -- every other caller in this file reaches it only
 // through acquireProviderAccountLease/releaseProviderAccountLease/
 // quarantineProviderAccount/clearProviderAccountQuarantine.
-export function withFileLock(lockDir, fn, { waitMs = 5000 } = {}) {
+//
+// The wait is thirty seconds because the holder flushes to disk (fsync) inside the critical section:
+// on a busy disk a live holder can take well over the old five seconds, and giving up then fails a
+// caller for no wrong done. A lock whose holder has died is still reclaimed at once, so a longer wait
+// only costs time when a live holder is really slow.
+export function withFileLock(lockDir, fn, { waitMs = 30_000 } = {}) {
   const deadline = Date.now() + waitMs;
   const holder = { pid: process.pid, processStartTime: getProcessStartTime(process.pid) };
   const epoch = acquireGenerationLock(lockDir, holder, deadline);

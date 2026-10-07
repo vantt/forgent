@@ -38,6 +38,7 @@
     "release:check": "node scripts/prepare-release.mjs --dry-run",
     "release:prepare": "node scripts/prepare-release.mjs",
     "setup:hooks": "node scripts/install-git-hooks.mjs",
+    "fgos:dev": "node scripts/run-rust-dev-host.mjs",
     "cli": "node bin/fgos.mjs",
     "build:skills": "node scripts/build-skill-wrappers.mjs",
     "build:domains": "node scripts/build-domain-registry.mjs"
