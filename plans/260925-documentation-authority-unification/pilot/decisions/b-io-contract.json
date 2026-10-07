@@ -350,10 +350,8 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Per-entry fields list with touchesState and externalEffect axes and the externalEffect examples review, approve, coordination; carried verbatim under Entry Fields And Effect Axes alongside the work-state.md 665-676 text. This io wording is the one the frozen map keeps (the ws exclusive list is the superseded side), but the coordination example is stale (COMMAND_REGISTRY marks 15 verbs and coordination is not among them) and is carried as written.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
+      "reviewStatus": "pending",
+      "rationale": "Per-entry fields list with touchesState and externalEffect axes and the externalEffect examples review, approve, coordination; carried verbatim under Entry Fields And Effect Axes alongside the work-state.md 665-676 text. This io wording is the one the frozen map keeps (the ws exclusive list is the superseded side), but the coordination example is stale (COMMAND_REGISTRY marks 15 verbs and coordination is not among them) and is carried as written. OPEN SEMANTIC CONFLICT: the carried `coordination` example (and the exclusive \"only review and approve\" claim of the other source) contradicts the code, which marks 15 verbs `externalEffect: true` and not `coordination`; the row stays pending until the owner resolves the conflict (see semantic-conflicts.md).",
       "targetUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd34"
     },
     {

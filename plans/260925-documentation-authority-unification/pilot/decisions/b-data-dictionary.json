@@ -1039,10 +1039,8 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "rationale": "Changed carry (map section 12): the exclusive statement \"today only review and approve carry externalEffect: true\" is replaced in the candidate by the io-contract wording (list lives in fgos --help --json, e.g. review, approve, coordination); verified against COMMAND_REGISTRY which marks 15 verbs.",
-      "reviewedBy": "independent reviewer (review-b-data-dictionary)",
-      "reviewedAt": "2026-10-07",
+      "reviewStatus": "pending",
+      "rationale": "Changed carry (map section 12): the exclusive statement \"today only review and approve carry externalEffect: true\" is replaced in the candidate by the io-contract wording (list lives in fgos --help --json, e.g. review, approve, coordination); verified against COMMAND_REGISTRY which marks 15 verbs. OPEN SEMANTIC CONFLICT: the carried `coordination` example (and the exclusive \"only review and approve\" claim of the other source) contradicts the code, which marks 15 verbs `externalEffect: true` and not `coordination`; the row stays pending until the owner resolves the conflict (see semantic-conflicts.md).",
       "targetUnitDigest": "9880ec12a0e27b031e1ab351d76b36db"
     },
     {
