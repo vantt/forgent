@@ -2110,7 +2110,7 @@ test('tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clea
 test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-research-unclear', workflowStep: 'discovery' });
-  const question = '## Context\n\nThe research worker needs a retry backoff strategy for this item.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy should this follow?';
+  const question = '## Chuyện gì đang xảy ra\n\nThe research worker needs a retry backoff strategy for this item.\n\n## Nguyên nhân\n\nThis directly affects the outcome: which retry backoff strategy should this follow?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
   const body = JSON.stringify({ clear: false, question });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 

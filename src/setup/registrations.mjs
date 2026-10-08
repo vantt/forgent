@@ -35,6 +35,18 @@ import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-di
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
+import {
+  checkClaudeHook,
+  installClaudeHook,
+  checkCodexHook,
+  installCodexHook,
+  checkAgyHook,
+  installAgyHook,
+  checkOmpHook,
+  installOmpHook,
+  checkPiHook,
+  installPiHook,
+} from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import { checkWorkflowPoolsSatisfyIndependence } from './workflow-pool-independence.mjs';
@@ -1274,10 +1286,7 @@ function checkMainCheckoutHookWired(cwd) {
 }
 
 function checkDispatchDecideHookWired(cwd) {
-  if (claudeCodeHookWired(cwd)) {
-    return { passed: true, message: 'PreToolUse hook wired — every Agent/Task call is routed through dispatch.mjs decide first' };
-  }
-  return { passed: false, message: '.claude/settings.json has no PreToolUse dispatch-decide hook wired — Agent/Task calls can bypass the decide-first enforcement — run fgos setup' };
+  return checkClaudeHook(cwd);
 }
 
 // tsk-1dj (tool-registry-capability port), CONTEXT.md D1: reports the tool
@@ -1441,8 +1450,72 @@ registerCheck({
 
 registerCheck({
   id: 'dispatch-decide-hook-wired',
-  description: '.claude/settings.json PreToolUse hook enforces dispatch.mjs decide on every Agent/Task call',
+  description: '.claude/settings.json PreToolUse hook enforces dispatch.mjs decide on every Agent/Task call and decision-question template',
   check: (cwd) => checkDispatchDecideHookWired(cwd),
+});
+
+registerFix({
+  id: 'dispatch-decide-hook-wired',
+  fix: (cwd) => {
+    const res = installClaudeHook(cwd);
+    return { fixed: res.wired, message: res.wired ? 'wired Claude Code hooks in .claude/settings.json' : `skipped: ${res.skippedExisting}` };
+  },
+});
+
+registerCheck({
+  id: 'codex-hook-wired',
+  description: '.codex/hooks.json PreToolUse hook enforces dispatch.mjs decide and decision-question template',
+  check: (cwd) => checkCodexHook(cwd),
+});
+
+registerFix({
+  id: 'codex-hook-wired',
+  fix: (cwd) => {
+    const res = installCodexHook(cwd);
+    return { fixed: res.wired, message: res.wired ? 'wired Codex CLI hooks in .codex/hooks.json' : `skipped: ${res.skippedExisting}` };
+  },
+});
+
+registerCheck({
+  id: 'agy-hook-wired',
+  description: '.agents/hooks.json PreToolUse hook enforces dispatch.mjs decide and decision-question template',
+  check: (cwd) => checkAgyHook(cwd),
+});
+
+registerFix({
+  id: 'agy-hook-wired',
+  fix: (cwd) => {
+    const res = installAgyHook(cwd);
+    return { fixed: res.wired, message: res.wired ? 'wired AGY hooks in .agents/hooks.json' : `skipped: ${res.skippedExisting}` };
+  },
+});
+
+registerCheck({
+  id: 'omp-hook-wired',
+  description: '.omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide and decision-question template',
+  check: (cwd) => checkOmpHook(cwd),
+});
+
+registerFix({
+  id: 'omp-hook-wired',
+  fix: (cwd) => {
+    const res = installOmpHook(cwd);
+    return { fixed: res.wired, message: res.wired ? 'wired OMP extension hook in .omp/extensions/fgos-hooks.ts' : `skipped: ${res.skippedExisting}` };
+  },
+});
+
+registerCheck({
+  id: 'pi-hook-wired',
+  description: '.pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide and decision-question template',
+  check: (cwd) => checkPiHook(cwd),
+});
+
+registerFix({
+  id: 'pi-hook-wired',
+  fix: (cwd) => {
+    const res = installPiHook(cwd);
+    return { fixed: res.wired, message: res.wired ? 'wired Pi extension hook in .pi/extensions/fgos-hooks.ts' : `skipped: ${res.skippedExisting}` };
+  },
 });
 
 registerCheck({

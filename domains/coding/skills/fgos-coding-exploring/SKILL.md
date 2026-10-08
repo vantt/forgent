@@ -22,10 +22,10 @@ that case — this skill never moves it. See
 
 ## Hard rules
 
-- When asking questions (`fgos ask`), format question text using
+- When asking questions (`fgos ask`, `AskUserQuestion`, chat), use
   self-contained citations (see `../_shared/citation-format.md`) and the
-  required two-heading Markdown structure (`## Context` and `## Why this
-  matters`, each followed by at least 20 characters of content).
+  decision-question template (`../_shared/decision-question.md`); the engine
+  refuses an `ask` missing its parts.
 - Call `fgos` subcommands directly:
 
   ```bash

@@ -71,7 +71,7 @@ Based on dispositions and evidence outcomes:
 - **Revise:** Authorize and dispatch revision operations within the declared adaptation bounds.
 - **Recheck:** Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
 - **Retry / Reopen:** When transient failures occur or bounded dialogue reopening is permitted, dispatch retry or follow-up turns within protocol limits.
-- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, batch all blocking questions for the human operator. Never stall unrelated or non-dependent work while awaiting human response.
+- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, ask the human operator in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2). Never stall unrelated or non-dependent work while awaiting human response.
 
 ### Step 7: Explicit Close or Continue
 

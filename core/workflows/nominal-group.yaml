@@ -32,6 +32,7 @@ steps:
     dependsOn: [round-robin-sharing]
     gate:
       kind: human
+      mode: input
       question: Review the consolidated ideas, cast votes, and provide priority rankings?
     units:
       - id: evaluate-votes

@@ -910,7 +910,7 @@ test('resolvePlan routes a risk-heavy root through the human gate on a caller-su
 // human has genuinely answered ITS OWN prior ask, never a stale answer from
 // an unrelated question. ---
 
-test('resolvePlan releases a risk-heavy root once the human has answered THIS gate\'s own prior ask, proceeding with the caller-supplied verdict', () => {
+test('resolvePlan releases a risk-heavy root only after an explicit --approve on THIS gate\'s own prior ask, proceeding with the caller-supplied verdict', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ risk: 'heavy' }));
 
@@ -918,10 +918,15 @@ test('resolvePlan releases a risk-heavy root once the human has answered THIS ga
   assert.equal(first.outcome, 'need-human');
   assert.match(listWork(storeDir).gates['item-x'].ask, /risk cao \(heavy\)/);
 
-  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Đã xác nhận, cứ pass-through.' });
+  // A plain answer is a clarification, not consent: the gate asks again.
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'chưa hiểu, giải thích lại' });
+  const clarified = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
+  assert.equal(clarified.outcome, 'need-human', 'an answer without --approve must not release the gate');
+
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Đã xác nhận, cứ pass-through.', approved: true });
 
   const second = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
-  assert.equal(second.outcome, 'pass-through', 'the gate must release once its own prior ask has a real answer on record');
+  assert.equal(second.outcome, 'pass-through', 'the gate must release once its own prior ask has an explicit approval on record');
   const finalView = listWork(storeDir);
   assert.equal(finalView.work['item-x'].workflowStep, 'executing');
 
@@ -930,10 +935,29 @@ test('resolvePlan releases a risk-heavy root once the human has answered THIS ga
   // round 1, then the caller-supplied entry + the pass-through entry from
   // round 2.
   const entries = finalView.decisionsById['item-x'];
-  assert.equal(entries.length, 4);
+  assert.equal(entries.length, 6);
   assert.ok(entries.some((e) => /need-human/.test(e.text)));
   assert.ok(entries.some((e) => /pass-through/.test(e.text)));
   assert.ok(entries.every((e) => e.source === 'resolvePlan'));
+});
+
+test('an approval releases only the exact proposal it answered, never a different verdict', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'ok, pass-through', approved: true });
+
+  const other = resolvePlan(storeDir, 'item-x', cfg, 'human', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'x' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'x' },
+    ],
+  });
+  assert.equal(other.outcome, 'need-human', 'approving pass-through must not release a decompose proposal');
+  assert.equal(Object.values(listWork(storeDir).work).filter((w) => w.parent === 'item-x').length, 0);
 });
 
 test('resolvePlan does NOT release the risk-heavy gate on a stale/unrelated gate answer (never a false bypass)', () => {
@@ -942,7 +966,7 @@ test('resolvePlan does NOT release the risk-heavy gate on a stale/unrelated gate
   // A gate answer already on record, but from an unrelated question (e.g.
   // the clarify-stage's own ask) — must never be read as confirming this
   // gate's own distinct ask.
-  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: '## Context\n\nA prior clarify-stage question already exists on this item, unrelated to the current gate.\n\n## Why this matters\n\nThis directly affects the outcome: Which file exactly?', statusAtAsk: 'todo' });
+  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: '## Chuyện gì đang xảy ra\n\nA prior clarify-stage question already exists on this item, unrelated to the current gate.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which file exactly?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.', statusAtAsk: 'todo' });
   moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'The parser module.' });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });

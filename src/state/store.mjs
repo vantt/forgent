@@ -625,7 +625,7 @@ export function assertPlanEvidence(id, work, repoRoot) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
   const result = withEventsLockAndRefresh(dir, logPath, () => {
   const before = currentView(dir);
@@ -793,19 +793,16 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (source !== undefined) {
     rawEvent.payload.source = source;
   }
-  // askRationale/askAlternatives/askSource (tsk-19zm D2): the agent's
-  // checkpoint distillate as of THIS ask, distinct from rationale/
-  // alternatives/source above (the human's answer, still authoritative) —
-  // same additive, fsm-ignored stamp pattern, carried only via putInAwaiting
-  // (never answerAwaiting, which keeps using the plain field names above).
-  if (askRationale !== undefined) {
-    rawEvent.payload.askRationale = askRationale;
-  }
-  if (askAlternatives !== undefined) {
-    rawEvent.payload.askAlternatives = askAlternatives;
-  }
+  // askSource (tsk-19zm D2): where THIS ask came from, kept apart from the
+  // answer's `source` above. The agent's options and reasoning live in the
+  // ask text itself (decision-question template), not in side fields.
   if (askSource !== undefined) {
     rawEvent.payload.askSource = askSource;
+  }
+  // approved: the owner answered with an explicit `--approve`. Gates that
+  // need consent release only on this, never on any non-empty answer.
+  if (approved === true) {
+    rawEvent.payload.approved = true;
   }
   // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this
   // specific `doing -> todo` move — additive, fsm-ignored, same
@@ -1072,8 +1069,6 @@ export function settleClaim(dir, {
   rationale,
   alternatives,
   source,
-  askRationale,
-  askAlternatives,
   askSource,
   mergedSha,
   mergedInto,
@@ -1203,8 +1198,6 @@ export function settleClaim(dir, {
         if (mergedInto !== undefined) move3Raw.payload.mergedInto = mergedInto;
         if (reason !== undefined) move3Raw.payload.reason = reason;
         if (parentSnapshotAtAsk !== undefined) move3Raw.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
-        if (askRationale !== undefined) move3Raw.payload.askRationale = askRationale;
-        if (askAlternatives !== undefined) move3Raw.payload.askAlternatives = askAlternatives;
         if (askSource !== undefined) move3Raw.payload.askSource = askSource;
         // Status-at-ask split (tsk-40m P1 fix, same two-field discipline as
         // moveWork's own — see its comment): `statusAtAsk` is caller-
@@ -1332,8 +1325,6 @@ export function settleClaim(dir, {
     rationale,
     alternatives,
     source,
-    askRationale,
-    askAlternatives,
     askSource,
     mergedSha,
     mergedInto,
@@ -1344,12 +1335,9 @@ export function settleClaim(dir, {
  * Park a work item into `awaiting-human`, carrying the question it is
  * waiting on (per D2/D5).
  *
- * tsk-19zm D2: `rationale`/`alternatives`/`source` here are the AGENT's
- * checkpoint distillate as of this `ask` — kept a caller-facing param name
- * matching `answerAwaiting`'s below (same CLI flag names either side), but
- * written into the payload as `askRationale`/`askAlternatives`/`askSource`
- * so a later `answer` on the same item never overwrites this checkpoint —
- * the two snapshots live side by side in `gates[id]` (replay.mjs's fold).
+ * The question's options and reasoning are part of `ask` itself (the
+ * decision-question template); only its `source` is stored apart, as
+ * `askSource`, so a later `answer` never overwrites it.
  *
  * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing
  * an item under an ACTIVE runtime claim must not leave that claim orphaned
@@ -1369,7 +1357,7 @@ export function settleClaim(dir, {
  * `durableStatusAtAsk` themselves, from a fresh durable read, regardless of
  * what (if anything) the caller passes.
  */
-export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source } = {}) {
+export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, source } = {}) {
   const claim = readClaim(dir, id);
   if (claim) {
     return settleClaim(dir, {
@@ -1379,8 +1367,6 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
       ask,
       parentSnapshotAtAsk,
       statusAtAsk,
-      askRationale: rationale,
-      askAlternatives: alternatives,
       askSource: source,
       result: 'paused',
     });
@@ -1392,8 +1378,6 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
     ask,
     parentSnapshotAtAsk,
     statusAtAsk,
-    askRationale: rationale,
-    askAlternatives: alternatives,
     askSource: source,
   });
 }
@@ -1427,12 +1411,12 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
  * final default for pre-existing logs/gates with neither field,
  * preserving the historical hardcoded-`todo` behavior byte for byte.
  */
-export function answerAwaiting(dir, { id, answer, expectedStatus, role, rationale, alternatives, source } = {}) {
+export function answerAwaiting(dir, { id, answer, expectedStatus, role, rationale, alternatives, source, approved } = {}) {
   const view = listWork(dir);
   const gate = view.gates?.[id];
   const recorded = gate?.durableStatusAtAsk ?? gate?.statusAtAsk;
   const to = recorded === 'doing' ? 'todo' : (recorded ?? 'todo');
-  return moveWork(dir, { id, to, expectedStatus, answer, role, rationale, alternatives, source });
+  return moveWork(dir, { id, to, expectedStatus, answer, role, rationale, alternatives, source, approved });
 }
 
 /**

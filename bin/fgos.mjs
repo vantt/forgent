@@ -1215,9 +1215,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const skipReturnGuard = to === 'awaiting-approval'
         ? optionalField(flags['skip-return-guard'], 'move --to awaiting-approval --skip-return-guard requires a non-empty reason value (omit --skip-return-guard entirely when the item is not "doing", or use "fgos return" to prove real progress for real)')
         : undefined;
+      const approved = flags.approve === true || flags.approve === 'true';
       return moveUseCase(
         { dir, repoRoot: process.cwd() },
-        { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role: 'human' },
+        { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role: 'human', approved },
       );
     }
 
@@ -1759,13 +1760,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // compute the resume-safe `durableStatusAtAsk` themselves, from a
       // fresh durable read, ignoring this value entirely.
       const statusAtAsk = askView.work[id]?.status;
-      // rationale/alternatives/source (tsk-63c D1/D3): optional, same
-      // guarded-passthrough shape as the rest of ask's fields — fold into
-      // gates[id] alongside ask/parentSnapshotAtAsk/statusAtAsk.
-      const rationale = optionalField(flags.rationale, 'ask --rationale requires a non-empty value (omit --rationale entirely to skip it)');
-      const alternatives = optionalField(flags.alternatives, 'ask --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
+      // Options and reasoning belong in --text (decision-question template);
+      // only the question's source is stored apart.
       const source = optionalField(flags.source, 'ask --source requires a non-empty value (omit --source entirely to skip it)');
-      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source });
+      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk, source });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -1784,7 +1782,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const rationale = optionalField(flags.rationale, 'answer --rationale requires a non-empty value (omit --rationale entirely to skip it)');
       const alternatives = optionalField(flags.alternatives, 'answer --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'answer --source requires a non-empty value (omit --source entirely to skip it)');
-      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human', rationale, alternatives, source });
+      // --approve is the owner's explicit yes; only it releases a consent
+      // gate. An answer without it is a clarification, and the gate asks again.
+      const approved = flags.approve === true || flags.approve === 'true';
+      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human', rationale, alternatives, source, approved });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -2194,10 +2195,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (sub === 'answer') {
         const { answerWorkflow, answerWorkflowDetached } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text>');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text> [--approve]');
         const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
         const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
-        const answerParams = { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree };
+        const approved = flags.approve === true || flags.approve === 'true';
+        const answerParams = { stepId, answer, approved, repoRoot: flags.dir, worktree: flags.worktree };
         const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
       }
@@ -4534,8 +4536,148 @@ function isMutatingInvocation(verb, positional, flags) {
   return predicate ? predicate(positional, flags) : false;
 }
 
+const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question']);
+
+async function handleHook(rest) {
+  const [kind, ...flags] = rest;
+  if (!kind || kind === '--help' || kind === '-h') {
+    process.stdout.write(
+      'Usage: fgos hook <dispatch-decide|decision-question> [--format=standard|agy]\n\n' +
+        'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
+    );
+    process.exit(0);
+  }
+
+  if (!ALLOWED_HOOK_KINDS.has(kind)) {
+    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: dispatch-decide, decision-question\n`);
+    process.exit(1);
+  }
+
+  let rawStdin = '';
+  try {
+    rawStdin = fs.readFileSync(0, 'utf8');
+  } catch {
+    rawStdin = '';
+  }
+
+  let parsed = null;
+  if (rawStdin && rawStdin.trim()) {
+    try {
+      parsed = JSON.parse(rawStdin);
+    } catch {
+      parsed = null;
+    }
+  }
+
+  const isAgyFormat =
+    flags.includes('--format=agy') || (parsed && typeof parsed === 'object' && parsed.toolCall !== undefined);
+
+  if (isAgyFormat) {
+    if (kind === 'dispatch-decide') {
+      const toolInput = parsed?.toolCall?.args || {};
+      const payloadCwd =
+        Array.isArray(parsed?.workspacePaths) && parsed.workspacePaths[0]
+          ? parsed.workspacePaths[0]
+          : process.cwd();
+      const subagentType =
+        typeof toolInput.subagent_type === 'string' && toolInput.subagent_type.trim()
+          ? toolInput.subagent_type
+          : typeof toolInput.agent === 'string' && toolInput.agent.trim()
+            ? toolInput.agent
+            : 'general-purpose';
+
+      try {
+        const { decideExecutorCli } = await import('../src/runner/dispatch.mjs');
+        const decided = await decideExecutorCli(undefined, {
+          cwd: payloadCwd,
+          for: subagentType,
+          needsSoul: true,
+          hasLiveTaskAccess: true,
+        });
+        if (decided.mechanism !== 'in-process') {
+          process.stdout.write(
+            JSON.stringify({
+              decision: 'deny',
+              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run \`fgos dispatch execute\` instead.`,
+            }) + '\n',
+          );
+          process.exit(0);
+        }
+      } catch {
+        // fail-open
+      }
+      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
+      process.exit(0);
+    } else if (kind === 'decision-question') {
+      const toolName = parsed?.toolCall?.name || '';
+      if (toolName === 'AskUserQuestion' || toolName === 'ask' || toolName === 'ask_question') {
+        try {
+          const { checkDecisionQuestion, describeDecisionQuestion } = await import(
+            '../src/state/decision-question.mjs'
+          );
+          const questions = Array.isArray(parsed?.toolCall?.args?.questions)
+            ? parsed.toolCall.args.questions
+            : [];
+          const textToCheck = questions
+            .flatMap((q) => [
+              q?.question,
+              Array.isArray(q?.options) && q.options.length > 0
+                ? `Options:\n${q.options.map((o) => `- ${o?.label ?? ''}: ${o?.description ?? ''}`).join('\n')}`
+                : '',
+            ])
+            .filter(Boolean)
+            .join('\n');
+          const missing = checkDecisionQuestion(textToCheck);
+          if (missing.length > 0) {
+            process.stdout.write(
+              JSON.stringify({
+                decision: 'deny',
+                reason: `BLOCKED: write the analysis before asking. Missing parts of the decision-question template: ${missing.map((p) => p.title).join(', ')}.\n${describeDecisionQuestion()}`,
+              }) + '\n',
+            );
+            process.exit(0);
+          }
+        } catch {
+          // fail-open
+        }
+      }
+      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
+      process.exit(0);
+    }
+  }
+
+  const scriptPath = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'scripts',
+    `${kind}-hook.mjs`,
+  );
+  if (!fs.existsSync(scriptPath)) {
+    process.stderr.write(`Error: Hook script not found at ${scriptPath}\n`);
+    process.exit(1);
+  }
+
+  const child = spawnSync(process.execPath, [scriptPath, ...flags], {
+    input: rawStdin,
+    stdio: ['pipe', 'inherit', 'inherit'],
+    env: process.env,
+  });
+
+  if (child.error) {
+    process.stderr.write(`Error invoking hook script: ${child.error.message}\n`);
+    process.exit(1);
+  }
+
+  process.exit(child.status ?? (child.signal ? 1 : 0));
+}
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
+  if (verb === 'hook') {
+    await handleHook(rest);
+    return;
+  }
+
 
   if (verb === '--help') {
     handleHelp(rest.includes('--json'));

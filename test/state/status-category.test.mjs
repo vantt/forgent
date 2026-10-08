@@ -49,13 +49,25 @@ test('STATUS_CATEGORIES is exported, frozen, and contains exactly the six pinned
   );
 });
 
-const VALID_ASK = `## Context
+const VALID_ASK = `## Chuyện gì đang xảy ra
 
 We need a decision regarding the deployment configuration for this service.
 
-## Why this matters
+## Nguyên nhân
 
-The deployment configuration impacts system availability and resource allocation.`;
+The deployment configuration impacts system availability and resource allocation.
+
+## Các lựa chọn
+
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
 
 // D2/D3's exact map for the six front-segment statuses. Each case walks the
 // item through a real, legal status-fsm.mjs edge to reach `to`, so this also

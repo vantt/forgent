@@ -944,13 +944,24 @@ async fn post_work_ask(
     Ok(Json(data))
 }
 
+#[derive(Debug, Deserialize)]
+struct AnswerWorkBody {
+    text: String,
+    #[serde(default)]
+    approve: Option<bool>,
+}
+
 async fn post_work_answer(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    AppJson(body): AppJson<TextBody>,
+    AppJson(body): AppJson<AnswerWorkBody>,
 ) -> Result<Json<Value>, GatewayError> {
     reject_leading_dash(&id, "id")?;
-    let args = vec!["answer".to_string(), id, "--text".to_string(), body.text, "--json".to_string()];
+    let mut args = vec!["answer".to_string(), id, "--text".to_string(), body.text];
+    if body.approve == Some(true) {
+        args.push("--approve".to_string());
+    }
+    args.push("--json".to_string());
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
 }
@@ -2192,6 +2203,68 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn post_work_answer_forwards_approve_flag_when_true() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/v1/work/tsk-123/answer")
+                    .header("authorization", "Bearer test-token")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"text":"confirmed","approve":true}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        let captured = capturing.captured.lock().unwrap();
+        assert_eq!(captured.len(), 1);
+        assert_eq!(
+            captured[0],
+            vec!["answer".to_string(), "tsk-123".to_string(), "--text".to_string(), "confirmed".to_string(), "--approve".to_string(), "--json".to_string()]
+        );
+    }
+
+    #[tokio::test]
+    async fn post_work_answer_omits_approve_flag_when_false_or_absent() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/v1/work/tsk-123/answer")
+                    .header("authorization", "Bearer test-token")
+                    .header("content-type", "application/json")
+                    .body(Body::from(r#"{"text":"clarification only"}"#))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        let captured = capturing.captured.lock().unwrap();
+        assert_eq!(captured.len(), 1);
+        assert_eq!(
+            captured[0],
+            vec!["answer".to_string(), "tsk-123".to_string(), "--text".to_string(), "clarification only".to_string(), "--json".to_string()]
+        );
     }
 
     // tsk-4id: GET /work/{id}/docs -- CONTEXT.md/plan.md content, real

@@ -337,13 +337,26 @@ test('resolveDiscovery at discovery advances to exploring AND parks in awaiting-
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe payment integration needs to pick an OAuth provider.\n\n## Why this matters\n\nThis directly affects the outcome: Which auth provider?' });
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe payment integration needs to pick an OAuth provider.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which auth provider?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   assert.equal(result.outcome, 'unclear');
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human');
   assert.equal(view.work['item-x'].workflowStep, 'exploring', 'unclear at discovery must advance stage, not park in place');
-  assert.equal(view.gates?.['item-x']?.ask, '## Context\n\nThe payment integration needs to pick an OAuth provider.\n\n## Why this matters\n\nThis directly affects the outcome: Which auth provider?');
+  assert.equal(view.gates?.['item-x']?.ask, '## Chuyện gì đang xảy ra\n\nThe payment integration needs to pick an OAuth provider.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which auth provider?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.');
+});
+
+test('resolveDiscovery parks a headless worker\'s one-line question by wrapping it into the three shared parts', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'runner', { clear: false, question: 'Which auth provider should we use?' });
+  assert.equal(result.outcome, 'unclear');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.match(view.gates['item-x'].ask, /## Chuyện gì đang xảy ra\n\nWhich auth provider should we use\?/);
+  assert.match(view.gates['item-x'].ask, /## Phạm vi của câu trả lời/);
+  assert.doesNotMatch(view.gates['item-x'].ask, /## Các lựa chọn/, 'an open discovery question needs only the shared parts');
 });
 
 // tsk-31lz: the stage move above is real, but it is NOT a settlement — the
@@ -356,7 +369,7 @@ test('resolveDiscovery records NO clarify-pass settlement for an unclear verdict
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe payment integration needs to pick an OAuth provider.\n\n## Why this matters\n\nThis directly affects the outcome: Which auth provider?' });
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe payment integration needs to pick an OAuth provider.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which auth provider?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   assert.equal(result.outcome, 'unclear');
 
   const view = listWork(storeDir);
@@ -388,7 +401,7 @@ test('resolveDiscovery keeps park-in-place for an unclear verdict outside discov
   // existing domain-agnostic test's own fixture shape (line ~308 above).
   addWork(storeDir, sampleWork({ domain: 'triage', workflowStep: 'triage' }));
 
-  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe migration script needs a concrete target to run against.\n\n## Why this matters\n\nThis directly affects the outcome: Which target?' });
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe migration script needs a concrete target to run against.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which target?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   assert.equal(result.outcome, 'unclear');
 
   const view = listWork(storeDir);
@@ -433,7 +446,7 @@ test('resolveDiscovery on a SECOND consecutive caller-supplied unclear verdict f
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  const first = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
+  const first = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe client needs a concrete endpoint to call.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which endpoint?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   assert.equal(first.outcome, 'unclear');
   assert.equal(listWork(storeDir).work['item-x'].status, 'awaiting-human');
 
@@ -441,14 +454,14 @@ test('resolveDiscovery on a SECOND consecutive caller-supplied unclear verdict f
 
   let second;
   assert.doesNotThrow(() => {
-    second = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client still needs a concrete endpoint to call, now with more detail.\n\n## Why this matters\n\nThis directly affects the outcome: Still which endpoint, now with more detail?' });
+    second = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe client still needs a concrete endpoint to call, now with more detail.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Still which endpoint, now with more detail?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   });
   assert.equal(second.outcome, 'unclear');
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human');
   assert.equal(view.discovery['item-x'].length, 2);
-  assert.equal(view.discovery['item-x'][1].question, '## Context\n\nThe client still needs a concrete endpoint to call, now with more detail.\n\n## Why this matters\n\nThis directly affects the outcome: Still which endpoint, now with more detail?');
+  assert.equal(view.discovery['item-x'][1].question, '## Chuyện gì đang xảy ra\n\nThe client still needs a concrete endpoint to call, now with more detail.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Still which endpoint, now with more detail?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.');
 });
 
 // claim-lock §5.1: the item's OWN status at the moment of park rides the
@@ -458,7 +471,7 @@ test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk f
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
-  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
+  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe client needs a concrete endpoint to call.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which endpoint?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   const view = listWork(storeDir);
   assert.equal(view.gates['item-x'].statusAtAsk, 'todo');
 });
@@ -468,7 +481,7 @@ test('resolveDiscovery on a caller-supplied unclear verdict stamps statusAtAsk "
   addWork(storeDir, sampleWork());
   acquireClaim(storeDir, { id: 'item-x', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
 
-  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Context\n\nThe client needs a concrete endpoint to call.\n\n## Why this matters\n\nThis directly affects the outcome: Which endpoint?' });
+  resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: '## Chuyện gì đang xảy ra\n\nThe client needs a concrete endpoint to call.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which endpoint?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.' });
   const view = listWork(storeDir);
   assert.equal(view.gates['item-x'].statusAtAsk, 'doing');
 });
@@ -479,7 +492,7 @@ test('resolveDiscovery refuses a caller-supplied clear verdict when work.status 
   // Simulates an earlier round's verify-dispute park -- same shape
   // resolveDiscovery's own dispute branch produces (putInAwaiting with
   // statusAtAsk), without needing a full first discover round.
-  putInAwaiting(storeDir, { id: 'item-x', ask: '## Context\n\nĐề xuất verify bị nghi ngờ, cần xác nhận trước khi ghi vào planning.\n\n## Why this matters\n\nThis directly affects the outcome: Vòng kiểm tra độc lập không đồng ý với đề xuất ban đầu.', statusAtAsk: 'todo' });
+  putInAwaiting(storeDir, { id: 'item-x', ask: '## Chuyện gì đang xảy ra\n\nĐề xuất verify bị nghi ngờ, cần xác nhận trước khi ghi vào planning.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Vòng kiểm tra độc lập không đồng ý với đề xuất ban đầu.\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.', statusAtAsk: 'todo' });
 
   assert.throws(
     () => resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- corrected' }),

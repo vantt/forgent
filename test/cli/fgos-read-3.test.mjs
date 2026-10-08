@@ -318,9 +318,9 @@ test('show returns the work record plus every per-item log scoped to just that i
   addDiscovery(dir, { id: 'other-item', clear: false, question: 'unrelated question' });
   run(cwd, ['decision', '--id', 'show-detail-item', '--text', 'D1: scoped detail', '--rationale', 'test fixture', '--relation', 'none']);
   run(cwd, ['decision', '--id', 'other-item', '--text', 'D1: unrelated decision', '--rationale', 'test fixture', '--relation', 'none']);
-  run(cwd, ['ask', 'show-detail-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: which shape?']);
+  run(cwd, ['ask', 'show-detail-item', '--text', '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: which shape?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.']);
   run(cwd, ['answer', 'show-detail-item', '--text', 'this one']);
-  run(cwd, ['ask', 'other-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: unrelated ask']);
+  run(cwd, ['ask', 'other-item', '--text', '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: unrelated ask\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.']);
   addOutcome(dir, { id: 'show-detail-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, { id: 'other-item', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
 
@@ -337,7 +337,7 @@ test('show returns the work record plus every per-item log scoped to just that i
   assert.equal(data.decisions.length, 1);
   assert.equal(data.decisions[0].text, 'D1: scoped detail');
 
-  assert.equal(data.gates.ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: which shape?');
+  assert.equal(data.gates.ask, '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: which shape?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.');
   assert.equal(data.gates.answer, 'this one');
 
   assert.equal(data.outcome.id, 'show-detail-item');

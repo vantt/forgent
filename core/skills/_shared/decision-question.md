@@ -1,0 +1,42 @@
+# Shared fragment: decision-question
+
+Every question that asks the owner to choose a direction — in chat, through
+`AskUserQuestion`, `fgos ask`, a gate, or a review — carries these five parts.
+Write the analysis first; the question is a narrow confirm on top of it.
+
+1. **Chuyện gì đang xảy ra** (What is happening) — 1-2 sentences, plain words.
+2. **Nguyên nhân** (Cause) — what you checked and how. If the cause is still
+   unknown, ask only for permission to investigate, not for a direction.
+3. **Các lựa chọn** (Options) — 2-4 options; each says what it does, its gain,
+   its harm and its cost (estimated lines of code, time, which layer or paths
+   it touches).
+4. **Khuyến nghị** (Recommendation) — which option and why.
+5. **Phạm vi của câu trả lời** (Scope of the answer) — what a yes authorizes,
+   and what it does not.
+
+## Approved frame (khung đã duyệt)
+
+The frame is the scope (which files/contracts may change) and the budget
+(lines of src, test, docs and evidence; days) written once when the owner
+approves the work. A child item shares its parent's frame.
+
+- Inside the frame, decide and report; do not ask.
+- About to leave the frame: stop and ask in this template.
+- RUL11 (tùm lum không phải nặng): consolidate the mess inside the current work's scope until it is
+  gone. Mess seen outside the scope becomes its own item. Consolidating by
+  building a new tool or engine is a decision question.
+- Done means done inside the frame. A gate that cannot be met inside it is
+  a decision question; never edit outside the frame to unblock it.
+- Progress is behavior passing its declared check, not a pile of evidence.
+  Evidence counts against the budget and must come from a natural run;
+  evidence that needs staging (breaking something on purpose, writing the
+  verdict into the prompt) means the gate cannot be met, so ask.
+
+Open discovery questions (item workflow step `discovery` or `exploring`,
+Socratic questions in fgos-coding-exploring/-shaping) need only parts 1, 2 and
+5: their options are not known yet, and inventing them defeats the question.
+Write each part as a heading or as a label followed by ":" (`**Cause:** ...`).
+
+When to ask and how to batch: AGENTS.md product priority #2. Headings may be
+Vietnamese or the English names above. `fgos ask` and the AskUserQuestion hook
+check the parts through `src/state/decision-question.mjs`.

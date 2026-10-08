@@ -71,7 +71,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 - **RUL8 (chạy xong ≠ merge ≠ bền — mọi artifact khai mức bền tường minh).** "Chạy xong ≠ đã merge ≠ đã bền" — mọi artifact khai mức bền tường minh theo 5 cấp của `docs/platform-foundations.md` §L7 (L7).
 - **RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase).** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
 - **RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
-- **RUL11 (tùm lum không phải nặng).** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (ADR0036 (khoá RUL11 theo đúng phát biểu gốc của người dùng, cấm diễn giải lại)).
+- **RUL11 (tùm lum không phải nặng).** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum trong phạm vi việc đang làm thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ; tùm lum thấy ngoài phạm vi thì ghi thành item riêng, và gom mà phải xây công cụ mới là một câu hỏi quyết định; đích là ranh giới rõ và contract tường minh (ADR0054 (thêm vế phạm vi cho RUL11 theo phát biểu của người dùng 2026-10-08, supersede ADR0036)).
 
 ## Edge Cases Settled
 
@@ -386,6 +386,8 @@ nhân đôi chỗ ghi, vi phạm KISS.
 
 ### 0036 — Khoá RUL11 (tùm lum không phải nặng): "tùm lum", không phải "nặng"
 
+> Superseded bởi 0054 (2026-10-08): RUL11 (tùm lum không phải nặng) thêm vế phạm vi. Phát biểu gốc dưới đây giữ nguyên.
+
 #### Bối cảnh
 
 Phát biểu gốc của người dùng (2026-08-18, giữ nguyên văn làm nguồn — luật
@@ -461,3 +463,25 @@ khong phai no nang ma no tum lum
 - `tsk-38h` — bằng chứng thứ hai (bin/fgos.mjs, GitNexus zero-index).
 - RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase; `docs/specs/platform-foundations.md`) — ba quy tắc tầng doctrine
   mà RUL11 (tùm lum không phải nặng) phải tuân để "dính" thay vì chỉ là khẩu hiệu.
+
+### 0054 — RUL11 (tùm lum không phải nặng) gom trong phạm vi việc đang làm (supersede 0036)
+
+#### Bối cảnh
+
+Thảo luận gốc rễ phình to (2026-10-08, `plans/reports/prompt-261008-bloat-root-cause-discussion.md`) thấy năm luật/thói quen mỗi cái đúng khi đứng riêng nhưng cộng lại không có điểm dừng: RUL11 ("gom tới khi hết, quy mô không bao giờ là lý do miễn trừ"), "làm cho xong" (gate đủ-hết, cấm defer), release human (ưu tiên #2), L5 (bài kiểm tài liệu) và "có bằng chứng là có tiến độ". Bằng chứng: doc-unification Phase 02 xây 21.044 dòng tool cho một gate đối chiếu từng claim; advisory Phase 02 sửa ~880 dòng dispatch nằm ngoài Exclusions để gỡ một live gate. Phát biểu của người dùng (giữ nguyên văn): "không dọn dẹp này là dọn dẹp liên quan đến việc đang làm á"; "anh thấy có bô các luật khi kết hợp có thể tạo ra bloating … rõ ràng anh cảm thấy có rò rì khi 4 thứ đó kết hợp".
+
+#### Quyết định
+
+Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom phần tùm lum trong phạm vi việc đang làm, tới khi hết; tùm lum thấy ngoài phạm vi thì ghi item riêng; gom mà phải xây công cụ mới là một câu hỏi quyết định. Điểm dừng chung cho các luật đẩy về phía "nhiều hơn" là **khung đã duyệt** (phạm vi + ngân sách ghi lúc owner duyệt), định nghĩa trong `core/skills/_shared/decision-question.md`.
+
+#### Hệ quả
+
+- Dòng RUL11 (tùm lum không phải nặng) ở Business Rules mang vế phạm vi và trích 0054; `test/docs/rul11-anchor-phrase.test.mjs` khớp chữ mới.
+- `AGENTS.md` mục RUL11 (tùm lum không phải nặng) và ưu tiên #2 mang cùng vế; anchor phrase không đổi.
+- L5 không đổi.
+
+#### Tham chiếu
+
+- `plans/261008-1353-decision-question-template-and-cleanup/` — plan thực hiện.
+- 0036 — quyết định bị supersede.
+

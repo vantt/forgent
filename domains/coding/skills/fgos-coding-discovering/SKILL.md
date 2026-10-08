@@ -157,9 +157,9 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
      hoặc bằng chứng mâu thuẫn nhau. Question: nêu đúng điểm còn mở, trích
      dẫn lại bằng chứng đã có (để người ở `exploring` không phải scout lại
      từ đầu) — không hỏi chung chung. Định dạng `--question` theo self-contained
-     citations (`../_shared/citation-format.md`) và cấu trúc Markdown hai
-     heading bắt buộc (`## Context` và `## Why this matters`, mỗi phần ít
-     nhất 20 ký tự nội dung) — engine từ chối một `ask` thiếu cấu trúc này.
+     citations (`../_shared/citation-format.md`) và mẫu câu hỏi quyết định
+     (`../_shared/decision-question.md`; ở stage này chỉ cần Chuyện gì đang
+     xảy ra, Nguyên nhân, Phạm vi của câu trả lời).
 
    **Chỉ khi `clear`: phán luôn `size`/`rigor`/`kind`/`risk`** (Phase 3) —
    trên CÙNG bằng chứng vừa thu ở bước 3, không research thêm vòng mới.
