@@ -59,9 +59,10 @@ test('knowledge-doctor - doc-registry-stale check passes when up to date', () =>
     const checkObj = DOCTOR_CHECKS.find(c => c.id === 'doc-registry-stale');
     assert.ok(checkObj);
 
-    // Initial check without generated files -> fails
+    // Before the project adopts the registry there is nothing to keep fresh.
     const res1 = checkObj.check(tmpDir);
-    assert.equal(res1.passed, false);
+    assert.equal(res1.passed, true);
+    assert.match(res1.message, /not applicable/);
 
     // Run fgos doc-registry
     const fgosBin = path.resolve('bin/fgos.mjs');

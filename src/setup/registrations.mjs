@@ -1279,6 +1279,9 @@ function checkAgentTypeNamesUnique(cwd) {
 }
 
 function checkMainCheckoutHookWired(cwd) {
+  if (!fs.existsSync(path.join(resolveMainCheckout(cwd) ?? cwd, '.githooks'))) {
+    return { passed: true, message: 'not applicable -- this project ships no .githooks/ directory' };
+  }
   if (mainCheckoutHookWired(cwd)) {
     return { passed: true, message: 'core.hooksPath = .githooks — main-checkout lock guards every commit here' };
   }
@@ -3433,6 +3436,8 @@ function fixEnduserDocsIndexStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
+  // Refresh only: a project adopts the index by running `fgos docs-index`.
+  if (!fs.existsSync(manifestPathFor(root))) return { changed: false, message: 'skipped -- no end-user doc index in this project (run fgos docs-index to adopt)' };
   const { path: manifestRelPath, count, changed } = generateEnduserDocsIndex(root, fgosDir);
   if (!changed) {
     return { changed: false, message: `${manifestRelPath} already up to date (${count} tài liệu)` };
@@ -3479,10 +3484,12 @@ function checkDecisionIndexStale(cwd) {
   const { previousContent, nextContent, changed } = computeDecisionIndex(root, fgosDir);
   const nextHasRows = /^\|.+\|.*\|\s*$/m.test(nextContent);
   if (previousContent === undefined) {
-    if (!nextHasRows) {
+    // In the fgOS source repo a missing index with rows to project is drift;
+    // in any other project the index is opt-in and only refreshed.
+    if (!nextHasRows || !isFgosSourceCheckout(root)) {
       return {
         passed: true,
-        message: `${indexPathFor(root)} not found -- nothing to check (no platform-scoped decisions logged yet)`,
+        message: `${indexPathFor(root)} not found -- nothing to check${nextHasRows ? ' (run fgos decision-index to adopt it)' : ''}`,
       };
     }
     return {
@@ -3516,6 +3523,9 @@ function fixDecisionIndexStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
+  // Outside the fgOS source repo, refresh only: a project adopts the index by
+  // running `fgos decision-index`.
+  if (!fs.existsSync(indexPathFor(root)) && !isFgosSourceCheckout(root)) return { changed: false, message: 'skipped -- no decision index in this project (run fgos decision-index to adopt)' };
   let result;
   try {
     result = generateDecisionIndex(root, fgosDir);
@@ -3657,12 +3667,25 @@ registerCheck({
   check: (cwd) => checkDocRegistryEnforce(cwd),
 });
 
+// Same marker the release drift check uses to recognise the fgOS source repo.
+function isFgosSourceCheckout(root) {
+  return fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'));
+}
+
+// The doc registry is opt-in per project: doctor --fix only refreshes it.
+function docRegistryAdopted(root) {
+  return fs.existsSync(path.join(root, 'docs/doc-registry.md')) || fs.existsSync(path.join(root, 'docs/doc-registry.json'));
+}
+
 function checkDocRegistryStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
   if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
     return { passed: true, message: 'knowledge registry check skipped -- no events log' };
+  }
+  if (!docRegistryAdopted(root)) {
+    return { passed: true, message: 'not applicable -- no doc registry in this project (run fgos doc-registry to adopt)' };
   }
   const view = rebuild(fgosDir);
   const { jsonContent, mdContent } = computeKnowledgeProjection(view);
@@ -3683,6 +3706,9 @@ function fixDocRegistryStale(cwd) {
   const fgosDir = path.join(root, '.fgos');
   if (!fs.existsSync(path.join(fgosDir, 'events.jsonl'))) {
     return { changed: false, message: 'skipped -- no events log' };
+  }
+  if (!docRegistryAdopted(root)) {
+    return { changed: false, message: 'skipped -- no doc registry in this project (run fgos doc-registry to adopt)' };
   }
   let view;
   try {

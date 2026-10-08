@@ -830,6 +830,7 @@ test('mainCheckoutHookWired is true from inside a linked worktree when the main 
 test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {
   const cwd = mkTemp('doctor-hook-check-');
   execFileSync('git', ['init', '-q'], { cwd });
+  fs.mkdirSync(path.join(cwd, '.githooks'));
   const before = checkById('main-checkout-hook-wired').check(cwd);
   assert.equal(before.passed, false);
   assert.match(before.message, /run fgos setup/);
