@@ -48,9 +48,13 @@ function dispatchedVerbs() {
   return verbs;
 }
 
+// Verbs main() handles before runVerb(): `hook` must keep the agent's raw
+// exit code and stdout protocol, so it never goes through the envelope.
+const EARLY_PATH_VERBS = new Set(['hook']);
+
 test('manifest verb-name set equals the set of verbs runVerb() actually dispatches', () => {
   const dispatched = [...new Set(dispatchedVerbs())].sort();
-  const registered = COMMAND_REGISTRY.filter((entry) => !entry.nativeOnly).map((entry) => entry.name).sort();
+  const registered = COMMAND_REGISTRY.filter((entry) => !entry.nativeOnly && !EARLY_PATH_VERBS.has(entry.name)).map((entry) => entry.name).sort();
   assert.deepEqual(registered, dispatched);
 });
 
