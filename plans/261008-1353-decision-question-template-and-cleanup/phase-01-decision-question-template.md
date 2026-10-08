@@ -1,45 +1,60 @@
-# Phase 01 — Mẫu câu hỏi quyết định thay quy tắc cũ
+# Phase 01 — Mẫu câu hỏi quyết định + validator `fgos ask`
 
 ## Bối cảnh
 
-- Validator hiện tại: [src/state/status-fsm.mjs:295-334](../../src/state/status-fsm.mjs) — khi chuyển sang `awaiting-human`, đòi `## Context` và `## Why this matters`, mỗi mục ≥ 20 ký tự (tsk-539, commit `9828447d9`).
-- Bộ sinh câu hỏi có sẵn dùng cấu trúc cũ: [src/intake/plan.mjs:269-274, 555](../../src/intake/plan.mjs), [src/intake/discovery.mjs:459](../../src/intake/discovery.mjs).
-- Khoảng 20 test file chứa fixture `## Why this matters` (`git grep -l "Why this matters" test`).
-- Luật được render vào AGENTS.md qua `core/instructions/*.md` có frontmatter (`kind: law`), xem [core/instructions/platform-laws.md](../../core/instructions/platform-laws.md) và `src/setup/instruction-registry.mjs`. Xác minh cơ chế discovery trước khi thêm file.
+- Validator: [src/state/status-fsm.mjs:295-334](../../src/state/status-fsm.mjs) — khi chuyển sang `awaiting-human`, đòi `## Context` và `## Why this matters`, mỗi mục ≥ 20 ký tự, so heading bằng regex `\b` (tsk-539, `9828447d9`).
+- Mọi nơi sinh câu hỏi (red-team đếm lại, không phải 3):
+  - `src/intake/plan.mjs:266-275` `formatProposalAsk` (3 nhánh). Nhánh rủi ro/blast-radius phải **giữ nguyên chuỗi lý do** `DEFAULT_RISK_GATE_REASON`/`DEFAULT_BLAST_RADIUS_GATE_REASON`, vì gate được nhả bằng `gate.ask.includes(...)` (`plan.mjs:703-713, 732`).
+  - `src/intake/plan.mjs:551-556` (verify-dispute).
+  - `src/intake/discovery.mjs:455-460` (verify-dispute).
+  - `src/intake/discovery.mjs:61-62` `DEFAULT_UNCLEAR_QUESTION` — câu trần, không heading; hôm nay đã trượt validator cũ.
+  - `src/intake/discovery.mjs:545` — câu hỏi thô của worker headless (prompt `src/runner/prompt-templates/worker-prompt-discovery.txt:43` bảo worker trả một câu). Test che lỗ này bằng fixture có sẵn heading (`test/runner/loop.test.mjs:2113`).
+- Câu hỏi Socratic (exploring/shaping) cũng đi qua `fgos ask` (`domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md:64-82`), nên validator áp lên mọi loại câu hỏi — xem quyết định D1 trong plan.md.
+- `fgos ask` đã có `--rationale`/`--alternatives` (`bin/fgos.mjs:1759-1768`, `src/state/store.mjs:1372-1397`) — kênh song song cho lựa chọn/lý do; xem D3.
+- Render luật: `core/instructions/*.md` chỉ được chiếu vào AGENTS.md khi project có `core/instructions` (`src/setup/registrations.mjs:3502-3504`) — tức chỉ repo fgOS. Project khác chỉ nhận skill qua plugin. Writer là doctor fix `instruction-projections-stale`, chạy trên **main checkout** (`registrations.mjs:3500-3501`), và ghi kèm `.fgos/instructions/effective/repo.json`. Khối chiếu chép **toàn bộ** thân luật vào AGENTS.md (`src/setup/instruction-projections.mjs:125-136`).
+- RUL9/L8: mọi luật ở tầng luôn-nạp cần anchor phrase có assert (`docs/specs/platform-foundations.md:72`, tiền lệ `test/docs/rul11-anchor-phrase.test.mjs`).
 
-## Mẫu (nội dung file mới `core/instructions/decision-question.md`)
+## Chỗ đặt mẫu (sửa theo red-team)
+
+- **Nguồn duy nhất của mẫu:** `core/skills/_shared/decision-question.md` — đi theo skill tới mọi project (giống `../_shared/citation-format.md`).
+- **Luật:** `core/instructions/decision-question.md` ≤ 8 dòng: anchor phrase + trỏ tới `core/skills/_shared/decision-question.md`. Khối chiếu trong AGENTS.md vì vậy chỉ thêm ~10 dòng; khối sinh tự động không tính vào ngân sách, chỉ sửa ở file nguồn.
+- **Thông báo lỗi của validator** liệt kê đủ các phần bắt buộc kèm một dòng giải thích mỗi phần, để agent ở project khác học được mẫu từ chính lỗi.
+
+## Mẫu (nội dung `core/skills/_shared/decision-question.md`)
 
 Mọi câu hỏi gửi owner để chọn hướng — trong chat, `AskUserQuestion`, `fgos ask`, gate, review — có đủ 5 phần:
 
 1. **Chuyện gì đang xảy ra** — 1–2 câu, ngôn ngữ thường.
-2. **Nguyên nhân** — đã kiểm bằng gì. Chưa biết nguyên nhân thì chỉ được xin phép điều tra, chưa được hỏi chọn hướng.
+2. **Nguyên nhân** — đã kiểm bằng gì. Chưa biết nguyên nhân thì chỉ xin phép điều tra.
 3. **Các lựa chọn** (2–4) — mỗi cái: làm gì, lợi, hại, giá (dòng code ước tính, thời gian, tầng/đường dẫn bị đụng).
 4. **Khuyến nghị** — chọn cái nào, vì sao.
-5. **Phạm vi của câu trả lời** — đồng ý thì được làm gì, và không được làm gì.
+5. **Phạm vi của câu trả lời** — đồng ý thì được làm gì, không được làm gì.
 
-Gate không đạt được trong phạm vi đã khai là một câu hỏi quyết định theo mẫu này; không sửa ngoài phạm vi để gỡ gate.
+Heading chấp nhận tiếng Việt hoặc tiếng Anh tương đương (`What is happening`, `Cause`, `Options`, `Recommendation`, `Scope of the answer`) — fgOS chạy trên project khác, nhiều skill viết tiếng Anh.
 
-Phạm vi mẫu: câu hỏi chọn hướng. Câu hỏi Socratic khám phá ý định sản phẩm (fgos-coding-exploring) theo quy tắc riêng của nó. Khi nào hỏi và gom thành bộ: xem AGENTS.md ưu tiên #2 (không chép lại ở đây).
+Câu hỏi Socratic khám phá ý định: theo D1. Khi nào hỏi, gom thành bộ: AGENTS.md ưu tiên #2. Khung đã duyệt và gate không đạt được: Phase 03.
 
 ## Việc cần làm
 
-1. Tạo `core/instructions/decision-question.md` (frontmatter `kind: law`, ≤ 30 dòng, nội dung như trên). Chạy bước render đang dùng cho instruction (`fgos setup`/build tương ứng — xác minh lệnh) để AGENTS.md có mục mới.
-2. Sửa validator trong `status-fsm.mjs`: thay 2 heading bằng 5 heading `## Chuyện gì đang xảy ra`, `## Nguyên nhân`, `## Các lựa chọn`, `## Khuyến nghị`, `## Phạm vi của câu trả lời`, giữ quy tắc ≥ 20 ký tự mỗi mục. Không giữ đường cũ (một người dùng, không cần tương thích ngược).
-3. Sửa 3 bộ sinh câu hỏi trong `src/intake/` sang 5 heading, nội dung thật (không điền chữ đệm cho đủ độ dài).
-4. Đổi chuỗi fixture trong test có sẵn; không thêm test file mới. Thêm đúng 1 case vào test validator hiện có: thiếu `## Phạm vi của câu trả lời` thì bị từ chối.
-5. CHANGELOG `[Unreleased]`: 1 dòng (người dùng `fgos ask` sẽ thấy lỗi mới).
+1. Tạo `core/skills/_shared/decision-question.md` (≤ 30 dòng) và `core/instructions/decision-question.md` (≤ 8 dòng, `kind: law`, có anchor phrase).
+2. Chiếu luật vào AGENTS.md **từ worktree**: `node --input-type=module -e "import {materializeInstructionProjection} from './src/setup/instruction-projections.mjs'; materializeInstructionProjection(process.cwd())"` (xác minh tên export trước khi chạy; không dùng `fgos doctor --fix` vì nó ghi main checkout). Commit AGENTS.md + `.fgos/instructions/effective/repo.json`.
+3. Validator: danh sách heading bắt buộc theo D1, mỗi heading có alias tiếng Anh; so bằng `normalize('NFC')` + `toLowerCase()` + `startsWith`, **không dùng `\b`** (`/^khuyến\s+nghị\b/i` không khớp "khuyến nghị" — red-team đã chạy). Viết dạng vòng lặp trên mảng heading để giữ ngắn.
+4. Sửa đủ 5 nơi sinh câu hỏi ở Bối cảnh. Nội dung thật: phần engine không biết (giá, khuyến nghị) ghi rõ "engine không định giá được; lựa chọn là X/Y" thay vì chữ đệm. Câu hỏi thô của worker (`discovery.mjs:545`) và `DEFAULT_UNCLEAR_QUESTION` được engine bọc vào mẫu, như `discovery.mjs:456-460` đã làm. Sửa `worker-prompt-discovery.txt:43` cho worker biết mẫu. Giữ nguyên chuỗi lý do gate rủi ro/blast-radius.
+5. Test: đổi fixture có sẵn; thêm vào test validator hiện có 1 case câu hỏi hợp lệ đủ heading (có "Khuyến nghị", có dạng NFD) phải qua, 1 case thiếu "Phạm vi" phải trượt. Thêm 1 assert anchor phrase vào `test/docs/rul11-anchor-phrase.test.mjs` (không tạo file mới).
+6. CHANGELOG `[Unreleased]`: 1 dòng.
 
-Sửa skill, AGENTS.md và memory cho khỏi trùng: Phase 02.
+Sửa skill, AGENTS.md ưu tiên #2 và memory cho khỏi trùng: Phase 02.
 
 ## Kiểm chứng
 
-- Hẹp: test validator + `test/intake/*` + `test/cli/fgos-intake*`.
+- Hẹp: test validator, `test/intake/*`, `test/cli/fgos-intake*`, `test/runner/loop.test.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`.
 - Rộng: `npm test` (unset `CLAUDE_CODE_SESSION_ID` nếu chạy trong agent session).
-- `git grep -n "Why this matters" -- src test` ra 0 (skill sửa ở Phase 02).
-- `git diff --numstat <base> -- src` ≤ 60 dòng đổi; mọi path nằm trong `paths` của plan.md.
+- `git grep -n -E "Why this matters|Why this$" -- src test` ra 0.
+- Ngân sách đo bằng `git diff --numstat <base> -- src` lấy **thêm + xoá**; khối sinh tự động trong AGENTS.md và `repo.json` không tính.
 
 ## Rủi ro và rollback
 
-- Câu hỏi đang park ở `awaiting-human` với cấu trúc cũ không bị ảnh hưởng (validator chỉ chạy lúc chuyển trạng thái).
-- Agent điền heading rỗng cho qua validator: ngưỡng 20 ký tự chỉ chặn mức tối thiểu; chất lượng thật nằm ở mục 3 và 5, reviewer trả lại câu hỏi thiếu giá hoặc thiếu phạm vi.
+- Validator chỉ chứng minh heading tồn tại và đủ 20 ký tự; **không có reviewer nào** trên đường `fgos ask`. Câu "A hoặc B, tuỳ anh" vẫn có thể qua. Chất lượng thật dựa vào mẫu trong skill; không thêm bước review mới trong plan này.
+- Câu trả lời của owner **chưa bị ràng buộc** bởi phần "Phạm vi": gate rủi ro vẫn nhả với mọi câu trả lời không rỗng (`src/intake/plan.mjs:711-713, 731-732`). Xem D2.
+- Câu hỏi đang park với cấu trúc cũ không bị ảnh hưởng (validator chỉ chạy lúc chuyển trạng thái).
 - Rollback: revert commit của phase.
