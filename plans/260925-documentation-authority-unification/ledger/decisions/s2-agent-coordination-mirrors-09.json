@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-09",
+  "sources": [
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p00.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p01.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p02h.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p02l.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p03.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p04.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p05.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p05s.md",
+    "docs/architect/agent-coordination/verification/runtime-recovery/p08.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "blobSha": "05efb5d027cd7b8d09c6002c82a832f4063322e6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md",
+      "blobSha": "a7f8f67113db7e15f3975fa44f3488546bc804a7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md",
+      "blobSha": "07f45ebae6bf45551248c0467facf1d5e2c2293a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p00.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p00.md",
+      "blobSha": "82a9df99623d66d49cae3e95f37e746e01934677"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p01.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p01.md",
+      "blobSha": "b03a61736682b3056271b020031086194d3299ce"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+      "blobSha": "5b1907197c0149765f5e23789fb5202c6da48106"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p02h.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p02h.md",
+      "blobSha": "2fc9544da08c939acd81d75edbe7a23d0f492b02"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p02l.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p02l.md",
+      "blobSha": "a37a35e30de1d31e0bff878f86a1b47521b47f89"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p03.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p03.md",
+      "blobSha": "333bc8e4cfb526b6df6f401e21ec0bd5b8b0f63d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p04.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p04.md",
+      "blobSha": "d5ebd1bc9f8eba269f7955fd5cea739dda674784"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p05.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p05.md",
+      "blobSha": "c4c4c8a5e12be258b6e8a84741411b0013cb3434"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p05s.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p05s.md",
+      "blobSha": "8a76a7f28f7bb3fdcfa9fb8581b25949e399b9ce"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/runtime-recovery/p08.md",
+      "target": "docs/platform/agent-coordination/verification/runtime-recovery/p08.md",
+      "blobSha": "ceddc9e56c16aa73846d21f9721c9e47bdafa19e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p00.md",
+      "blobSha": "adf4ee2c83b224de8fdce0bd9837a15595065a3b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p01.md",
+      "blobSha": "f47a91722f349333a4a69c932c5b536964d22877"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p02.md",
+      "blobSha": "6afce134eec3e445a31f7d401691457ae7318de5"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p03.md",
+      "blobSha": "6b3195e492b21072918ffa661f1cc2658fce8d7d"
+    }
+  ]
+}

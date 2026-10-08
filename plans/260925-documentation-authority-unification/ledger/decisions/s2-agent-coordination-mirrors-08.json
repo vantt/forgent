@@ -1,0 +1,203 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-08",
+  "sources": [
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p05.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/full-suite-baseline.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/test-run-counts-baseline.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P01.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P02.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P03.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P05.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P06.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md",
+    "docs/architect/agent-coordination/verification/confinement-authority-implementation/P08.md",
+    "docs/architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+    "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount-result.json",
+    "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount.mjs",
+    "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/probe.mjs",
+    "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/result.json",
+    "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json",
+    "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
+    "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md",
+    "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md",
+    "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+    "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md",
+    "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+    "docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md",
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md",
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md",
+    "docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p05.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/p05.md",
+      "blobSha": "6dc32dbdc2de412ed122c4611dd5fdafc96ce591"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/full-suite-baseline.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/full-suite-baseline.md",
+      "blobSha": "904b4bbfca4418ec29cdfcb337d6175af048f547"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+      "blobSha": "6ba9c0216b9fd69cfa153ec5150adf4c42685ef6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+      "blobSha": "c8960a8d9486f52691e87ac3dc90909869db3b5c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/test-run-counts-baseline.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/test-run-counts-baseline.md",
+      "blobSha": "385c7c03ebd1ab3eafc05dcc729319b99ca934f1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
+      "blobSha": "52eb2d1a66262af714597dd091171bfe625c49a9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P00.md",
+      "blobSha": "74ec42504ed51b82e66b61cc2df570e80ba458dc"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P01.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P01.md",
+      "blobSha": "2032e12c92558d6a1d0cdcc7316e5185f325033a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P02.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P02.md",
+      "blobSha": "cfa24e562252fb3408d98e7f3a2b30d1a194e4c2"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P03.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P03.md",
+      "blobSha": "f76d6605a4520fa040358fe4ab748c3b6a893f40"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P04.md",
+      "blobSha": "2d4cbc24bdb5715cede26e904594754fb6270d51"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P05.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P05.md",
+      "blobSha": "60d9bca46dbc23deca3aa68056b1d24509ad1d99"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P06.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P06.md",
+      "blobSha": "976a694c3cc62ae7f886b39b9b785c637ffda04b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P07.md",
+      "blobSha": "e9f34172196b35b48cd6166fd9163e8266852311"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P08.md",
+      "target": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md",
+      "blobSha": "0bee4adda0c4ce30dad50b4542079e0bb89a3ba2"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+      "blobSha": "0974490af5ff2a2dfc37e94ed5e6dc112dcaaea7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount-result.json",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount-result.json",
+      "blobSha": "7ee082dc48c22f95cd064718eebd217c498dca10"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount.mjs",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/narrow-mount.mjs",
+      "blobSha": "062a1c014719d00d70c18a142d639bfc5a722caf"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/probe.mjs",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/probe.mjs",
+      "blobSha": "26680953ba929cda451c3cfbb334317eec429bb3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/result.json",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/result.json",
+      "blobSha": "daeb6669de59c58d0efcc0ce7bf89c99fd267087"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment-result.json",
+      "blobSha": "02f894648755764724f7e99684611e7a5d7f5161"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
+      "target": "docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs",
+      "blobSha": "125be87961979dd7fe083c49c180ca295b385377"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md",
+      "target": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I01.md",
+      "blobSha": "b9b4b65d4fd51fda80973e39166207a227fe4725"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md",
+      "target": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I02.md",
+      "blobSha": "ece0affc3811d66939ce98d31f11d78cfb5858d7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+      "target": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+      "blobSha": "dc9ae6e8eace090da5693eef1c993d0f2916167a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md",
+      "target": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I04.md",
+      "blobSha": "9dbde5c20041af4f7f35a9acf3477d9d543de54a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+      "target": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I05.md",
+      "blobSha": "391ae1db643bac39897f468f117fe63f52099595"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md",
+      "target": "docs/platform/agent-coordination/verification/executor-policy-dispatch-seams/p00.md",
+      "blobSha": "973dda87b4175691c1e402284173001341afc38f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md",
+      "blobSha": "494a57c99ceab1e3c3e24db2aa1a603b52100648"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md",
+      "blobSha": "cf5925e701f3a64aff1c6098395632ceed93a935"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md",
+      "blobSha": "d09cb308b7806e0a87c5e52c19b9ddc10edf99e9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md",
+      "target": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/index.md",
+      "blobSha": "0e3e7cd128e13927c043b01ff23fb742614c9ea3"
+    }
+  ]
+}

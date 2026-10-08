@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-13",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.4.md",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md",
+      "blobSha": "44bc17848e502ad621c63839c8ecd631ab3967df"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md",
+      "blobSha": "8dda0c64b93846660266041c1e90a07a44324a09"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "blobSha": "b4322060665abf85ef0a3498a35b66156bf6444a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "blobSha": "b9b7449a2260889708e8f6eebe0e117036b25c0a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.4.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.4.md",
+      "blobSha": "2b8d287c0927c77f346677c2dd3bdb156e5a4c2e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+      "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
+    }
+  ]
+}

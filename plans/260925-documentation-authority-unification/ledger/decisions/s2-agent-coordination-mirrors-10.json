@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-10",
+  "sources": [
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md",
+    "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p16.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/current-cell.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/index.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/P01.1.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p04.md",
+      "blobSha": "cc3a4e971775a75d138032503a9046cca1482f71"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p05.md",
+      "blobSha": "982b3e94cd5f5fde1ce46ee96101d175d63a4dc4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p06.md",
+      "blobSha": "a5631be26a6ab7e1350b0728d4f776bbd5fd1d7a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p07.md",
+      "blobSha": "8cd2cbd4ac5a142a7b70604a86ddaf01e920631a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p08.md",
+      "blobSha": "411f89db7570fe74b786b2a5c2cc4665e2d09d00"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p09.md",
+      "blobSha": "b5acfe6c45635d6cc4739ac56bb7224e9e8838c6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p10.md",
+      "blobSha": "0d49c76d41543769dfb13b209084633f1e652cef"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p11.md",
+      "blobSha": "4d261974aae64fb55f5fa71a8ded2c2e5295d3c6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md",
+      "blobSha": "d080535083c068de4739e7458eb36045bfdf5309"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p13.md",
+      "blobSha": "93d54c6f79a327c14ee8a45da9e3669cbd949432"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p14.md",
+      "blobSha": "36f17f7b3014aee86c3ce4780c575690fd82fb1e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p15.md",
+      "blobSha": "708c404c989e55ad352d92df83a441711bd28d8a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/rust-host-r1-kernel/p16.md",
+      "target": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p16.md",
+      "blobSha": "6dafba81899d0c4389939f10b3fa98f37bfefaa1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/current-cell.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md",
+      "blobSha": "dd7edc95c281fd9bc7f86c61c48f35749ba33729"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/index.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/index.md",
+      "blobSha": "a75810911e2fe9e2a1e84ce3b9c2a8989cfb021a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/P01.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/P01.1.md",
+      "blobSha": "b5df4bd810c879c0ffbeb4d7636ce73292378a1a"
+    }
+  ]
+}

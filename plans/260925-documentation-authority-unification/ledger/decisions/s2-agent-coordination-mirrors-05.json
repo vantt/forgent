@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-05",
+  "sources": [
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-recheck.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/architecture-advisory-panel-conformance-run.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/detect-changes-vs-head~2.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-fix-round-1-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/focused-suite-run.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-findings.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-recheck.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-1-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-2-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-findings.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-recheck.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-findings.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-recheck.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-report.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-recheck.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-recheck.md",
+      "blobSha": "781b244af1132d525373d83bb7c14034632e9c53"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-report.md",
+      "blobSha": "a46b3ea109a8055249d610ad3ffd0cd0c9b19ba4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/architecture-advisory-panel-conformance-run.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/architecture-advisory-panel-conformance-run.log",
+      "blobSha": "4890cc84888576acc36291746fe58563d13fb829"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/detect-changes-vs-head~2.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/detect-changes-vs-head~2.log",
+      "blobSha": "81991e8360ea7770dd52565fc749df6f4f41057a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-fix-round-1-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-fix-round-1-report.md",
+      "blobSha": "a91f073d2f6c347a0bbb1538c437f26a66c32638"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/doer-report.md",
+      "blobSha": "cb78550ae93840c8fcbf39e767e7464c6422d53c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/focused-suite-run.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/focused-suite-run.log",
+      "blobSha": "ce6ae5c609fe4cc33dd8f5e5a7ef74dbba80633b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-findings.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-findings.json",
+      "blobSha": "07028902a184f52c690e67a6030c9ca38cfefe86"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-recheck.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-recheck.md",
+      "blobSha": "3053f6e5d8b7d1c134a3cd09a9cd291a29382358"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-report.md",
+      "blobSha": "b203407d3c1991187095b4367ce2846853c7de8b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-1-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-1-report.md",
+      "blobSha": "4d1fea05addf87155fb977eb1af46102785414bd"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-2-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-2-report.md",
+      "blobSha": "c60f86350ec7d19a6050639983a634ad340e2f59"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-report.md",
+      "blobSha": "49531b7d0bb21ec8293b45b8045af9b2660556c1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-findings.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-findings.json",
+      "blobSha": "5a6814c14a5cc8b0177fd7465e8e9de43a0d4ff4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-recheck.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-recheck.md",
+      "blobSha": "808aeda4a72aed3a070b9a63b63ea1e09ea62bbf"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-report.md",
+      "blobSha": "65e5c3877608b6c66fb55f707a26c49c0c45d478"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-findings.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-findings.json",
+      "blobSha": "2de173c6e45ba0e1059fc6ffd5409bfac47c90a6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-recheck.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-recheck.md",
+      "blobSha": "6d2aa2ca9daa66fbbc531e1b4fe548ec9862f621"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-report.md",
+      "blobSha": "9b629a95a0cff483df1f4c3b8b4001d000fb8f7a"
+    }
+  ]
+}

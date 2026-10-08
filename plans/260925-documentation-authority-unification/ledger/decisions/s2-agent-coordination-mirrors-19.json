@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-19",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md",
+      "blobSha": "90c51e4e45ccb9c3dffc23a512498548a0c44130"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "blobSha": "5badc584055c5070d8c45fe180be56e880f86682"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md",
+      "blobSha": "466fb84e01309aecfcca2e3b5f5cd99c1641201a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md",
+      "blobSha": "372f84b44d7a0f6314adece7fc09ae1759a86729"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+      "blobSha": "3416e0b0b83f85c9249922cb15f7d681d70fd8af"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-27",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/index.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md",
+    "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-hem/hem-probe.sh"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md",
+      "blobSha": "08af5437a5f6d7193d56514639cc1a07315ca49b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md",
+      "blobSha": "f0857ca6829ae2edc0c9749bada24cfec8ed4bdb"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md",
+      "blobSha": "7bf5c3f201baf2f8fe11159a0d723ba67c7d49e6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md",
+      "blobSha": "483b3c090083b410e1d43d60096570d23b1ce0e7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/current-cell.md",
+      "blobSha": "76e8cc72a6ca66f87ecf9504572dda8bca6792e2"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/index.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/index.md",
+      "blobSha": "91c06cf2aa46dc754753f6b9f7b5ab5d1e9cbb0e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md",
+      "blobSha": "54045750c1bd4f6532162aeb9b21f52695a0cb4d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md",
+      "blobSha": "7c22d7a268d724ee6d4edfbd4bcb62b0baf74b50"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md",
+      "blobSha": "f777127bc358bd5ccf22cd52af5be70059a6d714"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md",
+      "blobSha": "f85d2716cae31cf06648759b838514c29dcd0705"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md",
+      "blobSha": "dbc1267d7cfc479b0cb7b738a57c394254ad8e31"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md",
+      "blobSha": "aedabf974a07a4e027cfa97f7b902aebe472647a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md",
+      "blobSha": "eeda9160e58c5b1d3a05877b6d4b0190a73f35eb"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md",
+      "blobSha": "d63b29b0aaa5ed031180a60df3f6180646734872"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md",
+      "target": "docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md",
+      "blobSha": "f7925a287f36fdfe90f9c3d8e1f3fd0c863862f9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-hem/hem-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-hem/hem-probe.sh",
+      "blobSha": "c709b15a8fae1be79e77e71ecf3ae5f7979bb9a3"
+    }
+  ]
+}

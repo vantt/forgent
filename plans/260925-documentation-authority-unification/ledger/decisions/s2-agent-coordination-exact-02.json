@@ -1,0 +1,2595 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-exact-02",
+  "sources": [
+    "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+    "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+    "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+    "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+    "docs/architect/agent-coordination/decisions/README.md",
+    "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+    "docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+    "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+    "docs/architect/agent-coordination/history/README.md",
+    "docs/architect/agent-coordination/intent-preservation-ledger.md",
+    "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+    "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "exact": [
+    {
+      "source": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "target": "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "rows": [
+        {
+          "claimId": "claim_4e42262fa92c7b2fc19650be61a024d8",
+          "sourceUnitDigest": "aeeb780ab4b1237bc1fb6c7658b669cc80a804378304b9787a8b26811d172516",
+          "targetUnitDigest": "aeeb780ab4b1237bc1fb6c7658b669cc80a804378304b9787a8b26811d172516"
+        },
+        {
+          "claimId": "claim_02c81a6f3f201a676a25aa6c3ed1dc73",
+          "sourceUnitDigest": "abe4ef95a67e5f831e2f6f44666c6adc7fb63c51a35547a2ffb7fbfffb8e80ca",
+          "targetUnitDigest": "abe4ef95a67e5f831e2f6f44666c6adc7fb63c51a35547a2ffb7fbfffb8e80ca"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "target": "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "rows": [
+        {
+          "claimId": "claim_0c1a42ea9436f34cae8f4c3d79693a39",
+          "sourceUnitDigest": "f4d9b0e52bb43ffd0250f032e5f07f5b84fb8692eeabd57330fea2eb319036d7",
+          "targetUnitDigest": "f4d9b0e52bb43ffd0250f032e5f07f5b84fb8692eeabd57330fea2eb319036d7"
+        },
+        {
+          "claimId": "claim_2411c7f612284f31578d445b01cb523d",
+          "sourceUnitDigest": "e6d529ab91d68068b702d4f9c6a6e3f52a84a8af8f7803b8b64c9c8417182884",
+          "targetUnitDigest": "e6d529ab91d68068b702d4f9c6a6e3f52a84a8af8f7803b8b64c9c8417182884"
+        },
+        {
+          "claimId": "claim_c93311617d42e5b4b068eacaabf0c769",
+          "sourceUnitDigest": "5e22a015544675bef682b7bbf3a19fef40900941e350fbf10503a07d8e18aaac",
+          "targetUnitDigest": "5e22a015544675bef682b7bbf3a19fef40900941e350fbf10503a07d8e18aaac"
+        },
+        {
+          "claimId": "claim_a000ecb349f6b68d1a1fe48f5c173ced",
+          "sourceUnitDigest": "5537e14983a1f44a34245de2231d98ee48730dd105a20b966a529177a54c8afa",
+          "targetUnitDigest": "5537e14983a1f44a34245de2231d98ee48730dd105a20b966a529177a54c8afa"
+        },
+        {
+          "claimId": "claim_64e1534920ca2870b642580f33d5156a",
+          "sourceUnitDigest": "f32261de5ce914e7b52528da6bb59d1a3dd1579b42c3942e298918276b5baeff",
+          "targetUnitDigest": "f32261de5ce914e7b52528da6bb59d1a3dd1579b42c3942e298918276b5baeff"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "target": "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "rows": [
+        {
+          "claimId": "claim_163507e3c43f5e07310289219d98064e",
+          "sourceUnitDigest": "3bc50e6b98cdee1b778fc585347e8232245dcfcdb79b8083a6daeeaebf8a7e6c",
+          "targetUnitDigest": "3bc50e6b98cdee1b778fc585347e8232245dcfcdb79b8083a6daeeaebf8a7e6c"
+        },
+        {
+          "claimId": "claim_f827ac75e170bbac568fba0ef57be348",
+          "sourceUnitDigest": "cb9cef08ec839f6ff3e3a883e7a9e9ea57fc9c28ed3e690e050a3e21e9b638be",
+          "targetUnitDigest": "cb9cef08ec839f6ff3e3a883e7a9e9ea57fc9c28ed3e690e050a3e21e9b638be"
+        },
+        {
+          "claimId": "claim_09f23659759e6ebf25852d6229c4da5c",
+          "sourceUnitDigest": "96015eee2c555b093d028c69a5804ab91ae4e75fc3e21fa2e088a893dd7dcc4d",
+          "targetUnitDigest": "96015eee2c555b093d028c69a5804ab91ae4e75fc3e21fa2e088a893dd7dcc4d"
+        },
+        {
+          "claimId": "claim_57ff7e3547debb8bcb2798792913b5d8",
+          "sourceUnitDigest": "0ba6dc5651e9b488ecf708b2ff2be854cdddbf81bf7f127dc2485f457053785f",
+          "targetUnitDigest": "0ba6dc5651e9b488ecf708b2ff2be854cdddbf81bf7f127dc2485f457053785f"
+        },
+        {
+          "claimId": "claim_83b494809c76c456a303b797a07ecf4b",
+          "sourceUnitDigest": "3bd3bbadc0c1822c61994175fc52fdf9ca75351bea0c8be3ca94efda1a26f2b5",
+          "targetUnitDigest": "3bd3bbadc0c1822c61994175fc52fdf9ca75351bea0c8be3ca94efda1a26f2b5"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "target": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "rows": [
+        {
+          "claimId": "claim_d9401602aca75e4fa1c5b2efe3aa903c",
+          "sourceUnitDigest": "e75651b37d276ea3ad60df661f1a75abdfe4b6a858396c5df38b40740035b887",
+          "targetUnitDigest": "e75651b37d276ea3ad60df661f1a75abdfe4b6a858396c5df38b40740035b887"
+        },
+        {
+          "claimId": "claim_e058ee730b7253c519dc8f38dd892f00",
+          "sourceUnitDigest": "5dc425d1f0bad971e829261eb29409bf3848cc58867814796e2ab428a3287363",
+          "targetUnitDigest": "5dc425d1f0bad971e829261eb29409bf3848cc58867814796e2ab428a3287363"
+        },
+        {
+          "claimId": "claim_82e3f1824c9fb3f0f4c4c292ec067ef8",
+          "sourceUnitDigest": "8726d0e02b20ac2beb203a002f2c7f99d3c6745fa01a188d7b5c91daceac34ec",
+          "targetUnitDigest": "8726d0e02b20ac2beb203a002f2c7f99d3c6745fa01a188d7b5c91daceac34ec"
+        },
+        {
+          "claimId": "claim_276d64851e2136e50539e46180122ceb",
+          "sourceUnitDigest": "7b239f28d2bfe5f5d4ae21bb7345fc38fbdca034836bd0049ff5af965ad71930",
+          "targetUnitDigest": "7b239f28d2bfe5f5d4ae21bb7345fc38fbdca034836bd0049ff5af965ad71930"
+        },
+        {
+          "claimId": "claim_020a1e424ee511993f0797d7ead1dfdc",
+          "sourceUnitDigest": "afdd3d1f20e74db0d8cbb32edd6793c277862dd5d413f615350b1a80dd84127a",
+          "targetUnitDigest": "afdd3d1f20e74db0d8cbb32edd6793c277862dd5d413f615350b1a80dd84127a"
+        },
+        {
+          "claimId": "claim_006a0abb9d507402215439fb23fdca5d",
+          "sourceUnitDigest": "0df8ef05fe5ffd0192a1ff7a258d9fe2c62fe5f09fbe96db97b21c3e3382b925",
+          "targetUnitDigest": "0df8ef05fe5ffd0192a1ff7a258d9fe2c62fe5f09fbe96db97b21c3e3382b925"
+        },
+        {
+          "claimId": "claim_7804fb0af6accd3b19f0e927d5c64300",
+          "sourceUnitDigest": "be45e63ac22d9bfb6f4e4d0c3ef9043a592ccb87096d220208b8cf602add14a8",
+          "targetUnitDigest": "be45e63ac22d9bfb6f4e4d0c3ef9043a592ccb87096d220208b8cf602add14a8"
+        },
+        {
+          "claimId": "claim_1fe2f9d8bcd07ea0d9cac3dd064f63cf",
+          "sourceUnitDigest": "548acb199c1ea893fe110e379efb440d2105e6928665a144ed1455b3433b9cac",
+          "targetUnitDigest": "548acb199c1ea893fe110e379efb440d2105e6928665a144ed1455b3433b9cac"
+        },
+        {
+          "claimId": "claim_1374dd72d941a06cc894364357e6e9be",
+          "sourceUnitDigest": "ae92a69c02fd45641328aeba3d4ae2c41f72b2b2d6eb2585d5822399db5e484c",
+          "targetUnitDigest": "ae92a69c02fd45641328aeba3d4ae2c41f72b2b2d6eb2585d5822399db5e484c"
+        },
+        {
+          "claimId": "claim_f9be8311c31aa61219e25fe732c7a373",
+          "sourceUnitDigest": "c89408caeabe8db8e23ef2e3e21858c6088f6d2f3c758d20a77063437e560ff5",
+          "targetUnitDigest": "c89408caeabe8db8e23ef2e3e21858c6088f6d2f3c758d20a77063437e560ff5"
+        },
+        {
+          "claimId": "claim_ab3ec78b6c0504016f5d6061946c2490",
+          "sourceUnitDigest": "86f57f83225410f2d71e4493aa7563265c167cb74eaa4fb6cef09db6cdf3c778",
+          "targetUnitDigest": "86f57f83225410f2d71e4493aa7563265c167cb74eaa4fb6cef09db6cdf3c778"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/decisions/README.md",
+      "target": "docs/platform/agent-coordination/decisions/README.md",
+      "rows": [
+        {
+          "claimId": "claim_f7be1d8a794e7f9c867378b67fbc3158",
+          "sourceUnitDigest": "4220e3a9675537c9fe609c9cfbf7324d589f26b484441c45a0ebf1ec2d0fa4dc",
+          "targetUnitDigest": "4220e3a9675537c9fe609c9cfbf7324d589f26b484441c45a0ebf1ec2d0fa4dc"
+        },
+        {
+          "claimId": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
+          "sourceUnitDigest": "0a311d99026944161e5c278e27c04c9751122d186dd7718cac1293e704bd2104",
+          "targetUnitDigest": "0a311d99026944161e5c278e27c04c9751122d186dd7718cac1293e704bd2104"
+        },
+        {
+          "claimId": "claim_a8914714b51091a9f0a487f739172da2",
+          "sourceUnitDigest": "5ba4d36d43461dcc3047edaf13a0aa0685b4352f9e177191e29dd1bd980a66bf",
+          "targetUnitDigest": "5ba4d36d43461dcc3047edaf13a0aa0685b4352f9e177191e29dd1bd980a66bf"
+        },
+        {
+          "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
+          "sourceUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
+          "targetUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "target": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+      "rows": [
+        {
+          "claimId": "claim_66ee17bdd3a2377fbaafc1f487b43591",
+          "sourceUnitDigest": "cedf97f706b412c9114fa305ad5091c52befc39ce490086448c88f60c48d50db",
+          "targetUnitDigest": "cedf97f706b412c9114fa305ad5091c52befc39ce490086448c88f60c48d50db"
+        },
+        {
+          "claimId": "claim_48c9634c14f2e2b03b1664e9eb8184ba",
+          "sourceUnitDigest": "5ff79a69597204ef7ca6de62fad23eac53b8330e9793bf292dbf262557f3c101",
+          "targetUnitDigest": "5ff79a69597204ef7ca6de62fad23eac53b8330e9793bf292dbf262557f3c101"
+        },
+        {
+          "claimId": "claim_3a8e39cfa58dd64661127962a4e216d2",
+          "sourceUnitDigest": "148771696e2f9c542a25257efd4a4fc101394e0544d108672d16ff5e98e442f1",
+          "targetUnitDigest": "148771696e2f9c542a25257efd4a4fc101394e0544d108672d16ff5e98e442f1"
+        },
+        {
+          "claimId": "claim_aabab6f759281af755f58a431d7c52a6",
+          "sourceUnitDigest": "7c1b7caabd5693e553788d3ecbcad093da561d5ada8d94341b4758ca6d88e994",
+          "targetUnitDigest": "7c1b7caabd5693e553788d3ecbcad093da561d5ada8d94341b4758ca6d88e994"
+        },
+        {
+          "claimId": "claim_87643ce6762878ec1999ffb666b3dfbd",
+          "sourceUnitDigest": "e310dbdbbaedc54439ad1b5a6d28c85dd73ca2562a1c1877b1cf781d7cca247f",
+          "targetUnitDigest": "e310dbdbbaedc54439ad1b5a6d28c85dd73ca2562a1c1877b1cf781d7cca247f"
+        },
+        {
+          "claimId": "claim_1d8f32bc50ccbeb07da9f5f1196fd047",
+          "sourceUnitDigest": "c87bfe81b6ad6e4623074a9aa95d1ebcc6f916d15991763c8440cef21839be0d",
+          "targetUnitDigest": "c87bfe81b6ad6e4623074a9aa95d1ebcc6f916d15991763c8440cef21839be0d"
+        },
+        {
+          "claimId": "claim_473cf814704769dbd8f9a8bcb18cb689",
+          "sourceUnitDigest": "2e27ac3fe52c8fdcecdc1fe5e9f2d7d73c8aeee10e386592538e63912a4919b5",
+          "targetUnitDigest": "2e27ac3fe52c8fdcecdc1fe5e9f2d7d73c8aeee10e386592538e63912a4919b5"
+        },
+        {
+          "claimId": "claim_cc8e3a5ce88c0a44723fc034efcf877f",
+          "sourceUnitDigest": "a20ddccbb6f014215bf6b30ab42a57cecf5129e3a851a8cbae8856cba8280361",
+          "targetUnitDigest": "a20ddccbb6f014215bf6b30ab42a57cecf5129e3a851a8cbae8856cba8280361"
+        },
+        {
+          "claimId": "claim_72a6f0df5af4cb6a979720e9cab58810",
+          "sourceUnitDigest": "a2749c6c25d78a45cafed0bddf54d0d3317cf41bee533078e28169827e5f3d37",
+          "targetUnitDigest": "a2749c6c25d78a45cafed0bddf54d0d3317cf41bee533078e28169827e5f3d37"
+        },
+        {
+          "claimId": "claim_4a8e53eba4a9b8171a85b4e13c4afed5",
+          "sourceUnitDigest": "459251ce81231bdc931f8210789a4b86bc02063ed9316d80973a6fe471dfb893",
+          "targetUnitDigest": "459251ce81231bdc931f8210789a4b86bc02063ed9316d80973a6fe471dfb893"
+        },
+        {
+          "claimId": "claim_1152885a1aa3412b40f851a6cb44650b",
+          "sourceUnitDigest": "623fff543aedee5cf0ed49a9f55b7d065a655144b3b71c0e231800bf80c9a484",
+          "targetUnitDigest": "623fff543aedee5cf0ed49a9f55b7d065a655144b3b71c0e231800bf80c9a484"
+        },
+        {
+          "claimId": "claim_c964500fa420d4218b3f1ce5a40df3e4",
+          "sourceUnitDigest": "c07ff41d687ab821044c8431245d4fb2822e1c14c0bfe9e9c5dd0b06855cb6f6",
+          "targetUnitDigest": "c07ff41d687ab821044c8431245d4fb2822e1c14c0bfe9e9c5dd0b06855cb6f6"
+        },
+        {
+          "claimId": "claim_cab57858e18defbac5653c686818fb55",
+          "sourceUnitDigest": "e31c235f4bc10ae72cbefddd81af02a92b9821e5dfb75fd6c3032ca1819546a3",
+          "targetUnitDigest": "e31c235f4bc10ae72cbefddd81af02a92b9821e5dfb75fd6c3032ca1819546a3"
+        },
+        {
+          "claimId": "claim_a83093db7476d44798f98489caeeffae",
+          "sourceUnitDigest": "463b950980344a5c002e9160a70acb1c86e875ca620f592f648a17e19c6ca2ae",
+          "targetUnitDigest": "463b950980344a5c002e9160a70acb1c86e875ca620f592f648a17e19c6ca2ae"
+        },
+        {
+          "claimId": "claim_2e35eda262998c528f056a632d9cbde6",
+          "sourceUnitDigest": "978caa380ceceaa55f0064a3a3677d74c72433a60b6e315346d83be0f96aa83e",
+          "targetUnitDigest": "978caa380ceceaa55f0064a3a3677d74c72433a60b6e315346d83be0f96aa83e"
+        },
+        {
+          "claimId": "claim_779cd645911c18689374a09ec69b5fbe",
+          "sourceUnitDigest": "22713f246a5e6b929f7efff97354f7371c56b7ba5e133a48c1cd0b4a0632bd8e",
+          "targetUnitDigest": "22713f246a5e6b929f7efff97354f7371c56b7ba5e133a48c1cd0b4a0632bd8e"
+        },
+        {
+          "claimId": "claim_7bebf798da94d4547a4fc06826bb5120",
+          "sourceUnitDigest": "72cbdd83cff0a65bbafcd1be964743b7bbb1c3333e75aa0ca28b42f24bbe316d",
+          "targetUnitDigest": "72cbdd83cff0a65bbafcd1be964743b7bbb1c3333e75aa0ca28b42f24bbe316d"
+        },
+        {
+          "claimId": "claim_ef6d171022f3c8ab51ae9f0eeb15ace3",
+          "sourceUnitDigest": "fddc97dde2fff53103be73350bc24d77c0bfbdb6c636c70a94baf1d1a0483712",
+          "targetUnitDigest": "fddc97dde2fff53103be73350bc24d77c0bfbdb6c636c70a94baf1d1a0483712"
+        },
+        {
+          "claimId": "claim_d2c6ea8d0a14fbd1d7aac74212f9296f",
+          "sourceUnitDigest": "7bba0b571bd99a573f2126a8f1801bae26aab5a2025afb49c516f97d8d9bfee2",
+          "targetUnitDigest": "7bba0b571bd99a573f2126a8f1801bae26aab5a2025afb49c516f97d8d9bfee2"
+        },
+        {
+          "claimId": "claim_6b50d34afdaf9326c91c815d37ffca22",
+          "sourceUnitDigest": "57c34677de058839a3363b2c290f00a95038fc5fed7078b35f6b9266eebdf147",
+          "targetUnitDigest": "57c34677de058839a3363b2c290f00a95038fc5fed7078b35f6b9266eebdf147"
+        },
+        {
+          "claimId": "claim_48143561af2abd20226ccee7b65903f6",
+          "sourceUnitDigest": "a1466a388238e14fd56513383797254e518a2ca48c5c15556e14b6a6f2c27ff8",
+          "targetUnitDigest": "a1466a388238e14fd56513383797254e518a2ca48c5c15556e14b6a6f2c27ff8"
+        },
+        {
+          "claimId": "claim_e7d92dc47488cf6539d885b2f5540b51",
+          "sourceUnitDigest": "ebc7149382716fc3b03116ed54d62d23423270a6d05a9c695fac781e03ed653f",
+          "targetUnitDigest": "ebc7149382716fc3b03116ed54d62d23423270a6d05a9c695fac781e03ed653f"
+        },
+        {
+          "claimId": "claim_b1cc3c3272a3943b9a95bf1ce11adb85",
+          "sourceUnitDigest": "b6756239ff2521d64088a41841205b3c53eac00f78fa83d8d08b67b00bd6f414",
+          "targetUnitDigest": "b6756239ff2521d64088a41841205b3c53eac00f78fa83d8d08b67b00bd6f414"
+        },
+        {
+          "claimId": "claim_c27d39c1b7e8cf6ee0d7c02e333fac81",
+          "sourceUnitDigest": "72437aaaaa41b632b1b0de2ea761bc9f6a321d1cc0594c3cd3009475eee789da",
+          "targetUnitDigest": "72437aaaaa41b632b1b0de2ea761bc9f6a321d1cc0594c3cd3009475eee789da"
+        },
+        {
+          "claimId": "claim_4b4ee1d5eebfd0533dd39cc5c79b9c82",
+          "sourceUnitDigest": "1e496b06df6f44f3ec07a7d9e667826ff204ee9ccbb3b22d83286c5264553c62",
+          "targetUnitDigest": "1e496b06df6f44f3ec07a7d9e667826ff204ee9ccbb3b22d83286c5264553c62"
+        },
+        {
+          "claimId": "claim_edef4f6d5a625e5ea073d60683cbb909",
+          "sourceUnitDigest": "9fb8737a3ea1e779c282feeae56f64171b100c5b07ff092fe06990ba3987848b",
+          "targetUnitDigest": "9fb8737a3ea1e779c282feeae56f64171b100c5b07ff092fe06990ba3987848b"
+        },
+        {
+          "claimId": "claim_1a03d521bbff36621bb97a6232633792",
+          "sourceUnitDigest": "b9e92e49bc30b57d5193a219016409b5f52e2e7bac9cb14c9d4ac005ab9c171d",
+          "targetUnitDigest": "b9e92e49bc30b57d5193a219016409b5f52e2e7bac9cb14c9d4ac005ab9c171d"
+        },
+        {
+          "claimId": "claim_f4836f8307e73ab23db131d3967dfe4b",
+          "sourceUnitDigest": "ab738fb7da9d51fb55731e3f51bf29e59a0402d2e62b8e0f8c14f491f02af840",
+          "targetUnitDigest": "ab738fb7da9d51fb55731e3f51bf29e59a0402d2e62b8e0f8c14f491f02af840"
+        },
+        {
+          "claimId": "claim_c6bb4a26b857e43aed52d48e9b646aeb",
+          "sourceUnitDigest": "fad3cf93c85a5963b054df592f3020b87002f13279f4cd6afa2f057db088b31d",
+          "targetUnitDigest": "fad3cf93c85a5963b054df592f3020b87002f13279f4cd6afa2f057db088b31d"
+        },
+        {
+          "claimId": "claim_9edae8bacc7e94b5011ea52621b01eec",
+          "sourceUnitDigest": "11b5fd2b3414b886311ac14bc44470069a852e4e48b99eea6634f8fe955a614d",
+          "targetUnitDigest": "11b5fd2b3414b886311ac14bc44470069a852e4e48b99eea6634f8fe955a614d"
+        },
+        {
+          "claimId": "claim_95a80a0795c022a35a6c4cab36162212",
+          "sourceUnitDigest": "906ee80c6844c528b7eaea31d654097c6505755ed0ca61cced847754eabc37d9",
+          "targetUnitDigest": "906ee80c6844c528b7eaea31d654097c6505755ed0ca61cced847754eabc37d9"
+        },
+        {
+          "claimId": "claim_3ecf7e5c1cd8d15f2fd5b9aad8cd757a",
+          "sourceUnitDigest": "ab5c9ce426ce10434d21c88eb4f60374a2d383b5e305107831cf447f70f5df1e",
+          "targetUnitDigest": "ab5c9ce426ce10434d21c88eb4f60374a2d383b5e305107831cf447f70f5df1e"
+        },
+        {
+          "claimId": "claim_70a99786c85b21dc2666daa2f693496f",
+          "sourceUnitDigest": "dcea2526ea776527ad6b2f5a514f130a3d4ed4749cedb47560759404f2f4a344",
+          "targetUnitDigest": "dcea2526ea776527ad6b2f5a514f130a3d4ed4749cedb47560759404f2f4a344"
+        },
+        {
+          "claimId": "claim_253b820841ebd993852399db8baa0c7c",
+          "sourceUnitDigest": "17f4ef14fd0c1153b3f30439ca93915344531b724c808cf016d18ace6369e1f9",
+          "targetUnitDigest": "17f4ef14fd0c1153b3f30439ca93915344531b724c808cf016d18ace6369e1f9"
+        },
+        {
+          "claimId": "claim_ea926abe5836eeaf13fbca4d92441d15",
+          "sourceUnitDigest": "f92b908461a129b1e84a2710e985d0d32dc242843f09ee487ceef7d0f50e751a",
+          "targetUnitDigest": "f92b908461a129b1e84a2710e985d0d32dc242843f09ee487ceef7d0f50e751a"
+        },
+        {
+          "claimId": "claim_5af6691a8c98250700df5cd47e0713ce",
+          "sourceUnitDigest": "0302d157c549f1d8c62c5ec89fb25e86b9e9ce2944ad018be0658522339f4d6c",
+          "targetUnitDigest": "0302d157c549f1d8c62c5ec89fb25e86b9e9ce2944ad018be0658522339f4d6c"
+        },
+        {
+          "claimId": "claim_b0cb34da11e45837f8549102f9bdbe50",
+          "sourceUnitDigest": "3afbcd42d300d40c670db8bafd678cd592ff7df0f606631c958174493b54b755",
+          "targetUnitDigest": "3afbcd42d300d40c670db8bafd678cd592ff7df0f606631c958174493b54b755"
+        },
+        {
+          "claimId": "claim_2f0e2a8ac4441d7bd8386b8aadfecab4",
+          "sourceUnitDigest": "43fe6b2267f2685e25558f829341e92f5ad0e3d3a05cf77080a62ac4e5d93973",
+          "targetUnitDigest": "43fe6b2267f2685e25558f829341e92f5ad0e3d3a05cf77080a62ac4e5d93973"
+        },
+        {
+          "claimId": "claim_958b34bff001fbcbb0128c423601acfc",
+          "sourceUnitDigest": "5be6139c8ba040ed5f93526027600c5162b3a783dd0a4f34841a7ba46e36e295",
+          "targetUnitDigest": "5be6139c8ba040ed5f93526027600c5162b3a783dd0a4f34841a7ba46e36e295"
+        },
+        {
+          "claimId": "claim_847702ebd8588bc3790227c78e95171e",
+          "sourceUnitDigest": "a0be95327c8916e46f08a2d5948905b1ee3827e661d3598bda626bbbe73da174",
+          "targetUnitDigest": "a0be95327c8916e46f08a2d5948905b1ee3827e661d3598bda626bbbe73da174"
+        },
+        {
+          "claimId": "claim_44c95ea145b112d772ca9a8998fc1c66",
+          "sourceUnitDigest": "c7b96fa1797d4498e8f41fac9c691df732ae5560f40b478d6772146e6fba7488",
+          "targetUnitDigest": "c7b96fa1797d4498e8f41fac9c691df732ae5560f40b478d6772146e6fba7488"
+        },
+        {
+          "claimId": "claim_452b63c4422e4b894eb9332d98088940",
+          "sourceUnitDigest": "f82d464c6d15f83fc4b15afaf2a7cf17106876a6496a43d567fe89a133a79926",
+          "targetUnitDigest": "f82d464c6d15f83fc4b15afaf2a7cf17106876a6496a43d567fe89a133a79926"
+        },
+        {
+          "claimId": "claim_000460c5d92c957d71cf0f244e4c4364",
+          "sourceUnitDigest": "21073c1bf796fc780243da9bc5fedd8dce7f8a253f0132c5553e425294031ee1",
+          "targetUnitDigest": "21073c1bf796fc780243da9bc5fedd8dce7f8a253f0132c5553e425294031ee1"
+        },
+        {
+          "claimId": "claim_23a1ad04f659f87aa3def9c347c201c9",
+          "sourceUnitDigest": "3235ba37539cbac2d4088b2b8a49fd127815b7ee1dff669dcb6a3ef4ad0e91c4",
+          "targetUnitDigest": "3235ba37539cbac2d4088b2b8a49fd127815b7ee1dff669dcb6a3ef4ad0e91c4"
+        },
+        {
+          "claimId": "claim_f5b7ed6f84e462d2b5cfe95f6eece6eb",
+          "sourceUnitDigest": "5ebff28c5061fdcd8510d3e006b6b2c3aead1c63b4abdfa35e4fff327ffc2ed8",
+          "targetUnitDigest": "5ebff28c5061fdcd8510d3e006b6b2c3aead1c63b4abdfa35e4fff327ffc2ed8"
+        },
+        {
+          "claimId": "claim_85976753141a0685bcd32a60c405cb24",
+          "sourceUnitDigest": "7f40203333775d4ca561c153b069302f4b45634a63580f118d100ff0624c8c74",
+          "targetUnitDigest": "7f40203333775d4ca561c153b069302f4b45634a63580f118d100ff0624c8c74"
+        },
+        {
+          "claimId": "claim_405d558818e3cc2cbc8803dcbedb20d5",
+          "sourceUnitDigest": "6b9fa0d8beb5067f49f015997dd95ac4b46004f1c31eac2cee2beac898da1412",
+          "targetUnitDigest": "6b9fa0d8beb5067f49f015997dd95ac4b46004f1c31eac2cee2beac898da1412"
+        },
+        {
+          "claimId": "claim_f2972c1a0bcbd3cbdef0a81cefffe947",
+          "sourceUnitDigest": "d349a89c094edb84c317f0d2d0ad49d5ed8118dda787e2a33c45341b8e151522",
+          "targetUnitDigest": "d349a89c094edb84c317f0d2d0ad49d5ed8118dda787e2a33c45341b8e151522"
+        },
+        {
+          "claimId": "claim_0bf86a6067a79b97705fb2148d4b6eac",
+          "sourceUnitDigest": "933840d304d6de760c5b8d33127336cd703e389b7b06e1ebf301ccb4483959c2",
+          "targetUnitDigest": "933840d304d6de760c5b8d33127336cd703e389b7b06e1ebf301ccb4483959c2"
+        },
+        {
+          "claimId": "claim_3d606b74fe23abd4f113201a56bad33c",
+          "sourceUnitDigest": "f57e661d3479312df06e408b01bf2f58b40246b706a11e1c114b414d477cbef1",
+          "targetUnitDigest": "f57e661d3479312df06e408b01bf2f58b40246b706a11e1c114b414d477cbef1"
+        },
+        {
+          "claimId": "claim_136924b4d581988a073f35fa7084d2d8",
+          "sourceUnitDigest": "b53931c6d6fac6b48dc5be2a28712a818ead5a1ada7f3da5e5649018add44e8d",
+          "targetUnitDigest": "b53931c6d6fac6b48dc5be2a28712a818ead5a1ada7f3da5e5649018add44e8d"
+        },
+        {
+          "claimId": "claim_733230fee6f0d82532f2699e46ce9ee0",
+          "sourceUnitDigest": "47a66653b83704eca2ae011daea29360505b3bc2d1f2a5670983ffe742214a26",
+          "targetUnitDigest": "47a66653b83704eca2ae011daea29360505b3bc2d1f2a5670983ffe742214a26"
+        },
+        {
+          "claimId": "claim_5a2ec5021254b0f46b4246330911979a",
+          "sourceUnitDigest": "38413e5728b19f3822846ba77cc78d8a710f3dc204ca4ef0ccd4cd9e73405907",
+          "targetUnitDigest": "38413e5728b19f3822846ba77cc78d8a710f3dc204ca4ef0ccd4cd9e73405907"
+        },
+        {
+          "claimId": "claim_d9696c3e4347e9b5ca53136c30b47f09",
+          "sourceUnitDigest": "0f6ea4a34dc8586d59890ff557451d7da0079dd54b2a5de161eb189f0feb2586",
+          "targetUnitDigest": "0f6ea4a34dc8586d59890ff557451d7da0079dd54b2a5de161eb189f0feb2586"
+        },
+        {
+          "claimId": "claim_efa723a8c819ae55d4a6d546f7f6f9a8",
+          "sourceUnitDigest": "fb2c7953bdc07599e33929d0bf5106d90182ddc9d03de5a74f435e1b87bc40b9",
+          "targetUnitDigest": "fb2c7953bdc07599e33929d0bf5106d90182ddc9d03de5a74f435e1b87bc40b9"
+        },
+        {
+          "claimId": "claim_ac25919643fad856faf4f4afa1ae40e2",
+          "sourceUnitDigest": "eb6eefe7df72fd60d24afbc48cda3e6e078accf5f4649ed7977ad33e380ee5be",
+          "targetUnitDigest": "eb6eefe7df72fd60d24afbc48cda3e6e078accf5f4649ed7977ad33e380ee5be"
+        },
+        {
+          "claimId": "claim_cb02999a424e73756f5899feb27c8d22",
+          "sourceUnitDigest": "330ff236f1befbd17ea053760667422a95b7a23e00295729ed614073e1cbd138",
+          "targetUnitDigest": "330ff236f1befbd17ea053760667422a95b7a23e00295729ed614073e1cbd138"
+        },
+        {
+          "claimId": "claim_b5dddb10908dffe013964505afdaec17",
+          "sourceUnitDigest": "551d28b9485ebd0a96837986e21faca03faa9aeec2c6b3fd15dd8658447d0f6a",
+          "targetUnitDigest": "551d28b9485ebd0a96837986e21faca03faa9aeec2c6b3fd15dd8658447d0f6a"
+        },
+        {
+          "claimId": "claim_69818107478ebd9903cb2440edddac86",
+          "sourceUnitDigest": "ff30766c80aebd36285679c6d5603a6272441e028c5367e27b859c15f5c8c8d4",
+          "targetUnitDigest": "ff30766c80aebd36285679c6d5603a6272441e028c5367e27b859c15f5c8c8d4"
+        },
+        {
+          "claimId": "claim_1f2d14ca3d444e400a56365df502f21f",
+          "sourceUnitDigest": "f026477c2377c25cf8a17a54ecaa925ea2882dc420f572b5773f718824bb4601",
+          "targetUnitDigest": "f026477c2377c25cf8a17a54ecaa925ea2882dc420f572b5773f718824bb4601"
+        },
+        {
+          "claimId": "claim_dd30771966f40481e562ab00e9d8a445",
+          "sourceUnitDigest": "6453f691a941b3a0c005f506ce23f9412218557502f27e194b044d9681fca0dc",
+          "targetUnitDigest": "6453f691a941b3a0c005f506ce23f9412218557502f27e194b044d9681fca0dc"
+        },
+        {
+          "claimId": "claim_0b17a9df378bc37c01eb4b2f8668090f",
+          "sourceUnitDigest": "ee6dca083b337dc1cf57e8deaa8e8f26ae2df7cca0f631a33e19ee40c23f6bbe",
+          "targetUnitDigest": "ee6dca083b337dc1cf57e8deaa8e8f26ae2df7cca0f631a33e19ee40c23f6bbe"
+        },
+        {
+          "claimId": "claim_660c961c7badf5e12d2a55fe3705adaa",
+          "sourceUnitDigest": "da310eda13d93ee116af6dd998bef09185784e0a1492d73106c6339832887a01",
+          "targetUnitDigest": "da310eda13d93ee116af6dd998bef09185784e0a1492d73106c6339832887a01"
+        },
+        {
+          "claimId": "claim_e48c7491884f44e75e4fbbe0c3548ab5",
+          "sourceUnitDigest": "a774cd8b025e3a60da80d594b508787eff0053c4f2b707c3774b4d7b74910f62",
+          "targetUnitDigest": "a774cd8b025e3a60da80d594b508787eff0053c4f2b707c3774b4d7b74910f62"
+        },
+        {
+          "claimId": "claim_d42a10b1ede1bd5d96bd8170be63bcb2",
+          "sourceUnitDigest": "937a93a96d769c6905e6c324d7df573b0246f95d609d3da04449c86bd5e16381",
+          "targetUnitDigest": "937a93a96d769c6905e6c324d7df573b0246f95d609d3da04449c86bd5e16381"
+        },
+        {
+          "claimId": "claim_a7aa946ce5cd01066697d519b3db7005",
+          "sourceUnitDigest": "8434af61567587ddb4b73484482c06404cf069c81ba0b4031ff9e60e84fad893",
+          "targetUnitDigest": "8434af61567587ddb4b73484482c06404cf069c81ba0b4031ff9e60e84fad893"
+        },
+        {
+          "claimId": "claim_fe99d77f85175d66b6fce85ab09965d9",
+          "sourceUnitDigest": "a73a3956741bcb5ec651d46da9e5dd4d0cd335fe651a5c89dea4aa4f820cc4fd",
+          "targetUnitDigest": "a73a3956741bcb5ec651d46da9e5dd4d0cd335fe651a5c89dea4aa4f820cc4fd"
+        },
+        {
+          "claimId": "claim_0f8205b1e692677dcfef0b69b90b45a7",
+          "sourceUnitDigest": "b44568f4deaa68e8adfceaf12c875c0059b6d6b2a3a64963d8909059a77991ae",
+          "targetUnitDigest": "b44568f4deaa68e8adfceaf12c875c0059b6d6b2a3a64963d8909059a77991ae"
+        },
+        {
+          "claimId": "claim_fac4881683197ee61ff4c013739b6918",
+          "sourceUnitDigest": "56682ac78ede7b18801933239d544d11531982d2300442871740a50772dc8b74",
+          "targetUnitDigest": "56682ac78ede7b18801933239d544d11531982d2300442871740a50772dc8b74"
+        },
+        {
+          "claimId": "claim_003bf31165cf49c3a97a5321855366b7",
+          "sourceUnitDigest": "b6685c3cc6e22bb4d7331c9142c7de77a47e1a3c0a8c89fb756366680218f332",
+          "targetUnitDigest": "b6685c3cc6e22bb4d7331c9142c7de77a47e1a3c0a8c89fb756366680218f332"
+        },
+        {
+          "claimId": "claim_70b0c33264666f97b76f76c34be6a6bf",
+          "sourceUnitDigest": "f0585494868ecfbdee9ec0ca14b7176fae0c1c6e79eda4d4f292cfe800f2b59f",
+          "targetUnitDigest": "f0585494868ecfbdee9ec0ca14b7176fae0c1c6e79eda4d4f292cfe800f2b59f"
+        },
+        {
+          "claimId": "claim_f2999037234805d1c9edc1d069d1123c",
+          "sourceUnitDigest": "9b0d79e200320d1f53184ba9598a9d638e4c7465bbf0b5d38c3ad3a8ef909f27",
+          "targetUnitDigest": "9b0d79e200320d1f53184ba9598a9d638e4c7465bbf0b5d38c3ad3a8ef909f27"
+        },
+        {
+          "claimId": "claim_ace23bc5aa062e92a4307635f439153e",
+          "sourceUnitDigest": "c0278bc76ea786af6e05bd31d3a80ec8ef6145d3d5f191914782423bcf2f289e",
+          "targetUnitDigest": "c0278bc76ea786af6e05bd31d3a80ec8ef6145d3d5f191914782423bcf2f289e"
+        },
+        {
+          "claimId": "claim_0aeea371e7ee42859158686ea298e7be",
+          "sourceUnitDigest": "591c1fc28fdaa478483691128038c766cc27a8a3eb563553b1729910a21b5ae8",
+          "targetUnitDigest": "591c1fc28fdaa478483691128038c766cc27a8a3eb563553b1729910a21b5ae8"
+        },
+        {
+          "claimId": "claim_cca877d606ef3a44e0b30cf9fb7301d5",
+          "sourceUnitDigest": "9a2ed867cba036474c7c2ae3d0c09e8be9d81dccd5b11c4cbeba792b4d3cc163",
+          "targetUnitDigest": "9a2ed867cba036474c7c2ae3d0c09e8be9d81dccd5b11c4cbeba792b4d3cc163"
+        },
+        {
+          "claimId": "claim_916f441c504ed0c70b4e3eab2e9fd41d",
+          "sourceUnitDigest": "5640829fd00a9a3817a1103f4d89b1c06f94eab2bad7ad89a822f0651adaa5c7",
+          "targetUnitDigest": "5640829fd00a9a3817a1103f4d89b1c06f94eab2bad7ad89a822f0651adaa5c7"
+        },
+        {
+          "claimId": "claim_a36e58bef738971fe9679ffb9b3d3e2c",
+          "sourceUnitDigest": "5d71676304bc64eee61db4a12f6589309f99d2aa4ab2e91b539206ee219cf269",
+          "targetUnitDigest": "5d71676304bc64eee61db4a12f6589309f99d2aa4ab2e91b539206ee219cf269"
+        },
+        {
+          "claimId": "claim_ce6612093778199886c6c4a9c87dc6ed",
+          "sourceUnitDigest": "4f723d86a9ba1f5c70db5adb11ba3cbb3054fd7e82b2a743b88e5bd5dc82fa42",
+          "targetUnitDigest": "4f723d86a9ba1f5c70db5adb11ba3cbb3054fd7e82b2a743b88e5bd5dc82fa42"
+        },
+        {
+          "claimId": "claim_ff2c46348ab5d4e3c3bc1fb0cc691be5",
+          "sourceUnitDigest": "9d67cbf98f593719445dd87cc2cb3bca2c8793d1879753170686d4aa27a33261",
+          "targetUnitDigest": "9d67cbf98f593719445dd87cc2cb3bca2c8793d1879753170686d4aa27a33261"
+        },
+        {
+          "claimId": "claim_93dca46233dad68a2e121f81ede6214e",
+          "sourceUnitDigest": "8a4b8240db3f2e5a370c6214e4b7df21b42f80e7e8c3032408130fbdcfd961c0",
+          "targetUnitDigest": "8a4b8240db3f2e5a370c6214e4b7df21b42f80e7e8c3032408130fbdcfd961c0"
+        },
+        {
+          "claimId": "claim_aa4a6a5903b7d4ec6d21ac2899685f75",
+          "sourceUnitDigest": "142afbc0c00ad4b9a87416c9260f3f573cec6d9c63ff5029e23132f59ebc300b",
+          "targetUnitDigest": "142afbc0c00ad4b9a87416c9260f3f573cec6d9c63ff5029e23132f59ebc300b"
+        },
+        {
+          "claimId": "claim_04cb039a1a3df06542a18fc395fe0fce",
+          "sourceUnitDigest": "ef94a70f70d5b76fc6a1f3b7816319c58a3fc20fd398c90c6f5c1508930b0259",
+          "targetUnitDigest": "ef94a70f70d5b76fc6a1f3b7816319c58a3fc20fd398c90c6f5c1508930b0259"
+        },
+        {
+          "claimId": "claim_f212e2f5b6a7cc486366d36a2fdfb787",
+          "sourceUnitDigest": "00986d3362e30ca692d42d142bde7c66a9d4b19e8a0f0cdd6e212d94ffdf36a7",
+          "targetUnitDigest": "00986d3362e30ca692d42d142bde7c66a9d4b19e8a0f0cdd6e212d94ffdf36a7"
+        },
+        {
+          "claimId": "claim_b555797c9e51fedc8680b3c98529552b",
+          "sourceUnitDigest": "c5f7763f897e9d7229b294d040f8991250422f3512626fdd749c625c7bbb59c5",
+          "targetUnitDigest": "c5f7763f897e9d7229b294d040f8991250422f3512626fdd749c625c7bbb59c5"
+        },
+        {
+          "claimId": "claim_41e6d4fb29bea211fb149d01e136b6ba",
+          "sourceUnitDigest": "3746fef00c32237f72bbb9fa14cd8716e00123bbc2ee6021a7ba49a56534e3c4",
+          "targetUnitDigest": "3746fef00c32237f72bbb9fa14cd8716e00123bbc2ee6021a7ba49a56534e3c4"
+        },
+        {
+          "claimId": "claim_a1136f8c7f5231d53aed914124f11b25",
+          "sourceUnitDigest": "54d60c181f3b940a2616246b8f9212c6d04f28d8d92fee232330b26175ee650d",
+          "targetUnitDigest": "54d60c181f3b940a2616246b8f9212c6d04f28d8d92fee232330b26175ee650d"
+        },
+        {
+          "claimId": "claim_2fd3044f59a4017a9a882ef6d3666d98",
+          "sourceUnitDigest": "48b59c56e2402ef34ec0a5eed8d1b7ee3d091c27dfbaa662283cb3a0f6bcef9a",
+          "targetUnitDigest": "48b59c56e2402ef34ec0a5eed8d1b7ee3d091c27dfbaa662283cb3a0f6bcef9a"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "target": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+      "rows": [
+        {
+          "claimId": "claim_fdabe8317d09677c93583a2f6fcfb13b",
+          "sourceUnitDigest": "4a7d1fd427c825cb7614601e0ccea6848f957de7e80cd95d8d2d1f7937ee57c5",
+          "targetUnitDigest": "4a7d1fd427c825cb7614601e0ccea6848f957de7e80cd95d8d2d1f7937ee57c5"
+        },
+        {
+          "claimId": "claim_f987d05f64ce0581342cb7214cc6d4c6",
+          "sourceUnitDigest": "5c8449d39f743bdaf3148e28495d9dd74ef77ad064f49627c042bcf16a49908f",
+          "targetUnitDigest": "5c8449d39f743bdaf3148e28495d9dd74ef77ad064f49627c042bcf16a49908f"
+        },
+        {
+          "claimId": "claim_e7e0c0a781c2ca687af26236b65a2b53",
+          "sourceUnitDigest": "5cc64d22b9b5cf7c9420f1dbfbfe3f7e3875969ba1982f17e9c944bb97d10ae2",
+          "targetUnitDigest": "5cc64d22b9b5cf7c9420f1dbfbfe3f7e3875969ba1982f17e9c944bb97d10ae2"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "target": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "rows": [
+        {
+          "claimId": "claim_87a8e20171f5ea129c07216abaa88ae3",
+          "sourceUnitDigest": "be2d5cd1a1b8111fd75408799caf10c1c4bd041d6f8193fb56f48aa1b6d980a7",
+          "targetUnitDigest": "be2d5cd1a1b8111fd75408799caf10c1c4bd041d6f8193fb56f48aa1b6d980a7"
+        },
+        {
+          "claimId": "claim_6815677d659ff1de2706cd4431809076",
+          "sourceUnitDigest": "0455b7260ce5eef0dcf1fc91cc70b47465413193a7d590aa325966ba900d22a0",
+          "targetUnitDigest": "0455b7260ce5eef0dcf1fc91cc70b47465413193a7d590aa325966ba900d22a0"
+        },
+        {
+          "claimId": "claim_08c543b310b6676fd400c6406ee1ea7e",
+          "sourceUnitDigest": "9f0622e835ddff3641445e61c54581793a346631b4984c4411ef6e0cce80c41a",
+          "targetUnitDigest": "9f0622e835ddff3641445e61c54581793a346631b4984c4411ef6e0cce80c41a"
+        },
+        {
+          "claimId": "claim_04eedf1732d9c05f95743f7f1dd66eb8",
+          "sourceUnitDigest": "a1d32d26fd13b069cfee47c077d86f113fc0d89ede1e14108f12893fe34c21a5",
+          "targetUnitDigest": "a1d32d26fd13b069cfee47c077d86f113fc0d89ede1e14108f12893fe34c21a5"
+        },
+        {
+          "claimId": "claim_26ea6d0a9f60ed7038571960931522e4",
+          "sourceUnitDigest": "b099005a754c6891b38f50e074a99b12d4891b0ac37438b5ddc780cf8c385b17",
+          "targetUnitDigest": "b099005a754c6891b38f50e074a99b12d4891b0ac37438b5ddc780cf8c385b17"
+        },
+        {
+          "claimId": "claim_ffbe3ccb05e3d7efa7f2dc64bc6b773d",
+          "sourceUnitDigest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
+          "targetUnitDigest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0"
+        },
+        {
+          "claimId": "claim_4971a286d9cc1d1c5ccce8ce8895ffdd",
+          "sourceUnitDigest": "8cd22a3e63175767baf048debb198e96994cdc5eea5676b7976f34ca1e71b45c",
+          "targetUnitDigest": "8cd22a3e63175767baf048debb198e96994cdc5eea5676b7976f34ca1e71b45c"
+        },
+        {
+          "claimId": "claim_8ece00a5f406f41a6b9dde33f68cad99",
+          "sourceUnitDigest": "91993baef19377eabf83c06f3248184c75700844012ff58396f2ea013174b0de",
+          "targetUnitDigest": "91993baef19377eabf83c06f3248184c75700844012ff58396f2ea013174b0de"
+        },
+        {
+          "claimId": "claim_e4e43ee6b6eeaeedea4830b2b5c40d63",
+          "sourceUnitDigest": "87ee37739fdb72edb9be1272ddb45cad9e970ebeb0f47e06de766e9f739cfb61",
+          "targetUnitDigest": "87ee37739fdb72edb9be1272ddb45cad9e970ebeb0f47e06de766e9f739cfb61"
+        },
+        {
+          "claimId": "claim_c87e11a8aee72a0032d6114050cc938b",
+          "sourceUnitDigest": "6cd4224612f0952656002ddfe52ccbceb9c9e073a50ce4c1bd8d64a9739e8762",
+          "targetUnitDigest": "6cd4224612f0952656002ddfe52ccbceb9c9e073a50ce4c1bd8d64a9739e8762"
+        },
+        {
+          "claimId": "claim_8629743bfe348fa482c312bf7e719d3e",
+          "sourceUnitDigest": "bc74e5a1ea16b7b2f3be5ac092bdc087cef2ea19aaab1807dfe6f3e1de9f005e",
+          "targetUnitDigest": "bc74e5a1ea16b7b2f3be5ac092bdc087cef2ea19aaab1807dfe6f3e1de9f005e"
+        },
+        {
+          "claimId": "claim_63bf836c7f59d066cebb391e0992df22",
+          "sourceUnitDigest": "c51044db9659c91fc71dc86eb56bcc495d19474dfbb38a5bfb0a061e70559f94",
+          "targetUnitDigest": "c51044db9659c91fc71dc86eb56bcc495d19474dfbb38a5bfb0a061e70559f94"
+        },
+        {
+          "claimId": "claim_61aab764fcb2a851f42701a751f8056f",
+          "sourceUnitDigest": "f0e60bfa5e65aed4c6addbbaf5d3c56a4f9f98de7d8ff8d021aec556a546a02b",
+          "targetUnitDigest": "f0e60bfa5e65aed4c6addbbaf5d3c56a4f9f98de7d8ff8d021aec556a546a02b"
+        },
+        {
+          "claimId": "claim_91aad94411505e6cbce2d8644e96ea8f",
+          "sourceUnitDigest": "dc4ade546c9ee1f40f4e2a069c1fe82fc9b5974b3819dbd153f4e96e850eddb9",
+          "targetUnitDigest": "dc4ade546c9ee1f40f4e2a069c1fe82fc9b5974b3819dbd153f4e96e850eddb9"
+        },
+        {
+          "claimId": "claim_f0ec7615d740111a44f13f14b7773cf0",
+          "sourceUnitDigest": "c28f632d0a1800d2eb45f986f95e3f363edc79041f52275fe93cba850c23dde4",
+          "targetUnitDigest": "c28f632d0a1800d2eb45f986f95e3f363edc79041f52275fe93cba850c23dde4"
+        },
+        {
+          "claimId": "claim_cd1174a5441ad6bbe37d63af141e4802",
+          "sourceUnitDigest": "161c55804dac88a96ae171bfec32ef4b49bb77fe681a40b055f40e72833ec3a7",
+          "targetUnitDigest": "161c55804dac88a96ae171bfec32ef4b49bb77fe681a40b055f40e72833ec3a7"
+        },
+        {
+          "claimId": "claim_5556df6c79c17c04c18f2152ed1b7a2c",
+          "sourceUnitDigest": "f696d3f07756b39512a373f55423b716915bd3aa5e21aa2a3d4fb899a0a88b59",
+          "targetUnitDigest": "f696d3f07756b39512a373f55423b716915bd3aa5e21aa2a3d4fb899a0a88b59"
+        },
+        {
+          "claimId": "claim_e2fb8e8fbb8b70b4f84a2178bcd095b9",
+          "sourceUnitDigest": "209bf52f1da9d8fe37960099e61c93b83051096be4cb4df047c542b362260ce0",
+          "targetUnitDigest": "209bf52f1da9d8fe37960099e61c93b83051096be4cb4df047c542b362260ce0"
+        },
+        {
+          "claimId": "claim_babea8bed5ce5ab310d750a47ee2e725",
+          "sourceUnitDigest": "c3662d5447aee9f430a56096d9a25009cc66922d00f1eea267b62cc82901a880",
+          "targetUnitDigest": "c3662d5447aee9f430a56096d9a25009cc66922d00f1eea267b62cc82901a880"
+        },
+        {
+          "claimId": "claim_758f06fc7e3245a20be89d50d075560b",
+          "sourceUnitDigest": "667d15523fcc06fc16c90dd67b422494f8f6a3c32562502cc6a0cb3dffd4b4c0",
+          "targetUnitDigest": "667d15523fcc06fc16c90dd67b422494f8f6a3c32562502cc6a0cb3dffd4b4c0"
+        },
+        {
+          "claimId": "claim_5050bc37d0c1cd5e3bb841460704b5b5",
+          "sourceUnitDigest": "f3abca10325bf457400dfdff7b2dfbdf9edf6d1cd80473573082773e950335a3",
+          "targetUnitDigest": "f3abca10325bf457400dfdff7b2dfbdf9edf6d1cd80473573082773e950335a3"
+        },
+        {
+          "claimId": "claim_58ad462f1c96d9f65d4013893cf9e2cd",
+          "sourceUnitDigest": "7d4f2ca690febaa8358bb84cb57a17a28990e902dd1bf0f5551c125b20cc3ace",
+          "targetUnitDigest": "7d4f2ca690febaa8358bb84cb57a17a28990e902dd1bf0f5551c125b20cc3ace"
+        },
+        {
+          "claimId": "claim_8ba35b30c644f950ec48867d94125669",
+          "sourceUnitDigest": "9f2de19c2c2e1cd4bea92af3c3ea2c62c62d68ac553c2b6ac07f5b1b2b313644",
+          "targetUnitDigest": "9f2de19c2c2e1cd4bea92af3c3ea2c62c62d68ac553c2b6ac07f5b1b2b313644"
+        },
+        {
+          "claimId": "claim_efa5aae24691d58e0885c552cedaf88e",
+          "sourceUnitDigest": "ce76ae1f657c0c280ad229ff3f8616e2f42657feb405885ade92638ee868c387",
+          "targetUnitDigest": "ce76ae1f657c0c280ad229ff3f8616e2f42657feb405885ade92638ee868c387"
+        },
+        {
+          "claimId": "claim_774279345777bdbad08abc9e383b9e94",
+          "sourceUnitDigest": "56ae2af1d3636993937e58cdb0231ca63d9d26e140b5385de2d26e46700b1940",
+          "targetUnitDigest": "56ae2af1d3636993937e58cdb0231ca63d9d26e140b5385de2d26e46700b1940"
+        },
+        {
+          "claimId": "claim_cdd9de43685066e78e30cda91bc92683",
+          "sourceUnitDigest": "1df64f9c1a645183bdf2b1a30b58ad94982b2bf4c831b603d11cb935b78a569a",
+          "targetUnitDigest": "1df64f9c1a645183bdf2b1a30b58ad94982b2bf4c831b603d11cb935b78a569a"
+        },
+        {
+          "claimId": "claim_fe88234409590877971a5259538ff050",
+          "sourceUnitDigest": "22151572fee963c054bb6b2c523d550ffac1928a19c4e3822b830f521d3e1848",
+          "targetUnitDigest": "22151572fee963c054bb6b2c523d550ffac1928a19c4e3822b830f521d3e1848"
+        },
+        {
+          "claimId": "claim_0e4598bf9ad1832675e4c05f901e585d",
+          "sourceUnitDigest": "b53b292b938cb7d94af3f8f19b0bc64c395260eccb79c799402347262a7cf11a",
+          "targetUnitDigest": "b53b292b938cb7d94af3f8f19b0bc64c395260eccb79c799402347262a7cf11a"
+        },
+        {
+          "claimId": "claim_51e25f6d9e1fde0a1d9e394289fac594",
+          "sourceUnitDigest": "26ea10868929ae20c03c50efce2d0531b4a71b2b1a2e2365f43a52a63fc8cf96",
+          "targetUnitDigest": "26ea10868929ae20c03c50efce2d0531b4a71b2b1a2e2365f43a52a63fc8cf96"
+        },
+        {
+          "claimId": "claim_7d6d3ec06bba3dbca10ca3b3f570da89",
+          "sourceUnitDigest": "b6944b59e9f91779d090e6e615f9dc08a6f048350bd716ae0e4e4eacc8e35974",
+          "targetUnitDigest": "b6944b59e9f91779d090e6e615f9dc08a6f048350bd716ae0e4e4eacc8e35974"
+        },
+        {
+          "claimId": "claim_9241ac9254e54d888828c33f035879d8",
+          "sourceUnitDigest": "a7c407203d1941afb48cebe57395c68f0268018b3e7019ef208411753f4d0c36",
+          "targetUnitDigest": "a7c407203d1941afb48cebe57395c68f0268018b3e7019ef208411753f4d0c36"
+        },
+        {
+          "claimId": "claim_635d04d1867803cdea18ba3baac56a7c",
+          "sourceUnitDigest": "f22f10f16304dc6cc62b297e7f28f957e3b3fad97ecefe479935defff589503e",
+          "targetUnitDigest": "f22f10f16304dc6cc62b297e7f28f957e3b3fad97ecefe479935defff589503e"
+        },
+        {
+          "claimId": "claim_a238f04cd2ccfd08908403529595e125",
+          "sourceUnitDigest": "b9abc5ee2212edf6cdb8064ae8345672438e4b01abc1f2a17f5e1bb020484d0a",
+          "targetUnitDigest": "b9abc5ee2212edf6cdb8064ae8345672438e4b01abc1f2a17f5e1bb020484d0a"
+        },
+        {
+          "claimId": "claim_77931f3088df6a4cce31afeb4a6367b0",
+          "sourceUnitDigest": "03f17f1bc26295b30b4ce37913cf17a0d72c3f70a0a88140442f6871ad00c702",
+          "targetUnitDigest": "03f17f1bc26295b30b4ce37913cf17a0d72c3f70a0a88140442f6871ad00c702"
+        },
+        {
+          "claimId": "claim_6cee23bb97bc281383192eac6d39547f",
+          "sourceUnitDigest": "14127594f11f9269ad8ebd4f86078e1f9bcd2818857f7c4ba33474e9e8530f42",
+          "targetUnitDigest": "14127594f11f9269ad8ebd4f86078e1f9bcd2818857f7c4ba33474e9e8530f42"
+        },
+        {
+          "claimId": "claim_e81e834bbb38a41e65852aea7b980b45",
+          "sourceUnitDigest": "3176ecf6076d8d848837859ca08402933baa040a50d1022a21a8cdbb4b574b15",
+          "targetUnitDigest": "3176ecf6076d8d848837859ca08402933baa040a50d1022a21a8cdbb4b574b15"
+        },
+        {
+          "claimId": "claim_85fca76200eefee0c21ae02e6480173c",
+          "sourceUnitDigest": "4375495f7a8a6f0ceac5306d5798fb457e90addd55ced151cb7fa07875bf3eb5",
+          "targetUnitDigest": "4375495f7a8a6f0ceac5306d5798fb457e90addd55ced151cb7fa07875bf3eb5"
+        },
+        {
+          "claimId": "claim_fb43c109a8099ae17955738f5d928e84",
+          "sourceUnitDigest": "2b1cff7cbaa4843ddf5d185fe7872794368bddfbc8dea319dafa0b54ccf447d6",
+          "targetUnitDigest": "2b1cff7cbaa4843ddf5d185fe7872794368bddfbc8dea319dafa0b54ccf447d6"
+        },
+        {
+          "claimId": "claim_f7d8fb386d26b2a846ae06dca3bed0c1",
+          "sourceUnitDigest": "9af9af7df6b3e55f6e8c53be342dd2ea5535cf2a01577bb2d1b81a713e0446ce",
+          "targetUnitDigest": "9af9af7df6b3e55f6e8c53be342dd2ea5535cf2a01577bb2d1b81a713e0446ce"
+        },
+        {
+          "claimId": "claim_0df9d113fc933f4e42d7b5d88caa28f1",
+          "sourceUnitDigest": "07926777a7b2c467498b3c62d44de8d8e5fbe7a50a2c7b738672e9a398266146",
+          "targetUnitDigest": "07926777a7b2c467498b3c62d44de8d8e5fbe7a50a2c7b738672e9a398266146"
+        },
+        {
+          "claimId": "claim_821573805afb676a7e5a06932106bf2c",
+          "sourceUnitDigest": "21e46167b08050751129369726cf10dc0d4f63dc5b83432f23f716d55a7b2b6a",
+          "targetUnitDigest": "21e46167b08050751129369726cf10dc0d4f63dc5b83432f23f716d55a7b2b6a"
+        },
+        {
+          "claimId": "claim_1b739ffb835c9e7414918fba9f1d24be",
+          "sourceUnitDigest": "2b864305f68998b73ee60e05b330ed5a0b3611b08e4dd03afa2214a23535b68a",
+          "targetUnitDigest": "2b864305f68998b73ee60e05b330ed5a0b3611b08e4dd03afa2214a23535b68a"
+        },
+        {
+          "claimId": "claim_a22c31d9ea164cda90c7c78eec09e2a6",
+          "sourceUnitDigest": "9bad586edb2988e6e71e969359925b4d23801b6f9e8d3e81d7008cce63a98ff3",
+          "targetUnitDigest": "9bad586edb2988e6e71e969359925b4d23801b6f9e8d3e81d7008cce63a98ff3"
+        },
+        {
+          "claimId": "claim_cbc988d61080b570c203c67af040b5c5",
+          "sourceUnitDigest": "0fcd0bf043f8a5867a867563bc866394c4a645d37570e458363937f25da5e89c",
+          "targetUnitDigest": "0fcd0bf043f8a5867a867563bc866394c4a645d37570e458363937f25da5e89c"
+        },
+        {
+          "claimId": "claim_79e925df74dea1db5263459da3a81991",
+          "sourceUnitDigest": "2cd7f6a7457719a3dde860d1f09c24ca8466acb4cca31c53a411cff4a60e1c12",
+          "targetUnitDigest": "2cd7f6a7457719a3dde860d1f09c24ca8466acb4cca31c53a411cff4a60e1c12"
+        },
+        {
+          "claimId": "claim_3ea507796b05f8dfd3c8f7c90331fd3f",
+          "sourceUnitDigest": "671832e190f205b82c1d8fc115b85aa5d03f33ad114b17abf28f19b6adadfc64",
+          "targetUnitDigest": "671832e190f205b82c1d8fc115b85aa5d03f33ad114b17abf28f19b6adadfc64"
+        },
+        {
+          "claimId": "claim_fc8bcd66091db0c07030ec616804d2b3",
+          "sourceUnitDigest": "edf9a97da11bb6978ef95942920b9813d6e3d9cbac866f9c6ad8f1d9bd43b24f",
+          "targetUnitDigest": "edf9a97da11bb6978ef95942920b9813d6e3d9cbac866f9c6ad8f1d9bd43b24f"
+        },
+        {
+          "claimId": "claim_98afe7103952e5a74be51e15be4457e6",
+          "sourceUnitDigest": "2865168a78f308d1db9a602490f90c4fc51b87181c79f24eac6e988f713c8350",
+          "targetUnitDigest": "2865168a78f308d1db9a602490f90c4fc51b87181c79f24eac6e988f713c8350"
+        },
+        {
+          "claimId": "claim_5cef2891b9b5069a15ae7e8fa9492c20",
+          "sourceUnitDigest": "defddab3be62a78244eda91b2dd3e26ad3f68aea1570c6bfaa4371ee81b397cd",
+          "targetUnitDigest": "defddab3be62a78244eda91b2dd3e26ad3f68aea1570c6bfaa4371ee81b397cd"
+        },
+        {
+          "claimId": "claim_0b8e27848da791e6d19331d5debb12c7",
+          "sourceUnitDigest": "ed2b9e1a7423751e6bb73534ebd1c8d1a994950205c9976ee1b1086957446079",
+          "targetUnitDigest": "ed2b9e1a7423751e6bb73534ebd1c8d1a994950205c9976ee1b1086957446079"
+        },
+        {
+          "claimId": "claim_93a8ecadd9441ac528a09ec2dbf34f33",
+          "sourceUnitDigest": "235746379359526236d0a28f185e6fa99df159b289131d23e8947ea42e29764f",
+          "targetUnitDigest": "235746379359526236d0a28f185e6fa99df159b289131d23e8947ea42e29764f"
+        },
+        {
+          "claimId": "claim_bf65f7ee1774fc61a3171e4d8b8d8237",
+          "sourceUnitDigest": "997afccab7423ab2744f3ae3ee052e2d39470a1c25d67336b1ada59119870223",
+          "targetUnitDigest": "997afccab7423ab2744f3ae3ee052e2d39470a1c25d67336b1ada59119870223"
+        },
+        {
+          "claimId": "claim_b2b308a4b4cfdab3c4d4b623ad962a5c",
+          "sourceUnitDigest": "2d08e724fce8340fc3c8d257670977f394fccf38ab9af4cf8a412726becd3715",
+          "targetUnitDigest": "2d08e724fce8340fc3c8d257670977f394fccf38ab9af4cf8a412726becd3715"
+        },
+        {
+          "claimId": "claim_2982d435866829760b4d4b97764ca7ef",
+          "sourceUnitDigest": "c7ddbdd553a5f2998f1472dbd257b49684426fe6e5832f566a5acdc96af9c90a",
+          "targetUnitDigest": "c7ddbdd553a5f2998f1472dbd257b49684426fe6e5832f566a5acdc96af9c90a"
+        },
+        {
+          "claimId": "claim_686c6e93534bddd80576472600382711",
+          "sourceUnitDigest": "5ce207053f5b99ab0e93135ae8b07bc78a6cf0bed86c2c03e45209105f404a95",
+          "targetUnitDigest": "5ce207053f5b99ab0e93135ae8b07bc78a6cf0bed86c2c03e45209105f404a95"
+        },
+        {
+          "claimId": "claim_226a7ad735b6d38b293ee830d59c0e68",
+          "sourceUnitDigest": "0c62898f3a5e3b88397ee7ea058a55d96dbe7cd761259a524273e545cbd14539",
+          "targetUnitDigest": "0c62898f3a5e3b88397ee7ea058a55d96dbe7cd761259a524273e545cbd14539"
+        },
+        {
+          "claimId": "claim_86a9c4ca388e167193351db139d881be",
+          "sourceUnitDigest": "9b40884abd9be84f22a60573d2ce994e014f869f28a39c5347182e52a1c7d937",
+          "targetUnitDigest": "9b40884abd9be84f22a60573d2ce994e014f869f28a39c5347182e52a1c7d937"
+        },
+        {
+          "claimId": "claim_81d322f404fef44f086f4f7cdf9567fc",
+          "sourceUnitDigest": "a7def3f89b648431aa8ee932ceab037486ad91f6d9cd0815bad5371377557e90",
+          "targetUnitDigest": "a7def3f89b648431aa8ee932ceab037486ad91f6d9cd0815bad5371377557e90"
+        },
+        {
+          "claimId": "claim_1decf030998bc50bbfbab97ee3030dc3",
+          "sourceUnitDigest": "7de686c26bfdb22b2ed6ee3618bfedcfd321d617fd3afe82695b03c2a40cb013",
+          "targetUnitDigest": "7de686c26bfdb22b2ed6ee3618bfedcfd321d617fd3afe82695b03c2a40cb013"
+        },
+        {
+          "claimId": "claim_960e50865fb5600c482ac9c4e4d49a80",
+          "sourceUnitDigest": "9137b2396b79c3f76e880895400768187b8cbf0be2bb3e55c35670700c21b657",
+          "targetUnitDigest": "9137b2396b79c3f76e880895400768187b8cbf0be2bb3e55c35670700c21b657"
+        },
+        {
+          "claimId": "claim_1b046b594d32f0704a7e23181e30e398",
+          "sourceUnitDigest": "c9981eb3b9b9be76a6524e3d99bcc02b5b26fe62e718434843f3d0b3f468f571",
+          "targetUnitDigest": "c9981eb3b9b9be76a6524e3d99bcc02b5b26fe62e718434843f3d0b3f468f571"
+        },
+        {
+          "claimId": "claim_8c1510d418920bb9e6c0360140b5b6f3",
+          "sourceUnitDigest": "c0e8a9b6474bb75f341c24cee61c7c4d2472f068f00c4cf6dd8f806ac78917ce",
+          "targetUnitDigest": "c0e8a9b6474bb75f341c24cee61c7c4d2472f068f00c4cf6dd8f806ac78917ce"
+        },
+        {
+          "claimId": "claim_5de814df972e56db94befe06a9fdf025",
+          "sourceUnitDigest": "7f634b7a1f0d43ae7f3e577b2026ebb1222965afc5edef015f359de7068781c4",
+          "targetUnitDigest": "7f634b7a1f0d43ae7f3e577b2026ebb1222965afc5edef015f359de7068781c4"
+        },
+        {
+          "claimId": "claim_37f56b2301eeb0a8eb3f8a5876d1bd8f",
+          "sourceUnitDigest": "bad25e157b9edc32cceb85528036fd48d44b694d5c25e502ecea65ebbf739950",
+          "targetUnitDigest": "bad25e157b9edc32cceb85528036fd48d44b694d5c25e502ecea65ebbf739950"
+        },
+        {
+          "claimId": "claim_89b16c3d846e8e5d3c8126dfb24eeb7e",
+          "sourceUnitDigest": "c59c257eae2bb98f30b7f1f4828e17f9dd97486aa2973377c2576314c78c8fc4",
+          "targetUnitDigest": "c59c257eae2bb98f30b7f1f4828e17f9dd97486aa2973377c2576314c78c8fc4"
+        },
+        {
+          "claimId": "claim_236557a4e57c4aad9e0ff5bf9c5c46f8",
+          "sourceUnitDigest": "692463204027fb0fb422e459f99ecdd5c3672d6cd93552c95807ecebc89574b4",
+          "targetUnitDigest": "692463204027fb0fb422e459f99ecdd5c3672d6cd93552c95807ecebc89574b4"
+        },
+        {
+          "claimId": "claim_35d852f9e8e4e9655dc4bfd17fac9ffe",
+          "sourceUnitDigest": "85dee83d5cba03de992d5ab60664758c27acdb253679083e92f6f09d1e0b7e62",
+          "targetUnitDigest": "85dee83d5cba03de992d5ab60664758c27acdb253679083e92f6f09d1e0b7e62"
+        },
+        {
+          "claimId": "claim_fce73a99c37fc57e9ffeaa979f1cea5f",
+          "sourceUnitDigest": "580093dc4ca12d0de4d1be38c271dcf84388959689aa8cb53d508160bcaff941",
+          "targetUnitDigest": "580093dc4ca12d0de4d1be38c271dcf84388959689aa8cb53d508160bcaff941"
+        },
+        {
+          "claimId": "claim_f15a560158ab1edb1a71ba86a32e19a2",
+          "sourceUnitDigest": "230a15909862031beb5b70c006b30c5a4a5e55d655ac8c72e488a78f757dcd72",
+          "targetUnitDigest": "230a15909862031beb5b70c006b30c5a4a5e55d655ac8c72e488a78f757dcd72"
+        },
+        {
+          "claimId": "claim_010fc4065993e258884b02a38d99ff08",
+          "sourceUnitDigest": "d047acd26b948755b702903dc5016e9c2e5b5ba1a61dab3ed384cb3c6fd3b699",
+          "targetUnitDigest": "d047acd26b948755b702903dc5016e9c2e5b5ba1a61dab3ed384cb3c6fd3b699"
+        },
+        {
+          "claimId": "claim_c37794f560066e47dd00f97c3f21b920",
+          "sourceUnitDigest": "b1247deba0cf3ef5da89c69d424f74cb9c9ae9f8b511b4ed992ffaadcce4e28b",
+          "targetUnitDigest": "b1247deba0cf3ef5da89c69d424f74cb9c9ae9f8b511b4ed992ffaadcce4e28b"
+        },
+        {
+          "claimId": "claim_83a3bb74e5392850c22317a4e88e1cdc",
+          "sourceUnitDigest": "690b583f2c415d672cd4bddddfe2a61bc30af5da2affa16d7d3f710fdc2ad666",
+          "targetUnitDigest": "690b583f2c415d672cd4bddddfe2a61bc30af5da2affa16d7d3f710fdc2ad666"
+        },
+        {
+          "claimId": "claim_2f2e134ce7d03a206262e12fc4c58538",
+          "sourceUnitDigest": "924c4ccd4692905f2bf0072050a06d4a1699c8893d13b499e9e855fcf75ea81b",
+          "targetUnitDigest": "924c4ccd4692905f2bf0072050a06d4a1699c8893d13b499e9e855fcf75ea81b"
+        },
+        {
+          "claimId": "claim_1d8ddd11ec0c414626c3f1218ee12bb6",
+          "sourceUnitDigest": "2b4cced50ce891a47cfb1ab32b7073babd11f1ed6099021f90da2ce2567db1b9",
+          "targetUnitDigest": "2b4cced50ce891a47cfb1ab32b7073babd11f1ed6099021f90da2ce2567db1b9"
+        },
+        {
+          "claimId": "claim_88bbac9ba458de0a5a5b69f243c7dadc",
+          "sourceUnitDigest": "568d95be4b7db83dee85d9af1eddba0dc8363a9bf36c2065defbd8069d172ef1",
+          "targetUnitDigest": "568d95be4b7db83dee85d9af1eddba0dc8363a9bf36c2065defbd8069d172ef1"
+        },
+        {
+          "claimId": "claim_62747117b38bc317e45987a8c4c473f5",
+          "sourceUnitDigest": "c28235b82fe6319ce91da08aecb41d32bfdcdf7b5a0c91281556aa56b0834a0c",
+          "targetUnitDigest": "c28235b82fe6319ce91da08aecb41d32bfdcdf7b5a0c91281556aa56b0834a0c"
+        },
+        {
+          "claimId": "claim_7a6ca9774fab3711843f1aa306cc9fe6",
+          "sourceUnitDigest": "5294649a68c71f07fa2c805a1b9d7c3da789eb40812e33a83120900f4bf855f0",
+          "targetUnitDigest": "5294649a68c71f07fa2c805a1b9d7c3da789eb40812e33a83120900f4bf855f0"
+        },
+        {
+          "claimId": "claim_a6d727db74f97b1915c0960743df3952",
+          "sourceUnitDigest": "a7f54dce7634cad0425b8ce825f973b1316e9ec5b264ab87500030fe087c9a3a",
+          "targetUnitDigest": "a7f54dce7634cad0425b8ce825f973b1316e9ec5b264ab87500030fe087c9a3a"
+        },
+        {
+          "claimId": "claim_0130b3c40ec51219d6f5340c4ba35e22",
+          "sourceUnitDigest": "911619ad50c303e0c91854ad81a4b9d9eb836ee676a8f306dad3ced7c353be24",
+          "targetUnitDigest": "911619ad50c303e0c91854ad81a4b9d9eb836ee676a8f306dad3ced7c353be24"
+        },
+        {
+          "claimId": "claim_71c2d87b65e2f94a8f26992281a6751e",
+          "sourceUnitDigest": "28a7abdd74f73211bdacc175bbc07ae78c7d2694f56cd90a319f7c94a5af7011",
+          "targetUnitDigest": "28a7abdd74f73211bdacc175bbc07ae78c7d2694f56cd90a319f7c94a5af7011"
+        },
+        {
+          "claimId": "claim_748d5222ad5437e772512197179919ca",
+          "sourceUnitDigest": "951b7bef2c5ae05a38c6c639675c82e8d55ae71e3026292a055e7fe171dc0a2d",
+          "targetUnitDigest": "951b7bef2c5ae05a38c6c639675c82e8d55ae71e3026292a055e7fe171dc0a2d"
+        },
+        {
+          "claimId": "claim_029fc5c528d1416289d7fc7def127e2d",
+          "sourceUnitDigest": "26ff51b9623958d887e86bae4c1ed7367056e92eb0cc5b1d29899d05216a5522",
+          "targetUnitDigest": "26ff51b9623958d887e86bae4c1ed7367056e92eb0cc5b1d29899d05216a5522"
+        },
+        {
+          "claimId": "claim_e53c31a6f45303e3166730d5302e0abc",
+          "sourceUnitDigest": "7798f4b48570f81377d024f7bdb55d0e2f3340e2c814706df71831efd6744710",
+          "targetUnitDigest": "7798f4b48570f81377d024f7bdb55d0e2f3340e2c814706df71831efd6744710"
+        },
+        {
+          "claimId": "claim_4cd4e20d837bbff864a93c3004dcc4ad",
+          "sourceUnitDigest": "627238d2f4aa14218e2099a0055b9919ad31ef28d90e78a9ef6828f632869fdf",
+          "targetUnitDigest": "627238d2f4aa14218e2099a0055b9919ad31ef28d90e78a9ef6828f632869fdf"
+        },
+        {
+          "claimId": "claim_c44b414c167775c19d70a19add1b04f7",
+          "sourceUnitDigest": "c3781145844090be841361414716125bf13095279fc4ca673d01627fde3b6792",
+          "targetUnitDigest": "c3781145844090be841361414716125bf13095279fc4ca673d01627fde3b6792"
+        },
+        {
+          "claimId": "claim_51b914696f4d7afc7b6146bdac652862",
+          "sourceUnitDigest": "08999336377b0aa4123300c4abcb9135e1b6cbd8b01b94d475358b6cb45a8faf",
+          "targetUnitDigest": "08999336377b0aa4123300c4abcb9135e1b6cbd8b01b94d475358b6cb45a8faf"
+        },
+        {
+          "claimId": "claim_21db64c8005cda2fc8b2119ffb164525",
+          "sourceUnitDigest": "1f445aec43618736dfe4b402c60ca9ec75e2a3de0435d148234699e99500833e",
+          "targetUnitDigest": "1f445aec43618736dfe4b402c60ca9ec75e2a3de0435d148234699e99500833e"
+        },
+        {
+          "claimId": "claim_89a4acf85e502b13a5053e6e770b1cfd",
+          "sourceUnitDigest": "31944a4606f7295f44a6f971ebd1148285b81d323cfde4f9e7f3307ac04c7b80",
+          "targetUnitDigest": "31944a4606f7295f44a6f971ebd1148285b81d323cfde4f9e7f3307ac04c7b80"
+        },
+        {
+          "claimId": "claim_87c3bd9cb38c78332ec643a78bad1647",
+          "sourceUnitDigest": "01754fa057af9543efdd5c8ce800d4d05dd0118ace8d29ccb1300a34eb40ab27",
+          "targetUnitDigest": "01754fa057af9543efdd5c8ce800d4d05dd0118ace8d29ccb1300a34eb40ab27"
+        },
+        {
+          "claimId": "claim_b36a38466d28162bad6b0d70822ec0d3",
+          "sourceUnitDigest": "0b2e079dbd8a57f9ea29f4529bc1d31dcc44ec29b1a18c89fc5d6c0a36ca0711",
+          "targetUnitDigest": "0b2e079dbd8a57f9ea29f4529bc1d31dcc44ec29b1a18c89fc5d6c0a36ca0711"
+        },
+        {
+          "claimId": "claim_f0c134e6d316fe9c3fd9796c8db98970",
+          "sourceUnitDigest": "930de1671a1761fd86dcdd3362c0be6ec73191f49a22eaddad934edff0878259",
+          "targetUnitDigest": "930de1671a1761fd86dcdd3362c0be6ec73191f49a22eaddad934edff0878259"
+        },
+        {
+          "claimId": "claim_fd4e0f3cc0822ad40a1ec72822a4c9b7",
+          "sourceUnitDigest": "ec7c08e7eb297ff3dff473140a70327302897acd454c440433c467971a95bbbd",
+          "targetUnitDigest": "ec7c08e7eb297ff3dff473140a70327302897acd454c440433c467971a95bbbd"
+        },
+        {
+          "claimId": "claim_00e007841acb36a8d04f545f8a459b2b",
+          "sourceUnitDigest": "306df6a1e3996fb4dcd1691a734ea741717f5ddeed650f155c7c6cf616f63dba",
+          "targetUnitDigest": "306df6a1e3996fb4dcd1691a734ea741717f5ddeed650f155c7c6cf616f63dba"
+        },
+        {
+          "claimId": "claim_4ad17f3903bc30faeb8d8e4f33b07d73",
+          "sourceUnitDigest": "8e2f4c63728f70458ca97c0a3b491a02334827f19f4d9b87394bea8ab5fa8b53",
+          "targetUnitDigest": "8e2f4c63728f70458ca97c0a3b491a02334827f19f4d9b87394bea8ab5fa8b53"
+        },
+        {
+          "claimId": "claim_77414fb78ac7d82b9f63dfb098cf3c1d",
+          "sourceUnitDigest": "21e9382a133afff883763e224b63f3cbe749b87b93e25cafc4c6f8d74cc465dc",
+          "targetUnitDigest": "21e9382a133afff883763e224b63f3cbe749b87b93e25cafc4c6f8d74cc465dc"
+        },
+        {
+          "claimId": "claim_ee7dc3f8d4915ce3d92217df1f465286",
+          "sourceUnitDigest": "724b08ba1c87d60c8c1f1d2c781ae9904a5bfa96f59d8aa10a5cca6b05c13df8",
+          "targetUnitDigest": "724b08ba1c87d60c8c1f1d2c781ae9904a5bfa96f59d8aa10a5cca6b05c13df8"
+        },
+        {
+          "claimId": "claim_3feea562793706324e03c322cb189ab6",
+          "sourceUnitDigest": "f3276baa174325f13b6c327497cfc46f7fb55f0203d4cb9f59838864d1168e1e",
+          "targetUnitDigest": "f3276baa174325f13b6c327497cfc46f7fb55f0203d4cb9f59838864d1168e1e"
+        },
+        {
+          "claimId": "claim_d3a9e4b12a5703a99d242e516b744033",
+          "sourceUnitDigest": "5fb7a8ad9ff1691130c8bdf99791741dd1077ea2a14e299d170ad1403531ac55",
+          "targetUnitDigest": "5fb7a8ad9ff1691130c8bdf99791741dd1077ea2a14e299d170ad1403531ac55"
+        },
+        {
+          "claimId": "claim_f670f80e2b38554a723773249db6d4d4",
+          "sourceUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
+          "targetUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e"
+        },
+        {
+          "claimId": "claim_d982b6401e2558aa687313c8787bab64",
+          "sourceUnitDigest": "26a8a9eb46d26c7611e9237c60cadc71ec4653d7a24ecfee7fac1ac866750669",
+          "targetUnitDigest": "26a8a9eb46d26c7611e9237c60cadc71ec4653d7a24ecfee7fac1ac866750669"
+        },
+        {
+          "claimId": "claim_43e756dd2a6730cd5192ea5bc23572bf",
+          "sourceUnitDigest": "5ef803005d11631da46cb3914da57f231eaffd322cbf668d0a7eb3170fbba91b",
+          "targetUnitDigest": "5ef803005d11631da46cb3914da57f231eaffd322cbf668d0a7eb3170fbba91b"
+        },
+        {
+          "claimId": "claim_5ab21de1cfa2eba3a0c8e7b04aae6eb8",
+          "sourceUnitDigest": "a9c35ffd9dc30be54e2721584635d8e9319c65b20e9f0505efec75820f3203fe",
+          "targetUnitDigest": "a9c35ffd9dc30be54e2721584635d8e9319c65b20e9f0505efec75820f3203fe"
+        },
+        {
+          "claimId": "claim_8646032efe0ed1eec4425dd92592f2cc",
+          "sourceUnitDigest": "6c649113e3a288d6501e9930c6f50283f442d2932f2a2bfa62048b5bac84284c",
+          "targetUnitDigest": "6c649113e3a288d6501e9930c6f50283f442d2932f2a2bfa62048b5bac84284c"
+        },
+        {
+          "claimId": "claim_77dd68444aca918a990bde84d2652b52",
+          "sourceUnitDigest": "8562f51a91dfdedfa65a6a741a184bfe3dd733d2e1e82707110e3670d1966a84",
+          "targetUnitDigest": "8562f51a91dfdedfa65a6a741a184bfe3dd733d2e1e82707110e3670d1966a84"
+        },
+        {
+          "claimId": "claim_ba4412449b4122e4a09fa57ff558e4d6",
+          "sourceUnitDigest": "efad6583089cd40c01352d7bad5deaf98ad6e1ef6bbc1e23b8a83fa8d3e3fe0f",
+          "targetUnitDigest": "efad6583089cd40c01352d7bad5deaf98ad6e1ef6bbc1e23b8a83fa8d3e3fe0f"
+        },
+        {
+          "claimId": "claim_032b0e7648d2e53c6ec886972cc9c9c7",
+          "sourceUnitDigest": "2a1efb78c776000231bffaf7ecb7486add2256590b575b751cb64c0b0c13c63e",
+          "targetUnitDigest": "2a1efb78c776000231bffaf7ecb7486add2256590b575b751cb64c0b0c13c63e"
+        },
+        {
+          "claimId": "claim_380a87bdf51191f8a6b1b2ffc36a093c",
+          "sourceUnitDigest": "5a1a5a90cf486c15843148a1b0a07d6dbd12089fb6804a857eb09d377af92dcc",
+          "targetUnitDigest": "5a1a5a90cf486c15843148a1b0a07d6dbd12089fb6804a857eb09d377af92dcc"
+        },
+        {
+          "claimId": "claim_a9fe5a98d66e6619b311c9bcba45a0f9",
+          "sourceUnitDigest": "418e2e428d7265b6b3d33c0a44ad3c15246f847ab6aaddfaa127db91a165ef1a",
+          "targetUnitDigest": "418e2e428d7265b6b3d33c0a44ad3c15246f847ab6aaddfaa127db91a165ef1a"
+        },
+        {
+          "claimId": "claim_8e5d67f1016e167b50e17abecd5dec38",
+          "sourceUnitDigest": "daeb728ba83ebc397d4a2439e80c61fe536321f38baf900bd4d2df5c04e810a6",
+          "targetUnitDigest": "daeb728ba83ebc397d4a2439e80c61fe536321f38baf900bd4d2df5c04e810a6"
+        },
+        {
+          "claimId": "claim_6d4149f0428338ebf15d5aa7bcedeb16",
+          "sourceUnitDigest": "8cf0b269164fd5241f283684d6214c42ea1669651b0ef5301f4a99ba9429c7ac",
+          "targetUnitDigest": "8cf0b269164fd5241f283684d6214c42ea1669651b0ef5301f4a99ba9429c7ac"
+        },
+        {
+          "claimId": "claim_b11c1af3d8c19b4205fa110593d862a8",
+          "sourceUnitDigest": "8b8f94b7fdda481965aa7c17f777d3ad8fe687c09d92e0f03f4d35f869313d19",
+          "targetUnitDigest": "8b8f94b7fdda481965aa7c17f777d3ad8fe687c09d92e0f03f4d35f869313d19"
+        },
+        {
+          "claimId": "claim_7452b052e86d7ee48da8f8ddb60ff67e",
+          "sourceUnitDigest": "f7ff0202b284ff35917c68438e12d4c891377c8d488f67e446d5cabd40d2b5ae",
+          "targetUnitDigest": "f7ff0202b284ff35917c68438e12d4c891377c8d488f67e446d5cabd40d2b5ae"
+        },
+        {
+          "claimId": "claim_bce6f8fad62d393cc4161f2c2c7291f9",
+          "sourceUnitDigest": "2e8d6c5ec4d3b42e9aeb8cfa1dd26a65ff1239d7e8d22554195aa07607936758",
+          "targetUnitDigest": "2e8d6c5ec4d3b42e9aeb8cfa1dd26a65ff1239d7e8d22554195aa07607936758"
+        },
+        {
+          "claimId": "claim_2fa44d58b56b27cb498f619cb8b51aef",
+          "sourceUnitDigest": "a57bcfd50a3e1d077a8cd4389f110578bb643af242aa5ca620f47da63d87ad88",
+          "targetUnitDigest": "a57bcfd50a3e1d077a8cd4389f110578bb643af242aa5ca620f47da63d87ad88"
+        },
+        {
+          "claimId": "claim_4bd3cdcd56d4faa0885f8eb4498db6fb",
+          "sourceUnitDigest": "3e784d4f3c02855979fee676825a1d70e2dccbde4a96b928292d0bd93d459493",
+          "targetUnitDigest": "3e784d4f3c02855979fee676825a1d70e2dccbde4a96b928292d0bd93d459493"
+        },
+        {
+          "claimId": "claim_cc41f9f376c66be170f8f5bda72c7d04",
+          "sourceUnitDigest": "aca63a4dc2a5f7999909f0fba1ee2b4f21f05eb1cba3c03471dfb97f8de77caa",
+          "targetUnitDigest": "aca63a4dc2a5f7999909f0fba1ee2b4f21f05eb1cba3c03471dfb97f8de77caa"
+        },
+        {
+          "claimId": "claim_ed66ba2338022a5d333917a8a9f018a4",
+          "sourceUnitDigest": "d526f1c5c2b4e3924f0ff5e21532d3f8d791957fec9c80603677a41df4fefe8a",
+          "targetUnitDigest": "d526f1c5c2b4e3924f0ff5e21532d3f8d791957fec9c80603677a41df4fefe8a"
+        },
+        {
+          "claimId": "claim_379b0642b463b9640571fc53c7567fe6",
+          "sourceUnitDigest": "929bccdb58125039e51aa0cc0d5614f8a2a97d2157583b5f24c5c9f54effb610",
+          "targetUnitDigest": "929bccdb58125039e51aa0cc0d5614f8a2a97d2157583b5f24c5c9f54effb610"
+        },
+        {
+          "claimId": "claim_7f76726f2f9da439574600c6408976b7",
+          "sourceUnitDigest": "d2003baa07e6dfee4ebb31f5d1e3153e5e36f092fb198cdd7dd582721f133a80",
+          "targetUnitDigest": "d2003baa07e6dfee4ebb31f5d1e3153e5e36f092fb198cdd7dd582721f133a80"
+        },
+        {
+          "claimId": "claim_f80e5e9e2d41886ec16d4a6a3803aa42",
+          "sourceUnitDigest": "66aecd2b138e54ffa521d820a749d277de0994dfcad3556509785a4c5b5e2355",
+          "targetUnitDigest": "66aecd2b138e54ffa521d820a749d277de0994dfcad3556509785a4c5b5e2355"
+        },
+        {
+          "claimId": "claim_7b9dfb2c59b449a3e0b49fb49d73efdd",
+          "sourceUnitDigest": "1c8681b6d8379441a99336882c7c604221f9143b50f287302ec65e8e74000d39",
+          "targetUnitDigest": "1c8681b6d8379441a99336882c7c604221f9143b50f287302ec65e8e74000d39"
+        },
+        {
+          "claimId": "claim_29682b288745170253dcb769e8dd8fea",
+          "sourceUnitDigest": "3fcce6b4cb60c0dcdcc76b55750da4b64492b00f6ac23a905540b63975e5980b",
+          "targetUnitDigest": "3fcce6b4cb60c0dcdcc76b55750da4b64492b00f6ac23a905540b63975e5980b"
+        },
+        {
+          "claimId": "claim_09752881a14e416f42994c347c4b23ca",
+          "sourceUnitDigest": "cc9aed692c5ebeef6b9bd10bb5f79ee2aded7eb93a89c34b7b0c2feb20af33c1",
+          "targetUnitDigest": "cc9aed692c5ebeef6b9bd10bb5f79ee2aded7eb93a89c34b7b0c2feb20af33c1"
+        },
+        {
+          "claimId": "claim_8634e0bf14a536ab7f74b5492b370959",
+          "sourceUnitDigest": "1510095a47864429f30abc057681c51186e344bd8d7e81b2f74f8a1da9dc00b3",
+          "targetUnitDigest": "1510095a47864429f30abc057681c51186e344bd8d7e81b2f74f8a1da9dc00b3"
+        },
+        {
+          "claimId": "claim_9522a0977cb843805711f279027934b0",
+          "sourceUnitDigest": "0aa6753737b470f573f1c8827533476fb734bc59d37b7a976712ffc1f3a61553",
+          "targetUnitDigest": "0aa6753737b470f573f1c8827533476fb734bc59d37b7a976712ffc1f3a61553"
+        },
+        {
+          "claimId": "claim_a509719228fc2cf4024152d8283f9492",
+          "sourceUnitDigest": "107651069eac97898ac7cc33ca37b18206c3b6a1592b977568484a4ca8a0f9a2",
+          "targetUnitDigest": "107651069eac97898ac7cc33ca37b18206c3b6a1592b977568484a4ca8a0f9a2"
+        },
+        {
+          "claimId": "claim_a9e49786ef525fa7456fa203c288732c",
+          "sourceUnitDigest": "837deee88ee4cc1e694888ddad6620e5e327a039e8e4912f689633dd61b3e798",
+          "targetUnitDigest": "837deee88ee4cc1e694888ddad6620e5e327a039e8e4912f689633dd61b3e798"
+        },
+        {
+          "claimId": "claim_f9587d979887748c32527a403378e73b",
+          "sourceUnitDigest": "fea6bbce004176423d3a8bd5273d5e45db3a0baa9f3961ae982fa341c650aad3",
+          "targetUnitDigest": "fea6bbce004176423d3a8bd5273d5e45db3a0baa9f3961ae982fa341c650aad3"
+        },
+        {
+          "claimId": "claim_bf3b1b00a655b260f7ea2ca3b3b12751",
+          "sourceUnitDigest": "e28697f9e9895c41d0e681c7dd55d7d92709fab17a775ea6d85f89456146989f",
+          "targetUnitDigest": "e28697f9e9895c41d0e681c7dd55d7d92709fab17a775ea6d85f89456146989f"
+        },
+        {
+          "claimId": "claim_9b4dad71c68b659cadc4f5b4cea50831",
+          "sourceUnitDigest": "8f91d840a28babe9d7290f53fc2949b505bb58ef3243f9c2e82f9fbbfdb930cd",
+          "targetUnitDigest": "8f91d840a28babe9d7290f53fc2949b505bb58ef3243f9c2e82f9fbbfdb930cd"
+        },
+        {
+          "claimId": "claim_ebaffad9989ab83432a1dbdda523fe69",
+          "sourceUnitDigest": "a333a50af91fa9f8b88353c3a49455bfb6356728c1e0baed0b04da7d9521ec7d",
+          "targetUnitDigest": "a333a50af91fa9f8b88353c3a49455bfb6356728c1e0baed0b04da7d9521ec7d"
+        },
+        {
+          "claimId": "claim_e7d7fbf96ea8c263aeca8a504b373425",
+          "sourceUnitDigest": "79574d2f72e64afcfa1b0b1451751cf7cdd6f466a5b1a033a4e7657ea37406ae",
+          "targetUnitDigest": "79574d2f72e64afcfa1b0b1451751cf7cdd6f466a5b1a033a4e7657ea37406ae"
+        },
+        {
+          "claimId": "claim_06f3dda173fae1c8b12b31f4d0fd2486",
+          "sourceUnitDigest": "2521903fcbd49ce740bd71ee92c7f113c5f80d631295d2ae33be1191387c908f",
+          "targetUnitDigest": "2521903fcbd49ce740bd71ee92c7f113c5f80d631295d2ae33be1191387c908f"
+        },
+        {
+          "claimId": "claim_2b04df534d5ccf208509aac0356a217b",
+          "sourceUnitDigest": "dc97787d7cca7ba4b8b710f5a0f3707fa06ad484f1666406c97181f775dd74f4",
+          "targetUnitDigest": "dc97787d7cca7ba4b8b710f5a0f3707fa06ad484f1666406c97181f775dd74f4"
+        },
+        {
+          "claimId": "claim_282d3e28484d29e8dc3c0b0c05114388",
+          "sourceUnitDigest": "0cf85c311803252e8b181e68066ecb7e8008646d77302f1ae882ad6219f6b09d",
+          "targetUnitDigest": "0cf85c311803252e8b181e68066ecb7e8008646d77302f1ae882ad6219f6b09d"
+        },
+        {
+          "claimId": "claim_21fababa7533abb1db1379a92c36c229",
+          "sourceUnitDigest": "d0257701c3cea131afc0e03ec3b0c1d0d6017e5aba8399ecb7a1eb1197bbf7f3",
+          "targetUnitDigest": "d0257701c3cea131afc0e03ec3b0c1d0d6017e5aba8399ecb7a1eb1197bbf7f3"
+        },
+        {
+          "claimId": "claim_09d872165774e22233bead06f2a7c3ce",
+          "sourceUnitDigest": "44b552e232ab6391fc3b603cf33deb7699a8decb40008d8d0f54142200f8a1df",
+          "targetUnitDigest": "44b552e232ab6391fc3b603cf33deb7699a8decb40008d8d0f54142200f8a1df"
+        },
+        {
+          "claimId": "claim_7e8e01911f427c420058d455b10dd5cb",
+          "sourceUnitDigest": "65290b7fd472cec07e7f2661ef1fe20cbc771dbec0c452929c3c2516d4df89e0",
+          "targetUnitDigest": "65290b7fd472cec07e7f2661ef1fe20cbc771dbec0c452929c3c2516d4df89e0"
+        },
+        {
+          "claimId": "claim_d774810c35e8aaaecf6aeb8109c3f8a9",
+          "sourceUnitDigest": "06e6cadc5ddba481da98293d8a296c829eec737fd9919d18802171d5219bd08a",
+          "targetUnitDigest": "06e6cadc5ddba481da98293d8a296c829eec737fd9919d18802171d5219bd08a"
+        },
+        {
+          "claimId": "claim_fb6cf3771419bbabc1c3c607b7f626ba",
+          "sourceUnitDigest": "b99e1c501d07a9bccb9c019313dbb3a12575ff9ed33ab0dec4034457b2937733",
+          "targetUnitDigest": "b99e1c501d07a9bccb9c019313dbb3a12575ff9ed33ab0dec4034457b2937733"
+        },
+        {
+          "claimId": "claim_83a1f078df18a384b4d6307114a8243e",
+          "sourceUnitDigest": "5f3a99b396ec67e974cf97d58579d68ef25972a9f96ace35187a2fcd88bad197",
+          "targetUnitDigest": "5f3a99b396ec67e974cf97d58579d68ef25972a9f96ace35187a2fcd88bad197"
+        },
+        {
+          "claimId": "claim_f86ccdff06cc798c1c87551481b8e6b4",
+          "sourceUnitDigest": "f76a0975b5b3ab8e8baf8598c5228493bbeb100053be51336d051c83797a9e6b",
+          "targetUnitDigest": "f76a0975b5b3ab8e8baf8598c5228493bbeb100053be51336d051c83797a9e6b"
+        },
+        {
+          "claimId": "claim_b450b3fbead0465e23815b07be167834",
+          "sourceUnitDigest": "551cc46629783bda6f1ba0ceeae0daac675359f9a6c1fed9d277661ab6fe61c2",
+          "targetUnitDigest": "551cc46629783bda6f1ba0ceeae0daac675359f9a6c1fed9d277661ab6fe61c2"
+        },
+        {
+          "claimId": "claim_3a49f8d9f83f79cabab5d619bf32aeb4",
+          "sourceUnitDigest": "e3acdb9ee3794e5c5524ad63f8dfa396d6b7f09847505f6efca90b121270d3b1",
+          "targetUnitDigest": "e3acdb9ee3794e5c5524ad63f8dfa396d6b7f09847505f6efca90b121270d3b1"
+        },
+        {
+          "claimId": "claim_27f645dfcd8d8748cbe85e43e6e382ef",
+          "sourceUnitDigest": "c99a560d949748752b7578832a14f792cd6ada3d09e4b49a9a9a1b73c7697357",
+          "targetUnitDigest": "c99a560d949748752b7578832a14f792cd6ada3d09e4b49a9a9a1b73c7697357"
+        },
+        {
+          "claimId": "claim_a313f88b57e9719499d0b5d5ba28f7c1",
+          "sourceUnitDigest": "5a0c337f54cfb0f8d1098be7c473ffe21cc2f416e1535244a93360d64d086591",
+          "targetUnitDigest": "5a0c337f54cfb0f8d1098be7c473ffe21cc2f416e1535244a93360d64d086591"
+        },
+        {
+          "claimId": "claim_83a268d8e281dec682d09eeac1f42c47",
+          "sourceUnitDigest": "cc4d2b0ffc3c6beda49552bf4c4bb1b05ba7654f8055731854c3af65ea570a09",
+          "targetUnitDigest": "cc4d2b0ffc3c6beda49552bf4c4bb1b05ba7654f8055731854c3af65ea570a09"
+        },
+        {
+          "claimId": "claim_a40f85c878663e0ea064b68039576aa1",
+          "sourceUnitDigest": "71f5982108260dbaada4e6a1e622fefddcbd3babe48cffa540ce4175af1b2d97",
+          "targetUnitDigest": "71f5982108260dbaada4e6a1e622fefddcbd3babe48cffa540ce4175af1b2d97"
+        },
+        {
+          "claimId": "claim_1fa0b4c133f38bd639599d72cf20e06f",
+          "sourceUnitDigest": "4bfe811c63b723a8f2b78e83256f9328d09034b780bd5c9bc5c1c26b2cd75dca",
+          "targetUnitDigest": "4bfe811c63b723a8f2b78e83256f9328d09034b780bd5c9bc5c1c26b2cd75dca"
+        },
+        {
+          "claimId": "claim_d68df466efec5fbec32770491d1e6090",
+          "sourceUnitDigest": "986a6e3af077d413022f5b723b7a97c91b5fccc4bcfd692df9872fe14492130d",
+          "targetUnitDigest": "986a6e3af077d413022f5b723b7a97c91b5fccc4bcfd692df9872fe14492130d"
+        },
+        {
+          "claimId": "claim_c2e569fc4693b363d7ff9abc87f6f72a",
+          "sourceUnitDigest": "13beea4e0b7d78db5d7a89d465ba54e0a81ee9230192044d961c485e1042ee48",
+          "targetUnitDigest": "13beea4e0b7d78db5d7a89d465ba54e0a81ee9230192044d961c485e1042ee48"
+        },
+        {
+          "claimId": "claim_47a4301bdf708d31162ce06bf2f27299",
+          "sourceUnitDigest": "fe307fec839bb0ef29d3b06144ee7d546763f3fd0aa86686efcc325ba0920fcc",
+          "targetUnitDigest": "fe307fec839bb0ef29d3b06144ee7d546763f3fd0aa86686efcc325ba0920fcc"
+        },
+        {
+          "claimId": "claim_82e76f262221cad75b709c3111bcd5f1",
+          "sourceUnitDigest": "f928a448c91b71267a3e186165c4ae3dd903119413932a00b1fae343818eaa6c",
+          "targetUnitDigest": "f928a448c91b71267a3e186165c4ae3dd903119413932a00b1fae343818eaa6c"
+        },
+        {
+          "claimId": "claim_07f4152c722b21971ac629d7ee0b0f1a",
+          "sourceUnitDigest": "70f410b1a74148269755cb7d27fcfc80c16da68e908e5ee0ee61096d58f72a54",
+          "targetUnitDigest": "70f410b1a74148269755cb7d27fcfc80c16da68e908e5ee0ee61096d58f72a54"
+        },
+        {
+          "claimId": "claim_309ebbb7d96bbc048538a43e67fb4a41",
+          "sourceUnitDigest": "d356fd1bdd36001ec7b5354c638fb575e9de1218bacae662a0134b4d373e1f72",
+          "targetUnitDigest": "d356fd1bdd36001ec7b5354c638fb575e9de1218bacae662a0134b4d373e1f72"
+        },
+        {
+          "claimId": "claim_e8f838f1d0d053e5005ed9cd79ad3796",
+          "sourceUnitDigest": "7560471c06591e60b2818c93a8df7e36db417dd3dd40afa6fb1726112287ff9f",
+          "targetUnitDigest": "7560471c06591e60b2818c93a8df7e36db417dd3dd40afa6fb1726112287ff9f"
+        },
+        {
+          "claimId": "claim_0d02e9937d0a64fbfd1c0f28417eaa8c",
+          "sourceUnitDigest": "834a2e61455fa005c57d0a09798a6b99042e8061d36d73711c96246e23f2ea59",
+          "targetUnitDigest": "834a2e61455fa005c57d0a09798a6b99042e8061d36d73711c96246e23f2ea59"
+        },
+        {
+          "claimId": "claim_913b8bae9d7a2ffa3ed1634ecd3c8401",
+          "sourceUnitDigest": "6b6e52c3141caf5589ccfe3276d78c336506f100c333425c90b98dccaa29b395",
+          "targetUnitDigest": "6b6e52c3141caf5589ccfe3276d78c336506f100c333425c90b98dccaa29b395"
+        },
+        {
+          "claimId": "claim_d573b4a60eb8bdba0da54d16a3bea672",
+          "sourceUnitDigest": "a7cac19334e6d4b4fa5342b2b7872c34c0ee703c4bb3e9d207841af176b7e3e8",
+          "targetUnitDigest": "a7cac19334e6d4b4fa5342b2b7872c34c0ee703c4bb3e9d207841af176b7e3e8"
+        },
+        {
+          "claimId": "claim_058a68b78db24488f58076747b6c1e20",
+          "sourceUnitDigest": "cf23320e92ad6c5c6392b6a42cf7443e6163eabb622d11e19d87777ba74f6c8b",
+          "targetUnitDigest": "cf23320e92ad6c5c6392b6a42cf7443e6163eabb622d11e19d87777ba74f6c8b"
+        },
+        {
+          "claimId": "claim_c14a45bb58bca0b513f17cdb7ee5d132",
+          "sourceUnitDigest": "44e4f0d74440f2bdd6ded800fe4cae372500b9d2202e4348208a14d048b65ead",
+          "targetUnitDigest": "44e4f0d74440f2bdd6ded800fe4cae372500b9d2202e4348208a14d048b65ead"
+        },
+        {
+          "claimId": "claim_3793cc2bd6bb1cddc17a6f295c6412b6",
+          "sourceUnitDigest": "8dca4bd66ef080b8a9c9a377f99f452fa45a5dad53acd050d01602cf32375433",
+          "targetUnitDigest": "8dca4bd66ef080b8a9c9a377f99f452fa45a5dad53acd050d01602cf32375433"
+        },
+        {
+          "claimId": "claim_89a300d53dffdb8160b68c5e70a087b2",
+          "sourceUnitDigest": "1ed9f423e4c74a7ae6425dce62263024edefa6450dbb88caa99365ce0522f40f",
+          "targetUnitDigest": "1ed9f423e4c74a7ae6425dce62263024edefa6450dbb88caa99365ce0522f40f"
+        },
+        {
+          "claimId": "claim_581ac5503bc33db1070b18be114aca4d",
+          "sourceUnitDigest": "4ba856ef6e869c3ee70e5df8efed4668a3772047cbe32ad723275ecad9003c6f",
+          "targetUnitDigest": "4ba856ef6e869c3ee70e5df8efed4668a3772047cbe32ad723275ecad9003c6f"
+        },
+        {
+          "claimId": "claim_bbbd024d32c9fb7bd2e5402d5036287a",
+          "sourceUnitDigest": "52d088db813dbaed7ed00bafa878d9dc0d0ecc0a6e0e9630473e4bf68f1fdc03",
+          "targetUnitDigest": "52d088db813dbaed7ed00bafa878d9dc0d0ecc0a6e0e9630473e4bf68f1fdc03"
+        },
+        {
+          "claimId": "claim_7ee37d2613cc4228ce2f4f4f94bbc286",
+          "sourceUnitDigest": "23a01f39154d325f632a31a3825cf1e2d1acba27a62e47b3d58e9bfc8530dbd2",
+          "targetUnitDigest": "23a01f39154d325f632a31a3825cf1e2d1acba27a62e47b3d58e9bfc8530dbd2"
+        },
+        {
+          "claimId": "claim_f8e352467aedf46b361bfc0fe18424f8",
+          "sourceUnitDigest": "82cb58c201cb6833ee63d999ec9e765d4c744691cb24e2764d5f670bebd6399f",
+          "targetUnitDigest": "82cb58c201cb6833ee63d999ec9e765d4c744691cb24e2764d5f670bebd6399f"
+        },
+        {
+          "claimId": "claim_1cbd697458d08eef9ee98dd45372a467",
+          "sourceUnitDigest": "a55231c3a7bb7ce6a0ad1c5103f5e2ffbd4b940b8398cc0a783d75b39f6c14ec",
+          "targetUnitDigest": "a55231c3a7bb7ce6a0ad1c5103f5e2ffbd4b940b8398cc0a783d75b39f6c14ec"
+        },
+        {
+          "claimId": "claim_066ce0a69ea5ce2010e48eeb41295394",
+          "sourceUnitDigest": "45c0753809beed41694c2600a2031b3717d85193e15b87214e377902c872caec",
+          "targetUnitDigest": "45c0753809beed41694c2600a2031b3717d85193e15b87214e377902c872caec"
+        },
+        {
+          "claimId": "claim_3aa7a442ecf4eb223d5ac771a7889fcb",
+          "sourceUnitDigest": "4647560833ea246957803fb1c83c06b57cc0a15be93d21eb2ea9826f9818ed34",
+          "targetUnitDigest": "4647560833ea246957803fb1c83c06b57cc0a15be93d21eb2ea9826f9818ed34"
+        },
+        {
+          "claimId": "claim_9204eea79cdecd6f9eee56eaf9b5a566",
+          "sourceUnitDigest": "1d85b555b2593d67773abcd65dc181f02fcb8751527678c95793437215988ef4",
+          "targetUnitDigest": "1d85b555b2593d67773abcd65dc181f02fcb8751527678c95793437215988ef4"
+        },
+        {
+          "claimId": "claim_8ac667509f8badefafa51552c6ef44b6",
+          "sourceUnitDigest": "888d1d9db317bb0ae7966efa80459add85b60e126534df09edb20ca29cd387a4",
+          "targetUnitDigest": "888d1d9db317bb0ae7966efa80459add85b60e126534df09edb20ca29cd387a4"
+        },
+        {
+          "claimId": "claim_6ff1e89a846a4e931180c5dd94147ebd",
+          "sourceUnitDigest": "56f57de20f619a417e618b960382539d4219d04bf92d646e0d80b89405d5e389",
+          "targetUnitDigest": "56f57de20f619a417e618b960382539d4219d04bf92d646e0d80b89405d5e389"
+        },
+        {
+          "claimId": "claim_18163b2d3d8aa4468f5d59179481e5f2",
+          "sourceUnitDigest": "2692aeaba5a264d0be78a95a168a857e01b8520950a18a02ee7cb86c98396671",
+          "targetUnitDigest": "2692aeaba5a264d0be78a95a168a857e01b8520950a18a02ee7cb86c98396671"
+        },
+        {
+          "claimId": "claim_04cc1f8458eb2219f368dfccf5cf9f68",
+          "sourceUnitDigest": "992483ac45d31e8737fecb03a8bb0bb01d927f1311995a437260f688362096b5",
+          "targetUnitDigest": "992483ac45d31e8737fecb03a8bb0bb01d927f1311995a437260f688362096b5"
+        },
+        {
+          "claimId": "claim_c895c42942ac9f31e2b24b8b50cf2e43",
+          "sourceUnitDigest": "0c693c8248c462db73c5a0a8402d2e063e0c11e6247e1d2bb35cbf53a26a84a1",
+          "targetUnitDigest": "0c693c8248c462db73c5a0a8402d2e063e0c11e6247e1d2bb35cbf53a26a84a1"
+        },
+        {
+          "claimId": "claim_c01a31276aa486d85a2d10f889028a48",
+          "sourceUnitDigest": "557e60966d7972a30800e6cc0676b5278d6ddec1ae53f9cd081dd9c27ef27146",
+          "targetUnitDigest": "557e60966d7972a30800e6cc0676b5278d6ddec1ae53f9cd081dd9c27ef27146"
+        },
+        {
+          "claimId": "claim_8455668efca6bf65d2528661eeeacc26",
+          "sourceUnitDigest": "bb90a6c8ef259eaef934156d950e0d96591bd95cf7a2f78a5e2bb6cacad55f33",
+          "targetUnitDigest": "bb90a6c8ef259eaef934156d950e0d96591bd95cf7a2f78a5e2bb6cacad55f33"
+        },
+        {
+          "claimId": "claim_a800e2db86530eaaaa7af5f2308d226c",
+          "sourceUnitDigest": "8e99e17ce3ab2e3ecfed843fb8cdca857bacc10ce7b5c88718acbb104216fe04",
+          "targetUnitDigest": "8e99e17ce3ab2e3ecfed843fb8cdca857bacc10ce7b5c88718acbb104216fe04"
+        },
+        {
+          "claimId": "claim_df1b0da46cf8babcfd0ce5f33e49dd6b",
+          "sourceUnitDigest": "41c9bfdaf5ccbfed1d9ab2a670f252f248b7df534bdbcc4f2fd76523d2887164",
+          "targetUnitDigest": "41c9bfdaf5ccbfed1d9ab2a670f252f248b7df534bdbcc4f2fd76523d2887164"
+        },
+        {
+          "claimId": "claim_3dc72886315b5531012a979d21dd1908",
+          "sourceUnitDigest": "cfa5240c5eecadcfc7731e278cddf86ef959aeaa6227473d1caa5337a4468325",
+          "targetUnitDigest": "cfa5240c5eecadcfc7731e278cddf86ef959aeaa6227473d1caa5337a4468325"
+        },
+        {
+          "claimId": "claim_1a75aaf70d8e7831d5deff5f5a23eace",
+          "sourceUnitDigest": "169572d9d19e009868d169a317e0413c248e70ce469b8c977aa3a60e74fdcf63",
+          "targetUnitDigest": "169572d9d19e009868d169a317e0413c248e70ce469b8c977aa3a60e74fdcf63"
+        },
+        {
+          "claimId": "claim_71846a2062aa1e8a6d34c2ff5e41a6be",
+          "sourceUnitDigest": "3665a3d0b5b67c576e2a43d637214e38172d543734fe18b421183e2eb9a0a948",
+          "targetUnitDigest": "3665a3d0b5b67c576e2a43d637214e38172d543734fe18b421183e2eb9a0a948"
+        },
+        {
+          "claimId": "claim_449162f657ce86a39a5664bd818c0904",
+          "sourceUnitDigest": "074a5ad04b053765f8d72bf49567a9adada6e29d9f742aa84b5307c32114954b",
+          "targetUnitDigest": "074a5ad04b053765f8d72bf49567a9adada6e29d9f742aa84b5307c32114954b"
+        },
+        {
+          "claimId": "claim_b0dac8befc58f3caf2a9de4f8490159e",
+          "sourceUnitDigest": "7adf5730fc9e8d4426eebfc10f31187f2f6f605b94aad20865c019c86dec3726",
+          "targetUnitDigest": "7adf5730fc9e8d4426eebfc10f31187f2f6f605b94aad20865c019c86dec3726"
+        },
+        {
+          "claimId": "claim_acc240d6e397b98fdbed600319cb34ac",
+          "sourceUnitDigest": "7b8ebf223ee1f5bf7bbf1c92003f7569a69af9b56e174fbdff9c7e82010bf155",
+          "targetUnitDigest": "7b8ebf223ee1f5bf7bbf1c92003f7569a69af9b56e174fbdff9c7e82010bf155"
+        },
+        {
+          "claimId": "claim_03fc936f4b555585d64dc0ebe29c4208",
+          "sourceUnitDigest": "81bf9326f60807bc740899a39507607fbde09222704bb83d80f53a63e1c9e4eb",
+          "targetUnitDigest": "81bf9326f60807bc740899a39507607fbde09222704bb83d80f53a63e1c9e4eb"
+        },
+        {
+          "claimId": "claim_e08f7148c1043493cd44d1c963bd3150",
+          "sourceUnitDigest": "5f45857ce14201aaa39ed6cfef84a1e8361ff37fe1f1ad07069221e265aabb5c",
+          "targetUnitDigest": "5f45857ce14201aaa39ed6cfef84a1e8361ff37fe1f1ad07069221e265aabb5c"
+        },
+        {
+          "claimId": "claim_92efc566b937693937550fbc5728fc1c",
+          "sourceUnitDigest": "5c8e7613930a3f7ecf83a6cc4b821e2cf6ee913c19a5867ae2eaeac2166303b4",
+          "targetUnitDigest": "5c8e7613930a3f7ecf83a6cc4b821e2cf6ee913c19a5867ae2eaeac2166303b4"
+        },
+        {
+          "claimId": "claim_f8a864fa4f12b5eb0541c330f3b4f403",
+          "sourceUnitDigest": "a85de8b12be950f2633450d079caf5a5b4d61afb96faf0454a38d8fe097d701c",
+          "targetUnitDigest": "a85de8b12be950f2633450d079caf5a5b4d61afb96faf0454a38d8fe097d701c"
+        },
+        {
+          "claimId": "claim_65374801363daa18573f2fe0f385013d",
+          "sourceUnitDigest": "5793edb77ba7c7f493bb3759c6ce8f91f5438a6ee112bd0bce9a354368ded3a4",
+          "targetUnitDigest": "5793edb77ba7c7f493bb3759c6ce8f91f5438a6ee112bd0bce9a354368ded3a4"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/history/README.md",
+      "target": "docs/platform/agent-coordination/history/README.md",
+      "rows": [
+        {
+          "claimId": "claim_0b9c7f98a5974a3363830700dff7f854",
+          "sourceUnitDigest": "ee7f648f453896926c71c987c5f9b6e7b5c179479d10e798fc4888a1359cb851",
+          "targetUnitDigest": "ee7f648f453896926c71c987c5f9b6e7b5c179479d10e798fc4888a1359cb851"
+        },
+        {
+          "claimId": "claim_ca0b274b375798d91e6c09f282234bc7",
+          "sourceUnitDigest": "02d9a21f16aabdbe52302deff5989ed07acf664a200574899bcfecda35433bbe",
+          "targetUnitDigest": "02d9a21f16aabdbe52302deff5989ed07acf664a200574899bcfecda35433bbe"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/intent-preservation-ledger.md",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+      "rows": [
+        {
+          "claimId": "claim_4a2d082437d31677a4344a224ac8e5a3",
+          "sourceUnitDigest": "2974465880fabd81b35af062d7a7e2b5d10709e486b63f1e530f92d7d15e2b34",
+          "targetUnitDigest": "2974465880fabd81b35af062d7a7e2b5d10709e486b63f1e530f92d7d15e2b34"
+        },
+        {
+          "claimId": "claim_9f49e2879aa40f1ea8ca6ae7f10ab63f",
+          "sourceUnitDigest": "4b2fcfe6432f7143b210dbed0c176cb9e8e08a3a9b8227c333f907aba5b978b8",
+          "targetUnitDigest": "4b2fcfe6432f7143b210dbed0c176cb9e8e08a3a9b8227c333f907aba5b978b8"
+        },
+        {
+          "claimId": "claim_0d49dd0a8f8933ec1063cc7c4eda7d30",
+          "sourceUnitDigest": "32a6d8488b147f5122e3b13318d1ab623f696e7479f858fa0227ab3bc7eee424",
+          "targetUnitDigest": "32a6d8488b147f5122e3b13318d1ab623f696e7479f858fa0227ab3bc7eee424"
+        },
+        {
+          "claimId": "claim_197f781846e81137ac930c44555b7632",
+          "sourceUnitDigest": "3657e8e79a3a8df722ba54135e2bbff0d86eab3c6a2c88d3e3e48b83228b4490",
+          "targetUnitDigest": "3657e8e79a3a8df722ba54135e2bbff0d86eab3c6a2c88d3e3e48b83228b4490"
+        },
+        {
+          "claimId": "claim_8571d7d5d1a915cf5888f14873d9dafc",
+          "sourceUnitDigest": "acb9f88839eee202bee3e0ed7b35d8ad51b18660a524f6d2b9c3d043445291b8",
+          "targetUnitDigest": "acb9f88839eee202bee3e0ed7b35d8ad51b18660a524f6d2b9c3d043445291b8"
+        },
+        {
+          "claimId": "claim_f4e4e8274cfd47ceba3edfa2e0fdfc3f",
+          "sourceUnitDigest": "9b8c1bbe8029651b80a6f39ce5598788d698a1e43b432db8f998b2e6dde571ff",
+          "targetUnitDigest": "9b8c1bbe8029651b80a6f39ce5598788d698a1e43b432db8f998b2e6dde571ff"
+        },
+        {
+          "claimId": "claim_f603c4dca35ecd50296db67119679e02",
+          "sourceUnitDigest": "4f339ab8e050d02807558bceb1533232b6d9f0d89fd142830975dbb6423b6f4e",
+          "targetUnitDigest": "4f339ab8e050d02807558bceb1533232b6d9f0d89fd142830975dbb6423b6f4e"
+        },
+        {
+          "claimId": "claim_89d73c80b36260ddb1143f6f300d06f4",
+          "sourceUnitDigest": "8f411a184cc0681f2bd3b7b466296be26c89797459dfc7b0b6905c04915b56dc",
+          "targetUnitDigest": "8f411a184cc0681f2bd3b7b466296be26c89797459dfc7b0b6905c04915b56dc"
+        },
+        {
+          "claimId": "claim_d51cf9f83a70b92f25357f49df4dab8e",
+          "sourceUnitDigest": "ad0b9c07b67e211a44c0afe67721d187850751bbce755aaf58645d6908beb1dd",
+          "targetUnitDigest": "ad0b9c07b67e211a44c0afe67721d187850751bbce755aaf58645d6908beb1dd"
+        },
+        {
+          "claimId": "claim_0650fd875d76cc8491534b6be0d43324",
+          "sourceUnitDigest": "7876bf12c73ebc2488336f377b1578f1994d4e93e4aa491f4c05b023e9d5a121",
+          "targetUnitDigest": "7876bf12c73ebc2488336f377b1578f1994d4e93e4aa491f4c05b023e9d5a121"
+        },
+        {
+          "claimId": "claim_ef6a4399f332f99a25b21af021a60afc",
+          "sourceUnitDigest": "b73fd092b274648b66fbfcc01893f97732be7a7363ecaa1aaa0ef6d882de3731",
+          "targetUnitDigest": "b73fd092b274648b66fbfcc01893f97732be7a7363ecaa1aaa0ef6d882de3731"
+        },
+        {
+          "claimId": "claim_cfc9be9d3ef1428a0d870b91e698eda8",
+          "sourceUnitDigest": "09f5b1299425e5ebba93ae1f2fb0b8ed7f8e16c99ad393fc6371e764c9f9a5dc",
+          "targetUnitDigest": "09f5b1299425e5ebba93ae1f2fb0b8ed7f8e16c99ad393fc6371e764c9f9a5dc"
+        },
+        {
+          "claimId": "claim_1f6359e5f1326f1e273cd360a04b6a95",
+          "sourceUnitDigest": "f20ec4cad03989bfa9d832a58331ee2114da5281a541e0f05c41a2c8a8529bc7",
+          "targetUnitDigest": "f20ec4cad03989bfa9d832a58331ee2114da5281a541e0f05c41a2c8a8529bc7"
+        },
+        {
+          "claimId": "claim_4423ca8796f25af57567fceb7be37140",
+          "sourceUnitDigest": "388cd2e60a37d5c445485812957d50f059cfbc20e1ba96eb9e6290b92b6b484c",
+          "targetUnitDigest": "388cd2e60a37d5c445485812957d50f059cfbc20e1ba96eb9e6290b92b6b484c"
+        },
+        {
+          "claimId": "claim_667097a52c3346fc0e319b483805b37f",
+          "sourceUnitDigest": "1b769d0410fac29b291845761cb03af1e51d234b35de36e9547d61198de3d1f3",
+          "targetUnitDigest": "1b769d0410fac29b291845761cb03af1e51d234b35de36e9547d61198de3d1f3"
+        },
+        {
+          "claimId": "claim_58e9d340d8d5785dab3ef58e1250f80f",
+          "sourceUnitDigest": "d89a2f35d74a2a8f5f6b333c90cf8dd1892667582b858d858507bed430f92052",
+          "targetUnitDigest": "d89a2f35d74a2a8f5f6b333c90cf8dd1892667582b858d858507bed430f92052"
+        },
+        {
+          "claimId": "claim_f84c52b1c2a3a97eddf21f0bedc19a8a",
+          "sourceUnitDigest": "23aba31758a53e11596b859a192050b2466fa435a843336589c84759262a69cd",
+          "targetUnitDigest": "23aba31758a53e11596b859a192050b2466fa435a843336589c84759262a69cd"
+        },
+        {
+          "claimId": "claim_66ba19d67fd4f5b698108b5d6adca0d4",
+          "sourceUnitDigest": "af84346972b6ce717a045ca9e8fd0a7ec085221869b12923cfd1b9581130cd59",
+          "targetUnitDigest": "af84346972b6ce717a045ca9e8fd0a7ec085221869b12923cfd1b9581130cd59"
+        },
+        {
+          "claimId": "claim_9473ebaf39a11a57c6dca37bc3c8fa51",
+          "sourceUnitDigest": "666baebb5b5c2d8aeae3d76b32e7b9f13684516e584920da16ba087eda1b5a8c",
+          "targetUnitDigest": "666baebb5b5c2d8aeae3d76b32e7b9f13684516e584920da16ba087eda1b5a8c"
+        },
+        {
+          "claimId": "claim_f5fa5e392818ec0478b3f16c3d6ceec2",
+          "sourceUnitDigest": "bb70e8b2fd66980a8959cb64370abc8b791e0aca28d6b253414420ac2daa55a8",
+          "targetUnitDigest": "bb70e8b2fd66980a8959cb64370abc8b791e0aca28d6b253414420ac2daa55a8"
+        },
+        {
+          "claimId": "claim_db826cc822e820f237d660dd47990a61",
+          "sourceUnitDigest": "48d5836a9a7d13f923a2266227325744be153a45d8378b0a92c421edd3f0177e",
+          "targetUnitDigest": "48d5836a9a7d13f923a2266227325744be153a45d8378b0a92c421edd3f0177e"
+        },
+        {
+          "claimId": "claim_cf6a44875de90752b3a82d73a7fca314",
+          "sourceUnitDigest": "52066ea3fda02625fbaf3b4c23ebf0a6811e357d05091c7badef0a7228da3636",
+          "targetUnitDigest": "52066ea3fda02625fbaf3b4c23ebf0a6811e357d05091c7badef0a7228da3636"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "target": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "rows": [
+        {
+          "claimId": "claim_e03343574997bf6be5dec36223e1b715",
+          "sourceUnitDigest": "cd4e15b78a309b4a5927e1961e7d2b0d668d4c9e9ac22e94dce3b39633e3fd40",
+          "targetUnitDigest": "cd4e15b78a309b4a5927e1961e7d2b0d668d4c9e9ac22e94dce3b39633e3fd40"
+        },
+        {
+          "claimId": "claim_d68de0039d436f401b4eebcfabffca62",
+          "sourceUnitDigest": "1e2f1a8ad2e80576bd1212a584e1da8b4499538f34d2188a200e0a9eff1a001d",
+          "targetUnitDigest": "1e2f1a8ad2e80576bd1212a584e1da8b4499538f34d2188a200e0a9eff1a001d"
+        },
+        {
+          "claimId": "claim_9bacf1df00768b0f8783ae5579ce3798",
+          "sourceUnitDigest": "26409dcb1fb8afa85b2b66c4fe750eac7c65cb7d104dd7dd4e533ab859433af2",
+          "targetUnitDigest": "26409dcb1fb8afa85b2b66c4fe750eac7c65cb7d104dd7dd4e533ab859433af2"
+        },
+        {
+          "claimId": "claim_70a805be575183f1a48f3d5933770896",
+          "sourceUnitDigest": "ce5513244017cd08e740fb27ef0ea4ca16a2bea1d16b19ee2ecada96b3de1de5",
+          "targetUnitDigest": "ce5513244017cd08e740fb27ef0ea4ca16a2bea1d16b19ee2ecada96b3de1de5"
+        },
+        {
+          "claimId": "claim_a5fe2390aabba0220953e38782ca559a",
+          "sourceUnitDigest": "8b9baa9b064545c4a5a410f454196e725c3de7abbf62837a17cd9f3a5b4ae332",
+          "targetUnitDigest": "8b9baa9b064545c4a5a410f454196e725c3de7abbf62837a17cd9f3a5b4ae332"
+        },
+        {
+          "claimId": "claim_e03e71322f4966158501e6da370897a6",
+          "sourceUnitDigest": "abea55eb3d1c7ac987a2aa55e01cef98a02e9452751622328ae302240e9eefed",
+          "targetUnitDigest": "abea55eb3d1c7ac987a2aa55e01cef98a02e9452751622328ae302240e9eefed"
+        },
+        {
+          "claimId": "claim_3ec36be7002bcc96e8fd42e8cab51e37",
+          "sourceUnitDigest": "b62353f2d3f3955c53d82b0efcdd7a118e85600a73daaba91273698e31e5733d",
+          "targetUnitDigest": "b62353f2d3f3955c53d82b0efcdd7a118e85600a73daaba91273698e31e5733d"
+        },
+        {
+          "claimId": "claim_454a911b873012ac0ff8f6c43613cd48",
+          "sourceUnitDigest": "de8b4415e6deef449cd314ab318fe42b9565d7cdcae5f70f8dabfbc317893175",
+          "targetUnitDigest": "de8b4415e6deef449cd314ab318fe42b9565d7cdcae5f70f8dabfbc317893175"
+        },
+        {
+          "claimId": "claim_5593594d6e0f8b79c5bceb23b2ca4aa1",
+          "sourceUnitDigest": "63dcb8d2ec927de7c977cbcd5398ae689442e2b10cb44ed5843bbba6153e0467",
+          "targetUnitDigest": "63dcb8d2ec927de7c977cbcd5398ae689442e2b10cb44ed5843bbba6153e0467"
+        },
+        {
+          "claimId": "claim_06ba3763ee2d4633743e325ca182448c",
+          "sourceUnitDigest": "ad7e3a36a8034e567729c191a746324f8fa463318d66f6f06a8cd3530b1e7dd0",
+          "targetUnitDigest": "ad7e3a36a8034e567729c191a746324f8fa463318d66f6f06a8cd3530b1e7dd0"
+        },
+        {
+          "claimId": "claim_d0aea214060c6b749a417ed5379655f0",
+          "sourceUnitDigest": "00bea35b17d3268ea34cfb5de417926b81d9edfe871613ad68fd114cf6bcd4da",
+          "targetUnitDigest": "00bea35b17d3268ea34cfb5de417926b81d9edfe871613ad68fd114cf6bcd4da"
+        },
+        {
+          "claimId": "claim_0987383b5e8998185c4d4b4d9d7808a8",
+          "sourceUnitDigest": "00e9536c0f0159524a48ebb31f058bdc6425a66f6630370475e7ce29cbf89589",
+          "targetUnitDigest": "00e9536c0f0159524a48ebb31f058bdc6425a66f6630370475e7ce29cbf89589"
+        },
+        {
+          "claimId": "claim_8d466c7adecbdef3a4bf5fa5382b4789",
+          "sourceUnitDigest": "b05a7329f7938434558c931359c97cd451c70e43175fcd66bb114420d4169a1d",
+          "targetUnitDigest": "b05a7329f7938434558c931359c97cd451c70e43175fcd66bb114420d4169a1d"
+        },
+        {
+          "claimId": "claim_9dbfdcc1d71cd55b1df7bb2cbf0b727d",
+          "sourceUnitDigest": "6f34ebfc4ecf8b377085f69df1f875816f0e2edbf644db9692296490e45aea22",
+          "targetUnitDigest": "6f34ebfc4ecf8b377085f69df1f875816f0e2edbf644db9692296490e45aea22"
+        },
+        {
+          "claimId": "claim_96d6f940c7e04c26083371d598c1a226",
+          "sourceUnitDigest": "198e3eb1ec1691a8a00cd78a8e274eabeb05d7fd272aed7763f0251abcc1cee9",
+          "targetUnitDigest": "198e3eb1ec1691a8a00cd78a8e274eabeb05d7fd272aed7763f0251abcc1cee9"
+        },
+        {
+          "claimId": "claim_6b5e2dcf12c56c277e7c90e56e128668",
+          "sourceUnitDigest": "ceedd7b89ecf4f93b2d1740c99e0b15f457dee804c22dd289076554c4abeec11",
+          "targetUnitDigest": "ceedd7b89ecf4f93b2d1740c99e0b15f457dee804c22dd289076554c4abeec11"
+        },
+        {
+          "claimId": "claim_4265ae53d6f60a543e5c6ddb87ca352e",
+          "sourceUnitDigest": "5ca2f4b26c7b636a1547f830a3148804d78cca301e22327e2e4a44da6989b9c7",
+          "targetUnitDigest": "5ca2f4b26c7b636a1547f830a3148804d78cca301e22327e2e4a44da6989b9c7"
+        },
+        {
+          "claimId": "claim_221bddfce6e1936b897bb21fa1ac4827",
+          "sourceUnitDigest": "375cc7046070d26a930d96ad8e3a64d966d837ee26e56ba42511f21e55b4a380",
+          "targetUnitDigest": "375cc7046070d26a930d96ad8e3a64d966d837ee26e56ba42511f21e55b4a380"
+        },
+        {
+          "claimId": "claim_55bbde5a56b1d6fcc53425178f192da8",
+          "sourceUnitDigest": "50a3de873103f5f57af70b7567da89289954f3eb99173ed94d4b11c72b213ac4",
+          "targetUnitDigest": "50a3de873103f5f57af70b7567da89289954f3eb99173ed94d4b11c72b213ac4"
+        },
+        {
+          "claimId": "claim_8c9643184173b55782981810fafe003c",
+          "sourceUnitDigest": "a34e7f7eff4c083e22258f88f691a26f325ccc8522abd4dd606240cea69ecace",
+          "targetUnitDigest": "a34e7f7eff4c083e22258f88f691a26f325ccc8522abd4dd606240cea69ecace"
+        },
+        {
+          "claimId": "claim_d317b3ae75d839b8c7a3c01f3e92b032",
+          "sourceUnitDigest": "382e51460b908f258767cf71b669f6a5669ef4332b7635f4179f2c7393738051",
+          "targetUnitDigest": "382e51460b908f258767cf71b669f6a5669ef4332b7635f4179f2c7393738051"
+        },
+        {
+          "claimId": "claim_cbc7206fac661463eafce34a01576834",
+          "sourceUnitDigest": "865c0e6dee3085380bf5afb529160fbc8c6eb0c2afafd4f6e445e89f80450228",
+          "targetUnitDigest": "865c0e6dee3085380bf5afb529160fbc8c6eb0c2afafd4f6e445e89f80450228"
+        },
+        {
+          "claimId": "claim_612e75ec16f9d47ebf5e09f11c3def33",
+          "sourceUnitDigest": "85bcebc2380d90a0737cc89c78b5cb9490d4f67bc2e7ffec2f1affe66b50762b",
+          "targetUnitDigest": "85bcebc2380d90a0737cc89c78b5cb9490d4f67bc2e7ffec2f1affe66b50762b"
+        },
+        {
+          "claimId": "claim_b9279e8c12d4b55fcf6255382e27e160",
+          "sourceUnitDigest": "a726763a223496b5cba708be5a23ac1ceb8379d8d59361ca7851d9687daad759",
+          "targetUnitDigest": "a726763a223496b5cba708be5a23ac1ceb8379d8d59361ca7851d9687daad759"
+        },
+        {
+          "claimId": "claim_3f50a3f078ae559bcb0fe10d560062b2",
+          "sourceUnitDigest": "3c04a0d0c79c293b43b3613982061976573bcc6bf1835c796b3874714b33dda2",
+          "targetUnitDigest": "3c04a0d0c79c293b43b3613982061976573bcc6bf1835c796b3874714b33dda2"
+        },
+        {
+          "claimId": "claim_86616efd585aa45a5147eebed1982c75",
+          "sourceUnitDigest": "e2cf6ca0a65c613503c27ec2597ae0fd9d48e65dfafad44375967f2446df339b",
+          "targetUnitDigest": "e2cf6ca0a65c613503c27ec2597ae0fd9d48e65dfafad44375967f2446df339b"
+        },
+        {
+          "claimId": "claim_2d6fead0c43c66d71a75a792b8fc0af4",
+          "sourceUnitDigest": "b966ae0e1460ab7ae4b8c0590e3b6f72c9d10abbe84e63a27bd29d3ad8a58915",
+          "targetUnitDigest": "b966ae0e1460ab7ae4b8c0590e3b6f72c9d10abbe84e63a27bd29d3ad8a58915"
+        },
+        {
+          "claimId": "claim_9053d212a1d094dda69ed7e3124ec459",
+          "sourceUnitDigest": "cf5054b7363a581dc1a02be6704071f9b33faf034df6581f1847a85ca97278ac",
+          "targetUnitDigest": "cf5054b7363a581dc1a02be6704071f9b33faf034df6581f1847a85ca97278ac"
+        },
+        {
+          "claimId": "claim_c87985222ef9cfb3a5a64ad3f375abb6",
+          "sourceUnitDigest": "6c50b9c6966a57813be2ef06dbd737388419a2ea121303eb325a14056f124235",
+          "targetUnitDigest": "6c50b9c6966a57813be2ef06dbd737388419a2ea121303eb325a14056f124235"
+        },
+        {
+          "claimId": "claim_831692f7033d44f577e462fa8051fed7",
+          "sourceUnitDigest": "13625138e4c6c57b40bcba402d2e22c74f7d3ccf4b8c1644fc92ef392d86b247",
+          "targetUnitDigest": "13625138e4c6c57b40bcba402d2e22c74f7d3ccf4b8c1644fc92ef392d86b247"
+        },
+        {
+          "claimId": "claim_67705b0839ce1e8f81402a807329b715",
+          "sourceUnitDigest": "547071c0219df561cf2bf7424df100b8977efb3ac18eae3993a0127e16f4277c",
+          "targetUnitDigest": "547071c0219df561cf2bf7424df100b8977efb3ac18eae3993a0127e16f4277c"
+        },
+        {
+          "claimId": "claim_bd6faf22ce69cf1310447b3c2d1cc5ab",
+          "sourceUnitDigest": "f2b168302c9a708fb4445d51d2f5d84b22ee2b6fe96a70dbf2cfc97b8139aeb8",
+          "targetUnitDigest": "f2b168302c9a708fb4445d51d2f5d84b22ee2b6fe96a70dbf2cfc97b8139aeb8"
+        },
+        {
+          "claimId": "claim_2c5dba8074390ab0a5b1c81d02d0923d",
+          "sourceUnitDigest": "fd2266b61741533615f209ff7e80828120f7e760bb207dad9c064779df737fba",
+          "targetUnitDigest": "fd2266b61741533615f209ff7e80828120f7e760bb207dad9c064779df737fba"
+        },
+        {
+          "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+          "sourceUnitDigest": "925fd21f6972ad4060e318d3d32bfc3feae3fa6aebd95910d5a6ff90837c5885",
+          "targetUnitDigest": "925fd21f6972ad4060e318d3d32bfc3feae3fa6aebd95910d5a6ff90837c5885"
+        },
+        {
+          "claimId": "claim_b6dde833e1e94658019aecb31294a7e6",
+          "sourceUnitDigest": "ffbb19884c262cabef857adbd445184a0fe365f9ef7d7020eeea6e38ad4155a7",
+          "targetUnitDigest": "ffbb19884c262cabef857adbd445184a0fe365f9ef7d7020eeea6e38ad4155a7"
+        },
+        {
+          "claimId": "claim_921fe2f798d3d1cbd95e02e7b597e1e2",
+          "sourceUnitDigest": "a7fe12ec970bb4a89b8f5f0880b71f449f3a71a88d8426b3126f65aafd902f79",
+          "targetUnitDigest": "a7fe12ec970bb4a89b8f5f0880b71f449f3a71a88d8426b3126f65aafd902f79"
+        },
+        {
+          "claimId": "claim_df876a1ab74395eaaadda955b740528c",
+          "sourceUnitDigest": "08567f67d3f8d2cd74df5b45987ca4015ad06e4843a451f41fadbc64c826c277",
+          "targetUnitDigest": "08567f67d3f8d2cd74df5b45987ca4015ad06e4843a451f41fadbc64c826c277"
+        },
+        {
+          "claimId": "claim_9cb82efecd63bf43d4cc79365a0769e6",
+          "sourceUnitDigest": "0a4d627a2ca4b9955639c4fed88ea157549be550b395711ac93ba46c9482d150",
+          "targetUnitDigest": "0a4d627a2ca4b9955639c4fed88ea157549be550b395711ac93ba46c9482d150"
+        },
+        {
+          "claimId": "claim_21e669fb9da64e6dee20864a2152b305",
+          "sourceUnitDigest": "2d43f10fa3273fa318caaeb304d5d7ba602a47cb413f3a53713e3fa0dec7c3d4",
+          "targetUnitDigest": "2d43f10fa3273fa318caaeb304d5d7ba602a47cb413f3a53713e3fa0dec7c3d4"
+        },
+        {
+          "claimId": "claim_665373dac472ef1e9130659d25645821",
+          "sourceUnitDigest": "dcecb671ee01314a3812765becae24a9712e5deda4c8d73391110f3b59af149a",
+          "targetUnitDigest": "dcecb671ee01314a3812765becae24a9712e5deda4c8d73391110f3b59af149a"
+        },
+        {
+          "claimId": "claim_b5dadbe63df8883537ee032ea33eaa10",
+          "sourceUnitDigest": "84f27b2046703271db8b86d80b5f7958c3eb0f1b5364d7e0255bda4afdc4bb50",
+          "targetUnitDigest": "84f27b2046703271db8b86d80b5f7958c3eb0f1b5364d7e0255bda4afdc4bb50"
+        },
+        {
+          "claimId": "claim_f5ac0ef50ab3563ebd907f6fce7bee1b",
+          "sourceUnitDigest": "bece9edc81e0ddcf82cad96d9340ac7e6cfe39fd9e52c195a3b2790da8fc3e75",
+          "targetUnitDigest": "bece9edc81e0ddcf82cad96d9340ac7e6cfe39fd9e52c195a3b2790da8fc3e75"
+        },
+        {
+          "claimId": "claim_0f76be95c618f89919425acfe0a62567",
+          "sourceUnitDigest": "a7c30b0e7a18fb085c2750de82462a7cb9fcdd724a38375f8fc1a652ccf42c65",
+          "targetUnitDigest": "a7c30b0e7a18fb085c2750de82462a7cb9fcdd724a38375f8fc1a652ccf42c65"
+        },
+        {
+          "claimId": "claim_379a294519bcc7969840648b13317cda",
+          "sourceUnitDigest": "91a5b1368f4bcd927a816ea03a612c8aba777dee011fec64190a2a89634889a9",
+          "targetUnitDigest": "91a5b1368f4bcd927a816ea03a612c8aba777dee011fec64190a2a89634889a9"
+        },
+        {
+          "claimId": "claim_ecd377c432c0daf638b3b71d85e36650",
+          "sourceUnitDigest": "023fcc80d67dda7852ba55d1197e732cab78626b009351f459f223e0016577b7",
+          "targetUnitDigest": "023fcc80d67dda7852ba55d1197e732cab78626b009351f459f223e0016577b7"
+        },
+        {
+          "claimId": "claim_da35589f0a916d99cc156017d550c959",
+          "sourceUnitDigest": "489d89ac6bb99fa832bf39ac8e994f15c27ee96b5344f0a6c2d9e84f9ed5b8c2",
+          "targetUnitDigest": "489d89ac6bb99fa832bf39ac8e994f15c27ee96b5344f0a6c2d9e84f9ed5b8c2"
+        },
+        {
+          "claimId": "claim_783fe313d8b78ec23047c9e134be5796",
+          "sourceUnitDigest": "46c86ad31a644685e0b496122ed2b012d672350de2add9f82eed4b21bafbb7d3",
+          "targetUnitDigest": "46c86ad31a644685e0b496122ed2b012d672350de2add9f82eed4b21bafbb7d3"
+        },
+        {
+          "claimId": "claim_7bf571c1204263dce4e29224ecbf92fe",
+          "sourceUnitDigest": "81b02230a567b417c099fca1065e2b13ae61ca10ba62407172cc8780ed5e8bba",
+          "targetUnitDigest": "81b02230a567b417c099fca1065e2b13ae61ca10ba62407172cc8780ed5e8bba"
+        },
+        {
+          "claimId": "claim_6e7cfd0a2cd08fff068aeeb9ab627ed2",
+          "sourceUnitDigest": "5fee3ff50ada4dc933767ecf4a5c32d375f9f1c72684040ba4f3c3ed7ee94cb1",
+          "targetUnitDigest": "5fee3ff50ada4dc933767ecf4a5c32d375f9f1c72684040ba4f3c3ed7ee94cb1"
+        },
+        {
+          "claimId": "claim_47e1bbce62798fe3ce5e32311ef045be",
+          "sourceUnitDigest": "1581b33108650bddbf5c05b6b9e0e7884c8f0320a4cfedd89b34cd2e64b55111",
+          "targetUnitDigest": "1581b33108650bddbf5c05b6b9e0e7884c8f0320a4cfedd89b34cd2e64b55111"
+        },
+        {
+          "claimId": "claim_9b15d1f4f0a0c0f81e13737d922a24cd",
+          "sourceUnitDigest": "9424d2598e1f2f8722b534e94908d0f153a0a6a1c7e6c3e6ef7fb54a79bbac27",
+          "targetUnitDigest": "9424d2598e1f2f8722b534e94908d0f153a0a6a1c7e6c3e6ef7fb54a79bbac27"
+        },
+        {
+          "claimId": "claim_48f849918416a2e7a0253da7188ed3a6",
+          "sourceUnitDigest": "419bb47b988e8b7e0d505ada59d1f8c0c6afc71be503b9c7d157f3e1065e0208",
+          "targetUnitDigest": "419bb47b988e8b7e0d505ada59d1f8c0c6afc71be503b9c7d157f3e1065e0208"
+        },
+        {
+          "claimId": "claim_9b2102341f42def82a0665cc7d92273f",
+          "sourceUnitDigest": "a9fe4cfeca9d0f76025b68b50112e091b9eafd10cf9454006bbcf21c9e92f01b",
+          "targetUnitDigest": "a9fe4cfeca9d0f76025b68b50112e091b9eafd10cf9454006bbcf21c9e92f01b"
+        },
+        {
+          "claimId": "claim_9d058e29fa247f69fb897aab37ce1724",
+          "sourceUnitDigest": "872a5764bbcf39ed147afbb87f57b44eb6c2f14e58f7e4a11610a242c319baee",
+          "targetUnitDigest": "872a5764bbcf39ed147afbb87f57b44eb6c2f14e58f7e4a11610a242c319baee"
+        },
+        {
+          "claimId": "claim_fb0f85ad508f7f857ba4c0963879790a",
+          "sourceUnitDigest": "732cda65ebd7af7948f6c88b0edff5c2d628edd0c27eda62481934c9cda01e66",
+          "targetUnitDigest": "732cda65ebd7af7948f6c88b0edff5c2d628edd0c27eda62481934c9cda01e66"
+        },
+        {
+          "claimId": "claim_5fcf7a8e1d52f4b4db5c3859a8407d6e",
+          "sourceUnitDigest": "a81d969e7332851fffa69d146be618b0536d638b444dc1dddbca95f97e92b1e5",
+          "targetUnitDigest": "a81d969e7332851fffa69d146be618b0536d638b444dc1dddbca95f97e92b1e5"
+        },
+        {
+          "claimId": "claim_234cfe4ee6319f76a699a920567daac2",
+          "sourceUnitDigest": "054c801e9bc4afa2e28220d6e8687e0ed3f5dbcad32d9e4eb97f191b2e14d1b1",
+          "targetUnitDigest": "054c801e9bc4afa2e28220d6e8687e0ed3f5dbcad32d9e4eb97f191b2e14d1b1"
+        },
+        {
+          "claimId": "claim_df598a8b539a9d7fd2c0cef2aa085fab",
+          "sourceUnitDigest": "a24a713156f6473d95bfda30613e379fa8d2afdef4b750bbdf0c84f43fc750ee",
+          "targetUnitDigest": "a24a713156f6473d95bfda30613e379fa8d2afdef4b750bbdf0c84f43fc750ee"
+        },
+        {
+          "claimId": "claim_8c81cb12fcc0ff0408e9b5bb594cb1dc",
+          "sourceUnitDigest": "5c25ba934123a77f41c1e242b1ef0746ca48edd4794f118dc40112830846a769",
+          "targetUnitDigest": "5c25ba934123a77f41c1e242b1ef0746ca48edd4794f118dc40112830846a769"
+        },
+        {
+          "claimId": "claim_41aa6b7f094734eff7a5de2686eac257",
+          "sourceUnitDigest": "7d2cf18f87c65020f2a57881adc4a5bd7bc6230514e421e697ad9c5bda982c66",
+          "targetUnitDigest": "7d2cf18f87c65020f2a57881adc4a5bd7bc6230514e421e697ad9c5bda982c66"
+        },
+        {
+          "claimId": "claim_6834ba270c7686be53bd71d742cf2e9e",
+          "sourceUnitDigest": "0230b05d92fc59bd3dbcde774130623a4d9424102eee641fece4c607f03fe1a1",
+          "targetUnitDigest": "0230b05d92fc59bd3dbcde774130623a4d9424102eee641fece4c607f03fe1a1"
+        },
+        {
+          "claimId": "claim_75f32f4d6c2b5d875561c22df0df9f1b",
+          "sourceUnitDigest": "b3a6af82b8f7ea4e9fd61ced24ccafbf79a089eae7e951da3cad0ba099018720",
+          "targetUnitDigest": "b3a6af82b8f7ea4e9fd61ced24ccafbf79a089eae7e951da3cad0ba099018720"
+        },
+        {
+          "claimId": "claim_345a3910843d49af28190c7823b3b197",
+          "sourceUnitDigest": "190d8ad652ab4f963bf94beb82dc02eecaccd91bed47d0810c1be65b866df618",
+          "targetUnitDigest": "190d8ad652ab4f963bf94beb82dc02eecaccd91bed47d0810c1be65b866df618"
+        },
+        {
+          "claimId": "claim_92c8fa1a47b6cf44805a06c302a9c397",
+          "sourceUnitDigest": "baa7f5aa89a8ea754da71f46d2aa42e1422eed692587a015be85ec5ca7a6c5e0",
+          "targetUnitDigest": "baa7f5aa89a8ea754da71f46d2aa42e1422eed692587a015be85ec5ca7a6c5e0"
+        },
+        {
+          "claimId": "claim_6cfe5b0c53e9fad02f7f87ade799bd79",
+          "sourceUnitDigest": "01b9a183e5c3e72d24ac0e24253bcff0827b28268fec7c6e65a4b02447125d56",
+          "targetUnitDigest": "01b9a183e5c3e72d24ac0e24253bcff0827b28268fec7c6e65a4b02447125d56"
+        },
+        {
+          "claimId": "claim_bed5343a562963f0ac155ccf087dbe16",
+          "sourceUnitDigest": "431ff1a0b82222f35e80b5bd8c97ce1cdc04a58b2e92852c69aa1f2d659ae532",
+          "targetUnitDigest": "431ff1a0b82222f35e80b5bd8c97ce1cdc04a58b2e92852c69aa1f2d659ae532"
+        },
+        {
+          "claimId": "claim_15d9607caf9f46351d95b551989f241f",
+          "sourceUnitDigest": "5e1f1e929a0cf661ef86a71d44c5bd635e2578f0cad948d53a7e14f830a2fd72",
+          "targetUnitDigest": "5e1f1e929a0cf661ef86a71d44c5bd635e2578f0cad948d53a7e14f830a2fd72"
+        },
+        {
+          "claimId": "claim_bbc7536835b5494c65673d94ff84b6af",
+          "sourceUnitDigest": "ccf2360c14fc57876eba692ed5ce99b27f7a47c7655631e6411579a5b5ae4765",
+          "targetUnitDigest": "ccf2360c14fc57876eba692ed5ce99b27f7a47c7655631e6411579a5b5ae4765"
+        },
+        {
+          "claimId": "claim_c0b0e99a66eedf4523176296ae7c2e5d",
+          "sourceUnitDigest": "2d71f7be9ae9b5d83e07bfaa80a1b6e278b9e2280dec45ba9753be829b95f96a",
+          "targetUnitDigest": "2d71f7be9ae9b5d83e07bfaa80a1b6e278b9e2280dec45ba9753be829b95f96a"
+        },
+        {
+          "claimId": "claim_9e021f7c14ff81db98181ca9cd97a878",
+          "sourceUnitDigest": "dffa26a4665722fda331e4a0c6b2eef89f54d6d8b3033685e9801bdf2040696b",
+          "targetUnitDigest": "dffa26a4665722fda331e4a0c6b2eef89f54d6d8b3033685e9801bdf2040696b"
+        },
+        {
+          "claimId": "claim_7dd4aa2204f5de2602d21cf31b666f96",
+          "sourceUnitDigest": "3409347624ccab127285df7eaf3db289bd74444c4101dc78bd475cbb98443d67",
+          "targetUnitDigest": "3409347624ccab127285df7eaf3db289bd74444c4101dc78bd475cbb98443d67"
+        },
+        {
+          "claimId": "claim_c827157d0a3976cec972a4330c4ecf6d",
+          "sourceUnitDigest": "76e23b823520829b1c6883fe908a311418ee4848c25d135aa74074199fafa8ec",
+          "targetUnitDigest": "76e23b823520829b1c6883fe908a311418ee4848c25d135aa74074199fafa8ec"
+        },
+        {
+          "claimId": "claim_cef6c4d99b8f29ced98c1bcf64eaf731",
+          "sourceUnitDigest": "f4c6b194bf092d02119c655f241d2801789ceb2d4ee3198860dcbe606ce52b6a",
+          "targetUnitDigest": "f4c6b194bf092d02119c655f241d2801789ceb2d4ee3198860dcbe606ce52b6a"
+        },
+        {
+          "claimId": "claim_8e489ff736ba50a186eef488fdf45c56",
+          "sourceUnitDigest": "e75202696078dfc604ef6c64f30066affe79f9e1304dc90b6532b974e34931cd",
+          "targetUnitDigest": "e75202696078dfc604ef6c64f30066affe79f9e1304dc90b6532b974e34931cd"
+        },
+        {
+          "claimId": "claim_dc2e50633fdcd7fccfba02775a4e8c99",
+          "sourceUnitDigest": "2348f7c013149a1d8565c408ec91323f17bfd8abc25c2ca5d7ffad8c45c5652c",
+          "targetUnitDigest": "2348f7c013149a1d8565c408ec91323f17bfd8abc25c2ca5d7ffad8c45c5652c"
+        },
+        {
+          "claimId": "claim_04f1628604d93c06b98725adcba6ff25",
+          "sourceUnitDigest": "a8c85eb3f072d709234caa4ef3203a664684078f52724f769de9a2297e27f26a",
+          "targetUnitDigest": "a8c85eb3f072d709234caa4ef3203a664684078f52724f769de9a2297e27f26a"
+        },
+        {
+          "claimId": "claim_35d1679efc865980cb3da420a5e9cb6c",
+          "sourceUnitDigest": "94e1fff6bdc9fbe4dd29ecf3820f475e282702f2d6dbbaf49d4c3f29df0a5a16",
+          "targetUnitDigest": "94e1fff6bdc9fbe4dd29ecf3820f475e282702f2d6dbbaf49d4c3f29df0a5a16"
+        },
+        {
+          "claimId": "claim_279bf6e354d3e9c472c12ed2d1aac853",
+          "sourceUnitDigest": "050b9392348c8179618fe65e4eae0dab87070d0ede5b70ef47f53528d58828b5",
+          "targetUnitDigest": "050b9392348c8179618fe65e4eae0dab87070d0ede5b70ef47f53528d58828b5"
+        },
+        {
+          "claimId": "claim_d191b4b9f457b50a8936302973698733",
+          "sourceUnitDigest": "1f302e037705db620ff2a1a1c3e4ce869227eb09e90f10fac01e0cb6c45db1c3",
+          "targetUnitDigest": "1f302e037705db620ff2a1a1c3e4ce869227eb09e90f10fac01e0cb6c45db1c3"
+        },
+        {
+          "claimId": "claim_4a45bed5a7cfbab3868aa12d43769450",
+          "sourceUnitDigest": "b305a18ce11506b14cae5728a1ad5768fec6cd7f6f539130a2324d03a5cb41ea",
+          "targetUnitDigest": "b305a18ce11506b14cae5728a1ad5768fec6cd7f6f539130a2324d03a5cb41ea"
+        },
+        {
+          "claimId": "claim_a3371035f36760e80daff24f1b12ae48",
+          "sourceUnitDigest": "b67455829142f78e8b9d4eba9897a599eb23e6ea213b7a84c9864d61640854eb",
+          "targetUnitDigest": "b67455829142f78e8b9d4eba9897a599eb23e6ea213b7a84c9864d61640854eb"
+        },
+        {
+          "claimId": "claim_b4a122fdf0fb7791b7747ab63d107da5",
+          "sourceUnitDigest": "a2260d42e998d826a205adaa9b8bb9755af5c4383971c64dc394b18c265afe47",
+          "targetUnitDigest": "a2260d42e998d826a205adaa9b8bb9755af5c4383971c64dc394b18c265afe47"
+        },
+        {
+          "claimId": "claim_a83ca367947815d7e7c623ec7688c222",
+          "sourceUnitDigest": "d2ab30d734580dd8850d55185524fd4e27cd446e9442ffddda44bbd05f512f27",
+          "targetUnitDigest": "d2ab30d734580dd8850d55185524fd4e27cd446e9442ffddda44bbd05f512f27"
+        },
+        {
+          "claimId": "claim_4f05e3d2d0842433065ee5cc5917f5cc",
+          "sourceUnitDigest": "d0bd09c37a8c36505c893141dd61a815a0a0575775356d5f5febd8223c9eb4e3",
+          "targetUnitDigest": "d0bd09c37a8c36505c893141dd61a815a0a0575775356d5f5febd8223c9eb4e3"
+        },
+        {
+          "claimId": "claim_1449692311c75f2f513b0e3838de257d",
+          "sourceUnitDigest": "5a24149f1b973fea20707d1688326f74835f942e028379402ab00eac5943a75f",
+          "targetUnitDigest": "5a24149f1b973fea20707d1688326f74835f942e028379402ab00eac5943a75f"
+        },
+        {
+          "claimId": "claim_8b66907461f2c1a815924ea9aebf4b09",
+          "sourceUnitDigest": "845fdc216ee998d3833dc123bd929e5d9f08bd6bc033feecb6c662a3e727171c",
+          "targetUnitDigest": "845fdc216ee998d3833dc123bd929e5d9f08bd6bc033feecb6c662a3e727171c"
+        },
+        {
+          "claimId": "claim_36e38c4eca885ae9d49279aeb4fb91bd",
+          "sourceUnitDigest": "482d182616ba2c4ae5f5a04db22318bf44a6dd3b82a3ce1928edd14aa82bb0c2",
+          "targetUnitDigest": "482d182616ba2c4ae5f5a04db22318bf44a6dd3b82a3ce1928edd14aa82bb0c2"
+        },
+        {
+          "claimId": "claim_c2074da65fa81d017661404dcd89ccc3",
+          "sourceUnitDigest": "e9c7309648a0f74f0b85130c3330e80604ee809155a72999463c8d1179e6b1d3",
+          "targetUnitDigest": "e9c7309648a0f74f0b85130c3330e80604ee809155a72999463c8d1179e6b1d3"
+        },
+        {
+          "claimId": "claim_4197781c095e4a26b5be5e0976accf5a",
+          "sourceUnitDigest": "b13ff3393a9af7e7e234a38e6f9cdfc292d49a2ef60e5d769eb93b43e3ab2af6",
+          "targetUnitDigest": "b13ff3393a9af7e7e234a38e6f9cdfc292d49a2ef60e5d769eb93b43e3ab2af6"
+        },
+        {
+          "claimId": "claim_3d07fc57e1be01b2896fec465174e54c",
+          "sourceUnitDigest": "a25ffac87650fcecd86a88ab775d1c6528fad82b7bf422f0c04c4bb25488902e",
+          "targetUnitDigest": "a25ffac87650fcecd86a88ab775d1c6528fad82b7bf422f0c04c4bb25488902e"
+        },
+        {
+          "claimId": "claim_09263c436b596dbf35121608ad1f9d15",
+          "sourceUnitDigest": "3871373a42773e84e51de003ad032922b9de106943cf75ed8d22fe0f56fa89ce",
+          "targetUnitDigest": "3871373a42773e84e51de003ad032922b9de106943cf75ed8d22fe0f56fa89ce"
+        },
+        {
+          "claimId": "claim_8d656329fbe4436977972cad5ff829e2",
+          "sourceUnitDigest": "e675f2967c591e10a3cf7eac813dbbe04e012b7d98bb1602c3552d03311d6366",
+          "targetUnitDigest": "e675f2967c591e10a3cf7eac813dbbe04e012b7d98bb1602c3552d03311d6366"
+        },
+        {
+          "claimId": "claim_f0bc9fabb69b3fff3a2279ca16dc1386",
+          "sourceUnitDigest": "e5310c9ec7de3e79c3a4de9cebff5f6a84397b31bea4128bd4652cc2dff0c7fb",
+          "targetUnitDigest": "e5310c9ec7de3e79c3a4de9cebff5f6a84397b31bea4128bd4652cc2dff0c7fb"
+        },
+        {
+          "claimId": "claim_09c41493bee64d87f99ac0d362a6e455",
+          "sourceUnitDigest": "122a8b7bb41ac3ff21e0b824d5984d91e5948ef40e6fe4117792e556be3690e0",
+          "targetUnitDigest": "122a8b7bb41ac3ff21e0b824d5984d91e5948ef40e6fe4117792e556be3690e0"
+        }
+      ]
+    },
+    {
+      "source": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "target": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "rows": [
+        {
+          "claimId": "claim_0b93b00d9997cfc522b58c1c23c32e13",
+          "sourceUnitDigest": "0be79ca13dceb38a0fbd488c04c7e589f0b5336655f3b7a5f08b11cffcc76cd3",
+          "targetUnitDigest": "0be79ca13dceb38a0fbd488c04c7e589f0b5336655f3b7a5f08b11cffcc76cd3"
+        },
+        {
+          "claimId": "claim_33c31ee80317cab62b0a67e2175b11c4",
+          "sourceUnitDigest": "8882dee7a4176c4b9bbb2d7e0b3d5c2bed29a5398f773c6b1adeb94a24870c5c",
+          "targetUnitDigest": "8882dee7a4176c4b9bbb2d7e0b3d5c2bed29a5398f773c6b1adeb94a24870c5c"
+        },
+        {
+          "claimId": "claim_6819e349258c39b7bc588684ccffbeeb",
+          "sourceUnitDigest": "1b30133f33b66c153349a3b2e57ee0c1c2563f032c46ed2bf0b8e222439a297a",
+          "targetUnitDigest": "1b30133f33b66c153349a3b2e57ee0c1c2563f032c46ed2bf0b8e222439a297a"
+        },
+        {
+          "claimId": "claim_cfddaf4b23e373c8df008820e1039ef1",
+          "sourceUnitDigest": "3a188bd459e5236769b02a8bc1f6a6cf79b784e17c63d2ca891002edd1e7c8c5",
+          "targetUnitDigest": "3a188bd459e5236769b02a8bc1f6a6cf79b784e17c63d2ca891002edd1e7c8c5"
+        },
+        {
+          "claimId": "claim_6e9fec30d912d2117dd60e3c97167af3",
+          "sourceUnitDigest": "3eac354180161e93116cab276538b23e5ac4747f71e0e19d458fd232b5c8b8ea",
+          "targetUnitDigest": "3eac354180161e93116cab276538b23e5ac4747f71e0e19d458fd232b5c8b8ea"
+        },
+        {
+          "claimId": "claim_cc28adc3c809386b5bad63a0f782f83a",
+          "sourceUnitDigest": "857af4b7926cd7fd731e760b5bfd54834e311b3fcb0b665f9ddebf20eb982f44",
+          "targetUnitDigest": "857af4b7926cd7fd731e760b5bfd54834e311b3fcb0b665f9ddebf20eb982f44"
+        },
+        {
+          "claimId": "claim_5ed2477f55abe3aa4f66bb7b75fe815d",
+          "sourceUnitDigest": "5d0ebf3c1cfe27924cf6a4ce7cba9f0f4d48d9fec066619c5aa9aa38915e527a",
+          "targetUnitDigest": "5d0ebf3c1cfe27924cf6a4ce7cba9f0f4d48d9fec066619c5aa9aa38915e527a"
+        },
+        {
+          "claimId": "claim_c96224f7925e5b4f85066faa056c820b",
+          "sourceUnitDigest": "427018d03eb9b22bbd55b37e8fc407e6e1b1ff1d43dd4975875b833a6b680eec",
+          "targetUnitDigest": "427018d03eb9b22bbd55b37e8fc407e6e1b1ff1d43dd4975875b833a6b680eec"
+        },
+        {
+          "claimId": "claim_8be0c987b2b5938bde70a1bfb729697b",
+          "sourceUnitDigest": "d29a3053c450be1d3cd67f4eff5e94d7877faaa20f6c763a0c422eed58066dd7",
+          "targetUnitDigest": "d29a3053c450be1d3cd67f4eff5e94d7877faaa20f6c763a0c422eed58066dd7"
+        },
+        {
+          "claimId": "claim_c49e4a8faa16e9002e787fa0c10ad462",
+          "sourceUnitDigest": "eca5c27dfabcbb290fbe00fafd719c804a424b5fb0e2934bd8b8238132c02121",
+          "targetUnitDigest": "eca5c27dfabcbb290fbe00fafd719c804a424b5fb0e2934bd8b8238132c02121"
+        },
+        {
+          "claimId": "claim_66efdc615e979445ad3f85c897f53c81",
+          "sourceUnitDigest": "efba5d8e32c6963a5fbc706cd1da06a62f8584d1065b7c66fd197e8532a78d28",
+          "targetUnitDigest": "efba5d8e32c6963a5fbc706cd1da06a62f8584d1065b7c66fd197e8532a78d28"
+        },
+        {
+          "claimId": "claim_7485ea80c31d4586b12a923c2eaa4577",
+          "sourceUnitDigest": "bf825cd6c9a2e109b10babd7c1a65195bf0b4b784bdc2126a5a3924d5f1a76b3",
+          "targetUnitDigest": "bf825cd6c9a2e109b10babd7c1a65195bf0b4b784bdc2126a5a3924d5f1a76b3"
+        },
+        {
+          "claimId": "claim_66b8226725e683f52e41d5c597a30eda",
+          "sourceUnitDigest": "67a25faacd34b9260f94b774b41ee0c5cc18ee4a0770de8f8d61f7e59f910251",
+          "targetUnitDigest": "67a25faacd34b9260f94b774b41ee0c5cc18ee4a0770de8f8d61f7e59f910251"
+        },
+        {
+          "claimId": "claim_f621f927fe3f6d1d01d6e9fcee3cf5f3",
+          "sourceUnitDigest": "954ea4b9bbe6d905b536e6025c7fde874e8bae464070082f3e18efd63342d03b",
+          "targetUnitDigest": "954ea4b9bbe6d905b536e6025c7fde874e8bae464070082f3e18efd63342d03b"
+        },
+        {
+          "claimId": "claim_ea25ab4f530bd1f4c75ebd6035c25722",
+          "sourceUnitDigest": "826d7570500c469821700ca917b5aba7a650bb0e0cfbfffa58bae97ffac0577e",
+          "targetUnitDigest": "826d7570500c469821700ca917b5aba7a650bb0e0cfbfffa58bae97ffac0577e"
+        },
+        {
+          "claimId": "claim_819d2a4ffb74095ae3cd496eaa1cc798",
+          "sourceUnitDigest": "1d1bd660cf5f5c219972fa9e8e11a77ec277c126e89f9e24bf052620bcac1418",
+          "targetUnitDigest": "1d1bd660cf5f5c219972fa9e8e11a77ec277c126e89f9e24bf052620bcac1418"
+        },
+        {
+          "claimId": "claim_704be6b4082d38aaab90bd64bd564377",
+          "sourceUnitDigest": "203e814e1a449702381019df5b263956413ffbb8bd1fbbe6815c5ceaef4f31bc",
+          "targetUnitDigest": "203e814e1a449702381019df5b263956413ffbb8bd1fbbe6815c5ceaef4f31bc"
+        },
+        {
+          "claimId": "claim_92efcd5ebc7e6be578c08f559b57215a",
+          "sourceUnitDigest": "92776d4dba344f92c28f188d29e5392c0abadbeaa286b02e01d665e311d0c826",
+          "targetUnitDigest": "92776d4dba344f92c28f188d29e5392c0abadbeaa286b02e01d665e311d0c826"
+        },
+        {
+          "claimId": "claim_aa3b64c48d320e48335959ea7cb89aea",
+          "sourceUnitDigest": "2808fac8c5f5bffff551834efc0b7ab9444602c8057e4f6356f6c55f50fd418b",
+          "targetUnitDigest": "2808fac8c5f5bffff551834efc0b7ab9444602c8057e4f6356f6c55f50fd418b"
+        },
+        {
+          "claimId": "claim_0249a02773059932f5a259a140fa4e27",
+          "sourceUnitDigest": "2e91e990627d3f91db3912cdfaea8f38fc35899a97a3bd2631bf7bd53eb7d7be",
+          "targetUnitDigest": "2e91e990627d3f91db3912cdfaea8f38fc35899a97a3bd2631bf7bd53eb7d7be"
+        },
+        {
+          "claimId": "claim_dfb68fbaa7c62913ba4e9796875daca2",
+          "sourceUnitDigest": "bb9a8643a971fdff1a62f41075cd8c248c4887f35fec8ec688209dcfe1836999",
+          "targetUnitDigest": "bb9a8643a971fdff1a62f41075cd8c248c4887f35fec8ec688209dcfe1836999"
+        },
+        {
+          "claimId": "claim_31ffb6dabab19ec588e55d3d31d53867",
+          "sourceUnitDigest": "0d3897f41589932d8e36b6bc3617380161d5cc021398d734bf4f3fa7f636892e",
+          "targetUnitDigest": "0d3897f41589932d8e36b6bc3617380161d5cc021398d734bf4f3fa7f636892e"
+        },
+        {
+          "claimId": "claim_54f3970929bf8d30f7ece7704902268b",
+          "sourceUnitDigest": "9a79f86d6c604b3f10071758d736d67a0a94614c881b55d800842090899649ec",
+          "targetUnitDigest": "9a79f86d6c604b3f10071758d736d67a0a94614c881b55d800842090899649ec"
+        },
+        {
+          "claimId": "claim_e28475efc6bae6a85c417aa7dc0b7de9",
+          "sourceUnitDigest": "4a86fbaa45efff0e7be4dc2cd6faf614ad96677a3cc9048422d5c086fb961645",
+          "targetUnitDigest": "4a86fbaa45efff0e7be4dc2cd6faf614ad96677a3cc9048422d5c086fb961645"
+        },
+        {
+          "claimId": "claim_c5d593322274924a9603971c41251493",
+          "sourceUnitDigest": "5b87ca320d5bfef0ededc2f8e2b86f85a39e47642ba9d506b3d83839022b753c",
+          "targetUnitDigest": "5b87ca320d5bfef0ededc2f8e2b86f85a39e47642ba9d506b3d83839022b753c"
+        },
+        {
+          "claimId": "claim_2e6406d2e7c7cbb0ac0e31a1ef22ddf7",
+          "sourceUnitDigest": "8e64e64996f53a7d44a8e37d800285a5f0062460c21ef5e1dcc64270ff9e5043",
+          "targetUnitDigest": "8e64e64996f53a7d44a8e37d800285a5f0062460c21ef5e1dcc64270ff9e5043"
+        },
+        {
+          "claimId": "claim_f20003299bba9e342d80ae5e4afc0374",
+          "sourceUnitDigest": "8de530394f547bde9dbd7d592b151735e63be7cf34b4c9bf60f366066c7fff37",
+          "targetUnitDigest": "8de530394f547bde9dbd7d592b151735e63be7cf34b4c9bf60f366066c7fff37"
+        },
+        {
+          "claimId": "claim_f0e656b4f18fd7ff9bd0ef8f4e424783",
+          "sourceUnitDigest": "d4a5145521b1462436a0a8f5fabb213f64be4f88eae0f6a6dd526a275ea68e23",
+          "targetUnitDigest": "d4a5145521b1462436a0a8f5fabb213f64be4f88eae0f6a6dd526a275ea68e23"
+        },
+        {
+          "claimId": "claim_87016db109d01f1738fc665fd25a7ed4",
+          "sourceUnitDigest": "fee3377714d02d7141b276efa137b05709b83a7fc9d7ebfabcc48a40c4f1a070",
+          "targetUnitDigest": "fee3377714d02d7141b276efa137b05709b83a7fc9d7ebfabcc48a40c4f1a070"
+        },
+        {
+          "claimId": "claim_6268e576ecc66d8ca659d3ab43d3c246",
+          "sourceUnitDigest": "7d4a52655e1c5310b65739093eee118bfbf0e1257461eee16659b1936b90b4de",
+          "targetUnitDigest": "7d4a52655e1c5310b65739093eee118bfbf0e1257461eee16659b1936b90b4de"
+        },
+        {
+          "claimId": "claim_f2ecbd975d976c653ce70137afdfe843",
+          "sourceUnitDigest": "89b88f093b50a1377c5522bc33c8e3eeb3df975508db5ad77fb4b0b81405eb26",
+          "targetUnitDigest": "89b88f093b50a1377c5522bc33c8e3eeb3df975508db5ad77fb4b0b81405eb26"
+        },
+        {
+          "claimId": "claim_2a888651a79e955c536b3ede362aaf01",
+          "sourceUnitDigest": "3472708ae42d41d427c1cf1ce73b0c9d973c552f54f6a020d31911861ec2b58e",
+          "targetUnitDigest": "3472708ae42d41d427c1cf1ce73b0c9d973c552f54f6a020d31911861ec2b58e"
+        },
+        {
+          "claimId": "claim_5052319046aa4f42d387388996acb446",
+          "sourceUnitDigest": "c11c0092df9a627b6dd4d8c787acb72ec56ec172adb65e4715ae278754fd36f0",
+          "targetUnitDigest": "c11c0092df9a627b6dd4d8c787acb72ec56ec172adb65e4715ae278754fd36f0"
+        },
+        {
+          "claimId": "claim_253fc0ba932a9713c024a202caa532df",
+          "sourceUnitDigest": "13ede0d65b5098cdbd36dafdb6b798bf44aaf153968107ae1f7e9ac8e99c07b3",
+          "targetUnitDigest": "13ede0d65b5098cdbd36dafdb6b798bf44aaf153968107ae1f7e9ac8e99c07b3"
+        },
+        {
+          "claimId": "claim_3e117ae0c024845234aa1a5896ecddac",
+          "sourceUnitDigest": "0152f065ea37370fe85447fa979b9c66e7cc17f602e4687dfdaea11e5c8d872e",
+          "targetUnitDigest": "0152f065ea37370fe85447fa979b9c66e7cc17f602e4687dfdaea11e5c8d872e"
+        },
+        {
+          "claimId": "claim_bc9125989f9d7de4625c7d8f45e3135b",
+          "sourceUnitDigest": "0b5e73d854840613a14e31710b485b606dcec1542d2c9bee6b93cc7d53ffdfa1",
+          "targetUnitDigest": "0b5e73d854840613a14e31710b485b606dcec1542d2c9bee6b93cc7d53ffdfa1"
+        },
+        {
+          "claimId": "claim_e976332dd4fb73def367d062991b016e",
+          "sourceUnitDigest": "c332c9768ed6cb7d4196e8f316f9c632d5f338344a8168afd8407c89bc0ea88e",
+          "targetUnitDigest": "c332c9768ed6cb7d4196e8f316f9c632d5f338344a8168afd8407c89bc0ea88e"
+        },
+        {
+          "claimId": "claim_ac1f844239a51859c77c0270265120b6",
+          "sourceUnitDigest": "ab1369d1c26fc7f8f7908133aa471dac00afde0d8f495cdc5f065474d8761a86",
+          "targetUnitDigest": "ab1369d1c26fc7f8f7908133aa471dac00afde0d8f495cdc5f065474d8761a86"
+        },
+        {
+          "claimId": "claim_5871e754e0a8cdddf95c4e17dbb963be",
+          "sourceUnitDigest": "f765f2dbf102cff663fd0aa27d426fb15f147be5a4c148ec4dc08a04ad43935f",
+          "targetUnitDigest": "f765f2dbf102cff663fd0aa27d426fb15f147be5a4c148ec4dc08a04ad43935f"
+        },
+        {
+          "claimId": "claim_1d8c785a4f460098ebe3b148f6efcea9",
+          "sourceUnitDigest": "8ab6e5a4760465d0974c17ed7622f7021d6619df415eb85502cb5282d2e2d70c",
+          "targetUnitDigest": "8ab6e5a4760465d0974c17ed7622f7021d6619df415eb85502cb5282d2e2d70c"
+        },
+        {
+          "claimId": "claim_58f7ad23b121d8888f33b8cd3d2d4fc0",
+          "sourceUnitDigest": "e06d2d723c4142f6339b9b8ff6a769b3e740680a0a17511388e1f7a8e5ceace1",
+          "targetUnitDigest": "e06d2d723c4142f6339b9b8ff6a769b3e740680a0a17511388e1f7a8e5ceace1"
+        },
+        {
+          "claimId": "claim_9c60847e6afc58eaac38ab36beda8889",
+          "sourceUnitDigest": "3e5e142b83b71fded7d616e3275f7d83214568ffbe6db84344a947af7396fb35",
+          "targetUnitDigest": "3e5e142b83b71fded7d616e3275f7d83214568ffbe6db84344a947af7396fb35"
+        },
+        {
+          "claimId": "claim_3d97c79e3477c56e002f75f27a964f3a",
+          "sourceUnitDigest": "1da5dbf71df3630ae3c2e804d97177c27136b04f98172137611050b7dc04737f",
+          "targetUnitDigest": "1da5dbf71df3630ae3c2e804d97177c27136b04f98172137611050b7dc04737f"
+        },
+        {
+          "claimId": "claim_b92b91d896acc8e12cab661f32b82ec1",
+          "sourceUnitDigest": "9f9a9bbe51e48671554de64fc8923d9aa482ab6fef7234c67e90d4aba31a24ac",
+          "targetUnitDigest": "9f9a9bbe51e48671554de64fc8923d9aa482ab6fef7234c67e90d4aba31a24ac"
+        },
+        {
+          "claimId": "claim_f7c0aa553e9100dbf3647b7e4957130e",
+          "sourceUnitDigest": "68676eb74d56ca6399f90f5300eb65f0df18d0be5d5ed0a81d7fc7adee7df0cd",
+          "targetUnitDigest": "68676eb74d56ca6399f90f5300eb65f0df18d0be5d5ed0a81d7fc7adee7df0cd"
+        },
+        {
+          "claimId": "claim_a7cb506a2c73561b1a4dde1e62fe273c",
+          "sourceUnitDigest": "65f83569620ad9de444a1d8e615a00fd02fd5c263b83b12c8e45b4fce6ce0e5a",
+          "targetUnitDigest": "65f83569620ad9de444a1d8e615a00fd02fd5c263b83b12c8e45b4fce6ce0e5a"
+        },
+        {
+          "claimId": "claim_b565eca9e1cf36dac6b27e59ae090435",
+          "sourceUnitDigest": "e4728d452e64916bdcaf5905a2288a6c3ce9a215e94b7e21760127b861ecddc8",
+          "targetUnitDigest": "e4728d452e64916bdcaf5905a2288a6c3ce9a215e94b7e21760127b861ecddc8"
+        },
+        {
+          "claimId": "claim_fb6f32b5b22654b9f92dfccd337713a4",
+          "sourceUnitDigest": "648523d99139a9192bdd96ff1be645a0a97a86053aa795bad3fea93ac3be3b69",
+          "targetUnitDigest": "648523d99139a9192bdd96ff1be645a0a97a86053aa795bad3fea93ac3be3b69"
+        },
+        {
+          "claimId": "claim_76aa81473d09688fc99edeb78b4200a2",
+          "sourceUnitDigest": "3d5bc8070af3c864f96a5c110dfbdd9b3b3020fe0ae33769f65d0f57d273103d",
+          "targetUnitDigest": "3d5bc8070af3c864f96a5c110dfbdd9b3b3020fe0ae33769f65d0f57d273103d"
+        },
+        {
+          "claimId": "claim_87eb6f1855000fbe6716641a538751f2",
+          "sourceUnitDigest": "410ae15c827a5086f1da06caa97796766b69258b2d677473859b5dda40b24d08",
+          "targetUnitDigest": "410ae15c827a5086f1da06caa97796766b69258b2d677473859b5dda40b24d08"
+        },
+        {
+          "claimId": "claim_45f6b33db66126c89c387d282432b588",
+          "sourceUnitDigest": "1193a7e54406ff97afdfea0809f669f0ec8beae5e8684743f84a59c3033d88c2",
+          "targetUnitDigest": "1193a7e54406ff97afdfea0809f669f0ec8beae5e8684743f84a59c3033d88c2"
+        },
+        {
+          "claimId": "claim_819e886f021031f89a3f30e8c7d48f36",
+          "sourceUnitDigest": "7ae844aa8784765b85bc7107ea2831a2db4f70e73a1541cadea070fcff36b930",
+          "targetUnitDigest": "7ae844aa8784765b85bc7107ea2831a2db4f70e73a1541cadea070fcff36b930"
+        },
+        {
+          "claimId": "claim_601a132ae1d97b6b21ba9ad345960cf2",
+          "sourceUnitDigest": "ff553a6771cc14cd01ba55c796a53cfc99a90764553275714e0bfba803db9d66",
+          "targetUnitDigest": "ff553a6771cc14cd01ba55c796a53cfc99a90764553275714e0bfba803db9d66"
+        },
+        {
+          "claimId": "claim_83408164d5b5b2b16d029d5d23a401fc",
+          "sourceUnitDigest": "94227e29d68ef7d1e08b1429ce6bf5333755de9644864c446283d2ffedd3e6f4",
+          "targetUnitDigest": "94227e29d68ef7d1e08b1429ce6bf5333755de9644864c446283d2ffedd3e6f4"
+        },
+        {
+          "claimId": "claim_937e450eee820c23e23b237410fad831",
+          "sourceUnitDigest": "edb5a67562b7c8d22756d2be6c7bd31a6c64fb3058dba2393b398f974ba31b0f",
+          "targetUnitDigest": "edb5a67562b7c8d22756d2be6c7bd31a6c64fb3058dba2393b398f974ba31b0f"
+        },
+        {
+          "claimId": "claim_b36c9a2774a560c9770ea76cac370981",
+          "sourceUnitDigest": "2e116f6a2e2a60f1782ab5e9ce00cc5f19e0d1cbee58d3f1d5225723051d3018",
+          "targetUnitDigest": "2e116f6a2e2a60f1782ab5e9ce00cc5f19e0d1cbee58d3f1d5225723051d3018"
+        },
+        {
+          "claimId": "claim_75a159feeaecad3b083187df1ee065bb",
+          "sourceUnitDigest": "05fa0b1f6441172fb822da7af9dd684e33dbdd348f6a82daacfa4e2e524034d5",
+          "targetUnitDigest": "05fa0b1f6441172fb822da7af9dd684e33dbdd348f6a82daacfa4e2e524034d5"
+        },
+        {
+          "claimId": "claim_ee1436df8e38efc584bc20fd458e0ed9",
+          "sourceUnitDigest": "330034de11cfdf5763a7c14b598504341abd5858ea1934d571e432d670a0b0d5",
+          "targetUnitDigest": "330034de11cfdf5763a7c14b598504341abd5858ea1934d571e432d670a0b0d5"
+        },
+        {
+          "claimId": "claim_4454ffcff8f7b0f7b18b1449ae01b26e",
+          "sourceUnitDigest": "506fc2ce1a95da10f86dffab7a89a69000bc0b2db0b6e1a5848530e3835da990",
+          "targetUnitDigest": "506fc2ce1a95da10f86dffab7a89a69000bc0b2db0b6e1a5848530e3835da990"
+        },
+        {
+          "claimId": "claim_22272aa8f74eb216c144ddfb7e152ea9",
+          "sourceUnitDigest": "9364392a58a010cda32484e3444be36d4741ba986b0a52ab203951f2680c6718",
+          "targetUnitDigest": "9364392a58a010cda32484e3444be36d4741ba986b0a52ab203951f2680c6718"
+        },
+        {
+          "claimId": "claim_14e6ea3df43f9cdc7d1d0012fce7d72b",
+          "sourceUnitDigest": "f8639f7babf87f17b35837301c5a0aadbb8514335aafd593b457cf2ab609d263",
+          "targetUnitDigest": "f8639f7babf87f17b35837301c5a0aadbb8514335aafd593b457cf2ab609d263"
+        },
+        {
+          "claimId": "claim_db4ded5f11b6629bbbd11529d25dcee3",
+          "sourceUnitDigest": "16306cf272d3f9ce3fa90d980e647aa268c9480c5f950837a24a68175edd7664",
+          "targetUnitDigest": "16306cf272d3f9ce3fa90d980e647aa268c9480c5f950837a24a68175edd7664"
+        },
+        {
+          "claimId": "claim_d211d214d0b391c4059b874baa1f881e",
+          "sourceUnitDigest": "45665dadaf469335f3533a8b7900cfa69c8c779bc908aaf1fe2209b3e822cba3",
+          "targetUnitDigest": "45665dadaf469335f3533a8b7900cfa69c8c779bc908aaf1fe2209b3e822cba3"
+        },
+        {
+          "claimId": "claim_29835ebab097bc7526dd5c6b38846903",
+          "sourceUnitDigest": "30b27343fac7e0f181a1c5cf99d2652f5c6b6eb16ec4ca748db100131561a86b",
+          "targetUnitDigest": "30b27343fac7e0f181a1c5cf99d2652f5c6b6eb16ec4ca748db100131561a86b"
+        },
+        {
+          "claimId": "claim_377357b936192368c724fd58952ba91a",
+          "sourceUnitDigest": "91148848f2b170a4ff78d913cd4a93a4195e4d6b0e5323e1399f26c2d890cdc1",
+          "targetUnitDigest": "91148848f2b170a4ff78d913cd4a93a4195e4d6b0e5323e1399f26c2d890cdc1"
+        },
+        {
+          "claimId": "claim_444dec3006b483519062790eaacd32eb",
+          "sourceUnitDigest": "5e997cc4a3b514f64f820d3dd603dd333f33702817c260ce76ece15eea85f268",
+          "targetUnitDigest": "5e997cc4a3b514f64f820d3dd603dd333f33702817c260ce76ece15eea85f268"
+        },
+        {
+          "claimId": "claim_d730647e7bb69bbf8f545640d35aa184",
+          "sourceUnitDigest": "f6980e7d5a2bb1d21a27583d989f97200d6d8193e2cdc3ca14f0c5ff75810941",
+          "targetUnitDigest": "f6980e7d5a2bb1d21a27583d989f97200d6d8193e2cdc3ca14f0c5ff75810941"
+        },
+        {
+          "claimId": "claim_ceee14a069e00b70bd582628abcd083f",
+          "sourceUnitDigest": "cbf87a207ebf8554c5abc2a5891c9253f6c756c124f7c8c570cbb2539ac9341c",
+          "targetUnitDigest": "cbf87a207ebf8554c5abc2a5891c9253f6c756c124f7c8c570cbb2539ac9341c"
+        },
+        {
+          "claimId": "claim_4754daed02bb99d87cb60a257fa979cd",
+          "sourceUnitDigest": "acc728a870c5a2a08b483d54e22da891dd71a0e558cd76e5650f8bf798aaa1df",
+          "targetUnitDigest": "acc728a870c5a2a08b483d54e22da891dd71a0e558cd76e5650f8bf798aaa1df"
+        },
+        {
+          "claimId": "claim_95857727a0d2bd6dd05515f82e85aa89",
+          "sourceUnitDigest": "e411ec4cc1d1b6116afaea9de8ba19613d97cb544a44ac1797eb0c444ff33521",
+          "targetUnitDigest": "e411ec4cc1d1b6116afaea9de8ba19613d97cb544a44ac1797eb0c444ff33521"
+        },
+        {
+          "claimId": "claim_2af3ee680336bc17c1c0df36b0cee2b6",
+          "sourceUnitDigest": "e7a140d23771757324d4f0397afc9ec1bf5538d419e411b97199ab31655e2bf7",
+          "targetUnitDigest": "e7a140d23771757324d4f0397afc9ec1bf5538d419e411b97199ab31655e2bf7"
+        },
+        {
+          "claimId": "claim_ec223028877db481d1f1dd0ba3419632",
+          "sourceUnitDigest": "50b5d472771cb70d18300f45222c8c31031deba0bb10385588a56252510579eb",
+          "targetUnitDigest": "50b5d472771cb70d18300f45222c8c31031deba0bb10385588a56252510579eb"
+        },
+        {
+          "claimId": "claim_7a382f6a6153c5b68cdb7fd557598623",
+          "sourceUnitDigest": "4a6916511542a6e023da4a7d391f67ab71b017aa7943e4dee380e8805664517e",
+          "targetUnitDigest": "4a6916511542a6e023da4a7d391f67ab71b017aa7943e4dee380e8805664517e"
+        },
+        {
+          "claimId": "claim_6ed7f2c285615b6ef028736452657e35",
+          "sourceUnitDigest": "826253ddea0cac6b985e44787301209800938c33d737b2fb9862fa5436d208af",
+          "targetUnitDigest": "826253ddea0cac6b985e44787301209800938c33d737b2fb9862fa5436d208af"
+        }
+      ]
+    }
+  ]
+}

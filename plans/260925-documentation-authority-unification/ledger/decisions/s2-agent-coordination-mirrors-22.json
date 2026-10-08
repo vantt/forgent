@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-22",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md",
+      "blobSha": "32d6b02696f94669cbcef0d86d9748f279d66e94"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md",
+      "blobSha": "4af590e762ac5be2772e504a2eee4ba07f318f9d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+      "blobSha": "d80e67337415261c8360a0535ac96bdc79632e90"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md",
+      "blobSha": "3d3d86d7d7b0907a152220dfe0434ad4214f03c9"
+    }
+  ]
+}

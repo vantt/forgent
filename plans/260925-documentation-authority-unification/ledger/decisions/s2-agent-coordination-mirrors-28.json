@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-28",
+  "sources": [
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-probe.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/failure-result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/result.json",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-2-boundary.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-3-mount-order.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-4-pane.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-5-pid-preservation.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-6-unshare-confinement.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-7-unshare-pane.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-inner.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-shell.sh",
+    "docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-findings.md",
+      "blobSha": "d2c20838350a0372217c4deddff8030fa9e29f0b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/agent-in-session-probe.sh",
+      "blobSha": "3a83e12e36ce6900b153d580729f393f0c997aa4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/env-probe.sh",
+      "blobSha": "e9330b5cdd1247f2ebcd62767420aec0f5a92491"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/findings.md",
+      "blobSha": "f013bf9fc021a19135f068f50a46b5ae50e1a120"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+      "blobSha": "da6d93d39e4d2e4b79468f47897853145ff59db6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-probe.sh",
+      "blobSha": "27f59bf52fb63bc03497de5346a50f18c971dc12"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/provisioned-worker-probe.sh",
+      "blobSha": "99a7ea298c667143595ba1773ff317e4bdb3481c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+      "blobSha": "a463c073e04e03413cef08d858ec9f84dee4c969"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/skip-permissions-probe.sh",
+      "blobSha": "c8a13857375493e9d9c3ed2972ba351c45e9e48c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/socket-probe.sh",
+      "blobSha": "93e45bf53ff9d7780834825b4629c0ca5deb5f61"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-probe.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-probe.sh",
+      "blobSha": "697fc4ea78f131b9ab40cb2abeffb997dc6cd6a9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/p6-result.json",
+      "blobSha": "79c1e42cb7c59d03a1e2fdd143f00466c4846e96"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs",
+      "blobSha": "106fe7bd291208b4aefc080dd0f69984228036a9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-result.json",
+      "blobSha": "56a8d4a61173513ba044e62f00b00151757dae27"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+      "blobSha": "efbcdca2c406d8db61cebd944e56a9b327bac310"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-result.json",
+      "blobSha": "d066313ff25505263b979bc0089314872f4230ec"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/failure-result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/failure-result.json",
+      "blobSha": "a5d7e9d53b548bf5e954bcab2c3a410d74488643"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+      "blobSha": "c0facb09e0cf4249f0ee471e8f2e9a755c6fac64"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-result.json",
+      "blobSha": "0137fca9ca3768a659fc821b7f9179bd7b712628"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+      "blobSha": "3c8523766e5acfce621961ee9b7266b72e586ba3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-result.json",
+      "blobSha": "373eb80358437c21009228aa663a7e70e9968f44"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/result.json",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/result.json",
+      "blobSha": "e6b1d20af9076946d2ee5bc0c578b770501db03f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+      "blobSha": "59970aecde73607098ae2f15b534550351580a45"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+      "blobSha": "b0a95ed3d1b5b29f513613a356e9acad1c2714df"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-1-smoke.sh",
+      "blobSha": "cdce4146f3966fafe80d981ba076ee34642b57d1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-2-boundary.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-2-boundary.sh",
+      "blobSha": "b4e4a96ba3c9da1f4c5b0285505405b80e94bb24"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-3-mount-order.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-3-mount-order.sh",
+      "blobSha": "259bd0a7b19add80d428c7ba8aefb9e4a2fcff93"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-4-pane.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-4-pane.sh",
+      "blobSha": "d53e49365b061dd1cbb96f23cc32fe2348ce9286"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-5-pid-preservation.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-5-pid-preservation.sh",
+      "blobSha": "5fd42879ced63e783e759fa18e140318045ef36f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-6-unshare-confinement.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-6-unshare-confinement.sh",
+      "blobSha": "6a07069b3ed21f61611bec15f5ec0dc0194a6f92"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-7-unshare-pane.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/bwrap-probe-7-unshare-pane.sh",
+      "blobSha": "e405c3e7a9c8ebbec16b740ffa20048c174e7600"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+      "blobSha": "5d6585ef3d39f7c4aeb9516e71d549b1edd73e3e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-inner.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-inner.sh",
+      "blobSha": "4009e10bd5fc86737501698b5d5d72c54eba9871"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-shell.sh",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-shell.sh",
+      "blobSha": "7adc8cff3aeffe03b34ba4640299267cbd99751c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md",
+      "target": "docs/platform/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md",
+      "blobSha": "c63db533bea90b59b1ddd900b182d4b116583044"
+    }
+  ]
+}

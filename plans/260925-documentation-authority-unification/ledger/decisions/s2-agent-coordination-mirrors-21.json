@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-21",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md",
+      "blobSha": "36b7d3645487c09c6a1526a2e1c8c148435bb3cd"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "blobSha": "e6e784e2caa57ac0e21c81dcf9e4fcadd78c23e1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md",
+      "blobSha": "1bf6fdba4c1d08fa3f9e58a9d0949c1bb4e4d5ec"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md",
+      "blobSha": "8c225d59b54bb2a16e72a60733d79bc9065d5438"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+      "blobSha": "1d43aaf3a5a413fd7a9e52793885c5e0b3c1e24a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md",
+      "blobSha": "f3d1264e694991dc56caff8227c3e826c206a4ee"
+    }
+  ]
+}

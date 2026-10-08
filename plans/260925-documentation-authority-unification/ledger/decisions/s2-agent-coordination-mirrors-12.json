@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-12",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-07-mvp/P02.5.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/P03.1.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/P03.3.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/assignment.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/command-stdout.txt",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/contract.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-report.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-result.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/exit.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/result.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/run.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/assignment.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/command-stdout.txt",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/contract.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/non-driving-check.txt",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-report.md",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-result.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/exit.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/result.json",
+    "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/run.json",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+    "docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/P02.5.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/P02.5.md",
+      "blobSha": "5ce52f55b62374e09953ef2d818fe51e856d2e5c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/P03.1.md",
+      "blobSha": "6edee23653309805d05e5f80a12d361522065a2d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.3.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/P03.3.md",
+      "blobSha": "0ecf15649f13d5ff4491da05ab1a9062042cad84"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md",
+      "blobSha": "478ab7b33f6ef9ed8a9274839ac9b7cbca11a0c7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md",
+      "blobSha": "7fb6685d13f49b497b01082914bd6c164f28ce01"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/assignment.json",
+      "blobSha": "267a3fd14152e209c4b8585b4013babcf554ae5f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/command-stdout.txt",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/command-stdout.txt",
+      "blobSha": "f3f2c987eb86274e97ca7077b1e63732fa4087e4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/contract.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/contract.json",
+      "blobSha": "f100cb26dd7ab467e09a7f969af509bbfc60f183"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-report.md",
+      "blobSha": "1d15eb6e9fecba404f6d6bc16aa9f7783e254ed8"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-result.json",
+      "blobSha": "b0ecd7defe380d5fcc3b959be581d86b68065d76"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/dispatch-plan.json",
+      "blobSha": "94a519497310e44fe5ced0229aca37d5c8f86dc9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/exit.json",
+      "blobSha": "fccbc4d0c80e63d2cebcd988c9b10d25dcc0f384"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/result.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/result.json",
+      "blobSha": "24016e0c191b600aee14c304ee62105aae73ea4a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/run.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/run.json",
+      "blobSha": "674c1a5949ca9ecd96792db5b4548a00569b1c2a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/assignment.json",
+      "blobSha": "4989ea034819655bec7ff49d794cec8cd6b38bef"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/command-stdout.txt",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/command-stdout.txt",
+      "blobSha": "36e16b0fb965d79475305c873c6ae2e4f1d29d93"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/contract.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/contract.json",
+      "blobSha": "1ec207d7d2d2e05f84dfd54f5c4f68ba28608834"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/non-driving-check.txt",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/non-driving-check.txt",
+      "blobSha": "c4d74986a875315507afd3eec10da95a6e2a98e3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-report.md",
+      "blobSha": "05921a8ca5a6c46cc1bf46a25703b61962612d58"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-result.json",
+      "blobSha": "857c27925e7a20149c865d90dbe5164decfecad3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/dispatch-plan.json",
+      "blobSha": "2931f1cf1250e9d71f9b6f718616fd5f3ab2de48"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/exit.json",
+      "blobSha": "322d4d388b1cfa948ef19b735de2d87401ac88c5"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/result.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/result.json",
+      "blobSha": "7c7632ac5ee43bb8fd1785fea18000fc5641a836"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/run.json",
+      "target": "docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/run.json",
+      "blobSha": "87307ace7f46c32c09835e7d6dbe488bb696fae3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+      "blobSha": "a88c6aa6df4a1af8154d62fe77a4b50b5aa3efa9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "blobSha": "efe6c66bd40cfd3e1b9797aa9663518186b9ce6d"
+    }
+  ]
+}

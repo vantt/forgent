@@ -1,0 +1,731 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-07",
+  "sources": [
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/reviewer-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_004-system-shaper-exec-family-a-run01-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_005-alternative-shaper-exec-family-b-run01-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_009-synthesizer-crash-resume-lineage/run01-run.json-frozen-running-no-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_009-synthesizer-crash-resume-lineage/run02-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_authority_attack2-events.jsonl",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_main-events.jsonl",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_visibility-events.jsonl",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/skill-wrappers-suite-run.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/assignment.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/evidence.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/exit.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/run.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stdout.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/assignment.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/evidence.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/exit.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/run.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stderr.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stdout.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/assignment.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/evidence.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/exit.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/run.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stdout.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/assignment.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/evidence.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/exit.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/run.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stderr.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stdout.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/assignment.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-report.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/dispatch-plan.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/evidence.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/exit.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/result.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/run.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stdout.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/human/1-person.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/01-open.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/02-retry-and-shape.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-01-open.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-02-critique.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-03-assess-retry.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-04-assess-retry2.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-05-assess-embedded.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-07-synth-redteam.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-01-open.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-02-critique.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-03-assess-retry.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-04-synth-redteam.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-05-explain.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-06-decide-close.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-01.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-02.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-01.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-02.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-03.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-04.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-05.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-06.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-09.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-01.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-02.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-03.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-04.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-05.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-06.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-07-close.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/human/1-person.md",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/agy-trust-prompt.txt",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/codex-trust-prompt.txt",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-02-critique.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-03-synth-redteam.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-04-explain.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-05-decide-close.json",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-01.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-02.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-03.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-04.log",
+    "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-06-close.log",
+    "docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt",
+    "docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md",
+    "docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md",
+    "docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md",
+    "docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md",
+    "docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md",
+    "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p01.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/reviewer-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/reviewer-report.md",
+      "blobSha": "ffc349db605984361c1713d808630e574fe3336b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_004-system-shaper-exec-family-a-run01-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_004-system-shaper-exec-family-a-run01-result.json",
+      "blobSha": "d1da38764865614e7f7d40b0f256c4fac0f2295a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_005-alternative-shaper-exec-family-b-run01-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_005-alternative-shaper-exec-family-b-run01-result.json",
+      "blobSha": "1037d113ae00ab096fa65e784fad82e8343aafbe"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_009-synthesizer-crash-resume-lineage/run01-run.json-frozen-running-no-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_009-synthesizer-crash-resume-lineage/run01-run.json-frozen-running-no-result.json",
+      "blobSha": "5df3c5d3a367034dd1609bb75acb9ed265fa5c33"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_009-synthesizer-crash-resume-lineage/run02-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_009-synthesizer-crash-resume-lineage/run02-result.json",
+      "blobSha": "e284dcdc62dd81bf5f02cb8baf5d8aedfce2e364"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_authority_attack2-events.jsonl",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_authority_attack2-events.jsonl",
+      "blobSha": "ec2292f5bf69f1f815bf08fca89b4717e322fc04"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_main-events.jsonl",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_main-events.jsonl",
+      "blobSha": "12270fa0d0fadcf2e8637565d5f74bd64688e319"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_visibility-events.jsonl",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_visibility-events.jsonl",
+      "blobSha": "cb071f2e6962e5afc4e8c97bc3a6b8a7be257e43"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/skill-wrappers-suite-run.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/skill-wrappers-suite-run.log",
+      "blobSha": "097a5bff771ae3bd18a24c329dbcd93914176e02"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/assignment.json",
+      "blobSha": "6e48cb1043b87e154b1883ed963081bb1be595b3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-report.md",
+      "blobSha": "d1cd6471192e0763eb66107986ba5a4023188735"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-result.json",
+      "blobSha": "8aeb8b011412650b0d2dd3368614b96c5fbccb09"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/dispatch-plan.json",
+      "blobSha": "536885dabd283701603e65938ecb64abe709677b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/evidence.json",
+      "blobSha": "b937e4d35a6f3e8cd42c303139a61e5dc4d812cb"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/exit.json",
+      "blobSha": "29267a8af651c7fb1e362236b4fa8c993a88514e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/result.json",
+      "blobSha": "c270caa7e6e40479978e68c3cce84313b2aad918"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/run.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/run.json",
+      "blobSha": "3e83b05ac12d2dcc7bc037630facc3f343233983"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stdout.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stdout.log",
+      "blobSha": "0e827237172804fc26e36e4fe18333a44aaee18f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/assignment.json",
+      "blobSha": "945e7035837c52e935a3394a0bb496d115cb3f4c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-report.md",
+      "blobSha": "d97981f5758767c37e896749cc7b5ea198a78785"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-result.json",
+      "blobSha": "08cdceab998393f1f8d4728f190ea2703903f69e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/dispatch-plan.json",
+      "blobSha": "0abb38cd247ae37d4e5c65ad150dbb3be8730b5f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/evidence.json",
+      "blobSha": "b98033874e6aa7b97140114a6f3567c52c65893c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/exit.json",
+      "blobSha": "aa1dcb5cb5f250defc1b20986f6c71814efaeb87"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/result.json",
+      "blobSha": "b8603401e24cd18dc87d466127e1c8ff8477dc42"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/run.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/run.json",
+      "blobSha": "9a046ac09e6caa7df2663330c5913ceac3a57df5"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stderr.log",
+      "blobSha": "788d0c16566e597acf77339806552fb9da7099b3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stdout.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stdout.log",
+      "blobSha": "57412a6f5e1358ece253b689c21b3390dfde8e2e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/assignment.json",
+      "blobSha": "8ab1f5fcdd0a1320c2e41c9b4ea5fdd0c2340223"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-report.md",
+      "blobSha": "8e493450ec7d0287550e0c0f651e00b17f60ceac"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-result.json",
+      "blobSha": "86608b3def2ae66ce5678d3242b4e67f1ba6af77"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/dispatch-plan.json",
+      "blobSha": "2109eab593f1ffd44afb6bf98e3d491efbbd9f8e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/evidence.json",
+      "blobSha": "4690c9dbf1f5c8054ee129e13f7d1f7eeeaa2852"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/exit.json",
+      "blobSha": "efa05b296abc0c215e563fba9a82a1474a6630e9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/result.json",
+      "blobSha": "5864fb1b84d490ac627288363ed14a3d6a81d45d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/run.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/run.json",
+      "blobSha": "fd433ae55b8e9840d82f31691b6c0a761064a912"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stdout.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stdout.log",
+      "blobSha": "61fd32c7dac63c2e815db6ec1f06ce27fcec2181"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/assignment.json",
+      "blobSha": "9dd2e3b1584f75fa8ef9b4d687878c05b09a67ed"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-report.md",
+      "blobSha": "44eb265f51036fe395aac0a0792cbd75bad307f7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-result.json",
+      "blobSha": "055d34d03e277b20123da74f0be23c2adec54912"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/dispatch-plan.json",
+      "blobSha": "b01d79fd4af0c828dc1bebf8e422395c17fc75b6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/evidence.json",
+      "blobSha": "ba6c0626c221177664e195e770104c767ebfb2c9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/exit.json",
+      "blobSha": "53cb3004ec9e0f4e3e74bfc8c1ccb813c567b275"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/result.json",
+      "blobSha": "cec59febb089d7a0c0f79061a651600d58b25ffe"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/run.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/run.json",
+      "blobSha": "18f7ca6ee8f3241d57d519ccd5598617f88a40e0"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stderr.log",
+      "blobSha": "6b3039a10a68f288d3185200f2c7dd04e5558afd"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stdout.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stdout.log",
+      "blobSha": "60fc0e38d249d78dc91d4ff992ba7ae3062ad2e9"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/assignment.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/assignment.json",
+      "blobSha": "906887d13c582da50c432fa5c0cdcada86dd5590"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-report.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-report.md",
+      "blobSha": "5b589c9b24e522768ee1cc46ebe5453ec5333d2d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-result.json",
+      "blobSha": "9502a7734467c0a5060de06a645718f428fb3315"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/dispatch-plan.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/dispatch-plan.json",
+      "blobSha": "376b0516ef21ff5a790553a10912e8a45ff8fdb0"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/evidence.json",
+      "blobSha": "ca3ca94f39a7efa743d29450f919ca2a8bada160"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/exit.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/exit.json",
+      "blobSha": "621d4c5ff3d4b44e24becae0628c59076cd2960d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/result.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/result.json",
+      "blobSha": "b1bbb5261e99605f52c56302659cbe4fabe2817b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/run.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/run.json",
+      "blobSha": "67e0f0c51449de183d1fc9cbd6e58ffdbfd4efab"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stdout.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stdout.log",
+      "blobSha": "66dcaa54b2329610a097efe89dba914515083763"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/human/1-person.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/human/1-person.md",
+      "blobSha": "d4a9ac2d7fcde0b7556e5ce3e6697d7191191fd8"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/01-open.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/01-open.json",
+      "blobSha": "0d6ac8cc5746ab97fdd6e2c0bfbcbe494624e2c2"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/02-retry-and-shape.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/02-retry-and-shape.json",
+      "blobSha": "6ad8a969c8ad998a1cfd4425bd5bc1484886fdd8"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-01-open.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-01-open.json",
+      "blobSha": "d1af26c138574b014855d67efde2b1e750fbb63a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-02-critique.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-02-critique.json",
+      "blobSha": "867460f29b86192488d23e743059e3f32f96a392"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-03-assess-retry.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-03-assess-retry.json",
+      "blobSha": "95cd5b8ba9e8a2795c4433e3609a2a18cebe7df6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-04-assess-retry2.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-04-assess-retry2.json",
+      "blobSha": "85f1d086566bbba794d6abbef567feee44b52757"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-05-assess-embedded.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-05-assess-embedded.json",
+      "blobSha": "3d9d91bf963f41a92f130fb605f582e64d412082"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-07-synth-redteam.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v2-07-synth-redteam.json",
+      "blobSha": "99fe116065e6f2a0b9f2379cb3ae72b1cdc9fcde"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-01-open.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-01-open.json",
+      "blobSha": "0a29e1360ebff2ab79abab7099f2bd30cc9cb4ed"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-02-critique.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-02-critique.json",
+      "blobSha": "5a2699aeb830e04f492a39253aa4fdf840dcf688"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-03-assess-retry.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-03-assess-retry.json",
+      "blobSha": "ff603a9ecca6964fef727d1382bf97f3c83df0fc"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-04-synth-redteam.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-04-synth-redteam.json",
+      "blobSha": "339f990322f5358753e3037322ad84184ed7cddf"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-05-explain.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-05-explain.json",
+      "blobSha": "b67a2e6996aba26d9a00edabd986bbb6bd0bf389"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-06-decide-close.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-06-decide-close.json",
+      "blobSha": "f9b065fc409461f126aae039aa1884e76a2650a7"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-01.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-01.log",
+      "blobSha": "5788335a9945a46227fbb56924c81ba9c7a33ef1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-02.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-02.log",
+      "blobSha": "969555afea76dd8d0d4bb1a82d676f6d3c18186e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-01.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-01.log",
+      "blobSha": "ffbe3208a3b0fc0924b8c86ef2e7e5cd098fca0c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-02.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-02.log",
+      "blobSha": "395096c6f07ada726c05ddf6f7734b90606fa49a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-03.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-03.log",
+      "blobSha": "040f55e9b8d04e969ceee41176280c01cf80631d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-04.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-04.log",
+      "blobSha": "818fdf4d23a74954b4fd25b519b41457cbff2f15"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-05.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-05.log",
+      "blobSha": "696b575a9d11f7ccd3713813ed288ee2fdd39479"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-06.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-06.log",
+      "blobSha": "d81b5527440c8c1c081ec27f3b7b22658320b896"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log",
+      "blobSha": "a3c4734fda733b589c50bb2dcdd8438dfbd03512"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log",
+      "blobSha": "a3c4734fda733b589c50bb2dcdd8438dfbd03512"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-09.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-09.log",
+      "blobSha": "e3fdde36d608f38471dda5af3d8d7ec208fc500f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-01.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-01.log",
+      "blobSha": "61ddebb99090c69dc8b458d1361e9284fe824702"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-02.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-02.log",
+      "blobSha": "5e6d1b4f32af8f18fe8aad0c45bdd06b2a8d4e3a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-03.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-03.log",
+      "blobSha": "7ed4f586ad7b9820206853ba8e9eef15b04f9c71"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-04.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-04.log",
+      "blobSha": "418bbee591c3150e7b979a242c5762aef11b4df6"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-05.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-05.log",
+      "blobSha": "e65845fab98766270dfc5a092cdbd845313de54e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-06.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-06.log",
+      "blobSha": "26a47e881a820a8b745c7b193fede3a2bbd40838"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-07-close.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-07-close.log",
+      "blobSha": "9568d9654c016984719811e245cb879d7dae21a1"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/human/1-person.md",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/human/1-person.md",
+      "blobSha": "7f2f44a31cbd44431ae8810d93ca4865ad97ab0a"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/agy-trust-prompt.txt",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/agy-trust-prompt.txt",
+      "blobSha": "fd28572050d728385f807b0ac7222fc51ae2ac7e"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/codex-trust-prompt.txt",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/real-captures/codex-trust-prompt.txt",
+      "blobSha": "d2b8e487e7e4a6689740b73067825a3430aa70f4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json",
+      "blobSha": "c561f088f4c05a6ec8ab0eb6adbe6b6e7b73735f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-02-critique.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-02-critique.json",
+      "blobSha": "7ac9abac9bc4e9c208e1afc2c87de9f15c92a239"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-03-synth-redteam.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-03-synth-redteam.json",
+      "blobSha": "043249c4a4ff2174821eed5c149ef5bea835070d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-04-explain.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-04-explain.json",
+      "blobSha": "f62ea046a7909f93f4648d625240998109bea2aa"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-05-decide-close.json",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-05-decide-close.json",
+      "blobSha": "60c72057b9a8f7f4c1115c46dd711c97eec6f039"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-01.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-01.log",
+      "blobSha": "c40ff5e92399e1b4eaece704de7e8b52a612995b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-02.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-02.log",
+      "blobSha": "76f91abdd445617ae23a90fce3ef769d31c3510d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-03.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-03.log",
+      "blobSha": "b769e6f9e72a8580b009ae5acc5067712a792ffc"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-04.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-04.log",
+      "blobSha": "db4789c94d4b3d3b06e234a4e4fdf1e71c0cfd49"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-06-close.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-06-close.log",
+      "blobSha": "930dc53b7cf72209408e3a6881de5dc30749f5de"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt",
+      "target": "docs/platform/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt",
+      "blobSha": "b1b55a9dd1b936d5087b80e4883724a83c02461c"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md",
+      "target": "docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md",
+      "blobSha": "2f69efaa873410e55e92a8c10ed47c7466388395"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md",
+      "target": "docs/platform/agent-coordination/verification/code-implementation-track-policy/p02.md",
+      "blobSha": "981a60a7010a3675d316dd5953ae63547551aae2"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md",
+      "target": "docs/platform/agent-coordination/verification/code-implementation-track-policy/p03.md",
+      "blobSha": "cd57a7059b82d9a0151321083b694f5dee3de102"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md",
+      "target": "docs/platform/agent-coordination/verification/code-implementation-track-policy/p04.md",
+      "blobSha": "18d45297a9a81e91a72099b717b4f749cd43bb4f"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md",
+      "target": "docs/platform/agent-coordination/verification/code-implementation-track-policy/p05.md",
+      "blobSha": "ae3d57f329995e736aec8b26497ad68dab5bbe21"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+      "blobSha": "98857e7f8526d49fe2f6bd2000f1e1252e46a5a5"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/index.md",
+      "blobSha": "8cf166a98cb213b0672f3cd95a093214dfc1f8dc"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/p00.md",
+      "blobSha": "50be79fd8c3dcf97547628dee3274622f592c1aa"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p01.md",
+      "target": "docs/platform/agent-coordination/verification/code-panel-multicell-facade/p01.md",
+      "blobSha": "357bbe9aff3657a905ab5a0689a5f349c7176300"
+    }
+  ]
+}

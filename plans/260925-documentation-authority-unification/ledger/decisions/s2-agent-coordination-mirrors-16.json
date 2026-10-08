@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-16",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+    "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+    "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
+    "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md",
+    "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+    "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md",
+      "blobSha": "c6d6114741a15c86138321c06135f0738d9fbbc3"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md",
+      "blobSha": "9ee79ddebc7739341f2d4dfe4e790a04b98c2fa4"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
+      "blobSha": "7af380b5852a8350a3f247f924d37ecfa7715a06"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md",
+      "blobSha": "138d76557a68fce2a473c9096539db3ea1660739"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+      "blobSha": "0ac2610a76d510015f5daa930bbb3da2bcc1daa2"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md",
+      "blobSha": "e4a1d42981f440de2ea745a3ea5b2f473618ad2b"
+    }
+  ]
+}

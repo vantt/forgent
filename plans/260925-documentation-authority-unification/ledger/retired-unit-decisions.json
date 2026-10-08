@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-08",
+  "sourceCommit": "76585861f718c7ef0dd6150d9b92a7c7baaa3ec4",
+  "candidateCommit": "0a41d793e60631aa9073c73a941f641548862b6c",
+  "rows": [
+    {
+      "claimId": "claim_ffa208224c13eeca2cdc3a874735b802",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceUnitDigest": "22b24a25ec6e4c595e7c606a7b73285d58b6b54e028ed4070ea473010192b5ad",
+      "claimKind": "historical-context",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+      "targetAnchor": "unheaded-block-9",
+      "shownTargetDigest": "bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "reviewStatus": "pending",
+      "rationale": "The candidate inventory unit is superseded by its current unit after the two A8-authorized history-reference updates. All other bytes of the complete 128009-character unit are identical; reversing only the two recorded row replacements reconstructs the prior source-unit digest. Each old classification and locator is explicitly retained as historical context, alongside the two newly owned non-authority history carriers. This is candidate bookkeeping, not a legacy-source retirement or an authority flip.",
+      "preservationReplacements": [
+        {
+          "before": "| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+          "after": "| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |"
+        },
+        {
+          "before": "| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+          "after": "| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |"
+        }
+      ]
+    }
+  ]
+}

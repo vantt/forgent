@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-mirrors-24",
+  "sources": [
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md",
+    "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md"
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "claims": [],
+  "mirrors": [
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md",
+      "blobSha": "5cf3cb2901f16f28f918967482fa87b8b2b0ac7d"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md",
+      "blobSha": "a94cb3e976688a978422f3803fe9ebd22e7813bb"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+      "blobSha": "971b9639ae11af79b92622b75315dec2bc336d01"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md",
+      "blobSha": "e6ed7b40c98327ac58800095321fc523a8873f87"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md",
+      "blobSha": "931d8952b5650c275a6ad1b7102d076a5703546b"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md",
+      "blobSha": "d41200431dc94457f0a2e36210daccd0adfda1ab"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md",
+      "target": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md",
+      "blobSha": "8d8eb3244583ec3329534368f737beebea162624"
+    }
+  ]
+}
