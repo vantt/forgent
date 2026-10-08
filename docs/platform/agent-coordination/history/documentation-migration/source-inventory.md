@@ -14,7 +14,7 @@ Do not use this for: Runtime behavior, accepted contracts, or proof details by i
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/agent-coordination/README.md
-- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md
 ```
 
 This ledger is a temporary migration aid. It intentionally classifies source files conservatively: a file can be accepted design authority while an implementation claim inside it still needs current-checkout proof before Phase 2 promotion.
@@ -35,6 +35,8 @@ The legacy-to-target structure is now explicit without rewriting evidence:
 - `documentation-governance.md` and
   `documentation-standardization-plan.md` remain local migration/governance
   sources rather than target-area claims, so neither receives a redirect.
+
+Added in candidate: The preceding disposition records the earlier migration. The retired area policy and completed migration plan now have literal, non-authority history carriers: [documentation-governance.md](documentation-governance.md) and [documentation-standardization-plan.md](documentation-standardization-plan.md). Original source bytes and historical status fields are preserved; neither copy is current policy.
 
 No component-boundary change in Phase 7.
 
@@ -75,8 +77,8 @@ validation record.
 | `docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
 | `docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
 | `docs/architect/agent-coordination/decisions/README.md` | decision index | navigation | partial | `docs/platform/agent-coordination/decisions/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
-| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
-| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |
 | `docs/architect/agent-coordination/history/README.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
 | `docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
 | `docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
