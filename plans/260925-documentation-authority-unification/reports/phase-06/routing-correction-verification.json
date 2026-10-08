@@ -1,0 +1,686 @@
+{
+  "commit": "a8986765ebbebc20765c85c8fcfb2aaf27b01529",
+  "sourceMapCoverage": {
+    "sourceFiles": 1040,
+    "covered": 1040,
+    "uncovered": []
+  },
+  "conservation": [
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/identity-registry.json",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "identityAndSelfReviewFindings": []
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/identity-registry.json",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "identityAndSelfReviewFindings": []
+    }
+  ],
+  "bodyProof": {
+    "exit": 0,
+    "before": "fcfe78cb89585bc9ab23f11bab67d41458834fc4",
+    "after": "a8986765ebbebc20765c85c8fcfb2aaf27b01529",
+    "files": 68,
+    "markdown": 67,
+    "failed": 0,
+    "results": [
+      {
+        "path": "docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "2482cf448cd5345e16d0ddad74e47c3dd8772a37817ac14f1cad5aa016552636",
+        "afterSha256": "3c116095c0f9fd25085add37f282ffd97063978d40db61bf46725e5885a5e24e",
+        "bodySha256": "2482cf448cd5345e16d0ddad74e47c3dd8772a37817ac14f1cad5aa016552636"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "0ede4fd42832c98dc600294907d6eff2432f5abb788ab0d75b2c063365a961ea",
+        "afterSha256": "2a7c083b0635c1a7679b9a5c3a3337e9c4b44cc3e3ae6ce5e5987ae9ca640b24",
+        "bodySha256": "0ede4fd42832c98dc600294907d6eff2432f5abb788ab0d75b2c063365a961ea"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "420053f8ddc55cbefd04adb625b32e58572d0257632f549c9b158f74f85b5fe9",
+        "afterSha256": "2f963016f1573db89f8b19cdea4c767a59238a12dc1a4b4bc620d8bd0089cd6f",
+        "bodySha256": "420053f8ddc55cbefd04adb625b32e58572d0257632f549c9b158f74f85b5fe9"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "0ee9a986716f44ad8454b98f538cdaf2782308592f13e7af57ec6a09aa09ce5a",
+        "afterSha256": "09d3074a859abf556cb7fee54034af799fcc938b9a3c844f18d7f796435ebd43",
+        "bodySha256": "0ee9a986716f44ad8454b98f538cdaf2782308592f13e7af57ec6a09aa09ce5a"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "589ae8bec5899f08f70392b1bb0f3368ade8755778637d3215a83ed33cb30858",
+        "afterSha256": "969ba5f64da76515a222214955eaac68d6fb40bd1e73ddd904be4815f43410fa",
+        "bodySha256": "589ae8bec5899f08f70392b1bb0f3368ade8755778637d3215a83ed33cb30858"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "79ab728e65e7d216a1699a9b6ef821acb435912d0e9a71f87e03077dba4c58d2",
+        "afterSha256": "b8809f7d6f3de3b5970757a0dd4250262b78918023de9fd02e7e60eef27d942e",
+        "bodySha256": "79ab728e65e7d216a1699a9b6ef821acb435912d0e9a71f87e03077dba4c58d2"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "aa37d4dd85eba0c2842a721ef9768730b2be53ac325c26bc91ddd872e9564588",
+        "afterSha256": "412c6549eef2c2a3e2e8e3c86201cd814831e664fe01fe7254f416cf43bb1eae",
+        "bodySha256": "aa37d4dd85eba0c2842a721ef9768730b2be53ac325c26bc91ddd872e9564588"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "bf7ceb2311c9e58314aefdf3dd16db88b7e3d62f41cbd7b591950bb43c625e82",
+        "afterSha256": "6ac092c31c002281cde491c707e20d29e722e3797c7aafbacd99d840308e961b",
+        "bodySha256": "bf7ceb2311c9e58314aefdf3dd16db88b7e3d62f41cbd7b591950bb43c625e82"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "2684b157e30ff1b161c3229e15405d37262ea70afb2e12f2fb3b16e9889abba8",
+        "afterSha256": "d6715088af75b954a9642034e607f04a9a0c4432723830fb50b2963d6e7f9a23",
+        "bodySha256": "2684b157e30ff1b161c3229e15405d37262ea70afb2e12f2fb3b16e9889abba8"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "3350ce36709c63b36b1b064e7dc7c81520cec42cf944ecb503772d4801c9da7c",
+        "afterSha256": "fd162fbe58d911dff7c0a821bea4cfbee4e531f312d580e93db1119fee81ddc9",
+        "bodySha256": "3350ce36709c63b36b1b064e7dc7c81520cec42cf944ecb503772d4801c9da7c"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "c8746fe210384e6d97b8764585ac0720b660203bedf3f73f369c5037728d0aed",
+        "afterSha256": "b564291e08611ef3b017f03788f78ea05211ca619a524783a7a757c9e8595d6d",
+        "bodySha256": "c8746fe210384e6d97b8764585ac0720b660203bedf3f73f369c5037728d0aed"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/system-context.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "25c1d151ba19d5845c1680ac22335779eeac850709a0d29e7da3f151b847001d",
+        "afterSha256": "bb94d3bfb023d6184dcd90ed110eb65b7906fc997c1bde839e1d7ee34f5178e4",
+        "bodySha256": "25c1d151ba19d5845c1680ac22335779eeac850709a0d29e7da3f151b847001d"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "d10693aca447191e5790b929e49a8341a36b767f7bd11767a77232cce8cb4c1b",
+        "afterSha256": "cb491b29d61eb39a5a3e32d00078d2b5f0140717a7743f6dc1f62466f7d32f61",
+        "bodySha256": "d10693aca447191e5790b929e49a8341a36b767f7bd11767a77232cce8cb4c1b"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "a88dbb337e339827ad45e0434d52a6cccfe621c36fd17a8a5f7dceb62fd1317f",
+        "afterSha256": "70378870d687f1b8e575f520deeb133d1eb81c867c7963d3ebed0eb691af515a",
+        "bodySha256": "a88dbb337e339827ad45e0434d52a6cccfe621c36fd17a8a5f7dceb62fd1317f"
+      },
+      {
+        "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "14178b7bf2feafd58e2f544d3788054db8ab4cfd021a0f0965e350396c4af592",
+        "afterSha256": "8f45a33a3d6cac30e8dfd384cba8cb0fdd5cfff8096f4ad7817c4ff92837d36b",
+        "bodySha256": "14178b7bf2feafd58e2f544d3788054db8ab4cfd021a0f0965e350396c4af592"
+      },
+      {
+        "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "dcf2dfcff950eb27b206c2982a6f29a3e1e2c164d146bdfab9d0b740b2d0c72c",
+        "afterSha256": "a661102709e15f8e28b5d03b97be1ffdb7fb78d9b3fb7469bd9c09bfa275b753",
+        "bodySha256": "dcf2dfcff950eb27b206c2982a6f29a3e1e2c164d146bdfab9d0b740b2d0c72c"
+      },
+      {
+        "path": "docs/platform/agent-coordination/contracts/flow-definition.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "8be8965de3d0c01b9aa035f281bcb9a29e52c1e6fef4145db946d844693da001",
+        "afterSha256": "77e6d8870ac100a01eaea2f539a8535d53dc48ac6137cf14c7cd771b166735a2",
+        "bodySha256": "8be8965de3d0c01b9aa035f281bcb9a29e52c1e6fef4145db946d844693da001"
+      },
+      {
+        "path": "docs/platform/agent-coordination/contracts/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "f8cad3ea8647cd0343074ab167921095e73b51e3d72c83a52debfa41d1090134",
+        "afterSha256": "6215cf63fda4aa9438e63e482073be6f147d8959afd9486c3f1cae6af19eb050",
+        "bodySha256": "f8cad3ea8647cd0343074ab167921095e73b51e3d72c83a52debfa41d1090134"
+      },
+      {
+        "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "55c60db2de069a3b8bd21e2c74dbb4e67640c13ec982fb20f4fd9acb015cbcf2",
+        "afterSha256": "980c6dce1a43aae09769995508966b8652079a97ed608fc519cade334b4de24d",
+        "bodySha256": "55c60db2de069a3b8bd21e2c74dbb4e67640c13ec982fb20f4fd9acb015cbcf2"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "344a39e312f12477da8043993a4f0547c3fdab9b2a98441d48891f54383d19ac",
+        "afterSha256": "7e5e23e2afdf4b9f8380b8bebb2d7c65e344625993764dd79e6a8abe1cd7921a",
+        "bodySha256": "344a39e312f12477da8043993a4f0547c3fdab9b2a98441d48891f54383d19ac"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "1b561d69117601b01b0905b2f9dd36ea19697f24f93238ce24b911bca532269d",
+        "afterSha256": "b865cce18a8f7d167d3a9e1b855c274e05f16dbc11d7df8130494ab9bac811e0",
+        "bodySha256": "1b561d69117601b01b0905b2f9dd36ea19697f24f93238ce24b911bca532269d"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "fac563ea214eae199c108a2b3ef7c18594f840d32165e056b0009053e3652a5f",
+        "afterSha256": "4368136590c62d3888562191aa46fd999173a08aace9894ee7a192708db388bf",
+        "bodySha256": "fac563ea214eae199c108a2b3ef7c18594f840d32165e056b0009053e3652a5f"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "c0a8c482ce5775af7cd51ca06919ad9c4d255cd36538cc14fcbccf90b5e26fb8",
+        "afterSha256": "a60ce5298c77d43edee04c299a0a0eb71b3515833c743f937cba009ce421453a",
+        "bodySha256": "c0a8c482ce5775af7cd51ca06919ad9c4d255cd36538cc14fcbccf90b5e26fb8"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "8a96fcec4983c3230c0e836f63ad13f701ef50829b7a10065ba90e33e4cbb345",
+        "afterSha256": "5fcce47bd72f70e053189a2fb58659000ce3ddd3e3d9b6651f793940d045430f",
+        "bodySha256": "8a96fcec4983c3230c0e836f63ad13f701ef50829b7a10065ba90e33e4cbb345"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "a15bc53b318923c3f4b4d59e8812c67187e7993456552d924f0cf6b8791cbaac",
+        "afterSha256": "685c84e23f4b080f880c0e53d08f11d7fdf3c40da0c97af3e433a0aa60868881",
+        "bodySha256": "a15bc53b318923c3f4b4d59e8812c67187e7993456552d924f0cf6b8791cbaac"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "1c6f9f7c4cbfd74a80e82bbde0e636a488f049018584636c9c370d8db54335dc",
+        "afterSha256": "f0a2a38c872c18d9f1e86f11a0b0a0788b7108ef8a49e5a17e9b3e5076bcabe9",
+        "bodySha256": "1c6f9f7c4cbfd74a80e82bbde0e636a488f049018584636c9c370d8db54335dc"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "0e95f5cf70cb5dbf48834ce4d5b93e810457821779bdf4eee0c65bc3f85036b4",
+        "afterSha256": "ec77c692f0fe9e73c4fb86d35de3f7567fdd5b0c7cdd20bf4ade373feb9621bf",
+        "bodySha256": "0e95f5cf70cb5dbf48834ce4d5b93e810457821779bdf4eee0c65bc3f85036b4"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "fbef632b42c5c05bc5820f0389afe71f7d7e0d78b36482a5c8821ed944ea9a35",
+        "afterSha256": "f17cb3fdcefa9b44dd3bd63fcf7dc7077cc74f42952fb12e49fff3101b964307",
+        "bodySha256": "fbef632b42c5c05bc5820f0389afe71f7d7e0d78b36482a5c8821ed944ea9a35"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "1e493497667ac76440d47a075f151e666f7db0cf2fce3e3afdcd4ac6e6d91633",
+        "afterSha256": "362e65352d18c3f0e0d0eeeefc6051bd983b4e03c9985eefb2d5aa1d5c152f54",
+        "bodySha256": "1e493497667ac76440d47a075f151e666f7db0cf2fce3e3afdcd4ac6e6d91633"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "5f84dddda1b4ada484a4f44ef29e722f1689f44be5aade562f8be51159784179",
+        "afterSha256": "18e4002d3b920fd09a28f22cd4cfec9f9531e56f0eae6ec5ff870cfcadb8fa59",
+        "bodySha256": "5f84dddda1b4ada484a4f44ef29e722f1689f44be5aade562f8be51159784179"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "b8b58355eb7d821de02ce07dedbf2007aee211f52c104f05c6dbc35efdf87aa2",
+        "afterSha256": "56b43bba7aeeb2cf49bed25052064808b6f654ef521614446e630d2026eb9854",
+        "bodySha256": "b8b58355eb7d821de02ce07dedbf2007aee211f52c104f05c6dbc35efdf87aa2"
+      },
+      {
+        "path": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "b71e79ce09911aa84d3c1ffd4996b47c3755a3e199bc8c7352e4d2ed62a56337",
+        "afterSha256": "4564427d37a3233680d8407090063b3f3d13552612fed95bd5bbf473be8a535c",
+        "bodySha256": "b71e79ce09911aa84d3c1ffd4996b47c3755a3e199bc8c7352e4d2ed62a56337"
+      },
+      {
+        "path": "docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "ac0a0108d9a8a3ec01c13648d0b389faa14601d6044476d26ac4aa23de9e4703",
+        "afterSha256": "ed1dce37107235dd5a5b5fb18664601e0227d7be43acfaf5cdea331c8e9a72f1",
+        "bodySha256": "ac0a0108d9a8a3ec01c13648d0b389faa14601d6044476d26ac4aa23de9e4703"
+      },
+      {
+        "path": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "c654771f32b357b095aeda851494463b08a6f406838098c8feb477bc2231c36e",
+        "afterSha256": "a5ae48dac78e2adb367559783ecdfb833189941a2876fa0394e8a6872194afbc",
+        "bodySha256": "c654771f32b357b095aeda851494463b08a6f406838098c8feb477bc2231c36e"
+      },
+      {
+        "path": "docs/platform/agent-coordination/history/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "be7cee0c1b1120b9b436abb4b40dcf5e401ff59a2d2d1048f3d26cb18b5bead7",
+        "afterSha256": "25464848cd84aa481c07ce54b8de52e1669a13e7a77e61d4e9ad2c84612f17b1",
+        "bodySha256": "be7cee0c1b1120b9b436abb4b40dcf5e401ff59a2d2d1048f3d26cb18b5bead7"
+      },
+      {
+        "path": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "1fde6fc09a9a66fbef5c5d31c10041d2be43405ddeabe8aace2875290d0b0bf2",
+        "afterSha256": "4187337db664b1cad2296fbf96ed90027a4752431a2058c89fea2f4054c16d26",
+        "bodySha256": "1fde6fc09a9a66fbef5c5d31c10041d2be43405ddeabe8aace2875290d0b0bf2"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "4f1d905bce9bd464863ee86876330f6d0cd3580c6b4d7fe0c2a40afd698e56fc",
+        "afterSha256": "0e959640b0f2ca28b7bf90d533567b2d6b09a9e557d25b4e50f726893fa22050",
+        "bodySha256": "4f1d905bce9bd464863ee86876330f6d0cd3580c6b4d7fe0c2a40afd698e56fc"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "ef0b1cb0d51ef603c8e4c6b203dae5308cc3c1293c5655562279b6001a561fde",
+        "afterSha256": "f8608622222cf2444210aa51f6ca478d11a3e8b95f08ad185c16a45aa57ed264",
+        "bodySha256": "ef0b1cb0d51ef603c8e4c6b203dae5308cc3c1293c5655562279b6001a561fde"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "14abfc260497d032eade9b2210207e5fa9db7a3f503c7154c7dde39dc44c8e7f",
+        "afterSha256": "99052ae2fba20a04582edcaa8168a63f25736e4745c9558bde79e1fdd96910c5",
+        "bodySha256": "14abfc260497d032eade9b2210207e5fa9db7a3f503c7154c7dde39dc44c8e7f"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "262026d4a5f27bd08f9df6e6415f775580b053b84c7f83dc0aff8b2bffa9522f",
+        "afterSha256": "dff5fbaeb0361da18dfa4485cb2721d4ecf6fb9090b5c71c4dca6cf198b90178",
+        "bodySha256": "262026d4a5f27bd08f9df6e6415f775580b053b84c7f83dc0aff8b2bffa9522f"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "0778be993e231aa610e62c626fd1dd13b51264f27576112a88a28586d389b4eb",
+        "afterSha256": "ce9a316aed566a1402b920541fedb34c06a382aa67681f4a5a3ac6f71d54c1ec",
+        "bodySha256": "0778be993e231aa610e62c626fd1dd13b51264f27576112a88a28586d389b4eb"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "e7e7f43b065de2d22038baf06442e127fe6afbec468db4ea03d11e841c8836dc",
+        "afterSha256": "f9337117388f9a064b22ad405c1b3133331366c72165643624a88cc186a15d76",
+        "bodySha256": "e7e7f43b065de2d22038baf06442e127fe6afbec468db4ea03d11e841c8836dc"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "d6bdada9d893ea47da331dd48c9e222792cdadcfb849628c74b607eeb92c2b85",
+        "afterSha256": "aaf07417070112d6d6e5898381b9b7c012eefffb631cf44b2c10f67d4f3ad47c",
+        "bodySha256": "d6bdada9d893ea47da331dd48c9e222792cdadcfb849628c74b607eeb92c2b85"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "b87db80e1e22db97a7f3d42de91d5ce907a262ebf2370afab116555d2a5f0a84",
+        "afterSha256": "0db2ff00a16d57e49ae5881e8844495cecc715bc127fbf2b8739ad58e7632085",
+        "bodySha256": "b87db80e1e22db97a7f3d42de91d5ce907a262ebf2370afab116555d2a5f0a84"
+      },
+      {
+        "path": "docs/platform/agent-coordination/playbooks/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "c34978df5d9980322cdee53f4ce95368925c0b9ad19e93f6e62434e816840918",
+        "afterSha256": "895690fa0cc87de7e14becadf95b274d57f89186c116d6315e0964beb5caa337",
+        "bodySha256": "c34978df5d9980322cdee53f4ce95368925c0b9ad19e93f6e62434e816840918"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "d8f3cc8e2a4b2b5ac8438444486efc28404545bfd3ee990507b675fdad6b233a",
+        "afterSha256": "9586675559b6c547f83ab27e1400c913fbb9313a41b2bc38eddf7c33127f475e",
+        "bodySha256": "d8f3cc8e2a4b2b5ac8438444486efc28404545bfd3ee990507b675fdad6b233a"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "1dde61f47ba2cc2dc29f70321bdff73b269ad9644bb04c1b1c1da07e4e8da71f",
+        "afterSha256": "3ac2655fe07216ab4087fd1e80b7f7adafbb1cd1d929fbd0c6b0f2508dc9793c",
+        "bodySha256": "1dde61f47ba2cc2dc29f70321bdff73b269ad9644bb04c1b1c1da07e4e8da71f"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "8b17ccb352614d89bfc7611a1a7d777aea68d11ce4877289622cf121a6e6dfb1",
+        "afterSha256": "7b371e78803f3148c1ee3f0946dbd52cae576c94ba1818da79da16138adb8000",
+        "bodySha256": "8b17ccb352614d89bfc7611a1a7d777aea68d11ce4877289622cf121a6e6dfb1"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "df5774f23404049824f47c68be8b28805b8a322b65917acc28a98b0e58ca646b",
+        "afterSha256": "dceae9599d635680848956835527382b82bd39ffba2fccf4369f0a016194acee",
+        "bodySha256": "df5774f23404049824f47c68be8b28805b8a322b65917acc28a98b0e58ca646b"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "a6207bd854355558f09e578fb89bbba5fc44850f869b845d1c430edfebae1d88",
+        "afterSha256": "ad00271c276f81ce73a51c9229597cf4ef50962562231560506f296ee3fea2b5",
+        "bodySha256": "a6207bd854355558f09e578fb89bbba5fc44850f869b845d1c430edfebae1d88"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "f1ddc95887c511215bf51d40c07ed0a1da1fdd3afa924a714ad60b3435dd8308",
+        "afterSha256": "6f9d87a2f4189617629be45686edcbbb794e74bf823d9a319645576c9b5cb357",
+        "bodySha256": "f1ddc95887c511215bf51d40c07ed0a1da1fdd3afa924a714ad60b3435dd8308"
+      },
+      {
+        "path": "docs/platform/agent-coordination/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "7fd209bcf72dba41148cfa81e7585b52e5bb5d9c0fee409df242c8b4d12fe346",
+        "afterSha256": "b15a076ef1ad815a341cd8baba7727a547f757773cd9a4ce75c1d7961ed0f10e",
+        "bodySha256": "234216a5f7c833ba141fa6c25a4b0d821dd69331064d1b8ef0d84e592d925e08"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "b7688be312e669b676e8ae74dfa35311f020d2063c7f2e1a304bd5357e23306c",
+        "afterSha256": "e23effba87631a93ae85d7861bfea634e1f036472cff3a6dad385920a36b9e2d",
+        "bodySha256": "b7688be312e669b676e8ae74dfa35311f020d2063c7f2e1a304bd5357e23306c"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "eb76377951ecd1e1e17da452ed3f5fabe0a4f8e3c4df5b5e5d2e3b42945ba136",
+        "afterSha256": "2e37db98aa30162e507166469a01780d7e4c58236de18f9654b5b11a97339518",
+        "bodySha256": "eb76377951ecd1e1e17da452ed3f5fabe0a4f8e3c4df5b5e5d2e3b42945ba136"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "5a828fc4a804b9110eb04637fcd26c232c3cdaee98b743ce726700002fbff44b",
+        "afterSha256": "fd4e0935684a5c4215574f6b8908cc8eb72b140777a41f40a7b3b20ab2ae14f3",
+        "bodySha256": "5a828fc4a804b9110eb04637fcd26c232c3cdaee98b743ce726700002fbff44b"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "e05599a6c507048dfbc407abb3b3f953bd05e67c4408764c1c3094af3914857c",
+        "afterSha256": "33c7c3d74ea55089c583194cdd549dcc0a8e5dacf355a4fae99fee130c316087",
+        "bodySha256": "e05599a6c507048dfbc407abb3b3f953bd05e67c4408764c1c3094af3914857c"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "4d583dc0c8cdc836761f5b9f10e4c208dcec459dc996f0c1c93891c22fb9ba2d",
+        "afterSha256": "08fbdde579a7c179826183d8409fba50bef5cb68176a4a95fba5a050aa168009",
+        "bodySha256": "4d583dc0c8cdc836761f5b9f10e4c208dcec459dc996f0c1c93891c22fb9ba2d"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "6175479565f271aa0756199a5aa9278fb0ccabf73a20260c24e2651a2ddb72b0",
+        "afterSha256": "cf9de163dc8d1d70eb61bd6c8e9b481e7e2e2f80e0292094187fac598caa8e8d",
+        "bodySha256": "6175479565f271aa0756199a5aa9278fb0ccabf73a20260c24e2651a2ddb72b0"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "5f66e3f533ca7b4e773bcc9887e96689f90b9901dacbbba9b21b603e5c56fcde",
+        "afterSha256": "550a1d7a9031fa3effbf2466cf934691410863744db2c82b8f8479b6be445009",
+        "bodySha256": "5f66e3f533ca7b4e773bcc9887e96689f90b9901dacbbba9b21b603e5c56fcde"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "66cd69e90c7d2ed072644768884c415c931e2db65210ce32f540b6029c4e40eb",
+        "afterSha256": "7bdefd0cd2c3f213503925ffd346cdfea825d488e4636015e929157d275029f8",
+        "bodySha256": "66cd69e90c7d2ed072644768884c415c931e2db65210ce32f540b6029c4e40eb"
+      },
+      {
+        "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "3c3c8f58592a1208cfe99d77bd91c7a0b985d020a74d312d63864797ddfe7c21",
+        "afterSha256": "c0bbece69bbb35da684164a9f460d2fa6005140b29c2d6f30fceba8c9f065045",
+        "bodySha256": "3c3c8f58592a1208cfe99d77bd91c7a0b985d020a74d312d63864797ddfe7c21"
+      },
+      {
+        "path": "docs/platform/agent-coordination/verification/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "171d074dbd99cd4b17107fc1b47f2cd789cfb424c6dd668d3eb059a5903a9493",
+        "afterSha256": "baef6ac0c27ff02472fd750485e452e8fd14c5600f728bbf027eb957f1a390d6",
+        "bodySha256": "171d074dbd99cd4b17107fc1b47f2cd789cfb424c6dd668d3eb059a5903a9493"
+      },
+      {
+        "path": "docs/platform/agent-coordination/vision.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "a52dfb00bc993981bbad948098d8d5e7632bbdd3f04bc66192dab34d1eb8ef10",
+        "afterSha256": "88eb066b1cc3f59286bd62a9ba4cfea02536bef3fe4ddd9ddfe1ea6bafa1022a",
+        "bodySha256": "a52dfb00bc993981bbad948098d8d5e7632bbdd3f04bc66192dab34d1eb8ef10"
+      },
+      {
+        "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "e5fa2de4171c0425ccc982f6aba732ccad89800cb6d868eb4c4992a08d1e5014",
+        "afterSha256": "fafc46fdb1d07dd3432fff2cab80ab916f0bd69cec2302c8710e17d7a1550e7c",
+        "bodySha256": "e5fa2de4171c0425ccc982f6aba732ccad89800cb6d868eb4c4992a08d1e5014"
+      },
+      {
+        "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "4f441fe8010cdb2472493b987f59e365f71ad80d531e6a6f77d3f4276e50a333",
+        "afterSha256": "43dcd3a7cdda7e5713dc2d56765a3fb0ddb9effde8cba820a919a1c07acb8cf5",
+        "bodySha256": "4f441fe8010cdb2472493b987f59e365f71ad80d531e6a6f77d3f4276e50a333"
+      },
+      {
+        "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "9985cae0d4c7a38b201ca608d46064bf7aa24bbd6bb90b37ee48811e5818a490",
+        "afterSha256": "64772305e549d11f0a822655718281dd4b6f7c37abb6a549666a3a991c3a1d35",
+        "bodySha256": "9985cae0d4c7a38b201ca608d46064bf7aa24bbd6bb90b37ee48811e5818a490"
+      },
+      {
+        "path": "docs/platform/agent-coordination/vocabulary/README.md",
+        "markdown": true,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "6c5ebc317384d2cfcde93c890674e26ae9b21d6b1e586f7add349c95f8c0ed36",
+        "afterSha256": "595ef132a7c493d37af7a5bf1d6a63beb80cb336eb513b177c37a5db0c02cbb2",
+        "bodySha256": "6c5ebc317384d2cfcde93c890674e26ae9b21d6b1e586f7add349c95f8c0ed36"
+      },
+      {
+        "path": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+        "markdown": false,
+        "bodyIdentical": true,
+        "missingFields": [],
+        "beforeSha256": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
+        "afterSha256": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
+        "bodySha256": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104"
+      }
+    ]
+  },
+  "scriptTests": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/*.test.mjs",
+    "discoveredFiles": 51,
+    "tests": 872,
+    "pass": 872,
+    "fail": 0
+  },
+  "H": {
+    "comparisonExit": 1,
+    "findings": 45,
+    "newInheritedFindings": 41,
+    "note": "Not rerun after the checkpoint: unchanged corrected data and frozen comparison remain blocked; no baseline relaxation."
+  },
+  "boundaries": {
+    "allowedPathViolations": [],
+    "extractorChanges": [],
+    "readerChanges": []
+  }
+}

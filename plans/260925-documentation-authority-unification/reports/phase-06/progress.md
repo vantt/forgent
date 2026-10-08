@@ -6,7 +6,7 @@ Session counter: 1
 Step: routing prerequisite; first content batch paused after header preparation
 State: authoring
 Blocker: stop condition 10, H still reports 41 new inherited findings after one data-only correction; committed owner amendment required
-Last green conservation commit: 7693331b087e24da2a6bf719f59fc531aac9046c
+Last green conservation commit: a8986765ebbebc20765c85c8fcfb2aaf27b01529
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 5d6467093217a6869b31afb28866732400767267
 Main at sync: c2aa9e374a8cee57c676809dab4849273ed71855
@@ -78,3 +78,5 @@ First content batch, header item: 67 Markdown headers completed, including 66 ne
 Routing correction and required stop: a broad agent-coordination route incorrectly selected 302 evidence payload Markdown files for candidate metadata checking. New Related values also used Markdown syntax instead of the existing path-list convention. Corrected data only: 77 explicit non-payload routes, 66 Related field lists, 0 body changes. H comparison remains red after this one correction: 45 findings total, four retained baseline findings plus 41 newly exposed inherited references (15 agent-coordination, 26 host-invocation; 36 unresolved links, five unresolved Related paths). All 41 literal references and missing destinations are proven at fcfe78cb8. No checker change or baseline relaxation; stop condition 10 now applies.
 
 Corrected scripts: 872/872; ratchet exit 0 (995 files, 24 accounted edits, one accounted new file); placement exit 0 (446/445, one standing exception). No first-batch decision shard or approval is written. This stop is not ready-for-review. Archive/delete lists and holds remain unauthored; observed source/target differences are not adjudicated. Manual authoring, independent content approval, scoped E and reduced promotion rehearsal remain UNPROVEN. Exact blocker and owner options: candidate-routing-blocker.md/json and owner-queue.md.
+
+Committed correction/stop checkpoint: a8986765e. Scratch refreshed at that commit; D against each owner-specified prior registry exits 0 with 0 fatal findings, 0 lost-id or self-review findings. Pinned header/body helper compares fcfe78cb8 to a8986765e: 68 files, 67 Markdown, 0 failures. Source map coverage remains 1,040/1,040. Complete commands and outputs: routing-correction-verification.json. H is still blocked by the unchanged corrected data; no additional fix attempt, baseline relaxation or content decision is made after the stop.
