@@ -3,23 +3,23 @@
 Date: 2026-10-08
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: first content batch, Agent Coordination authoring
+Step: first content batch, Agent Coordination; candidate authoring complete, decision authoring stopped
 State: authoring
-Blocker: none; A7 resolves the inherited-routing baseline stop without a checker change
-Last green conservation commit: 17b4de5225126a27e732fbf8cd9e753a8963a984
+Blocker: stop condition 10; D remains red after one draft correction (five fatal findings). Frozen-map archival also conflicts with the two maintained-authority source file classes; owner direction required.
+Last green conservation commit: e4650e5851ae21d0abebe46e2970ca901fd688eb
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 17b4de5225126a27e732fbf8cd9e753a8963a984
 Main at sync: 2bc76ced1f60e32b5d713adf2487416e464dcf4f
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
-Latest commits: e7fa77404 (A6 cutover), cc92094c9 (ordinary/checkpoint proof), 5d6467093 (main sync), fd6c9ab9e (source accounting), fcfe78cb8 (maps/counts), 7693331b0 (header-only preparation).
-Pending review requests: no further tooling re-review under A5; content review has not started
-Owner queue items: A7 resolved; Agent Coordination owns 15 inherited H tuples and Host Invocation owns 26, each required to reach zero by its batch end
-Archive/delete lists: none authored
-Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root-authorities batch
-Holds: none authored
-Promoted-document edits: agent-coordination portal, header-only metadata completion logged in promoted-edits.md; body unchanged
+Latest commits: 17b4de522 (main sync); 025b635a7, a861a0bb4, 0482a88f7, 8a044365b, b629b9aac, 184bce403, a5a153727 (historical reference labels); c774026da, b444f6cec, 20a7c2514, a158bfcc6, e6937d14b (verbatim source restores); a556856a3 (verification navigation); e4650e585 (portal last).
+Pending review requests: no further tooling re-review under A5; content is NOT ready for review. No review-request-2.md or approved content shard exists.
+Owner queue items: Agent Coordination's 15 inherited H tuples are zero; Host Invocation's 26 remain owned by its batch. Open: stopped proposal correction, frozen archival/class mismatch, scheduler enum disagreement.
+Archive/delete lists: two legacy-only documents (190 rows), plus 65 temporary migration-notice units, proposed only; no physical retirement or delete-as-obsolete.
+Real conflicts: scheduler source has four outcome values; target also has materialized. No enum changed. SC-1 remains owner-resolved for its later batch.
+Holds: draft claim_459cdfc305f52f6636bf73d1c56cccf1 stays unknown-blocking/blocking without approval identity/date; two draft file dispositions are blocking for the archival/class mismatch.
+Promoted-document edits: portal header completion plus 190-line preserved source-guidance body addition in e4650e585; exact diff logged, owner inspection pending.
 
-Next action: finish Agent Coordination candidate authoring, fix its inherited H references, decide all source rows into pending/script-proven entries, commit the ordinary review request and stop.
+Next action: await owner direction on stop condition 10 and archival/class treatment; only if resumed, correct/re-prove the saved proposals, settle or park the enum, finish conflict/reverse evidence, commit valid shards and review-request-2.md, then stop for the independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -82,3 +82,9 @@ Corrected scripts: 872/872; ratchet exit 0 (995 files, 24 accounted edits, one a
 Committed correction/stop checkpoint: a8986765e. Scratch refreshed at that commit; D against each owner-specified prior registry exits 0 with 0 fatal findings, 0 lost-id or self-review findings. Pinned header/body helper compares fcfe78cb8 to a8986765e: 68 files, 67 Markdown, 0 failures. Source map coverage remains 1,040/1,040. Complete commands and outputs: routing-correction-verification.json. H is still blocked by the unchanged corrected data; no additional fix attempt, baseline relaxation or content decision is made after the stop.
 
 A7 resume: committed ea6620028. Required main merge 17b4de522 imports only three advisory review/report files, no source or target changes and no ratchet exception needed. Clean resume; HEAD descends from the prior conservation checkpoint. Both D prior-registry proofs: exit 0, 0 fatal findings. A/B/I unchanged, C retains all pre-existing area statuses; ratchet exit 0 and placement exit 0. H exact-tuple comparison against the original baseline plus only the 41 authorized inherited findings: 45 current, 0 unaccounted. No checker or baseline file change. Per-batch closure obligations: Agent Coordination 15, Host Invocation 26; final corpus goal remains zero.
+
+A7 authoring stop: details and complete saved proposal/gate evidence are in authoring-blocker.md/json. All 937 source blobs remain pinned (zero drift). Actual Node smoke finds all six restored blocks verbatim in their changed targets. H: 30 current findings, Agent Coordination zero, Host Invocation 29 (26 inherited and three original baseline), Packaging Distribution one original baseline; zero unaccounted tuples.
+
+Draft decision D against each prior registry: 102 fatal findings initially, five after one correction. Stop condition 10 prevents another correction. The 42 uncommitted drafts are preserved in authoring-blocker.json and /tmp/phase06/blocked-proposals, not in the active ledger; no invalid decision shard is committed. Committed candidate-state D using only the nonempty pilot decision directory passes both prior-registry proofs with zero fatal/lost-id/self-review findings. Supplying the now-empty ledger directory correctly fails loader validation; it is omitted, not bypassed.
+
+Current script suite: 51 files, 872/872, zero fail. Ratchet and placement exit 0; A/B/C/I unchanged. Full independent content review, scoped E, conflict/reverse closure, reduced rehearsal and fresh-reader scenarios remain UNPROVEN. This is a stop-condition report, not ready-for-review or a Phase 6 completion.
