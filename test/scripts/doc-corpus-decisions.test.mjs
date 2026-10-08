@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { applyDecisions, loadDecisionShards } from '../../scripts/check-doc-inventory-gates.mjs';
+import { applyDecisions, loadDecisionShards, validateAgainstVocabulary } from '../../scripts/check-doc-inventory-gates.mjs';
 
 const plan = 'plans/260925-documentation-authority-unification';
 const vocabulary = JSON.parse(fs.readFileSync(new URL('../../' + plan + '/claim-and-disposition-vocabulary.json', import.meta.url)));
@@ -112,4 +112,32 @@ test('pending corpus policy keeps rows blocking until its independent review is 
   assert.deepEqual(result.findings, []);
   assert.equal(result.inventory.claimLedger[0].reviewStatus, 'blocking');
   assert.equal(result.inventory.items[0].proposedDisposition, 'unknown-blocking');
+});
+
+test('corpus approval preserves generated projections while reviewing every generated claim', (t) => {
+  const f = fixture(t);
+  const projections = [
+    ['docs/decisions/index.md', 'history-evidence'],
+    ['docs/doc-registry.md', 'user-knowledge'],
+    ['docs/enduser-docs-index.json', 'user-knowledge'],
+  ];
+  for (const [sourcePath, corpus] of projections) {
+    f.inventory.items.push({ path: sourcePath, corpus, authorityStatus: 'non-authority', fileClass: 'generated', proposedDisposition: 'regenerate-from-source' });
+    f.inventory.claimLedger.push({ claimId: 'claim_' + f.inventory.claimLedger.length, sourcePath, sourceAnchor: 'file-block', sourceUnitDigest: 'a'.repeat(64), claimKind: 'unclassified', disposition: 'unknown-blocking', reviewStatus: 'blocking', targetOwner: null, targetAnchor: null });
+    f.shard.sources.push(sourcePath);
+  }
+  const result = apply(f);
+  assert.deepEqual(result.findings, []);
+  const generated = result.inventory.items.filter((item) => item.fileClass === 'generated');
+  assert.deepEqual(generated.map((item) => item.proposedDisposition), projections.map(() => 'regenerate-from-source'));
+  assert.deepEqual(validateAgainstVocabulary({ items: generated, claimLedger: result.inventory.claimLedger.filter((row) => projections.some(([source]) => source === row.sourcePath)) }, vocabulary), []);
+  for (const [sourcePath, corpus] of projections) {
+    const row = result.inventory.claimLedger.find((entry) => entry.sourcePath === sourcePath);
+    assert.equal(row.disposition, rule(corpus).disposition);
+    assert.equal(row.reviewStatus, 'reviewed');
+    assert.equal(row.reviewedBy, reviewer);
+    assert.equal(row.reviewReport, reportPath);
+  }
+  assert.equal(result.inventory.items[0].proposedDisposition, 'retain-as-evidence');
+  assert.equal(result.inventory.items[1].proposedDisposition, 'reclassify-out-of-platform-scope');
 });
