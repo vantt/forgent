@@ -243,6 +243,17 @@ export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir })
   const run = path.resolve(runDir);
   const inputs = path.join(path.dirname(path.dirname(run)), 'inputs');
   const directories = [run, ...(fs.existsSync(inputs) ? [inputs] : [])];
+  // Non-blind handoffs point at settled sibling reports, not copied inputs.
+  const assignmentFile = path.join(path.dirname(path.dirname(run)), 'assignment.json');
+  if (fs.existsSync(assignmentFile)) {
+    const { contextRefs = [] } = JSON.parse(fs.readFileSync(assignmentFile, 'utf8'));
+    for (const ref of contextRefs) {
+      if (typeof ref === 'string' && path.isAbsolute(ref) && fs.existsSync(ref) && fs.statSync(ref).isFile()) {
+        const parent = path.dirname(fs.realpathSync(ref));
+        if (!directories.includes(parent)) directories.push(parent);
+      }
+    }
+  }
   const existing = args.indexOf('--add-dir');
   return existing < 0
     ? [...args, '--add-dir', ...directories]

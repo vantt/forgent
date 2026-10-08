@@ -666,6 +666,26 @@ test('Claude reads blind inputs without granting the assignment or store root, p
   assert.equal(withRunDirReadAccess({ ...options, interactiveMode: { kind: 'codex' } }), args);
 });
 
+test('Claude cross-repo handoffs grant only referenced report parents, not sibling assignments or store roots', () => {
+  const store = fixtureDir('fgos-cross-ref-access-');
+  const assignment = path.join(store, 'current', 'producer', '1');
+  const runDir = path.join(assignment, 'runs', '01');
+  const reportDir = path.join(store, 'previous', 'producer', '1', 'runs', '01');
+  const unrelated = path.join(store, 'unrelated', 'runs', '01');
+  for (const dir of [runDir, reportDir, unrelated]) fs.mkdirSync(dir, { recursive: true });
+  const report = path.join(reportDir, 'agent-report.md');
+  fs.writeFileSync(report, '# Settled recommendation with attributed dissent\n');
+  fs.writeFileSync(path.join(assignment, 'assignment.json'), JSON.stringify({
+    contextRefs: [report, report, path.join(store, 'absent.md'), unrelated, 'unit-run:previous/producer', 'relative.md'],
+  }));
+  const args = ['--model', 'fixture'];
+  const granted = withRunDirReadAccess({ adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir });
+  assert.deepEqual(granted, [...args, '--add-dir', runDir, fs.realpathSync(reportDir)]);
+  for (const dir of [store, assignment, path.dirname(reportDir), unrelated]) assert.ok(!granted.includes(dir));
+  fs.writeFileSync(path.join(assignment, 'assignment.json'), '{broken');
+  assert.throws(() => withRunDirReadAccess({ adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir }), SyntaxError);
+});
+
 test('the brief a reviewer reads in a pane says its claim needs assessment.verdict; the producer\'s does not', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir, signalDir } = setup(['alpha', 'beta']);
   const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }, { awaitProbe: true }] });
