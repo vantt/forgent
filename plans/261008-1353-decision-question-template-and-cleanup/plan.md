@@ -2,7 +2,7 @@
 title: Mẫu câu hỏi quyết định và gỡ các quy tắc hỏi trùng lặp
 status: pending
 created: 2026-10-08
-budget: "src ≤ 60 dòng đổi; test chỉ đổi chuỗi fixture có sẵn + 1 case, 0 test file mới; instructions/skills/AGENTS ≤ 60 dòng, net ≤ 0 ngoài file mẫu; ≤ 1 ngày"
+budget: "src ≤ 60 dòng đổi; test ≤ 300 dòng đổi (chỉ fixture có sẵn + 1 case, 0 test file mới), vượt thì dừng và hỏi; instructions/skills/AGENTS ≤ 60 dòng, net ≤ 0 ngoài file mẫu; ≤ 1 ngày"
 paths: [core/instructions/decision-question.md, src/state/status-fsm.mjs, src/intake/plan.mjs, src/intake/discovery.mjs, test/ (chỉ fixture chứa '## Why this matters' và test validator), domains/coding/skills/fgos-coding-{discovering,exploring,implement,shaping,validating}/SKILL.md, core/skills/_shared/coordination-driver.md, core/skills/fgos-run/SKILL.md, AGENTS.md (qua writer), CHANGELOG.md, bản render của build:skills, 2 memory file]
 ---
 
