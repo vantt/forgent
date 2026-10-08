@@ -2,16 +2,16 @@
 
 ## Authority and current execution boundary
 
-Owner amendment A5, committed as `a7ec5054a`, supersedes the review-method portions of A4 and the older per-batch seeded procedure. Tooling is frozen at `1ec3ceca6` plus the mandatory-authorship correction `658b4e602`. No further tooling re-review is requested.
+Owner amendments A5 (`a7ec5054a`) and A6 (`8bc686954`) supersede the earlier per-batch seeded procedure. Tooling retains H1 and the one authorized ordinary-report approval channel. No further tooling re-review is requested.
 
 Ordinary reviews read every judgment row, spot-check 100 random script-proven exact rows, run the gates and commit `review-<step>-<shard>.md`. Seeded packs and reviewer red-team occur only after Step 3, after Step 6 and in Step 10.
 
-**Application is blocked, not authorized by this brief.** The unchanged apply command still requires a passing sensitivity proof, and the unchanged gate requires a sensitivity binding. An honest unseeded ordinary review cannot currently be applied. See `unseeded-review-blocker.md` and the owner queue. Do not invent hashes, score headers, approvals or seed results. No real batch has been authored or approved.
+Ordinary approval requires a committed independent report with `Review mode: ordinary` and full source/target digests for every verdict. Checkpoint reports are named `review-3-checkpoint.md`, `review-6-checkpoint.md` and `review-10-checkpoint.md`, optionally with a shard suffix; they cannot use the ordinary channel. They retain the genuine passing sensitivity proof and pack binding. Do not invent hashes, score headers, approvals or seed results.
 
 ## Read first
 
 1. The committed `review-request-<step>.md`, its pinned commit, source blobs, shard paths and owner-routed lists.
-2. `phase-06-transform-all-platform-areas-as-candidate-material.md`, especially shared rules, stop conditions and the relevant batch; `owner-answers.md`, especially A1–A3 and A5.
+2. `phase-06-transform-all-platform-areas-as-candidate-material.md`, especially shared rules, stop conditions and the relevant batch; `owner-answers.md`, especially A1–A3, A5 and A6.
 3. `claim-and-disposition-vocabulary.json`, `minimum-constitution.json`, `pilot/claim-decisions.schema.json`, the frozen area map and relevant area spec.
 4. The full-text Markdown diff packs, source and candidate documents, reverse candidate-unit list, holds and identical-unit exceptions. The machine sidecar is binding data, not a substitute for reading.
 
@@ -54,24 +54,26 @@ node scripts/propose-doc-decisions.mjs --seed-pack <pack.md.json> --seed <record
 node scripts/propose-doc-decisions.mjs --score-pack <private-key.json> --verdicts <seed-verdicts.md>
 ```
 
-Frozen score thresholds: at least 5 of 6 mutations caught and at most 2 false flags among 24 controls. Report a failed score; repeat with another independent session. Two consecutive failing reviewer sessions trigger the phase stop condition. No checkpoint proof substitutes for an ordinary batch's missing proof under the current guards.
+Frozen score thresholds: at least 5 of 6 mutations caught and at most 2 false flags among 24 controls. Report a failed score; repeat with another independent session. Two consecutive failing reviewer sessions trigger the phase stop condition. Ordinary reviews do not require or fabricate sensitivity results.
 
-The frozen application command is shown for contract clarity, **not as an authorized workaround for ordinary unseeded reviews**:
+Ordinary application, only after the independent report is committed:
 
 ```sh
-node scripts/propose-doc-decisions.mjs --apply-review <shard.json> --inventory /tmp/phase06/doc-inventory.json --repo-root . --verdicts <committed-review.md> --reviewer <identity> --review-pack <pack.md.json> --seed-key <private-key.json> --seed-verdicts <seed-verdicts.md>
+node scripts/propose-doc-decisions.mjs --apply-review <shard.json> --inventory /tmp/phase06/doc-inventory.json --repo-root . --verdicts <committed-review.md> --reviewer <identity>
 ```
 
-It requires a genuine passing score, binds the shown pack and target digest, verifies the committed report, and writes the shard in place. Apply must wait for the owner to resolve the unseeded-review blocker. Do not flip rows manually to evade it.
+Its report supplies the shown source/target hashes; apply refuses changed text, missing authorship, same-session review or uncommitted evidence. Approval pins the committed report and stamps the target digest from the verdict, not newly discovered text. A checkpoint application uses the same command plus `--review-pack <pack.md.json> --seed-key <private-key.json> --seed-verdicts <seed-verdicts.md>`; its existing key replay, score thresholds and pack/target bindings remain unchanged. No rows are flipped manually.
 
 ## Reports, verdicts and owner lists
 
 Commit `reports/phase-06/review-<step>-<shard>.md` from the independent session. Include author and reviewer identities, request/shard/source commit pins, judgment counts, the reproducible exact sample and findings, gate commands/results, source-to-target and reverse checks, per-claim verdicts and specific notes:
 
-| Claim | Verdict | Note |
-|---|---|---|
+Ordinary report header: `Reviewer: <identity>` and `Review mode: ordinary`.
 
-Use `ok`, `rework` or `hold`. This format heading is not a verdict on any real row. A seeded checkpoint report also records the actual `Pack commit`, `Pack id` and `Seed score` produced by its proof. An ordinary unseeded report must not claim those values exist.
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+
+Each digest is the full sha256 of the shown unit; use literal `none` for a decision with no target. Use `ok`, `rework` or `hold`, with a specific own note. This empty format table is not a verdict on a real row. A checkpoint report instead uses the original three-column Claim/Verdict/Note table and the actual `Pack commit`, `Pack id` and `Seed score` headers from its proof. Do not put `Review mode: ordinary` in a checkpoint report.
 
 Hold/rework retains `blocking` for unknown-blocking rows and `pending` otherwise; records the note without `reviewedBy` or `reviewedAt`. List held unknown-blocking rows in `holds.md` and the owner queue. Allow one rework; a second round with more than 3% rework triggers a stop. Release archive/delete candidates, real conflicts, holds and promoted-document edits to the owner; a reviewer verdict does not authorize destructive or promoted-content changes.
 

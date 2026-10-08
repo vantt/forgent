@@ -42,3 +42,8 @@ The disposable probe was removed after verification; its observed output is reta
 2. Restore per-batch sensitivity proofs with the current frozen tooling. This changes A5's review procedure, not gate code.
 
 After the owner commits the choice, follow it tests-first where code changes are authorized, finish the remaining Step 1 maps/counts, then execute content batches sequentially and stop at each committed review request. `review-brief.md` already records the A5 procedure and the blocked application boundary. Archive/delete lists, authored holds and promoted-document edits remain empty; SC-1 remains the previously owner-resolved conflict.
+
+## Resolution
+
+A6, committed as `8bc686954` on 2026-10-08, authorizes the narrow ordinary-report approval channel while retaining mandatory authorship, independence, report pins and shown-text digest binding. The original blocker above is historical. The actual disposable rehearsal now approves 40 ordinary fixture rows without a seed, with zero gate findings; the unchanged checkpoint path approves 40 fixture rows with 6/6 detections and zero false flags. No real independent row has been approved by the author session.
+

@@ -5,7 +5,7 @@ import os from 'node:os';
 import { createHash, randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, reviewReportAuthor, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildCommittedReviewReportLookup, buildConservationUnitLookup, classifyExactCarry, isCheckpointReviewReport, isEvidenceMirrorPath, isLegacySourceItem, isLegacyDecisionShard, loadDecisionShards, reviewReportAuthor, reviewSessionIdentity, validateManualReview } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -25,9 +25,12 @@ Modes:
   --verify <snapshot>        Recompute rows and sha256 against the same inputs.
   --help                     Print this contract.
 
-Committed reports bind Reviewer, Pack commit, Pack id, Seed score and each
-claim's ok verdict/note. Approvals pin their own report commit; existing
-reviewed rows must verify before pack/apply, including earlier rounds.
+Committed ordinary reports have Review mode: ordinary and a five-column table:
+Claim, Verdict, Note, Source digest, Target digest (full sha256 or none for no target).
+They bind shown text without a seed or pack id. All approvals pin their committed
+independent report and retain mandatory authorship; prior rows verify before use.
+Checkpoint reports are review-3-checkpoint.md, review-6-checkpoint.md and
+review-10-checkpoint.md (optional shard suffix); their pack/score bindings remain.
 Legacy shards keep their original shape. Their --pack requires an explicit
 --author codex-session:<id>@<date>; the committed report must repeat that
 identity in an Author session header. This records the current review author,
@@ -53,9 +56,9 @@ Inputs:
                             path#anchor or path#start..end (inclusive sections).
   --decisions <path>         Repeatable decision input for coverage/snapshot/verify.
   --identity-registry <path> Required pinned registry for snapshot/verify gap rows.
-  --review-pack <path>       Required full pack seen by the reviewer for apply.
-  --seed-key <path>          Required private sensitivity key for apply.
-  --seed-verdicts <report>   Required sensitivity verdicts; must score passing.
+  --review-pack <path>       Required shown full pack for checkpoint apply.
+  --seed-key <path>          Required private sensitivity key for checkpoint apply.
+  --seed-verdicts <report>   Required passing sensitivity verdicts for checkpoint apply.
 
 Proof: Unit-exact requires one target digest match, equal ancestor heading titles,
 at least 40 source characters and at least half the source document's units exact.
@@ -73,10 +76,10 @@ and names its report; the gate accepts reviewed rows only after that report is
 committed. Verdicts are ok, rework or hold with an own note for every pending row.
 Hold/rework keeps unknown-blocking rows blocking and other rows pending; no approval
 identity/date remains. The reviewer lists held unknown-blocking rows in owner queue.
-Apply verifies the private key by replay and requires a passing sensitivity score.
-The manual report echoes Pack commit, Pack id and Seed score headers. Approval
-stamps the shown target digest/ancestry and refuses current text or context drift;
-it never approves text merely because that text exists at application time.
+Checkpoint apply replays the private key and requires a passing sensitivity score;
+its report echoes Pack commit, Pack id and Seed score. Ordinary apply reads the
+committed report's full source/target digests and refuses stale text or missing
+authorship/independence. Approval stamps the digest actually seen by the reviewer.
 Seed packs contain 24 byte-equal controls and six real mutations, shuffled; score
 passes at >=5/6 mutations caught and <=2/24 false flags. The author must not run
 --seed-pack on a real batch. Key and pack output paths must differ.
@@ -331,32 +334,38 @@ export function parseReviewVerdicts(text, reviewer, binding = null) {
     const actual = text.match(new RegExp(`^${headerName}:\\s*(.+)$`, 'im'))?.[1]?.trim();
     if (actual !== expected) throw new Error(`review report ${headerName} does not match the shown pack or scored sensitivity result`);
   }
+  const ordinary = /^Review mode:\s*ordinary\s*$/im.test(text);
   const verdicts = [];
   for (const line of text.split(/\r?\n/)) {
     if (!/^\s*\|\s*claim_[0-9a-f]{32}\s*\|/.test(line)) continue;
     const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map((cell) => cell.trim().replace(/\\\|/g, '|'));
-    if (cells.length !== 3 || !['ok', 'rework', 'hold'].includes(cells[1]) || !cells[2]) throw new Error('verdict row requires claimId, verdict and own note');
-    verdicts.push({ claimId: cells[0], verdict: cells[1], note: cells[2] });
+    if (cells.length !== (ordinary ? 5 : 3) || !['ok', 'rework', 'hold'].includes(cells[1]) || !cells[2]) throw new Error('verdict row requires claimId, verdict, own note and ordinary shown digests');
+    verdicts.push({ claimId: cells[0], verdict: cells[1], note: cells[2], ...(ordinary ? { sourceUnitDigest: cells[3], targetUnitDigest: cells[4] === 'none' ? null : cells[4] } : {}) });
   }
   if (!verdicts.length) throw new Error('review report has no verdict rows');
   return verdicts;
 }
 
-export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, pack, seedProof, reviewedAt = new Date().toISOString().slice(0, 10) }) {
+export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, pack, seedProof, ordinaryReview = false, reviewedAt = new Date().toISOString().slice(0, 10) }) {
   requireVerifiedShard(context, shard);
+  if (ordinaryReview && isCheckpointReviewReport(reportPath)) throw new Error('checkpoint reviews require sensitivity proof and pack binding');
+  if (ordinaryReview && !context.repoRoot) throw new Error('ordinary review requires a repository with committed report evidence');
   const legacy = isLegacyDecisionShard(shard);
-  const author = shard.authorSession || (legacy ? pack?.authorSession : null);
+  const author = shard.authorSession || (legacy ? pack?.authorSession || reviewReportAuthor(buildCommittedReviewReportLookup(context.repoRoot, context.inventory.commit)(reportPath)) : null);
   if (!reportPath || !independentReviewer(reviewer, author)) throw new Error('review application requires a report and an independent reviewer');
   const pending = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed');
   const index = indexVerdicts(verdicts, new Set(pending.map((row) => row.claimId)));
-  if (!pack || !seedProof?.key || !Array.isArray(seedProof.verdicts)) throw new Error('review application requires a passing sensitivity proof and the shown pack');
-  if (pack.commit !== context.inventory.commit || pack.shard !== shard.shard) throw new Error('review pack commit or shard changed');
-  if (pack.authorshipRequired !== !legacy || pack.authorSession !== author) throw new Error('review pack author or authorship scope changed');
-  const expectedKey = seedReviewPack(pack, { seed: seedProof.key.seed, nonce: seedProof.key.nonce, reviewer }).key;
-  if (JSON.stringify(expectedKey) !== JSON.stringify(seedProof.key)) throw new Error('sensitivity key does not bind this exact review pack and reviewer');
-  const score = scoreReviewPack(seedProof.key, seedProof.verdicts);
-  if (!score.pass) throw new Error('sensitivity review did not pass the chosen thresholds');
-  const shownRows = new Map(pack.rows.map((row) => [row.claimId, row]));
+  let score = null;
+  if (!ordinaryReview) {
+    if (!pack || !seedProof?.key || !Array.isArray(seedProof.verdicts)) throw new Error('review application requires a passing sensitivity proof and the shown pack');
+    if (pack.commit !== context.inventory.commit || pack.shard !== shard.shard) throw new Error('review pack commit or shard changed');
+    if (pack.authorshipRequired !== !legacy || pack.authorSession !== author) throw new Error('review pack author or authorship scope changed');
+    const expectedKey = seedReviewPack(pack, { seed: seedProof.key.seed, nonce: seedProof.key.nonce, reviewer }).key;
+    if (JSON.stringify(expectedKey) !== JSON.stringify(seedProof.key)) throw new Error('sensitivity key does not bind this exact review pack and reviewer');
+    score = scoreReviewPack(seedProof.key, seedProof.verdicts);
+    if (!score.pass) throw new Error('sensitivity review did not pass the chosen thresholds');
+  }
+  const shownRows = new Map((pack?.rows || []).map((row) => [row.claimId, row]));
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const claims = shard.claims.map((row) => {
     if (row.reviewStatus === 'reviewed') return { ...row };
@@ -365,23 +374,33 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     const source = sourceRows.get(row.claimId);
     if (!source || typeof row.sourceUnitDigest !== 'string' || row.sourceUnitDigest.length < 16 || !source.sourceUnitDigest.startsWith(row.sourceUnitDigest)) throw new Error(`missing or stale source ${row.claimId}`);
     const shown = shownRows.get(row.claimId);
-    if (!shown || shown.sourceUnitDigest !== source.sourceUnitDigest || shown.source.path !== source.sourcePath || shown.source.anchor !== source.sourceAnchor) throw new Error(`review pack source binding changed for ${row.claimId}`);
-    if (shown.reviewAuthor !== rowAuthor || shown.decision.authoredBy !== row.authoredBy) throw new Error(`review pack author binding changed for ${row.claimId}`);
     const verdict = index.get(row.claimId);
+    if (ordinaryReview) {
+      if (verdict.sourceUnitDigest !== source.sourceUnitDigest) throw new Error(`shown source digest changed for ${row.claimId}`);
+    } else {
+      if (!shown || shown.sourceUnitDigest !== source.sourceUnitDigest || shown.source.path !== source.sourcePath || shown.source.anchor !== source.sourceAnchor) throw new Error(`review pack source binding changed for ${row.claimId}`);
+      if (shown.reviewAuthor !== rowAuthor || shown.decision.authoredBy !== row.authoredBy) throw new Error(`review pack author binding changed for ${row.claimId}`);
+    }
     const updated = { ...row, reviewStatus: row.disposition === 'unknown-blocking' ? 'blocking' : 'pending', reviewNote: verdict.note };
     delete updated.reviewedBy; delete updated.reviewedAt; delete updated.targetUnitDigest;
-    for (const field of ['targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewPackCommit', 'reviewPackId', 'seedScoreId']) delete updated[field];
+    for (const field of ['targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewMode', 'reviewPackCommit', 'reviewPackId', 'seedScoreId']) delete updated[field];
     if (verdict.verdict === 'ok') {
       if (row.disposition === 'unknown-blocking') throw new Error(`unknown-blocking cannot be approved: ${row.claimId}`);
       const target = row.targetOwner ? (context.unitsOf(row.targetOwner) || []).find((unit) => unit.anchor === row.targetAnchor) : null;
       if (row.targetOwner && !target) throw new Error(`missing target for ${row.claimId}`);
-      if (row.targetOwner && (shown.target?.path !== row.targetOwner || shown.target.anchor !== row.targetAnchor || shown.targetUnitDigest !== target.textDigest || shown.target.text !== target.text || shown.target.sectionText !== target.sectionText || JSON.stringify(shown.target.ancestry) !== JSON.stringify(target.ancestry))) throw new Error(`target text or ancestry changed after review pack for ${row.claimId}`);
-      for (const field of ['targetOwner', 'targetAnchor', 'claimKind', 'disposition', 'rationale', 'remainder', 'stubOwner', 'stubAnchor']) if (shown.decision[field] !== row[field]) throw new Error(`review pack decision changed for ${row.claimId}`);
-      Object.assign(updated, { reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt, reviewReport: reportPath, reviewPackCommit: pack.commit, reviewPackId: score.packId, seedScoreId: score.scoreId, ...(target ? { targetUnitDigest: shown.targetUnitDigest, targetAncestry: [...(shown.target.ancestry || [])] } : {}) });
+      if (ordinaryReview) {
+        if (verdict.targetUnitDigest !== (target?.textDigest ?? null)) throw new Error(`shown target digest changed for ${row.claimId}`);
+      } else {
+        if (row.targetOwner && (shown.target?.path !== row.targetOwner || shown.target.anchor !== row.targetAnchor || shown.targetUnitDigest !== target.textDigest || shown.target.text !== target.text || shown.target.sectionText !== target.sectionText || JSON.stringify(shown.target.ancestry) !== JSON.stringify(target.ancestry))) throw new Error(`target text or ancestry changed after review pack for ${row.claimId}`);
+        for (const field of ['targetOwner', 'targetAnchor', 'claimKind', 'disposition', 'rationale', 'remainder', 'stubOwner', 'stubAnchor']) if (shown.decision[field] !== row[field]) throw new Error(`review pack decision changed for ${row.claimId}`);
+      }
+      Object.assign(updated, { reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt, reviewReport: reportPath,
+        ...(ordinaryReview ? { reviewMode: 'ordinary' } : { reviewPackCommit: pack.commit, reviewPackId: score.packId, seedScoreId: score.scoreId }),
+        ...(target ? { targetUnitDigest: ordinaryReview ? verdict.targetUnitDigest : shown.targetUnitDigest, targetAncestry: [...(ordinaryReview ? target.ancestry : shown.target.ancestry) || []] } : {}) });
     }
     return updated;
   });
-  if (jsonDigest(pack.sensitivityControls || []) !== jsonDigest(buildReviewPack(context, shard, { author }).sensitivityControls)) throw new Error('review pack sensitivity controls do not match the committed batch proofs');
+  if (!ordinaryReview && jsonDigest(pack.sensitivityControls || []) !== jsonDigest(buildReviewPack(context, shard, { author }).sensitivityControls)) throw new Error('review pack sensitivity controls do not match the committed batch proofs');
   if (context.repoRoot && claims.some((row, i) => row.reviewStatus === 'reviewed' && shard.claims[i].reviewStatus !== 'reviewed')) {
     const reportCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: context.repoRoot, encoding: 'utf8' }).trim();
     const reportOf = buildCommittedReviewReportLookup(context.repoRoot, reportCommit);
@@ -607,12 +626,18 @@ export function runCli(argv, cwd = process.cwd()) {
         const repoRoot = path.resolve(cwd, values.get('--repo-root') || '.');
         const reportPath = path.relative(repoRoot, resolve('--verdicts')).split(path.sep).join('/');
         if (reportPath.startsWith('../')) throw new Error('review report must be repository-relative');
-        const pack = jsonInput('--review-pack');
-        const key = jsonInput('--seed-key');
-        const seedProof = { key, verdicts: parseReviewVerdicts(fs.readFileSync(resolve('--seed-verdicts'), 'utf8'), key.reviewer) };
-        const score = scoreReviewPack(key, seedProof.verdicts);
-        const verdicts = parseReviewVerdicts(fs.readFileSync(resolve('--verdicts'), 'utf8'), values.get('--reviewer'), score);
-        result = applyReviewVerdicts(context, jsonInput('--apply-review'), { verdicts, reviewer: values.get('--reviewer'), reportPath, pack, seedProof });
+        const report = fs.readFileSync(resolve('--verdicts'), 'utf8');
+        const ordinaryReview = /^Review mode:\s*ordinary\s*$/im.test(report);
+        if (ordinaryReview && isCheckpointReviewReport(reportPath)) throw new Error('checkpoint reviews require sensitivity proof and pack binding');
+        let pack, seedProof, score;
+        if (!ordinaryReview) {
+          pack = jsonInput('--review-pack');
+          const key = jsonInput('--seed-key');
+          seedProof = { key, verdicts: parseReviewVerdicts(fs.readFileSync(resolve('--seed-verdicts'), 'utf8'), key.reviewer) };
+          score = scoreReviewPack(key, seedProof.verdicts);
+        }
+        const verdicts = parseReviewVerdicts(report, values.get('--reviewer'), score);
+        result = applyReviewVerdicts(context, jsonInput('--apply-review'), { verdicts, reviewer: values.get('--reviewer'), reportPath, pack, seedProof, ordinaryReview });
         fs.writeFileSync(resolve('--apply-review'), JSON.stringify(result, null, 2) + '\n');
       }
     }

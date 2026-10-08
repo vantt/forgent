@@ -615,6 +615,8 @@ export function reviewReportAuthor(report) {
   return /^[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(author || '') && !/^(script:|reviewer:)/.test(author) ? author : null;
 }
 
+export const isCheckpointReviewReport = reportPath => typeof reportPath === 'string' && /\/review-(?:3|6|10)-checkpoint(?:-[a-z0-9-]+)?\.md$/.test(reportPath);
+
 export function validateManualReview(row, shard, reportOf) {
   const findings = [];
   const fail = (type, message) => findings.push({ type, message: `claim ${row.claimId}: ${message}` });
@@ -629,18 +631,25 @@ export function validateManualReview(row, shard, reportOf) {
   if (!nonEmpty(shardAuthor)) fail('decision-author-session-missing', 'a reviewed manual row needs its shard or committed legacy review author');
   if ([author, shardAuthor].some((identity) => nonEmpty(identity) && reviewSessionIdentity(identity) === reviewSessionIdentity(row.reviewedBy))) fail('decision-self-review', 'reviewer and author must be different sessions, regardless of date or prefix');
   const header = (name) => typeof report === 'string' ? report.match(new RegExp(`^${name}:\\s*(.+)$`, 'mi'))?.[1].trim() : null;
+  const ordinary = row.reviewMode === 'ordinary' && header('Review mode') === 'ordinary' && !isCheckpointReviewReport(row.reviewReport);
   const bound = typeof report === 'string' &&
     /^reviewer:[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(row.reviewedBy || '') &&
     header('Reviewer') === row.reviewedBy &&
     (!legacy || nonEmpty(row.authoredBy) || (reportAuthor && (!shard.authorSession || reportAuthor === shard.authorSession))) &&
-    /^[0-9a-f]{40}$/.test(row.reviewPackCommit || '') && header('Pack commit') === row.reviewPackCommit &&
-    /^[0-9a-f]{64}$/.test(row.reviewPackId || '') && header('Pack id') === row.reviewPackId &&
-    /^[0-9a-f]{64}$/.test(row.seedScoreId || '') && header('Seed score') === row.seedScoreId &&
+    (ordinary || (
+      /^[0-9a-f]{40}$/.test(row.reviewPackCommit || '') && header('Pack commit') === row.reviewPackCommit &&
+      /^[0-9a-f]{64}$/.test(row.reviewPackId || '') && header('Pack id') === row.reviewPackId &&
+      /^[0-9a-f]{64}$/.test(row.seedScoreId || '') && header('Seed score') === row.seedScoreId
+    )) &&
     nonEmpty(row.reviewNote) && report.split(/\r?\n/).some((line) => {
       const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map((cell) => cell.trim().replace(/\\\|/g, '|'));
-      return cells.length === 3 && cells[0] === row.claimId && cells[1] === 'ok' && cells[2] === row.reviewNote;
+      if (cells[0] !== row.claimId || cells[1] !== 'ok' || cells[2] !== row.reviewNote) return false;
+      if (!ordinary) return cells.length === 3;
+      return cells.length === 5 && /^[0-9a-f]{40}$/.test(row.reviewReportCommit || '') && /^[0-9a-f]{64}$/.test(cells[3]) &&
+        /^[0-9a-f]{16,64}$/.test(row.sourceUnitDigest || '') && cells[3].startsWith(row.sourceUnitDigest) &&
+        (row.targetOwner ? /^[0-9a-f]{64}$/.test(row.targetUnitDigest || '') && cells[4] === row.targetUnitDigest : cells[4] === 'none');
     });
-  if (!bound) fail('decision-review-report-missing', 'no matching committed independent verdict with pack and sensitivity bindings');
+  if (!bound) fail('decision-review-report-missing', 'no matching committed independent verdict with shown-text or checkpoint sensitivity bindings');
   return findings;
 }
 
@@ -847,7 +856,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (d.disposition !== 'partial-carry' && d.disposition !== 'unknown-blocking' && !String(d.disposition).startsWith('delete-') && LOSS_LANGUAGE.test(String(d.rationale || '')) && !nonEmpty(d.remainder)) fail('decision-loss-without-partial-carry', `claim ${id}: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not ${d.disposition}`, at);
 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
-      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest', 'targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewPackCommit', 'reviewPackId', 'seedScoreId', 'reviewNote', 'stubOwner', 'stubAnchor', 'corpusRule']) if (d[field] !== undefined) merged[field] = d[field];
+      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest', 'targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewMode', 'reviewPackCommit', 'reviewPackId', 'seedScoreId', 'reviewNote', 'stubOwner', 'stubAnchor', 'corpusRule']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
       if (gapIdx >= 0 && d.reviewStatus === 'reviewed' && d.disposition !== 'unknown-blocking') gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };

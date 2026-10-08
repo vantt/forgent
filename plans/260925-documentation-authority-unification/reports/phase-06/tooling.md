@@ -251,3 +251,11 @@ A5 requires ordinary content reviews to read every judgment row, sample 100 rand
 
 Committed H1 green `658b4e602`: full suite 7,324 tests, 7,251 pass, zero fail, 8 skip, 65 todo; both prior-registry D proofs baseline-identical with zero fatal findings. Skipped/todo paths and actual batch E remain UNPROVEN. The review brief is written to A5; ordinary approval awaits the owner decision recorded in owner-queue.md, not a tooling re-review.
 
+## Ordinary approvals authorized by A6
+
+Committed A6 (`8bc686954`) resolves the unseeded-review blocker with one narrow channel change. Ordinary reports declare `Review mode: ordinary` and carry Claim/Verdict/Note/Source digest/Target digest columns, with full hashes and `none` for no target. Apply verifies current text against the committed independent verdict, keeps H1 and session independence, pins the report and stamps its shown target digest. Neither a seed nor a pack id is required.
+
+Checkpoint reports use `review-3-checkpoint.md`, `review-6-checkpoint.md` or `review-10-checkpoint.md`, optionally with a shard suffix; an ordinary declaration cannot bypass checkpoint proof. Their original key replay, threshold, pack, author, decision, target-text/ancestry and control bindings remain unchanged. Earlier seeded approvals retain their old proof path.
+
+Tests-first red: `452206652`. Corrected scripts suite: 872/872. Actual isolated CLI rehearsal: ordinary 40 approved fixture rows, no seed used, zero gate findings; checkpoint 40 approved fixture rows, 6/6 mutations caught, zero false flags, zero gate findings. These fixtures prove mechanics, not human judgment or real-session independence. No non-H1 review finding is reopened.
+
