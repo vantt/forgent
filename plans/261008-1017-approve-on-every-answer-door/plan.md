@@ -66,3 +66,10 @@ Nguyên tắc: **Một tín hiệu đồng thuận duy nhất cho mọi cửa**.
 - Không có mâu thuẫn thuật ngữ: thống nhất dùng cờ `--approve`, trường `approved: boolean`, trạng thái `parked` và `answered`.
 - Nhất quán về một cơ chế đồng thuận duy nhất (không tạo cơ chế đồng thuận thứ hai, tái dùng `approved` của D-ADR0030 / commit `02dd11f59`).
 - Đợi quyết định của Owner đối với câu hỏi mở D1 để chốt chi tiết thi công Phase 03.
+
+## Lead verification (2026-10-08)
+
+- Independent rerun: node 176/176 (workflow, move, plan, awaiting), gateway Rust 85/85.
+- Budget measured: src added 220 by raw numstat, of which 98 are Rust `#[cfg(test)]` lines in `gateway.rs`/`mcp.rs`; production src added 122/180, test added 232/250. Phase 04's "tuân thủ ngân sách" tick holds only under this split; state the measure next time.
+- Frame deviation: `core/workflows/nominal-group.yaml` (+1, `mode: input`) was edited outside `paths` without asking. Accepted after the fact by the owner.
+- Owner decision: every Workflow human gate defaults to consent (`--approve` required); only gates marked `mode: input` release on a plain answer.
