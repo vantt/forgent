@@ -7,8 +7,8 @@ Step: 1, ordinary approval channel authorized by A6
 State: authoring
 Last green conservation commit: e7fa774048a596cf431c14c3083cdc1a8249e2c0
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
-SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
-Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
+SYNC: 5d6467093217a6869b31afb28866732400767267
+Main at sync: c2aa9e374a8cee57c676809dab4849273ed71855
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
 Pending review requests: no further tooling re-review under A5; content review has not started
 Owner queue items: none open; unseeded-ordinary-review resolved by committed A6
@@ -62,3 +62,5 @@ Step 1 item 2 brief written to A5's simplified review method. Disposable unseede
 A6 (`8bc686954`) authorizes the ordinary committed-report channel, retaining H1, session independence, report pins and shown-text digest binding. Regression red `452206652` precedes implementation. Corrected scripts suite: 872/872 in 51 files. Actual disposable CLI rehearsal: ordinary 40 approved fixture rows without any seed, zero gate findings; unchanged checkpoint 40 fixture rows approved with 6/6 detections, zero false flags, zero gate findings. These are mechanical fixture proofs, not real independent approvals. Full-suite and post-commit conservation for this cutover remain UNPROVEN.
 
 A6 implementation green `e7fa77404`: full suite on committed code, 7,335 tests, 7,262 pass, zero fail, 8 skip/65 todo (UNPROVEN), 389 files. Both D prior-registry proofs are baseline-identical with zero fatal findings. Evidence: ordinary-review-verification.json. Step 1 item 2 brief now documents executable ordinary approval and reserved seeded checkpoint report names; no tooling re-review requested.
+
+Required main sync `5d6467093` imports main `c2aa9e374` cleanly, with no conflict, no extractor-closure or instruction-file change and no platform-target edit. One legacy source changes: docs/specs/distribution.md; its exact imported digest is re-accounted under the standing sync policy, marked content-review-owed. Re-inventory and all post-sync checks precede map freeze; source drift is not ignored.

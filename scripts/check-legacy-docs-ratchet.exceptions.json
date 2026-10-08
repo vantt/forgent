@@ -87,9 +87,9 @@
       "path": "docs/specs/distribution.md",
       "kind": "allowed-edit",
       "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 26 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | chore: pools for the discussion capabilities, more proven blind pairs, retire the coordination sessions check | docs(spec): keep the blind pool check row to registered check ids only (+23 more) Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); sync 2026-10-07 under the standing sync policy (plan.md §7.5b), per-file content review pending",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06; prior sync exceptions retained; sync 2026-10-08 at 5d6467093217a6869b31afb28866732400767267 imports main c2aa9e374a8cee57c676809dab4849273ed71855 under the standing sync policy (plan.md §7.5b); content-review-owed, per-file review pending before cutover",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "e1ebfb743dc7db1b860cf4704d9de60a230955f7cb762ede9418ff7dc59d11e5",
+      "expectedDigest": "6e44ee51f7e210351ba79ab6ddd28f4512e908621cd218cd5908b0de2c19df22",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
