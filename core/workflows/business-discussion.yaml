@@ -29,6 +29,7 @@ steps:
         template:
           capability: business:critique
           pattern: reviewed
+          acceptOutcomes: [pass, findings]
           objective: Stress-test assumptions and identify financial, regulatory, and operational risks
   - id: synthesis
     title: Strategic Synthesis & Trade-offs

@@ -30,6 +30,16 @@ const VALID_OPERATION_DISPATCH = new Set(['human-only']);
 
 const INPUT_ENTRY_KEYS = new Set(['step', 'sameSeat', 'label']);
 
+export function normalizeContextRefs(raw = [], label = 'contextRefs') {
+  if (!Array.isArray(raw) || raw.some((ref) => typeof ref !== 'string' || !ref.trim() ||
+    (ref.startsWith('unit-run:') || ref.startsWith('gate-answer:')
+      ? !/^(unit-run|gate-answer):[^/\\\s\0]+\/[^/\\\s\0]+$/.test(ref) || ref.split(/[:/]/).slice(1).some((part) => part === '.' || part === '..')
+      : path.isAbsolute(ref) || ref.includes('\\') || ref.includes('\0') || ref.split('/').includes('..')))) {
+    throw new WorkflowDefinitionError(`${label} must be an array of safe repo-relative paths or handoff references`);
+  }
+  return Object.freeze([...raw]);
+}
+
 /** One `inputs` entry of a unit template: which earlier step's results the unit receives. */
 function normalizeInputEntry(raw, label) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
@@ -303,6 +313,14 @@ export function validateWorkflow(raw) {
             throw new WorkflowDefinitionError(`${unitLabel} stanceOptions must be unique; "other" is reserved`);
           }
         }
+        const contextRefs = normalizeContextRefs(template.contextRefs, `${unitLabel}.contextRefs`);
+        const acceptOutcomes = template.acceptOutcomes === undefined ? ['pass'] : template.acceptOutcomes;
+        if (!Array.isArray(acceptOutcomes) || !acceptOutcomes.length ||
+          acceptOutcomes.some((outcome) => !['pass', 'findings'].includes(outcome)) ||
+          new Set(acceptOutcomes).size !== acceptOutcomes.length ||
+          (template.acceptOutcomes !== undefined && template.pattern !== 'reviewed')) {
+          throw new WorkflowDefinitionError(`${unitLabel}.acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
+        }
 
         if (template.anonymizeInputs !== undefined && typeof template.anonymizeInputs !== 'boolean') {
           throw new WorkflowDefinitionError(`${unitLabel} anonymizeInputs must be true or false`);
@@ -332,6 +350,8 @@ export function validateWorkflow(raw) {
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
               params: template.params === undefined ? undefined : structuredClone(template.params),
+              contextRefs,
+              ...(template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) } : {}),
               ...(stanceOptions === undefined ? {} : { stanceOptions: Object.freeze(stanceOptions) }),
               anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
               blind: template.blind === true ? true : undefined,

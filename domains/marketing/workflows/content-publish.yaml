@@ -19,6 +19,7 @@ steps:
         template:
           capability: marketing:write
           pattern: reviewed
+          acceptOutcomes: [pass, findings]
           persona: brand-guardian
           objective: Draft marketing copy and review against brand voice
   - id: approval

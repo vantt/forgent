@@ -1,0 +1,49 @@
+# Registered bounded revisit; parent settled reports arrive through --context-ref.
+id: architecture-advisory-reopen
+title: Architecture Advisory Reopen
+description: Revisit a final recommendation from parent evidence without rerunning blind seats.
+steps:
+  - id: synthesis
+    title: Revisit Final Recommendation
+    units:
+      - id: synthesize-recommendation
+        template:
+          capability: architecture:synthesize
+          pattern: reviewed
+          rigor: high
+          acceptOutcomes: [pass, findings]
+          params:
+            minCheckers: [reviewer, red-team]
+            roleTasks:
+              reviewer: 'Read the producer revised final RAW JSON packet listed in Context refs for this round. Review that packet, not git changes or the parent proposal. Check missing expertise array, revised verdict, evidence, dispositions, unchanged decisions, and preserved dissent. Do not rewrite it or change files; report concrete findings or explicitly none. {objective}'
+              red-team: 'Read the producer revised final RAW JSON packet listed in Context refs for this round. Attack that packet, not git changes or the parent proposal: framing, authority, changed claims, residual risks, missing expertise, and dissent laundering. Do not rewrite it or change files; report concrete failures with evidence or explicitly none. {objective}'
+          objective: >-
+            Use the supplied parent settled reports and verbatim owner request to revisit only affected
+            claims. Do not rerun or impersonate blind seats; preserve unchanged evidence and decisions.
+            Produce the final packet as a RAW JSON object without Markdown fences, with required
+            "missing expertise": an array of nonempty expertise names, or [] when none.
+            Include the verdict, evidence, alternatives, attributed findings and dispositions, unresolved
+            dissent, named defaults, residual risks, reversal triggers, and what changed and why.
+            Reviewers and red-team must challenge THIS revised final packet, not the earlier proposal:
+            check evidence, framing, authority, dissent preservation, and the missing-expertise array.
+            Never turn surviving findings into approval or invent consensus.
+  - id: explanation
+    title: Explain Revised Advice
+    dependsOn: [synthesis]
+    units:
+      - id: explain-recommendation
+        template:
+          capability: architecture:explain
+          pattern: solo
+          persona: advisor
+          objective: >-
+            Explain the settled revised packet and the impact of the owner request, with evidence and
+            one reversible next action. Preserve its verdict, "missing expertise" array, attributed
+            findings, and unresolved dissent; do not replace the advice or claim approval.
+  - id: close
+    title: Owner Expertise Decision
+    dependsOn: [explanation]
+    gate:
+      kind: human
+      mode: input
+      question: 'The revised final packet names missing expertise: {{report:synthesis/synthesize-recommendation:missing expertise}}. Bring in that expertise or not? Answer once for the whole list; [] means none is requested. Completion is not approval of the advice or permission to implement.'
