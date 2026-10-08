@@ -82,9 +82,11 @@ for (let round = 1; round <= rounds; round += 1) {
   // Each round gets its own temp dir, removed afterwards, so fixtures the
   // tests leave behind do not pile up in the OS temp dir round after round.
   const roundTemp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stress-round-'));
+  // Fixtures a confined worker must reach live under /var/tmp; the test helpers honour this root.
+  const roundFixtures = fs.existsSync('/var/tmp') ? fs.mkdtempSync('/var/tmp/fgos-stress-fixtures-') : null;
   const started = Date.now();
   const child = spawn(process.execPath, argv, {
-    env: { ...env, TMPDIR: roundTemp, TMP: roundTemp, TEMP: roundTemp }, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...env, TMPDIR: roundTemp, TMP: roundTemp, TEMP: roundTemp, ...(roundFixtures ? { FGOS_TEST_FIXTURE_ROOT: roundFixtures } : {}) }, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
   });
   let out = '';
   child.stdout.on('data', (d) => { out += d; });
@@ -97,6 +99,7 @@ for (let round = 1; round <= rounds; round += 1) {
   const code = await new Promise((resolve) => child.on('close', resolve));
   clearTimeout(timer);
   fs.rmSync(roundTemp, { recursive: true, force: true, maxRetries: 3 });
+  if (roundFixtures) fs.rmSync(roundFixtures, { recursive: true, force: true, maxRetries: 3 });
   const secs = ((Date.now() - started) / 1000).toFixed(1);
   const verdict = hung ? 'hang' : code === 0 ? 'pass' : 'fail';
   tally[verdict] += 1;

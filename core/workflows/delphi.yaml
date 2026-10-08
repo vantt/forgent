@@ -53,4 +53,11 @@ steps:
           capability: delphi:synthesize
           pattern: solo
           persona: synthesizer
-          objective: Produce final consensus synthesis reporting convergence and remaining dissent
+          objective: >-
+            Produce final consensus synthesis reporting convergence and remaining dissent. Write the verdict
+            in this order. (1) UNRESOLVED FIRST: what is still unknown, contested or unsupported, and what
+            would settle it. (2) POSITIONS: each participant's position by seat label only, never by role
+            id. (3) AGREEMENT OR SPLIT: say plainly whether they agree; if they split, name the split and
+            the sides, and do not average it away or invent consensus. (4) WHAT WOULD CHANGE THIS: the
+            conditions under which the conclusion should be revisited. (5) ONE NEXT STEP: exactly one
+            concrete action, with its evidence.

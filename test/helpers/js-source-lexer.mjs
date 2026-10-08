@@ -4,6 +4,10 @@
 // Words after which a slash starts a regular expression rather than a division.
 const REGEX_AFTER_WORD = new Set(['return', 'typeof', 'case', 'in', 'of', 'new', 'delete', 'void', 'throw', 'else', 'do', 'yield', 'await', 'instanceof']);
 
+// Keywords whose parenthesised head ends a statement header: a slash right after the closing paren
+// starts a regular expression (`if (x) /re/.test(y)`), unlike after a call's or group's paren.
+const CONTROL_BEFORE_PAREN = new Set(['if', 'while', 'for', 'with']);
+
 /**
  * Two same-length views of a source file. `code` has comments blanked
  * (newlines kept) and everything else intact. `shape` also blanks the inside
@@ -17,6 +21,7 @@ export function lexSource(source) {
   const n = source.length;
   const templateResume = [];
   let braces = 0;
+  const parenIsHeader = []; // one entry per open paren: whether it opened a control statement's head
   let last = null; // previous significant token: { kind: 'punct'|'word'|'value', text }
   let i = 0;
   const scanTemplate = (from) => {
@@ -82,7 +87,9 @@ export function lexSource(source) {
       let j = i + 1;
       while (j < n && /[\w$]/.test(source[j])) j++;
       const word = source.slice(i, j);
-      last = REGEX_AFTER_WORD.has(word) ? { kind: 'word', text: word } : { kind: 'value' };
+      if (REGEX_AFTER_WORD.has(word)) last = { kind: 'word', text: word };
+      else if (CONTROL_BEFORE_PAREN.has(word)) last = { kind: 'control' };
+      else last = { kind: 'value' };
       i = j; continue;
     }
     if (/[0-9]/.test(c)) {
@@ -92,6 +99,13 @@ export function lexSource(source) {
     }
     if (c === '{') braces++;
     else if (c === '}') braces = Math.max(0, braces - 1);
+    if (c === '(') {
+      parenIsHeader.push(last?.kind === 'control');
+    } else if (c === ')') {
+      // The head of an if/while/for/with is followed by a statement, so a slash there opens a regex.
+      last = parenIsHeader.pop() ? { kind: 'word', text: 'return' } : { kind: 'punct', text: c };
+      i++; continue;
+    }
     if (!/\s/.test(c)) last = { kind: 'punct', text: c };
     i++;
   }

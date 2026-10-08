@@ -36,7 +36,7 @@ Order 01 → 02 → 03 → 04. Each of 01–03 ships on its own and is measured 
 
 ## Facts to respect (checked 2026-10-07 on main)
 
-- `panel.mjs` already accepts `params` (role list, synthesizeRole); commit `52c53eee8` passes template persona and params down to the Unit run. The advisory plan's "panelist roleUnit calls omit params" is stale against main.
+- `resolvePanelRoles` takes pattern `params` (role list, synthesizeRole), and commit `52c53eee8` passes a template's persona and params down to the Unit run. But `panel.mjs` still builds each panelist's task with `roleUnit(unit, { role, kind })` without `params` (line 66; only the synthesizer gets them, line 92), so `params.roleTasks` does not reach panelists. The advisory plan's statement that panelist calls omit params is therefore still true on main.
 - `template.contextRefs` and `acceptOutcomes` do not exist in `src/workflow/definition.mjs`.
 - Persona renderer injects only `description/voice/style/archetype/decision_boundary`; extending it to `method`/`blind_spot` is a renderer change (decide in Phase 02, may fold method into `description`, as the experiment did).
 - `core/agents/` holds only the generic roles; the three experiment personas live in `plans/reports/council-lens-experiment-261004/personas/`.

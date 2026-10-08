@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- An account locked for a dead login no longer waits for a person to clear it: when a dispatch would otherwise find no usable account of the provider, fgOS makes one real call with that account's own credential (Codex or pi), unlocks it if it answers, and does not try again for 30 minutes if it does not. Quota limits and other locks are untouched.
 - `fgos doctor` reports activated Node-payload drift against a source checkout's working tree without changing activation; `npm run fgos:dev -- <verb>` runs working-tree code through the Rust host, preserving caller cwd and respecting custom Cargo targets without weakening manifest containment.
 - The source-checkout commit hook refuses new root files outside its single allowlist, including linked worktrees; separate allowlist commits and a root-only merge exception preserve normal integration and existing data-loss guards.
 - `fgos metrics coverage` reports assignment-run coverage and skip reasons; `fgos doctor` compares it with an independent directory scan and identifies older hosts as degraded.
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The final synthesis step of the `delphi`, `nominal-group`, `group-cognition` and `business-discussion` workflows now writes its verdict in a fixed order: what is still unresolved, each seat's position by seat label, whether the seats agree or split, what would change the conclusion, and exactly one next step. A split is reported as a split, not averaged away.
 - The provider capacity state lock now waits up to 30 seconds for a live holder instead of 5 before failing; a lock held by a dead process is still reclaimed at once. On a busy disk the holder's fsync could outlast five seconds and fail a dispatch for no fault of its own.
 - Architecture advisory guidance now uses config-owned binding and the current Workflow door instead of retired executor/model pins and coordination APIs; it preserves role doctrine, requires fail-closed host-write-denied execution, and explicitly separates unsupported advisory capabilities from this hygiene cleanup.
 - Skill render Markdown copies now carry a generated-from header naming their canonical source and the source-repo rebuild command, preserving frontmatter bytes; Claude thin wrappers identify their redirect target as an assembled projection.
@@ -52,6 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A panel seat whose provider capacity is exhausted or quarantined is no longer counted as passed. Its result had no outcome, which was read as success, so the panel went on to its synthesizer with a missing report. It now counts as a provider limit, so the seat moves to the next candidate of its pool and, with none left, the unit fails visibly.
+- A workflow run whose unit could not even start (for example a hand-off reference that no longer resolves) now fails its step and the run with the reason recorded, instead of ending the advance with the run still `running` and nothing in its event log.
 - Dispatch no longer loads every pre-existing dirty file into memory for the whole run: dirty-before snapshots keep only existence and a streamed sha256, so a worktree with large untracked files no longer drives `fgos run` to multi-GB RSS or OOM, and a FIFO or device among the dirty files no longer hangs the run.
 - A failure to record a unit's failed settlement no longer hides the execution error that caused it.
 - `metrics eval record` refusing an invalid eval store now names each offending shard file and line, and how to repair it.

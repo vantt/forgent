@@ -4,6 +4,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { deriveOutcome } from '../dispatch/run-result.mjs';
 
 function compareRunNames(a, b) {
   return Number(a) - Number(b) || a.localeCompare(b);
@@ -15,13 +16,19 @@ function compareRunNames(a, b) {
  * "this provider has no quota" from any other infrastructure failure.
  */
 export function outcomeOfRunResult(runResult) {
-  const category = runResult?.classification?.outcome?.category ?? 'ok';
-  const failureCode = runResult?.classification?.failure?.code;
+  const classification = runResult?.classification;
+  // A result settled without an outcome (a refused provider capacity is one) is judged from its
+  // classification like any other; treating the missing outcome as `ok` made a failed seat a pass.
+  const category = classification?.outcome?.category
+    ?? (classification && typeof classification === 'object' ? deriveOutcome(classification).category : 'ok');
+  const failureCode = classification?.failure?.code;
   if (category === 'ok') return 'pass';
   if (category === 'verdict' && runResult?.classification?.assessment?.verdict === 'findings') return 'findings';
   if (category === 'blocked') return 'blocked';
   if (category === 'policy') return 'policy-refusal';
-  if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit')) return 'provider-limit';
+  // A provider whose capacity is exhausted or quarantined is the same situation as a provider limit hit
+  // mid-run: the seat moves to the next candidate of the pool instead of counting as done.
+  if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit' || failureCode === 'provider-capacity-refused')) return 'provider-limit';
   return 'execution-failure';
 }
 

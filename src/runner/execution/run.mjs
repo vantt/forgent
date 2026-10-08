@@ -12,6 +12,7 @@ import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
+import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
@@ -352,6 +353,7 @@ export async function runUnit(options = {}) {
       cwd: unitRecord.worktree,
       repoRoot: mainRoot,
       runnerConfig,
+      providerCredentialProbe: createCredentialProbe(),
       cliOverride: {
         preferExecutor: bound.executor,
         // bind() already chose the invocation that carries bound.transport: the executor's
