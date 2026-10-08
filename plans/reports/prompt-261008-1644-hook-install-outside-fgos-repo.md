@@ -10,6 +10,13 @@ Written 2026-10-08 by the lead of the decision-question-template session. Self-c
 - Usage that matters: `mcp-skill-hub` (a real outside project) had 29 `AskUserQuestion` calls in 10 sessions since 2026-09-08; the new template hook protects none of them.
 - `doctor` check `dispatch-decide-hook-wired` (`src/setup/registrations.mjs` ~1278) only checks that settings.json has the entry, not that the command can run.
 
+## Facts found after writing this brief (2026-10-08)
+
+- Per-project setup itself works: `fgos setup` writes each project's own `.claude/settings.json` (mdview has the entry). Only the command path is wrong.
+- The activated release already ships the hook script: `~/.local/state/fgos/releases/<digest>/libexec/legacy-node/scripts/dispatch-decide-hook.mjs` (release path in `.fgos/installation/activation.json` → `releasePath`). Pointing the command at the installed payload, or at an `fgos` verb, is likely enough.
+- `installClaudeCodeHook` is fill-only and matches entries by script name, so re-running `fgos setup` will NOT replace an existing broken entry (mdview). The plan must repair already-written entries too.
+- The decision-question branch is merged to main (`0f0866592`); base the worktree on main.
+
 ## Base and isolation
 
 - Base the worktree on branch `plan/261008-decision-question-template` (head `cff70a5f4` or later; not yet merged to main), because it adds the second hook. If it has merged by the time you start, base on main.

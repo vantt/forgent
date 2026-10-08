@@ -1,6 +1,6 @@
 ---
 title: Mẫu câu hỏi quyết định và gỡ các quy tắc hỏi trùng lặp
-status: pending
+status: completed
 created: 2026-10-08
 budget: "src: dòng thêm ≤ 300, dòng xoá không giới hạn; test ≤ 530 dòng; ≤ 2,5 ngày; không tính khối AGENTS.md sinh tự động, .fgos/instructions/effective/repo.json và bản render skill. Vượt thì dừng và hỏi theo mẫu."
 paths: [core/skills/_shared/decision-question.md, core/instructions/decision-question.md, src/runner/prompt-templates/worker-prompt-discovery.txt, scripts/decision-question-hook.mjs, src/setup/claude-code-hooks.mjs, .claude/settings.json, bin/fgos.mjs (answer --approve, bỏ --rationale/--alternatives), src/state/{store,replay,awaiting-context}.mjs, skill /fgOS:answer, .fgos/instructions/effective/repo.json (sinh tự động), src/state/status-fsm.mjs, src/intake/plan.mjs, src/intake/discovery.mjs, test/ (chỉ fixture chứa '## Why this matters' và test validator), domains/coding/skills/fgos-coding-{discovering,exploring,implement,shaping,validating}/SKILL.md, core/skills/_shared/coordination-driver.md, core/skills/fgos-run/SKILL.md, docs/specs/platform-foundations.md (RUL11 + decision 0054), test/docs/rul11-anchor-phrase.test.mjs, domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md, docs/decisions/index.md (sinh tự động), AGENTS.md (khối luật sinh tự động + sửa tay dòng 19 và mục RUL11), CHANGELOG.md, bản render của build:skills, 2 memory file]
