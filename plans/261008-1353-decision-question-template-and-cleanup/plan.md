@@ -1,12 +1,12 @@
 ---
-title: Mẫu câu hỏi quyết định và dọn dẹp phần phình
+title: Mẫu câu hỏi quyết định và gỡ các quy tắc hỏi trùng lặp
 status: pending
 created: 2026-10-08
-budget: "src ≤ 60 dòng đổi; test chỉ đổi chuỗi fixture có sẵn, 0 test file mới; docs/instructions ≤ 60 dòng; ≤ 1 ngày cho Phase 01; Phase 02 chỉ được xoá/di chuyển, net dòng phải âm"
-paths: [core/instructions/, src/state/status-fsm.mjs, src/intake/plan.mjs, src/intake/discovery.mjs, test/ (chỉ fixture chứa '## Why this matters'), core/skills/fgos-coding-*/SKILL.md, core/skills/fgos-panel/SKILL.md, AGENTS.md (qua writer của nó), CHANGELOG.md, docs/architect/agent-coordination/, plans/**/*.log, archive/plans/**/*.log, .claude/worktrees/]
+budget: "src ≤ 60 dòng đổi; test chỉ đổi chuỗi fixture có sẵn + 1 case, 0 test file mới; instructions/skills/AGENTS ≤ 60 dòng, net ≤ 0 ngoài file mẫu; ≤ 1 ngày"
+paths: [core/instructions/decision-question.md, src/state/status-fsm.mjs, src/intake/plan.mjs, src/intake/discovery.mjs, test/ (chỉ fixture chứa '## Why this matters' và test validator), domains/coding/skills/fgos-coding-{discovering,exploring,implement,shaping,validating}/SKILL.md, core/skills/_shared/coordination-driver.md, core/skills/fgos-run/SKILL.md, AGENTS.md (qua writer), CHANGELOG.md, bản render của build:skills, 2 memory file]
 ---
 
-# Mẫu câu hỏi quyết định và dọn dẹp phần phình
+# Mẫu câu hỏi quyết định và gỡ các quy tắc hỏi trùng lặp
 
 ## Vì sao có plan này
 
@@ -16,30 +16,24 @@ Thảo luận 2026-10-08 ([brief](../reports/prompt-261008-bloat-root-cause-disc
 2. Agent dừng nhưng hỏi kiểu "giờ anh muốn sao" — không nguyên nhân, không giá, không khuyến nghị.
 3. Owner trả lời không hiểu ("làm tiếp phase 2"), câu trả lời bị ghi thành giấy phép mở rộng.
 
-Quy tắc "hỏi cho rõ" đã có ở 4 nơi dạng văn xuôi và đều thất bại; code tsk-539 chỉ bắt `## Context`/`## Why this matters` ở cửa `fgos ask`. Owner chọn: **một mẫu duy nhất + một dòng luật + sửa validator `fgos ask`**, áp cho mọi vai (implementer, lead, reviewer), và plan phải gồm dọn dẹp.
+Quy tắc "hỏi cho rõ" đang nằm rải ở nhiều nơi dạng văn xuôi (5 skill coding, coordination-driver, fgos-run, AGENTS.md, memory) và code tsk-539 chỉ bắt `## Context`/`## Why this matters` ở cửa `fgos ask`. Owner chọn: **một mẫu duy nhất + một dòng luật + sửa validator `fgos ask`**, áp cho mọi vai (implementer, lead, reviewer), và **gỡ các chỗ nói trùng**.
 
 ## Phases
 
 | # | Phase | Trạng thái | File |
 |---|---|---|---|
-| 01 | Mẫu câu hỏi quyết định thay quy tắc cũ | pending | [phase-01](phase-01-decision-question-template.md) |
-| 02 | Dọn dẹp phần phình (chờ owner trả lời bộ câu hỏi bên dưới) | pending | [phase-02](phase-02-cleanup.md) |
-
-Phase 02 không phụ thuộc Phase 01 về code; chỉ cần owner trả lời các câu hỏi D1–D5.
+| 01 | Mẫu câu hỏi quyết định + validator `fgos ask` | pending | [phase-01](phase-01-decision-question-template.md) |
+| 02 | Gỡ các chỗ nói trùng về cách hỏi | pending, sau 01 | [phase-02](phase-02-remove-duplicate-question-rules.md) |
 
 ## Acceptance
 
-- Một file mẫu duy nhất; validator `fgos ask` đòi đủ 5 phần của nó; không còn chuỗi `## Why this matters` trong src/test/skills.
-- AGENTS.md có đúng một dòng luật trỏ tới mẫu (qua instruction registry, không sửa tay phần render).
-- `npm test` xanh. Diff Phase 01 nằm trong `budget`/`paths`; vượt thì dừng và hỏi theo mẫu.
-- Phase 02: mỗi mục dọn có quyết định owner ghi kèm; net dòng/MB âm; không thêm code mới.
+- Một file mẫu duy nhất; validator `fgos ask` đòi đủ 5 phần; AGENTS.md có mục luật trỏ tới mẫu qua instruction registry.
+- Không còn `## Why this matters` trong src, test, core, domains, AGENTS.md; các skill chỉ còn 1 dòng trỏ tới mẫu.
+- `npm test` xanh. Diff nằm trong `budget`/`paths`; vượt thì dừng và hỏi theo mẫu.
 
 ## Ngoài phạm vi
 
 - Test ngày càng nhiều và chậm: owner hẹn truy vết sau.
-- Dòng ngân sách bắt buộc trong mọi plan, script pre-merge, doctor row, supersede L6, sửa RUL11: chưa được owner chốt.
-- `~/.claude/rules/CLAUDE.md` (ck) — dự án của người khác, không sửa.
-
-## Câu hỏi cho owner (theo mẫu mới, trả lời một lần)
-
-Xem [phase-02 § Bộ câu hỏi D1–D5](phase-02-cleanup.md#bộ-câu-hỏi-d1d5). Phase 01 không cần thêm quyết định.
+- Ngân sách bắt buộc cho mọi plan, script pre-merge, doctor row, supersede L6, sửa RUL11: chưa chốt.
+- Dọn tài liệu/log/worktree phình (agent-coordination docs, log đã commit, 880 dòng dispatch advisory): không thuộc plan này.
+- `~/.claude/rules/CLAUDE.md` (ck): dự án của người khác, không sửa.

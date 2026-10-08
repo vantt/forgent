@@ -19,7 +19,7 @@ Mọi câu hỏi gửi owner để chọn hướng — trong chat, `AskUserQuest
 
 Gate không đạt được trong phạm vi đã khai là một câu hỏi quyết định theo mẫu này; không sửa ngoài phạm vi để gỡ gate.
 
-Khi phân tích đã chọn rõ một phương án và việc nằm trong phạm vi đã được duyệt, quyết và báo cáo, không hỏi (AGENTS.md ưu tiên #2).
+Phạm vi mẫu: câu hỏi chọn hướng. Câu hỏi Socratic khám phá ý định sản phẩm (fgos-coding-exploring) theo quy tắc riêng của nó. Khi nào hỏi và gom thành bộ: xem AGENTS.md ưu tiên #2 (không chép lại ở đây).
 
 ## Việc cần làm
 
@@ -27,16 +27,15 @@ Khi phân tích đã chọn rõ một phương án và việc nằm trong phạm
 2. Sửa validator trong `status-fsm.mjs`: thay 2 heading bằng 5 heading `## Chuyện gì đang xảy ra`, `## Nguyên nhân`, `## Các lựa chọn`, `## Khuyến nghị`, `## Phạm vi của câu trả lời`, giữ quy tắc ≥ 20 ký tự mỗi mục. Không giữ đường cũ (một người dùng, không cần tương thích ngược).
 3. Sửa 3 bộ sinh câu hỏi trong `src/intake/` sang 5 heading, nội dung thật (không điền chữ đệm cho đủ độ dài).
 4. Đổi chuỗi fixture trong test có sẵn; không thêm test file mới. Thêm đúng 1 case vào test validator hiện có: thiếu `## Phạm vi của câu trả lời` thì bị từ chối.
-5. Năm skill viết câu hỏi (`fgos-coding-exploring/-validating/-implement/-shaping/-discovering`) và `fgos-panel` (nếu có chỗ hỏi owner): thay tham chiếu cấu trúc cũ bằng một dòng trỏ tới mẫu. `npm run build:skills`, không sửa tay `.agents/` hay `plugins/`.
-6. AGENTS.md ưu tiên #2: thêm vào câu "khi hỏi thì gom thành bộ" một vế "và theo mẫu câu hỏi quyết định". Sửa qua writer của AGENTS.md.
-7. Memory `feedback_advisor_not_mechanical_worker`: trỏ tới file mẫu, bỏ phần mô tả trùng.
-8. CHANGELOG `[Unreleased]`: 1 dòng (người dùng `fgos ask` sẽ thấy lỗi mới).
+5. CHANGELOG `[Unreleased]`: 1 dòng (người dùng `fgos ask` sẽ thấy lỗi mới).
+
+Sửa skill, AGENTS.md và memory cho khỏi trùng: Phase 02.
 
 ## Kiểm chứng
 
 - Hẹp: test validator + `test/intake/*` + `test/cli/fgos-intake*`.
 - Rộng: `npm test` (unset `CLAUDE_CODE_SESSION_ID` nếu chạy trong agent session).
-- `git grep -n "Why this matters" -- src test core` ra 0.
+- `git grep -n "Why this matters" -- src test` ra 0 (skill sửa ở Phase 02).
 - `git diff --numstat <base> -- src` ≤ 60 dòng đổi; mọi path nằm trong `paths` của plan.md.
 
 ## Rủi ro và rollback
