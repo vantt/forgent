@@ -386,7 +386,7 @@ nhân đôi chỗ ghi, vi phạm KISS.
 
 ### 0036 — Khoá RUL11 (tùm lum không phải nặng): "tùm lum", không phải "nặng"
 
-> Superseded bởi 0054 (2026-10-08): RUL11 thêm vế phạm vi. Phát biểu gốc dưới đây giữ nguyên.
+> Superseded bởi 0054 (2026-10-08): RUL11 (tùm lum không phải nặng) thêm vế phạm vi. Phát biểu gốc dưới đây giữ nguyên.
 
 #### Bối cảnh
 
@@ -464,7 +464,7 @@ khong phai no nang ma no tum lum
 - RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase; `docs/specs/platform-foundations.md`) — ba quy tắc tầng doctrine
   mà RUL11 (tùm lum không phải nặng) phải tuân để "dính" thay vì chỉ là khẩu hiệu.
 
-### 0054 — RUL11 gom trong phạm vi việc đang làm (supersede 0036)
+### 0054 — RUL11 (tùm lum không phải nặng) gom trong phạm vi việc đang làm (supersede 0036)
 
 #### Bối cảnh
 
@@ -476,8 +476,8 @@ Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom ph
 
 #### Hệ quả
 
-- Dòng RUL11 ở Business Rules mang vế phạm vi và trích 0054; `test/docs/rul11-anchor-phrase.test.mjs` khớp chữ mới.
-- `AGENTS.md` mục RUL11 và ưu tiên #2 mang cùng vế; anchor phrase không đổi.
+- Dòng RUL11 (tùm lum không phải nặng) ở Business Rules mang vế phạm vi và trích 0054; `test/docs/rul11-anchor-phrase.test.mjs` khớp chữ mới.
+- `AGENTS.md` mục RUL11 (tùm lum không phải nặng) và ưu tiên #2 mang cùng vế; anchor phrase không đổi.
 - L5 không đổi.
 
 #### Tham chiếu

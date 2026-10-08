@@ -36,3 +36,12 @@ Hook nhận input `PreToolUse` (`tool_name`, `tool_input`, `transcript_path`):
 - Câu hỏi chuyển sang viết thẳng trong chat để né: theo dõi 2 tuần, khi đó mới quyết hook `Stop`.
 - Chỉ Claude Code có hook; runtime khác dựa vào mẫu trong skill.
 - Hook chạy mỗi lần `AskUserQuestion`: đọc tối đa phần cuối transcript (giới hạn byte), không quét cả file.
+
+## Kết quả (2026-10-08)
+
+- `scripts/decision-question-hook.mjs` (~80 dòng) chỉ gom chữ (đoạn assistant của lượt hiện tại từ transcript + câu hỏi + mô tả option) rồi gọi `checkDecisionQuestion` — cùng một cửa kiểm với `fgos ask`.
+- `installClaudeCodeHook` cài cả `Agent|Task` và `AskUserQuestion`; `claudeCodeHookWired` đòi cả hai; thông báo doctor và dòng `dispatch-decide-hook-wired` trong `docs/specs/distribution.md` cập nhật. `.claude/settings.json` của worktree đã có entry mới.
+- Chạy thật: `claude -p` (haiku) trong worktree với hook `PreToolUse` ghi payload → payload có `transcript_path`, file tồn tại, cấu trúc entry (user str / assistant blocks / user tool_result) khớp cách hook đọc. Chưa chạy thật một `AskUserQuestion` qua hook (chế độ `-p` không hỏi người); test dùng transcript thật dạng JSONL.
+- Sửa kèm: chú thích cho RUL11 trong mục 0036/0054 và mẫu (check-decision-citation-drift bắt; Phase 03 chỉ chạy test docs nên lọt).
+- Test setup/scripts/docs: 1263 test, hết đỏ sau khi sửa chú thích.
+- Ngân sách tới hết Phase 04: src thêm 235/300 (xoá 61); test 415/530.

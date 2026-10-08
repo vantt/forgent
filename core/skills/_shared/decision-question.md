@@ -22,7 +22,7 @@ approves the work. A child item shares its parent's frame.
 
 - Inside the frame, decide and report; do not ask.
 - About to leave the frame: stop and ask in this template.
-- RUL11: consolidate the mess inside the current work's scope until it is
+- RUL11 (tùm lum không phải nặng): consolidate the mess inside the current work's scope until it is
   gone. Mess seen outside the scope becomes its own item. Consolidating by
   building a new tool or engine is a decision question.
 - Done means done inside the frame. A gate that cannot be met inside it is

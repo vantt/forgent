@@ -1,6 +1,6 @@
 // claude-code-hooks.mjs — infra layer: real `.claude/settings.json` I/O for
-// wiring this repo's `PreToolUse` dispatch-decide enforcement (tsk-60f D1/D5)
-// into a checkout. Same shape as `git-hooks.mjs`'s two entry points, one
+// wiring this repo's `PreToolUse` enforcement (dispatch-decide on Agent/Task,
+// decision-question template on AskUserQuestion) into a checkout. Same shape as `git-hooks.mjs`'s two entry points, one
 // mechanism level up (Claude Code's own hook config, not git's):
 //   - installClaudeCodeHook: the writer, used by `fgos setup` (bin/fgos.mjs).
 //   - claudeCodeHookWired: the read-only check, used by `fgos doctor`
@@ -10,7 +10,12 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-const HOOK_COMMAND_MARKER = 'dispatch-decide-hook.mjs';
+// Each PreToolUse hook this module wires: dispatch-decide on Agent/Task
+// calls, and the decision-question template on AskUserQuestion calls.
+const HOOKS = [
+  { matcher: 'Agent|Task', marker: 'dispatch-decide-hook.mjs' },
+  { matcher: 'AskUserQuestion', marker: 'decision-question-hook.mjs' },
+];
 
 function readSettings(settingsPath) {
   if (!existsSync(settingsPath)) return {};
@@ -21,7 +26,7 @@ function readSettings(settingsPath) {
   }
 }
 
-function hasDispatchDecideHook(settings) {
+function hasHook(settings, marker) {
   const entries = settings?.hooks?.PreToolUse;
   if (!Array.isArray(entries)) return false;
   return entries.some(
@@ -29,7 +34,7 @@ function hasDispatchDecideHook(settings) {
       entry &&
       typeof entry.matcher === 'string' &&
       Array.isArray(entry.hooks) &&
-      entry.hooks.some((h) => h && typeof h.command === 'string' && h.command.includes(HOOK_COMMAND_MARKER)),
+      entry.hooks.some((h) => h && typeof h.command === 'string' && h.command.includes(marker)),
   );
 }
 
@@ -54,14 +59,17 @@ export function installClaudeCodeHook(repoRoot) {
   const settingsPath = path.join(repoRoot, '.claude', 'settings.json');
   const settings = readSettings(settingsPath);
   if (settings === null) return { wired: false, skippedExisting: 'malformed' };
-  if (hasDispatchDecideHook(settings)) return { wired: true, skippedExisting: null };
+  const missing = HOOKS.filter((hook) => !hasHook(settings, hook.marker));
+  if (missing.length === 0) return { wired: true, skippedExisting: null };
 
   settings.hooks = settings.hooks && typeof settings.hooks === 'object' ? settings.hooks : {};
   const preToolUse = Array.isArray(settings.hooks.PreToolUse) ? settings.hooks.PreToolUse : [];
-  preToolUse.push({
-    matcher: 'Agent|Task',
-    hooks: [{ type: 'command', command: 'node "${CLAUDE_PROJECT_DIR}/scripts/dispatch-decide-hook.mjs"' }],
-  });
+  for (const hook of missing) {
+    preToolUse.push({
+      matcher: hook.matcher,
+      hooks: [{ type: 'command', command: `node "\${CLAUDE_PROJECT_DIR}/scripts/${hook.marker}"` }],
+    });
+  }
   settings.hooks.PreToolUse = preToolUse;
 
   mkdirSync(path.dirname(settingsPath), { recursive: true });
@@ -79,5 +87,5 @@ export function claudeCodeHookWired(cwd) {
   const settingsPath = path.join(cwd, '.claude', 'settings.json');
   const settings = readSettings(settingsPath);
   if (settings === null) return false;
-  return hasDispatchDecideHook(settings);
+  return HOOKS.every((hook) => hasHook(settings, hook.marker));
 }

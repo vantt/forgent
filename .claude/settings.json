@@ -89,6 +89,15 @@
           }
         ],
         "matcher": "Bash|Read"
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/decision-question-hook.mjs\""
+          }
+        ]
       }
     ],
     "SessionStart": [

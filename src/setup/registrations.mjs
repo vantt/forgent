@@ -1275,9 +1275,9 @@ function checkMainCheckoutHookWired(cwd) {
 
 function checkDispatchDecideHookWired(cwd) {
   if (claudeCodeHookWired(cwd)) {
-    return { passed: true, message: 'PreToolUse hook wired — every Agent/Task call is routed through dispatch.mjs decide first' };
+    return { passed: true, message: 'PreToolUse hooks wired — every Agent/Task call is routed through dispatch.mjs decide first, and every AskUserQuestion call is checked against the decision-question template' };
   }
-  return { passed: false, message: '.claude/settings.json has no PreToolUse dispatch-decide hook wired — Agent/Task calls can bypass the decide-first enforcement — run fgos setup' };
+  return { passed: false, message: '.claude/settings.json is missing a PreToolUse hook (dispatch-decide on Agent/Task, or decision-question on AskUserQuestion) — run fgos setup' };
 }
 
 // tsk-1dj (tool-registry-capability port), CONTEXT.md D1: reports the tool
