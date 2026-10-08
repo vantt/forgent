@@ -27,6 +27,9 @@ Last reviewed: 2026-09-01
 Canonical for: navigation across accepted behavioral contracts
 
 > **Ghi chú chuyển tiếp (2026-10-02):** Khái niệm `CoordinationSession` và `FlowDefinition` đã được thu hồi ở P4 per D-0050; thay bằng **Unit run** qua **CollaborationPattern** (`solo`, `reviewed`, `panel` + preset) và **Workflow run** (`src/workflow/**`).
+Read the [Agent Coordination Foundation Vision](../vision.md) first. Contracts
+define exact behavior beneath it and cannot make Work or a predeclared protocol
+universally mandatory.
 ## Migration Status
 
 This directory has been promoted from
