@@ -33,9 +33,10 @@ approves the work. A child item shares its parent's frame.
   evidence that needs staging (breaking something on purpose, writing the
   verdict into the prompt) means the gate cannot be met, so ask.
 
-Open discovery questions (item stage `discovery` or `exploring`, Socratic
-questions in fgos-coding-exploring/-shaping) need only parts 1, 2 and 5: their
-options are not known yet, and inventing them defeats the question.
+Open discovery questions (item workflow step `discovery` or `exploring`,
+Socratic questions in fgos-coding-exploring/-shaping) need only parts 1, 2 and
+5: their options are not known yet, and inventing them defeats the question.
+Write each part as a heading or as a label followed by ":" (`**Cause:** ...`).
 
 When to ask and how to batch: AGENTS.md product priority #2. Headings may be
 Vietnamese or the English names above. `fgos ask` and the AskUserQuestion hook

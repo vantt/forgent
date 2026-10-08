@@ -33,7 +33,7 @@ see the "Distill mode" section below for how the second one differs.
 
 ## Hard rules
 
-- When asking questions (`fgos ask`), use self-contained citations (`../_shared/citation-format.md`) and the decision-question template (`../_shared/decision-question.md`); open shaping questions need only its shared parts (what is happening, cause, scope of the answer).
+- When asking questions (`fgos ask`), use self-contained citations (`../_shared/citation-format.md`) and the decision-question template (`../_shared/decision-question.md`); at workflow step `discovery`/`exploring` only its shared parts are required (what is happening, cause, scope of the answer); at later steps all five.
 - Never write `docs/history/<feature>/CONTEXT.md` or `plan.md` — that stays
   `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, unchanged by this skill.
   This skill's only artifact is `DISCUSSION.md`.

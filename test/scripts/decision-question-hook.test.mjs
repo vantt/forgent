@@ -38,6 +38,17 @@ test('passes when this turn already wrote the five-part analysis before the ques
   assert.equal(result.status, 0, result.stderr);
 });
 
+test('meta entries and background-task notifications do not cut the turn', () => {
+  const file = transcript([
+    { type: 'user', message: { content: 'what now?' } },
+    { type: 'assistant', message: { content: [{ type: 'text', text: ANALYSIS }] } },
+    { type: 'user', message: { content: '<task-notification>agent finished</task-notification>' } },
+    { type: 'user', isMeta: true, message: { content: 'skill body' } },
+  ]);
+  const result = runHook({ tool_name: 'AskUserQuestion', transcript_path: file, tool_input: ask('Which option?') });
+  assert.equal(result.status, 0, result.stderr);
+});
+
 test('blocks a bare "what do you want" question and prints the template', () => {
   const file = transcript([
     { type: 'assistant', message: { content: [{ type: 'text', text: ANALYSIS }] } },

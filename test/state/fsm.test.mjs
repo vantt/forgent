@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { transitionWork, FsmError, STATUSES, TRANSITIONS } from '../../src/state/status-fsm.mjs';
+import { describeDecisionQuestion } from '../../src/state/decision-question.mjs';
 
 function work(status, overrides = {}) {
   return { id: 'w1', status, ...overrides };
@@ -311,20 +312,28 @@ test('transitionWork checks the ask against the decision-question template as va
     );
     const noScope = VALID_ASK.slice(0, VALID_ASK.indexOf('## Phạm vi'));
     assert.throws(
-      () => transitionWork({ work: work(from, { stage: 'planning' }), to: 'awaiting-human', ask: noScope }),
+      () => transitionWork({ work: work(from, { workflowStep: 'planning' }), to: 'awaiting-human', ask: noScope }),
       (err) => isValidation('Phạm vi của câu trả lời')(err) && !err.message.includes('Nguyên nhân,'),
     );
     // Discovery-shaped stages need only the three shared parts; others need all five.
-    assert.equal(transitionWork({ work: work(from, { stage: 'exploring' }), to: 'awaiting-human', ask: three }).payload.ask, three);
+    assert.equal(transitionWork({ work: work(from, { workflowStep: 'exploring' }), to: 'awaiting-human', ask: three }).payload.ask, three);
     assert.throws(
-      () => transitionWork({ work: work(from, { stage: 'planning' }), to: 'awaiting-human', ask: three }),
+      () => transitionWork({ work: work(from, { workflowStep: 'planning' }), to: 'awaiting-human', ask: three }),
       isValidation('Các lựa chọn', 'Khuyến nghị'),
     );
     // Vietnamese headings match in decomposed (NFD) form too, and English names are accepted.
     assert.ok(transitionWork({ work: work(from), to: 'awaiting-human', ask: VALID_ASK.normalize('NFD') }).payload.ask);
     const english = VALID_ASK.replace('## Chuyện gì đang xảy ra', '## What is happening').replace('## Khuyến nghị', '## Recommendation');
     assert.ok(transitionWork({ work: work(from), to: 'awaiting-human', ask: english }).payload.ask);
+    // A sentence that starts with a label word is not a new part.
+    const naturalRecommendation = VALID_ASK.replace(/## Khuyến nghị\n\n.*/, '## Khuyến nghị\n\nLựa chọn (b), vì rẻ nhất và không đụng tầng dispatch.');
+    assert.ok(transitionWork({ work: work(from), to: 'awaiting-human', ask: naturalRecommendation }).payload.ask);
   }
+  // Echoing the template's own hints is not an answer to it.
+  assert.throws(
+    () => transitionWork({ work: work('todo'), to: 'awaiting-human', ask: describeDecisionQuestion() }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
 });
 
 test('transitionWork allows awaiting-human -> todo (resume) and carries the answer in the payload', () => {

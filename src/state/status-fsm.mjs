@@ -304,7 +304,7 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
     // Decision-question template (core/skills/_shared/decision-question.md):
     // discovery-shaped stages need the 3 shared parts, every other stage all
     // 5. The same check guards the AskUserQuestion hook.
-    const required = requiredPartsForStage(work.stage);
+    const required = requiredPartsForStage(work.workflowStep);
     const missing = checkDecisionQuestion(ask, required);
     if (missing.length > 0) {
       throw new FsmError(

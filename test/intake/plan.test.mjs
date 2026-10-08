@@ -941,6 +941,25 @@ test('resolvePlan releases a risk-heavy root only after an explicit --approve on
   assert.ok(entries.every((e) => e.source === 'resolvePlan'));
 });
 
+test('an approval releases only the exact proposal it answered, never a different verdict', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'ok, pass-through', approved: true });
+
+  const other = resolvePlan(storeDir, 'item-x', cfg, 'human', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'x' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'x' },
+    ],
+  });
+  assert.equal(other.outcome, 'need-human', 'approving pass-through must not release a decompose proposal');
+  assert.equal(Object.values(listWork(storeDir).work).filter((w) => w.parent === 'item-x').length, 0);
+});
+
 test('resolvePlan does NOT release the risk-heavy gate on a stale/unrelated gate answer (never a false bypass)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ risk: 'heavy' }));

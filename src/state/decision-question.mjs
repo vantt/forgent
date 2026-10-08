@@ -3,9 +3,11 @@
 // the rule is written once. The full template lives in
 // core/skills/_shared/decision-question.md.
 //
-// A part is found by a line that starts with one of its labels, after
-// stripping heading/list/emphasis markers ("## Nguyên nhân", "2. **Cause:**").
-// Its content runs until the next part's label. Labels are compared after
+// A part is found by a label line: a Markdown heading ("## Nguyên nhân"), or
+// a line whose label is followed by ":" or a dash ("2. **Cause:** ..."), so a
+// sentence that merely starts with the word ("Lựa chọn (a) rẻ hơn") does not
+// open a part. Its content runs until the next label line; echoing a part's
+// hint does not count as content. Labels are compared after
 // NFC normalisation with a letter-boundary check instead of `\b`, which only
 // understands ASCII and so never matches a Vietnamese word like "nghị".
 
@@ -38,11 +40,15 @@ function stripMarkers(line) {
 }
 
 function matchLabel(line) {
+  const isHeading = /^\s*#/.test(line);
   const bare = normalize(stripMarkers(line));
   for (const part of DECISION_QUESTION_PARTS) {
     for (const label of part.labels) {
-      if (bare.startsWith(label) && !LETTER.test(bare.charAt(label.length))) {
-        return { key: part.key, rest: bare.slice(label.length).replace(/^[\s*_:\-—)]+/u, '') };
+      if (!bare.startsWith(label)) continue;
+      const after = bare.slice(label.length).replace(/^[*_]+/u, '');
+      if (LETTER.test(after.charAt(0))) continue;
+      if (isHeading || after.trim() === '' || /^\s*[:—–-]/u.test(after)) {
+        return { key: part.key, rest: after.replace(/^[\s*_:\-—–]+/u, '') };
       }
     }
   }
@@ -63,7 +69,9 @@ export function checkDecisionQuestion(text, required = ALL_KEYS) {
     }
   }
   return DECISION_QUESTION_PARTS.filter(
-    (part) => required.includes(part.key) && (content[part.key] ?? '').trim().length < MIN_PART_CONTENT,
+    (part) =>
+      required.includes(part.key) &&
+      (content[part.key] ?? '').replace(normalize(part.hint), '').trim().length < MIN_PART_CONTENT,
   );
 }
 

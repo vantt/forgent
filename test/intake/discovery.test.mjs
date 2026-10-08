@@ -346,6 +346,19 @@ test('resolveDiscovery at discovery advances to exploring AND parks in awaiting-
   assert.equal(view.gates?.['item-x']?.ask, '## Chuyện gì đang xảy ra\n\nThe payment integration needs to pick an OAuth provider.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which auth provider?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.');
 });
 
+test('resolveDiscovery parks a headless worker\'s one-line question by wrapping it into the three shared parts', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'runner', { clear: false, question: 'Which auth provider should we use?' });
+  assert.equal(result.outcome, 'unclear');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.match(view.gates['item-x'].ask, /## Chuyện gì đang xảy ra\n\nWhich auth provider should we use\?/);
+  assert.match(view.gates['item-x'].ask, /## Phạm vi của câu trả lời/);
+  assert.doesNotMatch(view.gates['item-x'].ask, /## Các lựa chọn/, 'an open discovery question needs only the shared parts');
+});
+
 // tsk-31lz: the stage move above is real, but it is NOT a settlement — the
 // item was just judged not clear and is parked with an open question. This
 // is the end-to-end guard for the replay gate (test/state/replay.test.mjs

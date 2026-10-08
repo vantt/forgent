@@ -27,8 +27,9 @@ function readTail(file) {
   }
 }
 
-// Assistant text written since the owner's last real message (tool results
-// also arrive as user entries, so those do not end the turn).
+// Assistant text written since the owner's last real message. Tool results,
+// meta entries (skill bodies, command caveats) and background-task
+// notifications also arrive as user entries; they do not end the turn.
 function textOfThisTurn(transcriptPath) {
   const texts = [];
   for (const line of readTail(transcriptPath).split('\n').reverse()) {
@@ -41,7 +42,8 @@ function textOfThisTurn(transcriptPath) {
     const content = entry?.message?.content;
     if (entry.type === 'user') {
       const isToolResult = Array.isArray(content) && content.every((block) => block?.type === 'tool_result');
-      if (!isToolResult) break;
+      const isNotification = typeof content === 'string' && content.trimStart().startsWith('<task-notification>');
+      if (!isToolResult && !entry.isMeta && !isNotification) break;
     } else if (entry.type === 'assistant' && Array.isArray(content)) {
       for (const block of content) if (block?.type === 'text' && block.text) texts.unshift(block.text);
     }
@@ -52,7 +54,11 @@ function textOfThisTurn(transcriptPath) {
 function missingParts(data) {
   if (data?.tool_name !== 'AskUserQuestion') return [];
   const questions = Array.isArray(data.tool_input?.questions) ? data.tool_input.questions : [];
-  const parts = questions.flatMap((q) => [q?.question, ...(Array.isArray(q?.options) ? q.options.map((o) => `${o?.label ?? ''}: ${o?.description ?? ''}`) : [])]);
+  // The tool's own options are the question's options (part 3).
+  const parts = questions.flatMap((q) => [
+    q?.question,
+    Array.isArray(q?.options) && q.options.length > 0 ? `Options:\n${q.options.map((o) => `- ${o?.label ?? ''}: ${o?.description ?? ''}`).join('\n')}` : '',
+  ]);
   let turnText = '';
   try {
     if (typeof data.transcript_path === 'string') turnText = textOfThisTurn(data.transcript_path);
