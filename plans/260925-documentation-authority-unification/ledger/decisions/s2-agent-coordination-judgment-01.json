@@ -460,10 +460,19 @@
       "targetAnchor": "deliberately-not-promoted",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md#deliberately-not-promoted at docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md#deliberately-not-promoted. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "Deliberately Not Promoted: I read the full text; only the Architecture Intent link was rewritten to a valid ../../../architect path and every deferral is kept, so supersede is fine, but the rationale claims promotion metadata changed this section, which is false here. Rewrite it to name the link normalization."
+      "reviewNote": "The Deliberately Not Promoted deferral list is carried whole, with only the Architecture Intent link rewritten to the relocated ../../../architect path. Supersede and architecture fit, and the rewritten rationale now names link normalization instead of metadata, fixing the round-one defect.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b4ccc783b4629ab8906f88ae99d89ca3f697217cf5049c2e5f27e175053d2846",
+      "targetAncestry": [
+        "Coordination Foundation Baseline"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_7d2808a02a4a7b6abfa21d7af87529ed",
@@ -1853,10 +1862,19 @@
       "targetAnchor": "runtime-recovery-principles",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/architecture/README.md#runtime-recovery-principles at docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records recovery authority and fencing design, not routing. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "Runtime Recovery Principles is labelled navigation but is substantive normative design: incident never creates execution authority, three distinct fencing guarantees, unknown versus absent, Node/Rust coexistence. Text is byte-equal, so only claimKind is wrong; relabel as architecture (or contract), not navigation."
+      "reviewNote": "Runtime Recovery Principles (no incident-created authority, fencing guarantees, Node/Rust coexistence) is byte-equal at its README anchor. The kind changed from navigation to architecture, which matches the recovery design content, so the round-one kind defect is fixed and the rationale agrees.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "568e55dce8911c31949f5c713359c96208c9d1cd7232a6fcf096b86d6481f969",
+      "targetAncestry": [
+        "Agent Coordination Architecture"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_7c48ceb5082296a5df9567dc205a76df",
@@ -2373,10 +2391,19 @@
       "targetAnchor": "6-local-concurrency-and-durability",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability. The actual difference is line reflow in the concurrency/durability prose, not promotion metadata or a migration notice.",
-      "reviewNote": "Local Concurrency And Durability: I diffed full text and target equals source except line reflow, so supersede is defensible, but the rationale claims promotion metadata and the migration notice altered this payload, which is false for a numbered body section. Restate the reason as whitespace reflow, or classify as promote."
+      "reviewNote": "Section 6 Local Concurrency And Durability (lock order, no lock across provider I/O, control acquisition) matches the source apart from line reflow. The rationale now says reflow rather than metadata or a migration notice, which corrects round one; supersede with architecture is acceptable.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "c6e91e7cb833568d6c5cadd7a4920e0c3f04de9b3c267d90b43f9279ad6e9550",
+      "targetAncestry": [
+        "Runtime Recovery And Work Continuity"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_f0435011b158171bddbfd8053eb545be",
@@ -3516,10 +3543,19 @@
       "targetAnchor": "driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/contracts/coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09 at docs/platform/agent-coordination/contracts/coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "Driver-Authorized Optional Operations heading section: full text matches except the Step 09 link retargeted to ../../../architect/proposals/ (navigation-only, fine), but the rationale blames promotion metadata and the migration notice, which do not touch this body heading. Reword to a link-rewrite basis."
+      "reviewNote": "Driver-Authorized Optional Operations heading section keeps its MVP1/MVP2 scoping text; only the Step 09 proposal link is retargeted to the architect path, a navigation-only change. Contract kind fits, and the rationale now cites link normalization, so the round-one wrongly-blamed cause is gone.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e9ea5984d5611e882508aaba1d57c15f577603c954ed8231714e722e766a316e",
+      "targetAncestry": [
+        "CoordinationSession Persistence And Recovery Contract"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_44eebba7e2aa16d07f7f0cf68b27035f",
@@ -3660,18 +3696,20 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-37 at docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-36. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. The unit names the limitations explicitly; its complete wording and section-specific context are retained.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
+      "reviewNote": "The one-line bold lead-in 'Named limitations, not omitted.' (first occurrence in the session contract) is byte-equal at a consistent -1 block shift and sits at the same place in the ledger-limitations list. The contract kind follows its section; weak-exact repetition was checked in context.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
       "targetAncestry": [
         "CoordinationSession Persistence And Recovery Contract",
         "Evidence-Preserving Aggregation (MVP7, Step 09)"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_c99b18e697b32d2c1a2199d6369da72b",
@@ -3680,10 +3718,19 @@
       "targetAnchor": "deliberation-contribution-ledger-mvp8-step-09",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/contracts/coordination-session.md#deliberation-contribution-ledger-mvp8-step-09 at docs/platform/agent-coordination/contracts/coordination-session.md#deliberation-contribution-ledger-mvp8-step-09. The historical contribution-ledger link is now an inline-code path with an explicit absent-at-pin label; the source contribution rules remain complete.",
-      "reviewNote": "Deliberation Contribution Ledger (MVP8): all content carried, with one markdown link flattened to inline code with a labelled 'historical path absent' note (acceptable). Rationale wrongly cites promotion metadata and the migration notice; it should state the link rewrite. Fix the rationale."
+      "reviewNote": "Deliberation Contribution Ledger (MVP8) was read in full; the only change is the schema.mjs markdown link turned into inline code with an explicit 'Added in candidate: historical path absent' label. All lineage, window, namespace and four-limitation clauses are intact. Rationale now names that link rewrite.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "54667e977eaf986342e42d8f4478e7e68a600dc501e40bd3e4d8e87e7e5ee8d3",
+      "targetAncestry": [
+        "CoordinationSession Persistence And Recovery Contract"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_ec5ef89fc8d2017ac401fc8b02d0ea95",
@@ -3714,18 +3761,20 @@
       "targetAnchor": "unheaded-block-44",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-45 at docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-44. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. The unit names the limitations explicitly; its complete wording and section-specific context are retained.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
+      "reviewNote": "Second 'Named limitations, not omitted.' marker is the same bold line, byte-equal, offset like its neighbours and anchored under its own later section. Contract kind follows the section, and differing ancestor headings are by design; the repeated digest is a context-checked weak match.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
       "targetAncestry": [
         "CoordinationSession Persistence And Recovery Contract",
         "Deliberation Contribution Ledger (MVP8, Step 09)"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_1ba7c8521fca5c0280367fafc6d30164",
@@ -3734,18 +3783,20 @@
       "targetAnchor": "unheaded-block-53",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-54 at docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-53. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. The unit names the limitations explicitly; its complete wording and section-specific context are retained.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
+      "reviewNote": "Third 'Named limitations, not omitted.' bold lead-in at the later position is byte-equal with the same relative line shift as its siblings. Promote and contract are right, and I judged the repeated-digest ownership from local context rather than copying the earlier verdict.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
       "targetAncestry": [
         "CoordinationSession Persistence And Recovery Contract",
         "Specialist Slot Binding (MVP9, Step 09)"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_8ce47cee51b7f8527b7057b09dff6e44",
@@ -4000,10 +4051,20 @@
       "targetAnchor": "activation-phase-00-step-09-mvp1mvp2",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/contracts/flow-definition.md#activation-phase-00-step-09-mvp1mvp2 at docs/platform/agent-coordination/contracts/flow-definition.md#activation-phase-00-step-09-mvp1mvp2. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "Activation (Phase 00, Step 09 MVP1/MVP2) (activation-phase-00-step-09-mvp1mvp2): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (../../proposals/step-09-group-thinking-substrate.md#7-mvp2-- becomes ../../../architect/proposals/step-09-group-thinking-substrate.md#7-mvp), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "Activation (Phase 00, Step 09 MVP1/MVP2) in flow-definition keeps the whole activation scope text; only the Step 09 proposal link is rewritten to ../../../architect. The rewritten rationale names link normalization rather than promotion metadata, fixing round one, and contract kind fits.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5fcd3215aaba5a855bdd393c9bd63806edb6ec2ec953165b2adebbef0e4a8663",
+      "targetAncestry": [
+        "FlowDefinition And Profile Schema Contract",
+        "Graph"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_a898399ce1ab5c7f4f88900f7e675de2",
@@ -8383,10 +8444,19 @@
       "targetAnchor": "reading-rule",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#reading-rule at docs/platform/agent-coordination/intent-preservation-ledger.md#reading-rule. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "Reading Rule (reading-rule): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (documentation-governance.md becomes ../../architect/agent-coordination/documentation-governance.md), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "Reading Rule of the intent ledger is carried whole; only the documentation-governance link now points into the architect tree. Intent kind fits a ledger-reading rule, supersede is justified by the link change, and the rationale now states link normalization as the real cause.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "84a3b6a33eab3df15cce03a144d5493f1d2dd24cb651ca49af4dcc8b8c62ff38",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_7bb43a970c276c239b175c305484e9f2",
@@ -8501,10 +8571,20 @@
       "targetAnchor": "ac-i003-reusable-declared-coordination-protocols",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "AC-I003: Reusable Declared Coordination Protocols (ac-i003-reusable-declared-coordination-p): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#discu becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "AC-I003 reusable declared coordination protocols keeps its original intent, source, status and evidence bullets; only relative links to the Step 08 checkpoint are retargeted. Intent kind and supersede are right, and the rationale no longer blames metadata, resolving the round-one defect.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "06c0f4d1dc8e3198af2c8463b1bbb747286946d8b165f06a5e80c38e7282aa91",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger",
+        "Preserved Intentions"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_3fcfa598b55eb8caeeac0f5710f35e4d",
@@ -8536,10 +8616,20 @@
       "targetAnchor": "ac-i004-group-cognition-and-heterogeneous-cohorts",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "AC-I004: Group Cognition And Heterogeneous Cohorts (ac-i004-group-cognition-and-heterogeneou): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#discu becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "AC-I004 group cognition and heterogeneous cohorts retains every intent, source and mechanism-level status clause with only Step 08 checkpoint links rewritten. Intent kind fits the ledger entry; supersede is accurate, and the rationale now describes link normalization correctly.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "1791df03091d70f26f936cba40d961417cfc74ae6aba5e361a55d762eeefc364",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger",
+        "Preserved Intentions"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_e9968b804d2a3451dad2da1aa51325c6",
@@ -8571,10 +8661,20 @@
       "targetAnchor": "ac-i006-one-governed-dispatch-and-evidence-core",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "AC-I006: One Governed Dispatch And Evidence Core (ac-i006-one-governed-dispatch-and-eviden): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (decisions/ADR-009-flow-definition-shared-ir-and-typed-profil becomes ../../architect/agent-coordination/decisions/ADR-009-flow-definition-s), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "AC-I006 one governed dispatch and evidence core: all provenance-fix and policy-chain status text is carried; only the vision and ADR-009 links are retargeted. Intent kind and supersede are correct, and the corrected rationale cites link normalization instead of metadata.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "16ea27ac05b4cd1fb94876ecc4e908f8a71a869aa085bb4f79ba7ffdb5c2a47b",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger",
+        "Preserved Intentions"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_a6c00740c165d291ab32cea3a9f5dc9f",
@@ -8606,10 +8706,20 @@
       "targetAnchor": "ac-i007-optional-multi-session-mission-grouping",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "AC-I007: Optional Multi-Session Mission Grouping (ac-i007-optional-multi-session-mission-g): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#6-mis becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "AC-I007 optional multi-session mission grouping preserves the deferred-preserved status and the must-not-preclude proof intact, with only Step 08 section links rewritten. Intent kind fits; supersede is justified by the link edits and the rationale now names them.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "94a22330c4b20d14d42f22eada9ce4aacf82e117686b1c90c95462611202d0f4",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger",
+        "Preserved Intentions"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_e01277e6bceabc79e56a3b2ab6d1c15c",
@@ -8641,10 +8751,20 @@
       "targetAnchor": "ac-i008-interactive-and-headless-capability-parity",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "AC-I008: Interactive And Headless Capability Parity (ac-i008-interactive-and-headless-capabil): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#discu becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "AC-I008 interactive and headless capability parity keeps the original intent, the human clarification source and the headless-adapter status evidence whole; only checkpoint links change. Intent kind fits and the rationale now correctly attributes the supersede to link normalization.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d7a54572d03076b473518af5a60bb5c9ced15700fec65dbc7af296189170fa3a",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger",
+        "Preserved Intentions"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_e68a8afbc85b7a5a4fddad3240c28bf9",
@@ -8676,10 +8796,19 @@
       "targetAnchor": "current-step-08-decision-trace",
       "claimKind": "intent",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace at docs/platform/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
-      "reviewNote": "Current Step 08 Decision Trace (current-step-08-decision-trace): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (decisions/ADR-009-flow-definition-shared-ir-and-typed-profil becomes ../../architect/agent-coordination/decisions/ADR-009-flow-definition-s), so the stated cause is wrong and the rationale must name the actual change."
+      "reviewNote": "Current Step 08 Decision Trace table is carried in full with ADR and contract links retargeted to the architect tree. Intent kind is defensible for an intent-ledger trace, supersede matches the link-only difference, and the rewritten rationale fixes the round-one wrong cause.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d0d96615699fad0683dea6587cbde15af80ba78aa59e5617f055231d5512eaaa",
+      "targetAncestry": [
+        "Agent Coordination Intent Preservation Ledger"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_c48de5ff31d696d7820b6d6688afec38",
@@ -10371,5 +10500,5 @@
       "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md"
 }

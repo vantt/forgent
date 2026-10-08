@@ -71,18 +71,20 @@
       "targetAnchor": "unheaded-block-48",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-49 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-48. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "The 'Verification commands:' lead-in in the first Step 01 rollout slice is byte-equal at the consistent +14 line offset next to the same neighbouring slice. Historical-context fits the retained rollout record; weak-exact repetition was resolved by checking position, not by copying round one.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "8. Slice 3 - Assignment Builder"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_64ca09ed0488385bf7e5d2a7b6d8aef9",
@@ -91,18 +93,20 @@
       "targetAnchor": "unheaded-block-54",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-55 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-54. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Exact code/config surfaces:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "'Exact code/config surfaces:' label in Step 01 rollout is a short byte-equal list lead-in at the offset-matched position of its slice. Promote with historical-context is right for a verbatim roadmap record, and the repeated digest does not point to a different owner.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "40d8d3a71761fe4ff894b410d4d6454fc73bf2a45ad40f945ecb622f1071b6d3",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "9. Slice 3a - Dispatch Policy Resolver"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_370a1085520597626ea93f9537dab525",
@@ -111,18 +115,20 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-60 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-59. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "Second-slice 'Verification commands:' label in Step 01 is carried byte-equal at the standard fourteen-line shift. The text repeats but its placement within the slice is unique, so the owner is legitimate and historical-context stays correct.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "9. Slice 3a - Dispatch Policy Resolver"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_bb1042c934efc411925714d86ee24e96",
@@ -153,18 +159,20 @@
       "targetAnchor": "unheaded-block-70",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-71 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-70. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "Another 'Verification commands:' lead-in at source line 483 maps to target 497 by the same offset and is byte-equal. Ancestor heading differences are only slice numbering; promote and historical-context are appropriate for this roadmap label.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "10. Slice 4 - cli-spawn Assignment Execution"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_9df1c8c21aa8c9b85e6606cf47fc0298",
@@ -194,18 +202,20 @@
       "targetAnchor": "unheaded-block-79",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-80 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-79. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "Slice-level 'Verification commands:' label at line 549 is byte-equal in the candidate at the offset-consistent line 563. Several slices share the label, which explains the repeated digest; promote and historical-context are fine.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "11. Slice 5 - RunResult Evidence"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_06f9ea524440bb882f407f08debcc5a7",
@@ -214,18 +224,20 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-86 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-85. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. Source topic: Exact code/doc surfaces:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "The 'Exact code/doc surfaces:' list lead-in in a Step 01 slice is verbatim at the matching relative position in the candidate. It is a plain label kept in the roadmap record, so promote and historical-context fit.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "9300842d2ae3afc789cb4b945009967ed883ec4d1485c81ed7012dea124ecda5",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "12. Slice 6 - Driver Operation Choice"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_6fd8a8e206ea05b8abc6d00a30e9b7e3",
@@ -234,18 +246,20 @@
       "targetAnchor": "unheaded-block-89",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-90 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-89. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "'Verification commands:' lead-in near source line 617 lines up with candidate line 631 and is byte-equal. As a label inside a retained roadmap slice, historical-context and promote are right and the owner is unambiguous.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "12. Slice 6 - Driver Operation Choice"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_42c6150539bcad141baf190bbd43ad42",
@@ -275,18 +289,20 @@
       "targetAnchor": "unheaded-block-95",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-96 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-95. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Exact code/doc surfaces:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "'Exact code/doc surfaces:' label under the team-orchestration slice is byte-equal at the offset-consistent line 666. It is a verbatim list lead-in, so the promote disposition and historical-context kind both stand.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "9300842d2ae3afc789cb4b945009967ed883ec4d1485c81ed7012dea124ecda5",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "13. Slice 7 - Team Orchestration"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_3f58cfae98e2b07d77c591ebaab63330",
@@ -295,18 +311,20 @@
       "targetAnchor": "unheaded-block-99",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-100 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-99. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "Final 'Verification commands:' label of Step 01 at line 677 maps to candidate 691 at the usual offset and is byte-equal. The repeated digest comes from identically labelled slices; promote and historical-context are correct.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
       "targetAncestry": [
         "Step 01 - Team Dispatch V1 Rollout",
         "13. Slice 7 - Team Orchestration"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_679b132029dbafad33928656c54f86b1",
@@ -3023,7 +3041,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/verification/README.md#evidence-sets at docs/platform/agent-coordination/verification/README.md#evidence-sets. The source evidence list and verification limits are retained; the pre-existing candidate migration paragraph and eight-row evidence navigation table are now explicitly labelled additions, not claimed to be source material.",
-      "reviewNote": "Evidence Sets keeps every source bullet and the future-verification list, but the target section also holds a paragraph ('During migration, target docs link to retained legacy proof roots') and an eight-row Evidence set / Supports / Current proof root table that exist in the pre-batch candidate (baseline fcfe78cb8) yet in no legacy source and carry no 'Added in candidate' label; the rationale blames promotion metadata instead, so label the added claims (or give them an owner) and correct the rationale."
+      "reviewNote": "Evidence Sets now labels the migration paragraph and the eight-row proof-root table, but the target also adds a Proof Preservation sentence ('phase-by-phase move policy and known gaps are in ...') that the label does not name and the rationale omits. Extend the Added-in-candidate label and rationale to cover it."
     },
     {
       "claimId": "claim_a41fa095e3c0bb83b1c7e5b55ebbe110",
@@ -3444,7 +3462,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/vision.md#reading-down-from-the-vision at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind navigation records reading-order links. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "Reading Down From The Vision is a numbered routing list of links to governance, vocabulary, architecture, contracts, decisions and Step 07 to 10 proposals, so kind should be navigation rather than vision. Link rewrites to ../../architect/... resolve correctly, and no text is lost."
+      "reviewNote": "Reading Down From The Vision now has the navigation kind and its eight links are carried whole with valid rewrites, fixing round one. But the rationale says the index 'does not turn this source rule into navigation' while the kind is navigation, a self-contradiction; drop that templated sentence."
     },
     {
       "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
@@ -3456,7 +3474,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/vision.md#unheaded-block-65 at docs/platform/agent-coordination/vision.md#unheaded-block-65. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind navigation records reading-order link list. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "The eight-item reading list under Reading Down is link routing to downstream docs; labelling it vision misstates its role and it should be navigation. Content is complete and the rewritten ../../architect paths are valid, so only the claimKind needs fixing."
+      "reviewNote": "The eight-item reading list is correctly relabelled navigation and all links are carried with valid architect-path rewrites. However the rationale adds that the index 'does not turn this source rule into navigation', contradicting kind=navigation; the templated sentence must be removed or corrected."
     },
     {
       "claimId": "claim_5b9f287ae5552fa2a46c7d39dd3cdc4e",
@@ -3893,11 +3911,13 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-31 at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-30. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats); review its local context and ownership. Source topic: Design status: Accepted, per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)..",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "The line 'Design status: Accepted, per ADR-008' closing the SessionActor entry is byte-equal at target 188-189, still inside SessionActor before Persona. Architecture follows the glossary entry; the repeated digest has a correct owner by position.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "0b83df8d154f9e6cf26b28e53698ab8d10b13ab63aaf066a6193e92396ce7e38",
       "targetAncestry": [
@@ -3905,7 +3925,7 @@
         "Coordination Runtime Layer",
         "SessionActor"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_86cea26d70eeedb2232613ff3c7318bb",
@@ -3936,11 +3956,13 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-33 at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-32. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ); review its local context and ownership. Source topic: Design status: Accepted, per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)..",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "The 'Accepted, per ADR-008' status line that closes the Persona entry (source 182-183, target 198-199) sits under Persona in both files. Byte-equal, same relative offset, architecture kind consistent with sibling entries.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "0b83df8d154f9e6cf26b28e53698ab8d10b13ab63aaf066a6193e92396ce7e38",
       "targetAncestry": [
@@ -3948,7 +3970,7 @@
         "Coordination Runtime Layer",
         "Persona"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_52e25a4a76b34dc00352b955bb348dd5",
@@ -4001,11 +4023,13 @@
       "targetAnchor": "unheaded-block-37",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-38 at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-37. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. Source topic: Design status: Proposed..",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "'Design status: Proposed.' at source 209 ends TaskCandidate and corresponds to target 225 under the same entry before AdhocTask. Short byte-equal block with correct ownership; promote and architecture are fine.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "382811f57c18be4ff662dc8474138fddf334b2e33531bc95689f78ca69d5bc84",
       "targetAncestry": [
@@ -4013,7 +4037,7 @@
         "Coordination Runtime Layer",
         "TaskCandidate"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_0bac3816b297b8d3aa7442a43209cf5d",
@@ -4044,11 +4068,13 @@
       "targetAnchor": "unheaded-block-40",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-41 at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-40. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Design status: Proposed..",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "The 'Design status: Proposed.' line ending AdhocTask (source 220, target 236) is anchored under AdhocTask just ahead of Assignment in both files. Short but legitimate, byte-equal, and kind matches its entry.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "382811f57c18be4ff662dc8474138fddf334b2e33531bc95689f78ca69d5bc84",
       "targetAncestry": [
@@ -4056,7 +4082,7 @@
         "Coordination Runtime Layer",
         "AdhocTask"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_120276736d1c72d4d1186921ba21b07f",
@@ -4131,11 +4157,13 @@
       "targetAnchor": "unheaded-block-46",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-47 at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-46. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Design status: Proposed..",
-      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+      "reviewNote": "The trailing 'Design status: Proposed.' under Synthesis (source 246, target 262) belongs to that glossary entry and precedes the Dispatch layer heading in both files. Byte-equal with consistent shift; promote and architecture fit.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "382811f57c18be4ff662dc8474138fddf334b2e33531bc95689f78ca69d5bc84",
       "targetAncestry": [
@@ -4143,7 +4171,7 @@
         "Coordination Runtime Layer",
         "Synthesis"
       ],
-      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_a7a7b7c82d087d3f6c63059b9b90cf88",
@@ -4917,7 +4945,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary at docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records historical vocabulary pointer and non-override context. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "Historical Vocabulary is a pointer to the pre-migration vocabulary map plus a non-override statement, so its kind is navigation or historical-context, not architecture. Text is byte-equal and the relative link resolves in the platform tree; only the kind label needs correcting."
+      "reviewNote": "Historical Vocabulary in vocabulary/deprecated-and-reserved.md is byte-equal and historical-context is the right kind (round-one mislabel fixed), but the rationale still ends with the copied sentence that the enclosing retained index does not turn this source rule into navigation; this unit sits in a vocabulary document, not an index, and is a pointer note, not a rule, so the sentence is false here. Rewrite the closing sentence specifically."
     },
     {
       "claimId": "claim_b65b3d060510d5506a3ecc697c4ef9c4",
@@ -5025,10 +5053,19 @@
       "targetAnchor": "entry-contract",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/vocabulary/README.md#entry-contract at docs/platform/agent-coordination/vocabulary/README.md#entry-contract. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind contract records required fields of canonical concept entries. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "Entry Contract lists mandatory fields every canonical concept entry should state (definition, owning layer, lifecycle authority, creator and consumer, aliases, status). That is a normative contract on entries, not navigation; re-label as contract or specification. Text itself is byte-equal."
+      "reviewNote": "Entry Contract lists the mandatory fields every canonical concept entry should state; the section is byte-equal. Relabelling from navigation to contract fixes the round-one kind defect, and the rationale describes the required-fields rule accurately.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3e29758be17e545cf3c0fd21fa991f9d6be3d003b3e271dc7c24d19c1c79d175",
+      "targetAncestry": [
+        "Agent Coordination Vocabulary"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_a8364ee8380e18547ceea9e58962e799",
@@ -5037,10 +5074,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/vocabulary/README.md#unheaded-block-8 at docs/platform/agent-coordination/vocabulary/README.md#unheaded-block-7. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind contract records lead-in to the required concept-entry fields. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "One-line lead-in 'Each canonical concept should identify:' inherits the kind of the Entry Contract section, which is a normative entry-field rule rather than navigation. Disposition and byte-equal target are fine; kind should be contract or specification to match row for its heading."
+      "reviewNote": "The lead-in 'Each canonical concept should identify:' opens the entry-field list and inherits the Entry Contract kind. It is byte-equal at the matching target block, and the changed kind contract resolves the round-one navigation mislabel.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f31fac90009b5c43aa6ba1e23554d981b721de1de358331715901e435a508d35",
+      "targetAncestry": [
+        "Agent Coordination Vocabulary",
+        "Entry Contract"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_755ad6b1f543ff615fc3d39052392b44",
@@ -5049,10 +5096,19 @@
       "targetAnchor": "change-control",
       "claimKind": "procedure",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/vocabulary/README.md#change-control at docs/platform/agent-coordination/vocabulary/README.md#change-control. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind procedure records vocabulary change-control procedure. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "Change Control rules (add an alias here before use, do not reuse terms across lifecycle layers, ownership changes need an ADR, naming questions go to proposals) are maintenance procedure and governance, not navigation. Byte-equal promotion is fine; re-label kind as procedure or decision."
+      "reviewNote": "Change Control (add alias first, no reuse across lifecycle layers, ADR for ownership changes, naming questions to proposals) is byte-equal. The procedure kind fits maintenance governance, correcting round one's navigation label, and the rationale states that.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "0b853f7355cc9c7181a046501d6b3c00e0ce0496a498eb3d959e60b87c9abe0e",
+      "targetAncestry": [
+        "Agent Coordination Vocabulary"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     },
     {
       "claimId": "claim_3e24819e15c8383445261a9fdfe10ba9",
@@ -9045,5 +9101,5 @@
       "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-03.md"
 }

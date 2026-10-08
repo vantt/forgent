@@ -45,9 +45,14 @@
       "targetAnchor": "unheaded-block-2",
       "shownTargetDigest": "0fc5290332da88be032e4397964b690893aca762028c747fd13fc94faa8af854",
       "authoredBy": "codex-session:1@2026-10-08",
-      "reviewStatus": "pending",
-      "reviewNote": "Rework: the removed second copy is carried source text, not a candidate-native addition. The complete paragraph remains in the exact source transition block; independent re-review is required for this retired candidate-unit disposition.",
-      "rationale": "Consolidate only the redundant paragraph under Migration Status into its already present full source transition block under H1. The paragraph remains byte-for-byte inside the target unit, alongside the original transition note. Exact legacy claim claim_d45237a22e355cee523c6c5b51c50454 still binds that complete block. One paragraph occurrence remains, no unique claim or legacy source byte is deleted, and no authority status changes."
+      "reviewStatus": "reviewed",
+      "reviewNote": "I recomputed the retired unit (old candidate unheaded-block-4 of contracts/README.md at 0a41d793e, 181 characters) and the shown target (unheaded-block-2 at the review tree, 438 characters) with the repository extractor; both digests equal the record. The paragraph survives once, inside the exact-proven transition block that claim_d45237a2 binds, and the only file change since the old candidate is deleting the redundant copy, so supersede loses nothing and invents nothing.",
+      "rationale": "Consolidate only the redundant paragraph under Migration Status into its already present full source transition block under H1. The paragraph remains byte-for-byte inside the target unit, alongside the original transition note. Exact legacy claim claim_d45237a22e355cee523c6c5b51c50454 still binds that complete block. One paragraph occurrence remains, no unique claim or legacy source byte is deleted, and no authority status changes.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-retired-unit.md",
+      "reviewReportCommit": "8e2fc315f45da800bf11076f539d3bd44a1dcde3",
+      "targetUnitDigest": "0fc5290332da88be032e4397964b690893aca762028c747fd13fc94faa8af854"
     }
   ]
 }

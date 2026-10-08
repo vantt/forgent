@@ -14,9 +14,22 @@
       "targetAnchor": "unheaded-block-60",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete legacy response-contract introduction at the corresponding introductory block, retaining the unchanged RunResult status/confidence rule. Added in candidate explicitly marks materialized as an implementation-era enum extension. This added label changes the native target digest, so the former script exact proof is removed and this row requires independent ordinary review; no script or previous reviewer approval is carried forward."
+      "rationale": "Carry the complete legacy response-contract introduction at the corresponding introductory block, retaining the unchanged RunResult status/confidence rule. Added in candidate explicitly marks materialized as an implementation-era enum extension. This added label changes the native target digest, so the former script exact proof is removed and this row requires independent ordinary review; no script or previous reviewer approval is carried forward.",
+      "reviewNote": "DAG response-contract introduction: the RunResult status/confidence sentence is unchanged and the only addition is a parenthetical explicitly labelled 'Added in candidate' stating that materialized extends the four-value enum. That matches the owner-accepted A8 decision; the rationale accurately explains why exact proof was dropped and the row is a supersede.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-reopened-exact.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b656cf728297a941abc926a30749a836e3c945512cda004d21f7d4bbcc9fe33f",
+      "targetAncestry": [
+        "DAG Request Scheduler For Coordination Runs",
+        "Reviewer Response And Revised Direction (2026-09-17)",
+        "4.1 DAG Response Contract"
+      ],
+      "reviewReportCommit": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de"
     }
-  ]
+  ],
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-reopened-exact.md"
 }
