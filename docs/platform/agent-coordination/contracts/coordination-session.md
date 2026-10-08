@@ -454,7 +454,7 @@ clarification, rank, specialist-request — persisted as immutable
 mailbox subsystem. The closed contribution-type enum, the shape validator,
 and the lineage rules (dangling anchor/response, cycle, foreign-session ref,
 operation/type mismatch) are owned by
-[`src/runner/deliberation/schema.mjs`](../../../../src/runner/deliberation/schema.mjs)
+`src/runner/deliberation/schema.mjs` (`../../../../src/runner/deliberation/schema.mjs`; Added in candidate: historical path absent at the batch pin)
 (P08.1) — this session engine calls that validator, never forks it. A
 contribution carries `artifactRef` + `revision` only; no content ever
 reaches the log.
