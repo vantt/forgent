@@ -1391,8 +1391,10 @@ test('workflow root context refs persist and reach only root Units across resume
   assert.deepEqual(resumed.contextRefs, ['owner.txt']);
 });
 
-test('gate renders settled producer JSON expertise and refuses malformed reports before parking', async (t) => {
-  for (const packet of [{ 'missing expertise': ['database sizing', 'security review'] }, { 'missing expertise': [] }, {}, { 'missing expertise': 'security' }, { 'missing expertise': [''] }]) {
+test('producer expertise gate parks clearly on malformed packets and remains answerable across resume', async (t) => {
+  const validPackets = [{ 'missing expertise': ['database sizing', 'security review'] }, { 'missing expertise': [] }];
+  const invalidPackets = [{}, { 'missing expertise': '' }, { 'missing expertise': 'security' }, { 'missing expertise': [''] }, { 'missing expertise': [' '] }];
+  for (const packet of [...validPackets, ...invalidPackets, '```json\n{"missing expertise":[]}\n```', '# Advice\n{"missing expertise":[]}', 'Here is the recommendation: {"missing expertise":[]}']) {
     const tmp = setupTestRepo();
     t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
     fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
@@ -1402,7 +1404,7 @@ test('gate renders settled producer JSON expertise and refuses malformed reports
       const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
       const dir = fs.existsSync(outbox) ? outbox : base;
       fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(JSON.stringify({ recommendation: 'Bound the design to its approved scope', ...packet }))});
+      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(typeof packet === 'string' ? packet : JSON.stringify({ recommendation: 'Bound the design to its approved scope', ...packet }))});
       fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
     `);
     const workflow = { id: 'gate-report', steps: [
@@ -1410,19 +1412,27 @@ test('gate renders settled producer JSON expertise and refuses malformed reports
       { id: 'close', dependsOn: ['synthesis'], gate: { kind: 'human', question: 'Bring in {{report:synthesis/synthesize-recommendation:missing expertise}} or not?' } },
       { id: 'check-sha', dependsOn: ['close'], gate: { kind: 'human', question: '{{report:synthesis/synthesize-recommendation:missing expertise}}' } },
     ] };
-    if (Array.isArray(packet['missing expertise']) && packet['missing expertise'].every((entry) => entry.trim())) {
-      const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+    const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+    assert.equal(state.status, 'parked');
+    assert.equal(state.steps.close.status, 'parked');
+    const resumed = await resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp });
+    assert.equal(resumed.status, 'parked');
+    assert.deepEqual(resumed.questions, state.questions);
+    if (validPackets.includes(packet)) {
       assert.equal(state.questions[0].question, `Bring in ${JSON.stringify(packet['missing expertise'])} or not?`);
-      assert.equal(state.steps.close.status, 'parked');
       const settled = state.steps.synthesis.units['synthesize-recommendation'].results.find((record) => record.role === 'producer').runResult.settleReports[0];
       fs.appendFileSync(path.resolve(tmp, settled.path), 'tampered');
-      await assert.rejects(answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'close', answer: 'yes' }), /report-changed-after-settle/);
-      assert.ok(!readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).some((event) => event.type === 'gate.park' && event.payload.stepId === 'check-sha'));
+      const unreadable = await answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'close', answer: 'yes' });
+      assert.equal(unreadable.status, 'parked');
+      assert.equal(unreadable.questions[0].stepId, 'check-sha');
+      assert.match(unreadable.questions[0].question, /report-changed-after-settle/);
+      assert.equal((await resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp })).status, 'parked');
+      assert.equal((await answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'check-sha', answer: 'Acknowledge the changed packet; no expertise decision inferred.' })).status, 'completed');
     } else {
-      await assert.rejects(startWorkflow({ workflow, repoRoot: tmp, cwd: tmp }), /missing expertise/);
-      const runs = fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs'));
-      const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: runs[0] });
-      assert.ok(!events.some((event) => event.type === 'gate.park'));
+      assert.match(state.questions[0].question, /Cannot read settled producer "missing expertise"/);
+      const next = await answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'close', answer: 'No expertise decision can be inferred; retain this limitation.' });
+      assert.equal(next.status, 'parked');
+      assert.equal((await answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'check-sha', answer: 'Retain the unreadable-report limitation and close.' })).status, 'completed');
     }
   }
 });
@@ -1455,12 +1465,46 @@ test('reviewed findings acceptance proceeds while default and execution failure 
   }
 });
 
-test('report gate refuses an absent producer without parking', async (t) => {
+test('an absent producer parks a recoverable expertise gate rather than wedging the run', async (t) => {
   const tmp = setupTestRepo();
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
-  await assert.rejects(startWorkflow({ repoRoot: tmp, cwd: tmp, workflow: {
+  const state = await startWorkflow({ repoRoot: tmp, cwd: tmp, workflow: {
     id: 'absent-producer', steps: [{ id: 'close', gate: { kind: 'human', question: '{{report:synthesis/synthesize-recommendation:missing expertise}}' } }],
-  } }), /producer is not settled/);
-  const [workflowRunId] = fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs'));
-  assert.ok(!readWorkflowEvents({ repoRoot: tmp, workflowRunId }).some((event) => event.type === 'gate.park'));
+  } });
+  assert.equal(state.status, 'parked');
+  assert.match(state.questions[0].question, /producer is not settled/);
+  assert.equal((await resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp })).status, 'parked');
+  assert.equal((await answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'close', answer: 'Acknowledge absent producer evidence; close without inferred expertise.' })).status, 'completed');
+});
+
+test('cross-repo workflows reject plain context paths before recording a run, but consume state-root unit reports', async (t) => {
+  const stateRoot = setupTestRepo();
+  const workerRoot = setupTestRepo();
+  t.after(() => {
+    fs.rmSync(stateRoot, { recursive: true, force: true });
+    fs.rmSync(workerRoot, { recursive: true, force: true });
+  });
+  const template = { capability: 'docs:write' };
+  const workflow = { id: 'cross-context', steps: [{ id: 'read', units: [{ id: 'reader', template }] }] };
+  for (const params of [
+    { workflow, contextRefs: ['README.md'] },
+    { workflow: { ...workflow, steps: [{ id: 'read', units: [{ id: 'reader', template: { ...template, contextRefs: ['README.md'] } }] }] } },
+  ]) {
+    await assert.rejects(startWorkflow({ ...params, repoRoot: stateRoot, cwd: workerRoot }), /plain paths across repositories; use unit-run:<id>\/<role>/);
+    assert.ok(!fs.existsSync(path.join(stateRoot, '.fgos', 'workflow-runs')), 'ambiguous context must fail before durable run creation');
+  }
+  await assert.rejects(startWorkflow({ workflow, contextRefs: ['README.md'], repoRoot: stateRoot, cwd: stateRoot, worktree: workerRoot }), /plain paths across repositories/);
+  const parent = await startWorkflow({ workflow, repoRoot: stateRoot, cwd: stateRoot });
+  const parentRef = `unit-run:${parent.steps.read.units.reader.unitRunId}/producer`;
+  const child = await startWorkflow({ workflow, contextRefs: [parentRef], repoRoot: stateRoot, cwd: workerRoot, worktree: workerRoot });
+  assert.equal(child.status, 'completed', 'settled state-root reports remain usable outside their repository');
+  assert.equal(child.steps.read.units.reader.results[0].runResult.classification.execution.status, 'completed');
+  const linked = path.join(path.dirname(stateRoot), `${path.basename(stateRoot)}-context-linked`);
+  execFileSync('git', ['worktree', 'add', '-b', 'context-linked', linked], { cwd: stateRoot, stdio: 'ignore' });
+  t.after(() => fs.rmSync(linked, { recursive: true, force: true }));
+  const sameRepo = await startWorkflow({
+    workflow: { id: 'linked-context', steps: [{ id: 'owner', gate: { kind: 'human', question: 'Start?' } }] },
+    contextRefs: ['README.md'], repoRoot: stateRoot, cwd: linked,
+  });
+  assert.equal(sameRepo.status, 'parked', 'linked worktrees are not different repositories');
 });

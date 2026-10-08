@@ -20,9 +20,9 @@ permission, politeness, and Workflow completion are not implementation instructi
 Start only the two registered definitions. Do not author inline definitions,
 select executors/models, impersonate independent seats, or choose a continuation
 step. Config and `bind()` own routing; Workflow owns execution and human gates.
-This skill starts workflows and reads settled report artifacts only. It must not
-read or write run state, poll status, resume a run, or drive gate transitions.
-The workflow CLI/operator owns delivery of the declared gate and the owner's answer.
+This skill starts workflows and reads settled reports. Use the public CLI to show
+the declared owner gate and submit only the owner's explicit answer. Do not read
+or write raw run-state files, poll in a loop, resume runs, or choose gate transitions.
 
 Preserve the person's words verbatim in `--request`. Use the actual target as
 caller cwd or explicitly set `--worktree`; `--dir` is the state/config root, not
@@ -80,17 +80,29 @@ it does not select a next step. An empty array is still explicit, not a skipped 
 No specialist is automatically dispatched. The owner can decline expertise, defer,
 or separately authorize a bounded consultation; record none of these as consensus.
 
+Show the declared question and settled Unit ids, then submit the owner's words:
+
+```sh
+fgos workflow status <workflowRunId> --dir <repoRoot>
+fgos workflow answer <workflowRunId> --step close --answer "<verbatim owner decision>" --dir <repoRoot> --worktree <targetRoot>
+```
+
+Malformed or missing producer expertise parks with a clear error, not an inferred
+list. Read the packet manually; the owner decides and acknowledges that limitation.
+Workflow owns the transition after the answer; closing is still not advice approval.
+
 ## Bounded reopen
 
 A material revisit uses only `architecture-advisory-reopen`: reviewed high-rigor
-synthesis → explanation → human close. Supply existing parent settled report paths
-with repeatable `--context-ref`, plus the new owner's words verbatim:
+synthesis → explanation → human close. Supply settled parent reports with repeatable
+`--context-ref unit-run:<unitRunId>/<role>`, plus the new owner's words verbatim.
+These references resolve from the state root; plain paths are rejected across repos:
 
 ```sh
-fgos workflow start architecture-advisory-reopen --request "<verbatim revisit>" --context-ref <parent-final-report> --context-ref <parent-evidence-report> --dir <repoRoot> --worktree <targetRoot>
+fgos workflow start architecture-advisory-reopen --request "<verbatim revisit>" --context-ref "unit-run:<parent-synthesis-unit>/producer" --context-ref "unit-run:<parent-critique-unit>/reviewer" --dir <repoRoot> --worktree <targetRoot>
 ```
 
-Use actual settled reports, not guessed paths, state files, or fabricated evidence.
+Use actual settled Unit ids and roles, not guessed paths, state files, or fabricated evidence.
 Include the relevant parent framing, proposals, critique, and final packet when they
 are load-bearing. This interface passes references, not frozen bytes or provenance.
 Reopen reruns recommendation even for an explanation-only change, but never reruns
@@ -120,25 +132,6 @@ Explain through the owner's system, trade-offs, reversal triggers, and one rever
 next action. No implementation plan, weighted score, numeric consensus, fabricated
 human input, or automatic work-item claiming/approval/merge. A separately authorized
 consultation remains attributed and cannot silently become panel consensus.
-
-## Owner acceptance and parked dispatch scope
-
-The M acceptance run is one native installed-CLI run on `mcp-skill-hub`, from a real
-terminal on a quiet machine. `--strict-mcp-config` is project-local only, never a
-shipped default or a reason to alter safety policy. Do not launch that run during
-implementation, install/render skills, or claim live success from deterministic tests.
-
-Only the owner rates final advice against packet `bab4742a` (at least equal); neither
-the skill nor Workflow completion certifies quality. Fresh-topic quality is rated
-later. A stall outside M's file list is recorded for dispatch and stops M. A stall
-inside M may be fixed and rerun once; two stalls stop M. Do not expand dispatch work
-to force the live run through.
-
-Parked dispatch scope includes durable Unit association/reconnect (controller crashes
-can rerun seats), launch-before-brief recovery, input byte capture, trust/home lifetime,
-orphan reaping, startup-dialog/receipt capture, and the two open HIGH session-isolation
-gaps. No native repair, automatic specialist, continuation chooser, or new durable
-state belongs in this skill. The owner orders that separate work.
 
 ## Cognitive references, not runtime recipes
 

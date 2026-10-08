@@ -14,6 +14,7 @@ import {
 import { findMutatedDirtyBeforeFiles } from '../../src/runner/dispatch/settlement.mjs';
 import { sha256FileSync } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
+import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
 
 function classifyRunEvidence({
   exitCode,
@@ -1596,34 +1597,54 @@ test('executeAssignment for reviewer findings produces execution.completed with 
   assert.ok(validation.valid, `Stored reviewer finding must be valid RunResult v3: ${validation.reasons?.join(', ')}`);
 });
 
-test('a done reviewer claim retains evidenced findings rather than becoming approval', async () => {
-  const tempDir = mkTempDir();
-  const executorScript = path.join(tempDir, 'done-findings.mjs');
-  fs.writeFileSync(executorScript, `
-    import fs from 'node:fs';
-    import path from 'node:path';
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.at(-1));
-    if (!match) process.exit(2);
-    const dir = path.dirname(match[1]);
-    fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Review\\nThe review is complete, but the recommendation lacks evidence for its authorization boundary. This dissent must remain visible to the owner.\\n');
-    fs.writeFileSync(match[1], JSON.stringify({
-      contract: { id: 'agent-result-claim', version: 2 }, status: 'done',
-      summary: 'Review completed with unresolved authorization findings',
-      assessment: { verdict: 'findings', severityFloor: 'high' },
-    }));
-  `);
-  const assignment = buildAssignment({ workId: 'done-findings', stage: 'executing', operation: 'review-item', role: 'reviewer' });
-  const result = await executeAssignment(assignment, {
-    cwd: tempDir, repoRoot: tempDir,
-    runnerConfig: {
-      executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-      modelPolicies: { claude: { standard: 'test-model' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
-      timeoutMs: 5000,
-    },
-  });
-  assert.equal(runOutcome(result).category, 'verdict');
-  assert.equal(runOutcome(result).verdict, 'findings');
-  assert.equal(result.classification.execution.status, 'completed');
-  assert.equal(result.classification.failure, null);
+test('done findings survive both settlement branches; verified mutating work still stops at operation-choice', async (t) => {
+  for (const [operation, role] of [['review-item', 'reviewer'], ['implement-item', 'reviewer'], ['implement-item', 'implementer']]) {
+    const tempDir = mkTempDir();
+    t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+    execFileSync('git', ['init', '-b', 'main'], { cwd: tempDir, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'findings@test.local'], { cwd: tempDir, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.name', 'Findings Contract'], { cwd: tempDir, stdio: 'ignore' });
+    fs.writeFileSync(path.join(tempDir, 'tracked.txt'), 'Original reviewed artifact\n');
+    execFileSync('git', ['add', 'tracked.txt'], { cwd: tempDir, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tempDir, stdio: 'ignore' });
+    const mutating = operation === 'implement-item';
+    const executorScript = path.join(tempDir, 'done-findings.mjs');
+    fs.writeFileSync(executorScript, `
+      import fs from 'node:fs'; import path from 'node:path';
+      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.at(-1));
+      if (!match) process.exit(2);
+      if (${mutating}) fs.writeFileSync(path.join(process.cwd(), 'tracked.txt'), 'Reviewed revision with unresolved authorization findings\\n');
+      const dir = path.dirname(match[1]);
+      fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Review\\nThe review is complete, but the recommendation lacks evidence for its authorization boundary. This dissent must remain visible to the owner.\\n');
+      fs.writeFileSync(match[1], JSON.stringify({
+        contract: { id: 'agent-result-claim', version: 2 }, status: 'done',
+        summary: 'Review completed with unresolved authorization findings',
+        assessment: { verdict: 'findings', severityFloor: 'high' },
+      }));
+    `);
+    const assignment = buildAssignment({ workId: 'done-findings', stage: 'executing', operation, role });
+    const result = await executeAssignment(assignment, {
+      cwd: tempDir, repoRoot: tempDir,
+      runnerConfig: {
+        executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+        modelPolicies: { claude: { standard: 'test-model' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        timeoutMs: 5000,
+      },
+    });
+    assert.equal(runOutcome(result).category, 'verdict');
+    assert.equal(runOutcome(result).verdict, 'findings');
+    assert.equal(runOutcome(result).evidence, mutating ? 'verified' : 'reported');
+    assert.equal(result.agentClaim.status, 'done');
+    assert.equal(result.classification.execution.status, 'completed');
+    assert.equal(result.classification.failure, null);
+    if (mutating) {
+      assert.ok(result.evidence.changedFiles.includes('tracked.txt'));
+      assert.equal(runOutcome(result).satisfied, false);
+      const disposition = interpretAssignmentRunResult({ choice: { operation, assignment }, runResult: result, repoRoot: tempDir });
+      assert.equal(disposition.stop, true);
+      assert.equal(disposition.canAdvanceEdge, false);
+      assert.equal(disposition.reason, 'assignment-implement-item-insufficient-confidence');
+    }
+  }
 });

@@ -284,6 +284,13 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // 1. Human gate check
       if (step.gate && step.gate.kind === 'human' && stepState.status !== 'answered') {
+        let question;
+        try {
+          question = renderGateQuestion(step, state, mainRoot);
+        } catch (error) {
+          const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code || error.message;
+          question = `Cannot read settled producer "missing expertise": ${reason}. No expertise decision was inferred. Review the packet manually and answer this gate with your decision and acknowledged limitation.`;
+        }
         recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
@@ -291,7 +298,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             type: 'gate.park',
             payload: {
               stepId: step.id,
-              question: renderGateQuestion(step, state, mainRoot),
+              question,
               header: step.gate.header,
               parkedAt: new Date().toISOString(),
             },
@@ -714,6 +721,13 @@ function prepareWorkflowRun(params) {
     throw new RunnerConfigError('startWorkflow requires workflowId, workflow, or planPath');
   }
 
+  const contextRefs = normalizeContextRefs(params.contextRefs);
+  const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
+  if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
+      && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
+    throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
+  }
+
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
@@ -722,7 +736,7 @@ function prepareWorkflowRun(params) {
     configSnapshot,
     request: params.request,
     stanceOptions: normalizeStanceOptions(params.stanceOptions),
-    contextRefs: normalizeContextRefs(params.contextRefs),
+    contextRefs,
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };
