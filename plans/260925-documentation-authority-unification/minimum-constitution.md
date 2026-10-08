@@ -322,3 +322,11 @@ Owner answer Q5 a authorizes three additive kinds for candidate placement: `gove
 
 The frozen area maps record the formerly unmapped types: Migration plan as historical migration evidence; Architecture design as architecture; Governance as governance; Governance guide as the existing temporary migration exception; Transitional switchboard as switchboard-doc; Documentation portal as portal; User docs portal as a non-platform user-corpus portal; and the `<type>` placeholder as archival template evidence rather than a maintained type. No placeholder type is promoted.
 
+
+## Additive non-authority carrier amendment (v2.5-001)
+
+Owner decision [`ea33f3d30`](reports/phase-06/owner-answers.md#command-amendments), recorded 2026-10-08, adds one exception to semantic-owner uniqueness: a row whose **target** is constitution kind `evidence-payload` with `canonical: false` names a physical evidence carrier, not an authority owner. Byte-identical payloads at distinct paths bind each legacy file to its own same-path platform copy. Source kind, evidence provenance, review status, disposition and `canonical: false` on any other kind do not earn the exception.
+
+Every canonical kind retains the always-fatal one-owner-per-`semanticClaimId` rule; unknown and ambiguous placements also remain subject to it. Other conservation, identical-unit open-data, authorship, independent committed review and digest checks are unchanged.
+
+Evidence: [same-path-binding-blocker.json](reports/phase-06/same-path-binding-blocker.json) records the 48 mirror and four raw-log corrections and the 12 failures of the prior rule. Plan §3 item 10 already establishes that evidence is not authority. The matching machine record lives in `minimum-constitution.json` and vocabulary minor version 5. Frozen rule text, disposition enums and extractor identity are unchanged.

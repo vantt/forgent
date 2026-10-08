@@ -87,9 +87,11 @@ test('mixed-file target anchors and digests are proven from the committed bytes,
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
-test('a duplicate group with two source copies and two platform copies has one owner', () => {
-  const rows = [source, source.replace('run/', 'other/'), target, target.replace('run/', 'other/')].map((sourcePath) => ({ sourcePath, semanticClaimId: 'shared-proof', targetOwner: target }));
+test('a canonical duplicate group with two source copies and two platform copies has one owner', () => {
+  const firstOwner = 'docs/platform/example/contracts/first.md';
+  const secondOwner = 'docs/platform/example/contracts/second.md';
+  const rows = ['docs/architect/example/contracts/first.md', 'docs/architect/example/contracts/second.md', firstOwner, secondOwner].map((sourcePath) => ({ sourcePath, semanticClaimId: 'shared-contract', targetOwner: firstOwner }));
   assert.deepEqual(validateSemanticClaimOwners(rows), []);
-  rows[1].targetOwner = target.replace('run/', 'other/');
+  rows[1].targetOwner = secondOwner;
   assert.equal(validateSemanticClaimOwners(rows).some((f) => f.type === 'semantic-claim-multiple-owners'), true);
 });

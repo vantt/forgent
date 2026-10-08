@@ -21,6 +21,7 @@ import { normalizePosix, readBlobAtCommit } from './generate-shipped-path-invent
 import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
 import { checkRatchet, DEFAULT_BASELINE_PATH as RATCHET_BASELINE_PATH, DEFAULT_EXCEPTIONS_PATH as RATCHET_EXCEPTIONS_PATH } from './check-legacy-docs-ratchet.mjs';
 import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, registryBindsToCommit, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
+import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitution.mjs';
 
 /**
  * Independently recomputes the in-scope file count directly from the commit
@@ -920,11 +921,16 @@ export function validateRowSetConservation(registry, previousRegistry, label = '
     .map((row) => ({ type: 'claim-id-not-conserved', path: row.sourcePath, message: `${row.sourcePath}: claim ${row.claimId} (${row.sourceAnchor}) of ${label} is neither a live, gap nor retired row of the current registry` }));
 }
 
-/** Rows that share a semanticClaimId must not name two different target owners. */
-export function validateSemanticClaimOwners(claimLedger) {
+let ownerConstitution;
+
+/** Canonical semantic owners stay unique; noncanonical evidence payloads are separate physical carriers. */
+export function validateSemanticClaimOwners(claimLedger, constitution = null) {
+  const placement = constitution || (ownerConstitution ||= JSON.parse(fs.readFileSync(new URL(`../${DEFAULT_CONSTITUTION_PATH}`, import.meta.url), 'utf8')));
+  const separateCarriers = placement.documentKinds.some(kind => kind.id === 'evidence-payload' && kind.canonical === false);
   const owners = new Map();
   for (const claim of claimLedger || []) {
     if (!claim?.semanticClaimId || typeof claim.targetOwner !== 'string' || claim.targetOwner === '') continue;
+    if (separateCarriers && classifyPath(claim.targetOwner, placement).kind === 'evidence-payload') continue;
     const set = owners.get(claim.semanticClaimId) || new Set();
     set.add(claim.targetOwner);
     owners.set(claim.semanticClaimId, set);

@@ -1,0 +1,1460 @@
+{
+  "version": 1,
+  "ownerDecision": "ea33f3d30304c8e4975d72e373dbad741ae47350",
+  "redCommit": "cd5052f7468db522883c72e47c83b2ea2c494c66",
+  "scope": "Only target evidence-payload with canonical false is exempt from fatal semantic owner uniqueness.",
+  "resume": {
+    "D": [
+      {
+        "command": [
+          "node",
+          "scripts/check-doc-inventory-gates.mjs",
+          "--inventory",
+          "/tmp/phase06/review-doc-inventory.json",
+          "--identity-registry",
+          "/tmp/phase06/review-identity-registry.json",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/pilot/decisions",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/ledger/decisions",
+          "--previous-registry",
+          "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+          "--json"
+        ],
+        "exit": 0,
+        "fatal": 0,
+        "open": [
+          {
+            "type": "files-unknown-blocking",
+            "message": "inventory files whose file-level disposition is unknown-blocking",
+            "count": 1111,
+            "examples": [
+              "AGENTS.md",
+              "CLAUDE.md",
+              "docs/architect/architecture-intent.md",
+              "docs/architect/component-boundary/component-boundary-advisory.md",
+              "docs/architect/component-boundary/README.md"
+            ]
+          },
+          {
+            "type": "claims-unknown-blocking",
+            "message": "claim rows whose disposition is unknown-blocking",
+            "count": 23684,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 24149,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "claims-without-own-rationale",
+            "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+            "count": 23684,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "message": "identical source units whose rows name different target owners",
+            "count": 335,
+            "examples": [
+              "03d85305b958: docs/platform/agent-coordination/architecture/run-handle.md, docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+              "5a917998f2db: docs/platform/agent-coordination/contracts/coordination-session.md, docs/platform/agent-coordination/contracts/flow-definition.md",
+              "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+              "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+              "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 188,
+            "examples": [
+              "AGENTS.md#unheaded-block-12",
+              "AGENTS.md#unheaded-block-13",
+              "AGENTS.md#unheaded-block-4",
+              "docs/architecture-manifest.json#file-block",
+              "docs/architecture-manifest.json#file-block"
+            ]
+          },
+          {
+            "type": "dropped-claims-unreviewed",
+            "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+            "count": 17,
+            "examples": [
+              "dropped-001",
+              "dropped-002",
+              "dropped-003",
+              "dropped-004",
+              "dropped-005"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 1445,
+            "examples": [
+              "docs/platform/agent-coordination/architecture/README.md#migration-status",
+              "docs/platform/agent-coordination/architecture/README.md#unheaded-block-2",
+              "docs/platform/agent-coordination/architecture/README.md#unheaded-block-3",
+              "docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow",
+              "docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4"
+            ]
+          }
+        ]
+      },
+      {
+        "command": [
+          "node",
+          "scripts/check-doc-inventory-gates.mjs",
+          "--inventory",
+          "/tmp/phase06/review-doc-inventory.json",
+          "--identity-registry",
+          "/tmp/phase06/review-identity-registry.json",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/pilot/decisions",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/ledger/decisions",
+          "--previous-registry",
+          "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+          "--json"
+        ],
+        "exit": 0,
+        "fatal": 0,
+        "open": [
+          {
+            "type": "files-unknown-blocking",
+            "message": "inventory files whose file-level disposition is unknown-blocking",
+            "count": 1111,
+            "examples": [
+              "AGENTS.md",
+              "CLAUDE.md",
+              "docs/architect/architecture-intent.md",
+              "docs/architect/component-boundary/component-boundary-advisory.md",
+              "docs/architect/component-boundary/README.md"
+            ]
+          },
+          {
+            "type": "claims-unknown-blocking",
+            "message": "claim rows whose disposition is unknown-blocking",
+            "count": 23684,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 24149,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "claims-without-own-rationale",
+            "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+            "count": 23684,
+            "examples": [
+              "AGENTS.md#forgent",
+              "AGENTS.md#unheaded-block-1",
+              "AGENTS.md#unheaded-block-2",
+              "AGENTS.md#unheaded-block-3",
+              "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+            ]
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "message": "identical source units whose rows name different target owners",
+            "count": 335,
+            "examples": [
+              "03d85305b958: docs/platform/agent-coordination/architecture/run-handle.md, docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+              "5a917998f2db: docs/platform/agent-coordination/contracts/coordination-session.md, docs/platform/agent-coordination/contracts/flow-definition.md",
+              "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+              "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+              "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 188,
+            "examples": [
+              "AGENTS.md#unheaded-block-12",
+              "AGENTS.md#unheaded-block-13",
+              "AGENTS.md#unheaded-block-4",
+              "docs/architecture-manifest.json#file-block",
+              "docs/architecture-manifest.json#file-block"
+            ]
+          },
+          {
+            "type": "dropped-claims-unreviewed",
+            "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+            "count": 17,
+            "examples": [
+              "dropped-001",
+              "dropped-002",
+              "dropped-003",
+              "dropped-004",
+              "dropped-005"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 1445,
+            "examples": [
+              "docs/platform/agent-coordination/architecture/README.md#migration-status",
+              "docs/platform/agent-coordination/architecture/README.md#unheaded-block-2",
+              "docs/platform/agent-coordination/architecture/README.md#unheaded-block-3",
+              "docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow",
+              "docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4"
+            ]
+          }
+        ]
+      }
+    ],
+    "boundaries": {
+      "A": [],
+      "B": [],
+      "C": [],
+      "I": [],
+      "F": [
+        {
+          "command": [
+            "node",
+            "scripts/check-legacy-docs-ratchet.mjs"
+          ],
+          "exit": 0,
+          "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 24 accounted edit(s), 1 accounted new file(s)).\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "node",
+            "scripts/check-doc-constitution.mjs",
+            "--no-ledger",
+            "--check-placement"
+          ],
+          "exit": 0,
+          "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 448 files, 447 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+          "stderr": ""
+        }
+      ],
+      "H": {
+        "count": 30,
+        "unexpected": [],
+        "agent": 0
+      }
+    }
+  },
+  "tests": {
+    "red": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/check-doc-conservation.test.mjs"
+      ],
+      "exit": 1,
+      "tests": 35,
+      "suites": 0,
+      "pass": 34,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "targeted": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/check-doc-conservation.test.mjs",
+        "test/scripts/doc-decision-mirrors.test.mjs"
+      ],
+      "exit": 0,
+      "tests": 40,
+      "suites": 0,
+      "pass": 40,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "scripts": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/backfill-status-category.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-citation-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-codes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-supersession.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-candidate-status.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-constitution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-retirement.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-locked-decisions-heading-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/dispatch-decide-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-alias-resolver.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-candidate-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-corpus-decisions.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-exact.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-mirrors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-review.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-restoration-proofs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-authorship.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/fgos-shell-integration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/full-suite-queue.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-doc-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-shipped-path-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/herdr-cockpit-notify.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/install-git-hooks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/is-main-module.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-classifier.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-migration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/list-doc-anchors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/migrate-actor-to-role.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/next-doc-id.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/prepare-release.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/probe-storytelling-material.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/project-agents.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-test-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-tests.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-ownership-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-plan-out.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-proof-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-compare.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-coverage-map.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-mutate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote-report.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-timing.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/verify-phase-02.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-test-marker.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-wrapper-script.test.mjs"
+      ],
+      "exit": 0,
+      "tests": 874,
+      "suites": 0,
+      "pass": 874,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "full": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "--test-concurrency=4",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/architecture.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/command-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dir-differs-from-cwd.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dispatch-inspect.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dispatch-operability.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dispatch-reconcile.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-5.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-6.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-7.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-claim-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-claim.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-decision-kind.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-decision.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-disconnected-worktree-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-edit-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-edit-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-edit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-gate-approve.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-gateway.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-handoff.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-help.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-5.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-6.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-7.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-iron-law-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-manifest.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-merge-next-idle-turn.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-merge-next-no-config-write.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-move.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-preflight.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-5.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-return.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-review-pr-precedence.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-setup.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stage-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stage-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stage.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stale-orphaned-runs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-tool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-version.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-workflow.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/invocation-fault-log.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/knowledge-attest-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/knowledge-deprecation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/knowledge-verbs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/plan-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/run-verb.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/take-pick-claim-eligibility.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/config/global-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/config/shared-config-file.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/fgos-edit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/fgos-read.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/fgos-step.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/merge-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/docs/decisions-corpus-retired.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/docs/rul11-anchor-phrase.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/coexistence-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/compound-learn-lifecycle.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/domain-aware-stage-literals.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/fixture-marketing-domain.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/main-checkout-lock-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/pr-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/rebuild-determinism.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/resync-worktree-bare-invocation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/root-file-guard-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/runner-loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/self-improve-loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/synthetic-domain.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/evolve/iron-law.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/helpers/fixture-dir.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/helpers/js-source-lexer.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/install-packaging.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/install/coexist.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/install/install-sh.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/classify.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/discovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/judge-verify-second-pass-stability.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/plan-verdict-from-plan-md.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/plan.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/observe/observe-contracts-fixtures.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/parity/edit-parity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/parity/read-parity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/parity/step-parity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/authoritative-match.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/capability-plan-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/context-render.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/decision-index.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/enduser-index.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/frontmatter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/knowledge-resolver.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/agent-result-claim-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/anti-loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-cwd-mutex-concurrency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-dispatch.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-enumerator-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-layout.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-normalizer.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-policy.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-provenance.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-runresult.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/attestation-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/claim-liveness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/claim-port.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/cli-spawn-reconciliation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/codex-cli-glm-cli-live-executors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/concurrent-claim-eventlog-loss.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dead-vocabulary-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-assignment-id-claim-concurrency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-brief.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-config-patterns.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-authority.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-backend-p03.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-blind.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-credential-hygiene.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-p04.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-p05.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-policies.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-effect-guarantee.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-executor-profile.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-governance-operability.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-governance-provider-denylist.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-i08b-remediation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-liveness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-operability-production-door.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-production-call-sites.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-r9-performance-cache.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconcile-operation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconciliation-concurrency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconciliation-import-graph.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconciliation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-recovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-runtime-inspect.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-trust-store.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-visibility-session.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-worker-home.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-worker-session-boot.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-worker-session.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/effective-execution-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/egress-governance.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/enrich-and-validate-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/evidence-attribution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/bind-committed-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/bind.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/handoff-refs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/architecture-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/index.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/panel.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/presets.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/reviewed.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/role-tasks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/solo.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/run-herdr.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/run-posture.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/run.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/unit-run-outcome.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/unit-summary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/unit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/fanout-batch-runner-commit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/frozen-judge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/gateway-control.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/github-adapter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/goal-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-agent.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-claude-invocations.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-launcher-env.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-private-home-trust.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-prompt-ready.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-provider-invocations.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-read-agent-state.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-reconciliation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-round-reconcile.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-spawn-adapter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-spawn-assignment-dispatch.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/lock-wait.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/lock.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/main-checkout-lock.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/main-checkout-reset-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/merge-target-slot-multiprocess.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/operation-choice.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/operation-prompt-templates.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/paths.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/process-identity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/promote-engine.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/promote-preflight.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/prompt-templates.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-adapter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-capacity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-credential-probe.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-quarantine-probe.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/recovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/root-affinity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-lock-identity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-outcome.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-result-source-scan.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-result-v2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-result-v3-reader.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/session.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/usage-parsers.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/worker-log.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/worktree-callsite-wrapper.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/worktree.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/write-queue.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/command-routes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/dev-host.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/envelope-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/fgctl-init.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/fgctl-stage.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/fgctl-upgrade.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/harness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/release-tree.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/backfill-status-category.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-citation-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-codes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-supersession.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-candidate-status.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-constitution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-retirement.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-locked-decisions-heading-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/dispatch-decide-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-alias-resolver.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-candidate-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-corpus-decisions.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-exact.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-mirrors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-review.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-restoration-proofs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-authorship.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/fgos-shell-integration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/full-suite-queue.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-doc-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-shipped-path-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/herdr-cockpit-notify.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/install-git-hooks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/is-main-module.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-classifier.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-migration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/list-doc-anchors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/migrate-actor-to-role.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/next-doc-id.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/prepare-release.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/probe-storytelling-material.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/project-agents.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-test-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-tests.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-ownership-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-plan-out.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-proof-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-compare.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-coverage-map.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-mutate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote-report.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-timing.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/verify-phase-02.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-test-marker.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-wrapper-script.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/active-release-drift-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/agent-cli-trust-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/agy-permissions.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/ansi.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/bin-discovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/blind-steps-proven-pools-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/bwrap-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/capability-catalog-doctrine.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-doctor-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-envelope.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-hookspath.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-idempotent.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-rc-line.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/claude-code-hooks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/config-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/confinement-doctor-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/dir-resolution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/doctor-coordination-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/doctor-fresh-run.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/doctor-strict-exit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/executor-profile-warnings.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/gitignore-docs-history-not-excluded.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/instruction-composition.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/instruction-projections.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/instruction-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/knowledge-doctor.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/observe-doctor-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/plugin-marketplace-doctor-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/readme-tag-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/self-uninstall-spike.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/shell-rc.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/skill-wrappers.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/uninstall-wiring-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/uninstall-wiring-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/uninstall-wiring.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/visibility-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/workflow-pool-independence-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/fgos-coding-exploring-root-fix.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/fgos-coding-knowledge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/fgos-mirror.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/knowledge-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/smoke.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/awaiting-context.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/awaiting.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/backward-compat.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/cleanup-harness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/cleanup-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/compound-learn-done-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/cursor.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/decision-relation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/decision-scope-field.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/dep-graph.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/discover-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/discover-verdict-override.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/domain-fields.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/domain-registry-compiled.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/domain-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/drift-status.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/envelope.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-compaction.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-jsonl-truncation-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-legacy-absence.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-shard-gitattributes-union-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/fgos-logs-bucket.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/frontier.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/fsm.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/gate-bypass.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/graph-harness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/graph-metrics.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/handoff.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/impact.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/knowledge-bootstrap.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/knowledge-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/plan-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/porting-store.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/porting.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/postland-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/priority-formula.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/replay.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/retro-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/retrospective-doors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/runtime-coordination.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/show-list-move-consistency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/status-category.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/step.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/store.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/tool-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/work-size-rigor.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/work.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/worker-slots.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/workflow-multiplicity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/working-tree-clean-unified.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/format-bytes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/format-duration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/host-bin.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/session-identity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/unique-tmp-tag.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/verbs/dispatch-observe.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/verbs/dispatch-recovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/verbs/merge/approve.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/architecture-advisory-workflow.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/business-discussion-workflow.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/discussion-workflows.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/workflow-runner.test.mjs"
+      ],
+      "exit": 0,
+      "tests": 7364,
+      "suites": 22,
+      "pass": 7291,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 8,
+      "todo": 65
+    }
+  },
+  "bindingSmoke": {
+    "beforeExit": 1,
+    "afterExit": 0,
+    "before": [
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_8b52f6236cacb629c47de415 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-impact.md, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_6ac5b20877c5585b445bdef1 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/interpretation.md, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_c3acb13cbce2097a1a9b2492 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/system-shaper.md, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_ca1c6607334f02c60d66e594 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_b0b5f99c8bbca85879b86429 names 38 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_1e9fc4074bbe5faaa990b503 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_943a523362f3df62a2fd6cc7 names 3 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_ac6e24f8fd68631c38f0f0c2 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_dcf636efe9a209660e095cae names 2 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_9b6b5cdd75e68f5adc33a576 names 4 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_8bde2eb4542d09aa6de234dc names 3 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json"
+      },
+      {
+        "type": "semantic-claim-multiple-owners",
+        "message": "semantic claim semantic_93f3596f54c732880b39f3f5 names 2 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt"
+      }
+    ],
+    "after": [],
+    "afterOpen": [
+      {
+        "type": "files-unknown-blocking",
+        "message": "inventory files whose file-level disposition is unknown-blocking",
+        "count": 1111,
+        "examples": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "docs/architect/architecture-intent.md",
+          "docs/architect/component-boundary/component-boundary-advisory.md",
+          "docs/architect/component-boundary/README.md"
+        ]
+      },
+      {
+        "type": "claims-unknown-blocking",
+        "message": "claim rows whose disposition is unknown-blocking",
+        "count": 23684,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 24149,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "claims-without-own-rationale",
+        "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+        "count": 23684,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "identical-units-multiple-owners",
+        "message": "identical source units whose rows name different target owners",
+        "count": 343,
+        "examples": [
+          "03d85305b958: docs/platform/agent-coordination/architecture/run-handle.md, docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+          "5a917998f2db: docs/platform/agent-coordination/contracts/coordination-session.md, docs/platform/agent-coordination/contracts/flow-definition.md",
+          "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+          "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 188,
+        "examples": [
+          "AGENTS.md#unheaded-block-12",
+          "AGENTS.md#unheaded-block-13",
+          "AGENTS.md#unheaded-block-4",
+          "docs/architecture-manifest.json#file-block",
+          "docs/architecture-manifest.json#file-block"
+        ]
+      },
+      {
+        "type": "dropped-claims-unreviewed",
+        "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+        "count": 17,
+        "examples": [
+          "dropped-001",
+          "dropped-002",
+          "dropped-003",
+          "dropped-004",
+          "dropped-005"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 1393,
+        "examples": [
+          "docs/platform/agent-coordination/architecture/README.md#migration-status",
+          "docs/platform/agent-coordination/architecture/README.md#unheaded-block-2",
+          "docs/platform/agent-coordination/architecture/README.md#unheaded-block-3",
+          "docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow",
+          "docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4"
+        ]
+      }
+    ],
+    "command": [
+      "node",
+      "scripts/check-doc-inventory-gates.mjs",
+      "--inventory",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--identity-registry",
+      "/tmp/phase06/review-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-05.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-files.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "--decisions",
+      "/tmp/phase06/owner-binding-smoke/s2-agent-coordination-log-duplicates.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-01.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-02.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-03.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-04.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-05.json",
+      "--decisions",
+      "/tmp/phase06/owner-binding-smoke/s2-agent-coordination-mirrors-06.json",
+      "--decisions",
+      "/tmp/phase06/owner-binding-smoke/s2-agent-coordination-mirrors-07.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-08.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-09.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-10.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-11.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-12.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-13.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-14.json",
+      "--decisions",
+      "/tmp/phase06/owner-binding-smoke/s2-agent-coordination-mirrors-15.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-16.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-17.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-18.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-19.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-20.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-21.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-22.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-23.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-24.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-25.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-26.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-27.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-28.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-reopened-exact.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-consumer-project.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-history-evidence.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-user-knowledge.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-generated-projections.json",
+      "--previous-registry",
+      "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+      "--json"
+    ]
+  },
+  "baselineDefault": [
+    {
+      "beforeCommand": [
+        "node",
+        "/tmp/phase06/owner-before-cli.mjs",
+        "--repo-root",
+        "/tmp/phase06/owner-step0-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "afterCommand": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/owner-step0-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "beforeExit": 0,
+      "afterExit": 0,
+      "identical": true,
+      "sha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "errors": ""
+    },
+    {
+      "beforeCommand": [
+        "node",
+        "/tmp/phase06/owner-before-cli.mjs",
+        "--repo-root",
+        "/tmp/phase06/owner-step0-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "afterCommand": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/owner-step0-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "beforeExit": 0,
+      "afterExit": 0,
+      "identical": true,
+      "sha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "errors": ""
+    }
+  ],
+  "impacts": [
+    {
+      "name": "validateSemanticClaimOwners",
+      "target": {
+        "id": "Function:scripts/check-doc-inventory-gates.mjs:validateSemanticClaimOwners",
+        "name": "validateSemanticClaimOwners",
+        "type": "Function",
+        "filePath": "scripts/check-doc-inventory-gates.mjs"
+      },
+      "direction": "upstream",
+      "impactedCount": 4,
+      "risk": "LOW",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 1,
+        "processes_affected": 2,
+        "modules_affected": 1
+      },
+      "byDepthCounts": {
+        "1": 1,
+        "2": 1,
+        "3": 2
+      },
+      "affected_processes": [
+        {
+          "name": "checkInventory",
+          "type": "Function",
+          "filePath": "scripts/check-doc-inventory-gates.mjs",
+          "affected_process_count": 7,
+          "total_hits": 7,
+          "earliest_broken_step": 1
+        },
+        {
+          "name": "gatherInputs",
+          "type": "Function",
+          "filePath": "scripts/check-doc-retirement.mjs",
+          "affected_process_count": 4,
+          "total_hits": 4,
+          "earliest_broken_step": 1
+        }
+      ],
+      "affected_modules": [
+        {
+          "name": "Scripts",
+          "hits": 4,
+          "impact": "direct"
+        }
+      ],
+      "byDepth": {
+        "1": [
+          {
+            "depth": 1,
+            "id": "Function:scripts/check-doc-inventory-gates.mjs:checkConservation",
+            "name": "checkConservation",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": []
+          }
+        ],
+        "2": [
+          {
+            "depth": 2,
+            "id": "Function:scripts/check-doc-inventory-gates.mjs:checkInventory",
+            "name": "checkInventory",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": [
+              {
+                "id": "proc_183_checkinventory",
+                "label": "CheckInventory → GithubSlugText",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_186_checkinventory",
+                "label": "CheckInventory → NormalizePosix",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_184_checkinventory",
+                "label": "CheckInventory → StableHash",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_100_checkinventory",
+                "label": "CheckInventory → Sha256Buffer",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_185_checkinventory",
+                "label": "CheckInventory → Sha256",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_99_checkinventory",
+                "label": "CheckInventory → IsNormativeUnheaded",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_187_checkinventory",
+                "label": "CheckInventory → ReadBlobAtCommit",
+                "processType": "cross_community",
+                "step": 1
+              }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "depth": 3,
+            "id": "Function:scripts/check-doc-inventory-gates.mjs:runCli",
+            "name": "runCli",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": []
+          },
+          {
+            "depth": 3,
+            "id": "Function:scripts/check-doc-retirement.mjs:gatherInputs",
+            "name": "gatherInputs",
+            "filePath": "scripts/check-doc-retirement.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": [
+              {
+                "id": "proc_258_gatherinputs",
+                "label": "GatherInputs → Sha256Buffer",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_257_gatherinputs",
+                "label": "GatherInputs → CurrentCommit",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_259_gatherinputs",
+                "label": "GatherInputs → PosixJoin",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_125_gatherinputs",
+                "label": "GatherInputs → NormalizePosix",
+                "processType": "cross_community",
+                "step": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "unreferencedCandidateRows",
+      "target": {
+        "id": "Function:scripts/check-doc-inventory-gates.mjs:unreferencedCandidateRows",
+        "name": "unreferencedCandidateRows",
+        "type": "Function",
+        "filePath": "scripts/check-doc-inventory-gates.mjs"
+      },
+      "direction": "upstream",
+      "impactedCount": 4,
+      "risk": "LOW",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 1,
+        "processes_affected": 2,
+        "modules_affected": 1
+      },
+      "byDepthCounts": {
+        "1": 1,
+        "2": 1,
+        "3": 2
+      },
+      "affected_processes": [
+        {
+          "name": "checkInventory",
+          "type": "Function",
+          "filePath": "scripts/check-doc-inventory-gates.mjs",
+          "affected_process_count": 7,
+          "total_hits": 7,
+          "earliest_broken_step": 1
+        },
+        {
+          "name": "gatherInputs",
+          "type": "Function",
+          "filePath": "scripts/check-doc-retirement.mjs",
+          "affected_process_count": 4,
+          "total_hits": 4,
+          "earliest_broken_step": 1
+        }
+      ],
+      "affected_modules": [
+        {
+          "name": "Scripts",
+          "hits": 4,
+          "impact": "direct"
+        }
+      ],
+      "byDepth": {
+        "1": [
+          {
+            "depth": 1,
+            "id": "Function:scripts/check-doc-inventory-gates.mjs:checkConservation",
+            "name": "checkConservation",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": []
+          }
+        ],
+        "2": [
+          {
+            "depth": 2,
+            "id": "Function:scripts/check-doc-inventory-gates.mjs:checkInventory",
+            "name": "checkInventory",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": [
+              {
+                "id": "proc_99_checkinventory",
+                "label": "CheckInventory → IsNormativeUnheaded",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_183_checkinventory",
+                "label": "CheckInventory → GithubSlugText",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_184_checkinventory",
+                "label": "CheckInventory → StableHash",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_100_checkinventory",
+                "label": "CheckInventory → Sha256Buffer",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_185_checkinventory",
+                "label": "CheckInventory → Sha256",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_186_checkinventory",
+                "label": "CheckInventory → NormalizePosix",
+                "processType": "intra_community",
+                "step": 1
+              },
+              {
+                "id": "proc_187_checkinventory",
+                "label": "CheckInventory → ReadBlobAtCommit",
+                "processType": "cross_community",
+                "step": 1
+              }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "depth": 3,
+            "id": "Function:scripts/check-doc-inventory-gates.mjs:runCli",
+            "name": "runCli",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": []
+          },
+          {
+            "depth": 3,
+            "id": "Function:scripts/check-doc-retirement.mjs:gatherInputs",
+            "name": "gatherInputs",
+            "filePath": "scripts/check-doc-retirement.mjs",
+            "relationType": "CALLS",
+            "confidence": 0.85,
+            "processes": [
+              {
+                "id": "proc_125_gatherinputs",
+                "label": "GatherInputs → NormalizePosix",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_258_gatherinputs",
+                "label": "GatherInputs → Sha256Buffer",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_257_gatherinputs",
+                "label": "GatherInputs → CurrentCommit",
+                "processType": "cross_community",
+                "step": 1
+              },
+              {
+                "id": "proc_259_gatherinputs",
+                "label": "GatherInputs → PosixJoin",
+                "processType": "cross_community",
+                "step": 1
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "unproven": [
+    "Eight skipped and 65 todo paths.",
+    "Real independent classification approval and batch strict closure."
+  ],
+  "noChange": [
+    "Canonical semantic-owner invariant",
+    "Identical-unit open-data check",
+    "Authorship and committed review report pins",
+    "Extractor closure",
+    "Legacy roots",
+    "Authority statuses",
+    "H2, M1–M5 and Low review items"
+  ]
+}

@@ -129,6 +129,8 @@ and an owner decision. Three amendments exist: 2.1-001 adds the `authorityClasse
 
 Amendment 2.4-001 records the first transformation use of `move` (the 190 pending rows and two file dispositions of the retired Agent Coordination policy and migration plan, owner A8) and `delete-as-duplicate` (four pending whole-log duplicates, plus the mirror proof channel). Only the usage annotations change; definitions, allowed classes, authority flags and rules remain frozen. Pending judgments are not independent approval and no source is physically retired.
 
+Amendment 2.5-001 records the additive [non-authority carrier exception](minimum-constitution.md#additive-non-authority-carrier-amendment-v25-001), owner decision `ea33f3d30` on 2026-10-08. Only targets of kind `evidence-payload` with `canonical: false` are exempt from always-fatal semantic-owner uniqueness; all canonical kinds and other noncanonical kinds retain the rule. Each byte-identical evidence file binds its own same-path platform copy. Existing enums, definitions, allowed classes, authority flags and frozen rule text remain unchanged; evidence is in `reports/phase-06/same-path-binding-blocker.json`.
+
 ## 6. Related Files
 
 | Relationship | File |

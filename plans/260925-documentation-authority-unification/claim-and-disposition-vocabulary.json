@@ -815,9 +815,15 @@
       "minor": 4,
       "change": "mark move and delete-as-duplicate in-use at their first transformation use; no value, definition, allowed class, authority flag or rule text changes",
       "evidence": "Agent Coordination pending decisions use move for the 190 rows and two file dispositions of the retired area policy and migration plan, authorized by owner amendment A8. Four byte-identical raw-log/Markdown receipt pairs use manual delete-as-duplicate because their extracted unit layouts differ; mirror entries use the existing script proof channel. Independent judgment approval and cutover are not claimed."
+    },
+    {
+      "id": "v2.5-001",
+      "minor": 5,
+      "change": "Record the owner-authorized noncanonical evidence-payload semantic ownership exception; no enum, disposition definition, allowed class or authority flag changes.",
+      "evidence": "Owner decision ea33f3d30304c8e4975d72e373dbad741ae47350 and minimum-constitution.json amendment v2.5-001; same-path-binding-blocker.json records the byte-identical physical carriers and prior fatal findings. Every canonical target kind remains subject to always-fatal unique semantic ownership."
     }
   ],
-  "minorVersion": 4,
+  "minorVersion": 5,
   "authorityClasses": [
     {
       "id": "navigation",
