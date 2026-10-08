@@ -41,7 +41,7 @@ unchanged.
 | Disposition | Definition | Target owner required? | Rationale required? | Retains authority? | Usage |
 |---|---|:---:|:---:|:---:|---|
 | `promote` | Source content moves into the target `docs/platform/**` structure as canonical authority. | Yes | No | Yes | in-use |
-| `move` | Source file moves directly to target structure with minimal rewriting. | Yes | No | Yes | reserved |
+| `move` | Source file moves directly to target structure with minimal rewriting. | Yes | No | Yes | in-use |
 | `merge` | Content from multiple sources is combined into a single canonical target document. | Yes | No | Yes | in-use |
 | `split` | Source is partitioned into multiple target documents with claim-level ledger tracking. | Yes | No | Yes | in-use |
 | `extract` | Specific claims or contracts are extracted into a dedicated target document. | Yes | No | Yes | reserved |
@@ -52,7 +52,7 @@ unchanged.
 | `supersede` | The target carries the WHOLE unit (possibly reworded or restructured) in a form that replaces it, and the source claim is retired. A target that carries only part of the unit is a `partial-carry`, never a `supersede`. | Yes | Yes | No | in-use |
 | `partial-carry` | The target carries part of the unit; the rest is named in the row's remainder and is not carried anywhere. Blocks cutover like `unknown-blocking` and never satisfies a promotion gate. | Yes | Yes | No | in-use |
 | `archive-with-reason` | Source is retired and relocated to history/archive with a recorded rationale. | No | Yes | No | in-use |
-| `delete-as-duplicate` | Source is an unneeded exact or semantic duplicate of another document. | Yes | Yes | No | reserved |
+| `delete-as-duplicate` | Source is an unneeded exact or semantic duplicate of another document. | Yes | Yes | No | in-use |
 | `delete-as-obsolete` | Source is obsolete with zero evidentiary or historical value. | No | Yes | No | in-use |
 | `defer-with-owner` | Source claim is deferred to a named future phase or engine with a named owner. | Yes | Yes | No | reserved |
 | `reject-with-rationale` | Proposed candidate design or source was evaluated and rejected with rationale. | No | Yes | No | reserved |
@@ -126,6 +126,8 @@ section is added only as an additive amendment (2.1, 2.2, ...) listed in
 `amendments` with its evidence, after the validator passes; the constitution keeps
 pinning the major version. Changing or removing a value needs a new major version
 and an owner decision. Three amendments exist: 2.1-001 adds the `authorityClasses` section and the class `verification-record`. The canonical verification kind's class was `evidence`, which collided with the locked rule that evidence is not authority (plan §3 item 10); `evidence` now belongs only to non-authority kinds (`evidence-payload`, `history`). Owner decision 2026-10-06. 2.2-001 moves `split`, `supersede`, `archive-with-reason`, `delete-as-obsolete` and the review status `reviewed` from `reserved` to `in-use` (no meaning changes); evidence: the dual pilot used them (see the amendment in the JSON file). 2.3-001 adds the disposition `partial-carry` and tightens the definition of `supersede` (owner ruling 2026-10-07: 134 of 195 `supersede` rows of the blind audit describe missing content). The tightened definition of `supersede` changes the meaning of an existing value; it is an owner-authorized exception to the rule above, recorded in the amendment evidence.
+
+Amendment 2.4-001 records the first transformation use of `move` (the 190 pending rows and two file dispositions of the retired Agent Coordination policy and migration plan, owner A8) and `delete-as-duplicate` (four pending whole-log duplicates, plus the mirror proof channel). Only the usage annotations change; definitions, allowed classes, authority flags and rules remain frozen. Pending judgments are not independent approval and no source is physically retired.
 
 ## 6. Related Files
 

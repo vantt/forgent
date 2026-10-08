@@ -98,7 +98,7 @@
       "allowedFileClasses": [
         "maintained-authority"
       ],
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "merge",
@@ -227,7 +227,7 @@
         "maintained-authority",
         "history-evidence"
       ],
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "delete-as-obsolete",
@@ -809,9 +809,15 @@
       "minor": 3,
       "change": "add the disposition partial-carry (blocks cutover, never satisfies a promotion gate) and tighten the definition of supersede to 'the target carries the whole unit, possibly reworded'",
       "evidence": "In the blind source-to-target audit of the dual pilot (2026-10-07) 134 of the 195 supersede rows carry a rationale saying content is missing, and a unit of the known dropped section (lines 918-920 of the runtime identity source) was filed as supersede although its rationale names the missing sentence. Supersede, a retired disposition that satisfies the conservation gates, was used for partial carries, which no gate blocks. Owner ruling 2026-10-07 (METHOD-MUST-CHANGE, one fix round): the owner authorized this additive disposition and the tightened definition; the existing first-round shards are not re-disposed and stay as first-round evidence. This amendment changes the meaning of an existing value (supersede), which the amendment rule reserves for a new major version with an owner decision; it is recorded as an owner-authorized exception to that rule for the one fix round, because the change narrows supersede without adding or removing a value and no row is re-disposed."
+    },
+    {
+      "id": "v2.4-001",
+      "minor": 4,
+      "change": "mark move and delete-as-duplicate in-use at their first transformation use; no value, definition, allowed class, authority flag or rule text changes",
+      "evidence": "Agent Coordination pending decisions use move for the 190 rows and two file dispositions of the retired area policy and migration plan, authorized by owner amendment A8. Four byte-identical raw-log/Markdown receipt pairs use manual delete-as-duplicate because their extracted unit layouts differ; mirror entries use the existing script proof channel. Independent judgment approval and cutover are not claimed."
     }
   ],
-  "minorVersion": 3,
+  "minorVersion": 4,
   "authorityClasses": [
     {
       "id": "navigation",

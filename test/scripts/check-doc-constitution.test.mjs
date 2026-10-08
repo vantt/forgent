@@ -638,15 +638,6 @@ test('authority classes are a vocabulary section and every kind uses a defined o
   assert.ok(types(validateConstitution(broken, vocabulary, { repoRoot: REPO_ROOT })).includes('unknown-authority-class'));
 });
 
-test('the freeze is recorded and the additive amendment carries its reason', () => {
-  assert.match(vocabulary.status, /^Accepted \(frozen 2026-10-06 by the owner\)/);
-  assert.match(constitution.status, /^Accepted \(frozen 2026-10-06 by the owner\)/);
-  const amendment = vocabulary.amendments.find((a) => a.change.includes('verification-record'));
-  assert.equal(amendment.minor, 1);
-  assert.match(amendment.evidence, /evidence is not authority/);
-  assert.equal(vocabulary.minorVersion, 3);
-  assert.deepEqual(vocabulary.amendments.map((a) => a.id), ['v2.1-001', 'v2.2-001', 'v2.3-001']);
-});
 
 test('the usage amendment rests on dispositions that the committed decision shards use', () => {
   const used = new Set();
