@@ -47,10 +47,10 @@ on how you got here:
 
 ## Hard rules
 
-- When asking questions (`fgos ask`), format question text using
+- When asking questions (`fgos ask`, `AskUserQuestion`, chat), use
   self-contained citations (see `../_shared/citation-format.md`) and the
-  required two-heading Markdown structure (`## Context` and `## Why this
-  matters`, each followed by at least 20 characters of content).
+  decision-question template (`../_shared/decision-question.md`); the engine
+  refuses an `ask` missing its parts.
 - The `fgos` shell function automatically resolves the main checkout root and appends `--dir "$root"` when invoking subcommands from a linked worktree, so you can call `fgos <verb>` subcommands (`ask`, `answer`, `return`) directly:
 
   ```bash

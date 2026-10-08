@@ -37,3 +37,10 @@ Không gộp, vì nói việc khác:
 ## Rủi ro
 
 - Bỏ nhầm phần riêng của một skill khi rút gọn: mỗi chỗ chỉ thay đúng câu nói về cấu trúc câu hỏi.
+
+## Kết quả (2026-10-08)
+
+- Sửa 5 skill coding, `coordination-driver.md`, `fgos-run`, AGENTS.md:19 (sửa tay); `npm run build:skills` render đúng 14 file + `_shared/decision-question.md` ra `.agents/` và `plugins/` (tới được project khác). Net 0 dòng (46/46).
+- 2 memory trỏ về mẫu.
+- `git grep -E "Why this matters|Why this$|two-heading|hai heading"` trên core, domains, src, test, AGENTS.md, .agents, plugins: 0.
+- test docs/skills/setup: 229/229 xanh.
