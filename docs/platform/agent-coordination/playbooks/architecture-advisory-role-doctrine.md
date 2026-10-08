@@ -54,7 +54,7 @@ Each role below carries seven things:
   a capable model writes when it is trying to be helpful.
 
 The worked examples use the two real cases this track advises on: the
-[mdview](../../../../plans/260905-architecture-advisory-panel/plan.md) desktop-shell
+mdview (`../../../../plans/260905-architecture-advisory-panel/plan.md`; Added in candidate: historical path absent at the batch pin) desktop-shell
 ownership question (clear case) and the vnflow EOD/intraday evolution question
 (unclear case). Using real cases is intentional — invented examples drift toward
 the abstract, and abstraction is exactly what this document exists to resist.
