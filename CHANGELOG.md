@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Coding review rejection with findings now follows its declared repair route instead of blocking; Claude herdr workers receive scoped read directories for settled cross-repo report refs, without granting the whole assignment store.
 - A panel seat whose provider capacity is exhausted or quarantined is no longer counted as passed. Its result had no outcome, which was read as success, so the panel went on to its synthesizer with a missing report. It now counts as a provider limit, so the seat moves to the next candidate of its pool and, with none left, the unit fails visibly.
 - A workflow run whose unit could not even start (for example a hand-off reference that no longer resolves) now fails its step and the run with the reason recorded, instead of ending the advance with the run still `running` and nothing in its event log.
 - Dispatch no longer loads every pre-existing dirty file into memory for the whole run: dirty-before snapshots keep only existence and a streamed sha256, so a worktree with large untracked files no longer drives `fgos run` to multi-GB RSS or OOM, and a FIFO or device among the dirty files no longer hangs the run.
