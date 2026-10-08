@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { buildConservationUnitLookup } from '../../scripts/check-doc-inventory-gates.mjs';
+import { applyDecisions, buildConservationUnitLookup } from '../../scripts/check-doc-inventory-gates.mjs';
 const cli = new URL('../../scripts/propose-doc-decisions.mjs', import.meta.url).pathname;
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-review-format-'));
@@ -91,4 +91,84 @@ test('a new shard cannot claim legacy compatibility by deleting author fields', 
   const result = f.run('--pack', 'shard.json', '--author', f.author, '--inventory', 'inventory.json', '--out', 'legacy.md');
   assert.equal(result.status, 1);
   assert.equal(fs.existsSync(path.join(f.root, 'legacy.md')), false);
+});
+
+function ordinaryReport(f, reportPath = 'plans/260925-documentation-authority-unification/reports/phase-06/review-2-operation.md') {
+  const reviewer = 'reviewer:fixture-session:other@2026-10-08';
+  const inventory = JSON.parse(fs.readFileSync(path.join(f.root, 'inventory.json')));
+  const shard = JSON.parse(fs.readFileSync(path.join(f.root, 'shard.json')));
+  const unitsOf = buildConservationUnitLookup(f.root, inventory.commit);
+  const text = `Reviewer: ${reviewer}\nReview mode: ordinary\n\n| Claim | Verdict | Note | Source digest | Target digest |\n|---|---|---|---|---|\n` + shard.claims.map(row => {
+    const source = inventory.claimLedger.find(item => item.claimId === row.claimId);
+    const target = unitsOf(row.targetOwner).find(unit => unit.anchor === row.targetAnchor);
+    return `| ${row.claimId} | ok | Read the complete source and proposed target. | ${source.sourceUnitDigest} | ${target.textDigest} |`;
+  }).join('\n') + '\n';
+  fs.mkdirSync(path.dirname(path.join(f.root, reportPath)), { recursive: true });
+  fs.writeFileSync(path.join(f.root, reportPath), text);
+  const commit = () => {
+    f.git('add', '--', reportPath);
+    f.git('commit', '-qm', 'docs: record independent ordinary verdict', '--', reportPath);
+    return f.git('rev-parse', 'HEAD');
+  };
+  const run = () => f.run('--apply-review', 'shard.json', '--inventory', 'inventory.json', '--verdicts', reportPath, '--reviewer', reviewer);
+  return { inventory, shard, unitsOf, reviewer, reportPath, text, commit, run };
+}
+
+test('ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin', (t) => {
+  const f = fixture(t), review = ordinaryReport(f);
+  assert.equal(review.run().status, 1, 'uncommitted verdict cannot approve');
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.root, 'shard.json'))), review.shard);
+  const reportCommit = review.commit();
+  const result = review.run();
+  assert.equal(result.status, 0, result.stderr);
+  const approved = JSON.parse(fs.readFileSync(path.join(f.root, 'shard.json')));
+  const row = approved.claims[0];
+  assert.equal(row.reviewStatus, 'reviewed');
+  assert.equal(row.reviewMode, 'ordinary');
+  assert.equal(row.reviewReportCommit, reportCommit);
+  assert.equal(row.targetUnitDigest, review.unitsOf(row.targetOwner).find(unit => unit.anchor === row.targetAnchor).textDigest);
+  assert.equal(row.seedScoreId, undefined);
+  const vocabulary = JSON.parse(fs.readFileSync(new URL('../../plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json', import.meta.url)));
+  const options = { vocabulary, repoRoot: f.root, unitsOf: review.unitsOf, targetUnitDigestOf: (owner, anchor) => review.unitsOf(owner).find(unit => unit.anchor === anchor)?.textDigest };
+  assert.deepEqual(applyDecisions({ ...review.inventory, commit: reportCommit }, [approved], options).findings, []);
+  fs.writeFileSync(path.join(f.root, review.reportPath), 'Reviewer: changed-session\n');
+  review.commit();
+  assert.deepEqual(applyDecisions({ ...review.inventory, commit: f.git('rev-parse', 'HEAD') }, [approved], options).findings, []);
+  const changed = structuredClone(approved); changed.claims[0].targetUnitDigest = 'c'.repeat(64);
+  assert.ok(applyDecisions({ ...review.inventory, commit: reportCommit }, [changed], options).findings.some(finding => finding.type === 'decision-review-report-missing'));
+});
+
+test('ordinary reviews cannot approve a changed digest, an unauthored row or their own session', async (t) => {
+  for (const defect of ['target-digest', 'source-digest', 'authoredBy', 'authorSession', 'same-session']) {
+    await t.test(defect, sub => {
+      const f = fixture(sub), review = ordinaryReport(f);
+      if (defect.endsWith('-digest')) fs.writeFileSync(path.join(f.root, review.reportPath), review.text.replace(defect === 'target-digest' ? review.unitsOf(f.target).find(unit => unit.anchor === review.shard.claims[0].targetAnchor).textDigest : review.inventory.claimLedger[0].sourceUnitDigest, 'f'.repeat(64)));
+      else {
+        if (defect === 'same-session') review.shard.claims[0].authoredBy = 'fixture-session:other@2026-10-07';
+        else if (defect === 'authorSession') delete review.shard.authorSession;
+        else delete review.shard.claims[0].authoredBy;
+        fs.writeFileSync(path.join(f.root, 'shard.json'), JSON.stringify(review.shard));
+      }
+      review.commit();
+      const before = fs.readFileSync(path.join(f.root, 'shard.json'), 'utf8');
+      const result = review.run();
+      assert.equal(result.status, 1);
+      assert.equal(fs.readFileSync(path.join(f.root, 'shard.json'), 'utf8'), before);
+    });
+  }
+});
+
+test('checkpoint reports cannot use the ordinary channel to omit sensitivity proof', async (t) => {
+  for (const checkpoint of [3, 6, 10]) {
+    await t.test(`checkpoint ${checkpoint}`, sub => {
+      const f = fixture(sub), review = ordinaryReport(f, `plans/260925-documentation-authority-unification/reports/phase-06/review-${checkpoint}-checkpoint.md`);
+      review.commit();
+      const result = review.run();
+      assert.equal(result.status, 1);
+      assert.match(result.stderr, /checkpoint.*sensitivity/i);
+      const vocabulary = JSON.parse(fs.readFileSync(new URL('../../plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json', import.meta.url)));
+      const forged = { ...review.shard, claims: review.shard.claims.map(row => ({ ...row, reviewMode: 'ordinary', reviewStatus: 'reviewed', reviewedBy: review.reviewer, reviewedAt: '2026-10-08', reviewReport: review.reportPath, reviewReportCommit: f.git('rev-parse', 'HEAD'), reviewNote: 'Read the complete source and proposed target.', targetUnitDigest: review.unitsOf(row.targetOwner).find(unit => unit.anchor === row.targetAnchor).textDigest })) };
+      assert.ok(applyDecisions({ ...review.inventory, commit: f.git('rev-parse', 'HEAD') }, [forged], { vocabulary, repoRoot: f.root }).findings.some(finding => finding.type === 'decision-review-report-missing'));
+    });
+  }
 });
