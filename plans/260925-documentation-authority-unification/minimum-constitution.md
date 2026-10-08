@@ -315,3 +315,10 @@ The last three rows (the OKF lessons of plan §12.3 that no earlier entry named)
 | governance | [docs/doc-governance.md](../../docs/doc-governance.md) |
 | switchboard | [docs/transitional-switchboard.md](../../docs/transitional-switchboard.md) |
 | plan | [plan.md](plan.md) |
+
+## Additive kind placement under the authorized root-document decision
+
+Owner answer Q5 a authorizes three additive kinds for candidate placement: `governance` at `docs/platform/governance.md`, `portal` snapshots under `docs/platform/documentation/operations/portals/**`, and `switchboard-doc` at `docs/platform/documentation/switchboard.md`. Existing kinds, singleton rules, authority statuses, placement precedence and frozen rule text are unchanged. This is an additive placement record, not an authority flip.
+
+The frozen area maps record the formerly unmapped types: Migration plan as historical migration evidence; Architecture design as architecture; Governance as governance; Governance guide as the existing temporary migration exception; Transitional switchboard as switchboard-doc; Documentation portal as portal; User docs portal as a non-platform user-corpus portal; and the `<type>` placeholder as archival template evidence rather than a maintained type. No placeholder type is promoted.
+

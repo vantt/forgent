@@ -186,7 +186,9 @@
           "route": "docs/architect/component-boundary/**",
           "authorityStatus": "legacy-current",
           "role": "Retained detailed component boundary contracts and specifications"
-        }
+        },
+        {"route":"docs/platform/system-architecture/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/platform/architecture-map.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -215,7 +217,8 @@
           "route": "docs/specs/system-overview.md",
           "authorityStatus": "legacy-current",
           "role": "Live Area Map and Shared Entities sections remain the consolidated current cross-area spec"
-        }
+        },
+        {"route":"docs/platform/system-overview/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -327,7 +330,8 @@
           "route": "docs/routing-handoff-contract.md",
           "authorityStatus": "legacy-current",
           "role": "Canonical agent-to-agent handoff contract and trust boundary"
-        }
+        },
+        {"route":"docs/platform/runner/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -397,7 +401,8 @@
           "route": "docs/architect/packaging-distribution/**",
           "authorityStatus": "legacy-current",
           "role": "Detailed architecture sources consulted only in roles assigned by portal"
-        }
+        },
+        {"route":"docs/platform/packaging-distribution/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -441,7 +446,8 @@
           "route": "docs/architect/host-invocation-routing/**",
           "authorityStatus": "legacy-current",
           "role": "Retained sources under docs/architect/host-invocation-routing/** remain legacy-current only where not drained"
-        }
+        },
+        {"route":"docs/platform/host-invocation-routing/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -498,7 +504,8 @@
           "route": "docs/specs/runner.md",
           "authorityStatus": "legacy-current",
           "role": "Runner integration and dispatch lifecycle"
-        }
+        },
+        {"route":"docs/platform/agent-coordination/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -541,7 +548,8 @@
           "route": "src/runner/dispatch/confinement/**",
           "authorityStatus": "legacy-current",
           "role": "Runtime confinement implementations and tests"
-        }
+        },
+        {"route":"docs/platform/agent-confinement/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -584,7 +592,8 @@
           "route": "plugins/fgOS/**",
           "authorityStatus": "legacy-current",
           "role": "Plugin manifest and command wrapper implementations"
-        }
+        },
+        {"route":"docs/platform/claude-plugin/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -640,7 +649,8 @@
           "route": "docs/specs/runner.md",
           "authorityStatus": "legacy-current",
           "role": "Runner/gateway integration behavior"
-        }
+        },
+        {"route":"docs/platform/herdr-web-dashboard/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -753,7 +763,8 @@
           "route": "scripts/check-decision-citation-drift.mjs",
           "authorityStatus": "legacy-current",
           "role": "Implementation ratchet script"
-        }
+        },
+        {"route":"docs/platform/decision-citation-drift/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -796,7 +807,8 @@
           "route": ".agents/skills/distill/SKILL.md",
           "authorityStatus": "legacy-current",
           "role": "Skill owns portable operational surface"
-        }
+        },
+        {"route":"docs/platform/distillery/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -839,7 +851,8 @@
           "route": "packages/observe/rust/**",
           "authorityStatus": "legacy-current",
           "role": "Rust implementation of the observe component (fgos-observe)"
-        }
+        },
+        {"route":"docs/platform/observe/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -929,7 +942,8 @@
           "route": "plugins/fgOS/skills/**",
           "authorityStatus": "non-authority",
           "role": "Generated skill wrapper projections"
-        }
+        },
+        {"route":"docs/platform/domainization/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -959,7 +973,8 @@
           "route": "docs/ui-spec/00-overview.md",
           "authorityStatus": "legacy-current",
           "role": "Entry for docs/ui-spec/** defining visual and UI layout contracts; functional behavior owned by area specs"
-        }
+        },
+        {"route":"docs/platform/ui-spec/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -1002,7 +1017,8 @@
           "route": "src/install/coexist.mjs",
           "authorityStatus": "legacy-current",
           "role": "Installation helper"
-        }
+        },
+        {"route":"docs/platform/coexistence/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
     },
     {
@@ -1086,8 +1102,29 @@
           "route": "plans/260925-documentation-authority-unification/plan.md",
           "authorityStatus": "legacy-current",
           "role": "Active migration plan (Phase 00/01 complete; 02-09 unauthorized)"
-        }
+        },
+        {"route":"docs/platform/proposals/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/platform/documentation/**","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/platform/README.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."},
+        {"route":"docs/platform/governance.md","authorityStatus":"candidate","scope":"candidate-transformation","role":"Candidate placement only; retained source authority and existing area status are unchanged."}
       ]
+    },
+    {
+      "area": "Platform contracts",
+      "authorityStatus": "candidate",
+      "fileClasses": [
+        "maintained-authority"
+      ],
+      "entryPoint": "docs/platform/contracts/README.md",
+      "currentRoutes": [
+        {
+          "route": "docs/platform/contracts/**",
+          "authorityStatus": "candidate",
+          "scope": "candidate-transformation",
+          "role": "Candidate placement only; retained source authority and existing area status are unchanged."
+        }
+      ],
+      "scopeSummary": "Candidate platform-wide contract collection; existing source authority is unchanged."
     }
   ],
   "rootDocuments": [

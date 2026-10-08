@@ -567,6 +567,33 @@
           "per": "subcomponent"
         }
       ]
+    },
+    {
+      "id": "governance",
+      "typeName": "Governance",
+      "introduced": true,
+      "authorityClass": "normative",
+      "canonical": true,
+      "claimKinds": ["normative-law", "procedure"],
+      "placements": [{ "pattern": "docs/platform/governance.md", "cardinality": "singleton", "per": "platform" }]
+    },
+    {
+      "id": "portal",
+      "typeName": "Documentation portal",
+      "introduced": true,
+      "authorityClass": "navigation",
+      "canonical": false,
+      "claimKinds": ["navigation"],
+      "placements": [{ "pattern": "docs/platform/documentation/operations/portals/**", "cardinality": "collection", "per": "area" }]
+    },
+    {
+      "id": "switchboard-doc",
+      "typeName": "Transitional switchboard",
+      "introduced": true,
+      "authorityClass": "navigation",
+      "canonical": true,
+      "claimKinds": ["navigation"],
+      "placements": [{ "pattern": "docs/platform/documentation/switchboard.md", "cardinality": "singleton", "per": "area" }]
     }
   ],
   "documentTypeAliases": {

@@ -1,0 +1,173 @@
+{
+  "commit": "fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7",
+  "sourceCoverage": {
+    "sourceFiles": 1040,
+    "covered": 1040,
+    "uncovered": []
+  },
+  "routeProbes": [
+    {
+      "area": "Agent coordination",
+      "path": "docs/platform/agent-coordination/routing-probe.md",
+      "classifiedArea": "Agent coordination",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Whole-system architecture and component boundaries",
+      "path": "docs/platform/system-architecture/routing-probe.md",
+      "classifiedArea": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Whole-system architecture and component boundaries",
+      "path": "docs/platform/architecture-map.md",
+      "classifiedArea": "Whole-system architecture and component boundaries",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Documentation system",
+      "path": "docs/platform/proposals/routing-probe.md",
+      "classifiedArea": "Documentation system",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Documentation system",
+      "path": "docs/platform/documentation/routing-probe.md",
+      "classifiedArea": "Documentation system",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Documentation system",
+      "path": "docs/platform/README.md",
+      "classifiedArea": "Documentation system",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Documentation system",
+      "path": "docs/platform/governance.md",
+      "classifiedArea": "Documentation system",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Skills and domainization",
+      "path": "docs/platform/domainization/routing-probe.md",
+      "classifiedArea": "Skills and domainization",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Host invocation routing",
+      "path": "docs/platform/host-invocation-routing/routing-probe.md",
+      "classifiedArea": "Host invocation routing",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Packaging-distribution",
+      "path": "docs/platform/packaging-distribution/routing-probe.md",
+      "classifiedArea": "Packaging-distribution",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Platform contracts",
+      "path": "docs/platform/contracts/routing-probe.md",
+      "classifiedArea": "Platform contracts",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Coexistence",
+      "path": "docs/platform/coexistence/routing-probe.md",
+      "classifiedArea": "Coexistence",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Herdr gateway and web dashboard",
+      "path": "docs/platform/herdr-web-dashboard/routing-probe.md",
+      "classifiedArea": "Herdr gateway and web dashboard",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Runner / dispatch / merge lifecycle",
+      "path": "docs/platform/runner/routing-probe.md",
+      "classifiedArea": "Runner / dispatch / merge lifecycle",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Agent confinement",
+      "path": "docs/platform/agent-confinement/routing-probe.md",
+      "classifiedArea": "Agent confinement",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Decision citation drift",
+      "path": "docs/platform/decision-citation-drift/routing-probe.md",
+      "classifiedArea": "Decision citation drift",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Distillery / reference learning",
+      "path": "docs/platform/distillery/routing-probe.md",
+      "classifiedArea": "Distillery / reference learning",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Claude plugin surface",
+      "path": "docs/platform/claude-plugin/routing-probe.md",
+      "classifiedArea": "Claude plugin surface",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "Observe (metrics and friction)",
+      "path": "docs/platform/observe/routing-probe.md",
+      "classifiedArea": "Observe (metrics and friction)",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "System overview",
+      "path": "docs/platform/system-overview/routing-probe.md",
+      "classifiedArea": "System overview",
+      "authorityStatus": "candidate"
+    },
+    {
+      "area": "UI specification",
+      "path": "docs/platform/ui-spec/routing-probe.md",
+      "classifiedArea": "UI specification",
+      "authorityStatus": "candidate"
+    }
+  ],
+  "existingAreaStatusChanges": [],
+  "constitutionFatalFindings": [],
+  "placement": {
+    "files": 446,
+    "matched": 445,
+    "leftovers": [],
+    "exceptions": [
+      "docs/platform/migration-authoring-rules.md"
+    ],
+    "ambiguous": [],
+    "evidenceWithoutOwner": [],
+    "byKind": {
+      "platform-portal": 1,
+      "area-portal": 4,
+      "collection-index": 14,
+      "architecture": 26,
+      "contract": 20,
+      "decision": 12,
+      "history": 14,
+      "intent-preservation-ledger": 3,
+      "guide-runbook": 8,
+      "proposal": 7,
+      "roadmap": 9,
+      "spec": 4,
+      "evidence-payload": 302,
+      "verification": 10,
+      "vision": 4,
+      "vocabulary": 3,
+      "redirect-stub": 2,
+      "rollout-plan": 1,
+      "platform-foundations": 1
+    }
+  },
+  "commands": [
+    "node scripts/propose-doc-decisions.mjs --summary --coverage --maps plans/260925-documentation-authority-unification/ledger --inventory /tmp/phase06/doc-inventory.json",
+    "node scripts/check-doc-constitution.mjs --inventory /tmp/phase06/doc-inventory.json --no-ledger --check-placement --json"
+  ]
+}

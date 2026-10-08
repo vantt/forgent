@@ -3,9 +3,9 @@
 Date: 2026-10-08
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: 1, ordinary approval channel authorized by A6
+Step: 2, first content batch preparing
 State: authoring
-Last green conservation commit: e7fa774048a596cf431c14c3083cdc1a8249e2c0
+Last green conservation commit: fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 5d6467093217a6869b31afb28866732400767267
 Main at sync: c2aa9e374a8cee57c676809dab4849273ed71855
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: sync main as prescribed, account its legacy edits, then finish Step 1 maps/counts and execute the first content batch to its ready-for-review checkpoint.
+Next action: commit the frozen maps and measured baseline, then add header-only promotion metadata to the agent-coordination counterparts and author the first batch for independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -64,3 +64,9 @@ A6 (`8bc686954`) authorizes the ordinary committed-report channel, retaining H1,
 A6 implementation green `e7fa77404`: full suite on committed code, 7,335 tests, 7,262 pass, zero fail, 8 skip/65 todo (UNPROVEN), 389 files. Both D prior-registry proofs are baseline-identical with zero fatal findings. Evidence: ordinary-review-verification.json. Step 1 item 2 brief now documents executable ordinary approval and reserved seeded checkpoint report names; no tooling re-review requested.
 
 Required main sync `5d6467093` imports main `c2aa9e374` cleanly, with no conflict, no extractor-closure or instruction-file change and no platform-target edit. One legacy source changes: docs/specs/distribution.md; its exact imported digest is re-accounted under the standing sync policy, marked content-review-owed. Re-inventory and all post-sync checks precede map freeze; source drift is not ignored.
+
+Step 1 complete: A6 ordinary committed-report approval is exercised (40 fixture rows approved without seeds); checkpoint proof remains exercised with 6/6 seeded errors caught and 0 false flags. The synchronized full suite passes: 393 files, 7,362 tests, 7,289 pass, 0 fail, 8 skip, 65 todo. Scripts suite after map/constitution changes: 872/872. Both post-sync D proofs have 0 fatal findings; legacy source counts increase by three distribution rows, explicitly accounted rather than described as baseline-identical.
+
+Frozen placement matrix: 1,040 legacy files plus five reconciliation files; all 1,040 legacy sources covered, 0 uncovered. Twenty-one additive candidate route probes pass; existing area-status changes: 0. Q5 additive kinds use existing vocabulary and do not alter frozen rules. Constitution check has 0 fatal findings; placement has 446 files, 445 matches, one standing exception, 0 leftovers or ambiguities. `baseline-counts.md`, `frozen-map-inputs.json`, `frozen-map-verification.json` and nine `ledger/area-map-*.md` files hold the pinned inputs and proof.
+
+Measured source total is 22,429: 12,882 Mirror, 2,787 Unit-exact, 971 Weak-exact and 5,789 Judgment. Agent coordination contributes 17,034 rows from 937 files: 867 evidence files, 68 existing counterparts (67 Markdown plus one SVG) and two legacy-only plans. Content authoring, independent content approval, reduced promotion rehearsal and scoped E remain UNPROVEN.
