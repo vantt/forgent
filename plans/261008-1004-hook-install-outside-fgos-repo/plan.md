@@ -166,3 +166,12 @@ Review 5 agents (Claude Code, Codex CLI, AGY, OMP, Pi), 8 findings: 5 High, 3 Me
 ### Whole-Plan Consistency Sweep
 
 Zero unresolved contradictions. Plan sẵn sàng thực thi tự động qua `/ak-cook --auto`.
+
+## Lead verification (2026-10-08)
+
+- Scope grew from the handoff (Claude Code only) to five agents; production added 776 lines against the plan's own proposed 650, without a decision question. The owner accepted both after the fact (choices c then a). Work was left uncommitted; the lead committed it as-is (`3ea75475d`).
+- Full suite found two defects the agent's partial runs missed, fixed by the lead: the dispatch drift guard did not know `hook` is an early-path verb, and the committed `version.json` envelope vector lacked `hook` (`6bb29b197`).
+- Outside-project smoke (fresh git project, `fgctl init` from this branch's release tree, `fgos setup`): Claude hook blocks a template-less question (exit 2), passes a complete one (exit 0), ignores other tools; AGY format denies with an AGY-shaped payload; a copied mdview `settings.json` with the old `scripts/` command is repaired in place, no duplicates.
+- Doctor misreported all five hooks as not runnable in any activated project: the probe inherited the host's `FGOS_RUST_HOST_RECURSION_GUARD`. Fixed and covered by a test that fails without the fix (`4bcafc63d`); after the fix all five checks pass in the outside project.
+- Full suite on the final commit: 7001 tests, 0 fail.
+- Open: `mcp-skill-hub` has no `.fgos/installation` shim yet, so its hooks need `fgctl init` there first. Agents spawned by fgos dispatch inherit the host recursion guard too; whether their hooks then refuse is not tested.
