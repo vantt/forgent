@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Architecture advisory gains reviewed final-packet synthesis, a producer-derived batched expertise close, and linear parent-report reopen; repeated Workflow `--context-ref` and explicit reviewed `pass/findings` outcomes preserve advice without accepting execution failures.
 - An account locked for a dead login no longer waits for a person to clear it: when a dispatch would otherwise find no usable account of the provider, fgOS makes one real call with that account's own credential (Codex or pi), unlocks it if it answers, and does not try again for 30 minutes if it does not. Quota limits and other locks are untouched.
 - `fgos doctor` reports activated Node-payload drift against a source checkout's working tree without changing activation; `npm run fgos:dev -- <verb>` runs working-tree code through the Rust host, preserving caller cwd and respecting custom Cargo targets without weakening manifest containment.
 - The source-checkout commit hook refuses new root files outside its single allowlist, including linked worktrees; separate allowlist commits and a root-only merge exception preserve normal integration and existing data-loss guards.
