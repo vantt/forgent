@@ -63,7 +63,7 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
     const independentOf = allPanelistRoles.filter((r) => r !== role);
     return await runRole({
       role,
-      unit: roleUnit(unit, { role, kind }),
+      unit: roleUnit(unit, { role, kind, params }),
       readOnly: true,
       independentOf,
     });

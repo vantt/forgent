@@ -441,10 +441,10 @@ function parseArgs(args) {
       const key = arg.slice(2);
       const next = args[i + 1];
       if (next !== undefined && !next.startsWith('--')) {
-        flags[key] = next;
+        flags[key] = key === 'context-ref' ? [...(flags[key] ?? []), next] : next;
         i += 1;
       } else {
-        flags[key] = true;
+        flags[key] = key === 'context-ref' ? [...(flags[key] ?? []), true] : true;
       }
     } else {
       positional.push(arg);
@@ -2180,6 +2180,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           planPath,
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
+          contextRefs: flags['context-ref'],
           repoRoot: flags.dir,
           worktree: flags.worktree,
         };

@@ -984,7 +984,8 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         const runOutcomeResult = outcome.runResult ? runOutcome(outcome.runResult) : null;
         log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" finished (confidence: ${runOutcomeResult?.evidence ?? 'none'}, status: ${runOutcomeResult?.category ?? 'none'})`);
 
-        if (outcome.stop || (runOutcomeResult ? !runOutcomeResult.satisfied : true)) {
+        const routed = outcome.nextOperation || outcome.canProceed === true;
+        if (outcome.stop || (!routed && !runOutcomeResult?.satisfied)) {
           log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" stopped safely (${outcome.reason}) — Work lifecycle untouched`);
           const isSecondary = opChoice.operation === 'scout-blast-radius' || opChoice.operation === 'review-item' || opChoice.operation === 'resolve-question';
           const finalStatus = isSecondary ? 'blocked' : 'todo';
