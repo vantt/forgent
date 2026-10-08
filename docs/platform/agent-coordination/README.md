@@ -16,7 +16,7 @@ Related:
 - docs/doc-governance.md
 - docs/platform/README.md
 - docs/platform/component-boundary.md
-- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
@@ -122,10 +122,13 @@ until later migration phases promote the detailed docs:
 | platform portal | [../README.md](../README.md) |
 | platform intent ledger | [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
 | component boundary | [../component-boundary.md](../component-boundary.md) |
-| migration plan | [../../architect/agent-coordination/documentation-standardization-plan.md](../../architect/agent-coordination/documentation-standardization-plan.md) |
+| migration plan (retired; non-authority history) | [history/documentation-migration/documentation-standardization-plan.md](history/documentation-migration/documentation-standardization-plan.md) |
 | legacy portal | [../../architect/agent-coordination/README.md](../../architect/agent-coordination/README.md) |
 | current state summary | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
+| retired area policy (non-authority history) | [history/documentation-migration/documentation-governance.md](history/documentation-migration/documentation-governance.md) |
+
+Added in candidate: The retired area policy and completed migration plan are retained verbatim as literal history snapshots, not current authority. The source-guidance section below retains their older references and status claims in historical context.
 
 ## Agent Coordination Documentation
 
