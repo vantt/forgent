@@ -1007,7 +1007,7 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
   const unitsOf = buildConservationUnitLookup(repoRoot, inventory.commit);
   const receipts = new Map();
   const ancestors = new Map([[inventory.commit, true]]);
-  const classes = ['candidate-native-navigation', 'structural-frame', 'bookkeeping'];
+  const classes = ['candidate-native-navigation', 'structural-frame', 'bookkeeping', 'candidate-native-content'];
   const receiptOf = (ref) => {
     if (!/^[0-9a-f]{40}$/.test(ref.receiptCommit || '') || typeof ref.receiptPath !== 'string' ||
         path.posix.normalize(ref.receiptPath) !== ref.receiptPath || !/^plans\/[^/]+\/ledger\/candidate-classifications-[a-z0-9-]+\.json$/.test(ref.receiptPath)) return null;
@@ -1046,10 +1046,43 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
         !/^\d{4}-\d{2}-\d{2}$/.test(ref.reviewedAt || '') || !nonEmpty(ref.reviewNote) ||
         header('Reviewer') !== ref.reviewedBy || reviewReportAuthor(report) !== artifact.authorSession ||
         header('Receipt commit') !== ref.receiptCommit) continue;
+    let evidenceDigest = null;
+    if (receipt.class === 'candidate-native-content') {
+      const evidence = receipt.currentEvidence;
+      if (!evidence || evidence.finding !== 'true-and-current' || !/^[0-9a-f]{40}$/.test(evidence.commit || '') ||
+          !Array.isArray(evidence.citations) || (evidence.citations.length === 0 && !evidence.commands?.length)) continue;
+      try {
+        execFileSync('git', ['merge-base', '--is-ancestor', evidence.commit, ref.receiptCommit], { cwd: repoRoot, stdio: 'pipe' });
+        let current = true;
+        const citations = [...evidence.citations];
+        if (evidence.commands !== undefined) {
+          if (!Array.isArray(evidence.commands)) continue;
+          for (const command of evidence.commands) {
+            if (!nonEmpty(command.command) || command.exitCode !== 0 || typeof command.output !== 'string' ||
+                command.outputDigest !== sha256Buffer(Buffer.from(command.output)) ||
+                !Array.isArray(command.inputs) || command.inputs.length === 0) { current = false; break; }
+            for (const input of command.inputs) citations.push({ ...input, startLine: 1, endLine: 1 });
+          }
+        }
+        for (const citation of citations) {
+          if (typeof citation.path !== 'string' || !/^(src|apps|core|bin|scripts|test)\//.test(citation.path) ||
+              path.posix.normalize(citation.path) !== citation.path || !/^[0-9a-f]{40}$/.test(citation.blobSha || '') ||
+              !Number.isSafeInteger(citation.startLine) || !Number.isSafeInteger(citation.endLine) ||
+              citation.startLine < 1 || citation.endLine < citation.startLine) { current = false; break; }
+          const pinned = execFileSync('git', ['rev-parse', `${evidence.commit}:${citation.path}`], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+          const actual = execFileSync('git', ['rev-parse', `${inventory.commit}:${citation.path}`], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+          const text = readBlobAtCommit(inventory.commit, citation.path, repoRoot).toString('utf8');
+          if (pinned !== citation.blobSha || actual !== pinned || citation.endLine > text.split(/\r?\n/).length) { current = false; break; }
+        }
+        if (!current) continue;
+      } catch { continue; }
+      evidenceDigest = sha256Buffer(Buffer.from(JSON.stringify(evidence)));
+    }
     const acceptedVerdict = report.split(/\r?\n/).some(line => {
       const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map(cell => cell.trim().replace(/\\\|/g, '|'));
-      return cells.length === 6 && cells[0] === receipt.claimId && cells[1] === receipt.class && cells[2] === 'ok' &&
-        cells[3] === receipt.unitDigest && cells[4] === receipt.shownTextDigest && cells[5] === ref.reviewNote;
+      return cells.length === (evidenceDigest ? 7 : 6) && cells[0] === receipt.claimId && cells[1] === receipt.class && cells[2] === 'ok' &&
+        cells[3] === receipt.unitDigest && cells[4] === receipt.shownTextDigest && cells[5] === ref.reviewNote &&
+        (!evidenceDigest || cells[6] === evidenceDigest);
     });
     if (acceptedVerdict) accepted.add(receipt.claimId);
   }

@@ -330,3 +330,10 @@ Owner decision [`ea33f3d30`](reports/phase-06/owner-answers.md#command-amendment
 Every canonical kind retains the always-fatal one-owner-per-`semanticClaimId` rule; unknown and ambiguous placements also remain subject to it. Other conservation, identical-unit open-data, authorship, independent committed review and digest checks are unchanged.
 
 Evidence: [same-path-binding-blocker.json](reports/phase-06/same-path-binding-blocker.json) records the 48 mirror and four raw-log corrections and the 12 failures of the prior rule. Plan §3 item 10 already establishes that evidence is not authority. The matching machine record lives in `minimum-constitution.json` and vocabulary minor version 5. Frozen rule text, disposition enums and extractor identity are unchanged.
+
+## Additive substantive candidate receipt class (v2.6-001)
+
+Owner amendment A11, committed `8dd0140ce`, adds `candidate-native-content` for substantive units already in the candidate tree without a legacy source. The receipt closes a unit only after a committed independent report finds its full shown text true and current against implementation or behaviour, citing file:line or command evidence. Stale or false text receives rework and remains open until corrected; authors cannot approve themselves.
+
+The existing navigation, structural-frame and bookkeeping classes, canonical semantic-owner uniqueness and checkpoint sensitivity path are unchanged. This is an additive class, not an authority promotion or a new source-disposition value. Evidence: committed `review-2rework-classifications.md` (`8e2fc315f`) and `reports/phase-06/candidate-content-verification.json`.
+

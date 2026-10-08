@@ -1147,6 +1147,12 @@
       "ownerDecision": "ea33f3d30304c8e4975d72e373dbad741ae47350",
       "change": "Rows targeting evidence-payload with canonical false are separate physical carriers and are excluded from the always-fatal semanticClaimId owner uniqueness rule. Every canonical kind and every other noncanonical kind retain that rule.",
       "evidence": "plans/260925-documentation-authority-unification/reports/phase-06/same-path-binding-blocker.json records 48 identical mirror carriers, four raw-log carriers and the 12 prior ownership failures. Plan section 3 item 10 already states evidence is not authority. The owner authorized this narrow exception; frozen rule text and extractor identity are unchanged."
+    },
+    {
+      "id": "v2.6-001",
+      "ownerDecision": "8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de",
+      "change": "Add candidate-native-content to the reverse-closure receipt classes. Substantive candidate-native units require committed independent acceptance of the shown text as true and current against cited current code or behaviour. Stale or false content remains open until corrected. The three existing classes and all other invariants are unchanged.",
+      "evidence": "Owner amendment A11 and committed review-2rework-classifications.md at 8e2fc315f identify 55 substantive units rejected under the prior three classes. candidate-content-verification.json records failing-before and passing-after evidence. Receipt proof, committed report, session independence, unit and shown-text digest binding remain mandatory."
     }
   ]
 }

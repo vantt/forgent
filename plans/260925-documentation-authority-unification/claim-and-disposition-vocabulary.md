@@ -141,3 +141,6 @@ Amendment 2.5-001 records the additive [non-authority carrier exception](minimum
 | validator | [scripts/check-doc-constitution.mjs](../../scripts/check-doc-constitution.mjs) |
 | migration plan | [plan.md](plan.md) |
 | documentation governance | [docs/doc-governance.md](../../docs/doc-governance.md) |
+
+Amendment 2.6-001 adds `candidate-native-content` only to the reverse-closure receipt channel, as authorized in owner amendment A11 (`8dd0140ce`). A committed independent report must check the full shown content against current code or behaviour with file:line or command evidence and accept it as true and current. A stale or false unit stays open until corrected. No existing enum definition, disposition, claim kind, document authority or prior receipt class changes. The constitution records the same additive amendment; tests-first proof is in `reports/phase-06/candidate-content-verification.json`.
+
