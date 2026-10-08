@@ -41,7 +41,8 @@ Why the current plan did not finish: the definition of done was "all seven live 
 - Any patch lands under dispatch, herdr or confinement.
 - `--context-ref` gains a second field.
 - The skill reads or writes run state.
-- A third definition appears.
+- Any definition branches, or has a step that decides which step runs next.
+- Any definition beyond the two named above (main and reopen) is added without the owner's prior approval, even a linear one. The limit is for this advisory scope only; it is a tripwire against continuation graphs coming back, not a cap on the platform (a future communication form that is one linear YAML stays welcome with approval).
 - M is not closed by the end of 2026-10-10.
 
 ## The single live run that decides done

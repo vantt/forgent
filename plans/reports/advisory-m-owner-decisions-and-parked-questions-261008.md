@@ -27,7 +27,7 @@ What an upfront composition would give: fewer gaps found late. What it cannot gi
 
 Options to weigh later (none chosen):
 - A. Framing outputs a required "expertise needed" field; the owner confirms it at a gate before shaping. Cheap, but adds a human round trip at the start, against the "release the human" priority.
-- B. The skill (lead) picks one of a few registered definitions or panelist params before starting the workflow. No runtime change, but it conflicts with M's kill rule "a third definition appears".
+- B. The skill (lead) picks one of a few registered definitions or panelist params before starting the workflow. No runtime change, but it needs the owner's approval under M's rule on extra definitions (the chair verdict wrote this as "a third definition appears"; the handoff note now states it as branching or unapproved definitions).
 - C. Seat params are taken from framing's output. Most flexible, but needs a new contract (a step output feeding seat params) and risks becoming a sequencer.
 
 Unresolved: whether the seat set differs enough between topics to justify any of A to C, or whether three fixed viewpoints plus the close-gate field is enough. Test this with the first M live run on `mcp-skill-hub`.
