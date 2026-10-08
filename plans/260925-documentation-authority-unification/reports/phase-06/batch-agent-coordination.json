@@ -1,12 +1,23 @@
 {
   "version": 1,
-  "status": "ready-for-review",
+  "status": "rework-blocked-on-owner-contract",
   "authorSession": "codex-session:1@2026-10-08",
   "reviewRelease": "review-packet-2.json",
   "generatedRoleCorrection": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
   "sourcePin": "76585861f718c7ef0dd6150d9b92a7c7baaa3ec4",
   "candidatePin": "0a41d793e60631aa9073c73a941f641548862b6c",
   "decisionDataPin": "576f9efea72de92d4191eb295afd9b2349bbb99a",
+  "currentRework": {
+    "request": "review-request-2-rework.md",
+    "evidence": "review-rework-evidence.json",
+    "candidatePin": "1f4f0b06274fa95fe94f10e904e1ff12a2898ef4",
+    "reviewedManualRows": 1329,
+    "pendingManualRows": 106,
+    "unitExactRows": 2721,
+    "blockedSamePathBindings": 52,
+    "candidateReverseOpen": 182,
+    "batchClosed": false
+  },
   "sourceStats": {
     "sourceFiles": 937,
     "sourceRows": 17034,

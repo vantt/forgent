@@ -1825,11 +1825,6 @@
           "targetUnitDigest": "9de89ba1e3d0041ccd71eb4508e8806e93268769432e2517b0fdf3741af841e0"
         },
         {
-          "claimId": "claim_3238388ff937f26d91eecab6c9c58e0b",
-          "sourceUnitDigest": "a58348d7b032704ad44d51edf3d8a7e3fddfa659caa28ba2ed098ef30a95cd66",
-          "targetUnitDigest": "a58348d7b032704ad44d51edf3d8a7e3fddfa659caa28ba2ed098ef30a95cd66"
-        },
-        {
           "claimId": "claim_5ed49b91bad7a47429791b3748b6fb16",
           "sourceUnitDigest": "fb29c1bf50fbee2132826f5e4b9409b39903a19b2025eecf0a73d8297efed3f5",
           "targetUnitDigest": "fb29c1bf50fbee2132826f5e4b9409b39903a19b2025eecf0a73d8297efed3f5"

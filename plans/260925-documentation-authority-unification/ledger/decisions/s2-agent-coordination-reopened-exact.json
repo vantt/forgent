@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-reopened-exact",
+  "authorSession": "codex-session:1@2026-10-08",
+  "authorshipRequired": true,
+  "sources": [
+    "docs/architect/agent-coordination/proposals/dag-request-scheduler.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_3238388ff937f26d91eecab6c9c58e0b",
+      "sourceUnitDigest": "a58348d7b032704ad44d51edf3d8a7e3fddfa659caa28ba2ed098ef30a95cd66",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+      "targetAnchor": "unheaded-block-60",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "rationale": "Carry the complete legacy response-contract introduction at the corresponding introductory block, retaining the unchanged RunResult status/confidence rule. Added in candidate explicitly marks materialized as an implementation-era enum extension. This added label changes the native target digest, so the former script exact proof is removed and this row requires independent ordinary review; no script or previous reviewer approval is carried forward."
+    }
+  ]
+}

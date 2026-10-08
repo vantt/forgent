@@ -11044,9 +11044,9 @@
       "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
       "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
       "evidence": [
-        "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
-        "Current members [{\"path\":\"docs/architect/agent-coordination/contracts/README.md\",\"blob\":\"9e0b3273446764a113cd057d9cd22ea2b2452174\"},{\"path\":\"docs/platform/agent-coordination/contracts/README.md\",\"blob\":\"301b850f3c739185e7a611cf373741c88fcd58bd\"}]",
-        "Member set sha256 187d8c39fd973edb44a9cb1a1f3b576c24267196ea2021a798f22289625e3361",
+        "Candidate pin 1f4f0b06274fa95fe94f10e904e1ff12a2898ef4",
+        "Current members [{\"path\":\"docs/architect/agent-coordination/contracts/README.md\",\"blob\":\"9e0b3273446764a113cd057d9cd22ea2b2452174\"},{\"path\":\"docs/platform/agent-coordination/contracts/README.md\",\"blob\":\"12c825c0e88e2c383b80dc38680662b6dd3c5835\"}]",
+        "Member set sha256 b03461ecb43671b54f2143ff9aaa35149afc4338c8f5362efd31740643a1f9c4",
         "Full source-row mapping in batch-agent-coordination.json; manual approval pending",
         "Independent group review pending"
       ]
@@ -11122,11 +11122,11 @@
       "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
       "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
       "evidence": [
-        "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
-        "Current members [{\"path\":\"docs/architect/agent-coordination/proposals/README.md\",\"blob\":\"5c7881fe9bf925af2b4838b087c8e84c82fd25f7\"},{\"path\":\"docs/platform/agent-coordination/proposals/README.md\",\"blob\":\"b4e10e354dafb534fe8fac608604e8c6cd246ecb\"}]",
-        "Member set sha256 16f94b12b54b5d8ac6eb8ce3a3e12d6f30e94be8baad732e5276f5c5d3cf034a",
+        "Candidate pin abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1",
+        "Current members [{\"path\":\"docs/architect/agent-coordination/proposals/README.md\",\"blob\":\"5c7881fe9bf925af2b4838b087c8e84c82fd25f7\"},{\"path\":\"docs/platform/agent-coordination/proposals/README.md\",\"blob\":\"c857b8e5ccba14598d8cae477b72d30af2f1ae52\"}]",
+        "Member set sha256 9faa9456b8b214f0f4e2ff458b4569b805623f1e01c5084bf9893fb997301b6c",
         "Full source-row mapping in batch-agent-coordination.json; manual approval pending",
-        "Independent group review pending"
+        "Prior independent report bb03cab52; current target-member blobs changed, updated evidence requires re-review"
       ]
     },
     {
@@ -11161,11 +11161,11 @@
       "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
       "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
       "evidence": [
-        "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
-        "Current members [{\"path\":\"docs/architect/agent-coordination/verification/README.md\",\"blob\":\"1e5d490e5773d71faf13e8dc616c44d460634e1d\"},{\"path\":\"docs/platform/agent-coordination/verification/README.md\",\"blob\":\"56d5722de279f1c1291e40f6ee41cc1cccec3ac8\"}]",
-        "Member set sha256 103389637c95b7bf3719c63530882b2764efb62203319486d4dd944edf32080d",
+        "Candidate pin abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1",
+        "Current members [{\"path\":\"docs/architect/agent-coordination/verification/README.md\",\"blob\":\"1e5d490e5773d71faf13e8dc616c44d460634e1d\"},{\"path\":\"docs/platform/agent-coordination/verification/README.md\",\"blob\":\"eae81ccbc4b33f8506ded7bc3bed8efd2a7dd252\"}]",
+        "Member set sha256 c4b0292e27e439c42e2d870f6962e73637076b96c9897249598e274856fb400f",
         "Full source-row mapping in batch-agent-coordination.json; manual approval pending",
-        "Independent group review pending"
+        "Prior independent report bb03cab52; current target-member blobs changed, updated evidence requires re-review"
       ]
     },
     {
@@ -11499,11 +11499,11 @@
       "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
       "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
       "evidence": [
-        "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
-        "Current members [{\"path\":\"docs/architect/agent-coordination/proposals/dag-request-scheduler.md\",\"blob\":\"6bcb1ca5da22fcfa3de2bffd2c4b7cb521745bed\"},{\"path\":\"docs/platform/agent-coordination/proposals/dag-request-scheduler.md\",\"blob\":\"e217f147a11f1d22d045c76875b3e7d22c8726e4\"}]",
-        "Member set sha256 373c29e4def8a0857c0a6efb05f9bbf45f6683a678206f8fe513fe2fe7b6eb1d",
+        "Candidate pin abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1",
+        "Current members [{\"path\":\"docs/architect/agent-coordination/proposals/dag-request-scheduler.md\",\"blob\":\"6bcb1ca5da22fcfa3de2bffd2c4b7cb521745bed\"},{\"path\":\"docs/platform/agent-coordination/proposals/dag-request-scheduler.md\",\"blob\":\"330f18b53963605a834d294676280d6a6f19751d\"}]",
+        "Member set sha256 97c6cac04721d819164b2d60b151fadcd50fde69164dfc03ef0113223d3026f5",
         "Full source-row mapping in batch-agent-coordination.json; manual approval pending",
-        "Independent group review pending"
+        "Prior independent report bb03cab52; current target-member blobs changed, updated evidence requires re-review"
       ]
     },
     {
@@ -12042,8 +12042,8 @@
     {
       "kind": "semantic",
       "key": "agent-coordination:stage-operation-taskspec-skill-relationship",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Byte-identical source/platform SVG pair, not different metadata blobs: both members are Git blob d9b6d34f75a79b5910909a555c32298e922bdbfb. The canonical semantic diagram owner is docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg; the pinned source remains immutable until cutover.",
+      "rule": "One mapped diagram owner with byte-equal whole-file preservation; this title-based semantic-group record describes a duplicate, not a normative conflict.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/architect/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg\",\"blob\":\"d9b6d34f75a79b5910909a555c32298e922bdbfb\"},{\"path\":\"docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg\",\"blob\":\"d9b6d34f75a79b5910909a555c32298e922bdbfb\"}]",
@@ -12367,8 +12367,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:1-context-investigator",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator.json\",\"blob\":\"ac7b6d79eb94db4c1a0a64382b38e1cd14a504c1\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator.json\",\"blob\":\"c3ecddb8953510a9341e74cd120908868c43cb81\"}]",
@@ -12380,8 +12380,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:1-context-investigator-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator-raw.log\",\"blob\":\"1aa02570ba482befb4b31ca428cd5533cc2c4131\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator-raw.log\",\"blob\":\"f59fc333882449d5498ba79700b2f27a10274ca0\"}]",
@@ -12393,8 +12393,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:1-person",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/human/1-person.md\",\"blob\":\"cbf471ddee4e6d0decc524aca5233d9b13f5422a\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/human/1-person.md\",\"blob\":\"3dcdfe0bbf3f0503cf603067a3ef4e7d22a23d25\"}]",
@@ -12406,8 +12406,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:2-lead-advisor-interpretation",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/2-lead-advisor-interpretation.json\",\"blob\":\"ca528e6191ba3901a2c1367bab9e69d94dd2b171\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation.json\",\"blob\":\"469ac74b0f51841ca994e621975acd33a326169b\"}]",
@@ -12419,8 +12419,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:2-lead-advisor-interpretation-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/2-lead-advisor-interpretation-raw.log\",\"blob\":\"fefe3e3dcf4603cc25cd32d4f7d7a1e0959bcc23\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log\",\"blob\":\"20798e890ee7ecf99b694a2efec209f8e9992e86\"}]",
@@ -12432,8 +12432,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:3-system-shaper",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/3-system-shaper.json\",\"blob\":\"4d6e20751b2a5ac444a9f4e1bd6073dc3fd78423\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/system-shaper.md\",\"blob\":\"da5e97a9c37255eff88b8abb47a69787077aaf29\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper.json\",\"blob\":\"7f7e7967c26a0997027a4d96050c7f94a7f0c707\"}]",
@@ -12445,8 +12445,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:3-system-shaper-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/3-system-shaper-raw.log\",\"blob\":\"48d3c332d0773ae224e5529c52e0ab6f25dfa343\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log\",\"blob\":\"512227079f74eb0ec5aea744285540d3a1a6b173\"}]",
@@ -12458,8 +12458,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:4-alternative-shaper",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/4-alternative-shaper.json\",\"blob\":\"87a9037a3a0608584cb77c7c65c82a78caca4cbc\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/alternative-shaper.md\",\"blob\":\"d182ad72349242d46f8144ce203ce71f1e73579b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/4-alternative-shaper.json\",\"blob\":\"84750db5cd441d0d427e1a7ad60f643e7bc5ea9b\"}]",
@@ -12471,8 +12471,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:4-alternative-shaper-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/4-alternative-shaper-raw.log\",\"blob\":\"f8cc4cfdf786f6c908a335367ebe10145727d585\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/4-alternative-shaper-raw.log\",\"blob\":\"38f6cd9bc029fad7ab169f4f52a904eeafd6fa7f\"}]",
@@ -12484,8 +12484,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:5-constraint-advocate",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/5-constraint-advocate.json\",\"blob\":\"d899288893f1110b4f07791663f7ec8478c2cce4\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/constraint-advocate.md\",\"blob\":\"71279e07d6be9a4131d10ef54b112890cf8ba724\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/5-constraint-advocate.json\",\"blob\":\"eafbd07fd4dd2b3d6537a592d24023896f377aab\"}]",
@@ -12497,8 +12497,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:5-constraint-advocate-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/5-constraint-advocate-raw.log\",\"blob\":\"902846b963238d96f6cbe4d2fa596b7688181c4a\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/5-constraint-advocate-raw.log\",\"blob\":\"ca871c56a045fe87c9ebd52c21ffcd1a4addc159\"}]",
@@ -12510,8 +12510,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:520195702bddc099",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/coordination/sessions/coord_r8b_live_proof/tasks/520195702bddc099.json\",\"blob\":\"a14361ff044d0c7f338303aff0a868afea4911ae\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/coordination/sessions/coord_r8b_recovery_attempt/tasks/520195702bddc099.json\",\"blob\":\"5367b5add6cc806d260e61779680c7ca84d0f5a8\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/coordination/sessions/coord_r8b_followup_codex_pi/tasks/520195702bddc099.json\",\"blob\":\"e03347b1ee2133459ad4a4b82185a126d6659f39\"}]",
@@ -12523,8 +12523,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:6-architecture-critic",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/6-architecture-critic.json\",\"blob\":\"251cfe86436210b7ce426fa89aa642dd8a1b7d9b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/architecture-critic.md\",\"blob\":\"1dfdd1aad4d1145e9e9a90d40e1e4ccf8faaba84\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/6-architecture-critic.json\",\"blob\":\"bab13d2e83cd87765e9025ac808afc4311e04dfd\"}]",
@@ -12536,8 +12536,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:6-architecture-critic-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/6-architecture-critic-raw.log\",\"blob\":\"70baa25a899b28a6ca05f4a21f0d0d115ff237f2\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/6-architecture-critic-raw.log\",\"blob\":\"3125e998d5823995f74c722eb25b8faa7618480d\"}]",
@@ -12549,8 +12549,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:7-synthesizer",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/7-synthesizer.json\",\"blob\":\"e40c1553cb5d41371633d657d370fee737aad883\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/synthesizer.md\",\"blob\":\"7f3dd51d9ab8d311d638b4bcdc4d7eb1b6b50d5b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer.json\",\"blob\":\"f8c41cf60177ad158fcaa340687b4cbb0a1f1d61\"}]",
@@ -12562,8 +12562,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:7-synthesizer-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/7-synthesizer-raw.log\",\"blob\":\"c78ea5ef04f1fc25bfdac446e7c94b8675d7d12b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log\",\"blob\":\"6328335dcb51b256668d7587c3b7e21a03e06588\"}]",
@@ -12575,8 +12575,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:8-lead-advisor-explanation",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/8-lead-advisor-explanation.json\",\"blob\":\"ce8cece0b34f9f20d44cdb329e3bd16a956f5acc\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/8-lead-advisor-explanation.json\",\"blob\":\"24583b4bfe9e88f005bb820dbb99ee9bb7e67043\"}]",
@@ -12588,8 +12588,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:8-lead-advisor-explanation-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/8-lead-advisor-explanation-raw.log\",\"blob\":\"c10d4b7bd0a1d3f6924e49cc764e86a806ee44a0\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/8-lead-advisor-explanation-raw.log\",\"blob\":\"219fa55ff16134c77ce30a343f8ed9dc73d67ee2\"}]",
@@ -12601,8 +12601,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:9-lead-advisor-dialogue-1-impact",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/9-lead-advisor-dialogue-1-impact.json\",\"blob\":\"f8ce43511fe807dab4b0c827020f8b1ccb6e1fe3\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact.json\",\"blob\":\"12eb0e2d4c5eebc0305a72add258dc32e3b83b5a\"}]",
@@ -12614,8 +12614,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:9-lead-advisor-dialogue-1-impact-raw",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/9-lead-advisor-dialogue-1-impact-raw.log\",\"blob\":\"70f7a9d5d47a3472b5c6385d650e55ac65354030\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log\",\"blob\":\"3dd02175966e34d0e9d272b95e3517da10c4e418\"}]",
@@ -12627,8 +12627,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:agent-result",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/agent-result.json\",\"blob\":\"8aeb8b011412650b0d2dd3368614b96c5fbccb09\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/agent-result.json\",\"blob\":\"08cdceab998393f1f8d4728f190ea2703903f69e\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/agent-result.json\",\"blob\":\"86608b3def2ae66ce5678d3242b4e67f1ba6af77\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/agent-result.json\",\"blob\":\"055d34d03e277b20123da74f0be23c2adec54912\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/agent-result.json\",\"blob\":\"9502a7734467c0a5060de06a645718f428fb3315\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/agent-result.json\",\"blob\":\"b0ecd7defe380d5fcc3b959be581d86b68065d76\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/agent-result.json\",\"blob\":\"857c27925e7a20149c865d90dbe5164decfecad3\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/agent-result.json\",\"blob\":\"9937f3171e3de5c468f2f9880d57cbb724e077cc\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/agent-result.json\",\"blob\":\"8c24c50516ff054098958900eb25eb88fb8c7d5c\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/agent-result.json\",\"blob\":\"9ef12e294b135add34979f2c63b4ee97e69507d4\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/agent-result.json\",\"blob\":\"3bf4b87e94d5c819d731804f41cb0c6e5f3925b1\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/agent-result.json\",\"blob\":\"696c01d89dc96d50c03a7c15604d94fa65bd7e2d\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/agent-result.json\",\"blob\":\"6941a4a0481eec10ce11e37ca49edf7e0a306e4a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/agent-result.json\",\"blob\":\"7b41fefbe1b0ca6f58982d727fabb6440ce7fae9\"}]",
@@ -12640,8 +12640,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:alternative-shaper",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/prompts/alternative-shaper.md\",\"blob\":\"5820fa05427bc08394c8f41bda6b0c45f664db35\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/alternative-shaper.md\",\"blob\":\"f36c293b2f6b614b71efdbbb00ec825fa326f7cd\"}]",
@@ -12653,8 +12653,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:architecture-critic",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/prompts/architecture-critic.md\",\"blob\":\"ce735f86dd698d8a0bfe97dc45c23178cb979a0e\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/critiques/architecture-critic.md\",\"blob\":\"f0d9d3cf42bc923cb3cb10a23fdca14e1d9423af\"}]",
@@ -12666,8 +12666,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:assignment",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/assignment.json\",\"blob\":\"6e48cb1043b87e154b1883ed963081bb1be595b3\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/assignment.json\",\"blob\":\"945e7035837c52e935a3394a0bb496d115cb3f4c\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/assignment.json\",\"blob\":\"8ab1f5fcdd0a1320c2e41c9b4ea5fdd0c2340223\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/assignment.json\",\"blob\":\"9dd2e3b1584f75fa8ef9b4d687878c05b09a67ed\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/assignment.json\",\"blob\":\"906887d13c582da50c432fa5c0cdcada86dd5590\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/assignment.json\",\"blob\":\"267a3fd14152e209c4b8585b4013babcf554ae5f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/assignment.json\",\"blob\":\"4989ea034819655bec7ff49d794cec8cd6b38bef\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/assignment.json\",\"blob\":\"310b7bb58d8b75a542a960c11a43d4123997598e\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/assignment.json\",\"blob\":\"0c17a48cb211e4598f62d5f9f2b2a0f0760ff023\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/assignment.json\",\"blob\":\"d94cb0ca850d65c6f098f0058b322a36ddae9c5f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/assignment.json\",\"blob\":\"21def375f620ff44a074053b1ff839fa54021c26\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/assignment.json\",\"blob\":\"8290455915c9602ed352819d80b4644188306030\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/assignment.json\",\"blob\":\"398dbe9957ca1f682ff76771a8bf5dc830244940\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/assignment.json\",\"blob\":\"46632edcb62865f30e8aada76414037b0c68dbeb\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/assignment.json\",\"blob\":\"6beba742470054bff0649b49a827a5aded4e8b94\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/resolved-value-evidence/op_001/assignment.json\",\"blob\":\"babdcca4ef1fa774a8e7f4974c3fbd16fdc5690c\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/resolved-value-evidence/op_002/assignment.json\",\"blob\":\"6505417209cb8ba234a4392075cbd4696691761f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/resolved-value-evidence/op_006-distinguishable-project-value/assignment.json\",\"blob\":\"b20af64b4973c911b230f3215fa9e61669f59f22\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/assignment.json\",\"blob\":\"1c2f6191c27470d7e0c0217c3bfcc1284dd1a991\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/assignment.json\",\"blob\":\"8ad1db33ed76e7e4773f6a8067b10c72936b24e0\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/assignment.json\",\"blob\":\"134d783f3f5f27fea044e240de544c23edee1427\"}]",
@@ -12679,8 +12679,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:baseline-full-test-run",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/baseline-full-test-run.log\",\"blob\":\"b29f85bf3e788dc23ce867e7c89411c8c3d11de7\"},{\"path\":\"docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/proofs/baseline-full-test-run.log\",\"blob\":\"35fac275486eb478c213b9db59b3f41a6fe17fdb\"}]",
@@ -12692,8 +12692,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:close",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/close.json\",\"blob\":\"292bd2aae1ae8466d29ef93ee982dca7a1f89ede\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/close.json\",\"blob\":\"964a528e05a735d72705e3a774fd917b055cdddc\"}]",
@@ -12705,8 +12705,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:codex-cli-live-proof",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/codex-cli-live-proof.log\",\"blob\":\"037c71c42390b1f22d20842ddde06a044561e3f9\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-live-proof.log\",\"blob\":\"ffbcee87b05a21516c8a9db19c58088332204472\"}]",
@@ -12718,8 +12718,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:command-stdout",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/command-stdout.txt\",\"blob\":\"f3f2c987eb86274e97ca7077b1e63732fa4087e4\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/command-stdout.txt\",\"blob\":\"36e16b0fb965d79475305c873c6ae2e4f1d29d93\"}]",
@@ -12731,8 +12731,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:constraint-advocate",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/prompts/constraint-advocate.md\",\"blob\":\"d8902f8180ef8705b6d067f393c0426fd7e1346b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/constraint-advocate.md\",\"blob\":\"2806a370809d0b3a67e5062d50bc319c89cafe09\"}]",
@@ -12744,8 +12744,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:contract",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/contract.json\",\"blob\":\"f100cb26dd7ab467e09a7f969af509bbfc60f183\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/contract.json\",\"blob\":\"1ec207d7d2d2e05f84dfd54f5c4f68ba28608834\"}]",
@@ -12757,8 +12757,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:current-cell",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md\",\"blob\":\"a88c6aa6df4a1af8154d62fe77a4b50b5aa3efa9\"},{\"path\":\"docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md\",\"blob\":\"c6d6114741a15c86138321c06135f0738d9fbbc3\"},{\"path\":\"docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md\",\"blob\":\"500f389ccf4fe8ee9fe149a66917372da4f69510\"}]",
@@ -12770,8 +12770,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:dispatch",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"}]",
@@ -12783,8 +12783,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:dispatch-plan",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/dispatch-plan.json\",\"blob\":\"536885dabd283701603e65938ecb64abe709677b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/dispatch-plan.json\",\"blob\":\"0abb38cd247ae37d4e5c65ad150dbb3be8730b5f\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/dispatch-plan.json\",\"blob\":\"2109eab593f1ffd44afb6bf98e3d491efbbd9f8e\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/dispatch-plan.json\",\"blob\":\"b01d79fd4af0c828dc1bebf8e422395c17fc75b6\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/dispatch-plan.json\",\"blob\":\"376b0516ef21ff5a790553a10912e8a45ff8fdb0\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/dispatch-plan.json\",\"blob\":\"94a519497310e44fe5ced0229aca37d5c8f86dc9\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/dispatch-plan.json\",\"blob\":\"2931f1cf1250e9d71f9b6f718616fd5f3ab2de48\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/dispatch-plan.json\",\"blob\":\"375dcfe5f5f0e04d234167062a9303ca316e58da\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/dispatch-plan.json\",\"blob\":\"0443e7cd6ef2d2eecd7eadfaca6674ec1ba19a7f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/dispatch-plan.json\",\"blob\":\"64155c436e6af9eaa921eded11827432a7ee7bf7\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/dispatch-plan.json\",\"blob\":\"c4aefd933cad984209af8927ab9d0ba75603ca00\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/dispatch-plan.json\",\"blob\":\"f24fd26031c96c0587f40cb57001c1ff69803c58\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/dispatch-plan.json\",\"blob\":\"de5dabbc70de1dcc4f9eb4481703e50f659f53d1\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/dispatch-plan.json\",\"blob\":\"a0c11673e54d1c3edc3dbff0ef70f9182abd2d61\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/dispatch-plan.json\",\"blob\":\"19558808a0c7f9dfe22c1b80078bdadcd4ea83e2\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/dispatch-plan.json\",\"blob\":\"d2aa80b0edb4f30a8a2f5a13585f3cfb2f408900\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/dispatch-plan.json\",\"blob\":\"d9863e8f7fc9d969f602acb47e523e960e65718b\"}]",
@@ -12796,8 +12796,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:driver",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/driver.mjs\",\"blob\":\"5c42c47ac11f28f11cdb6bd42a6156faa574122a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/driver.mjs\",\"blob\":\"4fe8ee847a17c3b6024e926478563e041c5da90b\"}]",
@@ -12809,8 +12809,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:events",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/session-artifacts/events.jsonl\",\"blob\":\"f3588c32140d1ca390cf073c7e6c9fc5298b57ad\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/coordination/sessions/coord_r8b_live_proof/events.jsonl\",\"blob\":\"6db6bfeb2f26a0f5229d6041ae1d8acff117b14c\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/coordination/sessions/coord_r8b_recovery_attempt/events.jsonl\",\"blob\":\"64e0e7ccc7f9ffa78a65bc037294896e7a33b471\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/coordination/sessions/coord_r8b_followup_codex_pi/events.jsonl\",\"blob\":\"fdae0c55a99dd5717884a569d3b6710fda09df2d\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpxa8e_mkugxx/events.jsonl\",\"blob\":\"42c3f0d7c0ad451283363636dd41de4668648233\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpy4yb_1zfb5k/events.jsonl\",\"blob\":\"690725d98663dff4da53e66ae4d3a78bacd0e1da\"}]",
@@ -12822,8 +12822,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:evidence",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/evidence.json\",\"blob\":\"b937e4d35a6f3e8cd42c303139a61e5dc4d812cb\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/evidence.json\",\"blob\":\"b98033874e6aa7b97140114a6f3567c52c65893c\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/evidence.json\",\"blob\":\"4690c9dbf1f5c8054ee129e13f7d1f7eeeaa2852\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/evidence.json\",\"blob\":\"ba6c0626c221177664e195e770104c767ebfb2c9\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/evidence.json\",\"blob\":\"ca3ca94f39a7efa743d29450f919ca2a8bada160\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/evidence.json\",\"blob\":\"c941744689e52b3a48109305c4b102588f5758f9\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json\",\"blob\":\"1645db411eabf6408b71647cb953a4703dd76355\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/evidence.json\",\"blob\":\"7a9a6da5c5c98043ef032922b12a804cfabff634\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json\",\"blob\":\"1645db411eabf6408b71647cb953a4703dd76355\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json\",\"blob\":\"1645db411eabf6408b71647cb953a4703dd76355\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/evidence.json\",\"blob\":\"0e6d80aac453b304d5d932cd2d876178e4727117\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/evidence.json\",\"blob\":\"a80f52406ca904468115c63189d0721514c2e90b\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/evidence.json\",\"blob\":\"9b915764186ab3565457be5a646d46ec6eb3b1c0\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/evidence.json\",\"blob\":\"218b7214ea10a2e59ce81558451962e4bbc50da8\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/evidence.json\",\"blob\":\"63d11491be4c2f3a10dd5dae1e7737c393361228\"}]",
@@ -12835,8 +12835,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:exit",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/exit.json\",\"blob\":\"29267a8af651c7fb1e362236b4fa8c993a88514e\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/exit.json\",\"blob\":\"aa1dcb5cb5f250defc1b20986f6c71814efaeb87\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/exit.json\",\"blob\":\"efa05b296abc0c215e563fba9a82a1474a6630e9\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/exit.json\",\"blob\":\"53cb3004ec9e0f4e3e74bfc8c1ccb813c567b275\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/exit.json\",\"blob\":\"621d4c5ff3d4b44e24becae0628c59076cd2960d\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/exit.json\",\"blob\":\"fccbc4d0c80e63d2cebcd988c9b10d25dcc0f384\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/exit.json\",\"blob\":\"322d4d388b1cfa948ef19b735de2d87401ac88c5\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/exit.json\",\"blob\":\"06a7b726ad27627afd7ec11706fe7e454f22f069\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/exit.json\",\"blob\":\"436af198063d9efb03a38bcdf05987280ac2d5e0\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/exit.json\",\"blob\":\"d5874f04b164c98b553b42869cb6e19ff23694f8\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/exit.json\",\"blob\":\"b4197058009e443ee651f66448d1c7536324f727\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/exit.json\",\"blob\":\"60df02848112e79ddabc04dfb7eb5aa816343c33\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/exit.json\",\"blob\":\"73088292f729b94e487c8a2379f8ed3eb3a85c5f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/exit.json\",\"blob\":\"bfab6220f851eea322099bcd85de6ab7f0e0db4f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/exit.json\",\"blob\":\"911a0d656409afcb3c992fe023bade6fa335ab46\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/exit.json\",\"blob\":\"e203cf2d8d531b57c24983c21a76a0088bb987ec\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/exit.json\",\"blob\":\"7b3339d21b20a0108940d4934e252c6b326b2fb0\"}]",
@@ -12848,8 +12848,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:final-outcome-of-this-advisory-session",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/dialogue/2-response.md\",\"blob\":\"3fda59633f67f0bbdad81f681dcc32e4651545b1\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-response.md\",\"blob\":\"66c24937dab8eb507fe214802b69070135354192\"}]",
@@ -12861,8 +12861,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:fix-1",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/fix-1.json\",\"blob\":\"1e8053a929c00a1d4f7ba63a000ca508f161ac5b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/fix-1.json\",\"blob\":\"4098876c0290bdc74479db64a7f3da59e0648b08\"}]",
@@ -12874,8 +12874,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:focused-suite-run",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P02.1/focused-suite-run.log\",\"blob\":\"746e0a5ccb272e6b0020ad82a9130724058cc4de\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/focused-suite-run.log\",\"blob\":\"a4114044b58be7c1f8351ddf3f44405d74f9d1f8\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/focused-suite-run.log\",\"blob\":\"ce6ae5c609fe4cc33dd8f5e5a7ef74dbba80633b\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/focused-suite-run.log\",\"blob\":\"4a6c8b734774c54eba459827a2596befd2530c43\"}]",
@@ -12887,8 +12887,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:full-test-run",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/full-test-run.log\",\"blob\":\"cc336035577143870f19a740941f003de7adb6a4\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/full-test-run.log\",\"blob\":\"ba67ec930423e760e73665c1bcc0e4b3aa769d22\"}]",
@@ -12900,8 +12900,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:git-status-after",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt\",\"blob\":\"ee78cde3ac63322d93a24362e74fc32e9c51bb54\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/git-status-after.txt\",\"blob\":\"b9ba8becef6a74273e160c4d7ceaa2854f69226a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/git-status-after.txt\",\"blob\":\"e508aa49b60abfcd55b310500a6254b6ff620f99\"}]",
@@ -12913,8 +12913,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:git-status-before",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt\",\"blob\":\"ee78cde3ac63322d93a24362e74fc32e9c51bb54\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/git-status-before.txt\",\"blob\":\"80588f7a1cd4ea80c0869ee54869d2609fc34d72\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/git-status-before.txt\",\"blob\":\"ff69e0562683f7f2d3c5145ecd4437c4b95a1c7f\"}]",
@@ -12926,8 +12926,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:glm-cli-live-proof",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P00.3/glm-cli-live-proof.log\",\"blob\":\"7aeec356a3fbfc8ce21cc7adb11d702d2199a1df\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/glm-cli-live-proof.log\",\"blob\":\"e5d2de86c7ab99dab187bf2dc98854af6d0da1a7\"}]",
@@ -12939,8 +12939,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:lead-advisor-dialogue-1-impact",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/prompts/lead-advisor-dialogue-1-impact.md\",\"blob\":\"444b2062816e4779bacd808fb9020091cb3d71b2\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/lead-advisor-dialogue-1-impact.md\",\"blob\":\"cfcbbaa0431ef2f8f0b869415c5905050e863070\"}]",
@@ -12952,8 +12952,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:lead-advisor-explanation",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/prompts/lead-advisor-explanation.md\",\"blob\":\"57d547dcb0cda84d181f4a02af0775f45924e1f8\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/prompts/lead-advisor-explanation.md\",\"blob\":\"4bcc39eab0416d3b46b20d8d6643021c1045247f\"}]",
@@ -12965,8 +12965,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:open",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P00.1/requests/open.json\",\"blob\":\"a0a6031d51ff4e75e666b4b655f723b5280899e2\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.1/requests/open.json\",\"blob\":\"275aa453e8862d1d59e28b8e272eac0b700ef6c6\"}]",
@@ -12978,8 +12978,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:r8-live-proof-driver",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r8-live-proof-driver.mjs\",\"blob\":\"a091a21aee63649e32e7f698e0ee7c90c7a23191\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-driver.mjs\",\"blob\":\"7bedfeaed242162d5a1a90e07ad733840261b0e5\"}]",
@@ -12991,8 +12991,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:r8-live-proof-followup-serial",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-followup-serial.log\",\"blob\":\"27f9023ba99eef52bf99595a8e10a98e148dc267\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-followup-serial.mjs\",\"blob\":\"dd16f39f02003bf68cb54ca18aa91b9ae1763732\"}]",
@@ -13004,8 +13004,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:r8-live-proof-run1",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r8-live-proof-run1.log\",\"blob\":\"b755e957dc9bb8fd1979c2525432438e11af05ec\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-run1.log\",\"blob\":\"a8d8dd1d44fbefa785599ea53aa962fe982fdfb0\"}]",
@@ -13017,8 +13017,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:redteam-findings",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/redteam-findings.json\",\"blob\":\"8863d5b975df12cbefebf47338d1cb623236fb12\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/redteam-findings.json\",\"blob\":\"5a6814c14a5cc8b0177fd7465e8e9de43a0d4ff4\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/redteam-findings.json\",\"blob\":\"8274b2d6e48777ceab8e83b45d2b3bf84b8e2e41\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/redteam-findings.json\",\"blob\":\"011b24450034db684d251bc17271689078250b07\"}]",
@@ -13030,8 +13030,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:result",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/result.json\",\"blob\":\"c270caa7e6e40479978e68c3cce84313b2aad918\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/result.json\",\"blob\":\"b8603401e24cd18dc87d466127e1c8ff8477dc42\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/result.json\",\"blob\":\"5864fb1b84d490ac627288363ed14a3d6a81d45d\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/result.json\",\"blob\":\"cec59febb089d7a0c0f79061a651600d58b25ffe\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/result.json\",\"blob\":\"b1bbb5261e99605f52c56302659cbe4fabe2817b\"},{\"path\":\"docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-audit/result.json\",\"blob\":\"daeb6669de59c58d0efcc0ce7bf89c99fd267087\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/result.json\",\"blob\":\"24016e0c191b600aee14c304ee62105aae73ea4a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/result.json\",\"blob\":\"7c7632ac5ee43bb8fd1785fea18000fc5641a836\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/result.json\",\"blob\":\"5fb8564c68ad8efda8d54c6bfe4eb1602c87ac2b\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/result.json\",\"blob\":\"054d430b221e27222cf455a6005d0d960f37f22b\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/result.json\",\"blob\":\"f2818c5db7cf304703baa651d7f688ff4ff07e48\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/result.json\",\"blob\":\"a0fc0973bd2415b2126361cf65cee22c1f6c75d1\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/result.json\",\"blob\":\"dbe1d86d8aaeb812c02fe57d84504726ad7e74d2\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/result.json\",\"blob\":\"5e40aa555301708345b809db9a262afa35327e62\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/result.json\",\"blob\":\"a17f3393ad801ceb8cdce647532636225babc410\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/resolved-value-evidence/op_001/result.json\",\"blob\":\"d293f35ec31670bdde2bb02fb93ffd9b244ed751\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/resolved-value-evidence/op_002/result.json\",\"blob\":\"4606a4cbea81c32e59a10097504d0bacf84bb77a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/config-precedence/resolved-value-evidence/op_006-distinguishable-project-value/result.json\",\"blob\":\"f08f7d14203fc69bd2e887b73c7077f8ddc68ec7\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/result.json\",\"blob\":\"c8b547e12d512d4362b66ec7f50fdf0ea6ba11fd\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/result.json\",\"blob\":\"2f4ce1c1a3606790e4ee839c051de6068d526ffa\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/result.json\",\"blob\":\"4963cf2b92eddd80f979217864e51e415805d679\"},{\"path\":\"docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/result.json\",\"blob\":\"e6b1d20af9076946d2ee5bc0c578b770501db03f\"}]",
@@ -13043,8 +13043,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:reviewer-findings",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/reviewer-findings.json\",\"blob\":\"2d821b717365c9cadc09f54e6316cc4e3cd1a659\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-findings.json\",\"blob\":\"07028902a184f52c690e67a6030c9ca38cfefe86\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-findings.json\",\"blob\":\"2de173c6e45ba0e1059fc6ffd5409bfac47c90a6\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/reviewer-findings.json\",\"blob\":\"c075d9e50f2c176481e4685c49742fdc5ccd915e\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/reviewer-findings.json\",\"blob\":\"edb6679ab2d280abd3216a86e42d764ff6270fc5\"}]",
@@ -13056,8 +13056,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:run",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/run.json\",\"blob\":\"3e83b05ac12d2dcc7bc037630facc3f343233983\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/run.json\",\"blob\":\"9a046ac09e6caa7df2663330c5913ceac3a57df5\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/run.json\",\"blob\":\"fd433ae55b8e9840d82f31691b6c0a761064a912\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/run.json\",\"blob\":\"18f7ca6ee8f3241d57d519ccd5598617f88a40e0\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/run.json\",\"blob\":\"67e0f0c51449de183d1fc9cbd6e58ffdbfd4efab\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-1/runs-01/run.json\",\"blob\":\"674c1a5949ca9ecd96792db5b4548a00569b1c2a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/runs-01/run.json\",\"blob\":\"87307ace7f46c32c09835e7d6dbe488bb696fae3\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/run.json\",\"blob\":\"8058f1a5bffca978f3fcc4beed1fe7e7e7b2e98f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/run.json\",\"blob\":\"6746496a7b6e027fa4951846015d24cc5f58c566\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/run.json\",\"blob\":\"9c2507b13d4bd619cd191d86090ad4cbb43dbfd2\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/run.json\",\"blob\":\"5bce4938f4aff5d4a8933076c50c439aa6cf1519\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/run.json\",\"blob\":\"e2e685e45963483fda94bf7888c4673b6ab830c2\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/run.json\",\"blob\":\"9f266aa0b571b47616fc060bb2b449dd62729539\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/run.json\",\"blob\":\"0589ab0a171351e1ebc77e0b2f59a0874e5d320e\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/run.log\",\"blob\":\"6706f87485c8fa254d080b99c99a2c066f5dd8f4\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/run.log\",\"blob\":\"ef006b1a2378f051269eeae79a61c4c85926e591\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/run.json\",\"blob\":\"07e55feec9c10941b2a4afcbbebb5ecb0aa695ce\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/run.json\",\"blob\":\"3de2cdd078ba6197744e10540140e7a1eff04fb7\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/run.json\",\"blob\":\"ed45881dccd34c6798db57d542d25b1dd5d21d3c\"}]",
@@ -13069,8 +13069,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:run-v3-01",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-01.log\",\"blob\":\"61ddebb99090c69dc8b458d1361e9284fe824702\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-01.log\",\"blob\":\"c40ff5e92399e1b4eaece704de7e8b52a612995b\"}]",
@@ -13082,8 +13082,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:run-v3-02",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-02.log\",\"blob\":\"5e6d1b4f32af8f18fe8aad0c45bdd06b2a8d4e3a\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-02.log\",\"blob\":\"76f91abdd445617ae23a90fce3ef769d31c3510d\"}]",
@@ -13095,8 +13095,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:run-v3-03",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-03.log\",\"blob\":\"7ed4f586ad7b9820206853ba8e9eef15b04f9c71\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-03.log\",\"blob\":\"b769e6f9e72a8580b009ae5acc5067712a792ffc\"}]",
@@ -13108,8 +13108,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:run-v3-04",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v3-04.log\",\"blob\":\"418bbee591c3150e7b979a242c5762aef11b4df6\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/run-v3-04.log\",\"blob\":\"db4789c94d4b3d3b06e234a4e4fdf1e71c0cfd49\"}]",
@@ -13121,8 +13121,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:session",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/session-artifacts/session.json\",\"blob\":\"5b29b15dc640ab8f821af339f9165912ed56238f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/coordination/sessions/coord_r8b_live_proof/session.json\",\"blob\":\"e302b43e6eea87f247731d735670594013c8c33f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/coordination/sessions/coord_r8b_recovery_attempt/session.json\",\"blob\":\"71659b9786c8b3ff4140a3397e2d9515ce74827a\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/coordination/sessions/coord_r8b_followup_codex_pi/session.json\",\"blob\":\"16c8278b5bd9ae8e9c4ca93f61690c077958857c\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpxa8e_mkugxx/session.json\",\"blob\":\"78b67561239babdc58700b3890884ac7608d52a9\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/coordination-sessions/coord_mtjpy4yb_1zfb5k/session.json\",\"blob\":\"8e17a0f3c18ecf1d78b5ae6ee2c3689a6e5bf29c\"}]",
@@ -13134,8 +13134,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:session-manifest",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/session-manifest.json\",\"blob\":\"cc46a805cfe96425ad42024e592da9bbf96f6d70\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/session-manifest.json\",\"blob\":\"94c2433fdfd31f6fcedb28958af5189ca1e8dbfb\"}]",
@@ -13147,8 +13147,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:stderr",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stderr.log\",\"blob\":\"788d0c16566e597acf77339806552fb9da7099b3\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stderr.log\",\"blob\":\"6b3039a10a68f288d3185200f2c7dd04e5558afd\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stderr.log\",\"blob\":\"22fb67f0dbbe74d4bd249495855608932f002cc2\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stderr.log\",\"blob\":\"af326524fd8c0d1fb8f0b1bf59d715870b99cf28\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stderr.log\",\"blob\":\"889def38c7f83861320eab4f622f19a85c3ca29c\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"}]",
@@ -13160,8 +13160,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:stdout",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stdout.log\",\"blob\":\"0e827237172804fc26e36e4fe18333a44aaee18f\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/runs/01/stdout.log\",\"blob\":\"57412a6f5e1358ece253b689c21b3390dfde8e2e\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stdout.log\",\"blob\":\"61fd32c7dac63c2e815db6ec1f06ce27fcec2181\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/runs/01/stdout.log\",\"blob\":\"60fc0e38d249d78dc91d4ff992ba7ae3062ad2e9\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stdout.log\",\"blob\":\"66dcaa54b2329610a097efe89dba914515083763\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stdout.log\",\"blob\":\"719d4f9f0db81e1d53472fd11325091ae16f9223\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stdout.log\",\"blob\":\"76e5b4a4f08285b595e2f3743a1cb8a086f52f3f\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log\",\"blob\":\"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stdout.log\",\"blob\":\"1c920729b729babe6bb4e4ba088188febaf5b581\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stdout.log\",\"blob\":\"78cd90476e595d5e692cc4e730ef8f74f7803ae9\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stdout.log\",\"blob\":\"35f2dab316e600a56cd5c32352822e6b318156bc\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stdout.log\",\"blob\":\"24a2db2b615a1f0a56d5608acc6c983dfb8c8529\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stdout.log\",\"blob\":\"07d37b5d15a2e2efebe4e504df4824adb88f2b60\"}]",
@@ -13173,8 +13173,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:supplement-codex-family-check",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/supplement-codex-family-check.log\",\"blob\":\"81d622ffc18680a2617f47427b2efa34e8e9b391\"},{\"path\":\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/supplement-codex-family-check.mjs\",\"blob\":\"591a9bc500ba59a1753b461753275c93efd2e369\"}]",
@@ -13186,8 +13186,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:the-persons-words-verbatim-nothing-else",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/human/1-person.md\",\"blob\":\"91aaab39f1b65d4790ec1ead397f9943b3e6e0f2\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/human/2-person.md\",\"blob\":\"df44ad97422dae37e3cfc0cd9731809269f38022\"}]",
@@ -13199,8 +13199,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:turn-1-real-decision-dialogue-reply",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/human/1-person.md\",\"blob\":\"d4a9ac2d7fcde0b7556e5ce3e6697d7191191fd8\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/human/1-person.md\",\"blob\":\"7f2f44a31cbd44431ae8810d93ca4865ad97ab0a\"}]",
@@ -13212,8 +13212,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:v3-01-open",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-01-open.json\",\"blob\":\"0a29e1360ebff2ab79abab7099f2bd30cc9cb4ed\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json\",\"blob\":\"c561f088f4c05a6ec8ab0eb6adbe6b6e7b73735f\"}]",
@@ -13225,8 +13225,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:v3-02-critique",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/requests/v3-02-critique.json\",\"blob\":\"5a2699aeb830e04f492a39253aa4fdf840dcf688\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-02-critique.json\",\"blob\":\"7ac9abac9bc4e9c208e1afc2c87de9f15c92a239\"}]",
@@ -13238,8 +13238,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:verdict-no-decision-request-sent-yet-reasoning-below",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md\",\"blob\":\"6d70b7fb4abb9de4286b73e8e78d290434105c5f\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/decision-request.md\",\"blob\":\"202a3ddd7e3a287b77f14a6eb46d7f1b0a66ba4b\"}]",
@@ -13251,8 +13251,8 @@
     {
       "kind": "semantic",
       "key": "platform-documentation-unmapped-candidate:what-we-think-you-should-do",
-      "resolution": "Source/candidate preservation pair, not a second current authority. The platform carrier retains the source claims; metadata/snapshot framing has a different blob and all human decisions remain pending.",
-      "rule": "Single mapped owner with source-row conservation; source/candidate metadata differences are not normative disagreement. The scheduler enum uses committed owner A8 and the two retired documents use its non-authority history placement.",
+      "resolution": "Evidence name collision: each immutable receipt stays scoped to its proof run and role; equal normalized title alone does not merge observations or create competing runtime authority.",
+      "rule": "Distinct proof-run, cell and artifact-role provenance; preserve each complete record and its observations rather than merging equal names. The 20-group independent sample is recorded in committed review-2-conflicts.md.",
       "evidence": [
         "Candidate pin 0a41d793e60631aa9073c73a941f641548862b6c",
         "Current members [{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md\",\"blob\":\"ba84c4560a26b93342d2d2ca3f471fc2a9709632\"},{\"path\":\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/explanation.md\",\"blob\":\"0e30bc6d724de9d241830191cde072a6118551ad\"}]",

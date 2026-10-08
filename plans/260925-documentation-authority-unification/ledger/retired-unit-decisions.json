@@ -33,6 +33,21 @@
           "after": "| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |"
         }
       ]
+    },
+    {
+      "claimId": "claim_9f6e15a2ce50865f7d2499a31dad819f",
+      "sourcePath": "docs/platform/agent-coordination/contracts/README.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "80bfb53cf02c8e8deb576d9f9bc51f6852d6235c3a5d45ad0ac2e69534d8aa84",
+      "claimKind": "normative-law",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/contracts/README.md",
+      "targetAnchor": "unheaded-block-2",
+      "shownTargetDigest": "0fc5290332da88be032e4397964b690893aca762028c747fd13fc94faa8af854",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "reviewStatus": "pending",
+      "reviewNote": "Rework: the removed second copy is carried source text, not a candidate-native addition. The complete paragraph remains in the exact source transition block; independent re-review is required for this retired candidate-unit disposition.",
+      "rationale": "Consolidate only the redundant paragraph under Migration Status into its already present full source transition block under H1. The paragraph remains byte-for-byte inside the target unit, alongside the original transition note. Exact legacy claim claim_d45237a22e355cee523c6c5b51c50454 still binds that complete block. One paragraph occurrence remains, no unique claim or legacy source byte is deleted, and no authority status changes."
     }
   ]
 }

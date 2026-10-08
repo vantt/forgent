@@ -1,10 +1,10 @@
 # Agent Coordination reverse-open units
 
-Pinned tree: `0a41d793e60631aa9073c73a941f641548862b6c`. These are the 184 mechanically unbound candidate units reported by scoped D. This is review material, not a waiver or a claim of strict closure. Read each unit against the source packs; Added labels and inherited bookkeeping do not automatically close the frozen mechanical reverse check. Closure/rehearsal follows the independent verdict.
+Historical first-review workset at `0a41d793e60631aa9073c73a941f641548862b6c`: 184 units, with their original shown text below. Independent report bb03cab52 accepts 125 classifications and reworks 59. Current strict E at `1f4f0b06274fa95fe94f10e904e1ff12a2898ef4` still reports 182 mechanically unreferenced candidate units: the scheduler enum is now source-bound and the redundant contract paragraph is consolidated with an explicit pending retired-unit disposition. See review-rework-evidence.json for current changed-unit text, digests and all blocked binding proposals. Neither accepted classifications nor Added labels waive the unchanged mechanical reverse gate.
 
 ## docs/platform/agent-coordination/architecture/README.md#migration-status
 
-Digest: `10b8c351197b35ee0d087b596f5ac868c8f5ab511187ffe1775199d4c2e0a385`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `10b8c351197b35ee0d087b596f5ac868c8f5ab511187ffe1775199d4c2e0a385`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -12,7 +12,7 @@ Digest: `10b8c351197b35ee0d087b596f5ac868c8f5ab511187ffe1775199d4c2e0a385`. Clas
 
 ## docs/platform/agent-coordination/architecture/README.md#unheaded-block-2
 
-Digest: `9bf0348789f4183ba7499518cdad5697fbdd05e5f0775b468aff5b8d17c9d847`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `9bf0348789f4183ba7499518cdad5697fbdd05e5f0775b468aff5b8d17c9d847`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This directory has been promoted from
@@ -22,7 +22,7 @@ documentation migration.
 
 ## docs/platform/agent-coordination/architecture/README.md#unheaded-block-3
 
-Digest: `f14c588f7deae8fb12bf6068a6b4c6c08b0fc2ace115cc1cffc72c218ecd05df`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `f14c588f7deae8fb12bf6068a6b4c6c08b0fc2ace115cc1cffc72c218ecd05df`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Accepted architecture documents keep their authority. Runtime-recovery-family
@@ -36,7 +36,7 @@ the proof roots linked from
 
 ## docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow
 
-Digest: `dfc433aa7e8f71fe401ecb8539ceea0f7ea48d8b62ce94e82cfb288d65b69e87`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `dfc433aa7e8f71fe401ecb8539ceea0f7ea48d8b62ce94e82cfb288d65b69e87`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Component And Runtime Flow
@@ -44,7 +44,7 @@ Digest: `dfc433aa7e8f71fe401ecb8539ceea0f7ea48d8b62ce94e82cfb288d65b69e87`. Clas
 
 ## docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4
 
-Digest: `d9aa9975e7a7e7fd8eb83bfade4faca1ed15556b2de8b0d6263ace6c199a90d1`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `d9aa9975e7a7e7fd8eb83bfade4faca1ed15556b2de8b0d6263ace6c199a90d1`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```mermaid
@@ -77,7 +77,7 @@ flowchart TB
 
 ## docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-5
 
-Digest: `016e54429b645e450dafc1fcb957976819543e16afad4c0713a18de49ec73436`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `016e54429b645e450dafc1fcb957976819543e16afad4c0713a18de49ec73436`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 The diagram separates execution from delivery lifecycle: a result can inform a
@@ -88,7 +88,7 @@ not create execution authority or terminal truth.
 
 ## docs/platform/agent-coordination/contracts/README.md#migration-status
 
-Digest: `bffae19a0c8c4746847f5b63d2d7ef186c3d873ff2b11d5580fb8cecaf33ee10`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `bffae19a0c8c4746847f5b63d2d7ef186c3d873ff2b11d5580fb8cecaf33ee10`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -96,7 +96,7 @@ Digest: `bffae19a0c8c4746847f5b63d2d7ef186c3d873ff2b11d5580fb8cecaf33ee10`. Clas
 
 ## docs/platform/agent-coordination/contracts/README.md#unheaded-block-3
 
-Digest: `37cd7c902e80aefa62576f4bb8be3099668b6f7e7e4b2c8dbc80c8b0cd73dbaa`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `37cd7c902e80aefa62576f4bb8be3099668b6f7e7e4b2c8dbc80c8b0cd73dbaa`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This directory has been promoted from
@@ -107,7 +107,7 @@ semantic change needs an accepted decision and compatibility notes.
 
 ## docs/platform/agent-coordination/contracts/README.md#unheaded-block-4
 
-Digest: `80bfb53cf02c8e8deb576d9f9bc51f6852d6235c3a5d45ad0ac2e69534d8aa84`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `80bfb53cf02c8e8deb576d9f9bc51f6852d6235c3a5d45ad0ac2e69534d8aa84`. Corrected classification proposal: duplicate-carried-source-consolidated. Independent re-review pending. Removed only the redundant paragraph in 1f4f0b06274fa95fe94f10e904e1ff12a2898ef4. Full original transition block remains exact, bound by claim_d45237a22e355cee523c6c5b51c50454; retired-unit-decisions.json records pending supersede of this candidate unit.
 
 ``````markdown
 Read the [Agent Coordination Foundation Vision](../vision.md) first. Contracts
@@ -117,7 +117,7 @@ universally mandatory.
 
 ## docs/platform/agent-coordination/decisions/README.md#migration-status
 
-Digest: `f9bad0ca961df3c3aa64c7b93514e36542c7396cc04dc93e97a5f80cf4de057f`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `f9bad0ca961df3c3aa64c7b93514e36542c7396cc04dc93e97a5f80cf4de057f`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -125,7 +125,7 @@ Digest: `f9bad0ca961df3c3aa64c7b93514e36542c7396cc04dc93e97a5f80cf4de057f`. Clas
 
 ## docs/platform/agent-coordination/decisions/README.md#unheaded-block-2
 
-Digest: `f41d3ef3e738d43a642135246fc9200ce8c92e73e58841ec5e8342241fbe5e4d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `f41d3ef3e738d43a642135246fc9200ce8c92e73e58841ec5e8342241fbe5e4d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This directory has been promoted from
@@ -137,7 +137,7 @@ summary replacement.
 
 ## docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#agent-coordination-claim-preservation
 
-Digest: `335baeef42e83237bb1cfbcbe2d0cfbb4b4e269a25e4a0bbb0fc6feb59dec82f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `335baeef42e83237bb1cfbcbe2d0cfbb4b4e269a25e4a0bbb0fc6feb59dec82f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Claim Preservation
@@ -145,7 +145,7 @@ Digest: `335baeef42e83237bb1cfbcbe2d0cfbb4b4e269a25e4a0bbb0fc6feb59dec82f`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-1
 
-Digest: `9e12681b58f31370ef554d491ce4e9a9ba8281cfaae0db438623086e245fe16a`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `9e12681b58f31370ef554d491ce4e9a9ba8281cfaae0db438623086e245fe16a`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -168,7 +168,7 @@ Related:
 
 ## docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-2
 
-Digest: `a9934bdb7e664b6019b9bbccc19c59a26f8cfdc43e847e57d9ae8693ace1627b`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `a9934bdb7e664b6019b9bbccc19c59a26f8cfdc43e847e57d9ae8693ace1627b`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Use `unknown` or `track-complete / verify current checkout` instead of
@@ -178,7 +178,7 @@ current-checkout code, test, contract, or proof supports it.
 
 ## docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-3
 
-Digest: `bd1db6e9232f57939b16fb5effa1dd5e69d21363f6248a2fe4ff424562e2d5ed`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `bd1db6e9232f57939b16fb5effa1dd5e69d21363f6248a2fe4ff424562e2d5ed`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 | Claim ID | Claim | Source | Authority | Status | Target anchor | Must not lose | Proof / gap |
@@ -214,7 +214,7 @@ Digest: `bd1db6e9232f57939b16fb5effa1dd5e69d21363f6248a2fe4ff424562e2d5ed`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#boundary-note
 
-Digest: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Boundary Note
@@ -222,7 +222,7 @@ Digest: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-4
 
-Digest: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change in this Phase 0/1 migration.
@@ -230,7 +230,7 @@ No component-boundary change in this Phase 0/1 migration.
 
 ## docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md#agent-coordination-documentation-governance
 
-Digest: `c647ec09e056954c02fc5dabde28590240244ac5dcf19d1a2f1c36462b319b32`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `c647ec09e056954c02fc5dabde28590240244ac5dcf19d1a2f1c36462b319b32`. Corrected classification proposal: explicit-added-candidate-frame. Independent re-review pending. Explicit Added in candidate label at abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1 distinguishes the history wrapper H1/metadata or changed Related path from literal source snapshot content. No authority or source-origin claim is made; the unchanged reverse gate has no frame-approval input, so classification alone does not close it.
 
 ``````markdown
 # Agent Coordination Documentation Governance
@@ -238,7 +238,7 @@ Digest: `c647ec09e056954c02fc5dabde28590240244ac5dcf19d1a2f1c36462b319b32`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md#unheaded-block-1
 
-Digest: `5f7d1e034b414f729e18521b98bab75bece4943768b232772d7eae86703b22e6`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5f7d1e034b414f729e18521b98bab75bece4943768b232772d7eae86703b22e6`. Corrected classification proposal: explicit-added-candidate-frame. Independent re-review pending. Explicit Added in candidate label at abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1 distinguishes the history wrapper H1/metadata or changed Related path from literal source snapshot content. No authority or source-origin claim is made; the unchanged reverse gate has no frame-approval input, so classification alone does not close it.
 
 ``````markdown
 ```txt
@@ -263,7 +263,7 @@ Superseded by: None
 
 ## docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md#unheaded-block-2
 
-Digest: `715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.
@@ -271,7 +271,7 @@ Added in candidate: Retired area policy and migration plan, retained verbatim as
 
 ## docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md#agent-coordination-documentation-standardization-plan
 
-Digest: `e7ad94fade6cdd15d23ce9a0b7fdba7b977a478ef6c764b92c12e509fd22b527`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e7ad94fade6cdd15d23ce9a0b7fdba7b977a478ef6c764b92c12e509fd22b527`. Corrected classification proposal: explicit-added-candidate-frame. Independent re-review pending. Explicit Added in candidate label at abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1 distinguishes the history wrapper H1/metadata or changed Related path from literal source snapshot content. No authority or source-origin claim is made; the unchanged reverse gate has no frame-approval input, so classification alone does not close it.
 
 ``````markdown
 # Agent Coordination Documentation Standardization Plan
@@ -279,7 +279,7 @@ Digest: `e7ad94fade6cdd15d23ce9a0b7fdba7b977a478ef6c764b92c12e509fd22b527`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md#unheaded-block-1
 
-Digest: `5cc0ec72f7161779180c14bd471e5520ee76456e2755d481fbe76d580f8826ca`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5cc0ec72f7161779180c14bd471e5520ee76456e2755d481fbe76d580f8826ca`. Corrected classification proposal: explicit-added-candidate-frame. Independent re-review pending. Explicit Added in candidate label at abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1 distinguishes the history wrapper H1/metadata or changed Related path from literal source snapshot content. No authority or source-origin claim is made; the unchanged reverse gate has no frame-approval input, so classification alone does not close it.
 
 ``````markdown
 ```txt
@@ -304,7 +304,7 @@ Superseded by: None
 
 ## docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md#unheaded-block-2
 
-Digest: `715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.
@@ -312,7 +312,7 @@ Added in candidate: Retired area policy and migration plan, retained verbatim as
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#agent-coordination-migration-status
 
-Digest: `e8c2d690b8efd3d7e537671d67b6aa7de3a2bc412e4ec3b0818cb8610005a09a`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `e8c2d690b8efd3d7e537671d67b6aa7de3a2bc412e4ec3b0818cb8610005a09a`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 # Agent Coordination Migration Status
@@ -320,7 +320,7 @@ Digest: `e8c2d690b8efd3d7e537671d67b6aa7de3a2bc412e4ec3b0818cb8610005a09a`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-1
 
-Digest: `a6215765fb06646cacc69bccb097e41be353243b9b0c1b2cc56c81e5cc7b3fa2`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `a6215765fb06646cacc69bccb097e41be353243b9b0c1b2cc56c81e5cc7b3fa2`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -344,7 +344,7 @@ Related:
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#phase-status
 
-Digest: `e87c0b1d8137253be9acd3577b4d053ed3fbec7ec80f55206cc85aded5f05857`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e87c0b1d8137253be9acd3577b4d053ed3fbec7ec80f55206cc85aded5f05857`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Phase Status
@@ -352,7 +352,7 @@ Digest: `e87c0b1d8137253be9acd3577b4d053ed3fbec7ec80f55206cc85aded5f05857`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-2
 
-Digest: `21697677038f114f34b6369119a3457c8c11e7413fcee8c584678be0bc0f644d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `21697677038f114f34b6369119a3457c8c11e7413fcee8c584678be0bc0f644d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Phase | Plan title | Status | Landed target docs | Remaining work |
@@ -369,7 +369,7 @@ Digest: `21697677038f114f34b6369119a3457c8c11e7413fcee8c584678be0bc0f644d`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#current-boundary-note
 
-Digest: `dde4b65b6d30e670f4e41e1e8ab847386a1050ef30d1a4ea6c3928dafcdb2c6d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `dde4b65b6d30e670f4e41e1e8ab847386a1050ef30d1a4ea6c3928dafcdb2c6d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Current Boundary Note
@@ -377,7 +377,7 @@ Digest: `dde4b65b6d30e670f4e41e1e8ab847386a1050ef30d1a4ea6c3928dafcdb2c6d`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-3
 
-Digest: `213abce12dc763d06b8116fa1fa1edb8bc666a0374428306081de91b1b9e94ba`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `213abce12dc763d06b8116fa1fa1edb8bc666a0374428306081de91b1b9e94ba`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change through the completed Phase 0-5 work. The
@@ -387,7 +387,7 @@ authority, state writes, or component ownership.
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#completion-evidence
 
-Digest: `0b8b72bd26f198855e395fabb9ed5218c92a2883694b2cbbde90fdc8f1907c13`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `0b8b72bd26f198855e395fabb9ed5218c92a2883694b2cbbde90fdc8f1907c13`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Completion Evidence
@@ -395,7 +395,7 @@ Digest: `0b8b72bd26f198855e395fabb9ed5218c92a2883694b2cbbde90fdc8f1907c13`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-4
 
-Digest: `86f603f4ab7f2785eddc1aeb10a8f11b8e2945f3ec8df86ce286921fa01315b6`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `86f603f4ab7f2785eddc1aeb10a8f11b8e2945f3ec8df86ce286921fa01315b6`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Phase 0-7 completion evidence is recorded in
@@ -404,7 +404,7 @@ Phase 0-7 completion evidence is recorded in
 
 ## docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#agent-coordination-documentation-migration-completion
 
-Digest: `a7c79bf58e79685a047e69a9cf95250b43c104cf91b9f038aca0a69f6bf844b0`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `a7c79bf58e79685a047e69a9cf95250b43c104cf91b9f038aca0a69f6bf844b0`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Documentation Migration Completion
@@ -412,7 +412,7 @@ Digest: `a7c79bf58e79685a047e69a9cf95250b43c104cf91b9f038aca0a69f6bf844b0`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#unheaded-block-1
 
-Digest: `60d78413ed9a9e6cbcbab02bc0c29f5af76a0f520da8998f6020e593757497be`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `60d78413ed9a9e6cbcbab02bc0c29f5af76a0f520da8998f6020e593757497be`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -436,7 +436,7 @@ Related:
 
 ## docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#completion-record
 
-Digest: `da246349ae75320592ccf49a2f8f9f9eb5e744a4544aa707e2cfc80dc77306d1`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `da246349ae75320592ccf49a2f8f9f9eb5e744a4544aa707e2cfc80dc77306d1`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Completion Record
@@ -444,7 +444,7 @@ Digest: `da246349ae75320592ccf49a2f8f9f9eb5e744a4544aa707e2cfc80dc77306d1`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#unheaded-block-2
 
-Digest: `473e23f9968f866da45ab7f6fec38c89175f666e314746106464b98375767064`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `473e23f9968f866da45ab7f6fec38c89175f666e314746106464b98375767064`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Field | Result |
@@ -462,7 +462,7 @@ Digest: `473e23f9968f866da45ab7f6fec38c89175f666e314746106464b98375767064`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#scope-boundary
 
-Digest: `06319b17ced923b387edd4192486050ff24dc19439b9c218de166b489be54fe9`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `06319b17ced923b387edd4192486050ff24dc19439b9c218de166b489be54fe9`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Scope Boundary
@@ -470,7 +470,7 @@ Digest: `06319b17ced923b387edd4192486050ff24dc19439b9c218de166b489be54fe9`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#unheaded-block-3
 
-Digest: `f622a4baf74a691b9ab5679808749c9900ca52e94bf4c51f66b0cc5931f36d38`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `f622a4baf74a691b9ab5679808749c9900ca52e94bf4c51f66b0cc5931f36d38`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 The migration does not rewrite proof artifacts, claim semantics, contracts, or
@@ -480,7 +480,7 @@ while retaining proof history in place.
 
 ## docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#agent-coordination-proof-preservation
 
-Digest: `9364e56ebcb837e79e0a2ee19f8d040d13feac4407c5986f429b359e4720f8de`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `9364e56ebcb837e79e0a2ee19f8d040d13feac4407c5986f429b359e4720f8de`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Proof Preservation
@@ -488,7 +488,7 @@ Digest: `9364e56ebcb837e79e0a2ee19f8d040d13feac4407c5986f429b359e4720f8de`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-1
 
-Digest: `dd577e9abd52ce3ac54f71951460a44f402677d5fec4df688aeaa00903175423`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `dd577e9abd52ce3ac54f71951460a44f402677d5fec4df688aeaa00903175423`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -511,7 +511,7 @@ Related:
 
 ## docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-2
 
-Digest: `c5c09ab025fb7e305ed471e757effd5fbfec278182e03136facf81004a21ed98`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `c5c09ab025fb7e305ed471e757effd5fbfec278182e03136facf81004a21ed98`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Proof trees must remain linkable. Summary rows here do not replace the proof
@@ -520,7 +520,7 @@ roots, logs, current-cell files, reviews, red-team reports, or known gaps.
 
 ## docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-3
 
-Digest: `2f2d7a46d4e2ebf5b82c75c675e95f19261522611b45bd14d766fdb14cd1c018`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2f2d7a46d4e2ebf5b82c75c675e95f19261522611b45bd14d766fdb14cd1c018`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Proof root | Proves / supports | Consumed by target doc | Move policy | Known gaps | Notes |
@@ -561,7 +561,7 @@ Digest: `2f2d7a46d4e2ebf5b82c75c675e95f19261522611b45bd14d766fdb14cd1c018`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#boundary-note
 
-Digest: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Boundary Note
@@ -569,7 +569,7 @@ Digest: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-4
 
-Digest: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change in this Phase 0/1 migration.
@@ -577,7 +577,7 @@ No component-boundary change in this Phase 0/1 migration.
 
 ## docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#agent-coordination-proposal-status
 
-Digest: `3c5c2379e2be5e99e0119476921286de646c7a5a9ed20b8cbe1feebbf8672d9d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `3c5c2379e2be5e99e0119476921286de646c7a5a9ed20b8cbe1feebbf8672d9d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Proposal Status
@@ -585,7 +585,7 @@ Digest: `3c5c2379e2be5e99e0119476921286de646c7a5a9ed20b8cbe1feebbf8672d9d`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-1
 
-Digest: `704d9755f06c6bf904d254b8d7248a454812dae70ca9f843ee87ef09504c40b2`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `704d9755f06c6bf904d254b8d7248a454812dae70ca9f843ee87ef09504c40b2`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -608,7 +608,7 @@ Related:
 
 ## docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-2
 
-Digest: `ea12cceacc982c67fd77289115189670f004d4bd9c2bac0eccea2d5da3f9d408`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `ea12cceacc982c67fd77289115189670f004d4bd9c2bac0eccea2d5da3f9d408`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Proposal status is conservative. A proposal can contain accepted pieces, but
@@ -618,7 +618,7 @@ decision, or spec target before it becomes current authority.
 
 ## docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-3
 
-Digest: `d49fc868340267893e0cacd257900ecb5859dd141da220c64d97eff3bb581dad`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `d49fc868340267893e0cacd257900ecb5859dd141da220c64d97eff3bb581dad`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Proposal / frontier source | Topic | Current status | Accepted pieces | Deferred / rejected pieces | Target treatment |
@@ -641,7 +641,7 @@ Digest: `d49fc868340267893e0cacd257900ecb5859dd141da220c64d97eff3bb581dad`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#boundary-note
 
-Digest: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Boundary Note
@@ -649,7 +649,7 @@ Digest: `b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-4
 
-Digest: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change in this Phase 0/1 migration.
@@ -657,7 +657,7 @@ No component-boundary change in this Phase 0/1 migration.
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#agent-coordination-source-inventory
 
-Digest: `4eb040b0695627694d87559605227e452e29cc10b137e432979884c455832288`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `4eb040b0695627694d87559605227e452e29cc10b137e432979884c455832288`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Source Inventory
@@ -665,7 +665,7 @@ Digest: `4eb040b0695627694d87559605227e452e29cc10b137e432979884c455832288`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-1
 
-Digest: `e242254f3a1fcfff4f905066d193d8399965360ac8e824cc061e1a004e93228e`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e242254f3a1fcfff4f905066d193d8399965360ac8e824cc061e1a004e93228e`. Corrected classification proposal: explicit-added-candidate-frame. Independent re-review pending. Explicit Added in candidate label at abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1 distinguishes the history wrapper H1/metadata or changed Related path from literal source snapshot content. No authority or source-origin claim is made; the unchanged reverse gate has no frame-approval input, so classification alone does not close it.
 
 ``````markdown
 ```txt
@@ -688,7 +688,7 @@ Related:
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-2
 
-Digest: `0418585b4453c417bea88c1c26b591dde9b853896311c4c91313c16f63a8b2d4`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `0418585b4453c417bea88c1c26b591dde9b853896311c4c91313c16f63a8b2d4`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This ledger is a temporary migration aid. It intentionally classifies source files conservatively: a file can be accepted design authority while an implementation claim inside it still needs current-checkout proof before Phase 2 promotion.
@@ -696,7 +696,7 @@ This ledger is a temporary migration aid. It intentionally classifies source fil
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-3
 
-Digest: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change in this Phase 0/1 migration.
@@ -704,7 +704,7 @@ No component-boundary change in this Phase 0/1 migration.
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#phase-7-disposition
 
-Digest: `0eafaee7edbe4a25a453109a776ef4187492cec14794027c1297a72cd1f6ffae`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `0eafaee7edbe4a25a453109a776ef4187492cec14794027c1297a72cd1f6ffae`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Phase 7 Disposition
@@ -712,7 +712,7 @@ Digest: `0eafaee7edbe4a25a453109a776ef4187492cec14794027c1297a72cd1f6ffae`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-4
 
-Digest: `5b74c32251a1c02944319de2064d4b8da06d49da1224ad52352b987de308bc34`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5b74c32251a1c02944319de2064d4b8da06d49da1224ad52352b987de308bc34`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 The legacy-to-target structure is now explicit without rewriting evidence:
@@ -720,7 +720,7 @@ The legacy-to-target structure is now explicit without rewriting evidence:
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-5
 
-Digest: `2735cebe7ae02a6a13e68cc2fce66c3b56ac465719aad63d79a5719d552ef376`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2735cebe7ae02a6a13e68cc2fce66c3b56ac465719aad63d79a5719d552ef376`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 - 63 legacy narrative or index documents under `architecture/`, `contracts/`,
@@ -737,7 +737,7 @@ Digest: `2735cebe7ae02a6a13e68cc2fce66c3b56ac465719aad63d79a5719d552ef376`. Clas
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-6
 
-Digest: `bd01ed8bf40127058869342ffbc6bab63d3ae06b834a1e178803557bebcaaf21`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `bd01ed8bf40127058869342ffbc6bab63d3ae06b834a1e178803557bebcaaf21`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 Added in candidate: The preceding disposition records the earlier migration. The retired area policy and completed migration plan now have literal, non-authority history carriers: [documentation-governance.md](documentation-governance.md) and [documentation-standardization-plan.md](documentation-standardization-plan.md). Original source bytes and historical status fields are preserved; neither copy is current policy.
@@ -745,7 +745,7 @@ Added in candidate: The preceding disposition records the earlier migration. The
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-7
 
-Digest: `07369f7b32fa6f2939379493ed28dda4a38459287fbae86d1d9a2f1898399e42`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `07369f7b32fa6f2939379493ed28dda4a38459287fbae86d1d9a2f1898399e42`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change in Phase 7.
@@ -753,7 +753,7 @@ No component-boundary change in Phase 7.
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-8
 
-Digest: `b739794ca8467880313e582f8beaa699552cac088fe1e20bac36ba0689a92d2f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b739794ca8467880313e582f8beaa699552cac088fe1e20bac36ba0689a92d2f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 See [Phase 7 completion](phase-7-completion.md) for the final counts and
@@ -762,7 +762,7 @@ validation record.
 
 ## docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-9
 
-Digest: `bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 | Source path | Existing type | Authority | Implementation status | Target path | Disposition | Notes |
@@ -1216,7 +1216,7 @@ Digest: `bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3`. Clas
 
 ## docs/platform/agent-coordination/history/README.md#migration-status
 
-Digest: `b73e58a51d0cc2703e07d0b2166e59374b8133ef9e22cf7d1547c542b4d145fb`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `b73e58a51d0cc2703e07d0b2166e59374b8133ef9e22cf7d1547c542b4d145fb`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -1224,7 +1224,7 @@ Digest: `b73e58a51d0cc2703e07d0b2166e59374b8133ef9e22cf7d1547c542b4d145fb`. Clas
 
 ## docs/platform/agent-coordination/history/README.md#unheaded-block-2
 
-Digest: `9908f80ae911c38da04e63e364aa1f962172edff2b0e377335d81a8182fb51ff`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `9908f80ae911c38da04e63e364aa1f962172edff2b0e377335d81a8182fb51ff`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This target directory preserves historical material from
@@ -1235,7 +1235,7 @@ contract authority.
 
 ## docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i010-one-shared-driver-discipline-across-coordination-facades
 
-Digest: `314debc51c2c5c8a373dc16c8868eddd39c7cccfc01cc366950e13bf24bb8282`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `314debc51c2c5c8a373dc16c8868eddd39c7cccfc01cc366950e13bf24bb8282`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ### AC-I010: One Shared Driver Discipline Across Coordination Facades
@@ -1243,7 +1243,7 @@ Digest: `314debc51c2c5c8a373dc16c8868eddd39c7cccfc01cc366950e13bf24bb8282`. Clas
 
 ## docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-20
 
-Digest: `0d8ff388231df802a716dd228c6038db8e0e98887b457d25c71ad059d408bf6a`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `0d8ff388231df802a716dd228c6038db8e0e98887b457d25c71ad059d408bf6a`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 - **Original intent:** the judgment loop a coordination driver runs (observe
@@ -1283,7 +1283,7 @@ Digest: `0d8ff388231df802a716dd228c6038db8e0e98887b457d25c71ad059d408bf6a`. Clas
 
 ## docs/platform/agent-coordination/playbooks/README.md#migration-status
 
-Digest: `efe71019b1ac49bea1370a3d1dc44c02f7354c1c704194737b9a668f73fdb68e`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `efe71019b1ac49bea1370a3d1dc44c02f7354c1c704194737b9a668f73fdb68e`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -1291,7 +1291,7 @@ Digest: `efe71019b1ac49bea1370a3d1dc44c02f7354c1c704194737b9a668f73fdb68e`. Clas
 
 ## docs/platform/agent-coordination/playbooks/README.md#unheaded-block-2
 
-Digest: `b922571489b0f00ea110f7584547508cdb156186f4727c28ccb96726f1a7c6f0`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b922571489b0f00ea110f7584547508cdb156186f4727c28ccb96726f1a7c6f0`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This target directory preserves operational and bootstrap material from
@@ -1302,7 +1302,7 @@ code own their respective claims.
 
 ## docs/platform/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-61
 
-Digest: `5e9c4c943dc80dde64cfb104a50335f804012e0ca373a49b64efff51e6cd0eeb`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5e9c4c943dc80dde64cfb104a50335f804012e0ca373a49b64efff51e6cd0eeb`. Corrected classification proposal: carried-source-with-labelled-outcome-addition. Independent re-review pending. Source claim_459cdfc305f52f6636bf73d1c56cccf1 now binds unheaded-block-61. Adjacent introduction and materialized bullet explicitly label the candidate extension, implementation evidence and retained candidate status; enum bytes are unchanged. Manual judgment remains pending.
 
 ``````markdown
 ```txt
@@ -1312,7 +1312,7 @@ outcome = settled | refused | blocked | deferred | materialized
 
 ## docs/platform/agent-coordination/proposals/README.md#migration-status
 
-Digest: `7f4950f0a7ba6f2ffd13eb7cd9586a2547506d23ebbc71bda936b4cbe069df25`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `7f4950f0a7ba6f2ffd13eb7cd9586a2547506d23ebbc71bda936b4cbe069df25`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -1320,7 +1320,7 @@ Digest: `7f4950f0a7ba6f2ffd13eb7cd9586a2547506d23ebbc71bda936b4cbe069df25`. Clas
 
 ## docs/platform/agent-coordination/proposals/README.md#unheaded-block-2
 
-Digest: `5ad40f6336f4614dfd06456436faadc681e17caed5b9ecfc96c80e186562d13c`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5ad40f6336f4614dfd06456436faadc681e17caed5b9ecfc96c80e186562d13c`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This target directory preserves the proposal frontier from
@@ -1331,7 +1331,7 @@ promote its design: the status of every frontier source remains governed by
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#semantic-cli-surface-for-agent-coordination
 
-Digest: `5635c9d12a67082b13aa158fb199a83bc546a91355138c7dc19a0038f5378c27`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5635c9d12a67082b13aa158fb199a83bc546a91355138c7dc19a0038f5378c27`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Semantic CLI Surface for Agent Coordination
@@ -1339,7 +1339,7 @@ Digest: `5635c9d12a67082b13aa158fb199a83bc546a91355138c7dc19a0038f5378c27`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-1
 
-Digest: `2205f5b26727e660d0ea709dcff98ca2945f21390710fbcaa186cab1077f0106`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2205f5b26727e660d0ea709dcff98ca2945f21390710fbcaa186cab1077f0106`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -1359,7 +1359,7 @@ Related:
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#1-vấn-đề-the-problem
 
-Digest: `06c734826c49daf6acdc59723ab00ce6fb4aedf0c90c2f0457dbaf68daaf9f22`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `06c734826c49daf6acdc59723ab00ce6fb4aedf0c90c2f0457dbaf68daaf9f22`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## 1. Vấn đề (The Problem)
@@ -1367,7 +1367,7 @@ Digest: `06c734826c49daf6acdc59723ab00ce6fb4aedf0c90c2f0457dbaf68daaf9f22`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-2
 
-Digest: `70b7d78dd9dc8e482d6ab7620785c06246f08d32df107530a136d7b96b52cbde`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `70b7d78dd9dc8e482d6ab7620785c06246f08d32df107530a136d7b96b52cbde`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Hiện tại, bề mặt giao tiếp của Agent Coordination chỉ có một lệnh duy nhất: `fgos coordination run --file <request.json>`.
@@ -1376,7 +1376,7 @@ Việc bắt Agent (LLM) hoặc Human phải tương tác qua JSON gây ra 2 v�
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-3
 
-Digest: `c193308a3bd4014028b5d1f7e2e5ebc4651143f85bdf48293b17e6686b0959e9`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `c193308a3bd4014028b5d1f7e2e5ebc4651143f85bdf48293b17e6686b0959e9`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 1. **Generation Fragility & Sequencing:** Việc LLM phải giữ đúng thứ tự các bước `authorize` -> `dispatch` -> `disposition` qua nhiều turn và bọc trong một file JSON lớn là điểm yếu kinh điển. Lỗi JSON thường dẫn đến việc phải gen lại toàn bộ từ đầu. (Lưu ý: JSON plumbing chiếm ~2-20% số dòng của SKILL, không phải context).
@@ -1385,7 +1385,7 @@ Digest: `c193308a3bd4014028b5d1f7e2e5ebc4651143f85bdf48293b17e6686b0959e9`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#2-giải-pháp-kiến-trúc-the-solution
 
-Digest: `997cb669d34aca8434cb895a823c5a904262144654865aabc6dce2408f522dac`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `997cb669d34aca8434cb895a823c5a904262144654865aabc6dce2408f522dac`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## 2. Giải pháp Kiến trúc (The Solution)
@@ -1393,7 +1393,7 @@ Digest: `997cb669d34aca8434cb895a823c5a904262144654865aabc6dce2408f522dac`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-4
 
-Digest: `2a1a3dc98841d36b8b13603a532482486a26e96162ac5b4100bfca375c531742`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2a1a3dc98841d36b8b13603a532482486a26e96162ac5b4100bfca375c531742`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Triển khai một lớp **Semantic Verbs as Request Generators**. CLI sẽ không bypass Engine, mà đóng vai trò là "Máy sinh JSON Request", bọc các hành vi an toàn rồi đẩy vào chung một cửa `runCoordinationUseCase`.
@@ -1401,7 +1401,7 @@ Triển khai một lớp **Semantic Verbs as Request Generators**. CLI sẽ khô
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-5
 
-Digest: `222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 **Nguyên lý cốt lõi:**
@@ -1413,7 +1413,7 @@ Digest: `222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#3-các-sửa-đổi-tầng-engine-core-fixes
 
-Digest: `237d30965047a8e9a8127dafc74b240fe18323a4967b6e8c93e724b9ff7bbcf0`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `237d30965047a8e9a8127dafc74b240fe18323a4967b6e8c93e724b9ff7bbcf0`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## 3. Các Sửa Đổi Tầng Engine (Core Fixes)
@@ -1421,7 +1421,7 @@ Digest: `237d30965047a8e9a8127dafc74b240fe18323a4967b6e8c93e724b9ff7bbcf0`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-6
 
-Digest: `af63a8a596d7e8a7863c8ce6c858e75816aca25b953b4ffce595ae9d4c969110`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `af63a8a596d7e8a7863c8ce6c858e75816aca25b953b4ffce595ae9d4c969110`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Để lớp CLI này hoạt động đúng, Engine phải được sửa 3 lỗi kiến trúc đang tồn tại:
@@ -1429,7 +1429,7 @@ Digest: `af63a8a596d7e8a7863c8ce6c858e75816aca25b953b4ffce595ae9d4c969110`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-7
 
-Digest: `e9e58fc019a2b0ed9f7539666b99fdfd9f4d0cfa5c892869101fa587f37627b4`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e9e58fc019a2b0ed9f7539666b99fdfd9f4d0cfa5c892869101fa587f37627b4`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 1. **Bóc tách Auto-close (F3):** Hàm `run.mjs` hiện tại auto-close session ở cuối. Phải tách logic này ra, chặn hành vi tự đóng ngầm định để bảo vệ các lệnh lẻ.
@@ -1444,7 +1444,7 @@ Digest: `e9e58fc019a2b0ed9f7539666b99fdfd9f4d0cfa5c892869101fa587f37627b4`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#4-bề-mặt-cli-mới-10-verbs-1-view
 
-Digest: `e5b929b76fb55e7bbed61f2e2910c5201d1489a887c0a10f3a73985edca425df`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e5b929b76fb55e7bbed61f2e2910c5201d1489a887c0a10f3a73985edca425df`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## 4. Bề Mặt CLI Mới (10 Verbs + 1 View)
@@ -1452,7 +1452,7 @@ Digest: `e5b929b76fb55e7bbed61f2e2910c5201d1489a887c0a10f3a73985edca425df`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-8
 
-Digest: `2b3f5b4cf2e0adb864e785cd2a0e764de42ed743f7de2e0dbfbabeaeb6a35245`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2b3f5b4cf2e0adb864e785cd2a0e764de42ed743f7de2e0dbfbabeaeb6a35245`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Hệ thống sẽ cung cấp 10 verb cấp cao (Các lệnh thay đổi state bắt buộc có `--cwd`):
@@ -1460,7 +1460,7 @@ Hệ thống sẽ cung cấp 10 verb cấp cao (Các lệnh thay đổi state b�
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-9
 
-Digest: `217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 1. `start` (Mở session thuần túy)
@@ -1477,7 +1477,7 @@ Digest: `217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-10
 
-Digest: `c5498ea438b2534a19a52dede74e3d5f1d053f1c83516d95a04c4b276f76479c`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `c5498ea438b2534a19a52dede74e3d5f1d053f1c83516d95a04c4b276f76479c`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Và 1 View: `status` (Trả về `--json` chuẩn cho LLM).
@@ -1485,7 +1485,7 @@ Và 1 View: `status` (Trả về `--json` chuẩn cho LLM).
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#5-lộ-trình-triển-khai-execution-order
 
-Digest: `0232a3a7c3eeabb703bb099c1cbed718aacac6bda672305539190ee5f6c1a115`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `0232a3a7c3eeabb703bb099c1cbed718aacac6bda672305539190ee5f6c1a115`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## 5. Lộ trình Triển khai (Execution Order)
@@ -1493,7 +1493,7 @@ Digest: `0232a3a7c3eeabb703bb099c1cbed718aacac6bda672305539190ee5f6c1a115`. Clas
 
 ## docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-11
 
-Digest: `139e7d6c9a1aee5db7ada78c939e4a7cfdbf3ee3627ede6436c67b2b6cd41ce3`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `139e7d6c9a1aee5db7ada78c939e4a7cfdbf3ee3627ede6436c67b2b6cd41ce3`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | # | Việc | Phụ thuộc | Ghi chú |
@@ -1509,7 +1509,7 @@ Digest: `139e7d6c9a1aee5db7ada78c939e4a7cfdbf3ee3627ede6436c67b2b6cd41ce3`. Clas
 
 ## docs/platform/agent-coordination/roadmap/README.md#migration-status
 
-Digest: `30f9ca49904696df07a09e4ee82c31142e0319c25662a81ea06120adc06c6fd7`. Classification proposal: existing-migration-bookkeeping. Review pending.
+Digest at original review pin: `30f9ca49904696df07a09e4ee82c31142e0319c25662a81ea06120adc06c6fd7`. Classification accepted by review-2-reverse.md at bb03cab52: existing-migration-bookkeeping.
 
 ``````markdown
 ## Migration Status
@@ -1517,7 +1517,7 @@ Digest: `30f9ca49904696df07a09e4ee82c31142e0319c25662a81ea06120adc06c6fd7`. Clas
 
 ## docs/platform/agent-coordination/roadmap/README.md#unheaded-block-2
 
-Digest: `51ad1bd7afe2901ef060445e734bd236cbb7fd9b6fa97d88854106b772410a7b`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `51ad1bd7afe2901ef060445e734bd236cbb7fd9b6fa97d88854106b772410a7b`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This target directory preserves rollout and implementation sequencing from
@@ -1527,7 +1527,7 @@ roadmap cannot establish current architecture, contracts, or decisions.
 
 ## docs/platform/agent-coordination/spec.md#agent-coordination-spec
 
-Digest: `2520869b1677b45e399d56d1e3656406f4c80f7587805d6e0d6b803e20c8ac0f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2520869b1677b45e399d56d1e3656406f4c80f7587805d6e0d6b803e20c8ac0f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Spec
@@ -1535,7 +1535,7 @@ Digest: `2520869b1677b45e399d56d1e3656406f4c80f7587805d6e0d6b803e20c8ac0f`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-1
 
-Digest: `4975794d114f01071cb025c08379a711e11d119766c99de633a6890d23df45ab`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `4975794d114f01071cb025c08379a711e11d119766c99de633a6890d23df45ab`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -1562,7 +1562,7 @@ Related:
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-2
 
-Digest: `26a638a0493c7786349c7f74b7622bfcd815131f0f7535e0a566a7fef8893718`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `26a638a0493c7786349c7f74b7622bfcd815131f0f7535e0a566a7fef8893718`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This spec is a migration bridge. It summarizes current truth and points to
@@ -1572,7 +1572,7 @@ verification trees are fully promoted into this area.
 
 ## docs/platform/agent-coordination/spec.md#current-summary
 
-Digest: `243485da79e8d82e1a005278effce41f94b8eb321be99a5e3eb6af27f35781fc`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `243485da79e8d82e1a005278effce41f94b8eb321be99a5e3eb6af27f35781fc`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Current Summary
@@ -1580,7 +1580,7 @@ Digest: `243485da79e8d82e1a005278effce41f94b8eb321be99a5e3eb6af27f35781fc`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-3
 
-Digest: `574e4dfab034e6c87838a168d4d5277e8b4681e85a90ff1b14b99dc0c3de8693`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `574e4dfab034e6c87838a168d4d5277e8b4681e85a90ff1b14b99dc0c3de8693`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Agent Coordination is the foundation layer for governed, evidence-aware agent
@@ -1591,7 +1591,7 @@ dispatch that triggers work by an agent.
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-4
 
-Digest: `b3a71c75ee4f904d2153c68c1f5aba969fc412f46b3d879671d8a92736889f1f`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b3a71c75ee4f904d2153c68c1f5aba969fc412f46b3d879671d8a92736889f1f`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Current implemented behavior centers on:
@@ -1599,7 +1599,7 @@ Current implemented behavior centers on:
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-5
 
-Digest: `41301a9368f32dbecb14a15713c7aa7977d3a33237a44b0fb3134993856dd288`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `41301a9368f32dbecb14a15713c7aa7977d3a33237a44b0fb3134993856dd288`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 - `CoordinationSession` as the V1 executable/recovery root;
@@ -1614,7 +1614,7 @@ Digest: `41301a9368f32dbecb14a15713c7aa7977d3a33237a44b0fb3134993856dd288`. Clas
 
 ## docs/platform/agent-coordination/spec.md#scope
 
-Digest: `28e7ac5ff01167310835c3f9b2a227aaa8fd1077906b2a8bb188ee7ec1d8f036`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `28e7ac5ff01167310835c3f9b2a227aaa8fd1077906b2a8bb188ee7ec1d8f036`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Scope
@@ -1622,7 +1622,7 @@ Digest: `28e7ac5ff01167310835c3f9b2a227aaa8fd1077906b2a8bb188ee7ec1d8f036`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-6
 
-Digest: `1dae68a93babbe019b1a6f85b9f909b81dc1b854338365099868c2568992d139`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `1dae68a93babbe019b1a6f85b9f909b81dc1b854338365099868c2568992d139`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This area owns:
@@ -1642,7 +1642,7 @@ This area owns:
 
 ## docs/platform/agent-coordination/spec.md#non-scope
 
-Digest: `3f1ec225afa6433d22c0f73618c80e364ea4bb5549a9975efa550e145785cb88`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `3f1ec225afa6433d22c0f73618c80e364ea4bb5549a9975efa550e145785cb88`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Non-Scope
@@ -1650,7 +1650,7 @@ Digest: `3f1ec225afa6433d22c0f73618c80e364ea4bb5549a9975efa550e145785cb88`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-7
 
-Digest: `4c8e935895facbb1f259c6edb468f9dd1db54862a636775f8d239e1176361a96`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `4c8e935895facbb1f259c6edb468f9dd1db54862a636775f8d239e1176361a96`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This area does not own:
@@ -1666,7 +1666,7 @@ This area does not own:
 
 ## docs/platform/agent-coordination/spec.md#actors-and-surfaces
 
-Digest: `97d92e28b8ae380028bbc7bbe547a7907dacc450819e13f5f02ac2b79d8f6d3a`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `97d92e28b8ae380028bbc7bbe547a7907dacc450819e13f5f02ac2b79d8f6d3a`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Actors And Surfaces
@@ -1674,7 +1674,7 @@ Digest: `97d92e28b8ae380028bbc7bbe547a7907dacc450819e13f5f02ac2b79d8f6d3a`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-8
 
-Digest: `9ebd99dc0abbabfe3b2c0402e35413162af1ad38cbd3946fc7ebc5953ea1e87a`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `9ebd99dc0abbabfe3b2c0402e35413162af1ad38cbd3946fc7ebc5953ea1e87a`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Surface | Current status | Notes |
@@ -1690,7 +1690,7 @@ Digest: `9ebd99dc0abbabfe3b2c0402e35413162af1ad38cbd3946fc7ebc5953ea1e87a`. Clas
 
 ## docs/platform/agent-coordination/spec.md#core-entities
 
-Digest: `75f686a4102d2f01a3fe622ff70b5d3f105f51c8443c10c496a41d78291f10a2`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `75f686a4102d2f01a3fe622ff70b5d3f105f51c8443c10c496a41d78291f10a2`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Core Entities
@@ -1698,7 +1698,7 @@ Digest: `75f686a4102d2f01a3fe622ff70b5d3f105f51c8443c10c496a41d78291f10a2`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-9
 
-Digest: `c9feb3366a7e81196f07297be694114441c586d4b7fe15a9b640e57f8ef866e8`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `c9feb3366a7e81196f07297be694114441c586d4b7fe15a9b640e57f8ef866e8`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Entity | Current state | Source |
@@ -1715,7 +1715,7 @@ Digest: `c9feb3366a7e81196f07297be694114441c586d4b7fe15a9b640e57f8ef866e8`. Clas
 
 ## docs/platform/agent-coordination/spec.md#operations-and-flows
 
-Digest: `4d8c7816a117d1520a26dc152ec28ae1ae52d68f95abd6e72f11580c242ba16d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `4d8c7816a117d1520a26dc152ec28ae1ae52d68f95abd6e72f11580c242ba16d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Operations And Flows
@@ -1723,7 +1723,7 @@ Digest: `4d8c7816a117d1520a26dc152ec28ae1ae52d68f95abd6e72f11580c242ba16d`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-10
 
-Digest: `eab945ffbde3d8ae87c15f4b2642f6b92823b36be08bd28f17b128af6e473f49`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `eab945ffbde3d8ae87c15f4b2642f6b92823b36be08bd28f17b128af6e473f49`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Flow | Status | Summary |
@@ -1741,7 +1741,7 @@ Digest: `eab945ffbde3d8ae87c15f4b2642f6b92823b36be08bd28f17b128af6e473f49`. Clas
 
 ## docs/platform/agent-coordination/spec.md#contracts-owned
 
-Digest: `b6ec7e6b2c4ab46b0c1efdd78aa38d574f56ea5b5e1124dd50d207ca742cc589`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b6ec7e6b2c4ab46b0c1efdd78aa38d574f56ea5b5e1124dd50d207ca742cc589`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Contracts Owned
@@ -1749,7 +1749,7 @@ Digest: `b6ec7e6b2c4ab46b0c1efdd78aa38d574f56ea5b5e1124dd50d207ca742cc589`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-11
 
-Digest: `f2b3765ae3d9b1f36caacda7eade5ee47b8eb5d0dee4ff5c4de48ba857eb9970`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `f2b3765ae3d9b1f36caacda7eade5ee47b8eb5d0dee4ff5c4de48ba857eb9970`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Detailed contract text remains legacy-current until Phase 4 promotion:
@@ -1757,7 +1757,7 @@ Detailed contract text remains legacy-current until Phase 4 promotion:
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-12
 
-Digest: `b3acf3b5f1931511c0a2610dd8879a52abbbca7b5adfae155209ef9d8eeb5110`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b3acf3b5f1931511c0a2610dd8879a52abbbca7b5adfae155209ef9d8eeb5110`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Contract | Current source | Status |
@@ -1770,7 +1770,7 @@ Digest: `b3acf3b5f1931511c0a2610dd8879a52abbbca7b5adfae155209ef9d8eeb5110`. Clas
 
 ## docs/platform/agent-coordination/spec.md#contracts-consumed
 
-Digest: `fd489432e02ca2a2c1d097327a760a14ca503a032f340ea92de6104237105961`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `fd489432e02ca2a2c1d097327a760a14ca503a032f340ea92de6104237105961`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Contracts Consumed
@@ -1778,7 +1778,7 @@ Digest: `fd489432e02ca2a2c1d097327a760a14ca503a032f340ea92de6104237105961`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-13
 
-Digest: `de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Contract area | Owner | Agent Coordination use |
@@ -1791,7 +1791,7 @@ Digest: `de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18`. Clas
 
 ## docs/platform/agent-coordination/spec.md#implementation-status
 
-Digest: `24dd8b125905d627d20319647844f99037139cfa324fd490a849c6dd087e3163`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `24dd8b125905d627d20319647844f99037139cfa324fd490a849c6dd087e3163`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Implementation Status
@@ -1799,7 +1799,7 @@ Digest: `24dd8b125905d627d20319647844f99037139cfa324fd490a849c6dd087e3163`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-14
 
-Digest: `40ff194821508a0153c385265bbefe51e56ffdc843c70a3b889afc441259a19d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `40ff194821508a0153c385265bbefe51e56ffdc843c70a3b889afc441259a19d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Claim | Status | Evidence |
@@ -1820,7 +1820,7 @@ Digest: `40ff194821508a0153c385265bbefe51e56ffdc843c70a3b889afc441259a19d`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-15
 
-Digest: `abca3e6b0db5297a71399ea11c79ebd0e08010854d6efb8dce9a6bbf44b33797`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `abca3e6b0db5297a71399ea11c79ebd0e08010854d6efb8dce9a6bbf44b33797`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 See [implementation-alignment.md](verification/implementation-alignment.md) for
@@ -1829,7 +1829,7 @@ the claim-by-claim evidence table.
 
 ## docs/platform/agent-coordination/spec.md#known-gaps
 
-Digest: `2125e01c1974f2633eccec213edb7865e6031c1337c77aeb9cf3e653880c98b9`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2125e01c1974f2633eccec213edb7865e6031c1337c77aeb9cf3e653880c98b9`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Known Gaps
@@ -1837,7 +1837,7 @@ Digest: `2125e01c1974f2633eccec213edb7865e6031c1337c77aeb9cf3e653880c98b9`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-16
 
-Digest: `f9618758d29a3b89d8858509cf4aa242d0e05bb2386615d021ccd48835a24f0a`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `f9618758d29a3b89d8858509cf4aa242d0e05bb2386615d021ccd48835a24f0a`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Gap | Status | Next action |
@@ -1855,7 +1855,7 @@ Digest: `f9618758d29a3b89d8858509cf4aa242d0e05bb2386615d021ccd48835a24f0a`. Clas
 
 ## docs/platform/agent-coordination/spec.md#related-files
 
-Digest: `846bebe2085577e99099b35608dbd6455d5c98a65574ca4f3c32f6696ba805f5`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `846bebe2085577e99099b35608dbd6455d5c98a65574ca4f3c32f6696ba805f5`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Related Files
@@ -1863,7 +1863,7 @@ Digest: `846bebe2085577e99099b35608dbd6455d5c98a65574ca4f3c32f6696ba805f5`. Clas
 
 ## docs/platform/agent-coordination/spec.md#unheaded-block-17
 
-Digest: `8375e15cfc82a23b8f6da28d91282c2df383e7fb050bff3339f54673d057cae0`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `8375e15cfc82a23b8f6da28d91282c2df383e7fb050bff3339f54673d057cae0`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Relationship | File |
@@ -1879,7 +1879,7 @@ Digest: `8375e15cfc82a23b8f6da28d91282c2df383e7fb050bff3339f54673d057cae0`. Clas
 
 ## docs/platform/agent-coordination/subcomponents/README.md#agent-coordination-subcomponents
 
-Digest: `b199b15dd14e50071109017bfd12eabd06644a0ee0744ce44697379f654bb7da`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b199b15dd14e50071109017bfd12eabd06644a0ee0744ce44697379f654bb7da`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Subcomponents
@@ -1887,7 +1887,7 @@ Digest: `b199b15dd14e50071109017bfd12eabd06644a0ee0744ce44697379f654bb7da`. Clas
 
 ## docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-1
 
-Digest: `a2f7f558687369ffb768196c543e8a1c54a307204b674ce222c214b14fd2aa7b`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `a2f7f558687369ffb768196c543e8a1c54a307204b674ce222c214b14fd2aa7b`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -1910,7 +1910,7 @@ Related:
 
 ## docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-2
 
-Digest: `977594297c84c63480f6bc311a702f3e9f695082bfcc529b1b5399c29ec9aa53`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `977594297c84c63480f6bc311a702f3e9f695082bfcc529b1b5399c29ec9aa53`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 Create `subcomponents/<name>/` directories only after the source inventory
@@ -1920,7 +1920,7 @@ component vocabulary and points to owning sources.
 
 ## docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-3
 
-Digest: `1bbf496db96ec2f6f7b8e2c7e096a52163ea253a91842d8f4df6a7495aee193b`. Classification proposal: explicit-added-frame. Review pending.
+Digest at original review pin: `1bbf496db96ec2f6f7b8e2c7e096a52163ea253a91842d8f4df6a7495aee193b`. Classification accepted by review-2-reverse.md at bb03cab52: explicit-added-frame.
 
 ``````markdown
 | Subcomponent | Owns | Primary sources | Target directory | Status |
@@ -1949,7 +1949,7 @@ Digest: `1bbf496db96ec2f6f7b8e2c7e096a52163ea253a91842d8f4df6a7495aee193b`. Clas
 
 ## docs/platform/agent-coordination/subcomponents/README.md#related-files
 
-Digest: `7adb704bebcafd2b3bec485a09dc44cf08ba52388f2e26ea01b9b15cb7b97f99`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `7adb704bebcafd2b3bec485a09dc44cf08ba52388f2e26ea01b9b15cb7b97f99`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Related Files
@@ -1957,7 +1957,7 @@ Digest: `7adb704bebcafd2b3bec485a09dc44cf08ba52388f2e26ea01b9b15cb7b97f99`. Clas
 
 ## docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-4
 
-Digest: `c2f39d5a1408826abe4019274e4ded7766b5bf8e361dd33513708f9fa1087dab`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `c2f39d5a1408826abe4019274e4ded7766b5bf8e361dd33513708f9fa1087dab`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Relationship | File |
@@ -1969,7 +1969,7 @@ Digest: `c2f39d5a1408826abe4019274e4ded7766b5bf8e361dd33513708f9fa1087dab`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log#file-block
 
-Digest: `5827186945b10396251ca5ebccc73dfbd89ebba2b9589d52dfe79fb732aa548a`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5827186945b10396251ca5ebccc73dfbd89ebba2b9589d52dfe79fb732aa548a`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 # Interpretation of the vnflow case (lead advisor, provisional — formed from the case and person inputs alone, before any evidence)
@@ -2029,7 +2029,7 @@ I can already name one thing the panel will not be able to decide for them, and 
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log#file-block
 
-Digest: `492ad9a1ef18f4ca0c332d144ba0713acc0b2526cab2b5f31b2dd880b3b7faba`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `492ad9a1ef18f4ca0c332d144ba0713acc0b2526cab2b5f31b2dd880b3b7faba`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 # proposals/system-shaper.md
@@ -2086,7 +2086,7 @@ If, over the next real run cycle, this fix catches zero mixed-schema partitions 
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log#file-block
 
-Digest: `03b97c720f105e8cd94150409ce9fee9ce68f365001e4b38455a35151487326e`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `03b97c720f105e8cd94150409ce9fee9ce68f365001e4b38455a35151487326e`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 # Decision Packet — vnflow (synthesizer)
@@ -2202,7 +2202,7 @@ A distant second: **is the breadth bypass deliberate?** It does not change the d
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log#file-block
 
-Digest: `e474e8cc9264dde8627b40050e1edd86969854f4cbb99e2390d803f6fcaae583`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e474e8cc9264dde8627b40050e1edd86969854f4cbb99e2390d803f6fcaae583`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 # dialogue/1-impact.md — Lead Advisor interpretation of the human turn
@@ -2292,7 +2292,7 @@ Vietnamese `tiếp theo là gì` is maximally scope-neutral — it carries no "f
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2300,7 +2300,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2308,7 +2308,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log#file-block
 
-Digest: `d440fad927b4ed0107542461e453d715dabaaae99cffe30b1509f79d31d58f2d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `d440fad927b4ed0107542461e453d715dabaaae99cffe30b1509f79d31d58f2d`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical
@@ -2318,7 +2318,7 @@ fatal: not a git repository (or any of the parent directories): .git
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log#file-block
 
-Digest: `d440fad927b4ed0107542461e453d715dabaaae99cffe30b1509f79d31d58f2d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `d440fad927b4ed0107542461e453d715dabaaae99cffe30b1509f79d31d58f2d`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical
@@ -2328,7 +2328,7 @@ fatal: not a git repository (or any of the parent directories): .git
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2336,7 +2336,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2344,7 +2344,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2352,7 +2352,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2360,7 +2360,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log#file-block
 
-Digest: `5a76697168564b55d534ebf67d52bc1d648711b6bb99e0ef87d513a41e7a1f53`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5a76697168564b55d534ebf67d52bc1d648711b6bb99e0ef87d513a41e7a1f53`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=analytical
@@ -2370,7 +2370,7 @@ fatal: not a git repository (or any of the parent directories): .git
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2378,7 +2378,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2386,7 +2386,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2394,7 +2394,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2402,7 +2402,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2410,7 +2410,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2418,7 +2418,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2426,7 +2426,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2434,7 +2434,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log#file-block
 
-Digest: `d2a23caff0b56f5f2c86083b1144d74e1395e5677d2d0230a635b1102839e227`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `d2a23caff0b56f5f2c86083b1144d74e1395e5677d2d0230a635b1102839e227`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
@@ -2443,7 +2443,7 @@ fgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn pr
 
 ## docs/platform/agent-coordination/verification/implementation-alignment.md#agent-coordination-implementation-alignment
 
-Digest: `b6dd4b2f575748c0f5378ad1cd71e7a28ee7308b71d19d2ab1466597d36ad537`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `b6dd4b2f575748c0f5378ad1cd71e7a28ee7308b71d19d2ab1466597d36ad537`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 # Agent Coordination Implementation Alignment
@@ -2451,7 +2451,7 @@ Digest: `b6dd4b2f575748c0f5378ad1cd71e7a28ee7308b71d19d2ab1466597d36ad537`. Clas
 
 ## docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-1
 
-Digest: `af85c8be98a22908a855a0656f011cf997dadcc253abdf85f402c11d33657c4d`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `af85c8be98a22908a855a0656f011cf997dadcc253abdf85f402c11d33657c4d`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ```txt
@@ -2475,7 +2475,7 @@ Related:
 
 ## docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-2
 
-Digest: `1f2df29fba3d3c07c0645d1bb81d0c2302ae41e051c8ca1e1800899ef368a880`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `1f2df29fba3d3c07c0645d1bb81d0c2302ae41e051c8ca1e1800899ef368a880`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 This table is deliberately conservative. `implemented` means current checkout
@@ -2485,7 +2485,7 @@ must not be silently upgraded during doc promotion.
 
 ## docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-3
 
-Digest: `68a20f3a858320cd01857afa7ecdec632ac2f11ec699122e03668688ed5f21e0`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `68a20f3a858320cd01857afa7ecdec632ac2f11ec699122e03668688ed5f21e0`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Design claim | Implementation status | Evidence | Gap / next action |
@@ -2522,7 +2522,7 @@ Digest: `68a20f3a858320cd01857afa7ecdec632ac2f11ec699122e03668688ed5f21e0`. Clas
 
 ## docs/platform/agent-coordination/verification/implementation-alignment.md#boundary-note
 
-Digest: `d639502fbc8e6a512ef8cc10ef61afa22498a0027d120941a817ba918f25b283`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `d639502fbc8e6a512ef8cc10ef61afa22498a0027d120941a817ba918f25b283`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 ## Boundary Note
@@ -2530,7 +2530,7 @@ Digest: `d639502fbc8e6a512ef8cc10ef61afa22498a0027d120941a817ba918f25b283`. Clas
 
 ## docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-4
 
-Digest: `5bd77edcc22dcad79f494f95db2eda9fbc78e5b0413354b218be6a1a52b9b136`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `5bd77edcc22dcad79f494f95db2eda9fbc78e5b0413354b218be6a1a52b9b136`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 No component-boundary change in this Phase 2 migration. The migration adds
@@ -2540,7 +2540,7 @@ authority or component ownership.
 
 ## docs/platform/agent-coordination/verification/README.md#unheaded-block-2
 
-Digest: `edb5530e64c012e0e27acefdd713a1f2797953b862bcfa044524a7f8bca568e0`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `edb5530e64c012e0e27acefdd713a1f2797953b862bcfa044524a7f8bca568e0`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 During migration, target docs link to retained legacy proof roots. The mirrored
@@ -2550,7 +2550,7 @@ evidence artifacts or their recorded environments.
 
 ## docs/platform/agent-coordination/verification/README.md#unheaded-block-4
 
-Digest: `2a89e2cc63361c7595e3f15cdef22042073f2321ea7dd595d362ae4f8d120f9b`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `2a89e2cc63361c7595e3f15cdef22042073f2321ea7dd595d362ae4f8d120f9b`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 | Evidence set | Supports | Current proof root |
@@ -2567,7 +2567,7 @@ Digest: `2a89e2cc63361c7595e3f15cdef22042073f2321ea7dd595d362ae4f8d120f9b`. Clas
 
 ## docs/platform/agent-coordination/verification/README.md#unheaded-block-5
 
-Digest: `ea9ff5d27d04ea0fd52b2ad22e93d59d0e5f3bfad5a8a4e5f952a88a827b2427`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `ea9ff5d27d04ea0fd52b2ad22e93d59d0e5f3bfad5a8a4e5f952a88a827b2427`. Classification accepted by review-2-reverse.md at bb03cab52: unbound-existing-candidate-unit.
 
 ``````markdown
 The phase-by-phase move policy and known gaps are in
@@ -2576,7 +2576,7 @@ The phase-by-phase move policy and known gaps are in
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2584,7 +2584,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt#file-block
 
-Digest: `50b444c2cc71ceb9a0f289d55584139621a121568b98995a72a0c2bf49c52a73`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `50b444c2cc71ceb9a0f289d55584139621a121568b98995a72a0c2bf49c52a73`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 M AGENTS.md
@@ -2631,7 +2631,7 @@ M AGENTS.md
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2639,7 +2639,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log#file-block
 
-Digest: `204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
@@ -2648,7 +2648,7 @@ fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log#file-block
 
-Digest: `204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
@@ -2657,7 +2657,7 @@ fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log#file-block
 
-Digest: `204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
@@ -2666,7 +2666,7 @@ fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2674,7 +2674,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2682,7 +2682,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2690,7 +2690,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2698,7 +2698,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2706,7 +2706,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2714,7 +2714,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2722,7 +2722,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2730,7 +2730,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json#file-block
 
-Digest: `fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 {
@@ -2750,7 +2750,7 @@ Digest: `fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2758,7 +2758,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2766,7 +2766,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json#file-block
 
-Digest: `fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 {
@@ -2786,7 +2786,7 @@ Digest: `fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2794,7 +2794,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2802,7 +2802,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2810,7 +2810,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2818,7 +2818,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2826,7 +2826,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt#file-block
 
-Digest: `4d49dcb3e2c4bce17d99e97a8c49e8a1c831b115cec6ecf2575bdd5ac28dad82`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `4d49dcb3e2c4bce17d99e97a8c49e8a1c831b115cec6ecf2575bdd5ac28dad82`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 M .fgos/events.jsonl
@@ -2834,7 +2834,7 @@ M .fgos/events.jsonl
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2842,7 +2842,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2850,7 +2850,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2858,7 +2858,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2866,7 +2866,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 
@@ -2874,7 +2874,7 @@ Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Clas
 
 ## docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log#file-block
 
-Digest: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Classification proposal: unbound-existing-candidate-unit. Review pending.
+Digest at original review pin: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Corrected classification proposal: legacy-same-path-proof-copy-binding-blocked. Independent re-review pending. Exact same-path binding is proposed in same-path-binding-blocker.json, not activated: unchanged one-owner gate rejects 12 split semantic groups. This is carried legacy evidence, not a candidate-native unit.
 
 ``````markdown
 

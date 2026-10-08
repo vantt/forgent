@@ -1,0 +1,532 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-08",
+  "reviewCommit": "bb03cab52579d358015c611fa8b8543062a6e4da",
+  "status": "blocked-not-active",
+  "gateCommand": [
+    "node",
+    "scripts/check-doc-inventory-gates.mjs",
+    "--inventory",
+    "/tmp/phase06/review-doc-inventory.json",
+    "--identity-registry",
+    "/tmp/phase06/review-identity-registry.json",
+    "--decisions",
+    "plans/260925-documentation-authority-unification/pilot/decisions",
+    "--decisions",
+    "plans/260925-documentation-authority-unification/ledger/decisions",
+    "--previous-registry",
+    "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+    "--json"
+  ],
+  "fatalFindings": [
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_8b52f6236cacb629c47de415 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-impact.md, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_6ac5b20877c5585b445bdef1 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/interpretation.md, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_c3acb13cbce2097a1a9b2492 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/system-shaper.md, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_ca1c6607334f02c60d66e594 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_b0b5f99c8bbca85879b86429 names 38 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_1e9fc4074bbe5faaa990b503 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_943a523362f3df62a2fd6cc7 names 3 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_ac6e24f8fd68631c38f0f0c2 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_dcf636efe9a209660e095cae names 2 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_9b6b5cdd75e68f5adc33a576 names 4 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_8bde2eb4542d09aa6de234dc names 3 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json"
+    },
+    {
+      "type": "semantic-claim-multiple-owners",
+      "message": "semantic claim semantic_93f3596f54c732880b39f3f5 names 2 different target owners: docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt, docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt"
+    }
+  ],
+  "mirrorChanges": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log",
+      "blobSha": "9c54dc613990d943af78a756182c47ec7522f00a"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log",
+      "blobSha": "9c54dc613990d943af78a756182c47ec7522f00a"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-06.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log",
+      "blobSha": "2edc470a8d5c0276453009863fb49b82c34c6b54"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-07.json",
+      "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log",
+      "after": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log",
+      "blobSha": "a3c4734fda733b589c50bb2dcdd8438dfbd03512"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt",
+      "blobSha": "ee78cde3ac63322d93a24362e74fc32e9c51bb54"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log",
+      "blobSha": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log",
+      "blobSha": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log",
+      "blobSha": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json",
+      "blobSha": "1645db411eabf6408b71647cb953a4703dd76355"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json",
+      "blobSha": "1645db411eabf6408b71647cb953a4703dd76355"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
+      "before": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
+      "blobSha": "1b30ed201a9b885c5be434203bbdd997c98fc015"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-mirrors-15.json",
+      "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log",
+      "before": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "after": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log",
+      "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    }
+  ],
+  "logShard": {
+    "version": 1,
+    "shard": "s2-agent-coordination-log-duplicates",
+    "sources": [
+      "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+      "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+      "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+      "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log"
+    ],
+    "authorSession": "codex-session:1@2026-10-08",
+    "authorshipRequired": true,
+    "claims": [
+      {
+        "claimId": "claim_8b81aaaa5cd08b21f9f91d12fedfeaff",
+        "sourceUnitDigest": "5827186945b10396251ca5ebccc73dfbd89ebba2b9589d52dfe79fb732aa548a",
+        "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+        "targetAnchor": "file-block",
+        "claimKind": "historical-context",
+        "disposition": "delete-as-duplicate",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-08",
+        "searched": [
+          "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+          "equal git blob 20798e890ee7ecf99b694a2efec209f8e9992e86",
+          "same-extension whole-file extraction"
+        ],
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "reviewNote": "The 9,446-byte raw log 2-lead-advisor-interpretation-raw.log is byte-identical to git blob 20798e89 (proofs/P01.3/interpretation.md), which I compared in full, and the root-heading anchor is right; but the byte-identical same-relative-path platform copy runs/2-lead-advisor-interpretation-raw.log is named by no row (reverse-open), so route the source to its own platform copy and keep the Markdown receipt as the semantic owner."
+      },
+      {
+        "claimId": "claim_b63727f20ff5dddbcf952143d51a7cc5",
+        "sourceUnitDigest": "492ad9a1ef18f4ca0c332d144ba0713acc0b2526cab2b5f31b2dd880b3b7faba",
+        "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+        "targetAnchor": "file-block",
+        "claimKind": "historical-context",
+        "disposition": "delete-as-duplicate",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-08",
+        "searched": [
+          "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+          "equal git blob 512227079f74eb0ec5aea744285540d3a1a6b173",
+          "same-extension whole-file extraction"
+        ],
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "reviewNote": "The 9,323-byte raw log 3-system-shaper-raw.log equals git blob 51222707 (proofs/P01.3/proposals/system-shaper.md) byte for byte and the owner anchor is the document root heading; however the same-path platform copy runs/3-system-shaper-raw.log is left unbound (reverse-open), so the log row should bind to that copy while the Markdown stays the one semantic owner."
+      },
+      {
+        "claimId": "claim_22cef8c4195654ff9e7d1605baee67de",
+        "sourceUnitDigest": "e474e8cc9264dde8627b40050e1edd86969854f4cbb99e2390d803f6fcaae583",
+        "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+        "targetAnchor": "file-block",
+        "claimKind": "historical-context",
+        "disposition": "delete-as-duplicate",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-08",
+        "searched": [
+          "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+          "equal git blob 3dd02175966e34d0e9d272b95e3517da10c4e418",
+          "same-extension whole-file extraction"
+        ],
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "reviewNote": "The 8,620-byte raw log 9-lead-advisor-dialogue-1-impact-raw.log is byte-identical to blob 3dd02175 (dialogue/1-impact.md) and the anchor is the root heading; the identical platform file runs/9-lead-advisor-dialogue-1-impact-raw.log has no deciding row (reverse-open), so route the source to its own platform copy and mark the Markdown as semantic owner."
+      },
+      {
+        "claimId": "claim_a5fa3b0377f31fb12bc7424b370dc8ba",
+        "sourceUnitDigest": "03b97c720f105e8cd94150409ce9fee9ce68f365001e4b38455a35151487326e",
+        "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log",
+        "targetAnchor": "file-block",
+        "claimKind": "historical-context",
+        "disposition": "delete-as-duplicate",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-08",
+        "searched": [
+          "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log",
+          "equal git blob 6328335dcb51b256668d7587c3b7e21a03e06588",
+          "same-extension whole-file extraction"
+        ],
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "reviewNote": "The 15,912-byte raw synthesizer log is byte-identical to blob 6328335d (proofs/P01.3/synthesis.md), but the owner anchor 'recommendation' is the H2 section, not the document root heading '# Decision Packet - vnflow (synthesizer)' that the rationale says it uses, and the same-path platform copy runs/7-synthesizer-raw.log stays unbound (reverse-open); fix the anchor and route the row to the platform log copy."
+      }
+    ],
+    "files": [
+      {
+        "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+        "disposition": "delete-as-duplicate",
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "targets": [
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log"
+        ]
+      },
+      {
+        "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+        "disposition": "delete-as-duplicate",
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "targets": [
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log"
+        ]
+      },
+      {
+        "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+        "disposition": "delete-as-duplicate",
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "targets": [
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log"
+        ]
+      },
+      {
+        "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log",
+        "disposition": "delete-as-duplicate",
+        "targets": [
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log"
+        ],
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover."
+      }
+    ],
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-log-duplicates.md"
+  },
+  "invariant": "Rows sharing semanticClaimId must have one targetOwner; same-path physical copies introduce multiple owners.",
+  "noCheckerOrBaselineChange": true
+}

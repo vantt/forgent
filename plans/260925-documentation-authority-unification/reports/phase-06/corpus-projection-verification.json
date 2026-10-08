@@ -2118,28 +2118,28 @@
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
       "markdown": "/tmp/phase06/review-agent-coordination-judgment-01.md",
       "rows": 500,
-      "commit": "3b0ccc3df89ceda58162f18c8361d951a830a081",
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
       "identities": 500
     },
     {
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
       "markdown": "/tmp/phase06/review-agent-coordination-judgment-02.md",
       "rows": 500,
-      "commit": "3b0ccc3df89ceda58162f18c8361d951a830a081",
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
       "identities": 500
     },
     {
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
       "markdown": "/tmp/phase06/review-agent-coordination-judgment-03.md",
       "rows": 430,
-      "commit": "3b0ccc3df89ceda58162f18c8361d951a830a081",
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
       "identities": 430
     },
     {
       "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
       "markdown": "/tmp/phase06/review-agent-coordination-log-duplicates.md",
       "rows": 4,
-      "commit": "3b0ccc3df89ceda58162f18c8361d951a830a081",
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
       "identities": 4
     }
   ],
@@ -2150,7 +2150,7 @@
       "Unit-exact": 2722
     },
     "path": "/tmp/phase06/script-proof-population-agent-coordination.json",
-    "sha256": "d1958abccfca5250165f2d0f09e00601cf1000b7005c12e550d1fab1111812a3",
+    "sha256": "fec451b651e1cc342af4709876a4eb8f734992ae54337b5e69069dc328f69af6",
     "chosenByAuthor": 0
   },
   "retiredFullText": {

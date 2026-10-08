@@ -462,7 +462,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md#deliberately-not-promoted at docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md#deliberately-not-promoted. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Deliberately Not Promoted.",
+      "rationale": "Preserve docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md#deliberately-not-promoted at docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md#deliberately-not-promoted. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Deliberately Not Promoted: I read the full text; only the Architecture Intent link was rewritten to a valid ../../../architect path and every deferral is kept, so supersede is fine, but the rationale claims promotion metadata changed this section, which is false here. Rewrite it to name the link normalization."
     },
     {
@@ -1851,11 +1851,11 @@
       "sourceUnitDigest": "568e55dce8911c31949f5c713359c96208c9d1cd7232a6fcf096b86d6481f969",
       "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
       "targetAnchor": "runtime-recovery-principles",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/architecture/README.md#runtime-recovery-principles at docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Runtime Recovery Principles.",
+      "rationale": "Preserve docs/architect/agent-coordination/architecture/README.md#runtime-recovery-principles at docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records recovery authority and fencing design, not routing. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Runtime Recovery Principles is labelled navigation but is substantive normative design: incident never creates execution authority, three distinct fencing guarantees, unknown versus absent, Node/Rust coexistence. Text is byte-equal, so only claimKind is wrong; relabel as architecture (or contract), not navigation."
     },
     {
@@ -2375,7 +2375,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: 6. Local Concurrency And Durability.",
+      "rationale": "Preserve docs/architect/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability. The actual difference is line reflow in the concurrency/durability prose, not promotion metadata or a migration notice.",
       "reviewNote": "Local Concurrency And Durability: I diffed full text and target equals source except line reflow, so supersede is defensible, but the rationale claims promotion metadata and the migration notice altered this payload, which is false for a numbered body section. Restate the reason as whitespace reflow, or classify as promote."
     },
     {
@@ -3518,7 +3518,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/contracts/coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09 at docs/platform/agent-coordination/contracts/coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Driver-Authorized Optional Operations And Recheck (MVP1/MVP2, Step 09).",
+      "rationale": "Preserve docs/architect/agent-coordination/contracts/coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09 at docs/platform/agent-coordination/contracts/coordination-session.md#driver-authorized-optional-operations-and-recheck-mvp1mvp2-step-09. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Driver-Authorized Optional Operations heading section: full text matches except the Step 09 link retargeted to ../../../architect/proposals/ (navigation-only, fine), but the rationale blames promotion metadata and the migration notice, which do not touch this body heading. Reword to a link-rewrite basis."
     },
     {
@@ -3660,12 +3660,10 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-37 at docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-36. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. The unit names the limitations explicitly; its complete wording and section-specific context are retained.",
-      "reviewNote": "Bold lead-in 'Named limitations, not omitted.' in the first limitation list is a byte-equal one-line block with consistent line offset; its numbered limitations are separately owned, and contract kind follows its section.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
@@ -3684,7 +3682,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/contracts/coordination-session.md#deliberation-contribution-ledger-mvp8-step-09 at docs/platform/agent-coordination/contracts/coordination-session.md#deliberation-contribution-ledger-mvp8-step-09. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Deliberation Contribution Ledger (MVP8, Step 09).",
+      "rationale": "Preserve docs/architect/agent-coordination/contracts/coordination-session.md#deliberation-contribution-ledger-mvp8-step-09 at docs/platform/agent-coordination/contracts/coordination-session.md#deliberation-contribution-ledger-mvp8-step-09. The historical contribution-ledger link is now an inline-code path with an explicit absent-at-pin label; the source contribution rules remain complete.",
       "reviewNote": "Deliberation Contribution Ledger (MVP8): all content carried, with one markdown link flattened to inline code with a labelled 'historical path absent' note (acceptable). Rationale wrongly cites promotion metadata and the migration notice; it should state the link rewrite. Fix the rationale."
     },
     {
@@ -3716,12 +3714,10 @@
       "targetAnchor": "unheaded-block-44",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-45 at docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-44. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. The unit names the limitations explicitly; its complete wording and section-specific context are retained.",
-      "reviewNote": "Second 'Named limitations, not omitted.' marker, same bold line, offset +16 like its neighbours, byte-equal in the candidate; kind contract follows the section, and ancestor-heading difference is by design.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
@@ -3738,12 +3734,10 @@
       "targetAnchor": "unheaded-block-53",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-54 at docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-53. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. The unit names the limitations explicitly; its complete wording and section-specific context are retained.",
-      "reviewNote": "Third 'Named limitations, not omitted.' bold lead-in at the later position is byte-equal with the consistent +16 line shift; accepted as a repeated-digest weak match whose local context was checked.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
@@ -4008,7 +4002,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/contracts/flow-definition.md#activation-phase-00-step-09-mvp1mvp2 at docs/platform/agent-coordination/contracts/flow-definition.md#activation-phase-00-step-09-mvp1mvp2. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Activation (Phase 00, Step 09 MVP1/MVP2).",
+      "rationale": "Preserve docs/architect/agent-coordination/contracts/flow-definition.md#activation-phase-00-step-09-mvp1mvp2 at docs/platform/agent-coordination/contracts/flow-definition.md#activation-phase-00-step-09-mvp1mvp2. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Activation (Phase 00, Step 09 MVP1/MVP2) (activation-phase-00-step-09-mvp1mvp2): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (../../proposals/step-09-group-thinking-substrate.md#7-mvp2-- becomes ../../../architect/proposals/step-09-group-thinking-substrate.md#7-mvp), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8391,7 +8385,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#reading-rule at docs/platform/agent-coordination/intent-preservation-ledger.md#reading-rule. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Reading Rule.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#reading-rule at docs/platform/agent-coordination/intent-preservation-ledger.md#reading-rule. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Reading Rule (reading-rule): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (documentation-governance.md becomes ../../architect/agent-coordination/documentation-governance.md), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8509,7 +8503,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: AC-I003: Reusable Declared Coordination Protocols.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "AC-I003: Reusable Declared Coordination Protocols (ac-i003-reusable-declared-coordination-p): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#discu becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8544,7 +8538,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: AC-I004: Group Cognition And Heterogeneous Cohorts.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "AC-I004: Group Cognition And Heterogeneous Cohorts (ac-i004-group-cognition-and-heterogeneou): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#discu becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8579,7 +8573,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: AC-I006: One Governed Dispatch And Evidence Core.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "AC-I006: One Governed Dispatch And Evidence Core (ac-i006-one-governed-dispatch-and-eviden): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (decisions/ADR-009-flow-definition-shared-ir-and-typed-profil becomes ../../architect/agent-coordination/decisions/ADR-009-flow-definition-s), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8614,7 +8608,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: AC-I007: Optional Multi-Session Mission Grouping.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "AC-I007: Optional Multi-Session Mission Grouping (ac-i007-optional-multi-session-mission-g): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#6-mis becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8649,7 +8643,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: AC-I008: Interactive And Headless Capability Parity.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity at docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "AC-I008: Interactive And Headless Capability Parity (ac-i008-interactive-and-headless-capabil): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (proposals/step-08-standalone-coordination-protocols.md#discu becomes ../../architect/agent-coordination/proposals/step-08-standalone-coordi), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8684,7 +8678,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace at docs/platform/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Current Step 08 Decision Trace.",
+      "rationale": "Preserve docs/architect/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace at docs/platform/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Current Step 08 Decision Trace (current-step-08-decision-trace): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (decisions/ADR-009-flow-definition-shared-ir-and-typed-profil becomes ../../architect/agent-coordination/decisions/ADR-009-flow-definition-s), so the stated cause is wrong and the rationale must name the actual change."
     },
     {

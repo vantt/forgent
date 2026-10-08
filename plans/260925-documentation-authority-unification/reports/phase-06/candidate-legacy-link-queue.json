@@ -1,0 +1,345 @@
+{
+  "version": 1,
+  "reviewCommit": "bb03cab52579d358015c611fa8b8543062a6e4da",
+  "candidatePin": "abf4bf803d56a6db8805e6ea4cb3b3a21d750fa1",
+  "units": [
+    {
+      "claimId": "claim_2970edb369265480bce99fc459a78f9f",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#reading-rule",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/documentation-governance.md",
+          "resolved": "docs/architect/agent-coordination/documentation-governance.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_7bb43a970c276c239b175c305484e9f2",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-3",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/documentation-governance.md",
+          "resolved": "docs/architect/agent-coordination/documentation-governance.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_9279f4835dadfbc5bfe1e36a6996e224",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i003-reusable-declared-coordination-protocols",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_3fcfa598b55eb8caeeac0f5710f35e4d",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-13",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_90fb224838802d8b8219173540d2bd54",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e9968b804d2a3451dad2da1aa51325c6",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-14",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_1df109fb2d2dfb82e8dd95f03194e0bf",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i006-one-governed-dispatch-and-evidence-core",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_a6c00740c165d291ab32cea3a9f5dc9f",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-16",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_c5c045261c06f0a689092f4192b47db7",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i007-optional-multi-session-mission-grouping",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#6-mission-versus-coordinationsession",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#6-mission-versus-coordinationsession"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e01277e6bceabc79e56a3b2ab6d1c15c",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-17",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#6-mission-versus-coordinationsession",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#6-mission-versus-coordinationsession"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_8c1c4171c13de6c0373afbc34e4f7fb2",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i008-interactive-and-headless-capability-parity",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e68a8afbc85b7a5a4fddad3240c28bf9",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-18",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_e82b12e2386d28bc0275ad5d884d3b5e",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#current-step-08-decision-trace",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/flow-definition.md",
+          "resolved": "docs/architect/agent-coordination/contracts/flow-definition.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/coordination-session.md",
+          "resolved": "docs/architect/agent-coordination/contracts/coordination-session.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/coordination-session.md",
+          "resolved": "docs/architect/agent-coordination/contracts/coordination-session.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c48de5ff31d696d7820b6d6688afec38",
+      "target": "docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-21",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/flow-definition.md",
+          "resolved": "docs/architect/agent-coordination/contracts/flow-definition.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/coordination-session.md",
+          "resolved": "docs/architect/agent-coordination/contracts/coordination-session.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/coordination-session.md",
+          "resolved": "docs/architect/agent-coordination/contracts/coordination-session.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+          "resolved": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "reviewed"
+    },
+    {
+      "claimId": "claim_9ca45c1cbc5df4468eae3eb46d27e672",
+      "target": "docs/platform/agent-coordination/verification/README.md#evidence-sets",
+      "links": [
+        {
+          "href": "../../../architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+          "resolved": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/runtime-recovery/",
+          "resolved": "docs/architect/agent-coordination/verification/runtime-recovery/"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/dispatch-operability-implementation/",
+          "resolved": "docs/architect/agent-coordination/verification/dispatch-operability-implementation/"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md",
+          "resolved": "docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/code-implementation-track-policy/",
+          "resolved": "docs/architect/agent-coordination/verification/code-implementation-track-policy/"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md",
+          "resolved": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md",
+          "resolved": "docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md"
+        },
+        {
+          "href": "../../../architect/agent-coordination/verification/team-dispatch-v1/index.md",
+          "resolved": "docs/architect/agent-coordination/verification/team-dispatch-v1/index.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b15db24ee1738cb12ed454378aab1638",
+      "target": "docs/platform/agent-coordination/vision.md#reading-down-from-the-vision",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/documentation-governance.md",
+          "resolved": "docs/architect/agent-coordination/documentation-governance.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/vocabulary/README.md",
+          "resolved": "docs/architect/agent-coordination/vocabulary/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/architecture/README.md",
+          "resolved": "docs/architect/agent-coordination/architecture/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/README.md",
+          "resolved": "docs/architect/agent-coordination/contracts/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/README.md",
+          "resolved": "docs/architect/agent-coordination/decisions/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+          "resolved": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
+      "target": "docs/platform/agent-coordination/vision.md#unheaded-block-65",
+      "links": [
+        {
+          "href": "../../architect/agent-coordination/documentation-governance.md",
+          "resolved": "docs/architect/agent-coordination/documentation-governance.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/vocabulary/README.md",
+          "resolved": "docs/architect/agent-coordination/vocabulary/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/architecture/README.md",
+          "resolved": "docs/architect/agent-coordination/architecture/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/contracts/README.md",
+          "resolved": "docs/architect/agent-coordination/contracts/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/decisions/README.md",
+          "resolved": "docs/architect/agent-coordination/decisions/README.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+          "resolved": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md"
+        },
+        {
+          "href": "../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+          "resolved": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md"
+        }
+      ],
+      "status": "queued-for-step-10",
+      "reviewStatus": "pending"
+    }
+  ],
+  "scope": "The 17 target units named by the independent review; 50 link occurrences, including heading/child overlap, not a repository-wide link inventory.",
+  "action": "Step 10 single link pass: repoint to canonical platform copies, log edits, rebind and re-review changed approved units; no link rewrite now."
+}

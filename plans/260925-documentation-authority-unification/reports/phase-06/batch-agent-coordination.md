@@ -1,6 +1,6 @@
 # Agent Coordination authoring evidence
 
-Status: ready-for-review (P4 authoring complete); batch closure remains UNPROVEN.
+Status: one rework round authored; blocked on owner contract decisions. Batch closure remains UNPROVEN. The tables below retain first-release authoring evidence; current counts and proof are in review-rework-evidence.json.
 Author session: codex-session:1@2026-10-08
 Decision data: 576f9efea72de92d4191eb295afd9b2349bbb99a
 Candidate documents: 0a41d793e60631aa9073c73a941f641548862b6c
@@ -59,4 +59,4 @@ Actual corpus fixture proof: 45,759 reviewed fixture rows, all three projections
 
 The retirement CLI remains red (15 blocked / four pass / one review), with zero invariant failures; its unresolved-conflict measure is three duplicate and 13 semantic groups outside the authored batch. Receipts still need independent semantic acceptance. Owner holds: zero unknown-blocking source rows, zero corpus-policy holds. Archive proposals remain 65 notices; no obsolete delete. Promoted portal edits are unchanged and stay in the reviewer/owner visibility list.
 
-Next action: owner starts the independent content review. Author stops now, does not flip rows and does not start the next batch. After committed review reports, apply only their verdicts, then perform strict E, reverse closure, reduced promotion rehearsal and fresh-reader scenarios. None of those later proofs or Phase 6 completion is asserted.
+Next action: owner resolves physical-carrier/semantic-owner and candidate-native reverse proof contracts in owner-queue.md; then complete the bindings and regenerate the single independent re-review release described in review-request-2-rework.md. Current manual status is 1,329 reviewed / 106 pending; 74 receipts, 128 exception classifications and 59 reverse proposals require re-review. Both D commands are green; strict E remains red with 106 pending, 334 declared exceptions and 182 reverse-open. No batch close, promotion rehearsal, fresh-reader result or Host Invocation progress is asserted.

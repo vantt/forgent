@@ -2262,11 +2262,11 @@
       "sourceUnitDigest": "f5dcc024bc8fcd4791a5a38fa1aa8a5c53020bf858c2e44c02af19916377338f",
       "targetOwner": "docs/platform/agent-coordination/playbooks/README.md",
       "targetAnchor": "runtime-boundary",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/playbooks/README.md#runtime-boundary at docs/platform/agent-coordination/playbooks/README.md#runtime-boundary. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Runtime Boundary.",
+      "rationale": "Preserve docs/architect/agent-coordination/playbooks/README.md#runtime-boundary at docs/platform/agent-coordination/playbooks/README.md#runtime-boundary. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records production dependency boundary. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Runtime Boundary in playbooks/README states that nothing under the directory is a production dependency and sets duties for runtime code; that is a boundary rule, not routing, so kind navigation misstates it while the portal kind forbids rules (same defect as the Bootstrap Role and End-State Lifecycle rows)."
     },
     {
@@ -2274,11 +2274,11 @@
       "sourceUnitDigest": "5586cee97371d7973679470e21546b64a320f30f82c7cc30f636db0c38c332d5",
       "targetOwner": "docs/platform/agent-coordination/playbooks/README.md",
       "targetAnchor": "unheaded-block-6",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/playbooks/README.md#unheaded-block-6 at docs/platform/agent-coordination/playbooks/README.md#unheaded-block-6. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: The production authoring sources are:.",
+      "rationale": "Preserve docs/architect/agent-coordination/playbooks/README.md#unheaded-block-6 at docs/platform/agent-coordination/playbooks/README.md#unheaded-block-6. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records production-source boundary lead-in. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The lead-in 'The production authoring sources are:' belongs to the Runtime Boundary rule section whose kind is a rule, not navigation; kind should follow the reworked Runtime Boundary section or the list should live in a non-portal owner."
     },
     {
@@ -2286,11 +2286,11 @@
       "sourceUnitDigest": "3b212d84be0ac669c98f2d44cb1a9c4d99d4b7ee8481e16b1e7bdb3ba7e99c42",
       "targetOwner": "docs/platform/agent-coordination/playbooks/README.md",
       "targetAnchor": "bootstrap-role",
-      "claimKind": "navigation",
+      "claimKind": "intent",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/playbooks/README.md#bootstrap-role at docs/platform/agent-coordination/playbooks/README.md#bootstrap-role. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Bootstrap Role.",
+      "rationale": "Preserve docs/architect/agent-coordination/playbooks/README.md#bootstrap-role at docs/platform/agent-coordination/playbooks/README.md#bootstrap-role. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind intent records rationale for the bootstrap/manual recovery path. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Bootstrap Role explains why the manual harness exists, with the human-selects-template flow, and why it stays useful as a recovery procedure. That is design rationale, not routing, so kind=navigation misstates it; architecture or intent fits. Text is byte-equal."
     },
     {
@@ -2298,11 +2298,11 @@
       "sourceUnitDigest": "c0f2627bd3a40d5a7da062b832d43f7b5b544e6052136ccc8a529b372173696b",
       "targetOwner": "docs/platform/agent-coordination/playbooks/README.md",
       "targetAnchor": "end-state-lifecycle",
-      "claimKind": "navigation",
+      "claimKind": "intent",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/playbooks/README.md#end-state-lifecycle at docs/platform/agent-coordination/playbooks/README.md#end-state-lifecycle. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: End-State Lifecycle.",
+      "rationale": "Preserve docs/architect/agent-coordination/playbooks/README.md#end-state-lifecycle at docs/platform/agent-coordination/playbooks/README.md#end-state-lifecycle. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind intent records end-state obligations of the manual harness. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "End-State Lifecycle sets obligations once runtime coordination is verified: prompts unread during execution, deleting the playbook must not change behavior, and archive conditions. These are normative lifecycle rules, so navigation is the wrong kind; intent or decision fits. Text is byte-equal."
     },
     {
@@ -2761,19 +2761,19 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/dag-request-scheduler.md#41-dag-response-contract at docs/platform/agent-coordination/proposals/dag-request-scheduler.md#41-dag-response-contract. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: 4.1 DAG Response Contract.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dag-request-scheduler.md#41-dag-response-contract at docs/platform/agent-coordination/proposals/dag-request-scheduler.md#41-dag-response-contract. The four legacy outcomes are retained and materialized is explicitly labelled Added in candidate, with last-implementation evidence at 2180b4e72^. It is an implementation-era extension, not an unchanged enum or active-scheduler assertion.",
       "reviewNote": "Section 4.1 DAG Response Contract: the target adds a 'materialized' outcome to the enum and a paragraph defining it, with no Added in candidate label, while the rationale cites only promotion metadata. That is an unlabelled normative addition; label it or keep the source enum verbatim. I verified the owner evidence: materialized exists in the last implementation (src/verbs/coordination/dag-scheduler.mjs:95 and run.mjs:836,846,954 at 2180b4e72^), so the value is substantive, but the unit must label it Added in candidate (A8) and the rationale must stop saying the enum text is unchanged."
     },
     {
       "claimId": "claim_459cdfc305f52f6636bf73d1c56cccf1",
       "sourceUnitDigest": "a15104eb286e7c6dcc7d41a7420adc6dfe71ce6b450d384e8c80dd5706ebdb2b",
       "targetOwner": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
-      "targetAnchor": "41-dag-response-contract",
+      "targetAnchor": "unheaded-block-61",
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Owner A8 supersedes the older source outcome enum with the DAG response contract. materialized was a real outcome in the last implementation: src/verbs/coordination/dag-scheduler.mjs:95 and run.mjs:836,846,954 at 2180b4e72^; the scheduler was retired in 2180b4e72. Both enum texts remain unchanged. The target contract carries the complete source outcome set and the implementation-supported additional outcome; independent review remains required.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-62 at docs/platform/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-61. The four legacy outcomes are retained and materialized is explicitly labelled Added in candidate, with last-implementation evidence at 2180b4e72^. It is an implementation-era extension, not an unchanged enum or active-scheduler assertion. Bind the corresponding enum block, not the enclosing contract heading.",
       "reviewNote": "Source is only the fenced enum 'settled | refused | blocked | deferred', but the target unit is the whole 4.1 section whose enum now ends '| materialized'. The rationale claims both enum texts stay unchanged, which is false; the original enum is not preserved and the extra outcome is unlabelled. Needs a corresponding block target. I verified the owner evidence: materialized exists in the last implementation (src/verbs/coordination/dag-scheduler.mjs:95 and run.mjs:836,846,954 at 2180b4e72^), so the value is substantive, but the unit must label it Added in candidate (A8) and the rationale must stop saying the enum text is unchanged."
     },
     {
@@ -2785,7 +2785,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-63 at docs/platform/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-62. The source text is retained in full after navigation-only path normalization or enclosing metadata/additional target text; all source clauses are retained. Review the full diff, not only the shared excerpt. Source topic: `settled` includes a RunResult whose own `status` is `failed`; it means the result was linked and readable on disk, not .",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-63 at docs/platform/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-62. The four legacy outcomes are retained and materialized is explicitly labelled Added in candidate, with last-implementation evidence at 2180b4e72^. It is an implementation-era extension, not an unchanged enum or active-scheduler assertion.",
       "reviewNote": "The settled-outcome paragraph (result.json evidence, corrupt-evidence fail-closed, assignmentId and door fields, refusal semantics) is carried, but the target block also holds a new 'materialized' paragraph with no Added in candidate label. Unlabelled normative addition breaks the whole-unit supersede rule. I verified the owner evidence: materialized exists in the last implementation (src/verbs/coordination/dag-scheduler.mjs:95 and run.mjs:836,846,954 at 2180b4e72^), so the value is substantive, but the unit must label it Added in candidate (A8) and the rationale must stop saying the enum text is unchanged."
     },
     {
@@ -3837,11 +3837,11 @@
       "sourceUnitDigest": "ee16240ef4b8ed7b6f3ca303dc2d04975f622a9ee582af5d9a596c604b9c0cde",
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "14-narrow-implementation-status",
-      "claimKind": "architecture",
+      "claimKind": "historical-context",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: 14. Narrow Implementation Status.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records dated implementation/review snapshot. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "14. Narrow Implementation Status records the reviewed branch fgw/tsk-5x7 and a review outcome (no remaining P1/P2 findings, ready to merge). That is an implementation snapshot, so kind=architecture misstates it; historical-context or verification fits. Text is byte-equal."
     },
     {
@@ -3849,11 +3849,11 @@
       "sourceUnitDigest": "d0f60b18c91c5993b590bdbc65cb9e8a10f415878d394ebb6150a5d7861a672f",
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-126",
-      "claimKind": "architecture",
+      "claimKind": "historical-context",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-126. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Reviewed candidate branch:.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-126. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records review branch provenance. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "'Reviewed candidate branch:' introduces review provenance for a specific branch; labelling it architecture misstates a retrospective review record, so historical-context or verification is the fitting claimKind. The target text itself is byte-equal."
     },
     {
@@ -3861,11 +3861,11 @@
       "sourceUnitDigest": "93a595d6830406dc8eb35124beefaf90bbc387ae3dc0034d8b7abaeaf52d922a",
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-127",
-      "claimKind": "architecture",
+      "claimKind": "historical-context",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-128 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: ```txt fgw/tsk-5x7 ```.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-128 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records literal reviewed branch identifier. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The txt fence containing only the branch name fgw/tsk-5x7 is review provenance, not architecture; text is identical in the target, but claimKind should be historical-context or verification."
     },
     {
@@ -3875,12 +3875,10 @@
       "targetAnchor": "unheaded-block-129",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-130 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-129. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats); review its local context and ownership. Source topic: Status: implemented in the reviewed candidate..",
-      "reviewNote": "The repeated line 'Status: implemented in the reviewed candidate.' maps to target block 129, the same -1 block and +14 line offset as its neighbours, and is byte-equal, so the duplicate-digest owner choice is consistent.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
@@ -3898,12 +3896,10 @@
       "targetAnchor": "unheaded-block-130",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-131 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-130. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. Source topic: Implemented behavior:.",
-      "reviewNote": "'Implemented behavior:' (first occurrence, under the status line) is mapped to target block 130 by the same offset pattern and is byte-equal, so the repeated digest does not make the owner ambiguous.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
@@ -3943,12 +3939,10 @@
       "targetAnchor": "unheaded-block-134",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-135 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-134. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ); review its local context and ownership. Source topic: Status: implemented in the reviewed candidate..",
-      "reviewNote": "Status line repeated under item 14.2 maps to target block 134 using the same -1 block, +14 line offset as the heading around it; byte-equal, with only the repeated-text ancestry difference.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
@@ -3966,12 +3960,10 @@
       "targetAnchor": "unheaded-block-135",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-136 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-135. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Implemented behavior:.",
-      "reviewNote": "The second 'Implemented behavior:' lead-in, under item 14.2, is identical at target block 135 and lines up with the offset pattern of adjacent rows; ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
@@ -4011,12 +4003,10 @@
       "targetAnchor": "unheaded-block-138",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-139 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-138. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ); review its local context and ownership. Source topic: Status: implemented in the reviewed candidate..",
-      "reviewNote": "Status line under item 14.3 maps to target block 138 with the consistent offset and is byte-equal; digest repetition is resolved by position.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
@@ -4034,12 +4024,10 @@
       "targetAnchor": "unheaded-block-139",
       "claimKind": "architecture",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-140 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-139. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Implemented behavior:.",
-      "reviewNote": "Third 'Implemented behavior:' lead-in, belonging to 14.3, is identical at target block 139 by the same offset pattern; ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
@@ -4188,7 +4176,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/README.md#agent-coordination-proposals at docs/platform/agent-coordination/proposals/README.md#agent-coordination-proposals. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Agent Coordination Proposals.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/README.md#agent-coordination-proposals at docs/platform/agent-coordination/proposals/README.md#agent-coordination-proposals. The source subordination paragraph is restored before Migration Status, in the same H1 context as the original. Candidate promotion metadata is labelled separately.",
       "reviewNote": "The H1 unit Agent Coordination Proposals binds its whole section payload, but in the candidate the 'All proposals are subordinate to the Vision ... reconcile with the Intent Preservation Ledger' paragraph no longer sits under this heading: it moved under the pre-existing candidate H2 '## Migration Status' (present in baseline fcfe78cb8, with its own bookkeeping text), so the supersede is not a whole-section carry and the rationale blames metadata rather than the move; use partial-carry or restore the paragraph."
     },
     {
@@ -4234,11 +4222,11 @@
       "sourceUnitDigest": "5aeda891560748b8081de815e442b3ea1f0e21781b2f08643fba7a76799241d8",
       "targetOwner": "docs/platform/agent-coordination/proposals/README.md",
       "targetAnchor": "unheaded-block-3",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/README.md#unheaded-block-3 at docs/platform/agent-coordination/proposals/README.md#unheaded-block-3. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: All proposals are subordinate to the [Agent Coordination Foundation Vision](../vision.md). They resolve open design shap.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/README.md#unheaded-block-3 at docs/platform/agent-coordination/proposals/README.md#unheaded-block-3. The reviewed source clauses remain whole in the relocated unit. This is not a claim that promotion metadata changed this body section. Kind normative-law records proposal subordination to accepted foundation boundaries. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The paragraph making all proposals subordinate to the Foundation Vision (reconcile with the Intent Preservation Ledger before narrowing a proposal) is byte-equal, but it now sits under the pre-existing candidate H2 'Migration Status', where it reads as migration bookkeeping instead of the portal's governing rule, and its kind navigation misstates a rule; name this context change in the rationale and justify the kind."
     },
     {
@@ -4292,7 +4280,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/README.md#related-architect-level-intentions at docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Related Architect-Level Intentions.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/README.md#related-architect-level-intentions at docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Related Architect-Level Intentions: content and link rewrites to ../../../architect/ look correct, but the rationale wrongly says promotion metadata changed the payload and never names the real change (relative links rewritten). Rationale does not match the row; restate it."
     },
     {
@@ -4322,11 +4310,11 @@
       "sourceUnitDigest": "55bec769438c77886e875e19d75cdab7de577e7c2d0b50202a8ecf434bed8fb4",
       "targetOwner": "docs/platform/agent-coordination/proposals/README.md",
       "targetAnchor": "promotion-rule",
-      "claimKind": "navigation",
+      "claimKind": "procedure",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/README.md#promotion-rule at docs/platform/agent-coordination/proposals/README.md#promotion-rule. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Promotion Rule.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/README.md#promotion-rule at docs/platform/agent-coordination/proposals/README.md#promotion-rule. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind procedure records procedure for extracting accepted proposal outcomes. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Promotion Rule in proposals/README says approval means extracting terms, boundaries, behavior, decisions and sequence into named owners; it is a governance rule, so kind navigation in a portal misstates it (the constitution lets portals carry navigation only)."
     },
     {
@@ -4334,11 +4322,11 @@
       "sourceUnitDigest": "a8f3990c64cb586a67f968389fa3c5303a0620ada1f02424c01601e2748ff0f5",
       "targetOwner": "docs/platform/agent-coordination/proposals/README.md",
       "targetAnchor": "unheaded-block-8",
-      "claimKind": "navigation",
+      "claimKind": "procedure",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/README.md#unheaded-block-8 at docs/platform/agent-coordination/proposals/README.md#unheaded-block-8. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Approving a proposal means extracting:.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/README.md#unheaded-block-8 at docs/platform/agent-coordination/proposals/README.md#unheaded-block-8. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind procedure records lead-in to the extraction procedure. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The lead-in 'Approving a proposal means extracting:' opens the Promotion Rule list and inherits its rule nature; navigation misstates it, so it must be re-kinded or placed together with the Promotion Rule in a non-portal owner."
     },
     {
@@ -6822,11 +6810,11 @@
       "sourceUnitDigest": "f23d4e46ae28aa9c8c4281792589760f8101bc48cd6f2bcd7073cb8f2a43d0a3",
       "targetOwner": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
       "targetAnchor": "answers-to-all-open-decisions",
-      "claimKind": "architecture",
+      "claimKind": "decision",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Answers to all open decisions.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records recommended decisions and reasons. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Answers to all open decisions is a table of recommended decisions with reasons, byte-equal and correctly placed, but claimKind architecture misstates a decision record; it should be kind decision."
     },
     {
@@ -7166,11 +7154,11 @@
       "sourceUnitDigest": "89b85c7ed9f067dd47f3435211784a449029ead209d1774a874fe9c59fd57151",
       "targetOwner": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
       "targetAnchor": "affected-open-decisions-1",
-      "claimKind": "architecture",
+      "claimKind": "decision",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Affected Open Decisions.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records human decisions recorded on 2026-09-01. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Affected Open Decisions records ten human decisions dated 2026-09-01 (shared kernel, Mission deferred-preserved, direct-cut) and is byte-equal, but kind architecture misstates a decision record; relabel as decision."
     },
     {
@@ -7178,11 +7166,11 @@
       "sourceUnitDigest": "a443737003a00fc48582165071860a99b04e5cb7b4deadb896365914bdbf1f0b",
       "targetOwner": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
       "targetAnchor": "unheaded-block-238",
-      "claimKind": "architecture",
+      "claimKind": "decision",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-239 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-238. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: Human decisions recorded on 2026-09-01:.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-239 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-238. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records lead-in to the recorded human decisions. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The one-line block 'Human decisions recorded on 2026-09-01:' introduces the ten recorded human decisions, so it takes a decision kind from its section; architecture is a misstatement even though the text is byte-equal."
     },
     {
@@ -7697,7 +7685,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-2 at docs/platform/agent-coordination/README.md#unheaded-block-13. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: Document type: Portal Design status: Accepted Implementation: Partial Last reviewed: 2026-09-01 Canonical for: navigatio.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-2 at docs/platform/agent-coordination/README.md#unheaded-block-14. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "Portal metadata block (Document type: Portal, Accepted, Partial, navigation only) is byte-equal and kind navigation is fine. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7705,11 +7693,11 @@
       "sourceUnitDigest": "638bc054283207a77a0758be0d2348f1d2b1b01e76f26afc3ed363310da894f5",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-15",
-      "claimKind": "navigation",
+      "claimKind": "historical-context",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-3 at docs/platform/agent-coordination/README.md#unheaded-block-14. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ); review its local context and ownership. Source topic: > **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và các khái niệm `CoordinationSession`/`CoordinationProtocol. The restored source-specific portal subsection, not the shorter pre-existing summary, is the selected carrier.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-3 at docs/platform/agent-coordination/README.md#unheaded-block-15. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records dated transition note, not current routing. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The Vietnamese transition note dated 2026-10-02 (CoordinationSession and FlowDefinition retracted at P4, D-0050) is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7721,7 +7709,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-4 at docs/platform/agent-coordination/README.md#unheaded-block-15. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: This documentation describes how fgOS coordinates agents across providers, models, tiers, roles, capabilities, and execu.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-4 at docs/platform/agent-coordination/README.md#unheaded-block-16. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "Intro paragraph on how fgOS coordinates agents across providers, models, tiers and roles is byte-equal and navigation fits. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7733,7 +7721,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-5 at docs/platform/agent-coordination/README.md#unheaded-block-16. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: Read [Agent Coordination Foundation Vision](vision.md) first. It is the highest authority for system identity, foundatio.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-5 at docs/platform/agent-coordination/README.md#unheaded-block-17. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "The 'Read Vision first, then Intent Preservation Ledger' reading-order paragraph is byte-equal with links intact. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7745,7 +7733,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-6 at docs/platform/agent-coordination/README.md#unheaded-block-17. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: The documentation is organized by authority. Canonical vocabulary and accepted architecture are separated from proposals.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-6 at docs/platform/agent-coordination/README.md#unheaded-block-18. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "The 'documentation is organized by authority' paragraph is carried byte-equal and kind navigation fits. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7757,7 +7745,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-7 at docs/platform/agent-coordination/README.md#unheaded-block-18. The source text is retained in full after navigation-only path normalization or enclosing metadata/additional target text; all source clauses are retained. Review the full diff, not only the shared excerpt. Source topic: Read [Documentation Governance](documentation-governance.md) before changing definitions, statuses, or document placemen.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-7 at docs/platform/agent-coordination/README.md#unheaded-block-19. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "The Documentation Governance reading instruction keeps every clause; the link becomes a labelled plain-path source reference. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7769,7 +7757,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#start-here at docs/platform/agent-coordination/README.md#start-here. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Start Here.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#start-here at docs/platform/agent-coordination/README.md#start-here. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 2 to 3 inside the preserved portal wrapper. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Start Here (start-here): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit the heading level moves from ## to ### because the section is embedded under the candidate portal wrapper, so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -7781,7 +7769,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#understand-the-system at docs/platform/agent-coordination/README.md#understand-the-system. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Understand The System.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#understand-the-system at docs/platform/agent-coordination/README.md#understand-the-system. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 3 to 4 inside the preserved portal wrapper. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Understand The System (understand-the-system): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit the heading level moves from ### to #### because the section is embedded under the candidate portal wrapper, and legacy links become labelled plain paths, so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -7793,7 +7781,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-8 at docs/platform/agent-coordination/README.md#unheaded-block-19. The source text is retained in full after navigation-only path normalization or enclosing metadata/additional target text; all source clauses are retained. Review the full diff, not only the shared excerpt. Source topic: 1. [Agent Coordination Foundation Vision](vision.md) 2. [Intent Preservation Ledger](intent-preservation-ledger.md) 3. [.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-8 at docs/platform/agent-coordination/README.md#unheaded-block-20. The reviewed source clauses remain whole in the relocated unit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "The twelve-item reading list retains every entry, with item 3 turned into a labelled plain-path reference. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7805,7 +7793,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#implement-or-review-current-contracts at docs/platform/agent-coordination/README.md#implement-or-review-current-contracts. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Implement Or Review Current Contracts.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#implement-or-review-current-contracts at docs/platform/agent-coordination/README.md#implement-or-review-current-contracts. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 3 to 4 inside the preserved portal wrapper. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Implement Or Review Current Contracts (implement-or-review-current-contracts): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit the heading level moves from ### to #### because the section is embedded under the candidate portal wrapper, so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -7817,7 +7805,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-9 at docs/platform/agent-coordination/README.md#unheaded-block-20. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: 1. [Workflow Stage Operation Contract](contracts/workflow-stage-operation.md) 2. [Assignment, Run, And RunResult Contrac.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-9 at docs/platform/agent-coordination/README.md#unheaded-block-21. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "The four-item contracts list (Workflow Stage Operation, Assignment/Run/RunResult, Architecture Decisions, Team Dispatch V1 Verification) is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7829,7 +7817,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#continue-the-design-discussion at docs/platform/agent-coordination/README.md#continue-the-design-discussion. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Continue The Design Discussion.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#continue-the-design-discussion at docs/platform/agent-coordination/README.md#continue-the-design-discussion. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 3 to 4 inside the preserved portal wrapper. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Continue The Design Discussion (continue-the-design-discussion): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit the heading level moves from ### to #### because the section is embedded under the candidate portal wrapper, and legacy links become labelled plain paths, so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -7841,7 +7829,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-10 at docs/platform/agent-coordination/README.md#unheaded-block-21. The source text is retained in full after navigation-only path normalization or enclosing metadata/additional target text; all source clauses are retained. Review the full diff, not only the shared excerpt. Source topic: Read [Coordination Capability Envelope](../proposals/coordination-capability-envelope.md) for the 2026-09-06 conceptual .",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-10 at docs/platform/agent-coordination/README.md#unheaded-block-22. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "The Coordination Capability Envelope paragraph (2026-09-06 conceptual response, remains Discussion) retains every clause with the link rewritten. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7853,7 +7841,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-11 at docs/platform/agent-coordination/README.md#unheaded-block-22. The source text is retained in full after navigation-only path normalization or enclosing metadata/additional target text; all source clauses are retained. Review the full diff, not only the shared excerpt. Source topic: 1. [Step 09: Group Thinking Substrate](../proposals/step-09-group-thinking-substrate.md) 2. [Architecture Advisory Panel.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-11 at docs/platform/agent-coordination/README.md#unheaded-block-23. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "The seven-item design-discussion list, with its Architecture Advisory Panel and Architecture Intent annotations, is fully retained after link rewriting. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7865,7 +7853,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#documentation-areas at docs/platform/agent-coordination/README.md#documentation-areas. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Documentation Areas.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#documentation-areas at docs/platform/agent-coordination/README.md#documentation-areas. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 2 to 3 inside the preserved portal wrapper. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Documentation Areas (documentation-areas): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit the heading level moves from ## to ### because the section is embedded under the candidate portal wrapper, so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -7877,7 +7865,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-12 at docs/platform/agent-coordination/README.md#unheaded-block-23. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: | Area | Authority | Contents | |---|---|---| | [`vision.md`](vision.md) | Highest product authority | System identity, .",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-12 at docs/platform/agent-coordination/README.md#unheaded-block-24. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "The eleven-row Area/Authority/Contents table is byte-equal to the source and navigation fits. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7885,11 +7873,11 @@
       "sourceUnitDigest": "ea208f253536f9d4e10b1d23b625266004df4e29acaa58f5a291217bd33817de",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "current-accepted-baseline-1",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#current-accepted-baseline at docs/platform/agent-coordination/README.md#current-accepted-baseline-1. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Current Accepted Baseline. The restored source-specific portal subsection, not the shorter pre-existing summary, is the selected carrier.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#current-accepted-baseline at docs/platform/agent-coordination/README.md#current-accepted-baseline-1. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 2 to 3 inside the preserved portal wrapper. This is not a claim that promotion metadata changed this body section. Kind architecture records accepted foundation baseline. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Current Accepted Baseline lists what Team Dispatch V1 and ADR-008 to ADR-010 establish; text is fully retained with a demoted heading, but kind navigation misstates accepted-baseline claims (specification or architecture)."
     },
     {
@@ -7897,11 +7885,11 @@
       "sourceUnitDigest": "f4d95e87165838b5f9ee648aa04ae249fc17819a46e7921e3f9a14c388fc7bc6",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-25",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-13 at docs/platform/agent-coordination/README.md#unheaded-block-24. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Team Dispatch V1 currently establishes:.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-13 at docs/platform/agent-coordination/README.md#unheaded-block-25. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records lead-in to the foundation baseline. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The 'Team Dispatch V1 currently establishes:' lead-in is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation also understates the baseline section."
     },
     {
@@ -7909,11 +7897,11 @@
       "sourceUnitDigest": "ef0ce4af4d66c476286aae37922c3df39cd0b25458bec10af8b236b6a4d1e068",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-26",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-14 at docs/platform/agent-coordination/README.md#unheaded-block-25. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: - Work as the sole delivery lifecycle authority; - Workflow Stage Operations with `stage.skill`/`stage.taskSpec` primary.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-14 at docs/platform/agent-coordination/README.md#unheaded-block-26. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records foundation authority and lifecycle boundary list. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The ten-bullet list (Work sole lifecycle authority, Herdr as visibility, Job reserved) is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation also misstates baseline claims."
     },
     {
@@ -7921,11 +7909,11 @@
       "sourceUnitDigest": "fa129fe6b3d711fcf05ee7d25421018a259d126efe7e9a3611481886b2454274",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-27",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-15 at docs/platform/agent-coordination/README.md#unheaded-block-26. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: The accepted Vision additionally establishes that:.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-15 at docs/platform/agent-coordination/README.md#unheaded-block-27. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records lead-in to the accepted optional integration baseline. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The 'accepted Vision additionally establishes that:' lead-in is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation understates the baseline section."
     },
     {
@@ -7933,11 +7921,11 @@
       "sourceUnitDigest": "84716b4566520da1317174cf37c12f6fd6587cdcaf5a64e20b3292bd4465a55f",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-28",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-16 at docs/platform/agent-coordination/README.md#unheaded-block-27. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: - Work is an optional integration profile rather than coordination identity; - a predeclared Workflow or Coordination Pr.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-16 at docs/platform/agent-coordination/README.md#unheaded-block-28. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records optional work and protocol integration boundaries. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The six bullets on Work as optional integration profile and optional predeclared protocol are byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation misstates these accepted-baseline claims."
     },
     {
@@ -7945,11 +7933,11 @@
       "sourceUnitDigest": "409a734afc86e4753516c4d1c907e1c3e7ec34d99ff6a0a50f668837553b6b4a",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-29",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-17 at docs/platform/agent-coordination/README.md#unheaded-block-28. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: Step 08 Phase 00 additionally establishes, per [ADR-008](decisions/ADR-008-coordination-session-and-mission-deferral.md).",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-17 at docs/platform/agent-coordination/README.md#unheaded-block-29. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records lead-in to the recorded session/ir baseline. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The 'Step 08 Phase 00 additionally establishes, per ADR-008, ADR-009, ADR-010' lead-in is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation is questionable here."
     },
     {
@@ -7957,11 +7945,11 @@
       "sourceUnitDigest": "22030d5c906d8e724e44be335caa5afe6b76f31a2f80fe7a55650053211e9ed8",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-30",
-      "claimKind": "navigation",
+      "claimKind": "architecture",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-18 at docs/platform/agent-coordination/README.md#unheaded-block-29. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: - CoordinationSession is the V1 executable/recovery root, with one-way session-to-Assignment membership and no `missio.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-18 at docs/platform/agent-coordination/README.md#unheaded-block-30. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind architecture records coordinationsession, shared ir and parity baseline. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Bullets on CoordinationSession as V1 root, FlowDefinition shared IR, and interactive-first parity are byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation misstates these architecture claims."
     },
     {
@@ -7969,11 +7957,11 @@
       "sourceUnitDigest": "a6a5bc3f546796a71f0d9f96d5f7d7a2ed848c2998b515d21aa328692ffe1c21",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "active-design-frontier",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#active-design-frontier at docs/platform/agent-coordination/README.md#active-design-frontier. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Active Design Frontier.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#active-design-frontier at docs/platform/agent-coordination/README.md#active-design-frontier. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 2 to 3 inside the preserved portal wrapper. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind normative-law records draft acceptance and preservation boundaries. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Active Design Frontier (active-design-frontier): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit the heading level moves from ## to ### because the section is embedded under the candidate portal wrapper, and legacy links become labelled plain paths, so the stated cause is wrong and the rationale must name the actual change. Also: Active Design Frontier contains the rules that Step 09/10 drafts must not be treated as accepted and must preserve the Vision direction; with those child units reworked, the heading unit (which binds their payload) carries the same navigation kind misstatement, and its rationale also blames promotion metadata instead of the heading-level change."
     },
     {
@@ -7985,7 +7973,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-19 at docs/platform/agent-coordination/README.md#unheaded-block-30. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: The accepted Step 00-08 foundation is summarized in [Coordination Foundation Baseline](architecture/coordination-foundat.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-19 at docs/platform/agent-coordination/README.md#unheaded-block-31. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "The Step 00-08 foundation summary lead-in with its baseline link is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -7997,7 +7985,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-20 at docs/platform/agent-coordination/README.md#unheaded-block-31. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: ```txt Step 09 standalone group-thinking substrate Master Coordination style loop as first proof fixture bounded a.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-20 at docs/platform/agent-coordination/README.md#unheaded-block-32. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
       "reviewNote": "The txt fence listing Step 09, Step 10 and Component Authority Boundary Map frontier items is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -8005,11 +7993,11 @@
       "sourceUnitDigest": "dbd6a3c07ce9c30b16309949d99479ecdbbf3c0b6b139333adcea479c49e1b10",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-33",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-21 at docs/platform/agent-coordination/README.md#unheaded-block-32. The source text is retained in full after navigation-only path normalization or enclosing metadata/additional target text; all source clauses are retained. Review the full diff, not only the shared excerpt. Source topic: Step 09, Step 10, and the Component Authority Boundary Map are discussion drafts. Their proposed entities and schemas mu.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-21 at docs/platform/agent-coordination/README.md#unheaded-block-33. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind normative-law records discussion drafts are not accepted authority. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The paragraph that Step 09, Step 10 and the Boundary Map are discussion drafts keeps all clauses, with only the governance link rewritten. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -8017,11 +8005,11 @@
       "sourceUnitDigest": "8a77f23c72bdf8be38d147c2a89a4d273bae705823f56d882d6df709a08cca45",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-34",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-22 at docs/platform/agent-coordination/README.md#unheaded-block-33. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: They must, however, preserve the accepted direction in the [Vision](vision.md); the proposals may choose implementation .",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-22 at docs/platform/agent-coordination/README.md#unheaded-block-34. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind normative-law records vision preservation and optional work constraints. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The paragraph that proposals must preserve the Vision and cannot make Work mandatory is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text."
     },
     {
@@ -8029,11 +8017,11 @@
       "sourceUnitDigest": "5d87bf21f4264d7b3fb336ce33bf9c3d376ea9d7a70516ee0294757eede7977f",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "core-invariants",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#core-invariants at docs/platform/agent-coordination/README.md#core-invariants. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Core Invariants.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#core-invariants at docs/platform/agent-coordination/README.md#core-invariants. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 2 to 3 inside the preserved portal wrapper. This is not a claim that promotion metadata changed this body section. Kind normative-law records lifecycle and visibility authority invariants. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Core Invariants (Work owns delivery lifecycle, Assignment carries intent, Herdr visibility only) is carried with only a heading demotion, but kind navigation misstates a normative invariant list; use architecture or normative-law."
     },
     {
@@ -8041,11 +8029,11 @@
       "sourceUnitDigest": "74e8b43de5541222244e8dcb753a1941956b930d4247e882106e21806be1af5b",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-35",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-23 at docs/platform/agent-coordination/README.md#unheaded-block-34. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: ```txt Work owns delivery lifecycle. Declared protocol definition constrains legal operations when selected. Every dynam.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-23 at docs/platform/agent-coordination/README.md#unheaded-block-35. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind normative-law records literal authority invariant list. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The txt invariants fence (Work owns lifecycle ... Herdr provides visibility only) is byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation also misstates normative invariants."
     },
     {
@@ -8053,11 +8041,11 @@
       "sourceUnitDigest": "3a22c9dacc244532c461d5124c6a4a529baa51b7612ce42d55a76e7c373ddef7",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "maintenance-rules",
-      "claimKind": "navigation",
+      "claimKind": "procedure",
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/README.md#maintenance-rules at docs/platform/agent-coordination/README.md#maintenance-rules. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Maintenance Rules.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#maintenance-rules at docs/platform/agent-coordination/README.md#maintenance-rules. The reviewed source clauses remain whole in the relocated unit. The heading changes from level 2 to 3 inside the preserved portal wrapper. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind procedure records maintenance operation sequence. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Maintenance Rules (update vocabulary first, ADR for boundary decisions, check links after moves) is fully retained, but kind navigation misstates operating rules; relabel as procedure."
     },
     {
@@ -8065,11 +8053,11 @@
       "sourceUnitDigest": "a1876681b2fad77e79e91defc69f29cb209a6b73ab2714c98b7e3171d33f486a",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-36",
-      "claimKind": "navigation",
+      "claimKind": "procedure",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/README.md#unheaded-block-24 at docs/platform/agent-coordination/README.md#unheaded-block-35. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: ancestor headings differ); review its local context and ownership. Source topic: - Update vocabulary before introducing a new canonical term. - Reconcile `vision.md` first when changing system identity.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-24 at docs/platform/agent-coordination/README.md#unheaded-block-36. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind procedure records maintenance operation requirements. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The nine maintenance-rule bullets are byte-equal. Rationale cites the wrong target anchor (names the preceding block number while the decision and locator point one block later), so it describes a neighbouring unit; fix the rationale text. Kind navigation also misstates operator rules as procedure."
     },
     {
@@ -8138,7 +8126,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve the section identity and its source context docs/architect/agent-coordination/roadmap/README.md#tracks at docs/platform/agent-coordination/roadmap/README.md#tracks. The title is retained; promotion metadata and the separately archived temporary migration notice change the bound section payload, so this is a manual decision, not an exact claim. Source topic: Tracks.",
+      "rationale": "Preserve docs/architect/agent-coordination/roadmap/README.md#tracks at docs/platform/agent-coordination/roadmap/README.md#tracks. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section.",
       "reviewNote": "Tracks (tracks): content is fully carried, but the rationale says promotion metadata and the migration notice changed the bound payload; in this unit only relative links are retargeted (../../proposals/step-09-group-thinking-substrate.md becomes ../../../architect/proposals/step-09-group-thinking-substrate.md), so the stated cause is wrong and the rationale must name the actual change."
     },
     {
@@ -8168,11 +8156,11 @@
       "sourceUnitDigest": "de3c173ad75cc97a2c3da3e8c4005b436e45bc001901807d62aeffc7a4b9329b",
       "targetOwner": "docs/platform/agent-coordination/roadmap/README.md",
       "targetAnchor": "unheaded-block-4",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/README.md#unheaded-block-4 at docs/platform/agent-coordination/roadmap/README.md#unheaded-block-4. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: document exact share below one half); review its local context and ownership. Source topic: Roadmap documents reference canonical vocabulary, architecture, and contracts. They are not a source of new system defin.",
+      "rationale": "Preserve docs/architect/agent-coordination/roadmap/README.md#unheaded-block-4 at docs/platform/agent-coordination/roadmap/README.md#unheaded-block-4. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind normative-law records roadmaps cannot redefine the system. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "The sentence that roadmap documents are not a source of new system definitions is a normative limit on roadmaps, not a route to documents; portal kind navigation misstates it and the limit needs a non-portal owner or a justified kind."
     },
     {
@@ -8180,11 +8168,11 @@
       "sourceUnitDigest": "bb63142809ab191a946d473d43be631ef0a8e731cffedcfdcb07fdf50f244e10",
       "targetOwner": "docs/platform/agent-coordination/roadmap/README.md",
       "targetAnchor": "unheaded-block-5",
-      "claimKind": "navigation",
+      "claimKind": "procedure",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/README.md#unheaded-block-5 at docs/platform/agent-coordination/roadmap/README.md#unheaded-block-5. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: document exact share below one half); review its local context and ownership. Source topic: Implementation sequencing begins from the [Agent Coordination Foundation Vision](../vision.md), then the [Intent Preserv.",
+      "rationale": "Preserve docs/architect/agent-coordination/roadmap/README.md#unheaded-block-5 at docs/platform/agent-coordination/roadmap/README.md#unheaded-block-5. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind procedure records implementation sequencing from accepted owners. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "This sequencing instruction (begin from the Vision, then the Intent Preservation Ledger, roadmaps may not change optional Work or protocol) is a rule for implementers; kind navigation misstates it and portals may carry navigation only."
     },
     {
@@ -8192,11 +8180,11 @@
       "sourceUnitDigest": "a05683d40666fe7419cbad181d02bdca0913004921c17fdf7f31327832b962b2",
       "targetOwner": "docs/platform/agent-coordination/roadmap/README.md",
       "targetAnchor": "unheaded-block-6",
-      "claimKind": "navigation",
+      "claimKind": "procedure",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/README.md#unheaded-block-6 at docs/platform/agent-coordination/roadmap/README.md#unheaded-block-6. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: document exact share below one half); review its local context and ownership. Source topic: Every new implementation phase must include an intent traceability section and close with a deferral audit. The audit mu.",
+      "rationale": "Preserve docs/architect/agent-coordination/roadmap/README.md#unheaded-block-6 at docs/platform/agent-coordination/roadmap/README.md#unheaded-block-6. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind procedure records required intent traceability and deferral audit. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
       "reviewNote": "Every new implementation phase must include an intent traceability section and close with a deferral audit; that is an obligation, not navigation, so the portal kind misstates it and the rule needs a non-portal owner or a justified kind."
     },
     {
@@ -10152,12 +10140,10 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-22 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-21. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. Source topic: Exact code/config surfaces:.",
-      "reviewNote": "The 'Exact code/config surfaces:' line in Slice 1 recurs in other slices; I checked the L158 to L172 mapping keeps the same +14 offset as neighbours, so the repeated digest does not cross-map. Byte-equal.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "40d8d3a71761fe4ff894b410d4d6454fc73bf2a45ad40f945ecb622f1071b6d3",
@@ -10174,12 +10160,10 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-25 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-24. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "The 'Verification commands:' line under Slice 1 at source L194 maps to target L208, preserving the constant offset, so the repeated text lands in its own slice and not a neighbour's; byte-equal, ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
@@ -10196,12 +10180,10 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-31 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-30. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Exact code/config surfaces:.",
-      "reviewNote": "The second 'Exact code/config surfaces:' lead-in (source L232, Slice 2 area) maps to target L246, consistent with the section offset, so this repeated line is bound to the correct slice; byte-equal.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "40d8d3a71761fe4ff894b410d4d6454fc73bf2a45ad40f945ecb622f1071b6d3",
@@ -10218,12 +10200,10 @@
       "targetAnchor": "unheaded-block-35",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Carry the complete source unit docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-36 at docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-35. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: target digest repeats; ancestor headings differ; source unit shorter than 40 characters); review its local context and ownership. Source topic: Verification commands:.",
-      "reviewNote": "The second 'Verification commands:' occurrence at source L252 maps to target L266, which keeps the section-wide offset of 14 and so belongs to its own slice rather than Slice 1; byte-equal.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
+      "reviewNote": "Stored digest matches multiple target units; independent re-review required.",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "64c365c0e38c3857ebd0aecc2581d6d7bd32c343c7159e70565e605e0d5fad02",
