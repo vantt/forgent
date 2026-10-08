@@ -47,3 +47,17 @@ Unresolved: whether the seat set differs enough between topics to justify any of
 - No rename now. Order: run M first, run the same shape on a non-software topic, and rename only if the advice holds up.
 - Before any rename, find every use of `architecture:*` capability names (provider pool preferences in config, routing, skills, tests); a rename is wide for a label change. Not yet measured.
 
+## Index of improvements to come back to (so none has to be remembered)
+
+Each line: what, why it was parked, the signal to pick it up. Nothing here is scheduled.
+
+1. Automatic specialist mid-run. Parked for M; return when expertise gaps keep appearing or reopens are too slow.
+2. Panel composition from the framing step (options A, B, C above). Decide after the first M run shows whether seats must differ per topic.
+3. Rename of `architecture-advisory`. After the same shape is tried on a non-software topic; first list every use of `architecture:*`.
+4. Settlement maps `inconclusive` and `blocked` to `pass` (the two sites in `settlement.mjs`). Left unchanged by M; decide whether they should stop a step.
+5. Coding `feature.yaml` now stops on review findings by default (one door for `findings`). Confirm this is the wanted coding behavior after M lands, and whether `operation-choice` needs a matching change.
+6. Separate dispatch item, owner decides by 2026-10-12. Order: Unit association, then the two HIGH session-isolation gaps (orphan reaper and recovery client in the ambient herdr namespace), then trust seeding, home lifetime, startup-dialog capture, receipt collection, launch-before-brief recovery.
+7. Earlier tracks waiting on the advisory work: two-tier persona loader and council parity phases 02 to 04 (`plans/261007-0910-council-parity-verdict-persona-restate/`), credential rotation safety plan (`plans/261007-1700-provider-credential-rotation-safety/`), deferred Observe overdue signal (`plans/261007-1800-observe-overdue-run-signal-deferred/`), moving the lazy-probe rule from `distribution.md` to `runner.md`.
+8. Way of working, from the drift forensics: a size and time budget in each plan header, a pre-merge diff-versus-budget check, a delete-or-descope section in reviews, done defined by one named run rather than a count of gates, a verifier other than the builder. Owner decisions still pending on superseding the maturity-ladder law and rewording RUL11's operative clause.
+9. Housekeeping: five merged worktrees to clean at track end; the earlier advisory worktree and tag `advisory-pre-m-snapshot` stay as reference.
+
