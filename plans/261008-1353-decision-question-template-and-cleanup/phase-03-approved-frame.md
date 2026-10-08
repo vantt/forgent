@@ -50,3 +50,11 @@ Phanh duy nhất từng hoạt động là owner; release human rút owner ra, v
 - Khai ngân sách thật cao: owner thấy con số lúc duyệt; vượt xa việc tương tự trước đây phải ghi lý do.
 - Chia việc để né ngân sách: item con dùng chung khung cha.
 - "Phạm vi việc đang làm" bị hiểu rộng: phạm vi = `paths` đã ghi, không phải chủ đề.
+
+## Kết quả (2026-10-08)
+
+- Mục "Approved frame (khung đã duyệt)" thêm vào `core/skills/_shared/decision-question.md`; luật mang câu anchor của khung; AGENTS.md ưu tiên #2 và mục RUL11 mang vế phạm vi (sửa tay), khối luật chiếu lại từ worktree.
+- ADR0054 thêm vào `docs/specs/platform-foundations.md`, 0036 có dòng "Superseded bởi 0054", dòng RUL11 và hằng số trong anchor test khớp chữ mới.
+- `fgos-coding-planning` (approach-and-shape): plan.md có `paths:` và `budget:`.
+- `fgos decision-index` chiếu từ `state.decisions`, không đọc mục "Lịch sử quyết định" của spec → không cần chạy.
+- Không code mới. test docs/skills/setup: 786/786 xanh.
