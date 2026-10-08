@@ -6,6 +6,8 @@ Source: owner replies after the chair verdict in `kongming-advisory-chair-verdic
 
 1. **Specialist need is a required field.** The final packet of the registered advisory flow carries a structured field "missing expertise X" (empty when none). It is not free text. The close gate reads it and asks one batched question: bring in X or not. Reason: without a required field a gap can slip through silently, which is the real loss of dropping the automatic specialist.
 
+2. **Live-run target stays `mcp-skill-hub`** (`/home/vantt/projects/mcp-skill-hub`, the Skill Hub project; operator trust entry already exists). Known limit: the advisory agent already used it for its own live gates and the comparison packet `bab4742a` came from it, so the owner's rating is not fully independent. One run answers whether M completes, not how good its advice is. After M completes, rate quality on a fresh topic.
+
 ## Parked: return to the automatic specialist
 
 - Path M hands an unfilled specialist need to the owner at the close gate instead of continuing automatically. One of two real observed cases was triggered by the advisors alone, so the automatic path has real use.
@@ -29,3 +31,11 @@ Options to weigh later (none chosen):
 - C. Seat params are taken from framing's output. Most flexible, but needs a new contract (a step output feeding seat params) and risks becoming a sequencer.
 
 Unresolved: whether the seat set differs enough between topics to justify any of A to C, or whether three fixed viewpoints plus the close-gate field is enough. Test this with the first M live run on `mcp-skill-hub`.
+
+## Parked: the registered flow is a domain-neutral core in a software-architecture shell
+
+- `core/skills/fgos-architecture-panel/SKILL.md:16` calls it the specialist surface for software-architecture advice and sends generic business, product and policy panels to another skill.
+- `core/workflows/architecture-advisory.yaml` is domain-neutral: only the `architecture:*` capability names and one mention of "architectural constraints"; the three seats are system, alternative and constraint viewpoints.
+- Consequence: topic-specific expertise has to come from the seats, which are fixed, which is why the missing-expertise field and the panel-composition options above matter. No rename or split now.
+- Check after the first M run: run the same flow on a non-software topic (business or policy). If the advice is still good the core is truly shared; if not, it is neutral only on paper.
+- Not checked: the rest of the 390-line skill for software-specific constraints on the seats.
