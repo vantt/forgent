@@ -371,7 +371,7 @@ must-not-preclude checks.
   architecture advisory, generic panels, and future research/business loops --
   instead of being fused into one coding facade or copied per skill.
 - **Source:** owner decision recorded on 2026-09-26 in
-  [the coordination skill/harness simplification plan](../../../plans/260919-coordination-skill-harness-simplification/plan.md)
+  the coordination skill/harness simplification plan (`../../../plans/260919-coordination-skill-harness-simplification/plan.md`; Added in candidate: historical path absent at the batch pin)
   ("Layering above the control layer"), consistent with
   [V-005](vision.md#v-005-agents-own-adaptive-reasoning-the-foundation-owns-authority),
   [V-008](vision.md#v-008-domain-and-organization-augmentation-creates-differentiation),
