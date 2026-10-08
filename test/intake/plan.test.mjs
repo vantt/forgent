@@ -942,7 +942,7 @@ test('resolvePlan does NOT release the risk-heavy gate on a stale/unrelated gate
   // A gate answer already on record, but from an unrelated question (e.g.
   // the clarify-stage's own ask) — must never be read as confirming this
   // gate's own distinct ask.
-  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: '## Context\n\nA prior clarify-stage question already exists on this item, unrelated to the current gate.\n\n## Why this matters\n\nThis directly affects the outcome: Which file exactly?', statusAtAsk: 'todo' });
+  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: '## Chuyện gì đang xảy ra\n\nA prior clarify-stage question already exists on this item, unrelated to the current gate.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which file exactly?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.', statusAtAsk: 'todo' });
   moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'The parser module.' });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });

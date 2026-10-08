@@ -58,7 +58,7 @@ test('discover on an unclear verdict parks the item in awaiting-human with the q
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'disc-2', { workflowStep: 'discovery' });
 
-  const question = '## Context\n\nBackground needed to understand this question.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?';
+  const question = '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question.\n\n## Nguyên nhân\n\nThis directly affects the outcome: Which service?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
   const res = discoverUseCase(
     { dir },
     { id: 'disc-2', callerVerdict: { clear: false, question } },
@@ -199,7 +199,7 @@ test('discover --verdict unclear never applies classification', () => {
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'disc-10', { workflowStep: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
 
-  const question = '## Context\n\nBackground needed to understand question.\n\n## Why this matters\n\nDirectly affects outcome: Which provider?';
+  const question = '## Chuyện gì đang xảy ra\n\nBackground needed to understand question.\n\n## Nguyên nhân\n\nDirectly affects outcome: Which provider?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
   const res = discoverUseCase(
     { dir },
     {

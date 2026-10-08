@@ -53,6 +53,7 @@
 // `awaiting-approval -> todo`/`awaiting-approval -> blocked`, which do require `reason`).
 
 import { STATUSES } from './work.mjs';
+import { checkDecisionQuestion, describeDecisionQuestion, requiredPartsForStage } from './decision-question.mjs';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class FsmError extends Error {
@@ -300,35 +301,15 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
         `transitionWork: "ask" is required and must be a non-empty string when moving work "${work.id}" into awaiting-human.`,
       );
     }
-    const lines = ask.split(/\r?\n/);
-    const sections = { context: [], whyThisMatters: [] };
-    let currentSection = null;
-    for (const line of lines) {
-      const headingMatch = line.match(/^\s*#+\s+(.+)$/);
-      if (headingMatch) {
-        const headingText = headingMatch[1].trim().toLowerCase();
-        if (/^context\b/i.test(headingText)) {
-          currentSection = 'context';
-        } else if (/^why\s+this\s+matters\b/i.test(headingText)) {
-          currentSection = 'whyThisMatters';
-        } else {
-          currentSection = null;
-        }
-      } else if (currentSection) {
-        sections[currentSection].push(line);
-      }
-    }
-    const missing = [];
-    if (sections.context.join('\n').trim().length < 20) {
-      missing.push('## Context');
-    }
-    if (sections.whyThisMatters.join('\n').trim().length < 20) {
-      missing.push('## Why this matters');
-    }
+    // Decision-question template (core/skills/_shared/decision-question.md):
+    // discovery-shaped stages need the 3 shared parts, every other stage all
+    // 5. The same check guards the AskUserQuestion hook.
+    const required = requiredPartsForStage(work.stage);
+    const missing = checkDecisionQuestion(ask, required);
     if (missing.length > 0) {
       throw new FsmError(
         'validation',
-        `transitionWork: "ask" for work "${work.id}" must contain structurally complete Markdown headings with at least 20 characters of content under each. Missing or incomplete: ${missing.join(', ')}.`,
+        `transitionWork: "ask" for work "${work.id}" is missing parts of the decision-question template (each needs at least 20 characters): ${missing.map((part) => part.title).join(', ')}. Write it as:\n${describeDecisionQuestion(required)}`,
       );
     }
     payload.ask = ask.trim();

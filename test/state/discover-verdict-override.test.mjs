@@ -65,13 +65,25 @@ test('discover --verdict clear without --force still parks in awaiting-human on 
   assert.equal(view.work[id].workflowStep, 'discovery');
 });
 
-const VALID_QUESTION = `## Context
+const VALID_QUESTION = `## Chuyện gì đang xảy ra
 
 We need to clarify which provider should be used for the payment gateway integration.
 
-## Why this matters
+## Nguyên nhân
 
-The choice of provider determines the SDK dependencies and API configuration required.`;
+The choice of provider determines the SDK dependencies and API configuration required.
+
+## Các lựa chọn
+
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
 
 test('discover --verdict unclear --force is a silent no-op for --force (force only ever applies to the clear branch)', () => {
   const cwd = tmpCwd();

@@ -253,6 +253,15 @@ This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relatio
 
 ### law
 
+#### Decision Question Template
+
+- id: `decision-question-template`
+- source: `core/instructions/decision-question.md`
+
+# Decision Question Template
+
+Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`.
+
 #### Platform Operating Laws
 
 - id: `platform-operating-laws`

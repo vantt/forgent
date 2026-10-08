@@ -176,7 +176,7 @@ test('move --to wontfix from awaiting-human succeeds when --answer is supplied, 
   const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-wontfix-from-ask');
   run(cwd, ['take', '--id', 'move-wontfix-from-ask']); // tsk-40m: real claim, no durable move anymore
-  run(cwd, ['ask', 'move-wontfix-from-ask', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
+  run(cwd, ['ask', 'move-wontfix-from-ask', '--text', '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: still relevant?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.']);
   assert.equal(stateView(cwd).work['move-wontfix-from-ask'].status, 'awaiting-human');
 
   const result = run(cwd, ['move', 'move-wontfix-from-ask', '--to', 'wontfix', '--answer', 'refuted by later evidence, closing']);
@@ -188,7 +188,7 @@ test('move --to wontfix from awaiting-human still refuses with no --answer, same
   const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-wontfix-no-answer');
   run(cwd, ['take', '--id', 'move-wontfix-no-answer']); // tsk-40m: real claim, no durable move anymore
-  run(cwd, ['ask', 'move-wontfix-no-answer', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
+  run(cwd, ['ask', 'move-wontfix-no-answer', '--text', '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: still relevant?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.']);
 
   const result = run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'wontfix']);
   assert.notEqual(result.status, 0);

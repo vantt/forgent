@@ -28,6 +28,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStep, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
+import { formatDecisionQuestion } from '../state/decision-question.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
@@ -264,14 +265,22 @@ export function resolveCallerPlanVerdict(raw, lockedContext) {
 }
 
 function formatProposalAsk(verdict, reason) {
-  if (verdict.kind === 'decompose') {
-    const list = verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n');
-    return `## Context\n\nĐề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue — sai sót ở đây tốn công dọn lại sau.`;
-  }
-  if (verdict.kind === 'pass-through') {
-    return `## Context\n\nĐề xuất: không chia (pass-through) — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi việc này được coi là một khối duy nhất, không tách nhỏ.`;
-  }
-  return `## Context\n\nĐề xuất chia — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue.`;
+  // The verdict itself is the engine's recommendation; it cannot price the
+  // alternatives, and says so instead of padding. `reason` must stay in the
+  // text verbatim: gate release matches on it (heavyRiskAlreadyConfirmed).
+  const proposal =
+    verdict.kind === 'decompose'
+      ? `chia thành các việc con dưới đây (chưa ghi vào queue) — ${reason}\n${verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n')}`
+      : verdict.kind === 'pass-through'
+        ? `không chia, giữ item là một khối (pass-through) — ${reason}`
+        : `chia — ${reason}`;
+  return formatDecisionQuestion({
+    happening: `Engine đề xuất ${proposal}`,
+    cause: 'Đề xuất cần người xác nhận trước khi ghi thật vào queue: sai ở đây tốn công dọn lại sau.',
+    options: '(a) Đồng ý đề xuất như trên. (b) Không đồng ý hoặc cần sửa: trả lời kèm lý do. Engine không định giá được từng lựa chọn.',
+    recommendation: '(a) — đây là verdict của vòng phán; chọn (b) nếu đề xuất sai ý định của item.',
+    scope: 'Đồng ý chỉ cho phép ghi đúng đề xuất trên vào queue; không mở rộng phạm vi của item.',
+  });
 }
 
 // tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
@@ -548,12 +557,13 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
           `plan --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
         );
       }
-      const ask =
-        `## Context\n\n` +
-        `Verify hiện tại của item (sẽ được stamp lúc sang executing) bị nghi ngờ ở vòng kiểm tra thứ hai: ${planVerifyDispute.reason}\n` +
-        `Verify: ${planApproveVerify}\n\n` +
-        `## Why this matters\n\n` +
-        `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
+      const ask = formatDecisionQuestion({
+        happening: `Verify của item (sẽ được stamp lúc sang executing) bị nghi ngờ. Verify: ${planApproveVerify}`,
+        cause: `Vòng kiểm tra thứ hai không đồng ý: ${planVerifyDispute.reason}`,
+        options: `(a) Giữ verify này: chạy lại "fgos plan ${id} --force". (b) Sửa verify trước khi sang executing.`,
+        recommendation: 'Engine không chọn thay: hai vòng phán mâu thuẫn nhau, cần người đọc lý do ở trên.',
+        scope: 'Câu trả lời chỉ quyết verify của item này; không đổi phạm vi item.',
+      });
       putInAwaiting(dir, { id, ask, statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
     }

@@ -25,12 +25,11 @@ function moveToDurableDoingForTest(dir, id, from = 'todo', extra = {}) {
   rebuild(dir);
 }
 
-// tsk-539 D11: `ask` must contain two Markdown headings ("## Context",
-// "## Why this matters") each with >=20 characters of content — every
-// literal ask text in this file must satisfy that shape now.
-const VALID_ASK = '## Context\n\nWe need to decide the login mechanism for the new API.\n\n## Why this matters\n\nThe choice determines the SDK dependencies: OAuth or password?';
-const VALID_ASK_FIRST = '## Context\n\nFirst round of this decision, still open.\n\n## Why this matters\n\nThe first open question in this round.';
-const VALID_ASK_SECOND = '## Context\n\nSecond round of this decision, still open.\n\n## Why this matters\n\nThe second open question in this round.';
+// `ask` must follow the decision-question template
+// (core/skills/_shared/decision-question.md): every part >= 20 characters.
+const VALID_ASK = '## Chuyện gì đang xảy ra\n\nWe need to decide the login mechanism for the new API.\n\n## Nguyên nhân\n\nThe choice determines the SDK dependencies: OAuth or password?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
+const VALID_ASK_FIRST = '## Chuyện gì đang xảy ra\n\nFirst round of this decision, still open.\n\n## Nguyên nhân\n\nThe first open question in this round.\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
+const VALID_ASK_SECOND = '## Chuyện gì đang xảy ra\n\nSecond round of this decision, still open.\n\n## Nguyên nhân\n\nThe second open question in this round.\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {

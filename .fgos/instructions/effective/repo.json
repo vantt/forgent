@@ -8,6 +8,30 @@
   "host": "*",
   "rules": [
     {
+      "id": "decision-question-template",
+      "kind": "law",
+      "mode": "append",
+      "operation": "append",
+      "owner": "core",
+      "authority": "platform:core",
+      "scope": "repo",
+      "specificity": 10,
+      "appliesTo": [
+        "*"
+      ],
+      "title": "Decision Question Template",
+      "effectiveText": "# Decision Question Template\n\nEvery question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`.",
+      "sources": [
+        "core/instructions/decision-question.md"
+      ],
+      "dependsOn": [],
+      "refines": [],
+      "refinedBy": [],
+      "supersedes": [],
+      "conflictsWith": [],
+      "renderHints": {}
+    },
+    {
       "id": "platform-operating-laws",
       "kind": "law",
       "mode": "append",

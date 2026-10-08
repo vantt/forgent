@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos ask` now checks questions against one decision-question template (`core/skills/_shared/decision-question.md`): at stage `discovery`/`exploring` a question needs "Chuyện gì đang xảy ra", "Nguyên nhân" and "Phạm vi của câu trả lời"; at every other stage it also needs "Các lựa chọn" and "Khuyến nghị" (English names accepted). The old `## Context`/`## Why this matters` headings are no longer accepted; the error message prints the template.
 - An account locked for a dead login no longer waits for a person to clear it: when a dispatch would otherwise find no usable account of the provider, fgOS makes one real call with that account's own credential (Codex or pi), unlocks it if it answers, and does not try again for 30 minutes if it does not. Quota limits and other locks are untouched.
 - `fgos doctor` reports activated Node-payload drift against a source checkout's working tree without changing activation; `npm run fgos:dev -- <verb>` runs working-tree code through the Rust host, preserving caller cwd and respecting custom Cargo targets without weakening manifest containment.
 - The source-checkout commit hook refuses new root files outside its single allowlist, including linked worktrees; separate allowlist commits and a root-only merge exception preserve normal integration and existing data-loss guards.

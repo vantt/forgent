@@ -39,7 +39,7 @@ Câu hỏi Socratic khám phá ý định (stage `discovery`/`exploring`): chỉ
 1. Tạo `core/skills/_shared/decision-question.md` (≤ 30 dòng) và `core/instructions/decision-question.md` (≤ 8 dòng, `kind: law`, có anchor phrase).
 2. Chiếu luật vào AGENTS.md **từ worktree**: `node --input-type=module -e "import {materializeInstructionProjection} from './src/setup/instruction-projections.mjs'; materializeInstructionProjection(process.cwd())"` (xác minh tên export trước khi chạy; không dùng `fgos doctor --fix` vì nó ghi main checkout). Commit AGENTS.md + `.fgos/instructions/effective/repo.json`.
 3. Validator: đọc `work.stage`; `discovery`/`exploring` → 3 heading, stage khác → 5 heading. **Một cửa kiểm duy nhất** (owner: "cả 2 đi qua 1 cửa"): một hàm `checkDecisionQuestion(text, { parts })` trong một module nguồn duy nhất trả về các phần còn thiếu, và một hàm in thông báo lỗi kèm mẫu. Validator `fgos ask` và hook `AskUserQuestion` (Phase 04) đều gọi đúng hàm này; không nơi nào tự so heading. Mỗi heading có alias tiếng Anh; so bằng `normalize('NFC')` + `toLowerCase()` + `startsWith`, **không dùng `\b`** (`/^khuyến\s+nghị\b/i` không khớp "khuyến nghị" — red-team đã chạy). Viết dạng vòng lặp trên mảng heading để giữ ngắn.
-4. Sửa đủ 5 nơi sinh câu hỏi ở Bối cảnh. Nội dung thật: phần engine không biết (giá, khuyến nghị) ghi rõ "engine không định giá được; lựa chọn là X/Y" thay vì chữ đệm. Câu hỏi thô của worker (`discovery.mjs:545`) và `DEFAULT_UNCLEAR_QUESTION` được engine bọc vào mẫu, như `discovery.mjs:456-460` đã làm. Sửa `worker-prompt-discovery.txt:43` cho worker biết mẫu. Giữ nguyên chuỗi lý do gate rủi ro/blast-radius.
+4. Sửa đủ 5 nơi sinh câu hỏi ở Bối cảnh. Nội dung thật: phần engine không biết (giá, khuyến nghị) ghi rõ "engine không định giá được; lựa chọn là X/Y" thay vì chữ đệm. Câu hỏi thô của worker (`discovery.mjs:545`) và `DEFAULT_UNCLEAR_QUESTION` được engine bọc vào mẫu, như `discovery.mjs:456-460` đã làm. ~~Sửa `worker-prompt-discovery.txt:43`~~ — không cần: engine bọc câu hỏi thô vào mẫu (`asDiscoveryQuestion`). Giữ nguyên chuỗi lý do gate rủi ro/blast-radius.
 5. Test: đổi fixture có sẵn; thêm vào test validator hiện có 1 case câu hỏi hợp lệ đủ heading (có "Khuyến nghị", có dạng NFD) phải qua, 1 case thiếu "Phạm vi" phải trượt. Thêm 1 assert anchor phrase vào `test/docs/rul11-anchor-phrase.test.mjs` (không tạo file mới).
 6. CHANGELOG `[Unreleased]`: 1 dòng.
 
@@ -58,3 +58,10 @@ Sửa skill, AGENTS.md ưu tiên #2 và memory cho khỏi trùng: Phase 02.
 - Câu trả lời bất kỳ nhả gate: sửa ở Phase 05 (D2b).
 - Câu hỏi đang park với cấu trúc cũ không bị ảnh hưởng (validator chỉ chạy lúc chuyển trạng thái).
 - Rollback: revert commit của phase.
+
+## Kết quả (2026-10-08)
+
+- Làm xong trong worktree `forgentX-worktrees/decision-question-template`. `impact-analysis: inactive` (0 provider), kiểm chéo bằng grep.
+- Module kiểm duy nhất `src/state/decision-question.mjs` (82 dòng); validator, 5 nơi sinh câu hỏi dùng nó. Luật chiếu vào AGENTS.md (+9 dòng sinh tự động).
+- Test hẹp 596/596 xanh; `test/state/fsm.test.mjs` 50/50; anchor test 5/5.
+- Đo: src +54/−48 trên file cũ + 82 dòng file mới = **184** (ước tính ban đầu ~100). test +228/−109 = **337**.

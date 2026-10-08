@@ -42,3 +42,9 @@ test('the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử qu
   const spec = fs.readFileSync(PLATFORM_FOUNDATIONS_SPEC, 'utf8');
   assert.match(spec, /^### 0036 — Khoá RUL11/m, 'a "### 0036 — Khoá RUL11..." heading must exist in the decision history section');
 });
+
+test('AGENTS.md carries the decision-question template law and points at its shared fragment', () => {
+  const agents = fs.readFileSync(AGENTS_MD, 'utf8');
+  assert.ok(agents.includes('Every question asking the owner to choose a direction carries five parts'), 'AGENTS.md must carry the decision-question law (projected from core/instructions/decision-question.md)');
+  assert.ok(agents.includes('core/skills/_shared/decision-question.md'), 'the law must point at the full template');
+});

@@ -103,13 +103,25 @@ import {
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
-const VALID_ASK_TEXT = `## Context
+const VALID_ASK_TEXT = `## Chuyện gì đang xảy ra
 
 We need to decide on the authentication mechanism for the application endpoints.
 
-## Why this matters
+## Nguyên nhân
 
-The chosen mechanism determines security requirements and user authentication flows.`;
+The chosen mechanism determines security requirements and user authentication flows.
+
+## Các lựa chọn
+
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
 
 
 test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
