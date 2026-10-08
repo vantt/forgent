@@ -60,6 +60,35 @@ test('two different target owners on one semantic claim are rejected, one shared
   assert.deepEqual(gates.validateSemanticClaimOwners(owners('docs/platform/a/README.md', 'docs/platform/a/README.md')), []);
 });
 
+test('separate noncanonical evidence payload carriers do not compete for semantic ownership', () => {
+  const claims = ['one', 'two'].map(name => row({
+    claimId: name, semanticClaimId: 'shared-proof',
+    sourcePath: `docs/architect/agent-coordination/verification/${name}/raw.log`,
+    targetOwner: `docs/platform/agent-coordination/verification/${name}/raw.log`,
+  }));
+  assert.deepEqual(gates.validateSemanticClaimOwners(claims), []);
+  assert.deepEqual(gates.checkConservation({ inventory: { claimLedger: claims }, vocabulary: VOCABULARY }).invariant, []);
+});
+
+test('evidence provenance cannot exempt canonical owners or other noncanonical kinds', () => {
+  const claims = ['one', 'two'].map(name => row({
+    claimId: name, semanticClaimId: 'shared-proof', claimKind: 'evidence',
+    sourcePath: `docs/architect/agent-coordination/verification/${name}/raw.log`,
+    targetOwner: `docs/platform/agent-coordination/verification/${name}.md`,
+  }));
+  assert.equal(gates.validateSemanticClaimOwners(claims)[0]?.type, 'semantic-claim-multiple-owners');
+  for (const directory of ['proposals', 'history']) {
+    const moved = claims.map((claim, i) => ({ ...claim, targetOwner: `docs/platform/agent-coordination/${directory}/${i}.md` }));
+    assert.equal(gates.validateSemanticClaimOwners(moved)[0]?.type, 'semantic-claim-multiple-owners');
+  }
+  const mixed = [...claims, { ...claims[0], targetOwner: 'docs/platform/agent-coordination/verification/run/raw.log' }];
+  assert.equal(gates.validateSemanticClaimOwners(mixed)[0]?.type, 'semantic-claim-multiple-owners');
+  const constitution = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, `../../${PLAN_DIR}/minimum-constitution.json`), 'utf8'));
+  constitution.documentKinds.find(kind => kind.id === 'evidence-payload').canonical = true;
+  const payloads = claims.map((claim, i) => ({ ...claim, targetOwner: `docs/platform/agent-coordination/verification/run/${i}.log` }));
+  assert.equal(gates.validateSemanticClaimOwners(payloads, constitution)[0]?.type, 'semantic-claim-multiple-owners');
+});
+
 test('a claim row without a disposition or with one outside the vocabulary is rejected', () => {
   const findings = gates.validateClaimDispositions([row({ claimId: 'c1', disposition: '' }), row({ claimId: 'c2', disposition: 'keep-legacy' }), row({ claimId: 'c3' })], VOCABULARY);
   assert.deepEqual(findings.map((f) => f.type).sort(), ['claim-disposition-missing', 'claim-disposition-unknown']);

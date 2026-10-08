@@ -5,7 +5,7 @@ Executor: codex-session:1@2026-10-08
 Session counter: 1
 Step: first content batch, Agent Coordination; committed independent review applied, one rework round
 State: rework
-Blocker: two owner contract decisions (52 same-path carriers versus one semantic owner; 130 candidate-native/frame units versus the frozen reverse checker). Rework evidence and request are prepared; the complete single re-review and P6 closure are blocked, not approved.
+Blocker: A10 resolves both contract decisions; narrow tests-first checker implementation is in progress. No same-path binding or reverse classification approval has been activated.
 Last green conservation commit: 7df171219df1dab4662d609246d10fcc8c271fda
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 17b4de5225126a27e732fbf8cd9e753a8963a984
@@ -123,3 +123,11 @@ Current strict E, both previous registries, all 937 source paths: exit 1 with 10
 Candidate legacy-link queue: all 17 target units named by the independent review are recorded in candidate-legacy-link-queue.json, with 50 observed Markdown link occurrences including heading/child overlap. No link rewrite is performed before the Step 10 link pass. Contracts README consolidation also changes one previously accepted conflict member blob: final receipt re-review total is 74 (70 requested reworks plus four accepted receipts with updated member evidence).
 
 Post-shard verification at 7df171219: A zero unexpected/exactly five A3 pairs; B/C/I unchanged; F ratchet 995/24/1 and placement 448/447, zero leftovers/ambiguity/evidence without index, one standing exception; H 30 accounted/zero unexpected, Agent Coordination zero; G zero lost-id/self-review in both green D outputs. No code/test change this turn; prior test-suite results are historical, not rerun or claimed as new verification. Stop with review-request-2-rework.md and the two owner questions; P6/Host Invocation remain blocked.
+
+## Authorized carrier and classification amendments
+
+A10 (`ea33f3d30`) authorizes only the noncanonical evidence-payload semantic-owner exception and committed independently accepted classification receipts for candidate-native navigation, structural frame and bookkeeping. Canonical ownership, H1, independence and digest/report pins remain mandatory.
+
+Resume proofs: both A1 D invocations exit 0 with zero fatal findings; A has zero unexpected commit/path pairs after the five exact A3 exceptions; B/C/I unchanged; F ratchet 995/24/1 and placement 448/447, zero leftovers/ambiguity/evidence without index and one standing exception; H 30 accounted, zero unexpected, Agent Coordination zero.
+
+Ownership regression: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-doc-conservation.test.mjs`, 35 tests, 34 pass/one fail. The separate same-path evidence carriers are still incorrectly rejected. Implementation, committed classification receipts and complete re-review release remain UNPROVEN.
