@@ -17,6 +17,7 @@ Related:
 - docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
 Supersedes: None; legacy source is unchanged
 Superseded by: None
+Added in candidate: Wrapper H1 and promotion metadata for the literal historical snapshot; not part of the retired source plan
 ```
 
 Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.

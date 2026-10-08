@@ -453,13 +453,13 @@ appended to an untrustworthy session.
 ### 4.1 DAG Response Contract
 
 Keep the existing RunResult `status` and `confidence` fields unchanged. Every
-response step gains a separate scheduler `outcome`:
+response step gains a separate scheduler `outcome` (Added in candidate: `materialized` extends the four-value legacy enum; it existed in the last implementation before the scheduler was retired):
 
 ```txt
 outcome = settled | refused | blocked | deferred | materialized
 ```
 
-`materialized` represents an admitted node whose assignment exists on disk or was resumed in-flight, but has not yet authoritatively settled with run evidence (also reported in show projection).
+Added in candidate: `materialized` represents an admitted node whose assignment exists on disk or was resumed in-flight, but has not yet authoritatively settled with run evidence (also reported in show projection). Evidence: `src/verbs/coordination/dag-scheduler.mjs:95` and `run.mjs:836,846,954` at `2180b4e72^`; scheduler retired in `2180b4e72`. This is an implementation-era addition, not a claim that the retired scheduler is active.
 `settled` includes a RunResult whose own `status` is `failed`; it means the
 result was linked and readable on disk, not that the worker succeeded. Settlement
 strictly requires authoritative on-disk `RunResult` evidence (`result.json`)

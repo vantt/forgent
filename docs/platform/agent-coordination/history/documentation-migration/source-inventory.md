@@ -15,6 +15,7 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/agent-coordination/README.md
 - docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md
+Added in candidate: Related now points to the verbatim non-authority history snapshot; the inventory table preserves the former source locator and classification
 ```
 
 This ledger is a temporary migration aid. It intentionally classifies source files conservatively: a file can be accepted design authority while an implementation claim inside it still needs current-checkout proof before Phase 2 promotion.

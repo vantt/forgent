@@ -26,6 +26,12 @@ Implementation: Partial
 Last reviewed: 2026-09-02
 Canonical for: nothing; proposals must be promoted into architecture/contracts/ADRs
 
+All proposals are subordinate to the
+[Agent Coordination Foundation Vision](../vision.md). They resolve open design
+shape and may not reopen its accepted foundation boundaries implicitly.
+Before narrowing an active proposal, reconcile it with the
+[Intent Preservation Ledger](../intent-preservation-ledger.md).
+
 ## Migration Status
 
 This target directory preserves the proposal frontier from
@@ -33,11 +39,6 @@ This target directory preserves the proposal frontier from
 promote its design: the status of every frontier source remains governed by
 [Proposal Status](../history/documentation-migration/proposal-status.md).
 
-All proposals are subordinate to the
-[Agent Coordination Foundation Vision](../vision.md). They resolve open design
-shape and may not reopen its accepted foundation boundaries implicitly.
-Before narrowing an active proposal, reconcile it with the
-[Intent Preservation Ledger](../intent-preservation-ledger.md).
 
 ## Active Proposals
 

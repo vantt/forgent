@@ -28,7 +28,7 @@ Canonical for: navigation to conformance evidence
 
 ## Evidence Sets
 
-During migration, target docs link to retained legacy proof roots. The mirrored
+Added in candidate: The following migration navigation paragraph and evidence-root table predate this batch (`fcfe78cb8`); they are candidate navigation, not newly verified conformance. During migration, target docs link to retained legacy proof roots. The mirrored
 target directories remain navigable copies, but do not replace the dated
 evidence artifacts or their recorded environments.
 
