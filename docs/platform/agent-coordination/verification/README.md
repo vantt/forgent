@@ -32,6 +32,9 @@ During migration, target docs link to retained legacy proof roots. The mirrored
 target directories remain navigable copies, but do not replace the dated
 evidence artifacts or their recorded environments.
 
+- [Team Dispatch V1 trace](team-dispatch-v1/index.md) records cell-level
+  implementation, review, red-team, and live proof evidence.
+
 | Evidence set | Supports | Current proof root |
 |---|---|---|
 | Foundation and standalone coordination | CoordinationSession, FlowDefinition, and Work-isolation boundaries | [Step 08](../../../architect/agent-coordination/verification/step-08-standalone-coordination/index.md) |
