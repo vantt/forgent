@@ -756,7 +756,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
           authoredBy: rule.authoredBy, reviewedBy: rule.reviewedBy, reviewedAt: rule.reviewedAt,
           reviewReport: rule.reviewReport, corpusRule: rule.corpus,
         });
-        mirrorFiles.push({ path: item.path, disposition: rule.disposition, rationale, targets: [] });
+        if (item.fileClass !== 'generated') mirrorFiles.push({ path: item.path, disposition: rule.disposition, rationale, targets: [] });
       }
     }
     for (const mirror of shard.mirrors || []) {

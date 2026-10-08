@@ -123,7 +123,7 @@ test('corpus approval preserves generated projections while reviewing every gene
   ];
   for (const [sourcePath, corpus] of projections) {
     f.inventory.items.push({ path: sourcePath, corpus, authorityStatus: 'non-authority', fileClass: 'generated', proposedDisposition: 'regenerate-from-source' });
-    f.inventory.claimLedger.push({ claimId: 'claim_' + f.inventory.claimLedger.length, sourcePath, sourceAnchor: 'file-block', sourceUnitDigest: 'a'.repeat(64), claimKind: 'unclassified', disposition: 'unknown-blocking', reviewStatus: 'blocking', targetOwner: null, targetAnchor: null });
+    f.inventory.claimLedger.push({ claimId: 'claim_' + f.inventory.claimLedger.length, sourceId: sourcePath, sourcePath, sourceAnchor: 'file-block', sourceDigest: 'a'.repeat(64), sourceUnitDigest: 'a'.repeat(64), authorityKind: 'generated', status: 'historical', relations: [], claimKind: 'unclassified', disposition: 'unknown-blocking', reviewStatus: 'blocking', targetOwner: null, targetAnchor: null });
     f.shard.sources.push(sourcePath);
   }
   const result = apply(f);

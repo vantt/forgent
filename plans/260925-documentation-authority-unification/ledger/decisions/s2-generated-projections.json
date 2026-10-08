@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "shard": "s2-generated-projections",
+  "authorSession": "codex-session:1@2026-10-08",
+  "sources": [
+    "docs/decisions/index.md",
+    "docs/doc-registry.md",
+    "docs/enduser-docs-index.json"
+  ],
+  "claims": [],
+  "files": [
+    {
+      "path": "docs/decisions/index.md",
+      "disposition": "regenerate-from-source",
+      "targets": [],
+      "rationale": "The generated projection keeps its machine-derived file role; the separately reviewed non-authority corpus rule governs its claims, not this file disposition.",
+      "reviewStatus": "pending"
+    },
+    {
+      "path": "docs/doc-registry.md",
+      "disposition": "regenerate-from-source",
+      "targets": [],
+      "rationale": "The generated projection keeps its machine-derived file role; the separately reviewed non-authority corpus rule governs its claims, not this file disposition.",
+      "reviewStatus": "pending"
+    },
+    {
+      "path": "docs/enduser-docs-index.json",
+      "disposition": "regenerate-from-source",
+      "targets": [],
+      "rationale": "The generated projection keeps its machine-derived file role; the separately reviewed non-authority corpus rule governs its claims, not this file disposition.",
+      "reviewStatus": "pending"
+    }
+  ]
+}
