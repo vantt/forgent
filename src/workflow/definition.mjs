@@ -194,8 +194,13 @@ export function validateWorkflow(raw) {
         throw new WorkflowDefinitionError(`${stepLabel}.gate must be an object`);
       }
       const gateKind = s.gate.kind || 'human';
+      const gateMode = s.gate.mode !== undefined ? String(s.gate.mode).trim() : 'consent';
+      if (gateMode !== 'consent' && gateMode !== 'input') {
+        throw new WorkflowDefinitionError(`${stepLabel}.gate.mode must be "consent" or "input", got "${s.gate.mode}"`);
+      }
       gate = {
         kind: gateKind,
+        mode: gateMode,
         question: typeof s.gate.question === 'string' ? s.gate.question.trim() : undefined,
         header: typeof s.gate.header === 'string' ? s.gate.header.trim() : undefined,
       };

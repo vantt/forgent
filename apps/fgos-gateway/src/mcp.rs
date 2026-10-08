@@ -289,6 +289,20 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
 
     let gw = gateway.clone();
     engine.register_fn(
+        "answer_work",
+        move |id: &str, text: &str, approve: bool| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
+            let mut args = vec!["answer".to_string(), id.to_string(), "--text".to_string(), text.to_string()];
+            if approve {
+                args.push("--approve".to_string());
+            }
+            args.push("--json".to_string());
+            call_verb(&gw, args)
+        },
+    );
+
+    let gw = gateway.clone();
+    engine.register_fn(
         "take_work",
         move |id: &str, role: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
             reject_leading_dash(id, "id")?;
@@ -484,6 +498,21 @@ mod tests {
         Arc::new(FakeGateway { response })
     }
 
+    struct CapturingGateway {
+        captured: std::sync::Mutex<Vec<Vec<String>>>,
+        response: Result<serde_json::Value, String>,
+    }
+
+    impl VerbGateway for CapturingGateway {
+        fn run_verb(&self, args: &[String]) -> Result<serde_json::Value, crate::gateway::GatewayError> {
+            self.captured.lock().unwrap().push(args.to_vec());
+            match &self.response {
+                Ok(v) => Ok(v.clone()),
+                Err(msg) => Err(crate::gateway::GatewayError::validation(msg.clone())),
+            }
+        }
+    }
+
     #[test]
     fn tool_router_advertises_exactly_search_and_execute() {
         let router = FgosMcpServer::tool_router();
@@ -607,6 +636,27 @@ mod tests {
             result.is_err(),
             "a dash-prefixed 'to' value must be refused as validation, never reach the verb chokepoint where it could be misread as a flag"
         );
+    }
+
+    #[tokio::test]
+    async fn execute_answer_work_forwards_approve_when_passed_as_third_argument() {
+        let capturing = Arc::new(CapturingGateway {
+            captured: std::sync::Mutex::new(Vec::new()),
+            response: Ok(json!({"contract": "fgos.v1", "data": {}})),
+        });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let script = r#"
+            answer_work("tsk-1", "plain answer");
+            answer_work("tsk-2", "approved answer", true);
+            answer_work("tsk-3", "disapproved answer", false);
+        "#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        assert!(result.is_ok(), "script error: {:?}", result.err());
+        let captured = capturing.captured.lock().unwrap();
+        assert_eq!(captured.len(), 3);
+        assert_eq!(captured[0], vec!["answer", "tsk-1", "--text", "plain answer", "--json"]);
+        assert_eq!(captured[1], vec!["answer", "tsk-2", "--text", "approved answer", "--approve", "--json"]);
+        assert_eq!(captured[2], vec!["answer", "tsk-3", "--text", "disapproved answer", "--json"]);
     }
 
     #[tokio::test]

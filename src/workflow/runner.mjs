@@ -831,9 +831,10 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
 
   // The file comes first: an answer that cannot be kept where later units read it is refused,
   // not recorded.
+  const approved = params.approved === true || params.approved === 'true';
   const answeredAt = new Date().toISOString();
   const question = state.questions.find((q) => q.stepId === params.stepId)?.question ?? state.steps[params.stepId]?.gate?.question ?? '';
-  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt });
+  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt, approved });
 
   appendWorkflowEvent({
     repoRoot: mainRoot,
@@ -843,6 +844,7 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
       payload: {
         stepId: params.stepId,
         answer: params.answer,
+        approved,
         answeredAt,
       },
     },
@@ -855,30 +857,60 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
  * units are handed it from (`gate-answer:<workflowRunId>/<stepId>`). A second answer to the same
  * gate replaces the first.
  */
-function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt }) {
+function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt, approved }) {
   const file = gateAnswerFile(mainRoot, workflowRunId, stepId);
   if (!file) {
     throw new RunnerConfigError(`gate answer refused: "${stepId}" is not a step id that can name an answer file`);
   }
-  const text = [
-    `# Owner's answer at the "${stepId}" gate`,
+  let baseHeader = '';
+  let priorRounds = '';
+  if (fs.existsSync(file)) {
+    const existing = fs.readFileSync(file, 'utf8');
+    const roundsIndex = existing.indexOf('## Rounds');
+    if (roundsIndex !== -1) {
+      baseHeader = existing.slice(0, roundsIndex).trim();
+      priorRounds = existing.slice(roundsIndex).trim();
+    } else {
+      baseHeader = existing.trim();
+    }
+  }
+
+  const roundEntry = [
+    `### Round at ${answeredAt} (${approved ? 'Approved' : 'Clarification'})`,
     '',
-    `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
+    `- Approved: ${approved ? 'yes' : 'no'}`,
     '',
-    `- Workflow run: ${workflowRunId}`,
-    `- Step: ${stepId}`,
-    `- Answered by: the owner, through "fgos workflow answer"`,
-    `- Answered at: ${answeredAt}`,
-    '',
-    '## Question',
-    '',
-    question,
-    '',
-    '## Answer',
+    '#### Answer',
     '',
     answer,
     '',
   ].join('\n');
+
+  let text;
+  if (!baseHeader) {
+    text = [
+      `# Owner's answer at the "${stepId}" gate`,
+      '',
+      `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
+      '',
+      `- Workflow run: ${workflowRunId}`,
+      `- Step: ${stepId}`,
+      `- Answered by: the owner, through "fgos workflow answer"`,
+      '',
+      '## Question',
+      '',
+      question,
+      '',
+      '## Rounds',
+      '',
+      roundEntry,
+    ].join('\n');
+  } else if (priorRounds) {
+    text = `${baseHeader}\n\n${priorRounds}\n\n${roundEntry}\n`;
+  } else {
+    text = `${baseHeader}\n\n## Rounds\n\n${roundEntry}\n`;
+  }
+
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const tmp = `${file}.${process.pid}.tmp`;
   fs.writeFileSync(tmp, text);

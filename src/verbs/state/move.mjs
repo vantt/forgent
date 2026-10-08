@@ -12,7 +12,7 @@ function isBranchReachableFromTrunk(cwd, branch, trunk) {
   }
 }
 
-export function moveUseCase({ dir, repoRoot }, { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role = 'human' }) {
+export function moveUseCase({ dir, repoRoot }, { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role = 'human', approved }) {
   if (to === 'delivered') {
     const branch = branchNameFor(id);
     if (branchExists(repoRoot, branch)) {
@@ -52,6 +52,6 @@ export function moveUseCase({ dir, repoRoot }, { id, to, expectedStatus, reason,
       });
     }
   }
-  const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role });
+  const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role, approved });
   return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
 }

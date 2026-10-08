@@ -334,6 +334,7 @@ paths:
               required: [text]
               properties:
                 text: { type: string }
+                approve: { type: boolean, description: "Explicit approval signal for consent gates. When true, forwards --approve to fgos answer." }
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
