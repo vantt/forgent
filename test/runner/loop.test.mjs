@@ -2412,7 +2412,7 @@ test('driver loop runOnce: executing scout-blast-radius with failed or no-eviden
   assert.equal(res2.dispatched.length, 0);
 });
 
-test('driver loop runOnce: executing review-item with REJECT verdict on existing candidate routes to fix operation (Finding P2 fix)', async () => {
+test('driver loop routes done review findings with REJECT to fix-verify-red instead of blocking', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir } = setup();
   const taskSpecDir = path.join(repoRoot, 'domains', 'coding', 'task-specs');
   fs.mkdirSync(taskSpecDir, { recursive: true });
@@ -2440,7 +2440,7 @@ test('driver loop runOnce: executing review-item with REJECT verdict on existing
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nREJECT: evidence:candidate-diff implementation failed verify check in evidence:verify-fail.\\nEvaluation: REJECT.\\n');
-      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'REJECT', summary: 'Verify failed', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
+      fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'REJECT', assessment: { verdict: 'findings' }, summary: 'Verify failed', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
     } else if (match) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
@@ -3292,6 +3292,7 @@ if (match) {
     JSON.stringify({
       status: 'done',
       verdict: 'NOT READY',
+      assessment: { verdict: 'findings' },
       summary: 'Impact posture not accepted; plan needs another pass',
       realityGate: {
         modeFit: { status: 'PASS', citation: 'src/index.mjs' },
@@ -3596,7 +3597,7 @@ test('Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves 
   assert.deepEqual(item, itemBefore, 'the failed stop must not mutate any work-record field');
 });
 
-test('Cell 6.2 NOT READY verdict routes back to the primary planning path without advancing Work', async () => {
+test('validate-plan NOT READY with done findings returns to planning without advancing or blocking Work', async () => {
   const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanFixture({ executorFactory: writeNotReadyExecutor });
   const itemBefore = readWorkSnapshot(dir, id);
 
@@ -3607,6 +3608,7 @@ test('Cell 6.2 NOT READY verdict routes back to the primary planning path withou
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
   assert.equal(result.classification.execution.status, 'completed');
   assert.equal(result.classification.confidence.level, 'reported');
+  assert.equal(result.classification.assessment.verdict, 'findings');
   assert.ok(logs.some((l) => l.includes('returned NOT READY — routing back to primary planning path')), 'NOT READY must route back to the primary planning path');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
