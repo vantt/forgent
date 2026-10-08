@@ -79,17 +79,25 @@ function receiptFixture(t, options = {}) {
   const receiptPath = 'plans/fixture/ledger/candidate-classifications-alpha.json';
   const reportPath = options.reportPath || 'plans/fixture/reports/phase-06/review-2-classifications.md';
   write(owner, '# Alpha\n\n## Native\n\nCandidate navigation frame.\n');
+  const evidencePath = 'src/runtime.mjs';
+  write(evidencePath, 'export const driving = false;\n');
+  git('add', '--', evidencePath);
   git('add', '--', owner); git('commit', '-qm', 'candidate');
   const nativeUnit = buildConservationUnitLookup(root, git('rev-parse', 'HEAD'))(owner).find(unit => unit.anchor === (options.heading ? 'native' : 'unheaded-block-1'));
   const digest = nativeUnit.textDigest;
   const shownText = nativeUnit.sectionText ?? nativeUnit.text;
   const shownTextDigest = createHash('sha256').update(shownText).digest('hex');
   const receipt = { claimId: 'native-unit', path: owner, anchor: nativeUnit.anchor, unitDigest: digest, shownText: options.shownText || shownText, shownTextDigest: options.receiptShownDigest || shownTextDigest, class: options.class || 'candidate-native-navigation', authoredBy: options.authoredBy ?? author };
+  if (options.contentEvidence) receipt.currentEvidence = {
+    commit: git('rev-parse', 'HEAD'), finding: options.evidenceFinding || 'true-and-current',
+    citations: [{ path: evidencePath, startLine: 1, endLine: 1, blobSha: git('hash-object', evidencePath) }],
+  };
+  const evidenceDigest = receipt.currentEvidence && createHash('sha256').update(JSON.stringify(receipt.currentEvidence)).digest('hex');
   write(receiptPath, JSON.stringify({ version: 1, authorSession: options.authorSession ?? author, receipts: [receipt] }));
   if (!options.uncommittedReceipt) { git('add', '--', receiptPath); git('commit', '-qm', 'classification receipt'); }
   const receiptCommit = git('rev-parse', 'HEAD');
   const note = 'The shown unit is candidate-native material, not an unnamed legacy claim.';
-  write(reportPath, `# Independent classification review\nAuthor session: ${author}\nReviewer: ${options.reportReviewer || reviewer}\nReceipt commit: ${receiptCommit}\n\n| Claim | Class | Verdict | Unit digest | Shown text digest | Note |\n|---|---|---|---|---|---|\n| native-unit | ${options.reportClass || receipt.class} | ${options.verdict || 'ok'} | ${options.reportDigest || digest} | ${options.reportShownDigest || shownTextDigest} | ${note} |\n`);
+  write(reportPath, `# Independent classification review\nAuthor session: ${author}\nReviewer: ${options.reportReviewer || reviewer}\nReceipt commit: ${receiptCommit}\n\n| Claim | Class | Verdict | Unit digest | Shown text digest | Note |${receipt.currentEvidence ? ' Evidence digest |' : ''}\n|---|---|---|---|---|---|${receipt.currentEvidence ? '---|' : ''}\n| native-unit | ${options.reportClass || receipt.class} | ${options.verdict || 'ok'} | ${options.reportDigest || digest} | ${options.reportShownDigest || shownTextDigest} | ${note} |${receipt.currentEvidence ? ' ' + (options.reportEvidenceDigest || evidenceDigest) + ' |' : ''}\n`);
   if (!options.uncommittedReport) { git('add', '--', reportPath); git('commit', '-qm', 'independent review'); }
   const commit = git('rev-parse', 'HEAD');
   const classification = { claimId: receipt.claimId, receiptPath, receiptCommit, reviewStatus: options.reviewStatus || 'reviewed', reviewedBy: reviewer, reviewedAt: '2026-10-08', reviewReport: reportPath, reviewReportCommit: commit, reviewNote: note };
@@ -172,5 +180,33 @@ for (const [name, options] of [
 
 test('an ordinary classification receipt cannot replace checkpoint sensitivity review', (t) => {
   const fixture = receiptFixture(t, { reportPath: 'plans/fixture/reports/phase-06/review-3-checkpoint.md' });
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+});
+
+test('substantive candidate content closes only after an independently accepted current-code check', (t) => {
+  const fixture = receiptFixture(t, { class: 'candidate-native-content', contentEvidence: true });
+  assert.deepEqual(fixture.check(), []);
+});
+
+for (const [name, options] of [
+  ['missing current evidence', {}],
+  ['a stale assessment', { contentEvidence: true, evidenceFinding: 'stale' }],
+  ['a false assessment', { contentEvidence: true, evidenceFinding: 'false' }],
+  ['a different reviewed evidence digest', { contentEvidence: true, reportEvidenceDigest: 'a'.repeat(64) }],
+  ['a rework verdict', { contentEvidence: true, verdict: 'rework' }],
+  ['an author acting as reviewer', { contentEvidence: true, reviewer: 'reviewer:codex-session:author@2026-10-09' }],
+]) {
+  test(`substantive candidate content stays open with ${name}`, (t) => {
+    const fixture = receiptFixture(t, { class: 'candidate-native-content', ...options });
+    assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+  });
+}
+
+test('current-code evidence becomes stale when its cited implementation changes', (t) => {
+  const fixture = receiptFixture(t, { class: 'candidate-native-content', contentEvidence: true });
+  assert.deepEqual(fixture.check(), []);
+  fixture.write('src/runtime.mjs', 'export const driving = true;\n');
+  fixture.git('add', '--', 'src/runtime.mjs'); fixture.git('commit', '-qm', 'changed runtime');
+  fixture.nativeInventory.commit = fixture.git('rev-parse', 'HEAD');
   assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
 });
