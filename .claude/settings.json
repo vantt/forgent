@@ -55,13 +55,13 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Agent|Task",
         "hooks": [
           {
-            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/dispatch-decide-hook.mjs\"",
-            "type": "command"
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\" hook dispatch-decide"
           }
-        ],
-        "matcher": "Agent|Task"
+        ]
       },
       {
         "hooks": [
@@ -95,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/decision-question-hook.mjs\""
+            "command": "\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\" hook decision-question"
           }
         ]
       }
