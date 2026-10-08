@@ -1,0 +1,58 @@
+{
+  "commit": "e7fa774048a596cf431c14c3083cdc1a8249e2c0",
+  "ownerAmendment": "8bc686954869091555a5e4b3425093f6219f49c1",
+  "redCommit": "452206652cccf9b95fa2d1cd82ed5951c36c5ef2",
+  "red": [
+    "ℹ tests 15",
+    "ℹ pass 10",
+    "ℹ fail 5"
+  ],
+  "scripts": {
+    "files": 51,
+    "tests": 872,
+    "pass": 872,
+    "fail": 0
+  },
+  "full": {
+    "files": 389,
+    "tests": 7335,
+    "pass": 7262,
+    "fail": 0,
+    "skip": 8,
+    "todo": 65
+  },
+  "conservation": [
+    {
+      "prior": "identity-registry.json",
+      "exit": 0,
+      "baseline": true,
+      "fatal": 0
+    },
+    {
+      "prior": "phase-02-identity-registry.json",
+      "exit": 0,
+      "baseline": true,
+      "fatal": 0
+    }
+  ],
+  "rehearsal": [
+    {
+      "channel": "ordinary",
+      "approved": 40,
+      "gateFindings": 0,
+      "seedProofUsed": false
+    },
+    {
+      "channel": "checkpoint",
+      "approved": 40,
+      "caught": 6,
+      "falseFlags": 0,
+      "gateFindings": 0
+    }
+  ],
+  "unproven": [
+    "skipped and todo paths",
+    "actual content scoped strict E",
+    "real reviewer attention and independence"
+  ]
+}

@@ -5,7 +5,7 @@ Executor: codex-session:1@2026-10-08
 Session counter: 1
 Step: 1, ordinary approval channel authorized by A6
 State: authoring
-Last green conservation commit: 658b4e602e92f32d4435d9173aec98eb1420b715
+Last green conservation commit: e7fa774048a596cf431c14c3083cdc1a8249e2c0
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: complete full-suite/conservation verification of A6, then finish Step 1 maps/counts and execute the first content batch to its ready-for-review checkpoint.
+Next action: sync main as prescribed, account its legacy edits, then finish Step 1 maps/counts and execute the first content batch to its ready-for-review checkpoint.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -60,3 +60,5 @@ H1 green implementation: `658b4e602`; full suite on committed code: 389 files, 7
 Step 1 item 2 brief written to A5's simplified review method. Disposable unseeded rehearsal proves apply refuses absent passing sensitivity proof and gate refuses absent seed binding. Evidence: mandatory-authorship-verification.json and unseeded-review-blocker.md. Stop on the demonstrated frozen-contract blocker, not at another tooling re-review. No maps/routes or real content batches authored; actual batch E and real independent reviews remain UNPROVEN. Lists routed to owner: one approval-contract question; no authored archive/delete list, holds or promoted edits; SC-1 remains owner-resolved.
 
 A6 (`8bc686954`) authorizes the ordinary committed-report channel, retaining H1, session independence, report pins and shown-text digest binding. Regression red `452206652` precedes implementation. Corrected scripts suite: 872/872 in 51 files. Actual disposable CLI rehearsal: ordinary 40 approved fixture rows without any seed, zero gate findings; unchanged checkpoint 40 fixture rows approved with 6/6 detections, zero false flags, zero gate findings. These are mechanical fixture proofs, not real independent approvals. Full-suite and post-commit conservation for this cutover remain UNPROVEN.
+
+A6 implementation green `e7fa77404`: full suite on committed code, 7,335 tests, 7,262 pass, zero fail, 8 skip/65 todo (UNPROVEN), 389 files. Both D prior-registry proofs are baseline-identical with zero fatal findings. Evidence: ordinary-review-verification.json. Step 1 item 2 brief now documents executable ordinary approval and reserved seeded checkpoint report names; no tooling re-review requested.

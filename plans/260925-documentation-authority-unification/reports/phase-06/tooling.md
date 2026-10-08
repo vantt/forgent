@@ -259,3 +259,5 @@ Checkpoint reports use `review-3-checkpoint.md`, `review-6-checkpoint.md` or `re
 
 Tests-first red: `452206652`. Corrected scripts suite: 872/872. Actual isolated CLI rehearsal: ordinary 40 approved fixture rows, no seed used, zero gate findings; checkpoint 40 approved fixture rows, 6/6 mutations caught, zero false flags, zero gate findings. These fixtures prove mechanics, not human judgment or real-session independence. No non-H1 review finding is reopened.
 
+Committed cutover `e7fa77404`: red 15 tests/10 pass/5 fail; green full suite 7,335 tests/7,262 pass/0 fail, with 8 skip and 65 todo UNPROVEN. Both historical-registry D proofs remain baseline-identical with zero fatal findings. Complete measured evidence: ordinary-review-verification.json. The disposable rehearsal was removed after proof; no real row approval was authored.
+
