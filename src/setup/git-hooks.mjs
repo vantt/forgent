@@ -97,13 +97,13 @@ function resolvesToGithooks(cwd, value) {
  */
 export function installGitHooks(repoRoot) {
   if (!existsSync(path.join(repoRoot, '.git'))) return { wired: false, skippedExisting: null };
+  const current = readHooksPath(repoRoot);
+  if (resolvesToGithooks(repoRoot, current)) return { wired: true, skippedExisting: null };
+  if (current !== '') return { wired: false, skippedExisting: current };
   // Only a project that ships its own .githooks/ (the fgOS source repo) has
   // hooks to wire; pointing core.hooksPath at a missing directory would
   // silently disable whatever hooks the project already runs.
   if (!existsSync(path.join(repoRoot, '.githooks'))) return { wired: false, skippedExisting: null };
-  const current = readHooksPath(repoRoot);
-  if (resolvesToGithooks(repoRoot, current)) return { wired: true, skippedExisting: null };
-  if (current !== '') return { wired: false, skippedExisting: current };
   execFileSync('git', ['config', 'core.hooksPath', path.join(repoRoot, '.githooks')], { cwd: repoRoot });
   return { wired: true, skippedExisting: null };
 }

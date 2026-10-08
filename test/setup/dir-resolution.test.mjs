@@ -24,6 +24,7 @@ function initGitWithWorktree(prefix) {
   fs.writeFileSync(path.join(main, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt'], { cwd: main });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: main });
+  fs.mkdirSync(path.join(main, '.githooks'));
   const wt = mkTemp(`${prefix}-wt-`);
   fs.rmSync(wt, { recursive: true, force: true });
   execFileSync('git', ['worktree', 'add', '-b', `wt-${path.basename(wt)}`, wt], { cwd: main });
