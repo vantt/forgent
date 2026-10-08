@@ -29,7 +29,7 @@ the group-thinking UX surface and coordination protocol core
 Related: [Protocol Model](protocol-model.md),
 [Dispatch Control Plane](dispatch-control-plane.md),
 [FlowDefinition Contract](../contracts/flow-definition.md), and
-[Group Thinking Protocol Pack](../../../../core/protocol-packs/group-thinking.json)
+Group Thinking Protocol Pack (`../../../../core/protocol-packs/group-thinking.json`; Added in candidate: historical path absent at the batch pin)
 
 ## Decision
 
