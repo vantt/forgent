@@ -1289,7 +1289,8 @@
             "command": "claude",
             "args": [
               "--model",
-              "{model}"
+              "{model}",
+              "--strict-mcp-config"
             ],
             "confinement": {
               "backend": "bwrap"
