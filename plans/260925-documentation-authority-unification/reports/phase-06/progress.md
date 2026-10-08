@@ -5,7 +5,7 @@ Executor: codex-session:1@2026-10-08
 Session counter: 1
 Step: first content batch, Agent Coordination; committed independent review applied, one rework round
 State: rework
-Blocker: A10 resolves both contract decisions; narrow tests-first checker implementation is in progress. No same-path binding or reverse classification approval has been activated.
+Blocker: none requiring another owner contract decision. A10 implemented; 106 source rows and 130 new digest-bound classification receipts await the single independent re-review.
 Last green conservation commit: 7df171219df1dab4662d609246d10fcc8c271fda
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 17b4de5225126a27e732fbf8cd9e753a8963a984
@@ -20,7 +20,7 @@ Real conflicts: 12 semantic owner groups reject requested same-path bindings; 18
 Holds: zero unknown-blocking source-row holds; zero corpus-policy holds. Corrected manual workset 106 pending, receipts 74 pending re-review, exceptions 128 pending re-review, reverse proposals 59 pending re-review. No unapproved row is made reviewed.
 Promoted-document edits: e4650e585 preserved portal guidance plus 0a41d793e authorized history references; exact changes logged in promoted-edits.md. No area-status change.
 
-Next action: owner commits the two contract decisions; complete only that approved representation, rerun D/E against both prior registries and release the full single independent re-review. After its committed verdicts, perform P6 rehearsal/readers/strict closure, then Host Invocation. No author approval or next-batch work before closure.
+Next action: finish pinned rework release and stop ready-for-review; owner starts the one independent re-review. Apply only its committed acceptances, then P6 strict/rehearsal/readers and batch closure; no next batch yet.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.

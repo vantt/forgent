@@ -13,8 +13,8 @@
     {
       "claimId": "claim_8b81aaaa5cd08b21f9f91d12fedfeaff",
       "sourceUnitDigest": "5827186945b10396251ca5ebccc73dfbd89ebba2b9589d52dfe79fb732aa548a",
-      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/interpretation.md",
-      "targetAnchor": "interpretation-of-the-vnflow-case-lead-advisor-provisional-formed-from-the-case-and-person-inputs-alone-before-any-evidence",
+      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log",
+      "targetAnchor": "file-block",
       "claimKind": "historical-context",
       "disposition": "delete-as-duplicate",
       "reviewStatus": "pending",
@@ -25,14 +25,14 @@
         "equal git blob 20798e890ee7ecf99b694a2efec209f8e9992e86",
         "whole-file log and markdown unit layouts"
       ],
-      "rationale": "The whole raw log is byte-identical to the Markdown receipt docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/interpretation.md (Git blob 20798e890ee7ecf99b694a2efec209f8e9992e86). That document is the one semantic owner; the root heading locates the document and the reverse pack exposes its complete Markdown units. The different .log/.md extraction layouts prevent automatic mirror proof. Independently compare the entire raw source with the entire receipt before accepting this manual duplicate disposition; the log remains untouched until cutover.",
+      "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/2-lead-advisor-interpretation-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
       "reviewNote": "The 9,446-byte raw log 2-lead-advisor-interpretation-raw.log is byte-identical to git blob 20798e89 (proofs/P01.3/interpretation.md), which I compared in full, and the root-heading anchor is right; but the byte-identical same-relative-path platform copy runs/2-lead-advisor-interpretation-raw.log is named by no row (reverse-open), so route the source to its own platform copy and keep the Markdown receipt as the semantic owner."
     },
     {
       "claimId": "claim_b63727f20ff5dddbcf952143d51a7cc5",
       "sourceUnitDigest": "492ad9a1ef18f4ca0c332d144ba0713acc0b2526cab2b5f31b2dd880b3b7faba",
-      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/system-shaper.md",
-      "targetAnchor": "proposalssystem-shapermd",
+      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+      "targetAnchor": "file-block",
       "claimKind": "historical-context",
       "disposition": "delete-as-duplicate",
       "reviewStatus": "pending",
@@ -43,14 +43,14 @@
         "equal git blob 512227079f74eb0ec5aea744285540d3a1a6b173",
         "whole-file log and markdown unit layouts"
       ],
-      "rationale": "The whole raw log is byte-identical to the Markdown receipt docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/proposals/system-shaper.md (Git blob 512227079f74eb0ec5aea744285540d3a1a6b173). That document is the one semantic owner; the root heading locates the document and the reverse pack exposes its complete Markdown units. The different .log/.md extraction layouts prevent automatic mirror proof. Independently compare the entire raw source with the entire receipt before accepting this manual duplicate disposition; the log remains untouched until cutover.",
+      "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
       "reviewNote": "The 9,323-byte raw log 3-system-shaper-raw.log equals git blob 51222707 (proofs/P01.3/proposals/system-shaper.md) byte for byte and the owner anchor is the document root heading; however the same-path platform copy runs/3-system-shaper-raw.log is left unbound (reverse-open), so the log row should bind to that copy while the Markdown stays the one semantic owner."
     },
     {
       "claimId": "claim_22cef8c4195654ff9e7d1605baee67de",
       "sourceUnitDigest": "e474e8cc9264dde8627b40050e1edd86969854f4cbb99e2390d803f6fcaae583",
-      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-impact.md",
-      "targetAnchor": "dialogue1-impactmd-lead-advisor-interpretation-of-the-human-turn",
+      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log",
+      "targetAnchor": "file-block",
       "claimKind": "historical-context",
       "disposition": "delete-as-duplicate",
       "reviewStatus": "pending",
@@ -61,14 +61,14 @@
         "equal git blob 3dd02175966e34d0e9d272b95e3517da10c4e418",
         "whole-file log and markdown unit layouts"
       ],
-      "rationale": "The whole raw log is byte-identical to the Markdown receipt docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-impact.md (Git blob 3dd02175966e34d0e9d272b95e3517da10c4e418). That document is the one semantic owner; the root heading locates the document and the reverse pack exposes its complete Markdown units. The different .log/.md extraction layouts prevent automatic mirror proof. Independently compare the entire raw source with the entire receipt before accepting this manual duplicate disposition; the log remains untouched until cutover.",
+      "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/9-lead-advisor-dialogue-1-impact-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
       "reviewNote": "The 8,620-byte raw log 9-lead-advisor-dialogue-1-impact-raw.log is byte-identical to blob 3dd02175 (dialogue/1-impact.md) and the anchor is the root heading; the identical platform file runs/9-lead-advisor-dialogue-1-impact-raw.log has no deciding row (reverse-open), so route the source to its own platform copy and mark the Markdown as semantic owner."
     },
     {
       "claimId": "claim_a5fa3b0377f31fb12bc7424b370dc8ba",
       "sourceUnitDigest": "03b97c720f105e8cd94150409ce9fee9ce68f365001e4b38455a35151487326e",
-      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md",
-      "targetAnchor": "recommendation",
+      "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log",
+      "targetAnchor": "file-block",
       "claimKind": "historical-context",
       "disposition": "delete-as-duplicate",
       "reviewStatus": "pending",
@@ -79,7 +79,7 @@
         "equal git blob 6328335dcb51b256668d7587c3b7e21a03e06588",
         "whole-file log and markdown unit layouts"
       ],
-      "rationale": "The complete raw synthesis log is byte-identical to docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md (Git blob 6328335dcb51b256668d7587c3b7e21a03e06588). The Markdown synthesis is the single semantic owner shared with the duplicate Markdown source. Different log/Markdown unit layouts exclude automatic mirror proof. The root anchor locates the complete receipt; review the full raw log against the whole document and its reverse units before accepting this manual duplicate.",
+      "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
       "reviewNote": "The 15,912-byte raw synthesizer log is byte-identical to blob 6328335d (proofs/P01.3/synthesis.md), but the owner anchor 'recommendation' is the H2 section, not the document root heading '# Decision Packet - vnflow (synthesizer)' that the rationale says it uses, and the same-path platform copy runs/7-synthesizer-raw.log stays unbound (reverse-open); fix the anchor and route the row to the platform log copy."
     }
   ],

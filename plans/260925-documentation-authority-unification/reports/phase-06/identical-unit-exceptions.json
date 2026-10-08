@@ -10519,6 +10519,582 @@
           "text": "Useful verification commands:"
         }
       ]
+    },
+    {
+      "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representativeClaimId": "claim_1b2621b248099a5e05a12c7eb5c1d877",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_1b2621b248099a5e05a12c7eb5c1d877",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_48507c119dfcb53848a704919cf70b57",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_b300845891f80824a4214f9d93927586",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_a0c2db27d67800b7de8dd7cde5700f7e",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_7db96c9a20f6957c7926b952a034b392",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_f347d78d8ae7fc377bcd80608376cb13",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_3ee801931bf8ade2a9e8a5284b3ef824",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_1ee0c6ecc8ca286ed29d833580b2f9ef",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_fe8e4ab492373ca6b3cf3e7f326cdf6b",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_cffac0dd6b93649da7a7ffe1066366e7",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_0933e5ebfff4d56fd70385c9fe1b559d",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_86f6eaedd1be56e52881aaa8bc0854c6",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_f57a4f952896ba1a8578e91cd857fcc9",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_8564cc01ef05b440034bd3d21d05aead",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_c2504d9a6d7487ff24fa32fb6e211a7c",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_b4b301864c614fc15edd04f0a42362e5",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_1466e6bde5dd63f35b64ac2b1e123ba7",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_8a64573959412b20857494cdac56a595",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_2a9d47230d7ef4e7b01788b814ab5c02",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_5d781f175609457b3219f0d21ce22247",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_7e091f764085e6a44da624adbcb83bf1",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_f988c6b66b83a3eb6dc4b85b9d2ceae7",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_303715ac3144f0b086a708a655d3b261",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_a6e8e515f4871baf90a91aaf7b381788",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_7cb569e8369dc04ac119d4718d9a8d9c",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_609df9625097fbb53df47ae22f5360d5",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_f416ddc62781749ebfc7fde76714cd07",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_37fb17dd11bd1ed66f3f11b1f4570fcf",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_769e148bdfa619506877a1642e05ab04",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_29345a12ed60ae0ed186f13b8253a920",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_949fd02cc152b471385b67f39b65ccc2",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_79a646ac090e467de9d2782d62bc79f1",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_36557cce96797973cd72c4ade4ccfce4",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_f1e1c88b71fe908a1b658cf2ac309d71",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_9f8859d19d781989cd67ad72c1b67c95",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_b92c0e8acd0952f46dd01ee1ae83980c",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_6bd4a6ed4c197cf9af84b83ddfb5a5e3",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "claimId": "claim_569446a3d13b9ea95b71200575daa6c3",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log#file-block",
+          "ancestry": [],
+          "text": "",
+          "sourceBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "targetBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        }
+      ]
+    },
+    {
+      "digest": "5a76697168564b55d534ebf67d52bc1d648711b6bb99e0ef87d513a41e7a1f53",
+      "representativeClaimId": "claim_d6e7b444d59432c562bf34eb1e4a49cb",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_d6e7b444d59432c562bf34eb1e4a49cb",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=analytical\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git",
+          "sourceBlob": "2edc470a8d5c0276453009863fb49b82c34c6b54",
+          "targetBlob": "2edc470a8d5c0276453009863fb49b82c34c6b54"
+        },
+        {
+          "claimId": "claim_b50894c4b913ad1a84fc3ba28ce92215",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=analytical\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git",
+          "sourceBlob": "2edc470a8d5c0276453009863fb49b82c34c6b54",
+          "targetBlob": "2edc470a8d5c0276453009863fb49b82c34c6b54"
+        }
+      ]
+    },
+    {
+      "digest": "d440fad927b4ed0107542461e453d715dabaaae99cffe30b1509f79d31d58f2d",
+      "representativeClaimId": "claim_f5ee25e20f952bd0e35a91a0de5523eb",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_f5ee25e20f952bd0e35a91a0de5523eb",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git",
+          "sourceBlob": "9c54dc613990d943af78a756182c47ec7522f00a",
+          "targetBlob": "9c54dc613990d943af78a756182c47ec7522f00a"
+        },
+        {
+          "claimId": "claim_7849494beabff542e5b515ab61d8d783",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git",
+          "sourceBlob": "9c54dc613990d943af78a756182c47ec7522f00a",
+          "targetBlob": "9c54dc613990d943af78a756182c47ec7522f00a"
+        },
+        {
+          "claimId": "claim_06c8fe333c5ef5bd4c2d929501d3ccfe",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical\nfatal: not a git repository (or any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git",
+          "sourceBlob": "9c54dc613990d943af78a756182c47ec7522f00a",
+          "targetBlob": "9c54dc613990d943af78a756182c47ec7522f00a"
+        }
+      ]
+    },
+    {
+      "digest": "d2a23caff0b56f5f2c86083b1144d74e1395e5677d2d0230a635b1102839e227",
+      "representativeClaimId": "claim_8c23da1361bf2dfec9b08dec60086023",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_8c23da1361bf2dfec9b08dec60086023",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log#file-block",
+          "ancestry": [],
+          "text": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=opus tier=critical",
+          "sourceBlob": "a3c4734fda733b589c50bb2dcdd8438dfbd03512",
+          "targetBlob": "a3c4734fda733b589c50bb2dcdd8438dfbd03512"
+        },
+        {
+          "claimId": "claim_05ae17b6446aca66a3f6120cce734253",
+          "source": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log#file-block",
+          "ancestry": [],
+          "text": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=opus tier=critical",
+          "sourceBlob": "a3c4734fda733b589c50bb2dcdd8438dfbd03512",
+          "targetBlob": "a3c4734fda733b589c50bb2dcdd8438dfbd03512"
+        }
+      ]
+    },
+    {
+      "digest": "50b444c2cc71ceb9a0f289d55584139621a121568b98995a72a0c2bf49c52a73",
+      "representativeClaimId": "claim_a6822628d665b2a9b5daa580956cd252",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_a6822628d665b2a9b5daa580956cd252",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt#file-block",
+          "ancestry": [],
+          "text": "M AGENTS.md\n M CLAUDE.md\n M docs/architect/agent-coordination/proposals/README.md\n M docs/architect/agent-coordination/roadmap/README.md\n M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md\n M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md\n M docs/architect/agent-coordination/vision.md\n M docs/architecture-manifest.json\n M test/runner/coordination-static.test.mjs\n?? .agentkit/\n?? .claude/agents/advisor.md\n?? .claude/agents/brainstormer.md\n?? .claude/agents/code-reviewer.md\n?? .claude/agents/code-simplifier.md\n?? .claude/agents/debugger.md\n?? .claude/agents/docs-manager.md\n?? .claude/agents/explore.md\n?? .claude/agents/fullstack-developer.md\n?? .claude/agents/git-manager.md\n?? .claude/agents/journal-writer.md\n?? .claude/agents/kongming.md\n?? .claude/agents/planner.md\n?? .claude/agents/project-manager.md\n?? .claude/agents/researcher.md\n?? .claude/agents/tester.md\n?? .claude/agents/ui-ux-designer.md\n?? .fgos/events/95d36507-d4a6-432f-a879-b01c562217b0-20260830T164608767Z.jsonl\n?? .fgos/events/ee2110a9-914f-4138-b75b-55779f988e6b-20260901T020317216Z.jsonl\n?? docs/architect/agent-coordination/proposals/component-boundary-advisory.md\n?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md\n?? plans/260831-1637-step07-inline-assignment-mvp/reports/\n?? plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md\n?? plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md\n?? plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md\n?? plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md\n?? plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md\n?? plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md\n?? plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md\n?? src/runner/coordination/session-engine.mjs\n?? test/runner/coordination-session-engine.test.mjs",
+          "sourceBlob": "ee78cde3ac63322d93a24362e74fc32e9c51bb54",
+          "targetBlob": "ee78cde3ac63322d93a24362e74fc32e9c51bb54"
+        },
+        {
+          "claimId": "claim_e038484b61a7c776f93676925ade4c47",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt#file-block",
+          "ancestry": [],
+          "text": "M AGENTS.md\n M CLAUDE.md\n M docs/architect/agent-coordination/proposals/README.md\n M docs/architect/agent-coordination/roadmap/README.md\n M docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md\n M docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md\n M docs/architect/agent-coordination/vision.md\n M docs/architecture-manifest.json\n M test/runner/coordination-static.test.mjs\n?? .agentkit/\n?? .claude/agents/advisor.md\n?? .claude/agents/brainstormer.md\n?? .claude/agents/code-reviewer.md\n?? .claude/agents/code-simplifier.md\n?? .claude/agents/debugger.md\n?? .claude/agents/docs-manager.md\n?? .claude/agents/explore.md\n?? .claude/agents/fullstack-developer.md\n?? .claude/agents/git-manager.md\n?? .claude/agents/journal-writer.md\n?? .claude/agents/kongming.md\n?? .claude/agents/planner.md\n?? .claude/agents/project-manager.md\n?? .claude/agents/researcher.md\n?? .claude/agents/tester.md\n?? .claude/agents/ui-ux-designer.md\n?? .fgos/events/95d36507-d4a6-432f-a879-b01c562217b0-20260830T164608767Z.jsonl\n?? .fgos/events/ee2110a9-914f-4138-b75b-55779f988e6b-20260901T020317216Z.jsonl\n?? docs/architect/agent-coordination/proposals/component-boundary-advisory.md\n?? docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md\n?? plans/260831-1637-step07-inline-assignment-mvp/reports/\n?? plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md\n?? plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md\n?? plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md\n?? plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md\n?? plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md\n?? plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md\n?? plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md\n?? src/runner/coordination/session-engine.mjs\n?? test/runner/coordination-session-engine.test.mjs",
+          "sourceBlob": "ee78cde3ac63322d93a24362e74fc32e9c51bb54",
+          "targetBlob": "ee78cde3ac63322d93a24362e74fc32e9c51bb54"
+        }
+      ]
+    },
+    {
+      "digest": "204cd9c54d9fc06658f16b90988b1909d4bcb4aae69a57be2bb579fc23530c8c",
+      "representativeClaimId": "claim_ee0e27047d02de91e43bed460111b1e2",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_ee0e27047d02de91e43bed460111b1e2",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard",
+          "sourceBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4",
+          "targetBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+        },
+        {
+          "claimId": "claim_ae7a010310232fb0e43ca8afb78135c6",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard",
+          "sourceBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4",
+          "targetBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+        },
+        {
+          "claimId": "claim_4f2cfcbafb50e15e499552f325098aac",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard",
+          "sourceBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4",
+          "targetBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+        },
+        {
+          "claimId": "claim_aebb25f070985d7755314c649953386a",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log#file-block",
+          "ancestry": [],
+          "text": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard",
+          "sourceBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4",
+          "targetBlob": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
+        }
+      ]
+    },
+    {
+      "digest": "fd84f8cf698d0e19bccadceb6b97562656b50b70c6dcc9dbb35df5ccb4511a17",
+      "representativeClaimId": "claim_804f7bdd2e4f3bdc9a5bd844d8eb14bf",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_804f7bdd2e4f3bdc9a5bd844d8eb14bf",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json#file-block",
+          "ancestry": [],
+          "text": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": null,\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"artifacts\": [],\n  \"tests\": []\n}",
+          "sourceBlob": "1645db411eabf6408b71647cb953a4703dd76355",
+          "targetBlob": "1645db411eabf6408b71647cb953a4703dd76355"
+        },
+        {
+          "claimId": "claim_3dda41fbcb227a4d997ca9e32a4413f3",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json#file-block",
+          "ancestry": [],
+          "text": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": null,\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"artifacts\": [],\n  \"tests\": []\n}",
+          "sourceBlob": "1645db411eabf6408b71647cb953a4703dd76355",
+          "targetBlob": "1645db411eabf6408b71647cb953a4703dd76355"
+        },
+        {
+          "claimId": "claim_84e474cf4a42342fdf80a663c0357afd",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json#file-block",
+          "ancestry": [],
+          "text": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": null,\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"artifacts\": [],\n  \"tests\": []\n}",
+          "sourceBlob": "1645db411eabf6408b71647cb953a4703dd76355",
+          "targetBlob": "1645db411eabf6408b71647cb953a4703dd76355"
+        }
+      ]
+    },
+    {
+      "digest": "4d49dcb3e2c4bce17d99e97a8c49e8a1c831b115cec6ecf2575bdd5ac28dad82",
+      "representativeClaimId": "claim_5f84c7555351361e9409592daf765ffd",
+      "kind": "distinct-physical-evidence-carriers",
+      "reviewStatus": "pending",
+      "reason": "Byte-identical non-authority physical payloads are retained at their own same-path platform copies under owner decision ea33f3d30. The copies are not distinct semantic authority owners and are not claimed as independent corroboration. The unchanged identical-unit open-data check still lists this group; this explicit exception remains pending independent re-review.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_5f84c7555351361e9409592daf765ffd",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt#file-block",
+          "ancestry": [],
+          "text": "M .fgos/events.jsonl",
+          "sourceBlob": "1b30ed201a9b885c5be434203bbdd997c98fc015",
+          "targetBlob": "1b30ed201a9b885c5be434203bbdd997c98fc015"
+        },
+        {
+          "claimId": "claim_22268c34341d76838a7f3fbc47f5a154",
+          "source": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt#file-block",
+          "owner": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt#file-block",
+          "ancestry": [],
+          "text": "M .fgos/events.jsonl",
+          "sourceBlob": "1b30ed201a9b885c5be434203bbdd997c98fc015",
+          "targetBlob": "1b30ed201a9b885c5be434203bbdd997c98fc015"
+        }
+      ]
     }
   ]
 }

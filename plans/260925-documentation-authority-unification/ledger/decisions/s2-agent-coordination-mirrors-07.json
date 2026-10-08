@@ -179,7 +179,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -219,7 +219,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -234,7 +234,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -289,7 +289,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -329,7 +329,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -344,7 +344,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -399,7 +399,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -439,7 +439,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -569,7 +569,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-07.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-08.log",
       "blobSha": "a3c4734fda733b589c50bb2dcdd8438dfbd03512"
     },
     {

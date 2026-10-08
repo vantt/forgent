@@ -325,7 +325,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -340,7 +340,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-after.txt",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/git-status-before.txt",
       "blobSha": "ee78cde3ac63322d93a24362e74fc32e9c51bb54"
     },
     {
@@ -455,7 +455,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -465,7 +465,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step2-request-live.stderr.log",
       "blobSha": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
     },
     {
@@ -475,7 +475,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step3-provide-live.stderr.log",
       "blobSha": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
     },
     {
@@ -485,7 +485,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-attempt-self-inflicted-dirty-tree-false-fail.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step4-disposition-live.stderr.log",
       "blobSha": "b5ed083884351d3fcc5cefe84315a654d66bc1d4"
     },
     {
@@ -545,7 +545,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -600,7 +600,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -635,7 +635,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -650,7 +650,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -685,7 +685,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -695,7 +695,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -735,7 +735,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -750,7 +750,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -760,7 +760,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/evidence.json",
       "blobSha": "1645db411eabf6408b71647cb953a4703dd76355"
     },
     {
@@ -785,7 +785,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -795,7 +795,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -805,7 +805,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/evidence.json",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/evidence.json",
       "blobSha": "1645db411eabf6408b71647cb953a4703dd76355"
     },
     {
@@ -830,7 +830,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -885,7 +885,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -920,7 +920,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -935,7 +935,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -970,7 +970,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -1055,7 +1055,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
-      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
       "blobSha": "1b30ed201a9b885c5be434203bbdd997c98fc015"
     },
     {
@@ -1335,7 +1335,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -1375,7 +1375,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -1390,7 +1390,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -1430,7 +1430,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -1445,7 +1445,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -1485,7 +1485,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {

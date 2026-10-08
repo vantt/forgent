@@ -367,7 +367,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -382,7 +382,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -427,7 +427,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-09-human-turn-reopen1.stderr.log",
       "blobSha": "9c54dc613990d943af78a756182c47ec7522f00a"
     },
     {
@@ -437,12 +437,12 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-08-explain.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-10-reopen2.stderr.log",
       "blobSha": "9c54dc613990d943af78a756182c47ec7522f00a"
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -472,7 +472,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -482,7 +482,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -512,7 +512,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json",
       "blobSha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
@@ -527,7 +527,7 @@
     },
     {
       "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log",
-      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log",
+      "target": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log",
       "blobSha": "2edc470a8d5c0276453009863fb49b82c34c6b54"
     },
     {

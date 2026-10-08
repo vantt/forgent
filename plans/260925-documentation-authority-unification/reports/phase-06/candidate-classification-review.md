@@ -1,0 +1,5035 @@
+# Candidate classification re-review receipts
+
+Author session: codex-session:1@2026-10-08
+Status: pending independent re-review; no approval identity/date.
+
+Receipt artifact: `plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json`. Fixed classes are proposals, not acceptance. Read every full section/text below; reject a substantive unsupported claim rather than accept it as a structural frame. Historical review notes are context only; the new class and both digests require independent committed acceptance.
+
+## claim_c67a8053177b22178e5b82085dc82593
+
+Unit: `docs/platform/agent-coordination/architecture/README.md#migration-status`
+Class: structural-frame
+Unit digest: 10b8c351197b35ee0d087b596f5ac868c8f5ab511187ffe1775199d4c2e0a385
+Shown text digest: d3fdc34f77b3479dc573d8fe23d45129b8822dfc012297bf24f0c3bd38f231c4
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Architecture index Migration Status heading is pure promotion bookkeeping, byte-identical to baseline fcfe78cb8 and absent from legacy; bookkeeping classification fits and no new claim is made.
+
+```text
+## Migration Status
+
+This directory has been promoted from
+`docs/architect/agent-coordination/architecture/` during the platform
+documentation migration.
+
+Accepted architecture documents keep their authority. Runtime-recovery-family
+documents that are marked as proposals or partial designs remain
+proposal/partial even though they now live beside accepted architecture.
+Current implemented claims must still line up with
+[Implementation Alignment](../verification/implementation-alignment.md) and
+the proof roots linked from
+[Proof Preservation](../history/documentation-migration/proof-preservation.md).
+```
+
+## claim_878904e7b161e9e35e3123ed9621c3f3
+
+Unit: `docs/platform/agent-coordination/architecture/README.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 9bf0348789f4183ba7499518cdad5697fbdd05e5f0775b468aff5b8d17c9d847
+Shown text digest: 9bf0348789f4183ba7499518cdad5697fbdd05e5f0775b468aff5b8d17c9d847
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; One-sentence note that the architecture directory was promoted from the legacy path; present in baseline, not in legacy text, only states provenance of the move, so unbound-existing is true and harmless.
+
+```text
+This directory has been promoted from
+`docs/architect/agent-coordination/architecture/` during the platform
+documentation migration.
+```
+
+## claim_5a1fb968c21f373b8f97a4e4c62f0bfd
+
+Unit: `docs/platform/agent-coordination/architecture/README.md#unheaded-block-3`
+Class: bookkeeping
+Unit digest: f14c588f7deae8fb12bf6068a6b4c6c08b0fc2ace115cc1cffc72c218ecd05df
+Shown text digest: f14c588f7deae8fb12bf6068a6b4c6c08b0fc2ace115cc1cffc72c218ecd05df
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Paragraph keeping accepted authority and proposal/partial labels for runtime-recovery documents, pointing at alignment and proof-preservation; baseline-present, legacy-absent, governance prose about migration rather than a new design claim.
+
+```text
+Accepted architecture documents keep their authority. Runtime-recovery-family
+documents that are marked as proposals or partial designs remain
+proposal/partial even though they now live beside accepted architecture.
+Current implemented claims must still line up with
+[Implementation Alignment](../verification/implementation-alignment.md) and
+the proof roots linked from
+[Proof Preservation](../history/documentation-migration/proof-preservation.md).
+```
+
+## claim_57cc129eeedc6624d9e0f94e0419b1ec
+
+Unit: `docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow`
+Class: structural-frame
+Unit digest: dfc433aa7e8f71fe401ecb8539ceea0f7ea48d8b62ce94e82cfb288d65b69e87
+Shown text digest: be44e6dbb3d1acdfe3117fdb956b40c7a2a538eca1156df75af989cf97613c87
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Heading Component And Runtime Flow in system-context exists identically in baseline and has no legacy twin, so it is a pre-existing candidate heading; classification is accurate, no label required.
+
+````text
+## Component And Runtime Flow
+
+```mermaid
+flowchart TB
+  Intent[Objective or selected Work operation]
+  Structure[Optional Workflow or CoordinationProtocol]
+  Domain[Optional domain policy and evidence harness]
+  Session[CoordinationSession or agent-led planner]
+  Assignment[Validated Assignment]
+  Dispatch[Governed DispatchPlan]
+  Run[Run attempt]
+  Worker[Provider, model, executor, or CLI]
+  Result[Immutable RunResult]
+  Evidence[Artifacts and normalized evidence]
+  Work[Work Lifecycle Engine]
+  Herdr[Herdr process visibility]
+
+  Intent --> Session
+  Structure -.->|constrains legal operations when selected| Session
+  Domain -.->|augments policy and proof| Session
+  Session --> Assignment --> Dispatch --> Run --> Worker
+  Worker -->|claims and artifacts| Result
+  Result --> Evidence
+  Result -->|recommendation or evidence| Work
+  Work -.->|optional integration context| Session
+  Herdr -.->|observation only| Run
+  Herdr -.->|observation only| Worker
+```
+
+The diagram separates execution from delivery lifecycle: a result can inform a
+Work driver, but cannot move Work lifecycle state by itself. Dashed paths are
+optional structure, augmentation, integration context, or visibility; they do
+not create execution authority or terminal truth.
+````
+
+## claim_2d663f66649fd2758f3d44e4a947b4a3
+
+Unit: `docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4`
+Class: structural-frame
+Unit digest: d9aa9975e7a7e7fd8eb83bfade4faca1ed15556b2de8b0d6263ace6c199a90d1
+Shown text digest: d9aa9975e7a7e7fd8eb83bfade4faca1ed15556b2de8b0d6263ace6c199a90d1
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Mermaid flowchart of intent, session, assignment, dispatch, run, result and Work; text matches baseline fcfe78cb8 and is not in the legacy tree, so it is pre-existing candidate content rather than a fresh unlabelled addition.
+
+````text
+```mermaid
+flowchart TB
+  Intent[Objective or selected Work operation]
+  Structure[Optional Workflow or CoordinationProtocol]
+  Domain[Optional domain policy and evidence harness]
+  Session[CoordinationSession or agent-led planner]
+  Assignment[Validated Assignment]
+  Dispatch[Governed DispatchPlan]
+  Run[Run attempt]
+  Worker[Provider, model, executor, or CLI]
+  Result[Immutable RunResult]
+  Evidence[Artifacts and normalized evidence]
+  Work[Work Lifecycle Engine]
+  Herdr[Herdr process visibility]
+
+  Intent --> Session
+  Structure -.->|constrains legal operations when selected| Session
+  Domain -.->|augments policy and proof| Session
+  Session --> Assignment --> Dispatch --> Run --> Worker
+  Worker -->|claims and artifacts| Result
+  Result --> Evidence
+  Result -->|recommendation or evidence| Work
+  Work -.->|optional integration context| Session
+  Herdr -.->|observation only| Run
+  Herdr -.->|observation only| Worker
+```
+````
+
+## claim_a70a115136cadba4cacc52197e9436c5
+
+Unit: `docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-5`
+Class: structural-frame
+Unit digest: 016e54429b645e450dafc1fcb957976819543e16afad4c0713a18de49ec73436
+Shown text digest: 016e54429b645e450dafc1fcb957976819543e16afad4c0713a18de49ec73436
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Caption explaining that results inform Work but cannot move lifecycle state and dashed edges grant no authority; identical in baseline, absent in legacy, consistent with the diagram, so unbound-existing holds.
+
+```text
+The diagram separates execution from delivery lifecycle: a result can inform a
+Work driver, but cannot move Work lifecycle state by itself. Dashed paths are
+optional structure, augmentation, integration context, or visibility; they do
+not create execution authority or terminal truth.
+```
+
+## claim_5f6c4ad489eec4ec871e5abd1e829a47
+
+Unit: `docs/platform/agent-coordination/contracts/README.md#migration-status`
+Class: structural-frame
+Unit digest: 31d813de46f7e20576ba8c74159faeabeb60fc55739201889b9bf5f3f03ed593
+Shown text digest: cb179ce2c45adb5e6cbf21aff11ddbb20ce97ff9420df2c3b6eae6504178adbe
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Contracts README Migration Status heading: unchanged from baseline, no legacy counterpart, and it only frames the promotion note beneath it, so the bookkeeping label is correct.
+
+```text
+## Migration Status
+
+This directory has been promoted from
+`docs/architect/agent-coordination/contracts/` during the platform
+documentation migration. Contract language is preserved first; any later
+semantic change needs an accepted decision and compatibility notes.
+```
+
+## claim_3aad455dd4f98292b109d92d35c9874f
+
+Unit: `docs/platform/agent-coordination/contracts/README.md#unheaded-block-3`
+Class: bookkeeping
+Unit digest: 37cd7c902e80aefa62576f4bb8be3099668b6f7e7e4b2c8dbc80c8b0cd73dbaa
+Shown text digest: 37cd7c902e80aefa62576f4bb8be3099668b6f7e7e4b2c8dbc80c8b0cd73dbaa
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Promotion note for contracts saying wording is preserved first and semantic change needs an accepted decision; baseline-present and legacy-absent, a provenance and policy statement not a contract claim.
+
+```text
+This directory has been promoted from
+`docs/architect/agent-coordination/contracts/` during the platform
+documentation migration. Contract language is preserved first; any later
+semantic change needs an accepted decision and compatibility notes.
+```
+
+## claim_f06ad444a2c0a0c77ebc9976177564ea
+
+Unit: `docs/platform/agent-coordination/decisions/README.md#migration-status`
+Class: structural-frame
+Unit digest: f9bad0ca961df3c3aa64c7b93514e36542c7396cc04dc93e97a5f80cf4de057f
+Shown text digest: 64f25303daaea8aea72701d0ea299a968fd62e6558eb6f9328d47c85ee71e854
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Decisions README Migration Status heading, same as baseline and not in legacy; a bookkeeping heading wrapping the promotion note, so existing-migration-bookkeeping is correct.
+
+```text
+## Migration Status
+
+This directory has been promoted from
+`docs/architect/agent-coordination/decisions/` during the platform
+documentation migration. ADR IDs, titles, decisions, consequences, and
+implementation notes are preserved; this index does not merge ADRs into a
+summary replacement.
+```
+
+## claim_5ff85e6d436282a7d2acc5246ce5e7a1
+
+Unit: `docs/platform/agent-coordination/decisions/README.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: f41d3ef3e738d43a642135246fc9200ce8c92e73e58841ec5e8342241fbe5e4d
+Shown text digest: f41d3ef3e738d43a642135246fc9200ce8c92e73e58841ec5e8342241fbe5e4d
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Note that ADR identifiers, titles and consequences are preserved and the index does not merge ADRs; baseline-present, no legacy match, promotion statement only, classification true.
+
+```text
+This directory has been promoted from
+`docs/architect/agent-coordination/decisions/` during the platform
+documentation migration. ADR IDs, titles, decisions, consequences, and
+implementation notes are preserved; this index does not merge ADRs into a
+summary replacement.
+```
+
+## claim_52f4171b7ac9f5564387abedae33fc32
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#agent-coordination-claim-preservation`
+Class: structural-frame
+Unit digest: 335baeef42e83237bb1cfbcbe2d0cfbb4b4e269a25e4a0bbb0fc6feb59dec82f
+Shown text digest: 7c3196e6bee174982a344f4bb899e9a7889462fdabe37e295634e0883568813f
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 title of the claim-preservation ledger; the file and heading exist at baseline and legacy has no such text, so it is a pre-existing candidate-native ledger title.
+
+````text
+# Agent Coordination Claim Preservation
+
+```txt
+Document type: Claim preservation table
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve accepted, deferred, proposed, and current Agent Coordination claims during migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Writer type: Human + agent coauthor
+Canonical for: Migration claim tracking only
+Use this when: Promoting spec, architecture, contracts, or verification links
+Do not use this for: Runtime behavior by itself
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+```
+
+Use `unknown` or `track-complete / verify current checkout` instead of
+guessing. A target doc may mark a claim `implemented` only when the linked
+current-checkout code, test, contract, or proof supports it.
+
+| Claim ID | Claim | Source | Authority | Status | Target anchor | Must not lose | Proof / gap |
+|---|---|---|---|---|---|---|---|
+| `AC-CLAIM-001` | Agent Coordination is a foundation layer. | [vision](../../../../architect/agent-coordination/vision.md), [system context](../../../../architect/agent-coordination/architecture/system-context.md) | vision / architecture | partial | [README](../../README.md) | Domain-neutral foundation, not only coding workflow glue. | Evidence through Step 08 coordination implementation and current runner spec; Phase 2 needs alignment table. |
+| `AC-CLAIM-002` | Work is optional integration, not system identity. | [vision](../../../../architect/agent-coordination/vision.md), [work integration](../../../../architect/agent-coordination/architecture/work-integration.md), [ADR-001](../../../../architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md) | vision / ADR / architecture | implemented / partial | future `spec.md#work-integration` | No universal Work requirement for coordination. | `src/runner/coordination/**`, `test/runner/coordination-*.test.mjs`; Work-attached mutation remains gated. |
+| `AC-CLAIM-003` | A predeclared Workflow or CoordinationProtocol is optional. | [vision](../../../../architect/agent-coordination/vision.md), [protocol model](../../../../architect/agent-coordination/architecture/protocol-model.md) | vision / architecture | implemented / partial | future `spec.md#coordination-structure` | Agent-led coordination remains legal. | `src/verbs/coordination/schema.mjs`, `src/runner/coordination/session-engine.mjs`; richer runtime graphs deferred. |
+| `AC-CLAIM-004` | Runtime execution contracts are mandatory. | [assignment/run/runresult contract](../../../../architect/agent-coordination/contracts/assignment-run-runresult.md), [ADR-006](../../../../architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md) | contract / ADR | implemented / partial | future `contracts/assignment-run-runresult.md` | Free-form prose must not become execution authority. | Dispatch execution-contract code and assignment/runresult tests; Phase 2 should cite exact code anchors. |
+| `AC-CLAIM-005` | CoordinationSession is the V1 executable/recovery root. | [coordination-session contract](../../../../architect/agent-coordination/contracts/coordination-session.md), [ADR-008](../../../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md) | contract / ADR | implemented / partial | future `contracts/coordination-session.md` | No `missionId` resurrection or second session root. | `src/runner/coordination/{schema,store,replay,session-engine}.mjs`, `test/runner/coordination-*.test.mjs`. |
+| `AC-CLAIM-006` | FlowDefinition is shared graph/operation/policy IR with typed profiles. | [flow-definition contract](../../../../architect/agent-coordination/contracts/flow-definition.md), [ADR-009](../../../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) | contract / ADR | implemented / partial | future `contracts/flow-definition.md` | Shared IR beneath Workflow and CoordinationProtocol profiles. | `src/runner/definitions/**`, coordination tests; Phase 2 needs exact file scan. |
+| `AC-CLAIM-007` | Assignment, Run, and RunResult are separate. | [assignment/run/runresult contract](../../../../architect/agent-coordination/contracts/assignment-run-runresult.md), [ADR-003](../../../../architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md) | contract / ADR | implemented | future `contracts/assignment-run-runresult.md` | Do not collapse request, attempt, and outcome. | `test/runner/assignment-runresult.test.mjs`, dispatch operability proof. |
+| `AC-CLAIM-008` | Dispatch governs execution infrastructure. | [dispatch control plane](../../../../architect/agent-coordination/architecture/dispatch-control-plane.md), [ADR-011](../../../../architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) | architecture / ADR | implemented / partial | future `architecture/dispatch-control-plane.md` | Semantic operation choice stays separate from executor mechanics. | `src/runner/dispatch/**`, `src/verbs/dispatch/**`, runner spec dispatch sections. |
+| `AC-CLAIM-009` | Evidence and RunResult prevent false success. | [evidence and results](../../../../architect/agent-coordination/architecture/evidence-and-results.md), ADR-005/006/007 | architecture / ADR | implemented / partial | future `architecture/evidence-and-results.md` | Worker self-report is not normalized proof by itself. | RunResult v2 tests and dispatch-operability I03 proof; aggregation proof remains mixed by protocol. |
+| `AC-CLAIM-010` | Herdr is visibility, not evidence/truth. | [visibility and Herdr](../../../../architect/agent-coordination/architecture/visibility-and-herdr.md), [ADR-005](../../../../architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md) | architecture / ADR | partial | future `architecture/visibility-and-herdr.md` | Herdr must not settle Runs or replace evidence. | Visibility proof exists; writable takeover remains parked/deferred. |
+| `AC-CLAIM-011` | Domain-owned Work isolation remains outside coordination code until proven. | [ADR-010](../../../../architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md), [work integration](../../../../architect/agent-coordination/architecture/work-integration.md) | ADR / architecture | deferred-preserved / partial | future `architecture/work-integration.md` | Coordination code must not gain hidden Work lifecycle writes. | Needs Step 10 mutating live proof before promotion beyond current status. |
+| `AC-CLAIM-012` | Group-thinking and heterogeneous cohorts preserve dissent/evidence. | [group-thinking trigger surface](../../../../architect/agent-coordination/architecture/group-thinking-trigger-surface.md), [ledger AC-I004](../../../../architect/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts) | architecture / intent ledger | implemented mechanism / quality proof mixed | future `subcomponents/group-thinking/` or architecture doc | Do not hide failed actors, stale artifacts, or dissent in synthesis. | Step 09 proof roots; quality/advisory proof has known gaps. |
+| `AC-CLAIM-013` | Runtime recovery guarantees are distinct: control fencing, result fencing, effect protection. | [runtime recovery design](../../../../architect/agent-coordination/architecture/runtime-recovery-design.md), runtime recovery proofs | architecture / proposal / evidence | partial / proposed split | future runtime-recovery architecture doc | Do not describe unimplemented recovery slices as current. | P01-P05S proofs; S0-S4 and session-recovery half of S5 implemented, S5 transfer/import/budget/apply, S6, S7 not implemented. |
+| `AC-CLAIM-014` | Herdr-spawn bwrap launch reconciliation uses the P02H reopen launcher-script mechanism, not falsified direct-command pseudocode. | [P02H reopen](../../../../architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md), runtime-recovery plan launch design | evidence / plan | implemented with residual gap | future runtime-recovery verification index | Do not promote `herdr agent start ... -- <prepared-command>` as current design. | P02H reopen is authoritative shipped proof; residual accepted gap must stay visible. |
+| `AC-CLAIM-015` | `agent-result-claim.v2` is worker claim contract, not normalized proof. | [I01](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md), dispatch operability plan | evidence / contract-adjacent | implemented | future assignment/runresult contract or verification alignment | Worker claim remains untrusted input. | `test/runner/assignment-runresult.test.mjs`, `test/runner/assignment.test.mjs`. |
+| `AC-CLAIM-016` | Effective execution contract is persisted pre-launch and must stay inspectable where implemented. | [I02](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I02.md) | evidence | implemented | future dispatch operability section | Preserve pre-launch snapshot and inspection. | Current checkout evidence in dispatch execution-contract and tests. |
+| `AC-CLAIM-017` | `RunResult` v2 is immutable terminal Run truth; `RunObservation` is mutable read-only projection and never settles a Run. | [I03](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I03.md), runner spec | evidence / spec | implemented | future `spec.md#run-results` | Do not let observation settle a Run. | `test/runner/assignment-runresult.test.mjs`. |
+| `AC-CLAIM-018` | `dispatch.runtime.inspect` is read-only. | [I04](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I04.md), [inspect verb](../../../../../src/verbs/dispatch/inspect.mjs) | evidence / implementation truth | implemented | future `spec.md#dispatch-runtime-inspect` | Inspect cannot repair or mutate. | `test/runner/dispatch-operability-production-door.test.mjs`. |
+| `AC-CLAIM-019` | `dispatch.runtime.reconcile` is limited to guard/projection repair and must not kill, signal, retry, relaunch, resume, reattach, reassign, admit, cancel, or take over execution. | [I05](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I05.md), [reconcile verb](../../../../../src/verbs/dispatch/reconcile.mjs) | evidence / implementation truth | implemented / partial | future `spec.md#dispatch-runtime-reconcile` | Reconcile is not recovery. | `test/runner/dispatch-reconcile-operation.test.mjs`; preserve residual findings. |
+| `AC-CLAIM-020` | Executor identity is not execution policy. | executor-policy seams plan and design | plan / architecture | implemented / partial / verify current checkout | future dispatch-control subcomponent | Do not encode persona/model/account policy in executor identity. | Current warnings and placement-policy tests exist; Phase 2 needs focused scan. |
+| `AC-CLAIM-021` | `PlacementPolicy` owns provider/model/executor ranking/binding only where the self-verifying production binder has shipped; it does not own same-provider account rotation or lifecycle settlement. | executor-policy seams plan | plan / implementation evidence | implemented / partial / verify current checkout | future placement-policy section | Keep account rotation and lifecycle settlement out of PlacementPolicy. | `src/runner/dispatch/placement-policy.mjs`, placement-policy matrix tests; Phase 08 pending status must stay visible. |
+| `AC-CLAIM-022` | Provider Capacity Rotator is same-provider account/capacity rotation with global/operator config; not cross-provider fallback or project-local credential inventory. | rotator plan (`../../../../../plans/260916-account-rotator/plan.md`; Added in candidate: historical path absent at the batch pin), runner spec | plan / spec | partial / verify current checkout | future provider-capacity section | No project-local account inventory and no fallback ownership. | `src/runner/provider-capacity.mjs`, provider-capacity tests where present. |
+| `AC-CLAIM-023` | Work-independent code implementation tracks use targeted proof per cell plus full proof at gates; no `trackKind`/`executionPolicy` YAML or policy validator was accepted. | policy plan (`../../../../../plans/260915-code-implementation-track-policy/plan.md`; Added in candidate: historical path absent at the batch pin), policy verification | operational / evidence | done / operational | future playbook or verification policy | Do not invent policy YAML as accepted runtime behavior. | Policy proof p01-p05 and track closeout. |
+| `AC-CLAIM-024` | Test feedback/cost work improved proof trust and feedback cost; P05 related-test selector remains deferred. | test feedback plan (`../../../../../plans/260915-0455-test-suite-feedback-cost/plan.md`; Added in candidate: historical path absent at the batch pin), decision lock | plan / evidence | partial; P05 deferred | future verification/history | Do not describe related-test selector as shipped. | Decision lock and Phase 08 handoff. |
+| `AC-CLAIM-025` | Cold-resumable coordination DAG scheduling is proposal/frontier; it must not add mutation nodes, daemon, new lifecycle authority, or Work replacement. | [DAG proposal](../../../../architect/agent-coordination/proposals/dag-request-scheduler.md), DAG plan (`../../../../../plans/260917-cold-resumable-coordination-dag/plan.md`; Added in candidate: historical path absent at the batch pin) | proposal / plan | proposed / ready for implementation | future proposals index | Keep read-only immutable DAG limits. | Needs acceptance and code/proof before current-truth promotion. |
+| `AC-CLAIM-026` | Host-invocation-routing owns host command/provider process routing; Agent Coordination owns only dispatch/executor integration boundary. | [host portal](../../../host-invocation-routing/README.md) | external authority | partial | [README cross-area boundaries](../../README.md#cross-area-boundaries) | Do not duplicate host authority here. | Link-only boundary. |
+| `AC-CLAIM-027` | Packaging-distribution owns installation, activation, release manifest, setup/doctor, and runtime identity. | [packaging portal](../../../packaging-distribution/README.md) | external authority | partial | [README cross-area boundaries](../../README.md#cross-area-boundaries) | Do not duplicate install/setup/doctor authority here. | Link-only boundary. |
+````
+
+## claim_c4fcc5ca9c4c6ba269c32f151e09f39e
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: 9e12681b58f31370ef554d491ce4e9a9ba8281cfaae0db438623086e245fe16a
+Shown text digest: 9e12681b58f31370ef554d491ce4e9a9ba8281cfaae0db438623086e245fe16a
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence for the claim preservation table (Document type, Canonical for migration tracking only); identical to baseline and absent in legacy, a header for a candidate-native ledger.
+
+````text
+```txt
+Document type: Claim preservation table
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve accepted, deferred, proposed, and current Agent Coordination claims during migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Writer type: Human + agent coauthor
+Canonical for: Migration claim tracking only
+Use this when: Promoting spec, architecture, contracts, or verification links
+Do not use this for: Runtime behavior by itself
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+```
+````
+
+## claim_75f9a993ffc8cbff63f08200959c1ffb
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: a9934bdb7e664b6019b9bbccc19c59a26f8cfdc43e847e57d9ae8693ace1627b
+Shown text digest: a9934bdb7e664b6019b9bbccc19c59a26f8cfdc43e847e57d9ae8693ace1627b
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Rule that unknown status is stated instead of guessed and implemented needs current-checkout proof; baseline-present, legacy-absent, conservative ledger policy that introduces no new capability claim.
+
+```text
+Use `unknown` or `track-complete / verify current checkout` instead of
+guessing. A target doc may mark a claim `implemented` only when the linked
+current-checkout code, test, contract, or proof supports it.
+```
+
+## claim_2db60db20f1add588148186e717afe91
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-3`
+Class: candidate-native-navigation
+Unit digest: bd1db6e9232f57939b16fb5effa1dd5e69d21363f6248a2fe4ff424562e2d5ed
+Shown text digest: bd1db6e9232f57939b16fb5effa1dd5e69d21363f6248a2fe4ff424562e2d5ed
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Claim table differs from baseline only through inline Added in candidate annotations on historical plan paths absent at the pin; rows themselves pre-exist, so classification as labelled addition is accurate, though partly existing content.
+
+```text
+| Claim ID | Claim | Source | Authority | Status | Target anchor | Must not lose | Proof / gap |
+|---|---|---|---|---|---|---|---|
+| `AC-CLAIM-001` | Agent Coordination is a foundation layer. | [vision](../../../../architect/agent-coordination/vision.md), [system context](../../../../architect/agent-coordination/architecture/system-context.md) | vision / architecture | partial | [README](../../README.md) | Domain-neutral foundation, not only coding workflow glue. | Evidence through Step 08 coordination implementation and current runner spec; Phase 2 needs alignment table. |
+| `AC-CLAIM-002` | Work is optional integration, not system identity. | [vision](../../../../architect/agent-coordination/vision.md), [work integration](../../../../architect/agent-coordination/architecture/work-integration.md), [ADR-001](../../../../architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md) | vision / ADR / architecture | implemented / partial | future `spec.md#work-integration` | No universal Work requirement for coordination. | `src/runner/coordination/**`, `test/runner/coordination-*.test.mjs`; Work-attached mutation remains gated. |
+| `AC-CLAIM-003` | A predeclared Workflow or CoordinationProtocol is optional. | [vision](../../../../architect/agent-coordination/vision.md), [protocol model](../../../../architect/agent-coordination/architecture/protocol-model.md) | vision / architecture | implemented / partial | future `spec.md#coordination-structure` | Agent-led coordination remains legal. | `src/verbs/coordination/schema.mjs`, `src/runner/coordination/session-engine.mjs`; richer runtime graphs deferred. |
+| `AC-CLAIM-004` | Runtime execution contracts are mandatory. | [assignment/run/runresult contract](../../../../architect/agent-coordination/contracts/assignment-run-runresult.md), [ADR-006](../../../../architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md) | contract / ADR | implemented / partial | future `contracts/assignment-run-runresult.md` | Free-form prose must not become execution authority. | Dispatch execution-contract code and assignment/runresult tests; Phase 2 should cite exact code anchors. |
+| `AC-CLAIM-005` | CoordinationSession is the V1 executable/recovery root. | [coordination-session contract](../../../../architect/agent-coordination/contracts/coordination-session.md), [ADR-008](../../../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md) | contract / ADR | implemented / partial | future `contracts/coordination-session.md` | No `missionId` resurrection or second session root. | `src/runner/coordination/{schema,store,replay,session-engine}.mjs`, `test/runner/coordination-*.test.mjs`. |
+| `AC-CLAIM-006` | FlowDefinition is shared graph/operation/policy IR with typed profiles. | [flow-definition contract](../../../../architect/agent-coordination/contracts/flow-definition.md), [ADR-009](../../../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) | contract / ADR | implemented / partial | future `contracts/flow-definition.md` | Shared IR beneath Workflow and CoordinationProtocol profiles. | `src/runner/definitions/**`, coordination tests; Phase 2 needs exact file scan. |
+| `AC-CLAIM-007` | Assignment, Run, and RunResult are separate. | [assignment/run/runresult contract](../../../../architect/agent-coordination/contracts/assignment-run-runresult.md), [ADR-003](../../../../architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md) | contract / ADR | implemented | future `contracts/assignment-run-runresult.md` | Do not collapse request, attempt, and outcome. | `test/runner/assignment-runresult.test.mjs`, dispatch operability proof. |
+| `AC-CLAIM-008` | Dispatch governs execution infrastructure. | [dispatch control plane](../../../../architect/agent-coordination/architecture/dispatch-control-plane.md), [ADR-011](../../../../architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) | architecture / ADR | implemented / partial | future `architecture/dispatch-control-plane.md` | Semantic operation choice stays separate from executor mechanics. | `src/runner/dispatch/**`, `src/verbs/dispatch/**`, runner spec dispatch sections. |
+| `AC-CLAIM-009` | Evidence and RunResult prevent false success. | [evidence and results](../../../../architect/agent-coordination/architecture/evidence-and-results.md), ADR-005/006/007 | architecture / ADR | implemented / partial | future `architecture/evidence-and-results.md` | Worker self-report is not normalized proof by itself. | RunResult v2 tests and dispatch-operability I03 proof; aggregation proof remains mixed by protocol. |
+| `AC-CLAIM-010` | Herdr is visibility, not evidence/truth. | [visibility and Herdr](../../../../architect/agent-coordination/architecture/visibility-and-herdr.md), [ADR-005](../../../../architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md) | architecture / ADR | partial | future `architecture/visibility-and-herdr.md` | Herdr must not settle Runs or replace evidence. | Visibility proof exists; writable takeover remains parked/deferred. |
+| `AC-CLAIM-011` | Domain-owned Work isolation remains outside coordination code until proven. | [ADR-010](../../../../architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md), [work integration](../../../../architect/agent-coordination/architecture/work-integration.md) | ADR / architecture | deferred-preserved / partial | future `architecture/work-integration.md` | Coordination code must not gain hidden Work lifecycle writes. | Needs Step 10 mutating live proof before promotion beyond current status. |
+| `AC-CLAIM-012` | Group-thinking and heterogeneous cohorts preserve dissent/evidence. | [group-thinking trigger surface](../../../../architect/agent-coordination/architecture/group-thinking-trigger-surface.md), [ledger AC-I004](../../../../architect/agent-coordination/intent-preservation-ledger.md#ac-i004-group-cognition-and-heterogeneous-cohorts) | architecture / intent ledger | implemented mechanism / quality proof mixed | future `subcomponents/group-thinking/` or architecture doc | Do not hide failed actors, stale artifacts, or dissent in synthesis. | Step 09 proof roots; quality/advisory proof has known gaps. |
+| `AC-CLAIM-013` | Runtime recovery guarantees are distinct: control fencing, result fencing, effect protection. | [runtime recovery design](../../../../architect/agent-coordination/architecture/runtime-recovery-design.md), runtime recovery proofs | architecture / proposal / evidence | partial / proposed split | future runtime-recovery architecture doc | Do not describe unimplemented recovery slices as current. | P01-P05S proofs; S0-S4 and session-recovery half of S5 implemented, S5 transfer/import/budget/apply, S6, S7 not implemented. |
+| `AC-CLAIM-014` | Herdr-spawn bwrap launch reconciliation uses the P02H reopen launcher-script mechanism, not falsified direct-command pseudocode. | [P02H reopen](../../../../architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md), runtime-recovery plan launch design | evidence / plan | implemented with residual gap | future runtime-recovery verification index | Do not promote `herdr agent start ... -- <prepared-command>` as current design. | P02H reopen is authoritative shipped proof; residual accepted gap must stay visible. |
+| `AC-CLAIM-015` | `agent-result-claim.v2` is worker claim contract, not normalized proof. | [I01](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md), dispatch operability plan | evidence / contract-adjacent | implemented | future assignment/runresult contract or verification alignment | Worker claim remains untrusted input. | `test/runner/assignment-runresult.test.mjs`, `test/runner/assignment.test.mjs`. |
+| `AC-CLAIM-016` | Effective execution contract is persisted pre-launch and must stay inspectable where implemented. | [I02](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I02.md) | evidence | implemented | future dispatch operability section | Preserve pre-launch snapshot and inspection. | Current checkout evidence in dispatch execution-contract and tests. |
+| `AC-CLAIM-017` | `RunResult` v2 is immutable terminal Run truth; `RunObservation` is mutable read-only projection and never settles a Run. | [I03](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I03.md), runner spec | evidence / spec | implemented | future `spec.md#run-results` | Do not let observation settle a Run. | `test/runner/assignment-runresult.test.mjs`. |
+| `AC-CLAIM-018` | `dispatch.runtime.inspect` is read-only. | [I04](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I04.md), [inspect verb](../../../../../src/verbs/dispatch/inspect.mjs) | evidence / implementation truth | implemented | future `spec.md#dispatch-runtime-inspect` | Inspect cannot repair or mutate. | `test/runner/dispatch-operability-production-door.test.mjs`. |
+| `AC-CLAIM-019` | `dispatch.runtime.reconcile` is limited to guard/projection repair and must not kill, signal, retry, relaunch, resume, reattach, reassign, admit, cancel, or take over execution. | [I05](../../../../architect/agent-coordination/verification/dispatch-operability-implementation/I05.md), [reconcile verb](../../../../../src/verbs/dispatch/reconcile.mjs) | evidence / implementation truth | implemented / partial | future `spec.md#dispatch-runtime-reconcile` | Reconcile is not recovery. | `test/runner/dispatch-reconcile-operation.test.mjs`; preserve residual findings. |
+| `AC-CLAIM-020` | Executor identity is not execution policy. | executor-policy seams plan and design | plan / architecture | implemented / partial / verify current checkout | future dispatch-control subcomponent | Do not encode persona/model/account policy in executor identity. | Current warnings and placement-policy tests exist; Phase 2 needs focused scan. |
+| `AC-CLAIM-021` | `PlacementPolicy` owns provider/model/executor ranking/binding only where the self-verifying production binder has shipped; it does not own same-provider account rotation or lifecycle settlement. | executor-policy seams plan | plan / implementation evidence | implemented / partial / verify current checkout | future placement-policy section | Keep account rotation and lifecycle settlement out of PlacementPolicy. | `src/runner/dispatch/placement-policy.mjs`, placement-policy matrix tests; Phase 08 pending status must stay visible. |
+| `AC-CLAIM-022` | Provider Capacity Rotator is same-provider account/capacity rotation with global/operator config; not cross-provider fallback or project-local credential inventory. | rotator plan (`../../../../../plans/260916-account-rotator/plan.md`; Added in candidate: historical path absent at the batch pin), runner spec | plan / spec | partial / verify current checkout | future provider-capacity section | No project-local account inventory and no fallback ownership. | `src/runner/provider-capacity.mjs`, provider-capacity tests where present. |
+| `AC-CLAIM-023` | Work-independent code implementation tracks use targeted proof per cell plus full proof at gates; no `trackKind`/`executionPolicy` YAML or policy validator was accepted. | policy plan (`../../../../../plans/260915-code-implementation-track-policy/plan.md`; Added in candidate: historical path absent at the batch pin), policy verification | operational / evidence | done / operational | future playbook or verification policy | Do not invent policy YAML as accepted runtime behavior. | Policy proof p01-p05 and track closeout. |
+| `AC-CLAIM-024` | Test feedback/cost work improved proof trust and feedback cost; P05 related-test selector remains deferred. | test feedback plan (`../../../../../plans/260915-0455-test-suite-feedback-cost/plan.md`; Added in candidate: historical path absent at the batch pin), decision lock | plan / evidence | partial; P05 deferred | future verification/history | Do not describe related-test selector as shipped. | Decision lock and Phase 08 handoff. |
+| `AC-CLAIM-025` | Cold-resumable coordination DAG scheduling is proposal/frontier; it must not add mutation nodes, daemon, new lifecycle authority, or Work replacement. | [DAG proposal](../../../../architect/agent-coordination/proposals/dag-request-scheduler.md), DAG plan (`../../../../../plans/260917-cold-resumable-coordination-dag/plan.md`; Added in candidate: historical path absent at the batch pin) | proposal / plan | proposed / ready for implementation | future proposals index | Keep read-only immutable DAG limits. | Needs acceptance and code/proof before current-truth promotion. |
+| `AC-CLAIM-026` | Host-invocation-routing owns host command/provider process routing; Agent Coordination owns only dispatch/executor integration boundary. | [host portal](../../../host-invocation-routing/README.md) | external authority | partial | [README cross-area boundaries](../../README.md#cross-area-boundaries) | Do not duplicate host authority here. | Link-only boundary. |
+| `AC-CLAIM-027` | Packaging-distribution owns installation, activation, release manifest, setup/doctor, and runtime identity. | [packaging portal](../../../packaging-distribution/README.md) | external authority | partial | [README cross-area boundaries](../../README.md#cross-area-boundaries) | Do not duplicate install/setup/doctor authority here. | Link-only boundary. |
+```
+
+## claim_7b3b13b8e0713f13d64ce4b0b55480ee
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#boundary-note`
+Class: structural-frame
+Unit digest: b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f
+Shown text digest: ec22086cda72317305c5307da451a5cf6668962eaaabc25d3d8d600da7b2b2d3
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Boundary Note heading in claim-preservation, identical at baseline and absent in legacy; a pre-existing component-boundary heading, correct as unbound existing candidate unit.
+
+```text
+## Boundary Note
+
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_c1a56543207a1c33b166bf7581606299
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md#unheaded-block-4`
+Class: bookkeeping
+Unit digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Shown text digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Single line stating no component-boundary change in the Phase 0/1 migration; present at baseline, not in legacy, a standard boundary declaration rather than a new technical claim.
+
+```text
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_e85e6a1bc650842a19a2fb94032a37a8
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md#agent-coordination-documentation-governance`
+Class: structural-frame
+Unit digest: f218e3addfb039ce41426ab72f33835e0a11e11fb666ef90e2ac23202f26eef1
+Shown text digest: 1d276607415a71313fcd2642bb17657bdb5e593082242ec8d43b09b163845de2
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: rework; Wrapper H1 for documentation-governance.md: file did not exist at baseline, so unbound-existing is false. Title equals the legacy heading yet sits outside the verbatim fence, so label it a candidate frame or bind it.
+
+````text
+# Agent Coordination Documentation Governance
+
+```txt
+Document type: History
+Audience: Human reviewer, maintainer, documentation agent
+Purpose: Preserve the retired area policy and migration plan verbatim as non-authority history
+Design status: Candidate
+Implementation: Historical record; not a live runtime or documentation policy
+Provenance: Verbatim source snapshot from docs/architect/agent-coordination/documentation-governance.md
+Writer type: Human + agent coauthor
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing the former area documentation policy or migration plan
+Do not use this for: Current authority, current runtime behavior, or new migration instructions
+Last reviewed: Not independently reviewed
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+Supersedes: None; legacy source is unchanged
+Superseded by: None
+Added in candidate: Wrapper H1 and promotion metadata for the literal historical snapshot; not part of the retired source policy
+```
+
+Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.
+
+```text
+# Agent Coordination Documentation Governance
+
+Document type: Policy
+Design status: Accepted
+Implementation: Active
+Last reviewed: 2026-08-31
+Canonical for: document taxonomy, authority, metadata, and maintenance rules
+
+## Purpose
+
+This policy keeps design truth separate from proposals, delivery plans,
+verification evidence, operating instructions, and historical records.
+
+## Document Types
+
+| Type | Purpose | Normative |
+|---|---|---|
+| Vision | Highest-level product identity, foundation boundaries, and direction. | Yes. |
+| Portal | Top-level navigation and reading paths. | No. |
+| Policy | Documentation authority and maintenance rules. | Yes, for documentation. |
+| Index | Navigation within one documentation area. | No. |
+| Vocabulary | Canonical names, definitions, aliases, and concept relationships. | Yes, for terminology. |
+| Architecture | Accepted system boundaries, responsibilities, and invariants. | Yes. |
+| Contract | Accepted machine-facing or behavioral interface. | Yes. |
+| Proposal | Design under discussion or review. | No. |
+| ADR | Durable record of one accepted or rejected architecture decision. | Yes for accepted decisions. |
+| Roadmap | Time-ordered implementation sequence and acceptance plan. | No new architecture authority. |
+| Verification | Tests, live proof, traceability, and conformance evidence. | Evidence, not design authority. |
+| Playbook | Engineering bootstrap, maintenance, or manual fallback procedure. | Operational only; never product runtime authority. |
+| History | Superseded, exploratory, or implementation-era source material. | No. |
+
+## Required Metadata
+
+Every maintained Markdown design document should identify:
+
+```
+```txt
+Document type: <type>
+Design status: Discussion | Proposed | Accepted | Superseded | N/A
+Implementation: Not started | Partial | Implemented | Verified | Drifted | Active | N/A
+Last reviewed: YYYY-MM-DD
+Canonical for: <subject or "nothing">
+```
+```text
+
+Optional metadata:
+
+```
+```txt
+Supersedes: <document links>
+Superseded by: <document links>
+Related: <document links>
+```
+```text
+
+Design status and implementation state are independent. An accepted contract
+may be only partially implemented; an implemented prototype may still embody a
+discussion-stage design.
+
+## Authority Order
+
+When documents disagree, use this order:
+
+1. accepted Vision for product identity, foundation boundaries, and direction;
+2. accepted ADR for a specific decision within the Vision;
+3. accepted contract for machine-visible behavior;
+4. accepted architecture document;
+5. canonical vocabulary for term meaning;
+6. proposal;
+7. roadmap;
+8. playbook;
+9. verification or history as evidence of what happened.
+
+The Vision is not a substitute for exact schemas or state rules. ADRs and
+contracts refine it, but they cannot silently make a Vision capability
+mandatory, optional, or impossible in the opposite direction.
+
+An implementation mismatch does not silently rewrite the design. Mark the
+implementation state `Drifted`, then reconcile code or amend the accepted
+decision explicitly.
+
+## Source-Of-Truth Rules
+
+- Define a term only in `vocabulary/`; other documents link to it.
+- Put product identity and foundation-versus-domain boundaries in `vision.md`.
+- Put durable system boundaries in `architecture/`, not numbered steps.
+- Put exact schemas and state/evidence rules in `contracts/`.
+- Keep unresolved alternatives in `proposals/` until accepted.
+- Record accepted choices and rejected alternatives in `decisions/`.
+- Roadmaps may reference architecture and contracts but must not redefine them.
+- Test output and live proof belong in `verification/`.
+- Prompt templates and team execution procedures belong in `playbooks/`.
+- Runtime Skills/prose belong in `core/skills/` or `domains/<domain>/skills/`,
+  with TaskSpecs and protocol/workflow configuration beside their runtime
+  ownership layer; they must not depend on documentation playbooks.
+- Historical documents must state that they are non-canonical.
+
+## Change Rules
+
+- A canonical term change that affects boundaries requires an ADR or an update
+  to the ADR that owns the decision.
+- A change to product identity or the foundation/domain boundary updates the
+  Vision first, then reconciles every affected downstream document.
+- An accepted contract change requires compatibility and migration notes.
+- Proposal approval requires extracting accepted content into canonical docs;
+  do not merely relabel the entire proposal as accepted.
+- Superseded files remain searchable in `history/` when they contain useful
+  rationale or implementation evidence.
+- Cross-links must be checked after every move or rename.
+```
+````
+
+## claim_5572d93a497f830f5d1677d12c828bb1
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: a23f9f804ef9a60a08ad2e52cd1b099c56dbecbd0d38ed6ca230a2cc968ad1aa
+Shown text digest: a23f9f804ef9a60a08ad2e52cd1b099c56dbecbd0d38ed6ca230a2cc968ad1aa
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+
+````text
+```txt
+Document type: History
+Audience: Human reviewer, maintainer, documentation agent
+Purpose: Preserve the retired area policy and migration plan verbatim as non-authority history
+Design status: Candidate
+Implementation: Historical record; not a live runtime or documentation policy
+Provenance: Verbatim source snapshot from docs/architect/agent-coordination/documentation-governance.md
+Writer type: Human + agent coauthor
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing the former area documentation policy or migration plan
+Do not use this for: Current authority, current runtime behavior, or new migration instructions
+Last reviewed: Not independently reviewed
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+Supersedes: None; legacy source is unchanged
+Superseded by: None
+Added in candidate: Wrapper H1 and promotion metadata for the literal historical snapshot; not part of the retired source policy
+```
+````
+
+## claim_cdf4f526acf8731dcfe40587130ef308
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a
+Shown text digest: 715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Added in candidate paragraph stating the retired policy is kept verbatim as non-authority history; carries the explicit label, absent from baseline and legacy, and invents no behavior, so explicit-added-frame is correct.
+
+```text
+Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.
+```
+
+## claim_ac50db5d5bcefe61f0d4b4773b7ae29c
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md#agent-coordination-documentation-standardization-plan`
+Class: structural-frame
+Unit digest: b11eff289671f3513c50d8a465cd1af3d600188e4ad25a550da0f770ede1706a
+Shown text digest: c8a9883e20ecc1be3f40b220437b5ded5edacb351ee0ae64dbca851d0511a465
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: rework; Wrapper H1 for the standardization-plan history carrier: file is new versus baseline, and the same title is the legacy heading, so calling it an existing unbound unit is wrong; label as frame or bind to its source row.
+
+````text
+# Agent Coordination Documentation Standardization Plan
+
+```txt
+Document type: History
+Audience: Human reviewer, maintainer, documentation agent
+Purpose: Preserve the retired area policy and migration plan verbatim as non-authority history
+Design status: Candidate
+Implementation: Historical record; not a live runtime or documentation policy
+Provenance: Verbatim source snapshot from docs/architect/agent-coordination/documentation-standardization-plan.md
+Writer type: Human + agent coauthor
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing the former area documentation policy or migration plan
+Do not use this for: Current authority, current runtime behavior, or new migration instructions
+Last reviewed: Not independently reviewed
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+Supersedes: None; legacy source is unchanged
+Superseded by: None
+Added in candidate: Wrapper H1 and promotion metadata for the literal historical snapshot; not part of the retired source plan
+```
+
+Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.
+
+```text
+# Agent Coordination Documentation Standardization Plan
+
+```
+```txt
+Document type: Migration plan
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Plan the migration of agent-coordination docs into the new platform documentation system without losing accepted intent, contracts, ADRs, or proof trees
+Design status: Draft
+Implementation: Complete; Phase 0-7 completed, with legacy proof artifacts retained as link-only evidence
+Provenance: Created from documentation-system discussion and scan of existing agent-coordination docs
+Writer type: Human + agent coauthor
+Canonical for: Planning the agent-coordination documentation migration only
+Use this when: Standardizing, migrating, or reviewing agent-coordination documentation
+Do not use this for: Current runtime behavior, accepted architecture authority, or implementation truth
+Last reviewed: 2026-09-18
+Related:
+- docs/doc-governance.md
+- docs/platform/intent-preservation-ledger.md
+- docs/platform/component-boundary.md
+- docs/architect/agent-coordination/README.md
+- docs/architect/agent-coordination/intent-preservation-ledger.md
+```
+```text
+
+Agent Coordination is a critical foundation component. It is not a small docs
+cleanup target. It covers multiple important subcomponents: coordination
+session identity, flow definition, workflow/stage operation compatibility,
+assignment/run/run-result, dispatch control, evidence and result evaluation,
+visibility/Herdr, work integration, group-thinking protocols, runtime recovery,
+and domain adoption.
+
+The migration goal is to preserve and clarify this body of work, not simplify
+it into a smaller idea.
+
+Since this plan was first drafted, several adjacent and agent-coordination
+tracks have changed the design surface: host-invocation-routing,
+packaging-distribution, runtime-recovery, dispatch-operability,
+executor-policy/dispatch seams, provider-capacity/account rotation,
+code-implementation-track policy, test-suite feedback cost, and
+cold-resumable coordination DAG scheduling. The migration must therefore be
+source-first and code-verified: scan old docs/specs/history/plans first, then
+verify current truth against code, tests, contracts, and proof files before
+marking anything current.
+
+## 1. Goal
+
+Move agent-coordination toward the new `docs/platform/<area>/` documentation
+model while preserving:
+
+- the accepted vision and foundation/domain boundary;
+- the intent preservation ledger and every preserved/deferred intent;
+- all accepted ADRs and their implementation notes;
+- current contracts and schema authority;
+- accepted architecture boundaries;
+- proposal status for Step 09 / Step 10 and other frontier work;
+- verification proof trees and live evidence;
+- playbook status as engineering bootstrap, not product runtime authority;
+- history and implementation records as non-canonical but valuable source
+  material.
+
+The result must let a human or stranger agent answer what is accepted, what is
+implemented, what is deferred-preserved, what is only proposed, and what proof
+backs each claim.
+
+## 2. Non-Goals
+
+- Do not rewrite agent-coordination runtime code.
+- Do not promote proposals into accepted architecture.
+- Do not demote accepted contracts or ADRs into history.
+- Do not flatten verification proof trees into prose summaries.
+- Do not merge playbooks into architecture or contracts.
+- Do not collapse agent-coordination into host-invocation, runner, work-state,
+  or coding-domain docs.
+- Do not delete old paths until the migration ledger proves they are drained.
+
+## 3. Hard Rules
+
+| Rule | Meaning |
+|---|---|
+| Critical component posture | Treat this migration as high-risk documentation work because it affects foundation authority and many subcomponents. |
+| Vision first | [vision.md](vision.md) remains the highest area authority until explicitly superseded. |
+| Ledger preserved | [intent-preservation-ledger.md](intent-preservation-ledger.md) must be migrated intact before any simplification. |
+| ADRs stay authoritative | Accepted ADRs keep decision authority; do not replace them with prose summaries. |
+| Contracts stay normative | Contract docs define exact behavior and cannot be weakened by portal or architecture wording. |
+| Proposals remain proposals | Step 09, Step 10, runtime recovery proposals, and frontier docs remain non-canonical unless explicitly accepted. |
+| Proof trees stay linkable | Verification evidence remains navigable; summaries must link to proof roots. |
+| Implementation status explicit | Every major claim is marked current, implemented, partial, accepted-not-implemented, deferred-preserved, proposed, superseded, or unknown. |
+| Source-first, code-verified | Scan legacy docs, old specs, architecture docs, history, proposals, and plan tracks before writing target docs; then verify implementation claims against current code/tests/proof. |
+| Track-complete is not current-truth | A plan marked complete on a branch is only `track-complete` until the relevant code/docs/proof are visible in the current checkout or canonical target docs. |
+| Component boundary check | Update [component-boundary.md](../../platform/component-boundary.md) if ownership or parent/child shape changes; otherwise record `No component-boundary change`. |
+| New doc system invariants | Related files are linkable in body; one H1 title per file; sections begin at H2. |
+
+## 4. Source Inventory
+
+### 4.1. Existing Area Control Docs
+
+| Source | Current role | Migration treatment |
+|---|---|---|
+| [README.md](README.md) | Portal and accepted baseline summary | Promote to `docs/platform/agent-coordination/README.md` after preserving read paths and status distinctions. |
+| [documentation-governance.md](documentation-governance.md) | Local documentation authority | Reconcile with [../../doc-governance.md](../../doc-governance.md); preserve stricter local rules that protect this area. |
+| [vision.md](vision.md) | Highest area authority | Move/promote as `vision.md`; preserve authority and second-read rule for the ledger. |
+| [intent-preservation-ledger.md](intent-preservation-ledger.md) | Intent traceability authority | Move/promote as `intent-preservation-ledger.md`; do not summarize away entries. |
+| [vocabulary/README.md](vocabulary/README.md) | Vocabulary navigation | Preserve as area vocabulary or contract-adjacent reference. |
+
+### 4.2. Accepted Architecture Sources
+
+| Source | Current role |
+|---|---|
+| [architecture/README.md](architecture/README.md) | Accepted architecture index plus runtime recovery proposal status. |
+| [architecture/system-context.md](architecture/system-context.md) | System purpose and authority boundaries. |
+| [architecture/coordination-foundation-baseline.md](architecture/coordination-foundation-baseline.md) | Accepted Step 00-08 baseline. |
+| [architecture/protocol-model.md](architecture/protocol-model.md) | Workflow, CoordinationProtocol, agent-led planning, hard/soft coordination model. |
+| [architecture/runtime-model.md](architecture/runtime-model.md) | Assignment, dispatch, Run, RunResult, evidence flow. |
+| [architecture/work-integration.md](architecture/work-integration.md) | Work integration without becoming second lifecycle authority. |
+| [architecture/dispatch-control-plane.md](architecture/dispatch-control-plane.md) | Semantic operation choice vs execution infrastructure. |
+| [architecture/evidence-and-results.md](architecture/evidence-and-results.md) | Outcome confidence and false-success boundaries. |
+| [architecture/visibility-and-herdr.md](architecture/visibility-and-herdr.md) | Herdr visibility boundary. |
+| [architecture/run-handle.md](architecture/run-handle.md) | Runtime-layer handle proposal. |
+| [architecture/coordination-continuation-recovery.md](architecture/coordination-continuation-recovery.md) | Continuation/recovery proposal. |
+| [architecture/executor-health-and-fallback.md](architecture/executor-health-and-fallback.md) | Executor health/fallback proposal. |
+| [architecture/runtime-recovery-design.md](architecture/runtime-recovery-design.md) | Detailed runtime recovery design entry. |
+| [architecture/group-thinking-trigger-surface.md](architecture/group-thinking-trigger-surface.md) | Group-thinking trigger surface. |
+
+### 4.2.1. Recently Updated Runtime-Recovery Sources
+
+These sources were updated during runtime-recovery work and must be read
+directly before migrating runtime recovery, RunHandle, Herdr visibility, or
+launch reconciliation material.
+
+| Source | Current role | Migration warning |
+|---|---|---|
+| [architecture/runtime-recovery-design.md](architecture/runtime-recovery-design.md) | Runtime recovery entry point and proof/status map | Header says S0-S4 and the session-recovery half of S5 are implemented; S5 transfer/import/budget/apply half, S6, and S7 remain not implemented. Preserve this split. |
+| [architecture/run-handle.md](architecture/run-handle.md) | RunHandle and recovery material reasoning | Treat as accepted reasoning and proposed vocabulary; per-cell verification docs are authoritative for exact shipped field names/shapes. |
+| [architecture/visibility-and-herdr.md](architecture/visibility-and-herdr.md) | Visibility versus runtime truth | Implementation is now substantial; Herdr remains visibility, not Run truth. Writable takeover remains parked/deferred. |
+| [../../../plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md](../../../plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md) | Historical design plus implemented P02H reopen warning | The original `herdr agent start ... -- <prepared-command>` pseudocode was falsified. The shipped mechanism is documented in [verification/runtime-recovery/p02h-reopen.md](verification/runtime-recovery/p02h-reopen.md). Do not promote the falsified invocation as current design. |
+| [verification/runtime-recovery/p02h-reopen.md](verification/runtime-recovery/p02h-reopen.md) | Authoritative shipped proof for herdr-spawn bwrap launch reconciliation | Use this for what actually shipped and the residual accepted gap. |
+
+### 4.3. Accepted Contracts
+
+| Source | Current role |
+|---|---|
+| [contracts/README.md](contracts/README.md) | Contract index and proposal exclusion. |
+| [contracts/workflow-stage-operation.md](contracts/workflow-stage-operation.md) | Stage operation normalization, lookup, validation, compatibility. |
+| [contracts/assignment-run-runresult.md](contracts/assignment-run-runresult.md) | Assignment, Run, RunResult, evidence boundaries. |
+| [contracts/coordination-session.md](contracts/coordination-session.md) | CoordinationSession schema, storage, membership, recovery. |
+| [contracts/flow-definition.md](contracts/flow-definition.md) | Shared graph/operation/policy IR and typed profiles. |
+
+### 4.4. Accepted Decisions
+
+| Source | Current role |
+|---|---|
+| [decisions/README.md](decisions/README.md) | ADR index and implementation notes. |
+| [decisions/ADR-001-work-lifecycle-authority.md](decisions/ADR-001-work-lifecycle-authority.md) | Work owns delivery lifecycle. |
+| [decisions/ADR-002-stage-operation-compatibility.md](decisions/ADR-002-stage-operation-compatibility.md) | Stage primary operation compatibility. |
+| [decisions/ADR-003-assignment-run-runresult-separation.md](decisions/ADR-003-assignment-run-runresult-separation.md) | Assignment/Run/RunResult separation. |
+| [decisions/ADR-004-reserve-job.md](decisions/ADR-004-reserve-job.md) | Job reserved for future scheduler. |
+| [decisions/ADR-005-herdr-visibility-only.md](decisions/ADR-005-herdr-visibility-only.md) | Herdr is visibility, not evidence/truth. |
+| [decisions/ADR-006-assignment-provenance-and-contract-snapshot.md](decisions/ADR-006-assignment-provenance-and-contract-snapshot.md) | Assignment provenance and normalized execution-contract snapshot. |
+| [decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md](decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md) | Domain harness seam and non-driving inline evidence. |
+| [decisions/ADR-008-coordination-session-and-mission-deferral.md](decisions/ADR-008-coordination-session-and-mission-deferral.md) | CoordinationSession recovery root and mission deferral. |
+| [decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md](decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) | FlowDefinition shared IR and typed profiles. |
+| [decisions/ADR-010-interactive-headless-parity-and-work-isolation.md](decisions/ADR-010-interactive-headless-parity-and-work-isolation.md) | Interactive/headless parity and domain-owned Work isolation. |
+| [decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md](decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) | Dispatch owns lifecycle receiver writes receipt. |
+
+### 4.5. Proposals, Roadmap, Playbooks, Verification, History
+
+| Source group | Treatment |
+|---|---|
+| [proposals/](proposals/) | Keep non-canonical unless promoted by explicit decision. Preserve frontier status and unresolved questions. |
+| [roadmap/](roadmap/) | Preserve implementation sequencing; do not let roadmap redefine architecture. |
+| [playbooks/](playbooks/) | Preserve as engineering bootstrap and prompt material; never runtime authority. |
+| [verification/](verification/) | Preserve proof roots, indexes, proof artifacts, review/red-team records, live evidence, known gaps. |
+| [history/](history/) | Preserve historical context and implementation records as non-canonical source material. |
+
+### 4.6. Recent Plan, Code, And Cross-Area Sources
+
+These sources were created or changed after the first documentation-system
+rounds. They must be included in Phase 0 inventory. Do not migrate
+agent-coordination from `docs/architect/agent-coordination/**` alone.
+
+| Source | Current status | Must preserve | Target treatment |
+|---|---|---|---|
+| [../../../plans/260911-2305-runtime-recovery/](../../../plans/260911-2305-runtime-recovery/) | Track with implemented and unimplemented slices | Runtime recovery S0-S4 and session-recovery half of S5 are implemented; S5 transfer/import/budget/apply half, S6, S7, and writable partial-edit takeover are not implemented. | Split between architecture, contracts/status, verification, and history. |
+| [../../../plans/260915-dispatch-operability-implementation/](../../../plans/260915-dispatch-operability-implementation/) | Track-complete on implementation branch; verify current checkout before claiming current | `agent-result-claim.v2`, effective execution contract persistence, `RunResult` v2, `RunObservation`, `dispatch.runtime.inspect`, CAS-guarded `dispatch.runtime.reconcile`, and negative-route proof that reconcile is not recovery. | Feed dispatch-control, assignment/run/runresult, evidence/results, verification, and operator how-to links. |
+| [../../../plans/260915-executor-policy-dispatch-seams/](../../../plans/260915-executor-policy-dispatch-seams/) | Implemented/partial track with production behavior changes | Executor identity must be separated from execution policy; `PlacementPolicy` becomes provider/model/executor binder only after self-verifying proof; `readOnlyExecutorRedirects` remains a legacy pool source until fully retired. | Feed dispatch-control and executor-policy subcomponent rows; verify code before marking implemented. |
+| [../../../plans/260916-account-rotator/](../../../plans/260916-account-rotator/) | Proposed implementation contract; slice status needs code verification | Provider Capacity Rotator is same-provider account/capacity rotation, not provider/model/executor selection; global/operator config only; no project-local account inventory. | Keep as proposal or accepted-not-implemented until code/proof confirms a shipped slice. |
+| [../../../plans/260915-code-implementation-track-policy/](../../../plans/260915-code-implementation-track-policy/) | Done track affecting plan-loop/code-panel proof policy | Work-independent implementation tracks use targeted proof per cell plus full proof at gates; no `trackKind`/`executionPolicy` YAML; no policy validator; P05 became a real engine fix. | Feed playbooks, verification policy, and plan-loop operational docs. |
+| [../../../plans/260915-0455-test-suite-feedback-cost/plan.md](../../../plans/260915-0455-test-suite-feedback-cost/plan.md) | High-risk proof-harness track, mostly complete with P05 deferred | Restores trustworthy cross-env tests and feedback-cost evidence; P05 related-test selector is deferred and must not be described as accepted/shipped. | Feed verification policy and history; do not promote deferred selector behavior. |
+| [../../../plans/260917-cold-resumable-coordination-dag/plan.md](../../../plans/260917-cold-resumable-coordination-dag/plan.md) | Ready for implementation; design authority points to proposal | Cold-resumable DAG scheduling is read-only, immutable, and reconstructable from request plus session events; no mutation nodes, daemon, new lifecycle, or Work replacement. | Keep proposal/frontier until accepted and implemented proof exists. |
+| [proposals/dag-request-scheduler.md](proposals/dag-request-scheduler.md) | Proposal/discussion/partial implementation; canonical for nothing | Candidate `dependsOn` operation DAG, scheduler reconstruction, existing Assignment/DispatchPlan/Run/RunResult path, and unresolved acceptance questions. | Keep in proposals and link from any DAG roadmap row. |
+| [../../../plans/260915-host-invocation-r2-external-process/](../../../plans/260915-host-invocation-r2-external-process/) | Cross-area host-invocation rollout source | External-provider process routing affects agent-coordination only at dispatch/executor/provider boundaries. | Link to host-invocation-routing docs; do not duplicate host authority. |
+| [../../platform/host-invocation-routing/README.md](../../platform/host-invocation-routing/README.md) | New platform area docs | Host invocation owns command routing, operation catalog, provider process protocol, release boundaries, and legacy CLI transition. | Agent-coordination consumes/link-only for host boundary claims. |
+| [../../platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md) | New platform area docs | Packaging/distribution owns install, activation, release manifest, setup/doctor, and runtime identity. | Agent-coordination consumes/link-only for install/runtime activation claims. |
+
+### 4.7. Code And Test Surfaces To Verify
+
+Phase 0 must include a code/test scan for implementation truth. Minimum
+surfaces:
+
+| Surface | Why scan it |
+|---|---|
+| `src/runner/coordination/**` and `src/verbs/coordination/**` | CoordinationSession, FlowDefinition, protocol execution, continuation, and session recovery truth. |
+| `src/runner/dispatch/**` and `src/verbs/dispatch/**` | Assignment, Run, RunResult, dispatch inspection, reconciliation, recovery, execution policy, placement, and worker evidence truth. |
+| `src/runner/assignment*`, `src/runner/coordination/*recovery*`, `src/runner/dispatch/*recovery*` | Recovery and assignment/run boundaries often straddle module names. |
+| `src/runner/provider*`, `src/runner/*placement*`, `src/runner/*capacity*`, `src/runner/executor*` | Provider capacity, account rotation, executor policy, and placement truth. |
+| `src/cli/command-registry.mjs`, `bin/fgos.mjs`, `src/host/**`, `rust/**` where present | CLI/host doors prove which public operations are actually exposed. |
+| `test/runner/**`, `test/verbs/**`, `test/cli/**`, `test/setup/**` | Proof of shipped behavior and known non-shipped gaps. |
+| `docs/specs/**`, especially [../../../docs/specs/runner.md](../../../docs/specs/runner.md) | Existing state-layer facts that may still be canonical until replaced. |
+
+## 5. Target Structure
+
+Target shape:
+
+```
+```txt
+docs/platform/agent-coordination/
+  README.md
+  vision.md
+  intent-preservation-ledger.md
+  spec.md
+  subcomponents/
+  vocabulary/
+  architecture/
+  contracts/
+  decisions/
+  verification/
+  playbooks/
+  proposals/
+  roadmap/
+  history/
+```
+```text
+
+This area should not be compressed into fewer buckets just to look simpler.
+Its current separation is meaningful and should mostly survive the move.
+
+Because agent-coordination covers many child components, the target portal must
+include a subcomponent map. Create `subcomponents/<name>/` directories only
+after the source inventory proves the child needs local navigation; otherwise
+keep the child in the map and link to the owning architecture/contract docs.
+
+## 6. Subcomponent Map To Preserve
+
+The migration must keep these subcomponents visible:
+
+| Subcomponent | Current source | Migration note |
+|---|---|---|
+| Foundation identity and boundaries | [vision.md](vision.md), [architecture/system-context.md](architecture/system-context.md) | Preserve as top-level area direction and architecture. |
+| Intent preservation | [intent-preservation-ledger.md](intent-preservation-ledger.md) | Keep near vision, separate file. |
+| Vocabulary and concept relationships | [vocabulary/README.md](vocabulary/README.md) | Preserve canonical terminology. |
+| Workflow / Stage Operation compatibility | [contracts/workflow-stage-operation.md](contracts/workflow-stage-operation.md), ADR-002 | Keep contract authority explicit. |
+| CoordinationSession | [contracts/coordination-session.md](contracts/coordination-session.md), ADR-008 | Preserve recovery-root status and mission deferral. |
+| FlowDefinition | [contracts/flow-definition.md](contracts/flow-definition.md), ADR-009 | Preserve shared IR and typed profile distinction. |
+| Assignment / Run / RunResult | [contracts/assignment-run-runresult.md](contracts/assignment-run-runresult.md), ADR-003 | Preserve separation and evidence boundary. |
+| Dispatch control | [architecture/dispatch-control-plane.md](architecture/dispatch-control-plane.md), ADR-011 | Keep semantic choice separate from execution infrastructure. |
+| Dispatch operability | [../../../plans/260915-dispatch-operability-implementation/](../../../plans/260915-dispatch-operability-implementation/), [contracts/assignment-run-runresult.md](contracts/assignment-run-runresult.md) | Preserve `agent-result-claim.v2`, effective execution contract, `RunResult` v2, `RunObservation`, inspect/reconcile boundaries, and negative-route proof. |
+| Executor policy / placement | [../../../plans/260915-executor-policy-dispatch-seams/](../../../plans/260915-executor-policy-dispatch-seams/) | Preserve `PlacementPolicy` as provider/model/executor binder, not account rotator or lifecycle owner; verify shipped status in code. |
+| Provider capacity / account rotation | [../../../plans/260916-account-rotator/](../../../plans/260916-account-rotator/) | Preserve as same-provider account/capacity concern; do not describe as cross-provider fallback or model selection. |
+| Evidence and results | [architecture/evidence-and-results.md](architecture/evidence-and-results.md), ADR-005/006/007 | Preserve false-success and evidence integrity boundaries. |
+| Track execution / code implementation policy | [../../../plans/260915-code-implementation-track-policy/](../../../plans/260915-code-implementation-track-policy/) | Preserve targeted proof per cell, full proof at gates, and plan-loop/code-panel operational constraints. |
+| Verification feedback cost | [../../../plans/260915-0455-test-suite-feedback-cost/plan.md](../../../plans/260915-0455-test-suite-feedback-cost/plan.md) | Preserve proof-harness lessons while keeping P05 related-test selector deferred. |
+| Work integration | [architecture/work-integration.md](architecture/work-integration.md), ADR-001/010 | Preserve Work as optional integration and sole lifecycle authority. |
+| Visibility / Herdr | [architecture/visibility-and-herdr.md](architecture/visibility-and-herdr.md), ADR-005 | Keep visibility separate from truth/evidence. |
+| Runtime recovery | [architecture/runtime-recovery-design.md](architecture/runtime-recovery-design.md) and related docs | Preserve proposal/accepted status accurately. |
+| Launch reconciliation | [../../../plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md](../../../plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md), [verification/runtime-recovery/p02h-reopen.md](verification/runtime-recovery/p02h-reopen.md) | Preserve the implemented launcher-script mechanism and the warning that the earlier `herdr agent start ... -- <prepared-command>` shape is false. |
+| Cold-resumable DAG scheduling | [proposals/dag-request-scheduler.md](proposals/dag-request-scheduler.md), [../../../plans/260917-cold-resumable-coordination-dag/plan.md](../../../plans/260917-cold-resumable-coordination-dag/plan.md) | Keep as proposal/frontier until accepted; preserve read-only immutable DAG limits and no-new-lifecycle constraint. |
+| Group thinking and advisory panels | [architecture/group-thinking-trigger-surface.md](architecture/group-thinking-trigger-surface.md), [verification/architecture-advisory-panel/index.md](verification/architecture-advisory-panel/index.md) | Preserve protocol and proof status without hiding known gaps. |
+| Host invocation boundary | [../../platform/host-invocation-routing/README.md](../../platform/host-invocation-routing/README.md), [../../../plans/260915-host-invocation-r2-external-process/](../../../plans/260915-host-invocation-r2-external-process/) | Link to host authority for command/provider process routing; agent-coordination owns only its dispatch/executor integration contract. |
+| Packaging/distribution boundary | [../../platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md) | Link to install/runtime activation authority; do not duplicate distribution docs here. |
+
+## 7. Migration Phases
+
+### 7.1. Phase 0: Protect The Current Authority Graph
+
+1. Read [../../doc-governance.md](../../doc-governance.md), [../../platform/intent-preservation-ledger.md](../../platform/intent-preservation-ledger.md), and [../../platform/component-boundary.md](../../platform/component-boundary.md).
+2. Read all source groups in §4, including legacy docs, old specs, history,
+   proposals, verification roots, and every listed plan track.
+3. Scan current code and tests for every claim that may be marked
+   `implemented`, `partial`, or `track-complete`.
+4. Produce a source inventory with document type, authority, implementation
+   state, target location, and disposition.
+5. Identify docs that already satisfy the new documentation rules and should be
+   moved with minimal rewrite.
+6. Identify docs that require status notes because proposal/accepted/current
+   boundaries are ambiguous.
+
+Exit gate:
+
+- No source group is unclassified.
+- Every implemented/current claim has code, test, contract, or proof evidence
+  in the current checkout; otherwise mark it `unknown`, `partial`, or
+  `track-complete`.
+- Accepted, proposed, verification, playbook, and history materials are not
+  mixed.
+- Component-boundary impact is either updated or recorded as
+  `No component-boundary change`.
+
+### 7.2. Phase 1: Create Target Portal And Preserve Vision/Ledger Pair
+
+1. Create `docs/platform/agent-coordination/README.md`.
+2. Promote `vision.md` and `intent-preservation-ledger.md` first.
+3. Preserve the existing authority rule: Vision first, ledger second.
+4. Add linkable related files and status notes.
+5. Link from [../../platform/README.md](../../platform/README.md) only when the
+   new portal honestly routes readers.
+
+Exit gate:
+
+- A human can enter the new area and immediately tell what is accepted,
+  proposed, implemented, partial, and deferred-preserved.
+
+### 7.3. Phase 2: Promote Spec Without Shrinking The Vision
+
+Create `spec.md` from current implemented behavior and accepted contracts.
+
+The spec must separate:
+
+| Status | Meaning |
+|---|---|
+| `implemented` | Current code/proof supports it. |
+| `partial` | Some implementation exists, but not the full accepted claim. |
+| `accepted-not-implemented` | Accepted direction with no proof yet. |
+| `deferred-preserved` | Preserved in ledger but intentionally outside current slice. |
+| `proposed` | Design exists but is not accepted authority. |
+| `unknown` | Needs fresh code/proof scan. |
+
+Exit gate:
+
+- The spec does not make deferred-preserved capabilities disappear.
+- The spec does not imply proposals are current behavior.
+
+### 7.4. Phase 3: Move Accepted Architecture
+
+Promote accepted architecture before frontier proposals.
+
+Order:
+
+1. system context;
+2. coordination foundation baseline;
+3. protocol model;
+4. runtime model;
+5. work integration;
+6. dispatch control plane;
+7. evidence and results;
+8. visibility and Herdr;
+9. runtime recovery documents with explicit accepted/proposed labels;
+10. group-thinking trigger surface with explicit status.
+
+Exit gate:
+
+- Architecture docs link to relevant contracts, ADRs, verification, and ledger
+  entries.
+- Proposal status is visible in the body, not only implied by path.
+
+### 7.5. Phase 4: Move Contracts And ADRs
+
+Contracts and ADRs should move with minimal semantic rewrite.
+
+Rules:
+
+- Keep exact schema/contract language intact unless an accepted decision changes
+  it.
+- Preserve ADR IDs, titles, dates, context, consequences, implementation notes,
+  and supersession relationships.
+- Add metadata, H1/H2 normalization, linkable related files, and implementation
+  alignment where missing.
+- Do not merge multiple ADRs into one summary.
+
+Exit gate:
+
+- Every accepted contract and ADR has a new target path or explicit reason to
+  remain in legacy path during migration.
+
+### 7.6. Phase 5: Preserve Verification Trees
+
+Verification is large and must not be flattened.
+
+1. Move or mirror indexes first.
+2. Preserve proof directories as evidence artifacts.
+3. Keep `current-cell.md`, review reports, red-team reports, live proof logs,
+   request JSON, and known-failure notes linkable.
+4. Create summary pages only as navigation, never as replacement evidence.
+5. Keep dated proof context and configuration where present.
+
+Exit gate:
+
+- Every claim in spec/architecture/contracts that says `implemented` links to
+  evidence or a named proof gap.
+- Large proof trees remain reachable from stable indexes.
+
+### 7.7. Phase 6: Preserve Playbooks, Proposals, Roadmap, And History
+
+Rules:
+
+- Playbooks stay operational/bootstrap docs.
+- Proposals stay non-canonical until accepted.
+- Roadmap stays implementation sequence, not design authority.
+- History stays non-canonical source/evidence.
+- Add status notes instead of rewriting history as current truth.
+
+Exit gate:
+
+- A reader cannot mistake a prompt/playbook/proposal for a binding contract.
+
+### 7.8. Phase 7: Redirect Legacy Paths
+
+Only after target docs are reviewed:
+
+1. Add status notes to old files.
+2. Redirect portal/index docs where safe.
+3. Keep old detailed docs live if not fully drained.
+4. Mark the source inventory row as `drained` only when every important claim is
+   represented in target docs or explicitly retired.
+
+Exit gate:
+
+- Opening any old path tells the reader whether it is current, migration source,
+  historical, or redirected.
+
+## 8. Required Migration Ledgers
+
+Because agent-coordination already has a mature intent ledger, do not create a
+replacement ledger. Preserve and extend it.
+
+Additional temporary migration tables may be used:
+
+| Ledger | Purpose | Delete/archive when |
+|---|---|---|
+| Source inventory | Tracks old file -> target disposition. | Every row is promoted, redirected, retained, or archived. |
+| Claim preservation table | Tracks accepted claims and target anchors. | All accepted claims have stable anchors. |
+| Proof preservation table | Tracks verification roots and consuming claims. | Every proof root has an index and consumer link. |
+| Proposal status table | Tracks proposal/frontier docs and acceptance state. | Proposal paths are clearly labeled in target docs. |
+
+## 9. Execution Packet
+
+This section is the handoff packet for an agent implementing the migration.
+Follow it in order. Do not skip Phase 0 to start writing polished docs.
+
+### 9.1. First Commands
+
+Run these before editing:
+
+```
+```sh
+pwd
+git status --short
+find docs/architect/agent-coordination -maxdepth 3 -type f | sort
+find docs/architect/agent-coordination/verification -maxdepth 2 -type f | sort
+find docs/specs -maxdepth 2 -type f | sort
+find plans/260911-2305-runtime-recovery plans/260915-dispatch-operability-implementation plans/260915-executor-policy-dispatch-seams plans/260916-account-rotator plans/260915-code-implementation-track-policy plans/260915-0455-test-suite-feedback-cost plans/260917-cold-resumable-coordination-dag plans/260915-host-invocation-r2-external-process -maxdepth 2 -type f | sort
+find docs/platform/host-invocation-routing docs/platform/packaging-distribution -maxdepth 3 -type f | sort
+rg -n "agent-result-claim|RunResult v2|RunObservation|dispatch.runtime|PlacementPolicy|Provider Capacity Rotator|account rotator|cold-resumable|DAG|runtime recovery|RunHandle|test-suite feedback|related-test selector" docs/specs docs/architect/agent-coordination docs/platform/host-invocation-routing docs/platform/packaging-distribution plans src test
+```
+```text
+
+Then read, in this order:
+
+1. [../../doc-governance.md](../../doc-governance.md)
+2. [../../platform/README.md](../../platform/README.md)
+3. [../../platform/component-boundary.md](../../platform/component-boundary.md)
+4. This plan.
+5. [README.md](README.md)
+6. [documentation-governance.md](documentation-governance.md)
+7. [vision.md](vision.md)
+8. [intent-preservation-ledger.md](intent-preservation-ledger.md)
+9. [architecture/README.md](architecture/README.md)
+10. [contracts/README.md](contracts/README.md)
+11. [decisions/README.md](decisions/README.md)
+12. [verification/README.md](verification/README.md)
+13. Every source listed in §4.6.
+
+Before any claim is marked `implemented` or `partial`, run a focused code/test
+scan for that claim. At minimum, inspect the relevant files under
+`src/runner/coordination/**`, `src/verbs/coordination/**`,
+`src/runner/dispatch/**`, `src/verbs/dispatch/**`, `src/cli/**`, `bin/`,
+`test/runner/**`, `test/verbs/**`, and `test/cli/**`. If the code/proof is only
+mentioned in a plan branch or closeout report but is not visible in the current
+checkout, record `track-complete / needs current-checkout verification`.
+
+### 9.2. Phase 0 Deliverables
+
+Create these files first under a migration working directory:
+
+```
+```txt
+docs/platform/agent-coordination/history/documentation-migration/
+  source-inventory.md
+  claim-preservation.md
+  proof-preservation.md
+  proposal-status.md
+```
+```text
+
+These files are temporary migration aids. They may later be drained into
+canonical docs or retained as history.
+
+`source-inventory.md` must use this table:
+
+| Source path | Existing type | Authority | Implementation status | Target path | Disposition | Notes |
+|---|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/...` / `docs/specs/...` / `plans/...` / `src/...` / `test/...` | vision / spec / contract / architecture / proposal / verification / playbook / history / plan / code / test | accepted / proposed / evidence / operational / non-canonical / implementation truth | implemented / partial / accepted-not-implemented / proposed / track-complete / unknown / N/A | `docs/platform/agent-coordination/...` | promote / split / keep-legacy-current / link-only / archive / redirect / needs-human / evidence-only |  |
+
+Allowed `Disposition` values:
+
+| Disposition | Meaning |
+|---|---|
+| `promote` | Move or copy the source into the target docs with preserved meaning. |
+| `split` | Source contains multiple authority types and must be split into target docs. |
+| `keep-legacy-current` | Source remains current during migration; target links to it. |
+| `link-only` | Target index links to source, but content is not moved yet. |
+| `archive` | Source becomes history after canonical content is promoted. |
+| `redirect` | Source gets a status note pointing to the new canonical target. |
+| `needs-human` | Agent cannot decide without reviewer input. |
+| `evidence-only` | Code/test/proof file is not migrated, but is cited as evidence for a target claim. |
+
+`source-inventory.md` must include rows for:
+
+- every file under `docs/architect/agent-coordination/**` that is not generated
+  noise;
+- relevant legacy state-layer files under `docs/specs/**`, especially
+  `docs/specs/runner.md`;
+- every plan/source listed in §4.6;
+- target docs under `docs/platform/host-invocation-routing/**` and
+  `docs/platform/packaging-distribution/**` that define cross-area authority;
+- code/test evidence files for each implemented/partial claim.
+
+`claim-preservation.md` must use this table:
+
+| Claim ID | Claim | Source | Authority | Status | Target anchor | Must not lose | Proof / gap |
+|---|---|---|---|---|---|---|---|
+| `AC-CLAIM-001` |  |  | vision / ADR / contract / architecture | implemented / partial / accepted-not-implemented / deferred-preserved / proposed / unknown |  |  |  |
+
+Minimum claim buckets:
+
+- Agent Coordination is a foundation layer.
+- Work is optional integration, not system identity.
+- A predeclared Workflow or CoordinationProtocol is optional.
+- Runtime execution contracts are mandatory.
+- Work owns delivery lifecycle when present.
+- CoordinationSession is the V1 executable/recovery root.
+- FlowDefinition is shared graph/operation/policy IR with typed profiles.
+- Assignment, Run, and RunResult are separate.
+- Dispatch governs execution infrastructure.
+- Evidence and RunResult prevent false success.
+- Herdr is visibility, not evidence/truth.
+- Domain-owned Work isolation remains outside coordination code until proven.
+- Group-thinking and heterogeneous cohorts preserve dissent/evidence.
+- Runtime recovery guarantees are distinct: control fencing, result fencing,
+  effect protection.
+- Herdr is transport/visibility and failure detector, never Run truth.
+- Herdr-spawn bwrap launch reconciliation uses the P02H reopen shipped
+  launcher-script mechanism, not the falsified `herdr agent start ... --
+  <prepared-command>` pseudocode.
+- Runtime recovery status split: S0-S4 and session-recovery half of S5 are
+  implemented; S5 transfer/import/budget/apply, S6, and S7 remain not
+  implemented.
+- Writable partial-edit takeover remains parked/deferred until workspace-grant
+  and evaluator owners exist.
+- `agent-result-claim.v2` is a worker claim contract, not normalized proof.
+- Effective execution contract is persisted pre-launch and must stay
+  inspectable where implemented.
+- `RunResult` v2 is immutable terminal Run truth; `RunObservation` is mutable
+  read-only projection and never settles a Run.
+- `dispatch.runtime.inspect` is read-only.
+- `dispatch.runtime.reconcile` is limited to guard/projection repair and must
+  not kill, signal, retry, relaunch, resume, reattach, reassign, admit, cancel,
+  or take over execution.
+- Executor identity is not execution policy.
+- `PlacementPolicy` owns provider/model/executor ranking/binding only where the
+  self-verifying production binder has shipped; it does not own same-provider
+  account rotation or lifecycle settlement.
+- Provider Capacity Rotator, if present, is same-provider account/capacity
+  rotation with global/operator config; it is not cross-provider fallback and
+  not project-local credential inventory.
+- Work-independent code implementation tracks use targeted proof per cell and
+  full proof at gates; no `trackKind`/`executionPolicy` YAML or policy
+  validator was accepted by the policy track.
+- Test feedback/cost work improved proof trust and feedback cost; P05
+  related-test selector remains deferred and must not be described as shipped.
+- Cold-resumable coordination DAG scheduling is read-only proposal/frontier
+  work unless code/proof says otherwise; it must not add mutation nodes, daemon,
+  new lifecycle authority, or Work replacement.
+- Host-invocation-routing owns host command/provider process routing; this area
+  owns only the coordination/dispatch integration boundary.
+- Packaging-distribution owns installation, activation, release manifest, and
+  setup/doctor/runtime identity; this area links to it instead of duplicating
+  that authority.
+
+`proof-preservation.md` must use this table:
+
+| Proof root | Proves / supports | Consumed by target doc | Move policy | Known gaps | Notes |
+|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/verification/...` |  |  | move / link-only / keep-legacy-current |  |  |
+
+Required runtime-recovery proof rows:
+
+| Proof root | Must preserve |
+|---|---|
+| `docs/architect/agent-coordination/verification/runtime-recovery/p01.md` | Run admission/control-epoch fencing. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02l.md` | cli-spawn launch reconciliation. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h.md` | Original herdr-spawn proof attempt and falsified direct-command typing context. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | Authoritative shipped herdr-spawn bwrap launcher-script mechanism and residual accepted gap. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p03.md` | Governed fallback. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p04.md` | Pure evaluators. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05.md` | Standalone `dispatch recover`. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05s.md` | Session-owned recovery read/apply door. |
+
+Required recent-track proof/source rows:
+
+| Proof or source root | Must preserve |
+|---|---|
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md` | `agent-result-claim.v2` prompt/validation contract proof. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md` | Effective execution contract persisted pre-launch and inspectable. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md` | `RunResult` v2, legacy-v1 interpretation, and attribution dimensions; preserve documented residuals. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md` | `dispatch.runtime.inspect` read model and public CLI projection; preserve deferred label-consistency residual. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md` | `dispatch.runtime.reconcile` CAS guard/projection repair; preserve negative-route and residual findings. |
+| `plans/260915-dispatch-operability-implementation/reports/track-closeout.md` | Production-door proof summary, full-suite result, and deferred non-capabilities. |
+| `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | Existing executor-policy verification root; inventory must find whether later phase proof lives in plans/reports/code/tests. |
+| `plans/260915-executor-policy-dispatch-seams/plan.md` | Phase status for `PlacementPolicy`, self-verifying production binder, and redirect retirement status. |
+| `plans/260916-account-rotator/design.md` and `plans/260916-account-rotator/plan.md` | Provider Capacity Rotator design and proposed implementation contract; preserve same-provider/global-config limits. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md` through `p05.md` | Proof policy implementation track evidence and known gaps. |
+| `plans/260915-code-implementation-track-policy/reports/track-closeout.md` | Final policy-track closeout and proof status. |
+| `plans/260915-0455-test-suite-feedback-cost/decision-lock.md` and `phase-08-evidence-decision-and-handoff.md` | Decisions and handoff for test-suite feedback cost; preserve P05 deferred status. |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | DAG implementation plan and non-goals; not accepted runtime truth by itself. |
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | Proposal authority for DAG shape; canonical for nothing until accepted. |
+
+`proposal-status.md` must use this table:
+
+| Proposal / frontier source | Topic | Current status | Accepted pieces | Deferred / rejected pieces | Target treatment |
+|---|---|---|---|---|---|
+|  |  | proposed / partially-accepted / superseded / unknown |  |  | keep-proposal / split-accepted / archive / needs-human |
+
+### 9.3. Target Tree Decision
+
+Use this exact initial target tree for Phase 1:
+
+```
+```txt
+docs/platform/agent-coordination/
+  README.md
+  vision.md
+  intent-preservation-ledger.md
+  spec.md
+  subcomponents/
+    README.md
+  architecture/
+    README.md
+  contracts/
+    README.md
+  decisions/
+    README.md
+  verification/
+    README.md
+  proposals/
+    README.md
+  playbooks/
+    README.md
+  roadmap/
+    README.md
+  history/
+    README.md
+    documentation-migration/
+      source-inventory.md
+      claim-preservation.md
+      proof-preservation.md
+      proposal-status.md
+```
+```text
+
+Do not create `subcomponents/<name>/` directories in Phase 1 unless the source
+inventory proves a child component has at least two of:
+
+- its own contract;
+- its own implementation/proof set;
+- its own accepted ADR;
+- its own lifecycle/status distinct from the parent area;
+- enough docs that a local portal reduces reader confusion.
+
+If unsure, keep the child in `subcomponents/README.md` as a row and link to the
+owning architecture/contract docs.
+
+### 9.4. Initial Subcomponent Map
+
+Create `subcomponents/README.md` with this initial map. The `Target directory`
+column is a decision, not assumed.
+
+| Subcomponent | Owns | Primary sources | Target directory | Status |
+|---|---|---|---|---|
+| Foundation identity | Foundation/domain boundary and optional structure | `vision.md`, `architecture/system-context.md` | map-only initially | accepted / partial |
+| CoordinationSession | Session manifest, event schema, storage, recovery root | `contracts/coordination-session.md`, ADR-008 | likely `subcomponents/coordination-session/` | implemented / partial |
+| FlowDefinition | Shared graph/operation/policy IR and typed profiles | `contracts/flow-definition.md`, ADR-009 | likely `subcomponents/flow-definition/` | implemented / partial |
+| Workflow Stage Operation | Stage operation normalization and compatibility | `contracts/workflow-stage-operation.md`, ADR-002 | decide after inventory | accepted / partial |
+| Assignment / Run / RunResult | Semantic request, attempt, result, evidence boundary | `contracts/assignment-run-runresult.md`, ADR-003 | likely `subcomponents/assignment-run-result/` | implemented / partial |
+| Dispatch Control | Execution infrastructure and operation dispatch boundary | `architecture/dispatch-control-plane.md`, ADR-011 | likely `subcomponents/dispatch-control/` | implemented / partial |
+| Dispatch Operability | RunResult v2, RunObservation, inspect/reconcile, worker result claim attribution | `plans/260915-dispatch-operability-implementation/`, `verification/dispatch-operability-implementation/` | likely under `subcomponents/dispatch-control/` or `subcomponents/assignment-run-result/` after inventory | track-complete / verify current checkout |
+| Executor Policy / Placement | Provider/model/executor selection and self-verifying production binder | `plans/260915-executor-policy-dispatch-seams/` | likely `subcomponents/dispatch-control/placement-policy/` only if inventory proves enough local mass | implemented / partial / verify current checkout |
+| Provider Capacity Rotator | Same-provider account/capacity rotation and refusal facts | `plans/260916-account-rotator/` | likely proposal row under dispatch-control unless shipped code proves a component | proposed / verify |
+| Evidence And Results | Confidence, false-success, proof boundary | `architecture/evidence-and-results.md`, ADR-005/006/007 | likely `subcomponents/evidence-results/` | accepted / partial |
+| Code Implementation Track Policy | Proof policy for work-independent implementation tracks | `plans/260915-code-implementation-track-policy/`, `verification/code-implementation-track-policy/` | likely playbook/verification policy, not runtime subcomponent | done / operational |
+| Test Feedback Cost | Test/proof harness reliability and feedback-cost decisions | `plans/260915-0455-test-suite-feedback-cost/` | likely verification/history, not runtime subcomponent | partial; P05 deferred |
+| Work Integration | Work-attached coordination without second lifecycle authority | `architecture/work-integration.md`, ADR-001/010 | decide after inventory | accepted / partial |
+| Visibility / Herdr | Visibility-only boundary | `architecture/visibility-and-herdr.md`, ADR-005 | decide after inventory | accepted / partial |
+| Runtime Recovery | RunHandle, continuation/recovery, fallback, health | runtime recovery architecture docs | likely `subcomponents/runtime-recovery/` only if status is clear | proposed / partial / unknown |
+| Launch Reconciliation | Herdr/cli spawn launch reconciliation and confinement authority handoff | runtime recovery phase designs and P02H verification | likely under `subcomponents/runtime-recovery/` | substantially implemented with residual gap |
+| Cold-Resumable DAG Scheduler | Read-only DAG scheduling of protocol operation nodes | `proposals/dag-request-scheduler.md`, `plans/260917-cold-resumable-coordination-dag/` | proposal row only until accepted/implemented | proposed / ready for implementation |
+| Group Thinking | Group-thinking protocols, advisory panels, cohort planning | group-thinking docs and verification | likely `subcomponents/group-thinking/` | implemented mechanism / quality proof mixed |
+| Host Boundary | Host invocation and provider process ownership consumed by coordination | `docs/platform/host-invocation-routing/` | link-only cross-area boundary | external authority |
+| Packaging Boundary | Install, activation, release manifest, setup/doctor consumed by runtime docs | `docs/platform/packaging-distribution/` | link-only cross-area boundary | external authority |
+
+### 9.5. Phase 1 Files To Create
+
+After Phase 0 tables exist, create only these target files:
+
+```
+```txt
+docs/platform/agent-coordination/README.md
+docs/platform/agent-coordination/vision.md
+docs/platform/agent-coordination/intent-preservation-ledger.md
+docs/platform/agent-coordination/subcomponents/README.md
+docs/platform/agent-coordination/history/README.md
+```
+```text
+
+Minimum content:
+
+- `README.md`: area purpose, read-first table, current accepted baseline,
+  subcomponent map link, status summary, related files.
+- `vision.md`: preserve existing Vision authority and wording as much as
+  possible; add metadata, linkable related files, H1/H2 normalization.
+- `intent-preservation-ledger.md`: preserve existing ledger entries; do not
+  rewrite into a short summary.
+- `subcomponents/README.md`: use §9.4 table, with status and source links.
+- `history/README.md`: explain migration aids and legacy source status.
+
+Do not create `spec.md` in Phase 1 unless Phase 0 has enough implemented/current
+evidence to avoid guessing.
+
+### 9.6. Phase 2 Files To Create
+
+Create:
+
+```
+```txt
+docs/platform/agent-coordination/spec.md
+docs/platform/agent-coordination/verification/implementation-alignment.md
+```
+```text
+
+`spec.md` must include:
+
+- current summary;
+- scope / non-scope;
+- actors and surfaces;
+- core entities;
+- operations and flows;
+- contracts owned;
+- contracts consumed;
+- implementation status table;
+- known gaps.
+
+`implementation-alignment.md` must include:
+
+| Design claim | Implementation status | Evidence | Gap / next action |
+|---|---|---|---|
+
+Populate it from `claim-preservation.md` and `proof-preservation.md`; use
+`unknown` rather than guessing.
+
+### 9.7. Phase 3 Files To Create Or Promote
+
+Create target architecture index and promote accepted architecture docs:
+
+```
+```txt
+docs/platform/agent-coordination/architecture/README.md
+docs/platform/agent-coordination/architecture/system-context.md
+docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md
+docs/platform/agent-coordination/architecture/protocol-model.md
+docs/platform/agent-coordination/architecture/runtime-model.md
+docs/platform/agent-coordination/architecture/work-integration.md
+docs/platform/agent-coordination/architecture/dispatch-control-plane.md
+docs/platform/agent-coordination/architecture/evidence-and-results.md
+docs/platform/agent-coordination/architecture/visibility-and-herdr.md
+```
+```text
+
+Runtime recovery and group-thinking docs may be promoted in this phase only if
+their status is clear. Otherwise create index rows pointing back to legacy
+sources and mark them `proposed`, `partial`, or `unknown`.
+
+For runtime recovery, status is no longer simply `proposed`. Preserve the
+2026-09-14 split from [architecture/runtime-recovery-design.md](architecture/runtime-recovery-design.md):
+
+| Slice | Migration status |
+|---|---|
+| S0-S4 | implemented; link to runtime-recovery verification docs. |
+| S5 session-recovery half | implemented; link to P05/P05S evidence. |
+| S5 transfer/import/budget/apply half | not implemented; preserve as proposed/deferred. |
+| S6 additional adapters/checkpoint support | not implemented. |
+| S7 Rust writer port | not implemented; separate track. |
+| Writable partial-edit takeover | deliberately parked/deferred. |
+
+For launch reconciliation, use [verification/runtime-recovery/p02h-reopen.md](verification/runtime-recovery/p02h-reopen.md)
+as the shipped source. Keep
+[../../../plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md](../../../plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md)
+as historical reasoning plus warning, not as current invocation syntax.
+
+For dispatch-operability, do not rely on the plan closeout alone. Verify
+whether the current checkout contains the relevant code/tests before writing
+`implemented` into target docs. If current checkout verification passes, promote
+the accepted pieces into `assignment-run-runresult`, `dispatch-control`, and
+`evidence-and-results` docs with proof links. If not, mark them
+`track-complete / needs current-checkout verification`.
+
+For executor-policy/dispatch seams, preserve the separation between executor
+identity, execution policy, placement policy, and provider capacity. Do not
+collapse `PlacementPolicy` and Provider Capacity Rotator into one concept.
+
+For cold-resumable DAG scheduling, keep the proposal visible but non-canonical
+until an acceptance decision and implementation proof exist. The migration may
+add an architecture roadmap row, but it must not rewrite the proposal as
+current runtime behavior.
+
+### 9.8. Phase 4 Files To Create Or Promote
+
+Create target contract and decision indexes first:
+
+```
+```txt
+docs/platform/agent-coordination/contracts/README.md
+docs/platform/agent-coordination/decisions/README.md
+```
+```text
+
+Then promote accepted contract docs and ADRs one by one. Keep original IDs and
+titles. Do not combine ADRs.
+
+### 9.9. Phase 5 Files To Create Or Promote
+
+Create:
+
+```
+```txt
+docs/platform/agent-coordination/verification/README.md
+```
+```text
+
+Then decide per proof root:
+
+- `link-only` for large proof artifact directories during first migration;
+- `move` only for compact proof docs that do not risk breaking historical
+  evidence paths;
+- `keep-legacy-current` for active verification tracks that are still being
+  appended to.
+
+The default for large proof trees is `link-only`.
+
+### 9.10. Platform Portal Update Gate
+
+Update [../../platform/README.md](../../platform/README.md) only after Phase 1
+files exist and links resolve.
+
+The platform portal row should point to
+`docs/platform/agent-coordination/README.md` as the target area portal and list
+`docs/architect/agent-coordination/` as legacy/current source during migration.
+
+### 9.11. Legacy Status Notes
+
+Do not add status notes to old docs until the target doc exists.
+
+Use this exact status-note shape at the top of old docs when redirecting:
+
+```
+```md
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/<target>`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+```
+```text
+
+Use `legacy/current source` when the old doc still has authority during
+migration. Use `historical source` only after the target doc owns the claim.
+
+### 9.12. Stop Conditions
+
+Stop and ask a human reviewer when:
+
+- a source document mixes accepted contract and proposal in a way the agent
+  cannot separate confidently;
+- moving a proof tree would break references from active plans;
+- a proposal appears to have been partially accepted but no ADR/decision is
+  found;
+- a claim conflicts with the intent preservation ledger;
+- a component boundary would change and the correct parent/child relationship is
+  unclear;
+- code scan is needed to mark a major claim as implemented but the relevant code
+  ownership is unclear.
+- a plan says a track is complete, but the current checkout does not visibly
+  contain the code/docs/proof needed to support the target claim;
+- legacy docs/specs/history/plans disagree with current code and no ADR,
+  contract, or proof root explains the supersession.
+
+### 9.13. Validation Commands
+
+After each phase, run:
+
+```
+```sh
+rg -n '^# [0-9]+\\.' docs/platform/agent-coordination docs/architect/agent-coordination/documentation-standardization-plan.md
+```
+```text
+
+Run a local link check for production docs touched in that phase. Templates may
+contain future relative links and should be checked separately.
+
+Render long Markdown files with `mdview open <absolute-path>`.
+
+### 9.14. Phase Completion Report
+
+Each phase report must include:
+
+| Field | Required content |
+|---|---|
+| Files created/updated | Exact paths. |
+| Source rows completed | Count and notable paths. |
+| Claims preserved | IDs and target anchors. |
+| Proof links preserved | Proof roots and target consumers. |
+| Legacy docs still authoritative | Paths and why. |
+| Unknowns / human questions | Explicit list, or `none`. |
+| Component-boundary impact | Updated path or `No component-boundary change`. |
+| Validation | Commands run and result. |
+| Preview URLs | MDView URLs for long docs. |
+
+## 10. Review Checklist
+
+Before accepting the migration, answer:
+
+1. Is [vision.md](vision.md) preserved as highest area authority?
+2. Is [intent-preservation-ledger.md](intent-preservation-ledger.md) preserved
+   without losing entries?
+3. Can a reader distinguish accepted architecture from proposals?
+4. Can a reader distinguish contracts from playbooks/prompts?
+5. Are all ADRs preserved with their IDs and consequences?
+6. Are all contracts preserved with exact normative meaning?
+7. Are large verification proof trees still linkable and indexed?
+8. Are implementation statuses explicit for every major claim?
+9. Are Work, Dispatch, RunResult, Herdr, Host, and Coding Domain boundaries
+   still clear?
+10. Has [component-boundary.md](../../platform/component-boundary.md) been
+    updated or explicitly marked `No component-boundary change`?
+11. Are related files linkable in body sections?
+12. Does every new/updated Markdown file have one H1 title and H2+ sections?
+13. Were legacy docs, old specs, history, proposals, and relevant plans scanned
+    before target docs were written?
+14. Were implemented/partial claims verified against current code, tests,
+    contracts, or proof roots?
+15. Are track-complete branch claims distinguished from current-checkout truth?
+
+## 11. Open Questions
+
+| Question | Needed before |
+|---|---|
+| Should all proof artifact directories move physically, or should target docs link back to legacy proof roots during migration? | Phase 5. |
+| Should `documentation-governance.md` remain as an area-local policy after global governance exists? | Phase 1. |
+| Which runtime recovery docs are accepted architecture versus proposed detailed design? | Phase 3. |
+| Should vocabulary remain inside this area or move to a platform-wide vocabulary later? | Phase 4. |
+| What exact target path should host/dispatch overlap use to avoid duplicate authority? | Phase 3. |
+| Does dispatch-operability code/proof from the implementation branch exist in the current checkout, or must target docs mark it `track-complete / needs current-checkout verification`? | Phase 2 and Phase 3. |
+| Should `dispatch.runtime.inspect` / `dispatch.runtime.reconcile` live under dispatch-control, assignment-run-result, or a dedicated dispatch-operability subcomponent? | Phase 3. |
+| Does Provider Capacity Rotator belong as an agent-coordination subcomponent, a dispatch-control child, or a cross-area provider/runtime concern? | Phase 0 and Phase 3. |
+| Has cold-resumable DAG scheduling been accepted by ADR, or is it still proposal/frontier only? | Phase 3. |
+| Should code-implementation-track policy be documented under agent-coordination playbooks, verification policy, coding-domain docs, or all three with one canonical owner? | Phase 6. |
+| How should test-suite feedback-cost decisions be linked from verification docs without turning deferred related-test selection into accepted behavior? | Phase 5. |
+| Are host-invocation-routing and packaging-distribution already canonical enough that agent-coordination should only consume them by link, or are bridge contracts still needed? | Phase 3 and Phase 4. |
+
+## 12. Related Files
+
+| Relationship | File |
+|---|---|
+| global documentation governance | [../../doc-governance.md](../../doc-governance.md) |
+| platform intent ledger | [../../platform/intent-preservation-ledger.md](../../platform/intent-preservation-ledger.md) |
+| component-boundary anchor | [../../platform/component-boundary.md](../../platform/component-boundary.md) |
+| current area portal | [README.md](README.md) |
+| current area vision | [vision.md](vision.md) |
+| current area intent ledger | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
+| current architecture index | [architecture/README.md](architecture/README.md) |
+| current contracts index | [contracts/README.md](contracts/README.md) |
+| current decisions index | [decisions/README.md](decisions/README.md) |
+| current verification index | [verification/README.md](verification/README.md) |
+| runtime recovery plan source | [../../../plans/260911-2305-runtime-recovery/](../../../plans/260911-2305-runtime-recovery/) |
+| dispatch operability plan source | [../../../plans/260915-dispatch-operability-implementation/](../../../plans/260915-dispatch-operability-implementation/) |
+| executor policy dispatch seams source | [../../../plans/260915-executor-policy-dispatch-seams/](../../../plans/260915-executor-policy-dispatch-seams/) |
+| provider capacity/account rotator source | [../../../plans/260916-account-rotator/](../../../plans/260916-account-rotator/) |
+| code implementation track policy source | [../../../plans/260915-code-implementation-track-policy/](../../../plans/260915-code-implementation-track-policy/) |
+| test-suite feedback cost source | [../../../plans/260915-0455-test-suite-feedback-cost/plan.md](../../../plans/260915-0455-test-suite-feedback-cost/plan.md) |
+| cold-resumable DAG source | [../../../plans/260917-cold-resumable-coordination-dag/plan.md](../../../plans/260917-cold-resumable-coordination-dag/plan.md) |
+| DAG scheduler proposal | [proposals/dag-request-scheduler.md](proposals/dag-request-scheduler.md) |
+| host-invocation-routing authority | [../../platform/host-invocation-routing/README.md](../../platform/host-invocation-routing/README.md) |
+| packaging-distribution authority | [../../platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md) |
+```
+````
+
+## claim_bd6d264823ac19f3368e4905f7ad9e36
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: 99460511ae96fcceabb776ab84debbedb09079e057812c804a0892b1954c30a9
+Shown text digest: 99460511ae96fcceabb776ab84debbedb09079e057812c804a0892b1954c30a9
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+
+````text
+```txt
+Document type: History
+Audience: Human reviewer, maintainer, documentation agent
+Purpose: Preserve the retired area policy and migration plan verbatim as non-authority history
+Design status: Candidate
+Implementation: Historical record; not a live runtime or documentation policy
+Provenance: Verbatim source snapshot from docs/architect/agent-coordination/documentation-standardization-plan.md
+Writer type: Human + agent coauthor
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing the former area documentation policy or migration plan
+Do not use this for: Current authority, current runtime behavior, or new migration instructions
+Last reviewed: Not independently reviewed
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+Supersedes: None; legacy source is unchanged
+Superseded by: None
+Added in candidate: Wrapper H1 and promotion metadata for the literal historical snapshot; not part of the retired source plan
+```
+````
+
+## claim_d042ca5e37f8daabec21bf38c36eedf1
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a
+Shown text digest: 715e040ca25de20ebe65e3d3a9b453c39e2426833fc3edfdc68fc1c82e115d3a
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Labelled Added in candidate sentence introducing the literal snapshot of the retired migration plan as non-authority history; new text absent from baseline and legacy, label present, framing only.
+
+```text
+Added in candidate: Retired area policy and migration plan, retained verbatim as non-authority history. The literal source snapshot below preserves original status fields and file-relative references as historical text, not active authority or navigation.
+```
+
+## claim_b4ad8770e6fd15133e9a922314b617c3
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#agent-coordination-migration-status`
+Class: structural-frame
+Unit digest: e8c2d690b8efd3d7e537671d67b6aa7de3a2bc412e4ec3b0818cb8610005a09a
+Shown text digest: 892080e1f2b194aa5e91a01308de35f367446116fa896501ffdbbb631fc9dcb2
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Migration Status H1 in the history folder; present at baseline, no legacy counterpart, and it is the title of the candidate's own migration bookkeeping ledger, so the bookkeeping label is accurate.
+
+````text
+# Agent Coordination Migration Status
+
+```txt
+Document type: Migration status
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Track phase-by-phase progress for the Agent Coordination documentation migration
+Design status: Draft
+Implementation: Active
+Provenance: Created during execution of docs/architect/agent-coordination/documentation-standardization-plan.md
+Writer type: Human + agent coauthor
+Canonical for: Migration progress bookkeeping only
+Use this when: Resuming the documentation migration or checking which phase has landed
+Do not use this for: Current runtime behavior, accepted contracts, or implementation proof
+Last reviewed: 2026-09-18
+Related:
+- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+```
+````
+
+## claim_0f817562bcf9443edea32b0023e8edcb
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: a6215765fb06646cacc69bccb097e41be353243b9b0c1b2cc56c81e5cc7b3fa2
+Shown text digest: a6215765fb06646cacc69bccb097e41be353243b9b0c1b2cc56c81e5cc7b3fa2
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence for the migration progress tracker (Canonical for bookkeeping only, Related legacy plan); unchanged from baseline and absent from legacy, a pre-existing header with no unlabelled invention.
+
+````text
+```txt
+Document type: Migration status
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Track phase-by-phase progress for the Agent Coordination documentation migration
+Design status: Draft
+Implementation: Active
+Provenance: Created during execution of docs/architect/agent-coordination/documentation-standardization-plan.md
+Writer type: Human + agent coauthor
+Canonical for: Migration progress bookkeeping only
+Use this when: Resuming the documentation migration or checking which phase has landed
+Do not use this for: Current runtime behavior, accepted contracts, or implementation proof
+Last reviewed: 2026-09-18
+Related:
+- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+```
+````
+
+## claim_ade591ece6c8622566ab5b61e7c593f9
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#phase-status`
+Class: structural-frame
+Unit digest: e87c0b1d8137253be9acd3577b4d053ed3fbec7ec80f55206cc85aded5f05857
+Shown text digest: 5d2f9c209a517773c3d41ab037cbc60704f2169fe7e550ac3c5c40ab89641751
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Phase Status heading above the per-phase progress table; same as baseline, not in legacy tree, so pre-existing migration bookkeeping heading, classification is true.
+
+```text
+## Phase Status
+
+| Phase | Plan title | Status | Landed target docs | Remaining work |
+|---|---|---|---|---|
+| Phase 0 | Protect the current authority graph | complete | [source-inventory.md](source-inventory.md), [claim-preservation.md](claim-preservation.md), [proof-preservation.md](proof-preservation.md), [proposal-status.md](proposal-status.md) | Keep ledgers updated when later phases promote or redirect source rows. |
+| Phase 1 | Create target portal and preserve vision/ledger pair | complete | [../../README.md](../../README.md), [../../vision.md](../../vision.md), [../../intent-preservation-ledger.md](../../intent-preservation-ledger.md), [../../subcomponents/README.md](../../subcomponents/README.md), [../README.md](../README.md) | Legacy detailed docs remain current until later phases drain them. |
+| Phase 2 | Promote spec without shrinking the vision | complete | [../../spec.md](../../spec.md), [../../verification/implementation-alignment.md](../../verification/implementation-alignment.md) | Keep status conservative; update alignment when code/proof scans refine partial/implemented claims. |
+| Phase 3 | Move accepted architecture | complete | [architecture index](../../architecture/README.md) plus 13 target architecture documents; target-local and cross-area links were normalized. | Legacy sources remain retained until Phase 7 redirect review; keep runtime-recovery-family proposal/partial labels explicit. |
+| Phase 4 | Move contracts and ADRs | complete | [contract index](../../contracts/README.md), four target contracts, [decision index](../../decisions/README.md), and ADR-001 through ADR-011. | Legacy sources remain retained until Phase 7 redirect review; future semantic changes need decision/compatibility evidence. |
+| Phase 5 | Preserve verification trees | complete | [verification README](../../verification/README.md) indexes retained legacy proof roots; mirrored target trees remain navigable evidence copies. | Keep the proof-preservation ledger current when a target doc adds an implementation claim. |
+| Phase 6 | Preserve playbooks, proposals, roadmap, and history | complete | [playbooks](../../playbooks/README.md), [proposals](../../proposals/README.md), [roadmap](../../roadmap/README.md), and [history](../README.md) now state their target-path and non-normative status. | Keep proposal-status and source-inventory ledgers current as frontier material changes. |
+| Phase 7 | Redirect legacy paths | complete | All 63 legacy narrative/index documents with target counterparts carry standard target-path migration notes; legacy proof artifacts remain unchanged, link-only evidence through the target verification index. | Keep target/legacy pairs synchronized if a retained legacy source changes; preserve proof artifacts as evidence. |
+```
+
+## claim_fd41df5f417e56a6564e6ab77e65eb1c
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 21697677038f114f34b6369119a3457c8c11e7413fcee8c584678be0bc0f644d
+Shown text digest: 21697677038f114f34b6369119a3457c8c11e7413fcee8c584678be0bc0f644d
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Table of migration phases 0-7 with landed docs and remaining work; text matches baseline fcfe78cb8, absent from legacy; it records migration progress only, consistent with unbound-existing.
+
+```text
+| Phase | Plan title | Status | Landed target docs | Remaining work |
+|---|---|---|---|---|
+| Phase 0 | Protect the current authority graph | complete | [source-inventory.md](source-inventory.md), [claim-preservation.md](claim-preservation.md), [proof-preservation.md](proof-preservation.md), [proposal-status.md](proposal-status.md) | Keep ledgers updated when later phases promote or redirect source rows. |
+| Phase 1 | Create target portal and preserve vision/ledger pair | complete | [../../README.md](../../README.md), [../../vision.md](../../vision.md), [../../intent-preservation-ledger.md](../../intent-preservation-ledger.md), [../../subcomponents/README.md](../../subcomponents/README.md), [../README.md](../README.md) | Legacy detailed docs remain current until later phases drain them. |
+| Phase 2 | Promote spec without shrinking the vision | complete | [../../spec.md](../../spec.md), [../../verification/implementation-alignment.md](../../verification/implementation-alignment.md) | Keep status conservative; update alignment when code/proof scans refine partial/implemented claims. |
+| Phase 3 | Move accepted architecture | complete | [architecture index](../../architecture/README.md) plus 13 target architecture documents; target-local and cross-area links were normalized. | Legacy sources remain retained until Phase 7 redirect review; keep runtime-recovery-family proposal/partial labels explicit. |
+| Phase 4 | Move contracts and ADRs | complete | [contract index](../../contracts/README.md), four target contracts, [decision index](../../decisions/README.md), and ADR-001 through ADR-011. | Legacy sources remain retained until Phase 7 redirect review; future semantic changes need decision/compatibility evidence. |
+| Phase 5 | Preserve verification trees | complete | [verification README](../../verification/README.md) indexes retained legacy proof roots; mirrored target trees remain navigable evidence copies. | Keep the proof-preservation ledger current when a target doc adds an implementation claim. |
+| Phase 6 | Preserve playbooks, proposals, roadmap, and history | complete | [playbooks](../../playbooks/README.md), [proposals](../../proposals/README.md), [roadmap](../../roadmap/README.md), and [history](../README.md) now state their target-path and non-normative status. | Keep proposal-status and source-inventory ledgers current as frontier material changes. |
+| Phase 7 | Redirect legacy paths | complete | All 63 legacy narrative/index documents with target counterparts carry standard target-path migration notes; legacy proof artifacts remain unchanged, link-only evidence through the target verification index. | Keep target/legacy pairs synchronized if a retained legacy source changes; preserve proof artifacts as evidence. |
+```
+
+## claim_0bd5a9ca3c62796a5dc5778f945b2a12
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#current-boundary-note`
+Class: structural-frame
+Unit digest: dde4b65b6d30e670f4e41e1e8ab847386a1050ef30d1a4ea6c3928dafcdb2c6d
+Shown text digest: 2a6118cf112703e89b51c16bebee83a109f75e5a04544e5a73a75502ef63b0a7
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Current Boundary Note heading inside migration-status; identical to baseline and legacy-absent, pre-existing structural heading with no new claim.
+
+```text
+## Current Boundary Note
+
+No component-boundary change through the completed Phase 0-5 work. The
+migration is changing document placement and reader routing, not runtime
+authority, state writes, or component ownership.
+```
+
+## claim_b894754670dd2457aa66b344b96650d8
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-3`
+Class: bookkeeping
+Unit digest: 213abce12dc763d06b8116fa1fa1edb8bc666a0374428306081de91b1b9e94ba
+Shown text digest: 213abce12dc763d06b8116fa1fa1edb8bc666a0374428306081de91b1b9e94ba
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; States no component-boundary change through Phase 0-5 and that migration changes placement and routing only; baseline-present, legacy-absent, a boundary declaration that fits the existing ledger.
+
+```text
+No component-boundary change through the completed Phase 0-5 work. The
+migration is changing document placement and reader routing, not runtime
+authority, state writes, or component ownership.
+```
+
+## claim_1953c6cc417d5c75c008d7af7393635d
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#completion-evidence`
+Class: structural-frame
+Unit digest: 0b8b72bd26f198855e395fabb9ed5218c92a2883694b2cbbde90fdc8f1907c13
+Shown text digest: 03ab3e9fa0151c57e38fecd93586a7e8bfe715678666b8ce386d98d8b3e28db6
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Completion Evidence heading in migration-status; same bytes as baseline, no legacy occurrence, so a pre-existing candidate heading for the bookkeeping page.
+
+```text
+## Completion Evidence
+
+Phase 0-7 completion evidence is recorded in
+[phase-7-completion.md](phase-7-completion.md).
+```
+
+## claim_777d57d8dbcf6343390a7028cb85d563
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/migration-status.md#unheaded-block-4`
+Class: candidate-native-navigation
+Unit digest: 86f603f4ab7f2785eddc1aeb10a8f11b8e2945f3ec8df86ce286921fa01315b6
+Shown text digest: 86f603f4ab7f2785eddc1aeb10a8f11b8e2945f3ec8df86ce286921fa01315b6
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Pointer sentence linking Phase 0-7 completion evidence to phase-7-completion.md; baseline-present, absent in legacy, pure navigation inside the migration ledger.
+
+```text
+Phase 0-7 completion evidence is recorded in
+[phase-7-completion.md](phase-7-completion.md).
+```
+
+## claim_4c520b8ac53319f2849ae9efd95f5384
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#agent-coordination-documentation-migration-completion`
+Class: structural-frame
+Unit digest: a7c79bf58e79685a047e69a9cf95250b43c104cf91b9f038aca0a69f6bf844b0
+Shown text digest: e1a33463a6383938d3f17aa89f0f4042c99065738fb9a9eca4559aed519348d6
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Title of the Phase 7 completion report; exists at baseline, absent from legacy text, so it is a pre-existing candidate document heading as claimed.
+
+````text
+# Agent Coordination Documentation Migration Completion
+
+```txt
+Document type: Migration completion report
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Record the completed Phase 7 legacy-path disposition and final migration checks
+Design status: Draft
+Implementation: Complete
+Provenance: Documentation standardization Phase 0-7 execution
+Writer type: Human + agent coauthor
+Canonical for: Migration completion evidence only
+Use this when: Auditing the completed Agent Coordination documentation migration
+Do not use this for: Current runtime behavior, contract meaning, or proof contents
+Last reviewed: 2026-09-18
+Related:
+- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+- docs/platform/agent-coordination/history/documentation-migration/migration-status.md
+```
+````
+
+## claim_1416eec7e023d91d71eb80f2c6a67fc4
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: 60d78413ed9a9e6cbcbab02bc0c29f5af76a0f520da8998f6020e593757497be
+Shown text digest: 60d78413ed9a9e6cbcbab02bc0c29f5af76a0f520da8998f6020e593757497be
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence typing the page as a migration completion report, Canonical for completion evidence only; baseline-identical, legacy-absent, nothing new beyond the existing frame.
+
+````text
+```txt
+Document type: Migration completion report
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Record the completed Phase 7 legacy-path disposition and final migration checks
+Design status: Draft
+Implementation: Complete
+Provenance: Documentation standardization Phase 0-7 execution
+Writer type: Human + agent coauthor
+Canonical for: Migration completion evidence only
+Use this when: Auditing the completed Agent Coordination documentation migration
+Do not use this for: Current runtime behavior, contract meaning, or proof contents
+Last reviewed: 2026-09-18
+Related:
+- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+- docs/platform/agent-coordination/history/documentation-migration/migration-status.md
+```
+````
+
+## claim_5112c47ac1eaa20ed3d13cb744e27e0c
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#completion-record`
+Class: structural-frame
+Unit digest: da246349ae75320592ccf49a2f8f9f9eb5e744a4544aa707e2cfc80dc77306d1
+Shown text digest: 201e199c91b0266080f763be15c61dd0307757f2437635327c6f2cf0ac9aed20
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Completion Record heading preceding the result table; identical at baseline, nonexistent in legacy, pre-existing structural heading so unbound-existing is correct.
+
+```text
+## Completion Record
+
+| Field | Result |
+|---|---|
+| Files created/updated | This report; migration status, source inventory, target portals/indexes, target link corrections, and 63 legacy narrative/index documents. |
+| Source rows completed | 63 legacy narrative/index paths under architecture, contracts, decisions, history, playbooks, proposals, roadmap, and vocabulary received target-path notes. 306 verification artifacts remain link-only evidence. |
+| Claims preserved | `AC-CLAIM-001` through `AC-CLAIM-027` remain tracked by [claim preservation](claim-preservation.md); this phase changed navigation only. |
+| Proof links preserved | Runtime recovery, dispatch operability, executor-policy, code-track-policy, group-thinking, visibility, and Team Dispatch V1 roots remain reachable through [verification README](../../verification/README.md). |
+| Legacy docs still authoritative | Retained legacy narrative docs are legacy/current sources paired to their target paths. Verification artifacts remain legacy proof evidence and are intentionally unchanged. |
+| Unknowns / human questions | None for the migration mechanics. Future semantic changes must keep the target/legacy pair and inventory aligned until a later archival decision. |
+| Component-boundary impact | No component-boundary change. |
+| Validation | 63/63 legacy narrative docs have migration notes and target counterparts; legacy narrative links resolve; target non-verification links resolve; `git diff --check` passes. |
+| Preview URLs | Migration plan: `http://design-lap:7701/s/513a32939ee8`; migration status: `http://design-lap:7701/s/99f1b1f7febd`; source inventory: `http://design-lap:7701/s/64c4052e0e22`. |
+```
+
+## claim_8948514c27f4505734a771e4fa2cc4c9
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 473e23f9968f866da45ab7f6fec38c89175f666e314746106464b98375767064
+Shown text digest: 473e23f9968f866da45ab7f6fec38c89175f666e314746106464b98375767064
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Completion table (63 narrative docs, 306 verification artifacts link-only, claims AC-CLAIM-001 to 027 preserved); matches baseline and not in legacy; it is a recorded migration result that predates this batch.
+
+```text
+| Field | Result |
+|---|---|
+| Files created/updated | This report; migration status, source inventory, target portals/indexes, target link corrections, and 63 legacy narrative/index documents. |
+| Source rows completed | 63 legacy narrative/index paths under architecture, contracts, decisions, history, playbooks, proposals, roadmap, and vocabulary received target-path notes. 306 verification artifacts remain link-only evidence. |
+| Claims preserved | `AC-CLAIM-001` through `AC-CLAIM-027` remain tracked by [claim preservation](claim-preservation.md); this phase changed navigation only. |
+| Proof links preserved | Runtime recovery, dispatch operability, executor-policy, code-track-policy, group-thinking, visibility, and Team Dispatch V1 roots remain reachable through [verification README](../../verification/README.md). |
+| Legacy docs still authoritative | Retained legacy narrative docs are legacy/current sources paired to their target paths. Verification artifacts remain legacy proof evidence and are intentionally unchanged. |
+| Unknowns / human questions | None for the migration mechanics. Future semantic changes must keep the target/legacy pair and inventory aligned until a later archival decision. |
+| Component-boundary impact | No component-boundary change. |
+| Validation | 63/63 legacy narrative docs have migration notes and target counterparts; legacy narrative links resolve; target non-verification links resolve; `git diff --check` passes. |
+| Preview URLs | Migration plan: `http://design-lap:7701/s/513a32939ee8`; migration status: `http://design-lap:7701/s/99f1b1f7febd`; source inventory: `http://design-lap:7701/s/64c4052e0e22`. |
+```
+
+## claim_c30c77e5958a4a068becc93e2d1c4c96
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#scope-boundary`
+Class: structural-frame
+Unit digest: 06319b17ced923b387edd4192486050ff24dc19439b9c218de166b489be54fe9
+Shown text digest: fe70dc17d3624bbeae1a6d0b116a2ce5e063c87a9ec19516776f123ce66dbca7
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Scope Boundary heading in the Phase 7 report; byte-identical to baseline and without a legacy counterpart, so a pre-existing candidate heading.
+
+```text
+## Scope Boundary
+
+The migration does not rewrite proof artifacts, claim semantics, contracts, or
+runtime implementation. It makes authority, status, and navigation explicit
+while retaining proof history in place.
+```
+
+## claim_4db2eedb5a5ca45fa3d1f0ccb8404371
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/phase-7-completion.md#unheaded-block-3`
+Class: bookkeeping
+Unit digest: f622a4baf74a691b9ab5679808749c9900ca52e94bf4c51f66b0cc5931f36d38
+Shown text digest: f622a4baf74a691b9ab5679808749c9900ca52e94bf4c51f66b0cc5931f36d38
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Says the migration does not rewrite proofs, claims, contracts or runtime and only makes authority and navigation explicit; baseline-present, legacy-absent, a scope limit not a new capability claim.
+
+```text
+The migration does not rewrite proof artifacts, claim semantics, contracts, or
+runtime implementation. It makes authority, status, and navigation explicit
+while retaining proof history in place.
+```
+
+## claim_0c3e7ed818f9688e17bf5f12cfde51a7
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#agent-coordination-proof-preservation`
+Class: structural-frame
+Unit digest: 9364e56ebcb837e79e0a2ee19f8d040d13feac4407c5986f429b359e4720f8de
+Shown text digest: 47afb003a253506d6d4031d9bfb572c2bc06827aa6d5b5813706f4c9d7a49e0b
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 Agent Coordination Proof Preservation; present in baseline, not in legacy, the ledger's own pre-existing title so classification stands.
+
+````text
+# Agent Coordination Proof Preservation
+
+```txt
+Document type: Proof preservation table
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve Agent Coordination proof roots and consuming claims during migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Writer type: Human + agent coauthor
+Canonical for: Migration proof tracking only
+Use this when: Linking implemented claims from target docs to evidence
+Do not use this for: Replacing proof artifacts or verification logs
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+- docs/architect/agent-coordination/verification/README.md
+```
+
+Proof trees must remain linkable. Summary rows here do not replace the proof
+roots, logs, current-cell files, reviews, red-team reports, or known gaps.
+
+| Proof root | Proves / supports | Consumed by target doc | Move policy | Known gaps | Notes |
+|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/verification/runtime-recovery/p01.md` | Run admission/control-epoch fencing. | runtime-recovery architecture / implementation alignment | link-only | Later recovery slices still split. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02l.md` | cli-spawn launch reconciliation. | runtime-recovery verification index | link-only | Preserve exact scope. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h.md` | Original herdr-spawn proof attempt and falsified direct-command typing context. | runtime-recovery verification index | link-only | Do not promote falsified invocation. | Historical/evidence context. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | Authoritative shipped herdr-spawn bwrap launcher-script mechanism and residual accepted gap. | runtime-recovery architecture / implementation alignment | link-only | Residual accepted gap remains. | Must override earlier pseudocode when describing shipped behavior. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p03.md` | Governed fallback. | runtime-recovery verification index | link-only | Split status must stay explicit. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p04.md` | Pure evaluators. | runtime-recovery verification index | link-only | Split status must stay explicit. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05.md` | Standalone `dispatch recover`. | runtime-recovery verification index | link-only | S5 transfer/import/budget/apply not implemented. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05s.md` | Session-owned recovery read/apply door. | runtime-recovery architecture / implementation alignment | link-only | Only session-recovery half of S5 implemented. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md` | `agent-result-claim.v2` prompt/validation contract proof. | assignment/run/runresult contract and implementation alignment | link-only | Worker claim is not normalized proof. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md` | Effective execution contract persisted pre-launch and inspectable. | dispatch-control and implementation alignment | link-only | Preserve inspectability status. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md` | `RunResult` v2, legacy-v1 interpretation, attribution dimensions. | assignment/run/runresult and evidence/results | link-only | Preserve documented residuals. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md` | `dispatch.runtime.inspect` read model and public CLI projection. | spec / dispatch-control | link-only | Deferred label-consistency residual. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md` | `dispatch.runtime.reconcile` CAS guard/projection repair and negative routes. | spec / dispatch-control | link-only | Residual findings must stay visible. | Required recent-track row. |
+| `plans/260915-dispatch-operability-implementation/reports/track-closeout.md` | Production-door proof summary, full-suite result, and deferred non-capabilities. | implementation alignment | evidence-only | Track-complete until current checkout verified. | Keep as plan evidence. |
+| `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | Executor-policy baseline verification root. | dispatch-control placement-policy notes | link-only | Later phase proof lives across plan/code/tests. | Inventory must keep later status split. |
+| `plans/260915-executor-policy-dispatch-seams/plan.md` | Phase status for PlacementPolicy, self-verifying binder, redirect retirement. | dispatch-control / proposal-status | evidence-only | Phase 08 pending status must not be erased. | Required recent-track row. |
+| `plans/260916-account-rotator/design.md` | Provider Capacity Rotator design and same-provider/global-config limits. | provider-capacity proposal/status | link-only | Current shipped slice needs focused verification. | Required recent-track row. |
+| `plans/260916-account-rotator/plan.md` | Provider Capacity Rotator implementation contract. | provider-capacity proposal/status | link-only | Not cross-provider fallback; not project-local credential inventory. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md` | Policy-track proof slice P01. | playbook / verification policy | link-only | See p05 for remaining policy proof. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md` | Policy-track proof slice P02. | playbook / verification policy | link-only | None recorded here. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md` | Policy-track proof slice P03. | playbook / verification policy | link-only | None recorded here. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md` | Policy-track proof slice P04. | playbook / verification policy | link-only | None recorded here. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md` | Policy-track proof slice P05 and known gaps. | playbook / verification policy | link-only | Preserve final policy scope. | Required recent-track row. |
+| `plans/260915-code-implementation-track-policy/reports/track-closeout.md` | Final policy-track closeout and proof status. | playbook / verification policy | evidence-only | No policy YAML/validator was accepted. | Required recent-track row. |
+| `plans/260915-0455-test-suite-feedback-cost/decision-lock.md` | Test feedback/cost decisions. | verification/history | link-only | P05 related-test selector deferred. | Required recent-track row. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-08-evidence-decision-and-handoff.md` | Test feedback/cost handoff and deferred status. | verification/history | link-only | Preserve P05 deferred status. | Required recent-track row. |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | DAG implementation plan and non-goals. | proposals / proposal-status | link-only | Not accepted runtime truth by itself. | Required recent-track row. |
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | Candidate DAG shape and unresolved questions. | proposals / proposal-status | link-only | Canonical for nothing until accepted. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md` | CoordinationSession/FlowDefinition foundation implementation proof index. | future spec and contracts | link-only | Verify exact per-cell status before quoting. | Supports core implemented claims. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` | Early group-thinking substrate proof. | group-thinking status | link-only | Quality proof mixed. | Keep mechanism vs product-quality distinction. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md` | Later group-thinking/advisory proof tree. | group-thinking status | link-only | Known reports and rechecks must remain reachable. | Large proof tree remains legacy-current. |
+| `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | Herdr visibility proof. | visibility/Herdr architecture | link-only | Visibility only; not Run truth. | Supports AC-CLAIM-010. |
+````
+
+## claim_fee77b2afef07c9a3f5d1abb962722d6
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: dd577e9abd52ce3ac54f71951460a44f402677d5fec4df688aeaa00903175423
+Shown text digest: dd577e9abd52ce3ac54f71951460a44f402677d5fec4df688aeaa00903175423
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence for proof preservation table (Canonical for migration proof tracking only); unchanged from baseline and absent from legacy, a pre-existing header that overclaims nothing.
+
+````text
+```txt
+Document type: Proof preservation table
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve Agent Coordination proof roots and consuming claims during migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Writer type: Human + agent coauthor
+Canonical for: Migration proof tracking only
+Use this when: Linking implemented claims from target docs to evidence
+Do not use this for: Replacing proof artifacts or verification logs
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+- docs/architect/agent-coordination/verification/README.md
+```
+````
+
+## claim_2dc89f0f9de15746e118fba37b267e3b
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: c5c09ab025fb7e305ed471e757effd5fbfec278182e03136facf81004a21ed98
+Shown text digest: c5c09ab025fb7e305ed471e757effd5fbfec278182e03136facf81004a21ed98
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Rule that summary rows do not replace proof roots, logs, reviews or known gaps; baseline-identical, no legacy match, a protective ledger principle rather than a new behavioral claim.
+
+```text
+Proof trees must remain linkable. Summary rows here do not replace the proof
+roots, logs, current-cell files, reviews, red-team reports, or known gaps.
+```
+
+## claim_e6f5d79f58c2cffd6a636d0e28eaed92
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-3`
+Class: structural-frame
+Unit digest: 2f2d7a46d4e2ebf5b82c75c675e95f19261522611b45bd14d766fdb14cd1c018
+Shown text digest: 2f2d7a46d4e2ebf5b82c75c675e95f19261522611b45bd14d766fdb14cd1c018
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Proof-root table linking runtime-recovery proofs with move policy link-only and known gaps; text equals baseline, absent in legacy as a table, so it is pre-existing ledger content that keeps proof links.
+
+```text
+| Proof root | Proves / supports | Consumed by target doc | Move policy | Known gaps | Notes |
+|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/verification/runtime-recovery/p01.md` | Run admission/control-epoch fencing. | runtime-recovery architecture / implementation alignment | link-only | Later recovery slices still split. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02l.md` | cli-spawn launch reconciliation. | runtime-recovery verification index | link-only | Preserve exact scope. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h.md` | Original herdr-spawn proof attempt and falsified direct-command typing context. | runtime-recovery verification index | link-only | Do not promote falsified invocation. | Historical/evidence context. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | Authoritative shipped herdr-spawn bwrap launcher-script mechanism and residual accepted gap. | runtime-recovery architecture / implementation alignment | link-only | Residual accepted gap remains. | Must override earlier pseudocode when describing shipped behavior. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p03.md` | Governed fallback. | runtime-recovery verification index | link-only | Split status must stay explicit. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p04.md` | Pure evaluators. | runtime-recovery verification index | link-only | Split status must stay explicit. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05.md` | Standalone `dispatch recover`. | runtime-recovery verification index | link-only | S5 transfer/import/budget/apply not implemented. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05s.md` | Session-owned recovery read/apply door. | runtime-recovery architecture / implementation alignment | link-only | Only session-recovery half of S5 implemented. | Required runtime-recovery row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md` | `agent-result-claim.v2` prompt/validation contract proof. | assignment/run/runresult contract and implementation alignment | link-only | Worker claim is not normalized proof. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md` | Effective execution contract persisted pre-launch and inspectable. | dispatch-control and implementation alignment | link-only | Preserve inspectability status. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md` | `RunResult` v2, legacy-v1 interpretation, attribution dimensions. | assignment/run/runresult and evidence/results | link-only | Preserve documented residuals. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md` | `dispatch.runtime.inspect` read model and public CLI projection. | spec / dispatch-control | link-only | Deferred label-consistency residual. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md` | `dispatch.runtime.reconcile` CAS guard/projection repair and negative routes. | spec / dispatch-control | link-only | Residual findings must stay visible. | Required recent-track row. |
+| `plans/260915-dispatch-operability-implementation/reports/track-closeout.md` | Production-door proof summary, full-suite result, and deferred non-capabilities. | implementation alignment | evidence-only | Track-complete until current checkout verified. | Keep as plan evidence. |
+| `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | Executor-policy baseline verification root. | dispatch-control placement-policy notes | link-only | Later phase proof lives across plan/code/tests. | Inventory must keep later status split. |
+| `plans/260915-executor-policy-dispatch-seams/plan.md` | Phase status for PlacementPolicy, self-verifying binder, redirect retirement. | dispatch-control / proposal-status | evidence-only | Phase 08 pending status must not be erased. | Required recent-track row. |
+| `plans/260916-account-rotator/design.md` | Provider Capacity Rotator design and same-provider/global-config limits. | provider-capacity proposal/status | link-only | Current shipped slice needs focused verification. | Required recent-track row. |
+| `plans/260916-account-rotator/plan.md` | Provider Capacity Rotator implementation contract. | provider-capacity proposal/status | link-only | Not cross-provider fallback; not project-local credential inventory. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md` | Policy-track proof slice P01. | playbook / verification policy | link-only | See p05 for remaining policy proof. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md` | Policy-track proof slice P02. | playbook / verification policy | link-only | None recorded here. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md` | Policy-track proof slice P03. | playbook / verification policy | link-only | None recorded here. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md` | Policy-track proof slice P04. | playbook / verification policy | link-only | None recorded here. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md` | Policy-track proof slice P05 and known gaps. | playbook / verification policy | link-only | Preserve final policy scope. | Required recent-track row. |
+| `plans/260915-code-implementation-track-policy/reports/track-closeout.md` | Final policy-track closeout and proof status. | playbook / verification policy | evidence-only | No policy YAML/validator was accepted. | Required recent-track row. |
+| `plans/260915-0455-test-suite-feedback-cost/decision-lock.md` | Test feedback/cost decisions. | verification/history | link-only | P05 related-test selector deferred. | Required recent-track row. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-08-evidence-decision-and-handoff.md` | Test feedback/cost handoff and deferred status. | verification/history | link-only | Preserve P05 deferred status. | Required recent-track row. |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | DAG implementation plan and non-goals. | proposals / proposal-status | link-only | Not accepted runtime truth by itself. | Required recent-track row. |
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | Candidate DAG shape and unresolved questions. | proposals / proposal-status | link-only | Canonical for nothing until accepted. | Required recent-track row. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md` | CoordinationSession/FlowDefinition foundation implementation proof index. | future spec and contracts | link-only | Verify exact per-cell status before quoting. | Supports core implemented claims. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` | Early group-thinking substrate proof. | group-thinking status | link-only | Quality proof mixed. | Keep mechanism vs product-quality distinction. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md` | Later group-thinking/advisory proof tree. | group-thinking status | link-only | Known reports and rechecks must remain reachable. | Large proof tree remains legacy-current. |
+| `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | Herdr visibility proof. | visibility/Herdr architecture | link-only | Visibility only; not Run truth. | Supports AC-CLAIM-010. |
+```
+
+## claim_8b8f9453ec329dde5357cbdd54b99778
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#boundary-note`
+Class: structural-frame
+Unit digest: b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f
+Shown text digest: ec22086cda72317305c5307da451a5cf6668962eaaabc25d3d8d600da7b2b2d3
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Boundary Note heading on the proof ledger; same as baseline and absent from legacy tree, pre-existing structural heading, classification true.
+
+```text
+## Boundary Note
+
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_e412c482ee44feae89e27dbe22565f44
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md#unheaded-block-4`
+Class: bookkeeping
+Unit digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Shown text digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; One-line statement of no component-boundary change in Phase 0/1; present at baseline, not found in legacy, standard declaration in this ledger family with no new claim.
+
+```text
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_6271a36fcf399262c449faa29fcacda3
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#agent-coordination-proposal-status`
+Class: structural-frame
+Unit digest: 3c5c2379e2be5e99e0119476921286de646c7a5a9ed20b8cbe1feebbf8672d9d
+Shown text digest: 09e25b4da8cab6f7e91c153844505391179a636f99ffd651d1a677f833a4fc0e
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 Agent Coordination Proposal Status exists in the baseline file and nowhere in legacy, so it is the pre-existing title of the proposal tracking ledger.
+
+````text
+# Agent Coordination Proposal Status
+
+```txt
+Document type: Proposal status table
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve Agent Coordination proposal/frontier status during migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Writer type: Human + agent coauthor
+Canonical for: Migration proposal tracking only
+Use this when: Moving proposals or preventing accidental promotion
+Do not use this for: Accepted architecture or runtime truth
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+```
+
+Proposal status is conservative. A proposal can contain accepted pieces, but
+the accepted content must be extracted into the proper architecture, contract,
+decision, or spec target before it becomes current authority.
+
+| Proposal / frontier source | Topic | Current status | Accepted pieces | Deferred / rejected pieces | Target treatment |
+|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | Cold-resumable operation DAG scheduler. | proposed / frontier | Candidate read-only DAG vocabulary and constraints for discussion. | No mutation nodes, daemon, new lifecycle authority, or Work replacement accepted. | keep-proposal |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | Implementation plan for cold-resumable coordination DAG. | ready for implementation / not runtime truth | Non-goals and migration locks are useful status constraints. | Not implemented/accepted as current behavior by the plan alone. | keep-proposal / link-only |
+| `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | Earlier dispatch control redesign. | partially-accepted / superseded by accepted dispatch-control docs and ADR-011 where promoted | Dispatch-control ownership themes survive in accepted architecture. | Any unpromoted redesign details remain non-canonical. | split-accepted / archive later |
+| `docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md` | Step 07 ad-hoc task precursor. | promoted history / proposal | Some ideas flow into CoordinationSession and assignment separation. | Proposal path is not current contract. | archive after preservation |
+| `docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md` | Standalone CoordinationProtocol foundation. | largely promoted / history with source value | CoordinationSession, FlowDefinition, protocol loader, and public CLI were accepted through ADRs/contracts/proofs. | Frontier content not extracted remains non-canonical. | split-accepted / archive later |
+| `docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md` | Team communication protocol. | proposed / unknown | Preserve if referenced by future group-thinking protocol docs. | No current runtime authority. | keep-proposal |
+| `docs/architect/agent-coordination/architecture/run-handle.md` | RunHandle and recovery material reasoning. | proposed vocabulary / accepted reasoning split | Accepted reasoning informs runtime recovery status and proof mapping. | Exact shipped fields/shapes must come from verification docs and code. | split-accepted / keep-proposal |
+| `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | Continuation/recovery proposal. | proposed / partial | Normalized-but-unlinked state and transfer concepts remain preserved. | Not all apply/import/budget/transfer slices are implemented. | split-accepted / keep-proposal |
+| `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | Executor health and fallback proposal. | proposed / partial | Fallback boundaries inform dispatch-control migration. | Health store/scoring deferred. | keep-proposal |
+| `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | Detailed runtime recovery design. | partial / proposed split | S0-S4 and session-recovery half of S5 implemented; proof map is useful. | S5 transfer/import/budget/apply, S6, S7, writable partial-edit takeover not implemented. | split-accepted / keep-proposal |
+| `plans/260916-account-rotator/design.md` | Provider Capacity Rotator design. | proposed / partial / verify | Same-provider/global-config/account-capacity limits are preserved. | Cross-provider fallback and project-local credential inventory are not accepted here. | keep-proposal until verification |
+| `plans/260916-account-rotator/plan.md` | Provider Capacity Rotator implementation plan. | proposed / partial / verify | Slice boundaries and refusal facts preserve useful constraints. | Current shipped status needs focused scan before spec promotion. | keep-proposal / link-only |
+| `plans/260915-executor-policy-dispatch-seams/phase-05-placement-policy-shadow.md` | PlacementPolicy shadow mode. | partially implemented / verify | PlacementPolicy provider/model/executor ownership survives. | Same-provider account rotation and lifecycle settlement excluded. | split-accepted |
+| `plans/260915-executor-policy-dispatch-seams/phase-08-legacy-placement-retirement.md` | Legacy redirect retirement. | pending / unknown | Self-verifying redirect-selection direction may survive if proof lands. | Do not claim retirement shipped without evidence. | keep-proposal / needs verification |
+````
+
+## claim_1dc8d27a36c76965613032c127fb4fbc
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: 704d9755f06c6bf904d254b8d7248a454812dae70ca9f843ee87ef09504c40b2
+Shown text digest: 704d9755f06c6bf904d254b8d7248a454812dae70ca9f843ee87ef09504c40b2
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence for the proposal status table, Canonical for proposal tracking only and Do not use for accepted architecture; baseline-identical and legacy-absent, pre-existing header.
+
+````text
+```txt
+Document type: Proposal status table
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve Agent Coordination proposal/frontier status during migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Writer type: Human + agent coauthor
+Canonical for: Migration proposal tracking only
+Use this when: Moving proposals or preventing accidental promotion
+Do not use this for: Accepted architecture or runtime truth
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+```
+````
+
+## claim_2ca0795aef5b17299adc20b0792f7c3f
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: ea12cceacc982c67fd77289115189670f004d4bd9c2bac0eccea2d5da3f9d408
+Shown text digest: ea12cceacc982c67fd77289115189670f004d4bd9c2bac0eccea2d5da3f9d408
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Conservative rule that accepted pieces of a proposal must be extracted into architecture, contract, decision or spec before becoming authority; baseline-present, legacy-absent policy sentence, not new behavior.
+
+```text
+Proposal status is conservative. A proposal can contain accepted pieces, but
+the accepted content must be extracted into the proper architecture, contract,
+decision, or spec target before it becomes current authority.
+```
+
+## claim_c72016c6ceb4f84343b61c0118b2b359
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-3`
+Class: bookkeeping
+Unit digest: d49fc868340267893e0cacd257900ecb5859dd141da220c64d97eff3bb581dad
+Shown text digest: d49fc868340267893e0cacd257900ecb5859dd141da220c64d97eff3bb581dad
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Proposal and frontier status table (DAG scheduler, dispatch-control redesign, step-07 precursor) with accepted and deferred pieces; text matches baseline and is absent from legacy; keeps proposals non-promoted.
+
+```text
+| Proposal / frontier source | Topic | Current status | Accepted pieces | Deferred / rejected pieces | Target treatment |
+|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | Cold-resumable operation DAG scheduler. | proposed / frontier | Candidate read-only DAG vocabulary and constraints for discussion. | No mutation nodes, daemon, new lifecycle authority, or Work replacement accepted. | keep-proposal |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | Implementation plan for cold-resumable coordination DAG. | ready for implementation / not runtime truth | Non-goals and migration locks are useful status constraints. | Not implemented/accepted as current behavior by the plan alone. | keep-proposal / link-only |
+| `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | Earlier dispatch control redesign. | partially-accepted / superseded by accepted dispatch-control docs and ADR-011 where promoted | Dispatch-control ownership themes survive in accepted architecture. | Any unpromoted redesign details remain non-canonical. | split-accepted / archive later |
+| `docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md` | Step 07 ad-hoc task precursor. | promoted history / proposal | Some ideas flow into CoordinationSession and assignment separation. | Proposal path is not current contract. | archive after preservation |
+| `docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md` | Standalone CoordinationProtocol foundation. | largely promoted / history with source value | CoordinationSession, FlowDefinition, protocol loader, and public CLI were accepted through ADRs/contracts/proofs. | Frontier content not extracted remains non-canonical. | split-accepted / archive later |
+| `docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md` | Team communication protocol. | proposed / unknown | Preserve if referenced by future group-thinking protocol docs. | No current runtime authority. | keep-proposal |
+| `docs/architect/agent-coordination/architecture/run-handle.md` | RunHandle and recovery material reasoning. | proposed vocabulary / accepted reasoning split | Accepted reasoning informs runtime recovery status and proof mapping. | Exact shipped fields/shapes must come from verification docs and code. | split-accepted / keep-proposal |
+| `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | Continuation/recovery proposal. | proposed / partial | Normalized-but-unlinked state and transfer concepts remain preserved. | Not all apply/import/budget/transfer slices are implemented. | split-accepted / keep-proposal |
+| `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | Executor health and fallback proposal. | proposed / partial | Fallback boundaries inform dispatch-control migration. | Health store/scoring deferred. | keep-proposal |
+| `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | Detailed runtime recovery design. | partial / proposed split | S0-S4 and session-recovery half of S5 implemented; proof map is useful. | S5 transfer/import/budget/apply, S6, S7, writable partial-edit takeover not implemented. | split-accepted / keep-proposal |
+| `plans/260916-account-rotator/design.md` | Provider Capacity Rotator design. | proposed / partial / verify | Same-provider/global-config/account-capacity limits are preserved. | Cross-provider fallback and project-local credential inventory are not accepted here. | keep-proposal until verification |
+| `plans/260916-account-rotator/plan.md` | Provider Capacity Rotator implementation plan. | proposed / partial / verify | Slice boundaries and refusal facts preserve useful constraints. | Current shipped status needs focused scan before spec promotion. | keep-proposal / link-only |
+| `plans/260915-executor-policy-dispatch-seams/phase-05-placement-policy-shadow.md` | PlacementPolicy shadow mode. | partially implemented / verify | PlacementPolicy provider/model/executor ownership survives. | Same-provider account rotation and lifecycle settlement excluded. | split-accepted |
+| `plans/260915-executor-policy-dispatch-seams/phase-08-legacy-placement-retirement.md` | Legacy redirect retirement. | pending / unknown | Self-verifying redirect-selection direction may survive if proof lands. | Do not claim retirement shipped without evidence. | keep-proposal / needs verification |
+```
+
+## claim_99adfbe4fc05ae38bdb3d9adc2eba5aa
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#boundary-note`
+Class: structural-frame
+Unit digest: b2f76b66f14c51d398d331af7e2eb44f19bbb53da664c556109906c96b7bde7f
+Shown text digest: ec22086cda72317305c5307da451a5cf6668962eaaabc25d3d8d600da7b2b2d3
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Boundary Note heading in proposal-status; unchanged from baseline, no legacy counterpart, structural heading only, so the unbound-existing label is accurate.
+
+```text
+## Boundary Note
+
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_a321bcb18ba57182ccaf82a5474d4f44
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md#unheaded-block-4`
+Class: bookkeeping
+Unit digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Shown text digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Declares no component-boundary change in the Phase 0/1 migration for the proposal ledger; baseline-identical and legacy-absent, a repeated standard boundary note with no extra claim.
+
+```text
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_d6fdf15286501cde259cf5937a907083
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#agent-coordination-source-inventory`
+Class: structural-frame
+Unit digest: 4ef805db33b8fab83295f9a440474be360db7c6b15543ac5ad23802ea6500900
+Shown text digest: 7867c2a6e384c611a74e7d3d512844379b1a8b253850bd8faa9c429be593de41
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 Agent Coordination Source Inventory; title exists in baseline file and is not in the legacy tree, so pre-existing candidate ledger title, classification correct.
+
+````text
+# Agent Coordination Source Inventory
+
+```txt
+Document type: Source inventory
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Track Agent Coordination migration source paths, authority, status, target disposition, and evidence-only files
+Design status: Draft
+Implementation: Partial
+Provenance: Generated from Phase 0 inventory commands on 2026-09-18
+Writer type: Agent-generated, human-reviewable
+Canonical for: Migration bookkeeping only
+Use this when: Promoting, redirecting, or auditing Agent Coordination documentation migration
+Do not use this for: Runtime behavior, accepted contracts, or proof details by itself
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md
+Added in candidate: Related now points to the verbatim non-authority history snapshot; the inventory table preserves the former source locator and classification
+```
+
+This ledger is a temporary migration aid. It intentionally classifies source files conservatively: a file can be accepted design authority while an implementation claim inside it still needs current-checkout proof before Phase 2 promotion.
+
+No component-boundary change in this Phase 0/1 migration.
+````
+
+## claim_14fdc93d6fe95fdb31f854fda30f6c9b
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: d001d939aa7710d23ae35227884905ab53df416ddda1b530fe4e69b17ea6f89c
+Shown text digest: d001d939aa7710d23ae35227884905ab53df416ddda1b530fe4e69b17ea6f89c
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+
+````text
+```txt
+Document type: Source inventory
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Track Agent Coordination migration source paths, authority, status, target disposition, and evidence-only files
+Design status: Draft
+Implementation: Partial
+Provenance: Generated from Phase 0 inventory commands on 2026-09-18
+Writer type: Agent-generated, human-reviewable
+Canonical for: Migration bookkeeping only
+Use this when: Promoting, redirecting, or auditing Agent Coordination documentation migration
+Do not use this for: Runtime behavior, accepted contracts, or proof details by itself
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md
+Added in candidate: Related now points to the verbatim non-authority history snapshot; the inventory table preserves the former source locator and classification
+```
+````
+
+## claim_efa3b61e0772427d350867284c3ae5a0
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 0418585b4453c417bea88c1c26b591dde9b853896311c4c91313c16f63a8b2d4
+Shown text digest: 0418585b4453c417bea88c1c26b591dde9b853896311c4c91313c16f63a8b2d4
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Statement that the ledger is a temporary migration aid classifying sources conservatively; identical to baseline, absent from legacy, bookkeeping caution rather than a new claim.
+
+```text
+This ledger is a temporary migration aid. It intentionally classifies source files conservatively: a file can be accepted design authority while an implementation claim inside it still needs current-checkout proof before Phase 2 promotion.
+```
+
+## claim_f5f00a215ad993134c2cf978408f43d1
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-3`
+Class: bookkeeping
+Unit digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Shown text digest: 21d0a35ea24b3a226d077c912d738ae5d7d2650751a0efed8c54d0fc527e478e
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Plain line declaring no component-boundary change in Phase 0/1; present in baseline, not in legacy, standard boundary declaration so the unbound-existing classification holds.
+
+```text
+No component-boundary change in this Phase 0/1 migration.
+```
+
+## claim_e6346d2338f5318e8c484e7e78edf523
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#phase-7-disposition`
+Class: structural-frame
+Unit digest: 0eafaee7edbe4a25a453109a776ef4187492cec14794027c1297a72cd1f6ffae
+Shown text digest: aa8d62d12f0137f7e8dc99f7583df85eedb119fc976b1e9dfad89b82015bf12d
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Phase 7 Disposition heading in the source inventory; same as baseline and without legacy twin, a pre-existing section heading, classification true.
+
+```text
+## Phase 7 Disposition
+
+The legacy-to-target structure is now explicit without rewriting evidence:
+
+- 63 legacy narrative or index documents under `architecture/`, `contracts/`,
+  `decisions/`, `history/`, `playbooks/`, `proposals/`, `roadmap/`, and
+  `vocabulary/` have a matching target path and the standard migration note.
+- Verification artifacts remain `link-only` evidence. They are intentionally
+  unchanged so their recorded proof content, dates, and environments remain
+  intact; [the target verification index](../../verification/README.md)
+  routes readers to their retained legacy roots.
+- `documentation-governance.md` and
+  `documentation-standardization-plan.md` remain local migration/governance
+  sources rather than target-area claims, so neither receives a redirect.
+
+Added in candidate: The preceding disposition records the earlier migration. The retired area policy and completed migration plan now have literal, non-authority history carriers: [documentation-governance.md](documentation-governance.md) and [documentation-standardization-plan.md](documentation-standardization-plan.md). Original source bytes and historical status fields are preserved; neither copy is current policy.
+
+No component-boundary change in Phase 7.
+
+See [Phase 7 completion](phase-7-completion.md) for the final counts and
+validation record.
+
+| Source path | Existing type | Authority | Implementation status | Target path | Disposition | Notes |
+|---|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/README.md` | portal | navigation | partial | `docs/platform/agent-coordination/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/README.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/dispatch-control-plane.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/evidence-and-results.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/evidence-and-results.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/executor-health-and-fallback.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/protocol-model.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/protocol-model.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/run-handle.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/run-handle.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/runtime-model.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/runtime-model.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/runtime-recovery-design.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/system-context.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/system-context.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/visibility-and-herdr.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/work-integration.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/work-integration.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/README.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/assignment-run-runresult.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/assignment-run-runresult.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/coordination-session.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/coordination-session.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/flow-definition.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/flow-definition.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/workflow-stage-operation.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/workflow-stage-operation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/README.md` | decision index | navigation | partial | `docs/platform/agent-coordination/decisions/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/README.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/intent-preservation-ledger.md` | intent ledger | accepted | partial | `docs/platform/agent-coordination/intent-preservation-ledger.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/README.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/coordination-operating-harness.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/coordination-operating-harness.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/README.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/dag-request-scheduler.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/README.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/README.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P05.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P05.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P02.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P03.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P06.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P06.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P07.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P08.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | verification | evidence | implemented / partial / verify current checkout | `docs/platform/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p00.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p01.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p02h.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02l.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p02l.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p03.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p04.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05s.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p05s.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p08.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p08.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p06.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p07.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p08.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p09.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p10.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p11.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p13.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p14.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p15.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p16.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p16.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.5.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.5.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P03.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P03.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P04.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P04.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P05.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P05.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P06.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P06.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P07.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P07.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck2-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck2-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-final-recheck-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-final-recheck-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-redteam-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-redteam-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.5.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.5.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vision.md` | vision | accepted | partial | `docs/platform/agent-coordination/vision.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/README.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/concept-relationships.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/concept-relationships.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/specs/runner.md` | spec | accepted | partial | `docs/platform/agent-coordination/spec.md` | split | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/specs/confinement-authority.md` | spec | accepted | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | split | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/specs/distribution.md` | spec | accepted | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | split | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-decision-lock.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel-adoption-and-rebuttal.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/decision-request.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/final-recommendation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/intake.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/interpretation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/redteam.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/scout-report.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/session.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/synthesis.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/astra-delta-resolution.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-impact-correction.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-independent-review-prompt.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-independent-review-report.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-review-resolution.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/code-panel-cells.json` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/code-panel-requests.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/design-audit-final.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/design-panel-prompt.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/detailed-design-review.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/detailed-design.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/gateway-boundary-decision.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/implementation-contract-catalog.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/next-steps.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-00-freeze-existing-behavior.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/README.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/cli-spawn-local-contract.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/cli-spawn-reconciliation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/closeout-and-capability-matrix.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/confinement-adapter-contract.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/continuation-and-transfer.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/fallback-and-effect-boundary.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/read-evaluator-and-planner.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/run-admission-and-fencing.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/session-recovery-door.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/writable-takeover.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/plan.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/reports/dispatch-process-incidents.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/reports/phase-00-baseline-260911.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/requirements-traceability.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/simplicity-and-complexity-budget.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/static-contract-closure.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/RUN.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-01-agent-result-claim-v2.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-02-effective-execution-contract.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-03-runresult-v2-and-attribution.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-04-dispatch-runtime-inspect.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-05-dispatch-runtime-reconcile.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-06-production-door-proof.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-07-integration-closeout.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/plan.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/reports/track-closeout.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/design.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-00-baseline-snapshot.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-01-provider-adapter-shadow.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-02-persona-prompt-envelope.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-03-effort-and-alias-seam.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-04-quality-bridge.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-05-placement-policy-shadow.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-06-executor-profile-invocations.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-07-placement-production-binder.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-08-legacy-placement-retirement.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/plan.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/reports/design-review-260916-1815-phase04-readiness.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/design.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/plan.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/post-review-recut.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/reports/design-review-260916-1637-provider-capacity-rotator.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/review-prompt.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/phase-01-authoring-template-and-coding-fragment.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/phase-02-plan-loop-wording-and-routing.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/plan.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/reports/track-closeout.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/review-prompt.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/decision-lock.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-00-harness-writer-hermeticity.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-01-portable-test-runner-ci.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-02-green-baseline-and-profile.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-03-docs-index-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-04-external-claude-isolation-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-05-related-test-selector-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-06-cli-fixture-init-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-07-cli-harness-responsibility-audit.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-08-evidence-decision-and-handoff.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/plan.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/checkpoint-1-p00-p01-full-suite.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/cli-harness-candidates.json` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/cli-harness-responsibility-audit.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/cli-harness-run-inventory.json` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/docs-index-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/external-claude-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/final-evaluation.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/fixture-init-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/green-baseline.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/handoff-bin-local-state-verb-usecase-extraction.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/handoff-fast-fixture-expansion.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p00-harness-writer-hermeticity-handoff.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p00-p03-main-sync-proof.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p01-portable-test-runner-ci-handoff.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p02-status-paused-oom-contention.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-01-dag-session-declaration-and-replay.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-02-request-compiler-and-identity-gate.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-03-projection-and-consumer-contract.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-04-read-only-admission-and-outcome-taxonomy.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-05-dynamic-frontier-scheduler.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-06-code-panel-and-plan-loop-dogfood.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-host-invocation-r2-external-process/plan.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/README.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/README.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/external-provider-protocol.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/external-provider-protocol.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/host-use-cases.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/host-use-cases.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/invocation-kernel.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/invocation-kernel.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/provider-routing.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/provider-routing.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/README.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/command-route-descriptor.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/command-route-descriptor.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/component-protocol.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/component-protocol.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/external-provider-manifest.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/external-provider-manifest.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/legacy-payload.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/legacy-payload.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/operation-catalog.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/operation-catalog.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/operation-provider.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/operation-provider.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/decisions/README.md` | decision index | navigation | partial | `docs/platform/host-invocation-routing/decisions/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/history/host-invocation-baseline.md` | history | non-canonical | N/A | `docs/platform/host-invocation-routing/history/host-invocation-baseline.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/history/source-inventory.md` | history | non-canonical | N/A | `docs/platform/host-invocation-routing/history/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | intent ledger | accepted | partial | `docs/platform/agent-coordination/intent-preservation-ledger.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/roadmap.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/roadmap.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/spec.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/spec.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/README.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/compatibility-harness.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/compatibility-harness.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/implementation-alignment.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/implementation-alignment.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/vision.md` | vision | accepted | partial | `docs/platform/agent-coordination/vision.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/README.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md` | architecture | accepted | partial | `docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/architecture/future-constraints.md` | architecture | accepted | partial | `docs/platform/packaging-distribution/architecture/future-constraints.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md` | architecture | accepted | partial | `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/code-panel-rollout-plan.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/code-panel-rollout-plan.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/activation-binding.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/activation-binding.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/distribution-pin.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/distribution-pin.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/projection-ledger.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/projection-ledger.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/release-manifest.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/release-manifest.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/skill-package-distribution.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/skill-package-distribution.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/history/distribution-baseline.md` | history | non-canonical | N/A | `docs/platform/packaging-distribution/history/distribution-baseline.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/reports/track-closeout.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/reports/track-closeout.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/spec.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/spec.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/verification/implementation-alignment.md` | verification | evidence | evidence | `docs/platform/packaging-distribution/verification/implementation-alignment.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/verification/install-and-release-proof.md` | verification | evidence | evidence | `docs/platform/packaging-distribution/verification/install-and-release-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/verification/source-preservation-audit.md` | verification | evidence | evidence | `docs/platform/packaging-distribution/verification/source-preservation-audit.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/vision.md` | vision | accepted | partial | `docs/platform/agent-coordination/vision.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/schema.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/store.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/replay.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/session-engine.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/headless-adapter.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/coordination/schema.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/coordination/run.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/coordination/show.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/dispatch/execution-contract.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/dispatch/run-result.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/dispatch/inspect.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/dispatch/reconcile.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/dispatch/placement-policy.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/assignment-runresult.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/dispatch-operability-production-door.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/dispatch-reconcile-operation.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/placement-policy-matrix-coverage.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/provider-capacity.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+```
+
+## claim_f0cbc183fcaeae27403fbd7b3b14d5fc
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-4`
+Class: structural-frame
+Unit digest: 5b74c32251a1c02944319de2064d4b8da06d49da1224ad52352b987de308bc34
+Shown text digest: 5b74c32251a1c02944319de2064d4b8da06d49da1224ad52352b987de308bc34
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Lead-in sentence that the legacy-to-target structure is explicit without rewriting evidence; baseline-identical, absent from legacy, introductory text for the Phase 7 list.
+
+```text
+The legacy-to-target structure is now explicit without rewriting evidence:
+```
+
+## claim_d8a8cc0d409ee3904c6705cdff67825c
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-5`
+Class: bookkeeping
+Unit digest: 2735cebe7ae02a6a13e68cc2fce66c3b56ac465719aad63d79a5719d552ef376
+Shown text digest: 2735cebe7ae02a6a13e68cc2fce66c3b56ac465719aad63d79a5719d552ef376
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Bullets on 63 narrative documents with migration notes, link-only verification artifacts and governance files lacking redirects; matches baseline, not in legacy; a recorded earlier disposition, kept as history.
+
+```text
+- 63 legacy narrative or index documents under `architecture/`, `contracts/`,
+  `decisions/`, `history/`, `playbooks/`, `proposals/`, `roadmap/`, and
+  `vocabulary/` have a matching target path and the standard migration note.
+- Verification artifacts remain `link-only` evidence. They are intentionally
+  unchanged so their recorded proof content, dates, and environments remain
+  intact; [the target verification index](../../verification/README.md)
+  routes readers to their retained legacy roots.
+- `documentation-governance.md` and
+  `documentation-standardization-plan.md` remain local migration/governance
+  sources rather than target-area claims, so neither receives a redirect.
+```
+
+## claim_d104d02d60f3d3472ade00a0d40abf03
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-6`
+Class: bookkeeping
+Unit digest: bd01ed8bf40127058869342ffbc6bab63d3ae06b834a1e178803557bebcaaf21
+Shown text digest: bd01ed8bf40127058869342ffbc6bab63d3ae06b834a1e178803557bebcaaf21
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Added in candidate paragraph noting the earlier disposition and linking the two new literal history carriers; diff shows it inserted after baseline with the label, absent in legacy, so the frame classification is accurate.
+
+```text
+Added in candidate: The preceding disposition records the earlier migration. The retired area policy and completed migration plan now have literal, non-authority history carriers: [documentation-governance.md](documentation-governance.md) and [documentation-standardization-plan.md](documentation-standardization-plan.md). Original source bytes and historical status fields are preserved; neither copy is current policy.
+```
+
+## claim_5de78c1fd792873d0e980291add1c433
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-7`
+Class: structural-frame
+Unit digest: 07369f7b32fa6f2939379493ed28dda4a38459287fbae86d1d9a2f1898399e42
+Shown text digest: 07369f7b32fa6f2939379493ed28dda4a38459287fbae86d1d9a2f1898399e42
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Short line that Phase 7 has no component-boundary change; unchanged from baseline, legacy-absent, a standard declaration and not new substance.
+
+```text
+No component-boundary change in Phase 7.
+```
+
+## claim_3b81768b9fc94f54a6456305e8ee632b
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-8`
+Class: candidate-native-navigation
+Unit digest: b739794ca8467880313e582f8beaa699552cac088fe1e20bac36ba0689a92d2f
+Shown text digest: b739794ca8467880313e582f8beaa699552cac088fe1e20bac36ba0689a92d2f
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Cross-reference sentence to phase-7-completion.md for counts and validation; identical in baseline, not in legacy, pure navigation within the ledger.
+
+```text
+See [Phase 7 completion](phase-7-completion.md) for the final counts and
+validation record.
+```
+
+## claim_957a55767750d5261b1c2abcd287939a
+
+Unit: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md#unheaded-block-9`
+Class: bookkeeping
+Unit digest: bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3
+Shown text digest: bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Huge source-inventory table; per the diff only the governance and standardization-plan rows were edited to Historical locator wording, labelled in the file, while remaining rows match baseline, so the labelled frame classification is acceptable.
+
+```text
+| Source path | Existing type | Authority | Implementation status | Target path | Disposition | Notes |
+|---|---|---|---|---|---|---|
+| `docs/architect/agent-coordination/README.md` | portal | navigation | partial | `docs/platform/agent-coordination/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/README.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/dispatch-control-plane.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/evidence-and-results.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/evidence-and-results.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/executor-health-and-fallback.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/protocol-model.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/protocol-model.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/run-handle.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/run-handle.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/runtime-model.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/runtime-model.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | architecture / proposal | proposed | partial / proposed split | `docs/platform/agent-coordination/architecture/runtime-recovery-design.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/system-context.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/system-context.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/visibility-and-herdr.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/architecture/work-integration.md` | architecture | accepted | partial | `docs/platform/agent-coordination/architecture/work-integration.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/README.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/assignment-run-runresult.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/assignment-run-runresult.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/coordination-session.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/coordination-session.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/flow-definition.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/flow-definition.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/contracts/workflow-stage-operation.md` | contract | accepted | partial | `docs/platform/agent-coordination/contracts/workflow-stage-operation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | ADR | accepted | partial | `docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/decisions/README.md` | decision index | navigation | partial | `docs/platform/agent-coordination/decisions/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/README.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | history | non-canonical | N/A | `docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/intent-preservation-ledger.md` | intent ledger | accepted | partial | `docs/platform/agent-coordination/intent-preservation-ledger.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/README.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/coordination-operating-harness.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/coordination-operating-harness.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md` | playbook | operational | N/A | `docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/README.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/dag-request-scheduler.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/dag-request-scheduler.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md` | proposal | proposed | proposed | `docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/README.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md` | roadmap | non-canonical | N/A | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/README.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P01.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P04.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P04.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P05.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/P05.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/architecture-advisory-panel/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-implementation-track-policy/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/code-panel-multicell-facade/p05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/code-panel-multicell-facade/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P02.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P03.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P04.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P06.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P06.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P07.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P07.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/P08.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md` | verification | evidence | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/verification/dispatch-operability-implementation/I05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | verification | evidence | implemented / partial / verify current checkout | `docs/platform/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/current-cell-P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/group-thinking-plan-loop/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p00.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p01.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p02h-reopen.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02h.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p02h.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p02l.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p02l.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p03.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p04.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p05s.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p05s.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/runtime-recovery/p08.md` | verification | evidence | partial / proposed split | `docs/platform/agent-coordination/verification/runtime-recovery/p08.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p00.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p01.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p01.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p02.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p02.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p03.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p03.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p04.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p04.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p05.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p05.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p06.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p06.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p07.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p07.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p08.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p08.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p09.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p09.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p10.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p10.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p11.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p11.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p12.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p13.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p13.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p14.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p14.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p15.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p15.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p16.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/rust-host-r1-kernel/p16.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P02.5.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P02.5.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/P03.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/P03.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/proof-1-standalone-inline-read-only.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-07-mvp/proof-2-coding-consult-supporting-planning-work.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P04.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P04.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P05.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P05.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P06.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P06.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P07.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P07.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P07.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P03.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P01.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P02.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P03.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/P04.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-red-team.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-red-team.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-review.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2-review.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-recheck2-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-redteam-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck2-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck2-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.1.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-final-recheck-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-final-recheck-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-redteam-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-redteam-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.2.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.2.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.3.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.3.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.4.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.4.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.5.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.5.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.6.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.7.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.8.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.9.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/current-cell.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/index.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/index.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-0-reconcile-review-item.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-1-validate-plan-happy-path.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-2-validate-plan-negative.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-3-validate-plan-live-smoke.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-4-review-item.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-5-scout-blast-radius.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-6-scoped-subtask.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-cell-7-post-close-hardening.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/team-dispatch-v1/step-06-final-consolidation.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | verification | evidence | evidence | `docs/platform/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vision.md` | vision | accepted | partial | `docs/platform/agent-coordination/vision.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/README.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/concept-relationships.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/concept-relationships.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/architect/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg` | vocabulary | accepted | partial | `docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg` | promote | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/specs/runner.md` | spec | accepted | partial | `docs/platform/agent-coordination/spec.md` | split | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/specs/confinement-authority.md` | spec | accepted | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | split | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/specs/distribution.md` | spec | accepted | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | split | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-decision-lock.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel-adoption-and-rebuttal.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/decision-request.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/final-recommendation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/intake.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/interpretation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/redteam.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/scout-report.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/session.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/architecture-panel/synthesis.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/astra-delta-resolution.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-impact-correction.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-independent-review-prompt.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-independent-review-report.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/cli-spawn-review-resolution.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/code-panel-cells.json` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/code-panel-requests.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/design-audit-final.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/design-panel-prompt.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/detailed-design-review.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/detailed-design.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/gateway-boundary-decision.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/implementation-contract-catalog.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/next-steps.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-00-freeze-existing-behavior.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/README.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/cli-spawn-local-contract.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/cli-spawn-reconciliation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/closeout-and-capability-matrix.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/confinement-adapter-contract.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/continuation-and-transfer.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/fallback-and-effect-boundary.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/read-evaluator-and-planner.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/run-admission-and-fencing.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/session-recovery-door.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/phase-designs/writable-takeover.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/plan.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/reports/dispatch-process-incidents.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/reports/phase-00-baseline-260911.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/reports/phase-00-baseline-report.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/requirements-traceability.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/simplicity-and-complexity-budget.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260911-2305-runtime-recovery/static-contract-closure.md` | plan | non-canonical | partial / proposed split | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/RUN.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-01-agent-result-claim-v2.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-02-effective-execution-contract.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-03-runresult-v2-and-attribution.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-04-dispatch-runtime-inspect.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-05-dispatch-runtime-reconcile.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-06-production-door-proof.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/phase-07-integration-closeout.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/plan.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-dispatch-operability-implementation/reports/track-closeout.md` | plan | non-canonical | track-complete / current-checkout evidence present | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/design.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-00-baseline-snapshot.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-01-provider-adapter-shadow.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-02-persona-prompt-envelope.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-03-effort-and-alias-seam.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-04-quality-bridge.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-05-placement-policy-shadow.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-06-executor-profile-invocations.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-07-placement-production-binder.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/phase-08-legacy-placement-retirement.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/plan.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-executor-policy-dispatch-seams/reports/design-review-260916-1815-phase04-readiness.md` | plan | non-canonical | implemented / partial / verify current checkout | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/design.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/plan.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/post-review-recut.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/reports/design-review-260916-1637-provider-capacity-rotator.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260916-account-rotator/review-prompt.md` | plan | non-canonical | proposed / partial / verify | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/phase-01-authoring-template-and-coding-fragment.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/phase-02-plan-loop-wording-and-routing.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/plan.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/reports/track-closeout.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-code-implementation-track-policy/review-prompt.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/decision-lock.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-00-harness-writer-hermeticity.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-01-portable-test-runner-ci.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-02-green-baseline-and-profile.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-03-docs-index-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-04-external-claude-isolation-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-05-related-test-selector-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-06-cli-fixture-init-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-07-cli-harness-responsibility-audit.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/phase-08-evidence-decision-and-handoff.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/plan.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/checkpoint-1-p00-p01-full-suite.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/cli-harness-candidates.json` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/cli-harness-responsibility-audit.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/cli-harness-run-inventory.json` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/docs-index-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/external-claude-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/final-evaluation.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/fixture-init-pilot.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/green-baseline.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/handoff-bin-local-state-verb-usecase-extraction.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/handoff-fast-fixture-expansion.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p00-harness-writer-hermeticity-handoff.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p00-p03-main-sync-proof.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p01-portable-test-runner-ci-handoff.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-0455-test-suite-feedback-cost/reports/p02-status-paused-oom-contention.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-00-baseline-and-migration-lock.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-01-dag-session-declaration-and-replay.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-02-request-compiler-and-identity-gate.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-03-projection-and-consumer-contract.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-04-read-only-admission-and-outcome-taxonomy.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-05-dynamic-frontier-scheduler.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-06-code-panel-and-plan-loop-dogfood.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/phase-07-migration-and-release-proof.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260917-cold-resumable-coordination-dag/plan.md` | plan | non-canonical | proposed | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `plans/260915-host-invocation-r2-external-process/plan.md` | plan | non-canonical | N/A | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/README.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/README.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/external-provider-protocol.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/external-provider-protocol.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/host-use-cases.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/host-use-cases.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/invocation-kernel.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/invocation-kernel.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/provider-routing.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/provider-routing.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | architecture | accepted | partial | `docs/platform/host-invocation-routing/architecture/release-boundaries.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/README.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/command-route-descriptor.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/command-route-descriptor.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/component-protocol.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/component-protocol.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/external-provider-manifest.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/external-provider-manifest.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/legacy-payload.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/legacy-payload.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/operation-catalog.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/operation-catalog.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/operation-provider.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/operation-provider.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md` | contract | accepted | partial | `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/decisions/README.md` | decision index | navigation | partial | `docs/platform/host-invocation-routing/decisions/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/history/host-invocation-baseline.md` | history | non-canonical | N/A | `docs/platform/host-invocation-routing/history/host-invocation-baseline.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/history/source-inventory.md` | history | non-canonical | N/A | `docs/platform/host-invocation-routing/history/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/intent-preservation-ledger.md` | intent ledger | accepted | partial | `docs/platform/agent-coordination/intent-preservation-ledger.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/roadmap.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/roadmap.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/spec.md` | cross-area authority | accepted external authority | partial | `docs/platform/host-invocation-routing/spec.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/README.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/compatibility-harness.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/compatibility-harness.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/implementation-alignment.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/implementation-alignment.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | verification | evidence | evidence | `docs/platform/host-invocation-routing/verification/source-preservation-audit.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/host-invocation-routing/vision.md` | vision | accepted | partial | `docs/platform/agent-coordination/vision.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/README.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/README.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md` | architecture | accepted | partial | `docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/architecture/future-constraints.md` | architecture | accepted | partial | `docs/platform/packaging-distribution/architecture/future-constraints.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md` | architecture | accepted | partial | `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/code-panel-rollout-plan.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/code-panel-rollout-plan.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/activation-binding.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/activation-binding.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/distribution-pin.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/distribution-pin.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/projection-ledger.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/projection-ledger.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/release-manifest.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/release-manifest.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/contracts/skill-package-distribution.md` | contract | accepted | partial | `docs/platform/packaging-distribution/contracts/skill-package-distribution.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/history/distribution-baseline.md` | history | non-canonical | N/A | `docs/platform/packaging-distribution/history/distribution-baseline.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/reports/track-closeout.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/reports/track-closeout.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/spec.md` | cross-area authority | accepted external authority | partial | `docs/platform/packaging-distribution/spec.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/verification/implementation-alignment.md` | verification | evidence | evidence | `docs/platform/packaging-distribution/verification/implementation-alignment.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/verification/install-and-release-proof.md` | verification | evidence | evidence | `docs/platform/packaging-distribution/verification/install-and-release-proof.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/verification/source-preservation-audit.md` | verification | evidence | evidence | `docs/platform/packaging-distribution/verification/source-preservation-audit.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `docs/platform/packaging-distribution/vision.md` | vision | accepted | partial | `docs/platform/agent-coordination/vision.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/schema.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/store.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/replay.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/session-engine.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/coordination/headless-adapter.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/coordination/schema.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/coordination/run.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/coordination/show.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/dispatch/execution-contract.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/dispatch/run-result.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/dispatch/inspect.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/verbs/dispatch/reconcile.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `src/runner/dispatch/placement-policy.mjs` | code | implementation truth | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/assignment-runresult.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/dispatch-operability-production-door.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/dispatch-reconcile-operation.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/placement-policy-matrix-coverage.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+| `test/runner/provider-capacity.test.mjs` | test | evidence | implemented | `docs/platform/agent-coordination/verification/implementation-alignment.md` | evidence-only | Phase 0 classification; verify detailed claims before promotion. |
+```
+
+## claim_6790093b8074cc906761986358ea38d8
+
+Unit: `docs/platform/agent-coordination/history/README.md#migration-status`
+Class: structural-frame
+Unit digest: b73e58a51d0cc2703e07d0b2166e59374b8133ef9e22cf7d1547c542b4d145fb
+Shown text digest: c024777851c2351fd9e96dd671b7a0ec486c85d57d6d14398e765f39de4d2264
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; History README Migration Status heading, unchanged from baseline and absent from legacy; bookkeeping heading around the promotion note, label correct.
+
+```text
+## Migration Status
+
+This target directory preserves historical material from
+`docs/architect/agent-coordination/history/` and the temporary migration
+ledgers. It is retained for context and evidence, never as current runtime or
+contract authority.
+```
+
+## claim_5263dbda3cdb5a8abb2a011230cfdc99
+
+Unit: `docs/platform/agent-coordination/history/README.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 9908f80ae911c38da04e63e364aa1f962172edff2b0e377335d81a8182fb51ff
+Shown text digest: 9908f80ae911c38da04e63e364aa1f962172edff2b0e377335d81a8182fb51ff
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Note that the history directory keeps material and ledgers for context only, never as authority; baseline-present, legacy-absent, a protective status statement with no new claim.
+
+```text
+This target directory preserves historical material from
+`docs/architect/agent-coordination/history/` and the temporary migration
+ledgers. It is retained for context and evidence, never as current runtime or
+contract authority.
+```
+
+## claim_9c354eeb6f4a61966d0d015575eb331f
+
+Unit: `docs/platform/agent-coordination/intent-preservation-ledger.md#ac-i010-one-shared-driver-discipline-across-coordination-facades`
+Class: structural-frame
+Unit digest: 314debc51c2c5c8a373dc16c8868eddd39c7cccfc01cc366950e13bf24bb8282
+Shown text digest: 5b7a8f7f041c49aa4ba347f5ee580697e9fed3c8ca2c018623fbde7a197d8d40
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Heading AC-I010 on the shared driver discipline in the intent ledger; heading text exists at baseline and in no legacy file, so unbound-existing is true; the body below is handled by its own unit.
+
+```text
+### AC-I010: One Shared Driver Discipline Across Coordination Facades
+
+- **Original intent:** the judgment loop a coordination driver runs (observe
+  status, choose one legal action, dispatch, verify evidence independently,
+  disposition, revise/recheck/retry/ask a person, explicit close, cold resume)
+  is written once and shared by every coordination facade -- coding,
+  architecture advisory, generic panels, and future research/business loops --
+  instead of being fused into one coding facade or copied per skill.
+- **Source:** owner decision recorded on 2026-09-26 in
+  the coordination skill/harness simplification plan (`../../../plans/260919-coordination-skill-harness-simplification/plan.md`; Added in candidate: historical path absent at the batch pin)
+  ("Layering above the control layer"), consistent with
+  [V-005](vision.md#v-005-agents-own-adaptive-reasoning-the-foundation-owns-authority),
+  [V-008](vision.md#v-008-domain-and-organization-augmentation-creates-differentiation),
+  [V-011](vision.md#v-011-the-foundation-core-stays-small), and
+  [V-012](vision.md#v-012-generalization-requires-two-unlike-consumers).
+- **Status:** `deferred-preserved` -- decided, not yet built.
+- **Current slice:** Phase 4 extracted the discipline as a shared doctrine
+  fragment (`_shared/coordination-driver.md`, no code, no state) with
+  plan-loop as the first consumer; Phase 5 proved it with
+  `fgos-architecture-panel` as the second, unlike consumer. Phase 6 has now
+  merged the coding facades: `fgos-plan-loop` and `fgos-code-panel` are
+  deprecated stubs (Phase 7 compatibility window), and `fgos-code-change`
+  is the live consumer of the shared fragment plus coding-cell policy.
+- **Deferred:** moving any deterministic part of the discipline into the
+  control layer (for example, as action-view blockers) until at least two
+  unlike consumers need the identical mechanic.
+- **Must not preclude:** a non-coding facade can drive a protocol with the
+  same discipline without loading coding rules; interaction protocols never
+  encode driver judgment; no loop engine, track entity, scheduler, or second
+  ledger is introduced to hold the discipline; explicit close remains the sole
+  close action.
+- **Revisit when:** Phase 5 cannot consume the fragment unchanged, a third
+  facade (research/business loop) is proposed, or the same deterministic step
+  is duplicated across facades after Phase 6.
+- **Abandonment rule:** explicit owner decision only.
+```
+
+## claim_e6e7562209436621ff85518d0ad18fd5
+
+Unit: `docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-20`
+Class: candidate-native-navigation
+Unit digest: 0d8ff388231df802a716dd228c6038db8e0e98887b457d25c71ad059d408bf6a
+Shown text digest: 0d8ff388231df802a716dd228c6038db8e0e98887b457d25c71ad059d408bf6a
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; AC-I010 bullet block differs from baseline only in one source link turned into a path annotation carrying Added in candidate for the absent historical path; label present, rest of intent text pre-existing, so acceptable.
+
+```text
+- **Original intent:** the judgment loop a coordination driver runs (observe
+  status, choose one legal action, dispatch, verify evidence independently,
+  disposition, revise/recheck/retry/ask a person, explicit close, cold resume)
+  is written once and shared by every coordination facade -- coding,
+  architecture advisory, generic panels, and future research/business loops --
+  instead of being fused into one coding facade or copied per skill.
+- **Source:** owner decision recorded on 2026-09-26 in
+  the coordination skill/harness simplification plan (`../../../plans/260919-coordination-skill-harness-simplification/plan.md`; Added in candidate: historical path absent at the batch pin)
+  ("Layering above the control layer"), consistent with
+  [V-005](vision.md#v-005-agents-own-adaptive-reasoning-the-foundation-owns-authority),
+  [V-008](vision.md#v-008-domain-and-organization-augmentation-creates-differentiation),
+  [V-011](vision.md#v-011-the-foundation-core-stays-small), and
+  [V-012](vision.md#v-012-generalization-requires-two-unlike-consumers).
+- **Status:** `deferred-preserved` -- decided, not yet built.
+- **Current slice:** Phase 4 extracted the discipline as a shared doctrine
+  fragment (`_shared/coordination-driver.md`, no code, no state) with
+  plan-loop as the first consumer; Phase 5 proved it with
+  `fgos-architecture-panel` as the second, unlike consumer. Phase 6 has now
+  merged the coding facades: `fgos-plan-loop` and `fgos-code-panel` are
+  deprecated stubs (Phase 7 compatibility window), and `fgos-code-change`
+  is the live consumer of the shared fragment plus coding-cell policy.
+- **Deferred:** moving any deterministic part of the discipline into the
+  control layer (for example, as action-view blockers) until at least two
+  unlike consumers need the identical mechanic.
+- **Must not preclude:** a non-coding facade can drive a protocol with the
+  same discipline without loading coding rules; interaction protocols never
+  encode driver judgment; no loop engine, track entity, scheduler, or second
+  ledger is introduced to hold the discipline; explicit close remains the sole
+  close action.
+- **Revisit when:** Phase 5 cannot consume the fragment unchanged, a third
+  facade (research/business loop) is proposed, or the same deterministic step
+  is duplicated across facades after Phase 6.
+- **Abandonment rule:** explicit owner decision only.
+```
+
+## claim_fb55642843f6cbc42d2d89171349e55d
+
+Unit: `docs/platform/agent-coordination/playbooks/README.md#migration-status`
+Class: structural-frame
+Unit digest: efe71019b1ac49bea1370a3d1dc44c02f7354c1c704194737b9a668f73fdb68e
+Shown text digest: aaec3233205cb724774ac3c28581c9bdd3fffb7dd0347873ef070b3fb61cf16a
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Playbooks README Migration Status heading; identical to baseline and not in legacy, a bookkeeping heading, so existing-migration-bookkeeping is right.
+
+```text
+## Migration Status
+
+This target directory preserves operational and bootstrap material from
+`docs/architect/agent-coordination/playbooks/`. It is navigationally promoted,
+but remains non-normative: contracts, architecture, decisions, and runtime
+code own their respective claims.
+```
+
+## claim_1ccdc1ea2272f773cca540a31f19bf9f
+
+Unit: `docs/platform/agent-coordination/playbooks/README.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: b922571489b0f00ea110f7584547508cdb156186f4727c28ccb96726f1a7c6f0
+Shown text digest: b922571489b0f00ea110f7584547508cdb156186f4727c28ccb96726f1a7c6f0
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Note that playbooks are promoted navigationally yet non-normative with contracts and code owning claims; baseline-present, legacy-absent, a status statement that adds no operational procedure.
+
+```text
+This target directory preserves operational and bootstrap material from
+`docs/architect/agent-coordination/playbooks/`. It is navigationally promoted,
+but remains non-normative: contracts, architecture, decisions, and runtime
+code own their respective claims.
+```
+
+## claim_8e9fe8f689ee7544cd727803b9d951c0
+
+Unit: `docs/platform/agent-coordination/proposals/README.md#unheaded-block-2`
+Class: candidate-native-navigation
+Unit digest: 5aeda891560748b8081de815e442b3ea1f0e21781b2f08643fba7a76799241d8
+Shown text digest: 5aeda891560748b8081de815e442b3ea1f0e21781b2f08643fba7a76799241d8
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+
+```text
+All proposals are subordinate to the
+[Agent Coordination Foundation Vision](../vision.md). They resolve open design
+shape and may not reopen its accepted foundation boundaries implicitly.
+Before narrowing an active proposal, reconcile it with the
+[Intent Preservation Ledger](../intent-preservation-ledger.md).
+```
+
+## claim_acfddb49837c4f852fcf2f25350ca71e
+
+Unit: `docs/platform/agent-coordination/proposals/README.md#migration-status`
+Class: structural-frame
+Unit digest: 0e07b45cb6c3dce5f627e856849d26cbe0ff8d2eb77ab8ed5fec210d9a845848
+Shown text digest: c7982398b7684d1611ed88bbe6a7404d9e029f74f5c5bc9a4da599263d61ccb6
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Proposals README Migration Status heading unchanged from baseline and absent from legacy tree, bookkeeping heading for the promotion note, classification accurate.
+
+```text
+## Migration Status
+
+This target directory preserves the proposal frontier from
+`docs/architect/agent-coordination/proposals/`. A target-path copy does not
+promote its design: the status of every frontier source remains governed by
+[Proposal Status](../history/documentation-migration/proposal-status.md).
+```
+
+## claim_02e5a6da9aa69462567a61c1b8bcafa9
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#semantic-cli-surface-for-agent-coordination`
+Class: structural-frame
+Unit digest: 5635c9d12a67082b13aa158fb199a83bc546a91355138c7dc19a0038f5378c27
+Shown text digest: e590d58201f5293d3d977355121acc1fe984ac2ab8f9f4d257c825ae64c8f282
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 of semantic-cli-surface proposal; file added to the candidate area in an earlier commit with no legacy path at the pin, so pre-existing candidate-native proposal title and unbound-existing is true.
+
+````text
+# Semantic CLI Surface for Agent Coordination
+
+```txt
+Document type: Architecture Proposal
+Audience: Human reviewer, architect, maintainer, design-shaping agent
+Purpose: Propose a high-level semantic CLI surface for Agent Coordination, fix engine semantics for Disposition, and define the telemetry gate for rollout.
+Design status: Draft (V2.1)
+Implementation status: Pending
+Owner: Platform architecture
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/spec.md
+- docs/how-to/run-a-coordination-session.md
+- docs/platform/agent-coordination/contracts/coordination-session.md
+```
+````
+
+## claim_89a548f857f749e8e749693a7df6dc24
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: 2205f5b26727e660d0ea709dcff98ca2945f21390710fbcaa186cab1077f0106
+Shown text digest: 2205f5b26727e660d0ea709dcff98ca2945f21390710fbcaa186cab1077f0106
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence typing the semantic CLI document as Architecture Proposal, Draft V2.1, implementation Pending; baseline-present, no legacy file, status is conservative so no overclaim.
+
+````text
+```txt
+Document type: Architecture Proposal
+Audience: Human reviewer, architect, maintainer, design-shaping agent
+Purpose: Propose a high-level semantic CLI surface for Agent Coordination, fix engine semantics for Disposition, and define the telemetry gate for rollout.
+Design status: Draft (V2.1)
+Implementation status: Pending
+Owner: Platform architecture
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/spec.md
+- docs/how-to/run-a-coordination-session.md
+- docs/platform/agent-coordination/contracts/coordination-session.md
+```
+````
+
+## claim_7fae909de31694f1b661ac18211cad57
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#1-vấn-đề-the-problem`
+Class: structural-frame
+Unit digest: 06c734826c49daf6acdc59723ab00ce6fb4aedf0c90c2f0457dbaf68daaf9f22
+Shown text digest: 65ee71d774face9f2f7dae5e2df7a34eb9e3f0b0f393b171a93576e09f15bf7e
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Section heading 1 The Problem (Vietnamese) in the semantic CLI proposal; identical to baseline, no legacy source, pre-existing candidate-native heading.
+
+```text
+## 1. Vấn đề (The Problem)
+
+Hiện tại, bề mặt giao tiếp của Agent Coordination chỉ có một lệnh duy nhất: `fgos coordination run --file <request.json>`.
+Việc bắt Agent (LLM) hoặc Human phải tương tác qua JSON gây ra 2 vấn đề lớn:
+
+1. **Generation Fragility & Sequencing:** Việc LLM phải giữ đúng thứ tự các bước `authorize` -> `dispatch` -> `disposition` qua nhiều turn và bọc trong một file JSON lớn là điểm yếu kinh điển. Lỗi JSON thường dẫn đến việc phải gen lại toàn bộ từ đầu. (Lưu ý: JSON plumbing chiếm ~2-20% số dòng của SKILL, không phải context).
+2. **Đánh đổi Failure Mode:** Việc gom batch qua `$ref` tạo ra lỗi ồn ào (sai nhãn = refuse). Interactive CLI đổi lỗi đó lấy lỗi im lặng (truyền sai ID thật = ghi nhầm chỗ = exit 0). Rủi ro này chỉ được triệt tiêu khi lỗi F5 (dischargeOn) được vá ở dưới, vì bắn nhầm ID sẽ không mở khóa gate.
+```
+
+## claim_4d2603d2448b20475b2a89ca2ea1ad6f
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: 70b7d78dd9dc8e482d6ab7620785c06246f08d32df107530a136d7b96b52cbde
+Shown text digest: 70b7d78dd9dc8e482d6ab7620785c06246f08d32df107530a136d7b96b52cbde
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Describes the single run --file JSON command as the only coordination surface; baseline-identical, no legacy source file exists, belongs to the pre-existing candidate-native proposal.
+
+```text
+Hiện tại, bề mặt giao tiếp của Agent Coordination chỉ có một lệnh duy nhất: `fgos coordination run --file <request.json>`.
+Việc bắt Agent (LLM) hoặc Human phải tương tác qua JSON gây ra 2 vấn đề lớn:
+```
+
+## claim_c3bfb7cedbf63ea5a56ea1ee0f922bf9
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-3`
+Class: structural-frame
+Unit digest: c193308a3bd4014028b5d1f7e2e5ebc4651143f85bdf48293b17e6686b0959e9
+Shown text digest: c193308a3bd4014028b5d1f7e2e5ebc4651143f85bdf48293b17e6686b0959e9
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Two listed problems: generation fragility of multi-turn JSON sequencing and failure-mode trade-off of silent wrong-ID writes; text equals baseline, nothing in legacy, pre-existing proposal rationale.
+
+```text
+1. **Generation Fragility & Sequencing:** Việc LLM phải giữ đúng thứ tự các bước `authorize` -> `dispatch` -> `disposition` qua nhiều turn và bọc trong một file JSON lớn là điểm yếu kinh điển. Lỗi JSON thường dẫn đến việc phải gen lại toàn bộ từ đầu. (Lưu ý: JSON plumbing chiếm ~2-20% số dòng của SKILL, không phải context).
+2. **Đánh đổi Failure Mode:** Việc gom batch qua `$ref` tạo ra lỗi ồn ào (sai nhãn = refuse). Interactive CLI đổi lỗi đó lấy lỗi im lặng (truyền sai ID thật = ghi nhầm chỗ = exit 0). Rủi ro này chỉ được triệt tiêu khi lỗi F5 (dischargeOn) được vá ở dưới, vì bắn nhầm ID sẽ không mở khóa gate.
+```
+
+## claim_1ec34eb7139574fbbcaac476ee82a51a
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#2-giải-pháp-kiến-trúc-the-solution`
+Class: structural-frame
+Unit digest: 997cb669d34aca8434cb895a823c5a904262144654865aabc6dce2408f522dac
+Shown text digest: c08c40007b43c6dd723f648b433178ed4be1029264b8f1206b17a6219134779b
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Section heading 2 The Solution in the semantic CLI proposal; matches baseline and has no legacy twin, pre-existing heading in a candidate-native proposal.
+
+```text
+## 2. Giải pháp Kiến trúc (The Solution)
+
+Triển khai một lớp **Semantic Verbs as Request Generators**. CLI sẽ không bypass Engine, mà đóng vai trò là "Máy sinh JSON Request", bọc các hành vi an toàn rồi đẩy vào chung một cửa `runCoordinationUseCase`.
+
+**Nguyên lý cốt lõi:**
+- **Human-Agent Parity:** Cả người và máy đều gọi chung lệnh CLI. Giữ `--json` ở output (`status`) làm contract chuẩn cho máy đọc.
+- **Không có MCP Wrapper mới:** Cấm đẻ thêm MCP Tools bọc ngoài cho riêng Agent Coordination (tránh mâu thuẫn với `dispatch.mjs`). CLI là cửa duy nhất.
+- **Tính Deterministic:** CLI tự sinh Key an toàn, tuyệt đối không dùng Random UUID.
+- **An toàn đột biến (Mutation Safety):** Mọi verb có khả năng ghi/chạy mã đều BẮT BUỘC có cờ `--cwd` tường minh, cấm dùng ambient cwd của shell.
+```
+
+## claim_b14e1fac0d2b3e70231806099e41a6e8
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-4`
+Class: structural-frame
+Unit digest: 2a1a3dc98841d36b8b13603a532482486a26e96162ac5b4100bfca375c531742
+Shown text digest: 2a1a3dc98841d36b8b13603a532482486a26e96162ac5b4100bfca375c531742
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Proposes semantic verbs as request generators feeding runCoordinationUseCase rather than bypassing the engine; baseline-identical, no legacy file, a proposal-level statement within a Draft document.
+
+```text
+Triển khai một lớp **Semantic Verbs as Request Generators**. CLI sẽ không bypass Engine, mà đóng vai trò là "Máy sinh JSON Request", bọc các hành vi an toàn rồi đẩy vào chung một cửa `runCoordinationUseCase`.
+```
+
+## claim_02537525d046da73f1d54b948df6a567
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-5`
+Class: structural-frame
+Unit digest: 222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656
+Shown text digest: 222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Core principles list: human-agent parity, no new MCP wrapper, deterministic keys, explicit cwd for mutations; baseline-present and legacy-absent, remains proposal text under a Draft status.
+
+```text
+**Nguyên lý cốt lõi:**
+- **Human-Agent Parity:** Cả người và máy đều gọi chung lệnh CLI. Giữ `--json` ở output (`status`) làm contract chuẩn cho máy đọc.
+- **Không có MCP Wrapper mới:** Cấm đẻ thêm MCP Tools bọc ngoài cho riêng Agent Coordination (tránh mâu thuẫn với `dispatch.mjs`). CLI là cửa duy nhất.
+- **Tính Deterministic:** CLI tự sinh Key an toàn, tuyệt đối không dùng Random UUID.
+- **An toàn đột biến (Mutation Safety):** Mọi verb có khả năng ghi/chạy mã đều BẮT BUỘC có cờ `--cwd` tường minh, cấm dùng ambient cwd của shell.
+```
+
+## claim_9d6ab3d626cdbbc2272d2de3a04ac0b4
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#3-các-sửa-đổi-tầng-engine-core-fixes`
+Class: structural-frame
+Unit digest: 237d30965047a8e9a8127dafc74b240fe18323a4967b6e8c93e724b9ff7bbcf0
+Shown text digest: 9c1c5e03d990aeecd369b9e813f31148c424a7d64ecf534d0b620f77ec383172
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Section heading 3 Core Fixes of the engine layer; unchanged from baseline, no legacy equivalent, pre-existing heading of the native proposal.
+
+```text
+## 3. Các Sửa Đổi Tầng Engine (Core Fixes)
+
+Để lớp CLI này hoạt động đúng, Engine phải được sửa 3 lỗi kiến trúc đang tồn tại:
+
+1. **Bóc tách Auto-close (F3):** Hàm `run.mjs` hiện tại auto-close session ở cuối. Phải tách logic này ra, chặn hành vi tự đóng ngầm định để bảo vệ các lệnh lẻ.
+2. **Idempotency của Disposition (F4):** Tránh TOCTOU khi CLI ghi phán quyết. Sửa `store.mjs` để nhận thêm tham số `dispositionKey` (hoặc thu hẹp hàm `canonicalize` loại bỏ `rationale`) nhằm cho phép retry cùng quyết định mà không sinh bản ghi rác.
+3. **Từ vựng & Gating của Disposition (F5):** Đẩy luật vào YAML (FlowDefinition) thay vì hardcode trong Engine.
+   - Thêm `dispositionValues: [accepted, rejected, cell-closed, deferred]` làm từ vựng cho phép (Vocabulary).
+   - Thêm `dischargeOn: [accepted]` làm mảng xác định việc mở khóa.
+   - LUẬT LOADER: `dischargeOn` bắt buộc phải là tập con của `dispositionValues` (nếu vi phạm, từ chối load YAML).
+   - CLI validate giá trị đầu vào dựa theo `dispositionValues`. Engine quyết định discharge dựa theo `dischargeOn`.
+   - **LUẬT BACKWARD-COMPATIBILITY:** Nếu YAML vắng mặt cả hai field này, Engine phải giữ nguyên hành vi cũ (Mọi value hợp lệ đều được discharge). Đây là cơ chế bảo vệ sự toàn vẹn cho các replay session cũ.
+```
+
+## claim_86b6325d4e0e524b97f2a9f028ba6795
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-6`
+Class: structural-frame
+Unit digest: af63a8a596d7e8a7863c8ce6c858e75816aca25b953b4ffce595ae9d4c969110
+Shown text digest: af63a8a596d7e8a7863c8ce6c858e75816aca25b953b4ffce595ae9d4c969110
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Lead-in saying the engine needs three architectural fixes for the CLI layer to work; baseline-identical and legacy-absent, introductory proposal prose.
+
+```text
+Để lớp CLI này hoạt động đúng, Engine phải được sửa 3 lỗi kiến trúc đang tồn tại:
+```
+
+## claim_09fafb51d4b29cf1109cd0c9404b610b
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-7`
+Class: structural-frame
+Unit digest: e9e58fc019a2b0ed9f7539666b99fdfd9f4d0cfa5c892869101fa587f37627b4
+Shown text digest: e9e58fc019a2b0ed9f7539666b99fdfd9f4d0cfa5c892869101fa587f37627b4
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Three fixes F3 auto-close split, F4 disposition idempotency key, F5 dispositionValues and dischargeOn with backward-compatibility rule; text matches baseline, absent in legacy, remains a proposal and not accepted contract.
+
+```text
+1. **Bóc tách Auto-close (F3):** Hàm `run.mjs` hiện tại auto-close session ở cuối. Phải tách logic này ra, chặn hành vi tự đóng ngầm định để bảo vệ các lệnh lẻ.
+2. **Idempotency của Disposition (F4):** Tránh TOCTOU khi CLI ghi phán quyết. Sửa `store.mjs` để nhận thêm tham số `dispositionKey` (hoặc thu hẹp hàm `canonicalize` loại bỏ `rationale`) nhằm cho phép retry cùng quyết định mà không sinh bản ghi rác.
+3. **Từ vựng & Gating của Disposition (F5):** Đẩy luật vào YAML (FlowDefinition) thay vì hardcode trong Engine.
+   - Thêm `dispositionValues: [accepted, rejected, cell-closed, deferred]` làm từ vựng cho phép (Vocabulary).
+   - Thêm `dischargeOn: [accepted]` làm mảng xác định việc mở khóa.
+   - LUẬT LOADER: `dischargeOn` bắt buộc phải là tập con của `dispositionValues` (nếu vi phạm, từ chối load YAML).
+   - CLI validate giá trị đầu vào dựa theo `dispositionValues`. Engine quyết định discharge dựa theo `dischargeOn`.
+   - **LUẬT BACKWARD-COMPATIBILITY:** Nếu YAML vắng mặt cả hai field này, Engine phải giữ nguyên hành vi cũ (Mọi value hợp lệ đều được discharge). Đây là cơ chế bảo vệ sự toàn vẹn cho các replay session cũ.
+```
+
+## claim_ed22864a98055aea6246f39fbf5fd690
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#4-bề-mặt-cli-mới-10-verbs-1-view`
+Class: structural-frame
+Unit digest: e5b929b76fb55e7bbed61f2e2910c5201d1489a887c0a10f3a73985edca425df
+Shown text digest: dee1b88e625106f78b995c41aca0958dc3375da17cf13ca5ea0c21ad3790020d
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Section heading 4 for the new CLI surface of 10 verbs plus 1 view; matches baseline, no legacy source, pre-existing heading of the proposal.
+
+```text
+## 4. Bề Mặt CLI Mới (10 Verbs + 1 View)
+
+Hệ thống sẽ cung cấp 10 verb cấp cao (Các lệnh thay đổi state bắt buộc có `--cwd`):
+
+1. `start` (Mở session thuần túy)
+2. `authorize-and-dispatch` (Gộp 2 bước thành 1 transaction JSON an toàn)
+3. `operation` (Thực thi node)
+4. `fan-out` (Thực thi song song)
+5. `contribution` (Link kết quả)
+6. `human-turn` (Ghi nhận input người)
+7. `reveal` (Mở khóa Visibility Window)
+8. `disposition` (Ghi nhận phán quyết - Phụ thuộc từ vựng YAML)
+9. `close` (Đóng tường minh)
+10. `recover` (Cứu kẹt session)
+
+Và 1 View: `status` (Trả về `--json` chuẩn cho LLM).
+```
+
+## claim_a47a993b15a1e33eaa33ca65335d5328
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-8`
+Class: structural-frame
+Unit digest: 2b3f5b4cf2e0adb864e785cd2a0e764de42ed743f7de2e0dbfbabeaeb6a35245
+Shown text digest: 2b3f5b4cf2e0adb864e785cd2a0e764de42ed743f7de2e0dbfbabeaeb6a35245
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Sentence introducing ten high-level verbs where state-changing ones require --cwd; same as baseline and absent in legacy, part of the pre-existing proposal.
+
+```text
+Hệ thống sẽ cung cấp 10 verb cấp cao (Các lệnh thay đổi state bắt buộc có `--cwd`):
+```
+
+## claim_ae5516781ff44fff8a98d70c53612ffd
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-9`
+Class: structural-frame
+Unit digest: 217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74
+Shown text digest: 217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Numbered list of verbs start, authorize-and-dispatch, operation, fan-out, contribution, human-turn, reveal, disposition, close, recover; baseline-identical, legacy-absent, proposal-level and not an implemented surface.
+
+```text
+1. `start` (Mở session thuần túy)
+2. `authorize-and-dispatch` (Gộp 2 bước thành 1 transaction JSON an toàn)
+3. `operation` (Thực thi node)
+4. `fan-out` (Thực thi song song)
+5. `contribution` (Link kết quả)
+6. `human-turn` (Ghi nhận input người)
+7. `reveal` (Mở khóa Visibility Window)
+8. `disposition` (Ghi nhận phán quyết - Phụ thuộc từ vựng YAML)
+9. `close` (Đóng tường minh)
+10. `recover` (Cứu kẹt session)
+```
+
+## claim_0dff379203820718ecc15bb86854ccdc
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-10`
+Class: structural-frame
+Unit digest: c5498ea438b2534a19a52dede74e3d5f1d053f1c83516d95a04c4b276f76479c
+Shown text digest: c5498ea438b2534a19a52dede74e3d5f1d053f1c83516d95a04c4b276f76479c
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; One line adding the status view returning --json for LLMs; identical to baseline, no legacy file, pre-existing part of the semantic CLI proposal.
+
+```text
+Và 1 View: `status` (Trả về `--json` chuẩn cho LLM).
+```
+
+## claim_b926a2b6954443f07915268fba55e008
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#5-lộ-trình-triển-khai-execution-order`
+Class: structural-frame
+Unit digest: 0232a3a7c3eeabb703bb099c1cbed718aacac6bda672305539190ee5f6c1a115
+Shown text digest: 46aff428dbaf91ee34f0b0bf42ecbf16cfa5054092f7f1b6f31b5775c7f57924
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Section heading 5 Execution Order of the proposal; baseline-present and not in legacy, pre-existing structural heading, classification true.
+
+```text
+## 5. Lộ trình Triển khai (Execution Order)
+
+| # | Việc | Phụ thuộc | Ghi chú |
+|---|---|---|---|
+| **0** | **Chốt Proposal V2 này** | — | Hướng dẫn triển khai (Đã hoàn tất). |
+| **1** | **Bật Fault-log đếm JSON refuse** | — | Bật đếm lỗi JSON trong 2 tuần (Đếm bằng logger chuyên dụng, không dùng invocation-fault-log). |
+| **2a**| **Migration Script (Local)** | — | Viết script chạy 1 lần replay 583 local sessions trước/sau, diff derived state làm bằng chứng migration. |
+| **2b**| **CI Test Corpus & YAML Load**| — | Rút gọn corpus từ 43 session có disposition commit vào `test/fixtures/`. Code logic `dischargeOn` vào YAML Loader và Engine. |
+| **3** | **Tách Auto-close khỏi run (F3)** | — | Bổ sung verb `close`. |
+| **4** | **Sửa F4 engine fix (dispositionKey)** | — | Chống duplicate disposition an toàn. |
+| **5** | **Phát triển 10 Verb CLI** | Chờ #1 (Có số liệu) | Việc code bị chặn cho tới khi có số liệu từ Bước 1. |
+```
+
+## claim_3e99c9ba0ea20c44649583632fef547f
+
+Unit: `docs/platform/agent-coordination/proposals/semantic-cli-surface.md#unheaded-block-11`
+Class: bookkeeping
+Unit digest: 139e7d6c9a1aee5db7ada78c939e4a7cfdbf3ee3627ede6436c67b2b6cd41ce3
+Shown text digest: 139e7d6c9a1aee5db7ada78c939e4a7cfdbf3ee3627ede6436c67b2b6cd41ce3
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Execution-order table (fault-log count, migration script over 583 local sessions, CI corpus, close verb, F4 fix, 10 verbs gated on data); equals baseline, legacy-absent, a plan inside a Draft proposal.
+
+```text
+| # | Việc | Phụ thuộc | Ghi chú |
+|---|---|---|---|
+| **0** | **Chốt Proposal V2 này** | — | Hướng dẫn triển khai (Đã hoàn tất). |
+| **1** | **Bật Fault-log đếm JSON refuse** | — | Bật đếm lỗi JSON trong 2 tuần (Đếm bằng logger chuyên dụng, không dùng invocation-fault-log). |
+| **2a**| **Migration Script (Local)** | — | Viết script chạy 1 lần replay 583 local sessions trước/sau, diff derived state làm bằng chứng migration. |
+| **2b**| **CI Test Corpus & YAML Load**| — | Rút gọn corpus từ 43 session có disposition commit vào `test/fixtures/`. Code logic `dischargeOn` vào YAML Loader và Engine. |
+| **3** | **Tách Auto-close khỏi run (F3)** | — | Bổ sung verb `close`. |
+| **4** | **Sửa F4 engine fix (dispositionKey)** | — | Chống duplicate disposition an toàn. |
+| **5** | **Phát triển 10 Verb CLI** | Chờ #1 (Có số liệu) | Việc code bị chặn cho tới khi có số liệu từ Bước 1. |
+```
+
+## claim_732089b89266b5deddbc411c2432133c
+
+Unit: `docs/platform/agent-coordination/roadmap/README.md#migration-status`
+Class: structural-frame
+Unit digest: 30f9ca49904696df07a09e4ee82c31142e0319c25662a81ea06120adc06c6fd7
+Shown text digest: 317955262df5f4fa192b7320f813957af61d88af7c0d7879eef892fb1d6aede6
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Roadmap README Migration Status heading, byte-identical to baseline and absent from legacy; bookkeeping heading above the promotion note, so the label is right.
+
+```text
+## Migration Status
+
+This target directory preserves rollout and implementation sequencing from
+`docs/architect/agent-coordination/roadmap/`. It remains non-normative: a
+roadmap cannot establish current architecture, contracts, or decisions.
+```
+
+## claim_0d0a49d39a15a6b9a4150e859cfe0f9d
+
+Unit: `docs/platform/agent-coordination/roadmap/README.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: 51ad1bd7afe2901ef060445e734bd236cbb7fd9b6fa97d88854106b772410a7b
+Shown text digest: 51ad1bd7afe2901ef060445e734bd236cbb7fd9b6fa97d88854106b772410a7b
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Note that the roadmap directory preserves sequencing and stays non-normative, unable to set architecture or contracts; baseline-present, legacy-absent, a status guard rather than a claim.
+
+```text
+This target directory preserves rollout and implementation sequencing from
+`docs/architect/agent-coordination/roadmap/`. It remains non-normative: a
+roadmap cannot establish current architecture, contracts, or decisions.
+```
+
+## claim_9786ce02129b75faa01d4b022dca1fe2
+
+Unit: `docs/platform/agent-coordination/spec.md#agent-coordination-spec`
+Class: structural-frame
+Unit digest: 2520869b1677b45e399d56d1e3656406f4c80f7587805d6e0d6b803e20c8ac0f
+Shown text digest: 25a9d71d5ceacb2f6de133d9fe3dc82b0d076536decc678c0c832abecfadbbd7
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 Agent Coordination Spec; exists in the baseline spec file and has no legacy twin because the spec was promoted from docs/specs/runner.md, so a pre-existing candidate title.
+
+````text
+# Agent Coordination Spec
+
+```txt
+Document type: Spec
+Audience: Human reviewer, architect, maintainer, implementation agent
+Purpose: State current Agent Coordination behavior, owned contracts, consumed contracts, and known gaps during documentation migration
+Design status: Draft
+Implementation: Partial
+Provenance: Promoted from docs/specs/runner.md, accepted Agent Coordination contracts/ADRs, Phase 0 claim/proof ledgers, and current-checkout code/test evidence
+Writer type: Human + agent coauthor
+Canonical for: Current Agent Coordination state summary during migration
+Use this when: You need the current behavior/status map before reading detailed architecture or contracts
+Do not use this for: Exact schema language, ADR provenance, or proposal approval by itself
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/intent-preservation-ledger.md
+- docs/platform/agent-coordination/verification/implementation-alignment.md
+- docs/architect/agent-coordination/contracts/README.md
+- docs/specs/runner.md
+```
+
+This spec is a migration bridge. It summarizes current truth and points to
+legacy-current detailed sources until architecture, contracts, decisions, and
+verification trees are fully promoted into this area.
+````
+
+## claim_324948647e558bf38c460a566b4f1098
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: 4975794d114f01071cb025c08379a711e11d119766c99de633a6890d23df45ab
+Shown text digest: 4975794d114f01071cb025c08379a711e11d119766c99de633a6890d23df45ab
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Spec metadata fence (Draft, Partial, Canonical for current state summary during migration) with Related links; identical to baseline and absent from legacy, a pre-existing header that overclaims nothing.
+
+````text
+```txt
+Document type: Spec
+Audience: Human reviewer, architect, maintainer, implementation agent
+Purpose: State current Agent Coordination behavior, owned contracts, consumed contracts, and known gaps during documentation migration
+Design status: Draft
+Implementation: Partial
+Provenance: Promoted from docs/specs/runner.md, accepted Agent Coordination contracts/ADRs, Phase 0 claim/proof ledgers, and current-checkout code/test evidence
+Writer type: Human + agent coauthor
+Canonical for: Current Agent Coordination state summary during migration
+Use this when: You need the current behavior/status map before reading detailed architecture or contracts
+Do not use this for: Exact schema language, ADR provenance, or proposal approval by itself
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/intent-preservation-ledger.md
+- docs/platform/agent-coordination/verification/implementation-alignment.md
+- docs/architect/agent-coordination/contracts/README.md
+- docs/specs/runner.md
+```
+````
+
+## claim_8d96e547426ccb682e5fa6dd5c2a5f39
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 26a638a0493c7786349c7f74b7622bfcd815131f0f7535e0a566a7fef8893718
+Shown text digest: 26a638a0493c7786349c7f74b7622bfcd815131f0f7535e0a566a7fef8893718
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Statement that the spec is a migration bridge pointing to legacy-current sources until trees are promoted; baseline-identical, legacy-absent, an honest status disclaimer rather than a new design claim.
+
+```text
+This spec is a migration bridge. It summarizes current truth and points to
+legacy-current detailed sources until architecture, contracts, decisions, and
+verification trees are fully promoted into this area.
+```
+
+## claim_1b9e2ea95285bcf3db525a371492b405
+
+Unit: `docs/platform/agent-coordination/spec.md#current-summary`
+Class: structural-frame
+Unit digest: 243485da79e8d82e1a005278effce41f94b8eb321be99a5e3eb6af27f35781fc
+Shown text digest: cd100abbd9ed14984dcddeff6227dae0323e3717966465d9af07f39793e99083
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Current Summary heading in the spec; unchanged from baseline and absent from legacy, a pre-existing structural heading so unbound-existing is correct.
+
+```text
+## Current Summary
+
+Agent Coordination is the foundation layer for governed, evidence-aware agent
+activity. It can run without Work and without a predeclared Workflow or
+CoordinationProtocol, while still requiring runtime execution contracts for any
+dispatch that triggers work by an agent.
+
+Current implemented behavior centers on:
+
+- `CoordinationSession` as the V1 executable/recovery root;
+- `FlowDefinition` as shared graph/operation/policy IR with typed profiles;
+- `Assignment -> DispatchPlan -> Run -> RunResult` as the execution/evidence
+  path;
+- dispatch as the owner of execution infrastructure;
+- Herdr as visibility/transport, not Run truth;
+- Work as optional integration and sole delivery lifecycle authority when
+  present.
+```
+
+## claim_3e2f14324bce265fe7fdc776f88c6eae
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-3`
+Class: structural-frame
+Unit digest: 574e4dfab034e6c87838a168d4d5277e8b4681e85a90ff1b14b99dc0c3de8693
+Shown text digest: 574e4dfab034e6c87838a168d4d5277e8b4681e85a90ff1b14b99dc0c3de8693
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Current Summary opening paragraph in spec.md: foundation layer, Work and protocol optional, execution contracts required. Present in baseline fcfe78cb8, absent from legacy, working tree unchanged, so pre-existing candidate framing is truly unbound and invents nothing new.
+
+```text
+Agent Coordination is the foundation layer for governed, evidence-aware agent
+activity. It can run without Work and without a predeclared Workflow or
+CoordinationProtocol, while still requiring runtime execution contracts for any
+dispatch that triggers work by an agent.
+```
+
+## claim_5e5a0f63550d74b5d312bf18f91a4d40
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-4`
+Class: structural-frame
+Unit digest: b3a71c75ee4f904d2153c68c1f5aba969fc412f46b3d879671d8a92736889f1f
+Shown text digest: b3a71c75ee4f904d2153c68c1f5aba969fc412f46b3d879671d8a92736889f1f
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; One-line lead-in 'Current implemented behavior centers on:' for the bullet list. Identical in baseline, not in legacy; a pure connective fragment of the existing summary, so existing-candidate classification holds.
+
+```text
+Current implemented behavior centers on:
+```
+
+## claim_de43346a8b673d9ea0272947c5c752dc
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-5`
+Class: structural-frame
+Unit digest: 41301a9368f32dbecb14a15713c7aa7977d3a33237a44b0fb3134993856dd288
+Shown text digest: 41301a9368f32dbecb14a15713c7aa7977d3a33237a44b0fb3134993856dd288
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Six-bullet summary of CoordinationSession, FlowDefinition, Assignment-Run path, dispatch ownership, Herdr visibility and Work authority. Baseline-present, legacy-absent by exact text; it restates settled boundaries without new unlabelled claims.
+
+```text
+- `CoordinationSession` as the V1 executable/recovery root;
+- `FlowDefinition` as shared graph/operation/policy IR with typed profiles;
+- `Assignment -> DispatchPlan -> Run -> RunResult` as the execution/evidence
+  path;
+- dispatch as the owner of execution infrastructure;
+- Herdr as visibility/transport, not Run truth;
+- Work as optional integration and sole delivery lifecycle authority when
+  present.
+```
+
+## claim_6c4f618a99c27c8d995e5ae4ea838c31
+
+Unit: `docs/platform/agent-coordination/spec.md#scope`
+Class: structural-frame
+Unit digest: 28e7ac5ff01167310835c3f9b2a227aaa8fd1077906b2a8bb188ee7ec1d8f036
+Shown text digest: 81e115b5fc61bbdb606c9ac19677f9599d2e1c20b66aea95ea11dbfd0f59319d
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Bare 'Scope' heading. Legacy hit is only the common word heading in three files, not a source section; baseline had it and the working file is unchanged, so an existing candidate heading wrapper is accurate.
+
+```text
+## Scope
+
+This area owns:
+
+- coordination session identity, local storage, replay, and recovery-root
+  behavior;
+- declared and agent-led coordination execution through the shared dispatch
+  core;
+- FlowDefinition and typed profile semantics for Workflow and
+  CoordinationProtocol consumers;
+- Assignment, Run, RunResult, evidence, observation, and inspection boundaries;
+- dispatch integration contracts used by coordination;
+- visibility/evidence boundaries for Herdr and result evaluation;
+- group-thinking/advisory protocol surfaces where they are built on
+  CoordinationSession/FlowDefinition/Dispatch.
+```
+
+## claim_bff3a2cc2c15603593f120c3671296a9
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-6`
+Class: structural-frame
+Unit digest: 1dae68a93babbe019b1a6f85b9f909b81dc1b854338365099868c2568992d139
+Shown text digest: 1dae68a93babbe019b1a6f85b9f909b81dc1b854338365099868c2568992d139
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Scope list of owned areas: sessions, dispatch-core execution, FlowDefinition profiles, evidence boundaries, Herdr, group-thinking surfaces. Exact text in baseline and absent from legacy; candidate-authored scope statement predating this batch.
+
+```text
+This area owns:
+
+- coordination session identity, local storage, replay, and recovery-root
+  behavior;
+- declared and agent-led coordination execution through the shared dispatch
+  core;
+- FlowDefinition and typed profile semantics for Workflow and
+  CoordinationProtocol consumers;
+- Assignment, Run, RunResult, evidence, observation, and inspection boundaries;
+- dispatch integration contracts used by coordination;
+- visibility/evidence boundaries for Herdr and result evaluation;
+- group-thinking/advisory protocol surfaces where they are built on
+  CoordinationSession/FlowDefinition/Dispatch.
+```
+
+## claim_7c7e5b0cd65941649f09dccaccc3fcb8
+
+Unit: `docs/platform/agent-coordination/spec.md#non-scope`
+Class: structural-frame
+Unit digest: 3f1ec225afa6433d22c0f73618c80e364ea4bb5549a9975efa550e145785cb88
+Shown text digest: 9be84ecb8995f8af04a3e80086d7d38246bd0ca8c5003d923d7a219cce32cfe7
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; Heading 'Non-Scope' in spec.md. Exists in baseline, no legacy match, no diff in the working tree, so it is an old candidate structural heading and unbound is correct.
+
+```text
+## Non-Scope
+
+This area does not own:
+
+- Work lifecycle authority, state transitions, merge, or branch lifecycle;
+- host command/provider process routing, owned by
+  [host-invocation-routing](../host-invocation-routing/README.md);
+- installation, activation, release manifest, setup/doctor, or runtime identity,
+  owned by [packaging-distribution](../packaging-distribution/README.md);
+- project-local account inventory for provider capacity;
+- proposal approval by path rename alone.
+```
+
+## claim_74b00b519bc6b0b62131eef05e5e7061
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-7`
+Class: candidate-native-navigation
+Unit digest: 4c8e935895facbb1f259c6edb468f9dd1db54862a636775f8d239e1176361a96
+Shown text digest: 4c8e935895facbb1f259c6edb468f9dd1db54862a636775f8d239e1176361a96
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Non-scope exclusions list pointing to host-invocation-routing and packaging-distribution portals. Baseline-present and legacy-absent; boundary pointers to sibling areas only, with no new invented behavior claim.
+
+```text
+This area does not own:
+
+- Work lifecycle authority, state transitions, merge, or branch lifecycle;
+- host command/provider process routing, owned by
+  [host-invocation-routing](../host-invocation-routing/README.md);
+- installation, activation, release manifest, setup/doctor, or runtime identity,
+  owned by [packaging-distribution](../packaging-distribution/README.md);
+- project-local account inventory for provider capacity;
+- proposal approval by path rename alone.
+```
+
+## claim_bc2a036bfb370b61dfc459ae5a77cd8c
+
+Unit: `docs/platform/agent-coordination/spec.md#actors-and-surfaces`
+Class: structural-frame
+Unit digest: 97d92e28b8ae380028bbc7bbe547a7907dacc450819e13f5f02ac2b79d8f6d3a
+Shown text digest: 7e6ac52312158bb81b23614151b5d2bdea2854beb54817d9dd121c0cf3d1eb78
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Actors And Surfaces' heading, unchanged since baseline, no legacy equivalent text. Structural heading of the candidate spec itself, so classification as existing candidate unit is accurate.
+
+```text
+## Actors And Surfaces
+
+| Surface | Current status | Notes |
+|---|---|---|
+| `fgos coordination run --file <request>` | implemented | Public CLI door for synchronous session execution. |
+| `fgos coordination show <id> --json` | implemented | Read-only session projection. |
+| Headless adapter | implemented | Uses the same engine entry as CLI, with invocation-lifecycle differences only. |
+| Declared protocol definitions | implemented / partial | Definitions live in project/domain/core loaders and use `FlowDefinition`. |
+| Agent-led sessions | implemented / partial | V1 supports bounded agent-led primary plus consult shape; richer dynamic graphs remain deferred-preserved. |
+| Work-attached mutation | partial / gated | Read-only and selected mutating operation paths exist; domain-owned Work isolation remains the gating boundary. |
+| Herdr visibility | partial | Visibility/transport only; not evidence or Run truth. |
+```
+
+## claim_3273f8bddcca9ea46c529152326ad314
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-8`
+Class: structural-frame
+Unit digest: 9ebd99dc0abbabfe3b2c0402e35413162af1ad38cbd3946fc7ebc5953ea1e87a
+Shown text digest: 9ebd99dc0abbabfe3b2c0402e35413162af1ad38cbd3946fc7ebc5953ea1e87a
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Surface status table listing coordination run/show, headless adapter, protocol definitions, agent-led sessions, Herdr. Verbatim in baseline, not found in legacy; candidate-authored status summary already present before this batch.
+
+```text
+| Surface | Current status | Notes |
+|---|---|---|
+| `fgos coordination run --file <request>` | implemented | Public CLI door for synchronous session execution. |
+| `fgos coordination show <id> --json` | implemented | Read-only session projection. |
+| Headless adapter | implemented | Uses the same engine entry as CLI, with invocation-lifecycle differences only. |
+| Declared protocol definitions | implemented / partial | Definitions live in project/domain/core loaders and use `FlowDefinition`. |
+| Agent-led sessions | implemented / partial | V1 supports bounded agent-led primary plus consult shape; richer dynamic graphs remain deferred-preserved. |
+| Work-attached mutation | partial / gated | Read-only and selected mutating operation paths exist; domain-owned Work isolation remains the gating boundary. |
+| Herdr visibility | partial | Visibility/transport only; not evidence or Run truth. |
+```
+
+## claim_e55374f22025f86c63d8706a582e280d
+
+Unit: `docs/platform/agent-coordination/spec.md#core-entities`
+Class: structural-frame
+Unit digest: 75f686a4102d2f01a3fe622ff70b5d3f105f51c8443c10c496a41d78291f10a2
+Shown text digest: b0db64514210078ff669979019fef0388130fa37df637b620d1311f899a20cde
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Core Entities' heading in spec.md; present in baseline, absent from legacy by text. Just a section heading with no body of its own, so existing-candidate classification is true.
+
+```text
+## Core Entities
+
+| Entity | Current state | Source |
+|---|---|---|
+| CoordinationSession | Implemented V1 executable/recovery root with manifest/event store/replay. | [legacy contract](../../architect/agent-coordination/contracts/coordination-session.md), `src/runner/coordination/**` |
+| FlowDefinition | Implemented shared graph/operation/policy IR with typed profiles. | [legacy contract](../../architect/agent-coordination/contracts/flow-definition.md), `src/runner/definitions/**` |
+| Workflow Stage Operation | Accepted compatibility model; used where Work/Workflow integration is selected. | [legacy contract](../../architect/agent-coordination/contracts/workflow-stage-operation.md) |
+| Assignment | Semantic execution request. | [legacy contract](../../architect/agent-coordination/contracts/assignment-run-runresult.md) |
+| Run | One concrete execution attempt for an Assignment. | [legacy contract](../../architect/agent-coordination/contracts/assignment-run-runresult.md) |
+| RunResult | Immutable terminal Run truth and normalized evidence boundary. | [legacy contract](../../architect/agent-coordination/contracts/assignment-run-runresult.md), dispatch operability proof |
+| RunObservation | Mutable read-only projection; never settles a Run. | [dispatch-operability proof](../../architect/agent-coordination/verification/dispatch-operability-implementation/I03.md) |
+| DispatchPlan | Execution infrastructure plan under Dispatch authority. | [dispatch control plane](../../architect/agent-coordination/architecture/dispatch-control-plane.md) |
+```
+
+## claim_9d18f68c54b13d881dc32c17f0524337
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-9`
+Class: candidate-native-navigation
+Unit digest: c9feb3366a7e81196f07297be694114441c586d4b7fe15a9b640e57f8ef866e8
+Shown text digest: c9feb3366a7e81196f07297be694114441c586d4b7fe15a9b640e57f8ef866e8
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Entity table mapping CoordinationSession, FlowDefinition, Assignment, Run, RunResult etc. to legacy contract links and code paths. Pre-existing in baseline, legacy-absent as text; it links sources rather than copying them, so no competing authority.
+
+```text
+| Entity | Current state | Source |
+|---|---|---|
+| CoordinationSession | Implemented V1 executable/recovery root with manifest/event store/replay. | [legacy contract](../../architect/agent-coordination/contracts/coordination-session.md), `src/runner/coordination/**` |
+| FlowDefinition | Implemented shared graph/operation/policy IR with typed profiles. | [legacy contract](../../architect/agent-coordination/contracts/flow-definition.md), `src/runner/definitions/**` |
+| Workflow Stage Operation | Accepted compatibility model; used where Work/Workflow integration is selected. | [legacy contract](../../architect/agent-coordination/contracts/workflow-stage-operation.md) |
+| Assignment | Semantic execution request. | [legacy contract](../../architect/agent-coordination/contracts/assignment-run-runresult.md) |
+| Run | One concrete execution attempt for an Assignment. | [legacy contract](../../architect/agent-coordination/contracts/assignment-run-runresult.md) |
+| RunResult | Immutable terminal Run truth and normalized evidence boundary. | [legacy contract](../../architect/agent-coordination/contracts/assignment-run-runresult.md), dispatch operability proof |
+| RunObservation | Mutable read-only projection; never settles a Run. | [dispatch-operability proof](../../architect/agent-coordination/verification/dispatch-operability-implementation/I03.md) |
+| DispatchPlan | Execution infrastructure plan under Dispatch authority. | [dispatch control plane](../../architect/agent-coordination/architecture/dispatch-control-plane.md) |
+```
+
+## claim_1c3292ad19c922c586854d5d126e6f3b
+
+Unit: `docs/platform/agent-coordination/spec.md#operations-and-flows`
+Class: structural-frame
+Unit digest: 4d8c7816a117d1520a26dc152ec28ae1ae52d68f95abd6e72f11580c242ba16d
+Shown text digest: 05fb5c470db33a04062e9f094885eda4834910b5cb0b5b24403dd1abb2f94b96
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Operations And Flows' heading; baseline already carried it, legacy has no such text, and the working file is unchanged. Existing structural heading, classification correct.
+
+```text
+## Operations And Flows
+
+| Flow | Status | Summary |
+|---|---|---|
+| Agent-led coordination | implemented / partial | A session can open without Work/protocol identity and dispatch bounded requests through the same Assignment/Run/RunResult path. |
+| Declared coordination protocol | implemented / partial | FlowDefinition-backed protocol operations dispatch through the shared execution core. |
+| Inspect dispatch runtime | implemented | `dispatch.runtime.inspect` is read-only and exposes typed selectors. |
+| Reconcile dispatch runtime | implemented / partial | `dispatch.runtime.reconcile` repairs guard/projection state only; it is not recovery/takeover. |
+| Runtime recovery | partial / proposed split | S0-S4 and the session-recovery half of S5 are implemented; S5 transfer/import/budget/apply, S6, and S7 remain not implemented. |
+| Herdr-spawn launch reconciliation | implemented with residual gap | Current shipped path uses the P02H reopen launcher-script mechanism; earlier direct-command pseudocode is false. |
+| PlacementPolicy | implemented / partial / verify current checkout | Self-verifying provider/model/executor binder exists where proven; same-provider account rotation and lifecycle settlement stay outside it. |
+| Provider Capacity Rotator | partial / verify current checkout | Same-provider account/capacity rotation with global/operator config; not cross-provider fallback. |
+| Cold-resumable DAG scheduler | proposed | Read-only frontier; no mutation nodes, daemon, lifecycle replacement, or Work replacement accepted. |
+```
+
+## claim_4e688aaf38cb9b831a4bdd80ea2f499d
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-10`
+Class: structural-frame
+Unit digest: eab945ffbde3d8ae87c15f4b2642f6b92823b36be08bd28f17b128af6e473f49
+Shown text digest: eab945ffbde3d8ae87c15f4b2642f6b92823b36be08bd28f17b128af6e473f49
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Flow status table (agent-led, declared protocol, inspect/reconcile, recovery, DAG scheduler proposed). Verbatim in baseline, not in legacy sources; status labels stay conservative partial/proposed, so no upgraded claim appears here.
+
+```text
+| Flow | Status | Summary |
+|---|---|---|
+| Agent-led coordination | implemented / partial | A session can open without Work/protocol identity and dispatch bounded requests through the same Assignment/Run/RunResult path. |
+| Declared coordination protocol | implemented / partial | FlowDefinition-backed protocol operations dispatch through the shared execution core. |
+| Inspect dispatch runtime | implemented | `dispatch.runtime.inspect` is read-only and exposes typed selectors. |
+| Reconcile dispatch runtime | implemented / partial | `dispatch.runtime.reconcile` repairs guard/projection state only; it is not recovery/takeover. |
+| Runtime recovery | partial / proposed split | S0-S4 and the session-recovery half of S5 are implemented; S5 transfer/import/budget/apply, S6, and S7 remain not implemented. |
+| Herdr-spawn launch reconciliation | implemented with residual gap | Current shipped path uses the P02H reopen launcher-script mechanism; earlier direct-command pseudocode is false. |
+| PlacementPolicy | implemented / partial / verify current checkout | Self-verifying provider/model/executor binder exists where proven; same-provider account rotation and lifecycle settlement stay outside it. |
+| Provider Capacity Rotator | partial / verify current checkout | Same-provider account/capacity rotation with global/operator config; not cross-provider fallback. |
+| Cold-resumable DAG scheduler | proposed | Read-only frontier; no mutation nodes, daemon, lifecycle replacement, or Work replacement accepted. |
+```
+
+## claim_bdc686550bc36d7563154fd33098741d
+
+Unit: `docs/platform/agent-coordination/spec.md#contracts-owned`
+Class: structural-frame
+Unit digest: b6ec7e6b2c4ab46b0c1efdd78aa38d574f56ea5b5e1124dd50d207ca742cc589
+Shown text digest: 3825641e76409b358634b46cb5b9ad540abcf1ed950c0dd0fab3ea13cc19a0b0
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Contracts Owned' heading, existing in baseline with no legacy match and no working-tree diff. A bare heading belonging to the candidate spec skeleton, so unbound existing unit is right.
+
+```text
+## Contracts Owned
+
+Detailed contract text remains legacy-current until Phase 4 promotion:
+
+| Contract | Current source | Status |
+|---|---|---|
+| Workflow Stage Operation | [workflow-stage-operation.md](../../architect/agent-coordination/contracts/workflow-stage-operation.md) | accepted / partial |
+| Assignment, Run, RunResult | [assignment-run-runresult.md](../../architect/agent-coordination/contracts/assignment-run-runresult.md) | accepted / implemented / partial |
+| CoordinationSession | [coordination-session.md](../../architect/agent-coordination/contracts/coordination-session.md) | accepted / implemented / partial |
+| FlowDefinition | [flow-definition.md](../../architect/agent-coordination/contracts/flow-definition.md) | accepted / implemented / partial |
+```
+
+## claim_9c9e1cec42a55fa07c9505d2e2a0c017
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-11`
+Class: structural-frame
+Unit digest: f2b3765ae3d9b1f36caacda7eade5ee47b8eb5d0dee4ff5c4de48ba857eb9970
+Shown text digest: f2b3765ae3d9b1f36caacda7eade5ee47b8eb5d0dee4ff5c4de48ba857eb9970
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Sentence stating detailed contract text stays legacy-current until Phase 4 promotion. Migration-status bookkeeping, present in baseline, absent from legacy; honestly declares non-promotion rather than asserting authority.
+
+```text
+Detailed contract text remains legacy-current until Phase 4 promotion:
+```
+
+## claim_5020e11c44b6b053c400adc46cda95a1
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-12`
+Class: candidate-native-navigation
+Unit digest: b3acf3b5f1931511c0a2610dd8879a52abbbca7b5adfae155209ef9d8eeb5110
+Shown text digest: b3acf3b5f1931511c0a2610dd8879a52abbbca7b5adfae155209ef9d8eeb5110
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Contracts table linking four legacy contract files with accepted/implemented/partial status. Exists in baseline, no legacy text duplicate; link-only pointers keep legacy as owner, so no competing copy of contract text.
+
+```text
+| Contract | Current source | Status |
+|---|---|---|
+| Workflow Stage Operation | [workflow-stage-operation.md](../../architect/agent-coordination/contracts/workflow-stage-operation.md) | accepted / partial |
+| Assignment, Run, RunResult | [assignment-run-runresult.md](../../architect/agent-coordination/contracts/assignment-run-runresult.md) | accepted / implemented / partial |
+| CoordinationSession | [coordination-session.md](../../architect/agent-coordination/contracts/coordination-session.md) | accepted / implemented / partial |
+| FlowDefinition | [flow-definition.md](../../architect/agent-coordination/contracts/flow-definition.md) | accepted / implemented / partial |
+```
+
+## claim_021a84c1334927bc8bba62ec12584496
+
+Unit: `docs/platform/agent-coordination/spec.md#contracts-consumed`
+Class: structural-frame
+Unit digest: fd489432e02ca2a2c1d097327a760a14ca503a032f340ea92de6104237105961
+Shown text digest: 4fcf91c719d1cc2a30bf5cbacf01323760b9a1c48fbe33a67c3d1996a39d9406
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Contracts Consumed' heading from the baseline spec skeleton; no legacy occurrence and no change since baseline. Pure heading, existing-candidate classification holds.
+
+```text
+## Contracts Consumed
+
+| Contract area | Owner | Agent Coordination use |
+|---|---|---|
+| Work lifecycle and state | Work-state / runner specs | Optional Work integration; Work remains lifecycle authority. |
+| Host invocation and provider routing | [host-invocation-routing](../host-invocation-routing/README.md) | Dispatch/executor integration consumes host-owned process routing. |
+| Packaging/distribution | [packaging-distribution](../packaging-distribution/README.md) | Runtime identity, activation, setup/doctor, and release packaging are link-only external authority. |
+| Confinement Authority | [confinement-authority spec](../../specs/confinement-authority.md) | Execution confinement evidence and attestation may be consumed by dispatch paths. |
+```
+
+## claim_cc3d4a2db8370a93c4a7a6e8aba18e0c
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-13`
+Class: candidate-native-navigation
+Unit digest: de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18
+Shown text digest: de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Consumed-contract table: Work state, host routing, packaging, confinement authority, each with owner and use. Baseline-present, legacy-absent; assigns external ownership and link-only use, consistent with boundary, nothing newly invented.
+
+```text
+| Contract area | Owner | Agent Coordination use |
+|---|---|---|
+| Work lifecycle and state | Work-state / runner specs | Optional Work integration; Work remains lifecycle authority. |
+| Host invocation and provider routing | [host-invocation-routing](../host-invocation-routing/README.md) | Dispatch/executor integration consumes host-owned process routing. |
+| Packaging/distribution | [packaging-distribution](../packaging-distribution/README.md) | Runtime identity, activation, setup/doctor, and release packaging are link-only external authority. |
+| Confinement Authority | [confinement-authority spec](../../specs/confinement-authority.md) | Execution confinement evidence and attestation may be consumed by dispatch paths. |
+```
+
+## claim_1289fd071fae40e82e7dba2d1b9bcbb2
+
+Unit: `docs/platform/agent-coordination/spec.md#implementation-status`
+Class: structural-frame
+Unit digest: 24dd8b125905d627d20319647844f99037139cfa324fd490a849c6dd087e3163
+Shown text digest: ddc0f6d74c06dbec48a7806ff953ef1c672255b627dc9bf02b2af054858514a6
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Implementation Status' heading in spec.md; same in baseline fcfe78cb8, no legacy text. Candidate skeleton heading, so the proposed unbound-existing label is accurate.
+
+```text
+## Implementation Status
+
+| Claim | Status | Evidence |
+|---|---|---|
+| Foundation layer, not coding-only glue | partial | [vision](vision.md), [system context](../../architect/agent-coordination/architecture/system-context.md) |
+| Work optional integration | implemented / partial | `src/runner/coordination/**`, coordination tests, [work integration](../../architect/agent-coordination/architecture/work-integration.md) |
+| Protocol optional | implemented / partial | `src/verbs/coordination/schema.mjs`, `src/runner/coordination/session-engine.mjs` |
+| Runtime execution contract required | implemented / partial | dispatch execution contract code, assignment/runresult tests |
+| CoordinationSession V1 root | implemented / partial | `src/runner/coordination/{schema,store,replay,session-engine}.mjs` |
+| FlowDefinition shared IR | implemented / partial | `src/runner/definitions/**`, coordination tests |
+| Assignment / Run / RunResult separation | implemented | `test/runner/assignment-runresult.test.mjs` |
+| Dispatch owns execution infrastructure | implemented / partial | `src/runner/dispatch/**`, dispatch tests |
+| Herdr visibility only | partial | [visibility proof](../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md) |
+| Runtime recovery | partial / proposed split | [runtime-recovery proofs](../../architect/agent-coordination/verification/runtime-recovery/p01.md) through P05S |
+| Dispatch operability inspect/reconcile | implemented / partial | [I01-I05 proofs](../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md) |
+| Cold-resumable DAG scheduler | proposed | [DAG proposal](../../architect/agent-coordination/proposals/dag-request-scheduler.md) |
+
+See [implementation-alignment.md](verification/implementation-alignment.md) for
+the claim-by-claim evidence table.
+```
+
+## claim_2a0f67663daf206e2883bd79216cd084
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-14`
+Class: candidate-native-navigation
+Unit digest: 40ff194821508a0153c385265bbefe51e56ffdc843c70a3b889afc441259a19d
+Shown text digest: 40ff194821508a0153c385265bbefe51e56ffdc843c70a3b889afc441259a19d
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Claim/status/evidence table with implemented-or-partial statuses and code, test and proof links. Verbatim in baseline, not legacy; pre-existing candidate evidence map, not newly asserted here, so label is true.
+
+```text
+| Claim | Status | Evidence |
+|---|---|---|
+| Foundation layer, not coding-only glue | partial | [vision](vision.md), [system context](../../architect/agent-coordination/architecture/system-context.md) |
+| Work optional integration | implemented / partial | `src/runner/coordination/**`, coordination tests, [work integration](../../architect/agent-coordination/architecture/work-integration.md) |
+| Protocol optional | implemented / partial | `src/verbs/coordination/schema.mjs`, `src/runner/coordination/session-engine.mjs` |
+| Runtime execution contract required | implemented / partial | dispatch execution contract code, assignment/runresult tests |
+| CoordinationSession V1 root | implemented / partial | `src/runner/coordination/{schema,store,replay,session-engine}.mjs` |
+| FlowDefinition shared IR | implemented / partial | `src/runner/definitions/**`, coordination tests |
+| Assignment / Run / RunResult separation | implemented | `test/runner/assignment-runresult.test.mjs` |
+| Dispatch owns execution infrastructure | implemented / partial | `src/runner/dispatch/**`, dispatch tests |
+| Herdr visibility only | partial | [visibility proof](../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md) |
+| Runtime recovery | partial / proposed split | [runtime-recovery proofs](../../architect/agent-coordination/verification/runtime-recovery/p01.md) through P05S |
+| Dispatch operability inspect/reconcile | implemented / partial | [I01-I05 proofs](../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md) |
+| Cold-resumable DAG scheduler | proposed | [DAG proposal](../../architect/agent-coordination/proposals/dag-request-scheduler.md) |
+```
+
+## claim_c241c1cad297320099b9dfeeabb927d3
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-15`
+Class: candidate-native-navigation
+Unit digest: abca3e6b0db5297a71399ea11c79ebd0e08010854d6efb8dce9a6bbf44b33797
+Shown text digest: abca3e6b0db5297a71399ea11c79ebd0e08010854d6efb8dce9a6bbf44b33797
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Pointer sentence to verification/implementation-alignment.md for claim-by-claim evidence. In baseline, not in legacy; a navigation link into the candidate's own verification doc, nothing new claimed.
+
+```text
+See [implementation-alignment.md](verification/implementation-alignment.md) for
+the claim-by-claim evidence table.
+```
+
+## claim_abd1a1964d80a8d3e5635ba17cd386cf
+
+Unit: `docs/platform/agent-coordination/spec.md#known-gaps`
+Class: structural-frame
+Unit digest: 2125e01c1974f2633eccec213edb7865e6031c1337c77aeb9cf3e653880c98b9
+Shown text digest: 87d48f6e8e7f9aa6d92f61a2c4d945dccb43abdfe6590843949d0ee7340a018f
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Known Gaps' heading, present in baseline and absent from legacy by exact text. Unchanged structural heading of the candidate spec; classification as existing candidate unit is correct.
+
+```text
+## Known Gaps
+
+| Gap | Status | Next action |
+|---|---|---|
+| Full architecture/contract/ADR promotion | pending Phase 3/4 | Promote accepted docs with link normalization and status notes. |
+| Full verification tree preservation | pending Phase 5 | Move/mirror indexes and keep proof trees linkable. |
+| Runtime recovery S5 transfer/import/budget/apply, S6, S7 | not implemented | Keep proposed/partial labels until proof exists. |
+| Writable partial-edit takeover | deferred-preserved | Requires workspace-grant and evaluator owners. |
+| Richer dynamic agent-authored runtime graphs | deferred-preserved | Reopen when real consumers outgrow V1 primary-plus-consult shape. |
+| Provider Capacity Rotator current shipped slice | partial / verify | Focused code/proof scan before marking fully implemented. |
+| PlacementPolicy redirect retirement | pending / unknown | Preserve Phase 08 pending status until proof lands. |
+| Test feedback related-test selector | deferred | Do not describe P05 selector as shipped. |
+| Cold-resumable DAG scheduler | proposed | Needs explicit acceptance and implementation proof. |
+```
+
+## claim_c4d21a728479825bedb7f7eedf6e15c9
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-16`
+Class: structural-frame
+Unit digest: f9618758d29a3b89d8858509cf4aa242d0e05bb2386615d021ccd48835a24f0a
+Shown text digest: f9618758d29a3b89d8858509cf4aa242d0e05bb2386615d021ccd48835a24f0a
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Known-gaps table: promotion pending phases, recovery S5-S7 not implemented, deferred items, DAG scheduler proposed. Baseline-present, legacy-absent; gaps are stated conservatively and mix bookkeeping with status, with no unlabelled upgrade.
+
+```text
+| Gap | Status | Next action |
+|---|---|---|
+| Full architecture/contract/ADR promotion | pending Phase 3/4 | Promote accepted docs with link normalization and status notes. |
+| Full verification tree preservation | pending Phase 5 | Move/mirror indexes and keep proof trees linkable. |
+| Runtime recovery S5 transfer/import/budget/apply, S6, S7 | not implemented | Keep proposed/partial labels until proof exists. |
+| Writable partial-edit takeover | deferred-preserved | Requires workspace-grant and evaluator owners. |
+| Richer dynamic agent-authored runtime graphs | deferred-preserved | Reopen when real consumers outgrow V1 primary-plus-consult shape. |
+| Provider Capacity Rotator current shipped slice | partial / verify | Focused code/proof scan before marking fully implemented. |
+| PlacementPolicy redirect retirement | pending / unknown | Preserve Phase 08 pending status until proof lands. |
+| Test feedback related-test selector | deferred | Do not describe P05 selector as shipped. |
+| Cold-resumable DAG scheduler | proposed | Needs explicit acceptance and implementation proof. |
+```
+
+## claim_9a3c360e46f16369ea4820a1b8bfbcca
+
+Unit: `docs/platform/agent-coordination/spec.md#related-files`
+Class: structural-frame
+Unit digest: 846bebe2085577e99099b35608dbd6455d5c98a65574ca4f3c32f6696ba805f5
+Shown text digest: 2be9b44c6c5d4bf9087f5f7ca3c01bf3ab38bb737247eedc0c9c8260db47471a
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Related Files' heading in spec.md, in baseline, no legacy source text. Navigation heading of the candidate document, so existing candidate unit classification is accurate.
+
+```text
+## Related Files
+
+| Relationship | File |
+|---|---|
+| area portal | [README.md](README.md) |
+| vision | [vision.md](vision.md) |
+| intent ledger | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
+| implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
+| claim ledger | [history/documentation-migration/claim-preservation.md](history/documentation-migration/claim-preservation.md) |
+| proof ledger | [history/documentation-migration/proof-preservation.md](history/documentation-migration/proof-preservation.md) |
+| legacy runner spec | [../../specs/runner.md](../../specs/runner.md) |
+```
+
+## claim_136395b352b15a574d4d3895790f410b
+
+Unit: `docs/platform/agent-coordination/spec.md#unheaded-block-17`
+Class: bookkeeping
+Unit digest: 8375e15cfc82a23b8f6da28d91282c2df383e7fb050bff3339f54673d057cae0
+Shown text digest: 8375e15cfc82a23b8f6da28d91282c2df383e7fb050bff3339f54673d057cae0
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Related-files table linking README, vision, intent ledger, alignment, claim and proof ledgers, legacy runner spec. Baseline-present and legacy-absent; pure relationship links in candidate-local navigation, valid existing unit.
+
+```text
+| Relationship | File |
+|---|---|
+| area portal | [README.md](README.md) |
+| vision | [vision.md](vision.md) |
+| intent ledger | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
+| implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
+| claim ledger | [history/documentation-migration/claim-preservation.md](history/documentation-migration/claim-preservation.md) |
+| proof ledger | [history/documentation-migration/proof-preservation.md](history/documentation-migration/proof-preservation.md) |
+| legacy runner spec | [../../specs/runner.md](../../specs/runner.md) |
+```
+
+## claim_2361d048c1d9443043e89eb5fb31a6d9
+
+Unit: `docs/platform/agent-coordination/subcomponents/README.md#agent-coordination-subcomponents`
+Class: structural-frame
+Unit digest: b199b15dd14e50071109017bfd12eabd06644a0ee0744ce44697379f654bb7da
+Shown text digest: 646e4a41735b7606d70498eac6930b2b0303a1a2f0b85ef1708e90f6b62eeaaa
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 'Agent Coordination Subcomponents' of subcomponents/README.md. Exact text in baseline, none in legacy; the file title of an existing candidate portal, so the proposed classification holds.
+
+````text
+# Agent Coordination Subcomponents
+
+```txt
+Document type: Subcomponent portal
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve the Agent Coordination child-component map during documentation migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from docs/architect/agent-coordination/documentation-standardization-plan.md §9.4
+Writer type: Human + agent coauthor
+Canonical for: Initial Agent Coordination subcomponent navigation during migration
+Use this when: Deciding where a child component belongs before creating local subcomponent directories
+Do not use this for: Exact contracts, schemas, or implementation proof
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+```
+
+Create `subcomponents/<name>/` directories only after the source inventory
+proves that a child needs local navigation. Until then, this map preserves the
+component vocabulary and points to owning sources.
+
+| Subcomponent | Owns | Primary sources | Target directory | Status |
+|---|---|---|---|---|
+| Foundation identity | Foundation/domain boundary and optional structure | [legacy vision](../../../architect/agent-coordination/vision.md), [system context](../../../architect/agent-coordination/architecture/system-context.md) | map-only initially | accepted / partial |
+| CoordinationSession | Session manifest, event schema, storage, recovery root | [contract](../../../architect/agent-coordination/contracts/coordination-session.md), [ADR-008](../../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md) | likely `subcomponents/coordination-session/` | implemented / partial |
+| FlowDefinition | Shared graph/operation/policy IR and typed profiles | [contract](../../../architect/agent-coordination/contracts/flow-definition.md), [ADR-009](../../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) | likely `subcomponents/flow-definition/` | implemented / partial |
+| Workflow Stage Operation | Stage operation normalization and compatibility | [contract](../../../architect/agent-coordination/contracts/workflow-stage-operation.md), [ADR-002](../../../architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md) | decide after inventory | accepted / partial |
+| Assignment / Run / RunResult | Semantic request, attempt, result, evidence boundary | [contract](../../../architect/agent-coordination/contracts/assignment-run-runresult.md), [ADR-003](../../../architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md) | likely `subcomponents/assignment-run-result/` | implemented / partial |
+| Dispatch Control | Execution infrastructure and operation dispatch boundary | [dispatch control plane](../../../architect/agent-coordination/architecture/dispatch-control-plane.md), [ADR-011](../../../architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) | likely `subcomponents/dispatch-control/` | implemented / partial |
+| Dispatch Operability | RunResult v2, RunObservation, inspect/reconcile, worker result claim attribution | implementation plan (`../../../../plans/260915-dispatch-operability-implementation/plan.md`; Added in candidate: historical path absent at the batch pin), [verification](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md) | likely under dispatch-control or assignment-run-result after inventory | track-complete / verify current checkout |
+| Executor Policy / Placement | Provider/model/executor selection and self-verifying production binder | seams plan (`../../../../plans/260915-executor-policy-dispatch-seams/plan.md`; Added in candidate: historical path absent at the batch pin) | likely `subcomponents/dispatch-control/placement-policy/` only if inventory proves enough local mass | implemented / partial / verify current checkout |
+| Provider Capacity Rotator | Same-provider account/capacity rotation and refusal facts | rotator plan (`../../../../plans/260916-account-rotator/plan.md`; Added in candidate: historical path absent at the batch pin) | likely proposal row under dispatch-control unless shipped code proves a component | proposed / verify |
+| Evidence And Results | Confidence, false-success, proof boundary | [evidence and results](../../../architect/agent-coordination/architecture/evidence-and-results.md), ADR-005/006/007 | likely `subcomponents/evidence-results/` | accepted / partial |
+| Code Implementation Track Policy | Proof policy for work-independent implementation tracks | policy plan (`../../../../plans/260915-code-implementation-track-policy/plan.md`; Added in candidate: historical path absent at the batch pin), [verification](../../../architect/agent-coordination/verification/code-implementation-track-policy/p01.md) | playbook/verification policy, not runtime subcomponent | done / operational |
+| Test Feedback Cost | Test/proof harness reliability and feedback-cost decisions | test-suite feedback plan (`../../../../plans/260915-0455-test-suite-feedback-cost/plan.md`; Added in candidate: historical path absent at the batch pin) | verification/history, not runtime subcomponent | partial; P05 deferred |
+| Work Integration | Work-attached coordination without second lifecycle authority | [work integration](../../../architect/agent-coordination/architecture/work-integration.md), ADR-001/010 | decide after inventory | accepted / partial |
+| Visibility / Herdr | Visibility-only boundary | [visibility and Herdr](../../../architect/agent-coordination/architecture/visibility-and-herdr.md), ADR-005 | decide after inventory | accepted / partial |
+| Runtime Recovery | RunHandle, continuation/recovery, fallback, health | runtime recovery architecture docs | likely `subcomponents/runtime-recovery/` only if status is clear | proposed / partial / unknown |
+| Launch Reconciliation | Herdr/cli spawn launch reconciliation and confinement authority handoff | runtime recovery phase designs and P02H verification | likely under runtime-recovery | substantially implemented with residual gap |
+| Cold-Resumable DAG Scheduler | Read-only DAG scheduling of protocol operation nodes | [proposal](../../../architect/agent-coordination/proposals/dag-request-scheduler.md), plan (`../../../../plans/260917-cold-resumable-coordination-dag/plan.md`; Added in candidate: historical path absent at the batch pin) | proposal row only until accepted/implemented | proposed / ready for implementation |
+| Group Thinking | Group-thinking protocols, advisory panels, cohort planning | group-thinking docs and verification | likely `subcomponents/group-thinking/` | implemented mechanism / quality proof mixed |
+| Host Boundary | Host invocation and provider process ownership consumed by coordination | [host-invocation-routing](../../host-invocation-routing/README.md) | link-only cross-area boundary | external authority |
+| Packaging Boundary | Install, activation, release manifest, setup/doctor consumed by runtime docs | [packaging-distribution](../../packaging-distribution/README.md) | link-only cross-area boundary | external authority |
+````
+
+## claim_080089dbbfe4408ec467814ef86f177b
+
+Unit: `docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: a2f7f558687369ffb768196c543e8a1c54a307204b674ce222c214b14fd2aa7b
+Shown text digest: a2f7f558687369ffb768196c543e8a1c54a307204b674ce222c214b14fd2aa7b
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence for the subcomponent portal (Document type, Status Draft, Provenance from standardization plan §9.4). In baseline, legacy-absent; this is portal bookkeeping header, truthfully existing-candidate, no new claim.
+
+````text
+```txt
+Document type: Subcomponent portal
+Audience: Human reviewer, architect, maintainer, documentation agent
+Purpose: Preserve the Agent Coordination child-component map during documentation migration
+Design status: Draft
+Implementation: Partial
+Provenance: Created from docs/architect/agent-coordination/documentation-standardization-plan.md §9.4
+Writer type: Human + agent coauthor
+Canonical for: Initial Agent Coordination subcomponent navigation during migration
+Use this when: Deciding where a child component belongs before creating local subcomponent directories
+Do not use this for: Exact contracts, schemas, or implementation proof
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
+```
+````
+
+## claim_3a9d27a1c16851e02c5952da2ae1db86
+
+Unit: `docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: 977594297c84c63480f6bc311a702f3e9f695082bfcc529b1b5399c29ec9aa53
+Shown text digest: 977594297c84c63480f6bc311a702f3e9f695082bfcc529b1b5399c29ec9aa53
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Paragraph saying subcomponent directories are created only after the source inventory proves local navigation need. Baseline text, no legacy copy; a migration-process rule for the portal itself, so unbound-existing is correct.
+
+```text
+Create `subcomponents/<name>/` directories only after the source inventory
+proves that a child needs local navigation. Until then, this map preserves the
+component vocabulary and points to owning sources.
+```
+
+## claim_c908b3b595d16211e94263026e278842
+
+Unit: `docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-3`
+Class: candidate-native-navigation
+Unit digest: 1bbf496db96ec2f6f7b8e2c7e096a52163ea253a91842d8f4df6a7495aee193b
+Shown text digest: 1bbf496db96ec2f6f7b8e2c7e096a52163ea253a91842d8f4df6a7495aee193b
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Subcomponent map table. Mostly baseline rows, but six rows now carry 'Added in candidate: historical path absent at the batch pin'; I confirmed all six plans/ paths are absent at 76585861f, so labels are truthful. Mixed unit, acceptable.
+
+```text
+| Subcomponent | Owns | Primary sources | Target directory | Status |
+|---|---|---|---|---|
+| Foundation identity | Foundation/domain boundary and optional structure | [legacy vision](../../../architect/agent-coordination/vision.md), [system context](../../../architect/agent-coordination/architecture/system-context.md) | map-only initially | accepted / partial |
+| CoordinationSession | Session manifest, event schema, storage, recovery root | [contract](../../../architect/agent-coordination/contracts/coordination-session.md), [ADR-008](../../../architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md) | likely `subcomponents/coordination-session/` | implemented / partial |
+| FlowDefinition | Shared graph/operation/policy IR and typed profiles | [contract](../../../architect/agent-coordination/contracts/flow-definition.md), [ADR-009](../../../architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) | likely `subcomponents/flow-definition/` | implemented / partial |
+| Workflow Stage Operation | Stage operation normalization and compatibility | [contract](../../../architect/agent-coordination/contracts/workflow-stage-operation.md), [ADR-002](../../../architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md) | decide after inventory | accepted / partial |
+| Assignment / Run / RunResult | Semantic request, attempt, result, evidence boundary | [contract](../../../architect/agent-coordination/contracts/assignment-run-runresult.md), [ADR-003](../../../architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md) | likely `subcomponents/assignment-run-result/` | implemented / partial |
+| Dispatch Control | Execution infrastructure and operation dispatch boundary | [dispatch control plane](../../../architect/agent-coordination/architecture/dispatch-control-plane.md), [ADR-011](../../../architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) | likely `subcomponents/dispatch-control/` | implemented / partial |
+| Dispatch Operability | RunResult v2, RunObservation, inspect/reconcile, worker result claim attribution | implementation plan (`../../../../plans/260915-dispatch-operability-implementation/plan.md`; Added in candidate: historical path absent at the batch pin), [verification](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md) | likely under dispatch-control or assignment-run-result after inventory | track-complete / verify current checkout |
+| Executor Policy / Placement | Provider/model/executor selection and self-verifying production binder | seams plan (`../../../../plans/260915-executor-policy-dispatch-seams/plan.md`; Added in candidate: historical path absent at the batch pin) | likely `subcomponents/dispatch-control/placement-policy/` only if inventory proves enough local mass | implemented / partial / verify current checkout |
+| Provider Capacity Rotator | Same-provider account/capacity rotation and refusal facts | rotator plan (`../../../../plans/260916-account-rotator/plan.md`; Added in candidate: historical path absent at the batch pin) | likely proposal row under dispatch-control unless shipped code proves a component | proposed / verify |
+| Evidence And Results | Confidence, false-success, proof boundary | [evidence and results](../../../architect/agent-coordination/architecture/evidence-and-results.md), ADR-005/006/007 | likely `subcomponents/evidence-results/` | accepted / partial |
+| Code Implementation Track Policy | Proof policy for work-independent implementation tracks | policy plan (`../../../../plans/260915-code-implementation-track-policy/plan.md`; Added in candidate: historical path absent at the batch pin), [verification](../../../architect/agent-coordination/verification/code-implementation-track-policy/p01.md) | playbook/verification policy, not runtime subcomponent | done / operational |
+| Test Feedback Cost | Test/proof harness reliability and feedback-cost decisions | test-suite feedback plan (`../../../../plans/260915-0455-test-suite-feedback-cost/plan.md`; Added in candidate: historical path absent at the batch pin) | verification/history, not runtime subcomponent | partial; P05 deferred |
+| Work Integration | Work-attached coordination without second lifecycle authority | [work integration](../../../architect/agent-coordination/architecture/work-integration.md), ADR-001/010 | decide after inventory | accepted / partial |
+| Visibility / Herdr | Visibility-only boundary | [visibility and Herdr](../../../architect/agent-coordination/architecture/visibility-and-herdr.md), ADR-005 | decide after inventory | accepted / partial |
+| Runtime Recovery | RunHandle, continuation/recovery, fallback, health | runtime recovery architecture docs | likely `subcomponents/runtime-recovery/` only if status is clear | proposed / partial / unknown |
+| Launch Reconciliation | Herdr/cli spawn launch reconciliation and confinement authority handoff | runtime recovery phase designs and P02H verification | likely under runtime-recovery | substantially implemented with residual gap |
+| Cold-Resumable DAG Scheduler | Read-only DAG scheduling of protocol operation nodes | [proposal](../../../architect/agent-coordination/proposals/dag-request-scheduler.md), plan (`../../../../plans/260917-cold-resumable-coordination-dag/plan.md`; Added in candidate: historical path absent at the batch pin) | proposal row only until accepted/implemented | proposed / ready for implementation |
+| Group Thinking | Group-thinking protocols, advisory panels, cohort planning | group-thinking docs and verification | likely `subcomponents/group-thinking/` | implemented mechanism / quality proof mixed |
+| Host Boundary | Host invocation and provider process ownership consumed by coordination | [host-invocation-routing](../../host-invocation-routing/README.md) | link-only cross-area boundary | external authority |
+| Packaging Boundary | Install, activation, release manifest, setup/doctor consumed by runtime docs | [packaging-distribution](../../packaging-distribution/README.md) | link-only cross-area boundary | external authority |
+```
+
+## claim_9515d6dbb44c419f14cb85bf89a6116a
+
+Unit: `docs/platform/agent-coordination/subcomponents/README.md#related-files`
+Class: structural-frame
+Unit digest: 7adb704bebcafd2b3bec485a09dc44cf08ba52388f2e26ea01b9b15cb7b97f99
+Shown text digest: e7bc09623432229d4d95ca578a90a42c583a33b57ea3784db3bfc9666902dadd
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Related Files' heading in the subcomponents portal. Baseline-present, no legacy hit, unchanged in working tree; a plain navigation heading, so existing candidate unit is the right label.
+
+```text
+## Related Files
+
+| Relationship | File |
+|---|---|
+| area portal | [../README.md](../README.md) |
+| migration source inventory | [../history/documentation-migration/source-inventory.md](../history/documentation-migration/source-inventory.md) |
+| migration plan | [../../../architect/agent-coordination/documentation-standardization-plan.md](../../../architect/agent-coordination/documentation-standardization-plan.md) |
+```
+
+## claim_7d68bae45adf75d0b2d45c9bddef2674
+
+Unit: `docs/platform/agent-coordination/subcomponents/README.md#unheaded-block-4`
+Class: bookkeeping
+Unit digest: c2f39d5a1408826abe4019274e4ded7766b5bf8e361dd33513708f9fa1087dab
+Shown text digest: c2f39d5a1408826abe4019274e4ded7766b5bf8e361dd33513708f9fa1087dab
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Relationship table to area portal, migration source inventory and standardization plan. Verbatim baseline, none in legacy by exact text; link-only navigation and the plan exists at pin, so no invented claim.
+
+```text
+| Relationship | File |
+|---|---|
+| area portal | [../README.md](../README.md) |
+| migration source inventory | [../history/documentation-migration/source-inventory.md](../history/documentation-migration/source-inventory.md) |
+| migration plan | [../../../architect/agent-coordination/documentation-standardization-plan.md](../../../architect/agent-coordination/documentation-standardization-plan.md) |
+```
+
+## claim_b27d445f9ef1a6c7e7d87ae491066f93
+
+Unit: `docs/platform/agent-coordination/verification/implementation-alignment.md#agent-coordination-implementation-alignment`
+Class: structural-frame
+Unit digest: b6dd4b2f575748c0f5378ad1cd71e7a28ee7308b71d19d2ab1466597d36ad537
+Shown text digest: 38f1a3469a429f9331e33e7583efe01f49b6b2c956c35b402a8d658f829e4ce8
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; H1 'Agent Coordination Implementation Alignment' of verification/implementation-alignment.md. Same in baseline, no legacy source text, working copy unchanged; document title of an existing candidate verification file, classification accurate.
+
+````text
+# Agent Coordination Implementation Alignment
+
+```txt
+Document type: Verification
+Audience: Human reviewer, architect, maintainer, implementation agent
+Purpose: Map Agent Coordination design claims to implementation status, evidence, and migration gaps
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 claim/proof preservation ledgers and current-checkout test evidence
+Writer type: Human + agent coauthor
+Canonical for: Agent Coordination implementation alignment during migration
+Use this when: Deciding whether a target spec/architecture claim may say implemented
+Do not use this for: Replacing detailed proof artifacts
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/spec.md
+- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+- docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md
+```
+
+This table is deliberately conservative. `implemented` means current checkout
+code/test/proof supports the claim. `partial` and `track-complete / verify`
+must not be silently upgraded during doc promotion.
+
+| Design claim | Implementation status | Evidence | Gap / next action |
+|---|---|---|---|
+| Agent Coordination is a foundation layer, not coding-only workflow glue. | partial | [vision](../vision.md), [system context](../../../architect/agent-coordination/architecture/system-context.md), Step 08 proof indexes. | Promote accepted architecture and keep cross-domain mission fit explicit. |
+| Work is optional integration, not system identity. | implemented / partial | `src/runner/coordination/**`, `test/runner/coordination-*.test.mjs`, [work integration](../../../architect/agent-coordination/architecture/work-integration.md). | Work-attached mutating coordination remains gated by domain-owned isolation proof. |
+| A predeclared Workflow or CoordinationProtocol is optional. | implemented / partial | `src/verbs/coordination/schema.mjs`, `src/runner/coordination/session-engine.mjs`, Step 08 standalone coordination proofs. | Richer agent-authored dynamic graphs remain deferred-preserved. |
+| Runtime execution contracts are mandatory. | implemented / partial | `src/runner/dispatch/execution-contract.mjs`, assignment/runresult tests, ADR-006. | Phase 4 should preserve exact contract wording. |
+| Work owns delivery lifecycle when present. | implemented / partial | ADR-001, ADR-010, Work integration architecture, no Work-transition exports in coordination code. | Keep Work lifecycle authority out of coordination code until explicitly proven. |
+| CoordinationSession is the V1 executable/recovery root. | implemented / partial | `src/runner/coordination/{schema,store,replay,session-engine}.mjs`, coordination tests, ADR-008. | Promote CoordinationSession contract and preserve no-`missionId` rule. |
+| FlowDefinition is shared graph/operation/policy IR with typed profiles. | implemented / partial | `src/runner/definitions/**`, coordination protocol tests, ADR-009. | Promote FlowDefinition contract and typed profile distinction. |
+| Assignment, Run, and RunResult are separate. | implemented | `test/runner/assignment-runresult.test.mjs`, legacy contract, ADR-003. | Promote contract with minimal semantic rewrite. |
+| Dispatch governs execution infrastructure. | implemented / partial | `src/runner/dispatch/**`, `src/verbs/dispatch/**`, dispatch control architecture, ADR-011. | Preserve semantic choice versus execution infrastructure boundary. |
+| Evidence and RunResult prevent false success. | implemented / partial | Dispatch operability I03 proof, assignment/runresult tests. | Preserve residuals around aggregation/product-quality proof. |
+| Herdr is visibility, not evidence/truth. | partial | ADR-005, [visibility live proof](../../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md). | Writable takeover remains parked/deferred. |
+| Domain-owned Work isolation remains outside coordination code until proven. | deferred-preserved / partial | ADR-010, coordination static tests, Work integration architecture. | Requires coding-domain mutating live proof before widening. |
+| Group-thinking and heterogeneous cohorts preserve dissent/evidence. | implemented mechanism / quality proof mixed | Step 09 proof indexes and group-thinking trigger surface. | Keep mechanism status distinct from quality/advisory confidence. |
+| Runtime recovery guarantees are distinct: control fencing, result fencing, effect protection. | partial / proposed split | Runtime recovery P01-P05S proofs and runtime-recovery design. | S5 transfer/import/budget/apply, S6, S7 remain not implemented. |
+| Herdr-spawn bwrap launch reconciliation uses P02H reopen launcher-script mechanism. | implemented with residual gap | [P02H reopen](../../../architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md). | Do not promote falsified `herdr agent start ... -- <prepared-command>` pseudocode. |
+| `agent-result-claim.v2` is a worker claim contract, not normalized proof. | implemented | [I01](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md), `test/runner/assignment-runresult.test.mjs`. | Preserve untrusted-input wording in contract promotion. |
+| Effective execution contract is persisted pre-launch and inspectable where implemented. | implemented | [I02](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I02.md), dispatch execution-contract tests. | Preserve inspectability notes. |
+| `RunResult` v2 is immutable terminal Run truth; `RunObservation` is mutable projection. | implemented | [I03](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I03.md), assignment/runresult tests. | Keep observation from settling Runs. |
+| `dispatch.runtime.inspect` is read-only. | implemented | [I04](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I04.md), `src/verbs/dispatch/inspect.mjs`. | Preserve deferred label-consistency residual. |
+| `dispatch.runtime.reconcile` is limited to guard/projection repair and is not recovery. | implemented / partial | [I05](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I05.md), `test/runner/dispatch-reconcile-operation.test.mjs`. | Preserve forbidden-action list. |
+| Executor identity is not execution policy. | implemented / partial / verify current checkout | Executor-policy seams plan, setup warnings, placement-policy tests. | Phase 3/4 should avoid promoting pending redirect retirement. |
+| `PlacementPolicy` owns provider/model/executor ranking/binding only where self-verifying proof shipped. | implemented / partial / verify current checkout | `src/runner/dispatch/placement-policy.mjs`, placement-policy matrix tests, executor-policy seams plan. | Phase 08 redirect retirement remains pending/unknown. |
+| Provider Capacity Rotator is same-provider account/capacity rotation with global/operator config. | partial / verify current checkout | `src/runner/provider-capacity.mjs`, provider-capacity tests where present, rotator plan. | Do not claim cross-provider fallback or project-local credential inventory. |
+| Work-independent code implementation tracks use targeted proof per cell and full proof at gates. | done / operational | Code implementation track policy proofs p01-p05 and track closeout. | Put in playbook/verification policy, not runtime spec. |
+| Test feedback/cost work improved proof trust; P05 related-test selector remains deferred. | partial; P05 deferred | Test feedback cost decision lock and Phase 08 handoff. | Do not describe related-test selector as shipped. |
+| Cold-resumable coordination DAG scheduling is read-only proposal/frontier. | proposed | DAG proposal and 260917 plan. | Needs explicit acceptance and implementation proof. |
+| Host invocation routing owns host command/provider process routing. | external authority | [host-invocation-routing](../../host-invocation-routing/README.md). | Link-only from this area. |
+| Packaging-distribution owns install/activation/setup/doctor/runtime identity. | external authority | [packaging-distribution](../../packaging-distribution/README.md). | Link-only from this area. |
+````
+
+## claim_9cb3ff4b30f2df802bf02a5b064be41a
+
+Unit: `docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-1`
+Class: bookkeeping
+Unit digest: af85c8be98a22908a855a0656f011cf997dadcc253abdf85f402c11d33657c4d
+Shown text digest: af85c8be98a22908a855a0656f011cf997dadcc253abdf85f402c11d33657c4d
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Metadata fence (Verification type, Draft, Partial, last reviewed 2026-09-18, related candidate docs). Baseline-present, legacy-absent; document bookkeeping header of the candidate itself with no substantive claim, so unbound-existing is true.
+
+````text
+```txt
+Document type: Verification
+Audience: Human reviewer, architect, maintainer, implementation agent
+Purpose: Map Agent Coordination design claims to implementation status, evidence, and migration gaps
+Design status: Draft
+Implementation: Partial
+Provenance: Created from Phase 0 claim/proof preservation ledgers and current-checkout test evidence
+Writer type: Human + agent coauthor
+Canonical for: Agent Coordination implementation alignment during migration
+Use this when: Deciding whether a target spec/architecture claim may say implemented
+Do not use this for: Replacing detailed proof artifacts
+Last reviewed: 2026-09-18
+Related:
+- docs/platform/agent-coordination/spec.md
+- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+- docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md
+```
+````
+
+## claim_0addbf1edb5e3a5c36c84d1febb9e2d6
+
+Unit: `docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-2`
+Class: structural-frame
+Unit digest: 1f2df29fba3d3c07c0645d1bb81d0c2302ae41e051c8ca1e1800899ef368a880
+Shown text digest: 1f2df29fba3d3c07c0645d1bb81d0c2302ae41e051c8ca1e1800899ef368a880
+Rationale: Candidate-native contextual frame already inspected as existing material, or an explicitly labelled added wrapper; independent classification remains required.
+Historical verdict: ok; Caveat paragraph that implemented means current checkout code, test and proof support, and partial must not be silently upgraded. Baseline text, absent in legacy; a conservative reading rule, adds no new status claim.
+
+```text
+This table is deliberately conservative. `implemented` means current checkout
+code/test/proof supports the claim. `partial` and `track-complete / verify`
+must not be silently upgraded during doc promotion.
+```
+
+## claim_d1a817c37e5972f83310d2c7ca022f3d
+
+Unit: `docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-3`
+Class: candidate-native-navigation
+Unit digest: 68a20f3a858320cd01857afa7ecdec632ac2f11ec699122e03668688ed5f21e0
+Shown text digest: 68a20f3a858320cd01857afa7ecdec632ac2f11ec699122e03668688ed5f21e0
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Large design-claim versus implementation-status table with evidence links and gap actions. Exact text in baseline and absent from legacy (truncated in sheet); pre-existing candidate alignment map, statuses kept partial, so label holds.
+
+```text
+| Design claim | Implementation status | Evidence | Gap / next action |
+|---|---|---|---|
+| Agent Coordination is a foundation layer, not coding-only workflow glue. | partial | [vision](../vision.md), [system context](../../../architect/agent-coordination/architecture/system-context.md), Step 08 proof indexes. | Promote accepted architecture and keep cross-domain mission fit explicit. |
+| Work is optional integration, not system identity. | implemented / partial | `src/runner/coordination/**`, `test/runner/coordination-*.test.mjs`, [work integration](../../../architect/agent-coordination/architecture/work-integration.md). | Work-attached mutating coordination remains gated by domain-owned isolation proof. |
+| A predeclared Workflow or CoordinationProtocol is optional. | implemented / partial | `src/verbs/coordination/schema.mjs`, `src/runner/coordination/session-engine.mjs`, Step 08 standalone coordination proofs. | Richer agent-authored dynamic graphs remain deferred-preserved. |
+| Runtime execution contracts are mandatory. | implemented / partial | `src/runner/dispatch/execution-contract.mjs`, assignment/runresult tests, ADR-006. | Phase 4 should preserve exact contract wording. |
+| Work owns delivery lifecycle when present. | implemented / partial | ADR-001, ADR-010, Work integration architecture, no Work-transition exports in coordination code. | Keep Work lifecycle authority out of coordination code until explicitly proven. |
+| CoordinationSession is the V1 executable/recovery root. | implemented / partial | `src/runner/coordination/{schema,store,replay,session-engine}.mjs`, coordination tests, ADR-008. | Promote CoordinationSession contract and preserve no-`missionId` rule. |
+| FlowDefinition is shared graph/operation/policy IR with typed profiles. | implemented / partial | `src/runner/definitions/**`, coordination protocol tests, ADR-009. | Promote FlowDefinition contract and typed profile distinction. |
+| Assignment, Run, and RunResult are separate. | implemented | `test/runner/assignment-runresult.test.mjs`, legacy contract, ADR-003. | Promote contract with minimal semantic rewrite. |
+| Dispatch governs execution infrastructure. | implemented / partial | `src/runner/dispatch/**`, `src/verbs/dispatch/**`, dispatch control architecture, ADR-011. | Preserve semantic choice versus execution infrastructure boundary. |
+| Evidence and RunResult prevent false success. | implemented / partial | Dispatch operability I03 proof, assignment/runresult tests. | Preserve residuals around aggregation/product-quality proof. |
+| Herdr is visibility, not evidence/truth. | partial | ADR-005, [visibility live proof](../../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md). | Writable takeover remains parked/deferred. |
+| Domain-owned Work isolation remains outside coordination code until proven. | deferred-preserved / partial | ADR-010, coordination static tests, Work integration architecture. | Requires coding-domain mutating live proof before widening. |
+| Group-thinking and heterogeneous cohorts preserve dissent/evidence. | implemented mechanism / quality proof mixed | Step 09 proof indexes and group-thinking trigger surface. | Keep mechanism status distinct from quality/advisory confidence. |
+| Runtime recovery guarantees are distinct: control fencing, result fencing, effect protection. | partial / proposed split | Runtime recovery P01-P05S proofs and runtime-recovery design. | S5 transfer/import/budget/apply, S6, S7 remain not implemented. |
+| Herdr-spawn bwrap launch reconciliation uses P02H reopen launcher-script mechanism. | implemented with residual gap | [P02H reopen](../../../architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md). | Do not promote falsified `herdr agent start ... -- <prepared-command>` pseudocode. |
+| `agent-result-claim.v2` is a worker claim contract, not normalized proof. | implemented | [I01](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I01.md), `test/runner/assignment-runresult.test.mjs`. | Preserve untrusted-input wording in contract promotion. |
+| Effective execution contract is persisted pre-launch and inspectable where implemented. | implemented | [I02](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I02.md), dispatch execution-contract tests. | Preserve inspectability notes. |
+| `RunResult` v2 is immutable terminal Run truth; `RunObservation` is mutable projection. | implemented | [I03](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I03.md), assignment/runresult tests. | Keep observation from settling Runs. |
+| `dispatch.runtime.inspect` is read-only. | implemented | [I04](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I04.md), `src/verbs/dispatch/inspect.mjs`. | Preserve deferred label-consistency residual. |
+| `dispatch.runtime.reconcile` is limited to guard/projection repair and is not recovery. | implemented / partial | [I05](../../../architect/agent-coordination/verification/dispatch-operability-implementation/I05.md), `test/runner/dispatch-reconcile-operation.test.mjs`. | Preserve forbidden-action list. |
+| Executor identity is not execution policy. | implemented / partial / verify current checkout | Executor-policy seams plan, setup warnings, placement-policy tests. | Phase 3/4 should avoid promoting pending redirect retirement. |
+| `PlacementPolicy` owns provider/model/executor ranking/binding only where self-verifying proof shipped. | implemented / partial / verify current checkout | `src/runner/dispatch/placement-policy.mjs`, placement-policy matrix tests, executor-policy seams plan. | Phase 08 redirect retirement remains pending/unknown. |
+| Provider Capacity Rotator is same-provider account/capacity rotation with global/operator config. | partial / verify current checkout | `src/runner/provider-capacity.mjs`, provider-capacity tests where present, rotator plan. | Do not claim cross-provider fallback or project-local credential inventory. |
+| Work-independent code implementation tracks use targeted proof per cell and full proof at gates. | done / operational | Code implementation track policy proofs p01-p05 and track closeout. | Put in playbook/verification policy, not runtime spec. |
+| Test feedback/cost work improved proof trust; P05 related-test selector remains deferred. | partial; P05 deferred | Test feedback cost decision lock and Phase 08 handoff. | Do not describe related-test selector as shipped. |
+| Cold-resumable coordination DAG scheduling is read-only proposal/frontier. | proposed | DAG proposal and 260917 plan. | Needs explicit acceptance and implementation proof. |
+| Host invocation routing owns host command/provider process routing. | external authority | [host-invocation-routing](../../host-invocation-routing/README.md). | Link-only from this area. |
+| Packaging-distribution owns install/activation/setup/doctor/runtime identity. | external authority | [packaging-distribution](../../packaging-distribution/README.md). | Link-only from this area. |
+```
+
+## claim_e5a7c73681c7f1b91b71f9ce48ee4668
+
+Unit: `docs/platform/agent-coordination/verification/implementation-alignment.md#boundary-note`
+Class: structural-frame
+Unit digest: d639502fbc8e6a512ef8cc10ef61afa22498a0027d120941a817ba918f25b283
+Shown text digest: 5dae59f8437a0d85913b2f98835e874ee4a4b81532f9465ea557ba1024bfbc68
+Rationale: Structural heading organizing candidate-native material; no legacy-source carry is claimed.
+Historical verdict: ok; 'Boundary Note' heading in implementation-alignment.md. In baseline, no legacy match, unchanged; structural heading carrying the component-boundary statement the project documentation rule requires.
+
+```text
+## Boundary Note
+
+No component-boundary change in this Phase 2 migration. The migration adds
+state-summary and evidence-linking docs only; it does not change runtime
+authority or component ownership.
+```
+
+## claim_f7980e35908f6165218790a22ffdc0a4
+
+Unit: `docs/platform/agent-coordination/verification/implementation-alignment.md#unheaded-block-4`
+Class: bookkeeping
+Unit digest: 5bd77edcc22dcad79f494f95db2eda9fbc78e5b0413354b218be6a1a52b9b136
+Shown text digest: 5bd77edcc22dcad79f494f95db2eda9fbc78e5b0413354b218be6a1a52b9b136
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Statement of no component-boundary change in this Phase 2 migration, only state-summary and evidence-linking docs. Baseline-present, not legacy; satisfies the explicit no-boundary-change note rule, though 'Phase 2' wording is dated bookkeeping.
+
+```text
+No component-boundary change in this Phase 2 migration. The migration adds
+state-summary and evidence-linking docs only; it does not change runtime
+authority or component ownership.
+```
+
+## claim_0d33c7237aa3cccd8a5bd654bb567d86
+
+Unit: `docs/platform/agent-coordination/verification/README.md#unheaded-block-2`
+Class: bookkeeping
+Unit digest: 561a5279f4eef3be6b1ce80453988fc6cacdffcc8490433062dc2432c11c6991
+Shown text digest: 561a5279f4eef3be6b1ce80453988fc6cacdffcc8490433062dc2432c11c6991
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+
+```text
+Added in candidate: The following migration navigation paragraph and evidence-root table predate this batch (`fcfe78cb8`); they are candidate navigation, not newly verified conformance. During migration, target docs link to retained legacy proof roots. The mirrored
+target directories remain navigable copies, but do not replace the dated
+evidence artifacts or their recorded environments.
+```
+
+## claim_7fcf75a651ef6cf082e72a9dd87ddea9
+
+Unit: `docs/platform/agent-coordination/verification/README.md#unheaded-block-4`
+Class: candidate-native-navigation
+Unit digest: 2a89e2cc63361c7595e3f15cdef22042073f2321ea7dd595d362ae4f8d120f9b
+Shown text digest: 2a89e2cc63361c7595e3f15cdef22042073f2321ea7dd595d362ae4f8d120f9b
+Rationale: Candidate-native area navigation and reader routing, not an unnamed legacy claim.
+Historical verdict: ok; Evidence-set table mapping topics (standalone coordination, recovery, dispatch operability, Herdr, Team Dispatch) to legacy proof-root links. Baseline-present, legacy-absent by text; link-only index with no copied proof content.
+
+```text
+| Evidence set | Supports | Current proof root |
+|---|---|---|
+| Foundation and standalone coordination | CoordinationSession, FlowDefinition, and Work-isolation boundaries | [Step 08](../../../architect/agent-coordination/verification/step-08-standalone-coordination/index.md) |
+| Runtime recovery | admission fencing, launch reconciliation, fallback, and recovery status split | [Runtime recovery](../../../architect/agent-coordination/verification/runtime-recovery/) |
+| Dispatch operability | worker claim, execution-contract persistence, RunResult v2, inspect, and reconcile boundaries | [Dispatch operability](../../../architect/agent-coordination/verification/dispatch-operability-implementation/) |
+| Executor policy and placement | executor-policy baseline and placement-policy limits | [Executor-policy seams](../../../architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md) |
+| Code implementation track policy | targeted proof per cell and full proof at declared gates | [Track policy](../../../architect/agent-coordination/verification/code-implementation-track-policy/) |
+| Group thinking | protocol, cohort, and advisory-panel evidence, including known quality gaps | [Step 09 evidence](../../../architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md) |
+| Visibility / Herdr | visibility-only boundary | [Live proof](../../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md) |
+| Team Dispatch V1 | original cell-level implementation, review, red-team, and live proof | [Team Dispatch V1](../../../architect/agent-coordination/verification/team-dispatch-v1/index.md) |
+```
+
+## claim_75839e757022c312b00324eaafc65f30
+
+Unit: `docs/platform/agent-coordination/verification/README.md#unheaded-block-5`
+Class: bookkeeping
+Unit digest: ea9ff5d27d04ea0fd52b2ad22e93d59d0e5f3bfad5a8a4e5f952a88a827b2427
+Shown text digest: ea9ff5d27d04ea0fd52b2ad22e93d59d0e5f3bfad5a8a4e5f952a88a827b2427
+Rationale: Candidate migration, metadata or operational bookkeeping; no legacy authority is invented.
+Historical verdict: ok; Sentence pointing to Proof Preservation for phase-by-phase move policy and known gaps. Present in baseline, absent in legacy; a navigation pointer into the candidate's own migration ledger with no new claim.
+
+```text
+The phase-by-phase move policy and known gaps are in
+[Proof Preservation](../history/documentation-migration/proof-preservation.md).
+```
+

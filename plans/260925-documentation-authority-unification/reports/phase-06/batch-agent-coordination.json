@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "status": "rework-blocked-on-owner-contract",
+  "status": "rework-ready-for-independent-review",
   "authorSession": "codex-session:1@2026-10-08",
   "reviewRelease": "review-packet-2.json",
   "generatedRoleCorrection": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
@@ -14,8 +14,8 @@
     "reviewedManualRows": 1329,
     "pendingManualRows": 106,
     "unitExactRows": 2721,
-    "blockedSamePathBindings": 52,
-    "candidateReverseOpen": 182,
+    "blockedSamePathBindings": 0,
+    "candidateReverseOpen": 130,
     "batchClosed": false
   },
   "sourceStats": {
