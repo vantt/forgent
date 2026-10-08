@@ -77,7 +77,7 @@ function receiptFixture(t, options = {}) {
   const author = 'codex-session:author@2026-10-08';
   const reviewer = options.reviewer || 'reviewer:claude-session:reviewer@2026-10-08';
   const receiptPath = 'plans/fixture/ledger/candidate-classifications-alpha.json';
-  const reportPath = 'plans/fixture/reports/phase-06/review-2-classifications.md';
+  const reportPath = options.reportPath || 'plans/fixture/reports/phase-06/review-2-classifications.md';
   write(owner, '# Alpha\n\n## Native\n\nCandidate navigation frame.\n');
   git('add', '--', owner); git('commit', '-qm', 'candidate');
   const nativeUnit = buildConservationUnitLookup(root, git('rev-parse', 'HEAD'))(owner).find(unit => unit.anchor === (options.heading ? 'native' : 'unheaded-block-1'));
@@ -169,3 +169,8 @@ for (const [name, options] of [
     assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
   });
 }
+
+test('an ordinary classification receipt cannot replace checkpoint sensitivity review', (t) => {
+  const fixture = receiptFixture(t, { reportPath: 'plans/fixture/reports/phase-06/review-3-checkpoint.md' });
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+});
