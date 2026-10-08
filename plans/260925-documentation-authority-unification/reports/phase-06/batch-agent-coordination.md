@@ -1,7 +1,7 @@
 # Agent Coordination authoring evidence
 
-Status: authoring, blocked before full ready-for-review.
-Author session: undefined
+Status: ready-for-review (P4 authoring complete); batch closure remains UNPROVEN.
+Author session: codex-session:1@2026-10-08
 Decision data: 576f9efea72de92d4191eb295afd9b2349bbb99a
 Candidate documents: 0a41d793e60631aa9073c73a941f641548862b6c
 
@@ -50,3 +50,13 @@ The unchanged scripts suite initially exposed an obsolete metadata/wording test 
 The generated corpus-member diagnostic finds three file-class-not-allowed-for-disposition findings using the frozen validator. Active rules are still pending and active D remains green. Correcting their reviewed expansion requires an owner-authorized tooling semantic correction or replacing the corpus method; A5/A8 currently authorize neither. Stop under the frozen-change/unauthorized-tool-change contract. Full ready-for-review is not asserted.
 
 Recommended owner decision: preserve regenerate-from-source for generated file items during T3 expansion while keeping whole-corpus claim review, independent committed-report requirements, file-class validation and N1. Tests first if authorized. After a committed decision, correct/prove only the authorized scope, generate ordinary packs, finish review-request-2.md and stop for independent content review. Strict E, actual accepted corpus expansion, reverse closure, rehearsal, fresh readers and batch completion are UNPROVEN. No next batch is started.
+
+## Review release after the authorized correction
+
+A9 is resolved by d8a250ced. The preceding stop section is historical, not the current next action. Read review-request-2.md and review-packet-2.json for the released review scope, exact pin/pack paths and observed checks. Three generated-file role pins are added; 70 area file decisions plus three generated file decisions require review. Four ordinary full-text packs cover 500/500/430/4 pending rows, 1,434 total; the 15,600-row script-proof population is provided without an author-chosen sample. The separate retired-source-inventory-review.md exposes both complete units and binds the shown digests.
+
+Actual corpus fixture proof: 45,759 reviewed fixture rows, all three projections preserved, wrong generated disposition still rejected, both D comparisons green; no real corpus/manual row approved. Scripts 872/872; full 393-file suite 7,289 pass / zero fail, eight skip and 65 todo UNPROVEN. Actual baseline D output byte-identical before/after under both prior registries. Current real D has zero fatal findings. Scoped non-strict open data is exactly 1,434 pending judgments, 334 identical-unit exceptions and 184 unnamed candidate units. These are review inputs, not waived closure conditions.
+
+The retirement CLI remains red (15 blocked / four pass / one review), with zero invariant failures; its unresolved-conflict measure is three duplicate and 13 semantic groups outside the authored batch. Receipts still need independent semantic acceptance. Owner holds: zero unknown-blocking source rows, zero corpus-policy holds. Archive proposals remain 65 notices; no obsolete delete. Promoted portal edits are unchanged and stay in the reviewer/owner visibility list.
+
+Next action: owner starts the independent content review. Author stops now, does not flip rows and does not start the next batch. After committed review reports, apply only their verdicts, then perform strict E, reverse closure, reduced promotion rehearsal and fresh-reader scenarios. None of those later proofs or Phase 6 completion is asserted.

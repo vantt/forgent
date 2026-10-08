@@ -1,0 +1,336 @@
+{
+  "version": 1,
+  "status": "ready-for-review",
+  "authorSession": "codex-session:1@2026-10-08",
+  "sourcePin": "76585861f718c7ef0dd6150d9b92a7c7baaa3ec4",
+  "candidatePin": "0a41d793e60631aa9073c73a941f641548862b6c",
+  "decisionPins": [
+    "576f9efea72de92d4191eb295afd9b2349bbb99a",
+    "d8a250ced380b855d50ce34fa749b50c64c7e45b"
+  ],
+  "ownerDecision": "aa688258b08f3b64ede2fd7003bd2544142419a0",
+  "packCommit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+  "packs": [
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "markdown": "/tmp/phase06/review-agent-coordination-judgment-01.md",
+      "sidecar": "/tmp/phase06/review-agent-coordination-judgment-01.md.json",
+      "keys": [
+        "version",
+        "commit",
+        "shard",
+        "authorSession",
+        "authorshipRequired",
+        "rows",
+        "sensitivityControls",
+        "unmatchedCandidateUnits"
+      ],
+      "rows": 500,
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+      "markdownSha256": "5a739f75516db04c24c4ebc1201c1d4ffff5502845411a616c401cb10224a195"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "markdown": "/tmp/phase06/review-agent-coordination-judgment-02.md",
+      "sidecar": "/tmp/phase06/review-agent-coordination-judgment-02.md.json",
+      "keys": [
+        "version",
+        "commit",
+        "shard",
+        "authorSession",
+        "authorshipRequired",
+        "rows",
+        "sensitivityControls",
+        "unmatchedCandidateUnits"
+      ],
+      "rows": 500,
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+      "markdownSha256": "593fe2f8755e91fe240732a6d5027ef5d1ce9a2c86306d679703f5c1bb7f64a0"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "markdown": "/tmp/phase06/review-agent-coordination-judgment-03.md",
+      "sidecar": "/tmp/phase06/review-agent-coordination-judgment-03.md.json",
+      "keys": [
+        "version",
+        "commit",
+        "shard",
+        "authorSession",
+        "authorshipRequired",
+        "rows",
+        "sensitivityControls",
+        "unmatchedCandidateUnits"
+      ],
+      "rows": 430,
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+      "markdownSha256": "51d38171b4cce709138ce08e85e161271791ec02585a5b7a05b06fdea8975632"
+    },
+    {
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+      "markdown": "/tmp/phase06/review-agent-coordination-log-duplicates.md",
+      "sidecar": "/tmp/phase06/review-agent-coordination-log-duplicates.md.json",
+      "keys": [
+        "version",
+        "commit",
+        "shard",
+        "authorSession",
+        "authorshipRequired",
+        "rows",
+        "sensitivityControls",
+        "unmatchedCandidateUnits"
+      ],
+      "rows": 4,
+      "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+      "markdownSha256": "e46517053db8f5f94f70328ee41e501de2631a9cb77f191e9a28f82efbd94d3a"
+    }
+  ],
+  "manualJudgments": 1434,
+  "retiredUnit": {
+    "claimId": "claim_ffa208224c13eeca2cdc3a874735b802",
+    "pack": "plans/260925-documentation-authority-unification/reports/phase-06/retired-source-inventory-review.md",
+    "sourceUnitDigest": "22b24a25ec6e4c595e7c606a7b73285d58b6b54e028ed4070ea473010192b5ad",
+    "targetUnitDigest": "bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3",
+    "status": "pending"
+  },
+  "scriptPopulation": {
+    "path": "/tmp/phase06/script-proof-population-agent-coordination.json",
+    "commit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+    "rows": 15600,
+    "Mirror": 12878,
+    "Unit-exact": 2722,
+    "sha256": "fec451b651e1cc342af4709876a4eb8f734992ae54337b5e69069dc328f69af6",
+    "authorSelectedSample": []
+  },
+  "corpusRules": [
+    {
+      "corpus": "history-evidence",
+      "shard": "s2-corpus-history-evidence",
+      "sources": 1705,
+      "ruleDigest": "efa84a36a83aad82772a6d64b71bcc5e7d24d6782aee97e9600a492be1c6088a"
+    },
+    {
+      "corpus": "user-knowledge",
+      "shard": "s2-corpus-user-knowledge",
+      "sources": 515,
+      "ruleDigest": "433e848c90ee0cf9805ceb2d031c714bf64a819f49e7352a0100aa7e9ac35cdd"
+    },
+    {
+      "corpus": "consumer-project",
+      "shard": "s2-corpus-consumer-project",
+      "sources": 40,
+      "ruleDigest": "47661c744c759ea1ffa1e6d7bee60fffb04b66d89c530c6c5259884990082d59"
+    }
+  ],
+  "fileDecisions": {
+    "area": 70,
+    "generatedProjections": 3
+  },
+  "checks": {
+    "A": {
+      "unexpected": [],
+      "exactExceptions": [
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+        }
+      ]
+    },
+    "B": [],
+    "C": [],
+    "D": [
+      {
+        "prior": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "command": [
+          "node",
+          "scripts/check-doc-inventory-gates.mjs",
+          "--inventory",
+          "/tmp/phase06/review-doc-inventory.json",
+          "--identity-registry",
+          "/tmp/phase06/review-identity-registry.json",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/pilot/decisions",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/ledger/decisions",
+          "--previous-registry",
+          "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+          "--json"
+        ],
+        "exit": 0,
+        "fatalFindings": []
+      },
+      {
+        "prior": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "command": [
+          "node",
+          "scripts/check-doc-inventory-gates.mjs",
+          "--inventory",
+          "/tmp/phase06/review-doc-inventory.json",
+          "--identity-registry",
+          "/tmp/phase06/review-identity-registry.json",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/pilot/decisions",
+          "--decisions",
+          "plans/260925-documentation-authority-unification/ledger/decisions",
+          "--previous-registry",
+          "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+          "--json"
+        ],
+        "exit": 0,
+        "fatalFindings": []
+      }
+    ],
+    "F": {
+      "ratchet": {
+        "exit": 0,
+        "output": "check-legacy-docs-ratchet: clean (995 legacy files checked; 24 accounted edit(s), 1 accounted new file(s)).\n"
+      },
+      "placement": {
+        "exit": 0,
+        "output": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 448 files, 447 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n"
+      }
+    },
+    "G": [
+      {
+        "prior": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "findings": []
+      },
+      {
+        "prior": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "findings": []
+      }
+    ],
+    "H": {
+      "accounted": 30,
+      "unaccounted": [],
+      "agentCoordination": 0
+    },
+    "I": {
+      "protectedFiles": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        "README.md",
+        "docs/README.md",
+        "docs/reading-map.md",
+        "docs/specs/reading-map.md"
+      ],
+      "changes": ""
+    },
+    "scopedNonStrict": {
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/review-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--scope",
+        "docs/architect/agent-coordination"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "open": [
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 1434,
+          "examples": [
+            "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md#coordination-recovery-planning-and-session-continuation",
+            "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md#unheaded-block-2",
+            "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md#unheaded-block-3",
+            "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md#1-meaning-and-boundary",
+            "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md#2-snapshot-contract"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 334,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/architecture/run-handle.md, docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/contracts/coordination-session.md, docs/platform/agent-coordination/contracts/flow-definition.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+            "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 184,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/README.md#migration-status",
+            "docs/platform/agent-coordination/architecture/README.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/README.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow",
+            "docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    "retirement": {
+      "command": [
+        "node",
+        "scripts/check-doc-retirement.mjs",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/review-identity-registry.json",
+        "--cutover",
+        "--json"
+      ],
+      "exit": 1,
+      "counts": {
+        "pass": 4,
+        "blocked": 15,
+        "review": 1
+      },
+      "invariants": [],
+      "conflicts": {
+        "gate": "migration-acceptance",
+        "id": "no-unresolved-conflicts",
+        "rule": "No unresolved claim conflict remains.",
+        "enforcedBy": "script",
+        "status": "blocked",
+        "measure": "16 duplicate-content groups (3, excluding 814 evidence mirrors that resolve by deduplication) and semantic-conflict groups (13) still open"
+      }
+    }
+  },
+  "ownerLists": {
+    "archiveNoticeUnits": 65,
+    "obsoleteDeletes": 0,
+    "unknownBlockingSourceHolds": 0,
+    "corpusPolicyHolds": 0,
+    "schedulerEnum": "owner-resolved, pending independent row review",
+    "promotedEdits": "plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md"
+  },
+  "unproven": [
+    "Independent review and real approval",
+    "Strict E and reverse closure",
+    "Reduced promotion rehearsal",
+    "Fresh readers",
+    "Batch close and whole phase completion"
+  ]
+}

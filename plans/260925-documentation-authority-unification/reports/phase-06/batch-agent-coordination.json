@@ -1,6 +1,9 @@
 {
   "version": 1,
-  "status": "authoring-blocked-before-review",
+  "status": "ready-for-review",
+  "authorSession": "codex-session:1@2026-10-08",
+  "reviewRelease": "review-packet-2.json",
+  "generatedRoleCorrection": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
   "sourcePin": "76585861f718c7ef0dd6150d9b92a7c7baaa3ec4",
   "candidatePin": "0a41d793e60631aa9073c73a941f641548862b6c",
   "decisionDataPin": "576f9efea72de92d4191eb295afd9b2349bbb99a",
@@ -934,7 +937,7 @@
     "deleteAsObsolete": [],
     "unknownBlockingHolds": [],
     "resolvedEnumClaim": "claim_459cdfc305f52f6636bf73d1c56cccf1",
-    "corpusPolicyHolds": 2
+    "corpusPolicyHolds": 0
   },
   "unproven": [
     "Independent acceptance of 1434 judgments, retired candidate metadata and policies",

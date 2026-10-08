@@ -1,6 +1,13 @@
 {
   "version": 1,
-  "status": "blocked-awaiting-owner",
+  "status": "resolved-by-owner-authorized-producer-correction",
+  "authorSession": "codex-session:1@2026-10-08",
+  "resolution": {
+    "ownerCommit": "aa688258b08f3b64ede2fd7003bd2544142419a0",
+    "codeCommit": "d8a250ced380b855d50ce34fa749b50c64c7e45b",
+    "proof": "corpus-projection-verification.json",
+    "realIndependentApproval": false
+  },
   "observedAt": "0a41d793e60631aa9073c73a941f641548862b6c",
   "command": [
     "node",
