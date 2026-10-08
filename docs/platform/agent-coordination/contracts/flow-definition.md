@@ -12,7 +12,10 @@ Canonical for: Preserved contract material for FlowDefinition And Profile Schema
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](workflow-stage-operation.md)
+Related:
+- docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md
+- docs/platform/agent-coordination/architecture/protocol-model.md
+- docs/platform/agent-coordination/contracts/workflow-stage-operation.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

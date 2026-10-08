@@ -12,7 +12,8 @@ Canonical for: Preserved guide-runbook material for Architecture Advisory Evalua
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [artifact templates](architecture-advisory-artifact-templates.md)
+Related:
+- docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

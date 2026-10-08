@@ -12,7 +12,10 @@ Canonical for: Preserved vision material for Agent Coordination Foundation Visio
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Intent Preservation Ledger](intent-preservation-ledger.md), [Documentation Governance](../../architect/agent-coordination/documentation-governance.md), [Vocabulary](../../architect/agent-coordination/vocabulary/README.md)
+Related:
+- docs/platform/agent-coordination/intent-preservation-ledger.md
+- docs/architect/agent-coordination/documentation-governance.md
+- docs/architect/agent-coordination/vocabulary/README.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

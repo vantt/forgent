@@ -12,7 +12,10 @@ Canonical for: Preserved roadmap material for Team Dispatch V1 Roadmap; no autho
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Step 00: Overview](step-00-overview.md), [Step 01: Rollout](step-01-rollout.md), [Step 02: Workflow Stage Operations](step-02-workflow-stage-operations.md)
+Related:
+- docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md
+- docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md
+- docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

@@ -12,7 +12,8 @@ Canonical for: Preserved history material for Orchestration Vocabulary Map; no a
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Stage, Stage Operation, TaskSpec, and Skill relationship](../../vocabulary/stage-operation-taskspec-skill-relationship.svg)
+Related:
+- None
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

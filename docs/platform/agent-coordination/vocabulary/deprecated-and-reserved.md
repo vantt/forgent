@@ -12,7 +12,10 @@ Canonical for: Preserved vocabulary material for Deprecated And Reserved Coordin
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [SessionActor](canonical-concepts.md#sessionactor), [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [pre-migration vocabulary map](../history/implementation-records/orchestration-vocabulary-map-2026-08-27.md)
+Related:
+- docs/platform/agent-coordination/vocabulary/canonical-concepts.md
+- docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+- docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

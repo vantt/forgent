@@ -12,7 +12,9 @@ Canonical for: Preserved contract material for Workflow Stage Operation Contract
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Agent Coordination Foundation Vision](../vision.md), [Step 02](../roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

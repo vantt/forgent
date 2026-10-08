@@ -12,7 +12,8 @@ Canonical for: Preserved roadmap material for Step 01 - Team Dispatch V1 Rollout
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: None; source context is recorded in Provenance
+Related:
+- None
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

@@ -1,0 +1,496 @@
+{
+  "before": "7693331b087e24da2a6bf719f59fc531aac9046c",
+  "mapPin": "fcfe78cb89585bc9ab23f11bab67d41458834fc4",
+  "stopCondition": 10,
+  "rule": "H must introduce no finding outside the frozen baseline; comparison is still red after one data-only correction.",
+  "beforeCorrection": {
+    "findings": 369,
+    "newFindings": 365,
+    "comparisonExit": 1
+  },
+  "afterCorrection": {
+    "findings": 45,
+    "newFindings": 41,
+    "comparisonExit": 1,
+    "byType": {
+      "unresolved-link": 36,
+      "unresolved-related": 5
+    },
+    "byArea": {
+      "agentCoordination": 15,
+      "hostInvocation": 26
+    }
+  },
+  "correction": {
+    "evidencePayloadsNotCandidateRoutes": 302,
+    "explicitAgentRoutes": 77,
+    "relatedHeadersReformatted": 66,
+    "bodyProofFailures": 0,
+    "gateCodeChanges": 0
+  },
+  "inheritedFindings": [
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "message": "link target does not exist: ../../../../core/protocol-packs/group-thinking.json",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "79ab728e65e7d216a1699a9b6ef821acb435912d0e9a71f87e03077dba4c58d2",
+      "resolvedCandidates": [
+        "core/protocol-packs/group-thinking.json"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+      "message": "link target does not exist: ../../../../src/runner/deliberation/schema.mjs",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "dcf2dfcff950eb27b206c2982a6f29a3e1e2c164d146bdfab9d0b740b2d0c72c",
+      "resolvedCandidates": [
+        "src/runner/deliberation/schema.mjs"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "message": "link target does not exist: ../../../../../plans/260916-account-rotator/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "73c475c85b796c7b09398a441327c0c49c0430284a49ad34e2ea7630c77ea719",
+      "resolvedCandidates": [
+        "plans/260916-account-rotator/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "message": "link target does not exist: ../../../../../plans/260915-code-implementation-track-policy/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "73c475c85b796c7b09398a441327c0c49c0430284a49ad34e2ea7630c77ea719",
+      "resolvedCandidates": [
+        "plans/260915-code-implementation-track-policy/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "message": "link target does not exist: ../../../../../plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "73c475c85b796c7b09398a441327c0c49c0430284a49ad34e2ea7630c77ea719",
+      "resolvedCandidates": [
+        "plans/260915-0455-test-suite-feedback-cost/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "message": "link target does not exist: ../../../../../plans/260917-cold-resumable-coordination-dag/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "73c475c85b796c7b09398a441327c0c49c0430284a49ad34e2ea7630c77ea719",
+      "resolvedCandidates": [
+        "plans/260917-cold-resumable-coordination-dag/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../../plans/260919-coordination-skill-harness-simplification/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "1fde6fc09a9a66fbef5c5d31c10041d2be43405ddeabe8aace2875290d0b0bf2",
+      "resolvedCandidates": [
+        "plans/260919-coordination-skill-harness-simplification/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "message": "link target does not exist: ../../../../plans/260905-architecture-advisory-panel/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "14abfc260497d032eade9b2210207e5fa9db7a3f503c7154c7dde39dc44c8e7f",
+      "resolvedCandidates": [
+        "plans/260905-architecture-advisory-panel/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+      "message": "link target does not exist: ../../../../core/coordination-protocols/standalone-master-coordination-loop.yaml",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "d8f3cc8e2a4b2b5ac8438444486efc28404545bfd3ee990507b675fdad6b233a",
+      "resolvedCandidates": [
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "message": "link target does not exist: ../../../../plans/260915-dispatch-operability-implementation/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "3ecfcfba73b057a2bdf13dd7c118b75ca3c72010ccdd6ba007d24322347b367d",
+      "resolvedCandidates": [
+        "plans/260915-dispatch-operability-implementation/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "message": "link target does not exist: ../../../../plans/260915-executor-policy-dispatch-seams/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "3ecfcfba73b057a2bdf13dd7c118b75ca3c72010ccdd6ba007d24322347b367d",
+      "resolvedCandidates": [
+        "plans/260915-executor-policy-dispatch-seams/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "message": "link target does not exist: ../../../../plans/260916-account-rotator/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "3ecfcfba73b057a2bdf13dd7c118b75ca3c72010ccdd6ba007d24322347b367d",
+      "resolvedCandidates": [
+        "plans/260916-account-rotator/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "message": "link target does not exist: ../../../../plans/260915-code-implementation-track-policy/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "3ecfcfba73b057a2bdf13dd7c118b75ca3c72010ccdd6ba007d24322347b367d",
+      "resolvedCandidates": [
+        "plans/260915-code-implementation-track-policy/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "message": "link target does not exist: ../../../../plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "3ecfcfba73b057a2bdf13dd7c118b75ca3c72010ccdd6ba007d24322347b367d",
+      "resolvedCandidates": [
+        "plans/260915-0455-test-suite-feedback-cost/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "message": "link target does not exist: ../../../../plans/260917-cold-resumable-coordination-dag/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "3ecfcfba73b057a2bdf13dd7c118b75ca3c72010ccdd6ba007d24322347b367d",
+      "resolvedCandidates": [
+        "plans/260917-cold-resumable-coordination-dag/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "message": "link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "fea2e598ba9e7b8d0a33cc15bd16536217d5ff7667bca69f7552d5d2576b6d37",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "message": "link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "fea2e598ba9e7b8d0a33cc15bd16536217d5ff7667bca69f7552d5d2576b6d37",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-related",
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "message": "Related path does not exist: plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "fea2e598ba9e7b8d0a33cc15bd16536217d5ff7667bca69f7552d5d2576b6d37",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md",
+        "docs/platform/host-invocation-routing/architecture/plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "message": "link target does not exist: ../../../../plans/260929-1501-metrics-friction-rust-native/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "b80fb2392b6e67e709b054552141675bb27d78f22d72405f5209810eaf5708d0",
+      "resolvedCandidates": [
+        "plans/260929-1501-metrics-friction-rust-native/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../packaging-distribution/reports/track-closeout.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "5e86490b7129d2327a11c560e49a445b23269f3a8890444b63deb50907ff8d4a",
+      "resolvedCandidates": [
+        "docs/packaging-distribution/reports/track-closeout.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../packaging-distribution/verification/install-and-release-proof.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "5e86490b7129d2327a11c560e49a445b23269f3a8890444b63deb50907ff8d4a",
+      "resolvedCandidates": [
+        "docs/packaging-distribution/verification/install-and-release-proof.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../packaging-distribution/reports/track-closeout.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "5e86490b7129d2327a11c560e49a445b23269f3a8890444b63deb50907ff8d4a",
+      "resolvedCandidates": [
+        "docs/packaging-distribution/reports/track-closeout.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../packaging-distribution/verification/implementation-alignment.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "5e86490b7129d2327a11c560e49a445b23269f3a8890444b63deb50907ff8d4a",
+      "resolvedCandidates": [
+        "docs/packaging-distribution/verification/implementation-alignment.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../packaging-distribution/reports/track-closeout.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "5e86490b7129d2327a11c560e49a445b23269f3a8890444b63deb50907ff8d4a",
+      "resolvedCandidates": [
+        "docs/packaging-distribution/reports/track-closeout.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "message": "link target does not exist: ../../packaging-distribution/verification/install-and-release-proof.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "5e86490b7129d2327a11c560e49a445b23269f3a8890444b63deb50907ff8d4a",
+      "resolvedCandidates": [
+        "docs/packaging-distribution/verification/install-and-release-proof.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+      "message": "link target does not exist: ../../../plans/260915-host-invocation-r2-external-process/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "92b78489b0a5d05eb82f200c0706f4ccb539c32baee006c5c5c9dcc5194ad2ee",
+      "resolvedCandidates": [
+        "plans/260915-host-invocation-r2-external-process/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-related",
+      "path": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+      "message": "Related path does not exist: plans/260915-host-invocation-r2-external-process/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "92b78489b0a5d05eb82f200c0706f4ccb539c32baee006c5c5c9dcc5194ad2ee",
+      "resolvedCandidates": [
+        "plans/260915-host-invocation-r2-external-process/plan.md",
+        "docs/platform/host-invocation-routing/plans/260915-host-invocation-r2-external-process/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+      "message": "link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "ed21b0d93bd8833a8b921299fd569896ea7eb133fe310f3a9fa113501c213e05",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-related",
+      "path": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+      "message": "Related path does not exist: plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "ed21b0d93bd8833a8b921299fd569896ea7eb133fe310f3a9fa113501c213e05",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md",
+        "docs/platform/host-invocation-routing/plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "message": "link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "88e142e70e3aaed9028f5cb8a4dd89178d51d20ce71823bda08ebb0b7fd9e716",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "message": "link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "88e142e70e3aaed9028f5cb8a4dd89178d51d20ce71823bda08ebb0b7fd9e716",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "message": "link target does not exist: ../../../plans/260915-host-invocation-r2-external-process/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "88e142e70e3aaed9028f5cb8a4dd89178d51d20ce71823bda08ebb0b7fd9e716",
+      "resolvedCandidates": [
+        "plans/260915-host-invocation-r2-external-process/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/roadmap.md",
+      "message": "link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "88e142e70e3aaed9028f5cb8a4dd89178d51d20ce71823bda08ebb0b7fd9e716",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+      "message": "link target does not exist: ../../../../packages/host-runtime/rust/src/providers/external_process/supervisor.rs",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "7ca83b7f1cdc84c1b4e0942ad05eb0045b04959db8cdce20c45f0d8b5d53fb34",
+      "resolvedCandidates": [
+        "packages/host-runtime/rust/src/providers/external_process/supervisor.rs"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "message": "link target does not exist: ../../../../plans/260915-host-invocation-r2-external-process/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "ead31b1689d30ed97b5b98ffd41be82cfd3209dc27da0023260606902af0bb57",
+      "resolvedCandidates": [
+        "plans/260915-host-invocation-r2-external-process/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "message": "link target does not exist: ../../../../plans/260915-host-invocation-r2-external-process/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "ead31b1689d30ed97b5b98ffd41be82cfd3209dc27da0023260606902af0bb57",
+      "resolvedCandidates": [
+        "plans/260915-host-invocation-r2-external-process/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-related",
+      "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "message": "Related path does not exist: plans/260915-host-invocation-r2-external-process/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "ead31b1689d30ed97b5b98ffd41be82cfd3209dc27da0023260606902af0bb57",
+      "resolvedCandidates": [
+        "plans/260915-host-invocation-r2-external-process/plan.md",
+        "docs/platform/host-invocation-routing/verification/plans/260915-host-invocation-r2-external-process/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "message": "link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "91b3ff12a81ee05bcc3103de4369b899ae9b89230b7a59867f1631e25a1fdf3e",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "message": "link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "91b3ff12a81ee05bcc3103de4369b899ae9b89230b7a59867f1631e25a1fdf3e",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-related",
+      "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "message": "Related path does not exist: plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "91b3ff12a81ee05bcc3103de4369b899ae9b89230b7a59867f1631e25a1fdf3e",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md",
+        "docs/platform/host-invocation-routing/verification/plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "message": "link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "linkTextAlreadyPresentAtMapPin": true,
+      "bodyOrHeaderBeforeSha256": "c9360b3ec4d8f5241657d7fdf958121d8980ef35af09d46046b7951a9c899e17",
+      "resolvedCandidates": [
+        "plans/260918-host-invocation-r3-remote-peer/plan.md"
+      ],
+      "destinationMissingAtMapPin": true
+    }
+  ],
+  "checkCommand": [
+    "node",
+    "-e",
+    "const fs=require(\"fs\");const k=f=>f.type+\"|\"+f.path;const cur=JSON.parse(fs.readFileSync(process.argv[1],\"utf8\")).findings.map(k);const base=new Set(JSON.parse(fs.readFileSync(process.argv[2],\"utf8\")).findings.map(k));const nw=cur.filter(x=>!base.has(x));console.log(nw.join(\"\\n\"));process.exit(nw.length?1:0)",
+    "/tmp/phase06/candidate-status-after-correction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/candidate-status-baseline.json"
+  ]
+}

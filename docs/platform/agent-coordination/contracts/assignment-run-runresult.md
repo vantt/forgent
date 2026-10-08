@@ -12,7 +12,10 @@ Canonical for: Preserved contract material for Assignment, Run, And RunResult Co
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md), [RunHandle](../architecture/run-handle.md), [Continuation Planner](../architecture/coordination-continuation-recovery.md)
+Related:
+- docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md
+- docs/platform/agent-coordination/architecture/run-handle.md
+- docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

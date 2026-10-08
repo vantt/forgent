@@ -12,7 +12,10 @@ Canonical for: Preserved guide-runbook material for Architecture Advisory Coordi
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [master-coordinator.md](master-coordinator.md), [Role doctrine](../architecture-advisory-role-doctrine.md), [Artifact templates](../architecture-advisory-artifact-templates.md)
+Related:
+- docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md
+- docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md
+- docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

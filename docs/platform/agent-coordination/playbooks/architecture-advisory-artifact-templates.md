@@ -12,7 +12,10 @@ Canonical for: Preserved guide-runbook material for Architecture Advisory Artifa
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [the role doctrine](architecture-advisory-role-doctrine.md), [the coordinator prompt](prompts/architecture-advisory-coordinator.md), [rubric](architecture-advisory-evaluation-rubric.md)
+Related:
+- docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md
+- docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md
+- docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

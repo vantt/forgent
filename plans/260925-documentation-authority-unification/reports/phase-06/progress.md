@@ -3,21 +3,23 @@
 Date: 2026-10-08
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: 2, first content batch preparing
+Step: routing prerequisite; first content batch paused after header preparation
 State: authoring
-Last green conservation commit: fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7
+Blocker: stop condition 10, H still reports 41 new inherited findings after one data-only correction; committed owner amendment required
+Last green conservation commit: 7693331b087e24da2a6bf719f59fc531aac9046c
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 5d6467093217a6869b31afb28866732400767267
 Main at sync: c2aa9e374a8cee57c676809dab4849273ed71855
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
+Latest commits: e7fa77404 (A6 cutover), cc92094c9 (ordinary/checkpoint proof), 5d6467093 (main sync), fd6c9ab9e (source accounting), fcfe78cb8 (maps/counts), 7693331b0 (header-only preparation).
 Pending review requests: no further tooling re-review under A5; content review has not started
-Owner queue items: none open; unseeded-ordinary-review resolved by committed A6
+Owner queue items: candidate-routing-H open; A6 ordinary approval question resolved
 Archive/delete lists: none authored
 Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root-authorities batch
 Holds: none authored
 Promoted-document edits: agent-coordination portal, header-only metadata completion logged in promoted-edits.md; body unchanged
 
-Next action: commit the header-only completion, refresh inventory and both prior-registry proofs, then author mirror/exact/manual decision shards and their independent review request.
+Next action: await a committed owner amendment resolving the H routing/baseline conflict, execute only that amendment, then finish first-batch candidate and decision authoring to its independent review request.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -65,10 +67,14 @@ A6 implementation green `e7fa77404`: full suite on committed code, 7,335 tests, 
 
 Required main sync `5d6467093` imports main `c2aa9e374` cleanly, with no conflict, no extractor-closure or instruction-file change and no platform-target edit. One legacy source changes: docs/specs/distribution.md; its exact imported digest is re-accounted under the standing sync policy, marked content-review-owed. Re-inventory and all post-sync checks precede map freeze; source drift is not ignored.
 
-Step 1 complete: A6 ordinary committed-report approval is exercised (40 fixture rows approved without seeds); checkpoint proof remains exercised with 6/6 seeded errors caught and 0 false flags. The synchronized full suite passes: 393 files, 7,362 tests, 7,289 pass, 0 fail, 8 skip, 65 todo. Scripts suite after map/constitution changes: 872/872. Both post-sync D proofs have 0 fatal findings; legacy source counts increase by three distribution rows, explicitly accounted rather than described as baseline-identical.
+Step 1 tooling and mapping outputs are authored; full prerequisite completion is NOT claimed while H is blocked. A6 ordinary committed-report approval is exercised (40 fixture rows approved without seeds); checkpoint proof remains exercised with 6/6 seeded errors caught and 0 false flags. The synchronized full suite passes: 393 files, 7,362 tests, 7,289 pass, 0 fail, 8 skip, 65 todo. Scripts suite after map/constitution changes: 872/872. Both post-sync D proofs have 0 fatal findings; legacy source counts increase by three distribution rows, explicitly accounted rather than described as baseline-identical.
 
 Frozen placement matrix: 1,040 legacy files plus five reconciliation files; all 1,040 legacy sources covered, 0 uncovered. Twenty-one additive candidate route probes pass; existing area-status changes: 0. Q5 additive kinds use existing vocabulary and do not alter frozen rules. Constitution check has 0 fatal findings; placement has 446 files, 445 matches, one standing exception, 0 leftovers or ambiguities. `baseline-counts.md`, `frozen-map-inputs.json`, `frozen-map-verification.json` and nine `ledger/area-map-*.md` files hold the pinned inputs and proof.
 
 Measured source total is 22,429: 12,882 Mirror, 2,787 Unit-exact, 971 Weak-exact and 5,789 Judgment. Agent coordination contributes 17,034 rows from 937 files: 867 evidence files, 68 existing counterparts (67 Markdown plus one SVG) and two legacy-only plans. Content authoring, independent content approval, reduced promotion rehearsal and scoped E remain UNPROVEN.
 
 First content batch, header item: 67 Markdown headers completed, including 66 new fenced metadata blocks and one extended portal block. The SVG counterpart is unchanged. Actual command: `node plans/260925-documentation-authority-unification/reports/phase-06/verify-header-only-changes.mjs --before fcfe78cb89585bc9ab23f11bab67d41458834fc4 --after WORKTREE --files plans/260925-documentation-authority-unification/reports/phase-06/header-inputs.json`. It reports 68 files, 67 Markdown, 0 failures: stripping only the immediate fenced metadata block leaves byte-identical bodies in all cases, and all promotion fields exist. Before completion the same helper at the frozen pin reports 67 missing-metadata failures. No decision row has yet been authored or approved for this batch.
+
+Routing correction and required stop: a broad agent-coordination route incorrectly selected 302 evidence payload Markdown files for candidate metadata checking. New Related values also used Markdown syntax instead of the existing path-list convention. Corrected data only: 77 explicit non-payload routes, 66 Related field lists, 0 body changes. H comparison remains red after this one correction: 45 findings total, four retained baseline findings plus 41 newly exposed inherited references (15 agent-coordination, 26 host-invocation; 36 unresolved links, five unresolved Related paths). All 41 literal references and missing destinations are proven at fcfe78cb8. No checker change or baseline relaxation; stop condition 10 now applies.
+
+Corrected scripts: 872/872; ratchet exit 0 (995 files, 24 accounted edits, one accounted new file); placement exit 0 (446/445, one standing exception). No first-batch decision shard or approval is written. This stop is not ready-for-review. Archive/delete lists and holds remain unauthored; observed source/target differences are not adjudicated. Manual authoring, independent content approval, scoped E and reduced promotion rehearsal remain UNPROVEN. Exact blocker and owner options: candidate-routing-blocker.md/json and owner-queue.md.

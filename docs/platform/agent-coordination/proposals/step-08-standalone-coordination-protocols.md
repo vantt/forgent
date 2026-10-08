@@ -12,7 +12,10 @@ Canonical for: Preserved proposal material for Step 08 - Standalone Coordination
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Agent Coordination Intent Preservation Ledger](../intent-preservation-ledger.md), [Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md), [CoordinationSession](../contracts/coordination-session.md)
+Related:
+- docs/platform/agent-coordination/intent-preservation-ledger.md
+- docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md
+- docs/platform/agent-coordination/contracts/coordination-session.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

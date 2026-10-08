@@ -12,7 +12,10 @@ Canonical for: Preserved architecture material for Dispatch Control Plane; no au
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Component Boundary Advisory](../../../architect/component-boundary/component-boundary-advisory.md), [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md), [FlowDefinition Contract](../contracts/flow-definition.md)
+Related:
+- docs/architect/component-boundary/component-boundary-advisory.md
+- docs/architect/proposals/component-authority-boundary-map.md
+- docs/platform/agent-coordination/contracts/flow-definition.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

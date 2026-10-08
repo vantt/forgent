@@ -18,7 +18,10 @@ Canonical for: Preserved architecture material for Runtime Recovery And Work Con
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Run admission amendment](../contracts/assignment-run-runresult.md#proposed-runtime-recovery-amendment), [RunHandle and recovery material](run-handle.md), [Fallback eligibility and selection](executor-health-and-fallback.md)
+Related:
+- docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+- docs/platform/agent-coordination/architecture/run-handle.md
+- docs/platform/agent-coordination/architecture/executor-health-and-fallback.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

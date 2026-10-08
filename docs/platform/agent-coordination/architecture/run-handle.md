@@ -18,7 +18,8 @@ Canonical for: Preserved architecture material for RunHandle And Recovery Materi
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Runtime Recovery Design](runtime-recovery-design.md), [Local Concurrency And Durability](runtime-recovery-design.md#6-local-concurrency-and-durability), [the proof matrix](runtime-recovery-design.md#10-proof-matrix)
+Related:
+- docs/platform/agent-coordination/architecture/runtime-recovery-design.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

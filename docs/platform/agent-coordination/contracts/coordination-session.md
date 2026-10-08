@@ -12,7 +12,10 @@ Canonical for: Preserved contract material for CoordinationSession Persistence A
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [FlowDefinition Contract](flow-definition.md#specialist-slots-phase-09-step-09-mvp9), [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [Assignment, Run, And RunResult Contract](assignment-run-runresult.md)
+Related:
+- docs/platform/agent-coordination/contracts/flow-definition.md
+- docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+- docs/platform/agent-coordination/contracts/assignment-run-runresult.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

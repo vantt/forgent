@@ -12,7 +12,10 @@ Canonical for: Preserved architecture material for Visibility And Herdr; no auth
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [RunHandle And Recovery Material](run-handle.md), [Runtime Recovery Design](runtime-recovery-design.md), [history](../history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md)
+Related:
+- docs/platform/agent-coordination/architecture/run-handle.md
+- docs/platform/agent-coordination/architecture/runtime-recovery-design.md
+- docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

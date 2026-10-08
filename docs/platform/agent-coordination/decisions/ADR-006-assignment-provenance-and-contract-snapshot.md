@@ -12,7 +12,10 @@ Canonical for: Preserved decision material for ADR-006: Assignment Provenance An
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Vision V-003/V-004](../vision.md), [ADR-002](ADR-002-stage-operation-compatibility.md), [ADR-003](ADR-003-assignment-run-runresult-separation.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md
+- docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

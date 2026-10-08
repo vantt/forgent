@@ -12,7 +12,10 @@ Canonical for: Preserved proposal material for Team Communication Protocol V1; n
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Agent Coordination Foundation Vision](../vision.md), [coordination-operating-harness.md](../playbooks/coordination-operating-harness.md), [Step 08](step-08-standalone-coordination-protocols.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/playbooks/coordination-operating-harness.md
+- docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

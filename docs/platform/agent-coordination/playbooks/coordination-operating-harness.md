@@ -12,7 +12,9 @@ Canonical for: Preserved guide-runbook material for Coordination Operating Harne
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Step 07 - CoordinationSession, AdhocTask, And Planning Boundary](../proposals/step-07-coordination-session-adhoc-task.md), [Master Multi-Agent Implementation Coordinator](prompts/master-coordinator.md)
+Related:
+- docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md
+- docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

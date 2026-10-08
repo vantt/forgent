@@ -12,7 +12,8 @@ Canonical for: Preserved vocabulary material for Agent Coordination Concept Rela
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Canonical Concepts](canonical-concepts.md)
+Related:
+- docs/platform/agent-coordination/vocabulary/canonical-concepts.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

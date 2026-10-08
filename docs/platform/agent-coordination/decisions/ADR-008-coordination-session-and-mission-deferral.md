@@ -12,7 +12,10 @@ Canonical for: Preserved decision material for ADR-008: CoordinationSession As V
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Vision V-001/V-005/V-009](../vision.md), [ADR-006 §6](ADR-006-assignment-provenance-and-contract-snapshot.md), [Intent Preservation Ledger AC-I001/AC-I002/AC-I007](../intent-preservation-ledger.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md
+- docs/platform/agent-coordination/intent-preservation-ledger.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

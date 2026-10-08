@@ -12,7 +12,10 @@ Canonical for: Preserved collection-index material for Agent Coordination Archit
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Agent Coordination Foundation Vision](../vision.md), [ADR-001: Work Owns Delivery Lifecycle](ADR-001-work-lifecycle-authority.md), [ADR-002: Preserve Stage Primary Operation Compatibility](ADR-002-stage-operation-compatibility.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md
+- docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

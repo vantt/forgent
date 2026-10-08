@@ -261,3 +261,8 @@ Tests-first red: `452206652`. Corrected scripts suite: 872/872. Actual isolated 
 
 Committed cutover `e7fa77404`: red 15 tests/10 pass/5 fail; green full suite 7,335 tests/7,262 pass/0 fail, with 8 skip and 65 todo UNPROVEN. Both historical-registry D proofs remain baseline-identical with zero fatal findings. Complete measured evidence: ordinary-review-verification.json. The disposable rehearsal was removed after proof; no real row approval was authored.
 
+## Routing prerequisite after the tooling cutover
+
+A6 is complete; no further tooling re-review is requested. Candidate data verification exposes a separate frozen-procedure blocker: H checks more documents after the required routing expansion and remains red on 41 inherited references after one data correction. Gate code is unchanged. See `candidate-routing-blocker.md` and its exact JSON evidence; an owner amendment is required before proceeding.
+
+Header proof helper: `verify-header-only-changes.mjs`, using the existing governance baseline reader. Actual old/new committed-byte comparison covers 67 Markdown documents and one SVG; 0 body differences or missing promotion fields after completion. `Related` values are corrected to the existing repository-path list convention; evidence payloads retain their untouched bytes and are excluded from candidate document routes. The post-correction scripts suite remains 872/872.

@@ -12,7 +12,10 @@ Canonical for: Preserved collection-index material for Agent Coordination Vocabu
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Agent Coordination Foundation Vision](../vision.md), [Canonical Concepts](canonical-concepts.md), [Concept Relationships](concept-relationships.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/vocabulary/canonical-concepts.md
+- docs/platform/agent-coordination/vocabulary/concept-relationships.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

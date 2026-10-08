@@ -12,7 +12,10 @@ Canonical for: Preserved decision material for ADR-010: Interactive/Headless Cap
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Vision V-008/V-012](../vision.md), [Work Integration](../architecture/work-integration.md), [ADR-001](ADR-001-work-lifecycle-authority.md)
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/architecture/work-integration.md
+- docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

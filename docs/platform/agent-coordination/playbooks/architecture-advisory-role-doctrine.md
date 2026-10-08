@@ -12,7 +12,10 @@ Canonical for: Preserved guide-runbook material for Architecture Advisory Role D
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [mdview](../../../../plans/260905-architecture-advisory-panel/plan.md), [the coordinator prompt](prompts/architecture-advisory-coordinator.md), [the artifact templates](architecture-advisory-artifact-templates.md)
+Related:
+- docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md
+- docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
+- docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

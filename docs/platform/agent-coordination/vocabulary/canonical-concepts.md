@@ -12,7 +12,10 @@ Canonical for: Preserved vocabulary material for Canonical Agent Coordination Co
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md), [FlowDefinition Contract](../contracts/flow-definition.md)
+Related:
+- docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+- docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md
+- docs/platform/agent-coordination/contracts/flow-definition.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here

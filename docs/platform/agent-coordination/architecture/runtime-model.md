@@ -12,7 +12,10 @@ Canonical for: Preserved architecture material for Assignment Execution Runtime 
 Use this when: Comparing this candidate with its pinned legacy source
 Do not use this for: Inferring current implementation or supersession of retained sources
 Last reviewed: UNPROVEN; independent content review pending
-Related: [Assignment, Run, And RunResult Contract](../contracts/assignment-run-runresult.md), [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [CoordinationSession Contract](../contracts/coordination-session.md)
+Related:
+- docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+- docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+- docs/platform/agent-coordination/contracts/coordination-session.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
