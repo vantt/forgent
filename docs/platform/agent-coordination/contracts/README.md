@@ -37,10 +37,6 @@ This directory has been promoted from
 documentation migration. Contract language is preserved first; any later
 semantic change needs an accepted decision and compatibility notes.
 
-Read the [Agent Coordination Foundation Vision](../vision.md) first. Contracts
-define exact behavior beneath it and cannot make Work or a predeclared protocol
-universally mandatory.
-
 ## Contracts
 
 1. [Workflow Stage Operation](workflow-stage-operation.md) defines operation
