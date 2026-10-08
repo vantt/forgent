@@ -526,7 +526,10 @@
       "corpus": "user-knowledge",
       "disposition": "reclassify-out-of-platform-scope",
       "rationale": "The whole classified user-knowledge corpus supplies human-facing learning, tutorials and knowledge artifacts, including derived files. Keep it governed as user knowledge rather than migrating its claims into maintained platform contracts.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-corpus-user-knowledge.md",
       "authoredBy": "codex-session:1@2026-10-08",
       "sources": [
         "docs/doc-registry.md",

@@ -51,7 +51,10 @@
       "corpus": "consumer-project",
       "disposition": "reclassify-out-of-platform-scope",
       "rationale": "The whole classified consumer-project corpus belongs to projects using the platform, not platform authority. Preserve its local meaning and separate project doctrine/fixtures from platform contracts; classification and membership are rechecked.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-corpus-consumer-project.md",
       "authoredBy": "codex-session:1@2026-10-08",
       "sources": [
         "docs/distillery/comparison-matrix.md",

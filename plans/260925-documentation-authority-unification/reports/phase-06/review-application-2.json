@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "reviewCommit": "bb03cab52579d358015c611fa8b8543062a6e4da",
+  "reviewer": "reviewer:claude-session:4df9e88c@2026-10-08",
+  "commands": [
+    {
+      "command": [
+        "node",
+        "scripts/propose-doc-decisions.mjs",
+        "--apply-review",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+        "--verdicts",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-01.md",
+        "--reviewer",
+        "reviewer:claude-session:4df9e88c@2026-10-08",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--repo-root",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "node",
+        "scripts/propose-doc-decisions.mjs",
+        "--apply-review",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+        "--verdicts",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-02.md",
+        "--reviewer",
+        "reviewer:claude-session:4df9e88c@2026-10-08",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--repo-root",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "node",
+        "scripts/propose-doc-decisions.mjs",
+        "--apply-review",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+        "--verdicts",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-judgment-03.md",
+        "--reviewer",
+        "reviewer:claude-session:4df9e88c@2026-10-08",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--repo-root",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "node",
+        "scripts/propose-doc-decisions.mjs",
+        "--apply-review",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+        "--verdicts",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-s2-agent-coordination-log-duplicates.md",
+        "--reviewer",
+        "reviewer:claude-session:4df9e88c@2026-10-08",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--repo-root",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification"
+      ],
+      "exit": 0
+    }
+  ],
+  "shards": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reviewed": 487,
+      "pending": 13
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "reviewed": 446,
+      "pending": 54
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reviewed": 423,
+      "pending": 7
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+      "reviewed": 0,
+      "pending": 4
+    }
+  ],
+  "approvedPolicies": [
+    "history-evidence",
+    "user-knowledge",
+    "consumer-project"
+  ],
+  "retiredRecord": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "D": [
+    {
+      "prior": "identity-registry.json",
+      "exit": 0,
+      "fatal": []
+    },
+    {
+      "prior": "phase-02-identity-registry.json",
+      "exit": 0,
+      "fatal": []
+    }
+  ],
+  "holds": [],
+  "reworkRequired": [
+    {
+      "file": "review-2-identical-exceptions.md",
+      "rows": 334,
+      "ok": 206,
+      "rework": 128,
+      "hold": 0
+    },
+    {
+      "file": "review-2-s2-agent-coordination-log-duplicates.md",
+      "rows": 4,
+      "ok": 0,
+      "rework": 4,
+      "hold": 0
+    },
+    {
+      "file": "review-2-conflicts.md",
+      "rows": 1020,
+      "ok": 950,
+      "rework": 70,
+      "hold": 0
+    },
+    {
+      "file": "review-2-s2-agent-coordination-judgment-01.md",
+      "rows": 500,
+      "ok": 487,
+      "rework": 13,
+      "hold": 0
+    },
+    {
+      "file": "review-2-s2-agent-coordination-judgment-03.md",
+      "rows": 430,
+      "ok": 423,
+      "rework": 7,
+      "hold": 0
+    },
+    {
+      "file": "review-2-reverse.md",
+      "rows": 184,
+      "ok": 125,
+      "rework": 59,
+      "hold": 0
+    },
+    {
+      "file": "review-2-s2-agent-coordination-judgment-02.md",
+      "rows": 500,
+      "ok": 446,
+      "rework": 54,
+      "hold": 0
+    }
+  ]
+}

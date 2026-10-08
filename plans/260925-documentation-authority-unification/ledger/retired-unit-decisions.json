@@ -15,7 +15,13 @@
       "targetAnchor": "unheaded-block-9",
       "shownTargetDigest": "bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3",
       "authoredBy": "codex-session:1@2026-10-08",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-retired-unit.md",
+      "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da",
+      "targetUnitDigest": "bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3",
       "rationale": "The candidate inventory unit is superseded by its current unit after the two A8-authorized history-reference updates. All other bytes of the complete 128009-character unit are identical; reversing only the two recorded row replacements reconstructs the prior source-unit digest. Each old classification and locator is explicitly retained as historical context, alongside the two newly owned non-authority history carriers. This is candidate bookkeeping, not a legacy-source retirement or an authority flip.",
       "preservationReplacements": [
         {

@@ -1717,7 +1717,10 @@
       "disposition": "retain-as-evidence",
       "rationale": "Preserve the whole classified non-authority history corpus, including dated/generated receipts, without treating past decisions, plans or tool outputs as current platform authority. Item classification and the complete source set are rechecked by the gate.",
       "claimKind": "historical-context",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
+      "reviewedAt": "2026-10-08",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-corpus-history-evidence.md",
       "authoredBy": "codex-session:1@2026-10-08",
       "sources": [
         "docs/decisions/index.md",

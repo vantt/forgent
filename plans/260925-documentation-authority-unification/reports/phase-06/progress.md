@@ -3,23 +3,23 @@
 Date: 2026-10-08
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: first content batch, Agent Coordination; P4 complete, ready for independent review
-State: ready-for-review; author stopped before P5
-Blocker: external independent committed review reports required; no tooling owner question remains. No manual/corpus approval or strict closure asserted.
+Step: first content batch, Agent Coordination; committed independent review applied, one rework round
+State: rework
+Blocker: 78 judgment rows, 70 conflict receipts, 128 identical exceptions and 59 reverse classifications require correction and independent re-review. P6 closure and the next batch are not yet authorized by green proof.
 Last green conservation commit: d8a250ced380b855d50ce34fa749b50c64c7e45b
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 17b4de5225126a27e732fbf8cd9e753a8963a984
 Main at sync: 2bc76ced1f60e32b5d713adf2487416e464dcf4f
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
-Latest commits: A8 76585861f and candidate/data pins recorded below; A9 aa688258b, red regression 07ed45387, green d8a250ced. Review release adds report-only evidence, no legacy-root or gate change.
-Pending review requests: review-request-2.md is ready for P5. No further tooling re-review under A5. No manual content/corpus approval exists.
+Latest commits: independent review bb03cab52 (14 reports). Four --apply-review invocations applied 1,356 ok verdicts; 78 rework rows remain pending without approval identities. Three accepted corpus rules and the accepted retired-unit metadata record are bound to their committed reports.
+Pending review requests: review-request-2.md first review complete; corrected rows will be released for the single rework review. No further tooling review or per-batch seeded pack.
 Owner queue items: prior authoring stop, two-file treatment and scheduler enum resolved by A8; corpus-generated-file treatment resolved by A9. Agent Coordination's 15 inherited H tuples are zero; Host Invocation's 26 remain owned by its batch.
 Archive/delete lists: 65 temporary migration-notice units proposed; prior 190-row two-file archive list withdrawn in favor of authorized move. No delete-as-obsolete or physical legacy deletion.
 Real conflicts: scheduler owner-resolved; supersede pending at the authorized response-contract anchor, neither enum edited. Corpus file-role conflict resolved by A9 with unchanged guards. SC-1 remains owner-resolved for its later batch.
-Holds: zero unknown-blocking source-row holds; zero corpus-policy holds. 1434 judgments, one retired candidate-unit disposition, policies/file decisions and receipts remain pending independent review.
+Holds: zero unknown-blocking source-row holds; zero corpus-policy holds. The independent reports requested no holds. 78 judgment rows and the reworked supporting receipts/classifications remain unapproved.
 Promoted-document edits: e4650e585 preserved portal guidance plus 0a41d793e authorized history references; exact changes logged in promoted-edits.md. No area-status change.
 
-Next action: owner starts an independent session reviewing review-request-2.md and its pinned inputs, commits review-2-<shard>.md reports, then author resumes to apply/rework only those verdicts and prove P6. No next batch now. Independent approval, strict E, reverse closure, promotion rehearsal, fresh readers, batch/Phase 6 completion remain UNPROVEN.
+Next action: complete all requested data/content corrections, prove the unchanged gates, release only the corrected workset for committed independent re-review, then P6 strict E/rehearsal/readers. No self-approval or next-batch authoring before batch closure.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -102,3 +102,7 @@ Targeted command `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-cor
 Actual committed-state D has zero fatal findings twice; A zero unexpected and five exact A3 exceptions; B/C/I unchanged; F clean; G zero lost-id/self-review; H 30 accounted, zero unexpected and Agent Coordination zero. Scoped non-strict open data: 1,434 pending rows, 334 identical-unit exceptions and 184 unnamed candidate units. Retirement four pass/15 blocked/one review, zero invariant failures; remaining conflict groups three duplicate/13 semantic outside this batch. Strict E/reverse/rehearsal/readers remain UNPROVEN.
 
 Review release: four ordinary full-text packs, rows 500/500/430/4, all text digests checked; independently drawn 100-row sample required from the 15,600-row population (author drew none). review-packet-2.json records pins, hashes, commands and corpus rule digests. retired-source-inventory-review.md shows both complete units and a lossless two-replacement proof. Report-only author header correction derives codex-session:1@2026-10-08 from the actual retired row rather than its wrapper; no ledger identity or approval changed. All review input lists and exact next action are in review-request-2.md. STOP for independent committed review.
+
+## Committed independent review application
+
+Resume at bb03cab52: clean authorized worktree, descendant of the last green pin; A zero unexpected/five exact exemptions, B/C/I unchanged, F clean, H 30 accounted/zero unexpected, D twice exit 0/zero fatal. Reviewer reviewer:claude-session:4df9e88c@2026-10-08; every report declares its owner-approved reading method. Actual --apply-review outputs: judgment-01 487 reviewed/13 pending, judgment-02 446/54, judgment-03 423/7, log-duplicates 0/4. No held rows; A2 note/status behavior retained. Accepted corpus policies expand only via their three committed reports; retired metadata uses the independently shown digests, not --apply-review. D after these applications passes both prior registries with zero fatal findings. Full invocation/count evidence: review-application-2.json.
