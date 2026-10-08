@@ -64,6 +64,7 @@ import {
   MAX_DISPATCH_DEPTH,
   currentDispatchDepth,
   resolveExecutorEnv,
+  workerBaseEnv,
 } from './adapters.mjs';
 
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
@@ -509,7 +510,7 @@ export function cliSpawnAdapter(invocation, opts) {
       shell: false,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: true,
-      env: { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1), FGOS_SESSION_ID: resolveWriterIdentity(opts.fgosDir).id },
+      env: { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1), FGOS_SESSION_ID: resolveWriterIdentity(opts.fgosDir).id },
     });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
@@ -836,7 +837,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
 
   const resolvedEnv = resolveExecutorEnv(rawEnv);
   const herdrBin = resolveHerdrBin(optsHerdrBin);
-  const fullEnv = { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
+  const fullEnv = { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
   const delivery = promptDelivery ?? 'file-pointer';
 
   return runHerdrRound({

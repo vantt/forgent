@@ -4,7 +4,7 @@
 import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
-import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
+import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
 import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { resolveWriterIdentity } from '../../../util/session-identity.mjs';
@@ -1381,7 +1381,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const rawEnv = sourceInvocation.env || {};
   const resolvedExecutorEnv = resolveExecutorEnv(rawEnv);
   const workerEnv = {
-    ...process.env,
+    ...workerBaseEnv(),
     ...resolvedExecutorEnv,
     [DISPATCH_DEPTH_ENV]: String(depth + 1),
     FGOS_SESSION_ID: writerId,

@@ -4796,8 +4796,10 @@ function checkActiveReleaseMatchesCheckout(dir) {
     for (const declared of Array.isArray(pkg.files) ? pkg.files : []) {
       doctorDriftPath(checkout, declared);
     }
+    // Per-machine hook files `fgos setup` writes inside a declared payload directory are not source.
+    const generatedHookFiles = new Set(['.agents/hooks.json']);
     const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>
-      relative !== 'node_modules' && !relative.startsWith('node_modules/'));
+      relative !== 'node_modules' && !relative.startsWith('node_modules/') && !generatedHookFiles.has(relative));
     const sourceSet = new Set(sourceFiles);
     const releaseSources = new Map();
     const manifestPaths = new Set();
@@ -4817,7 +4819,7 @@ function checkActiveReleaseMatchesCheckout(dir) {
       if (!fs.statSync(stagedPath).isFile()) throw new Error(`Manifest entry is not a regular file: ${entry.path}`);
       if (prefix && !entry.path.startsWith(prefix)) continue;
       const relative = entry.path.slice(prefix.length);
-      if (!relative || relative === 'node_modules' || relative.startsWith('node_modules/')) continue;
+      if (!relative || relative === 'node_modules' || relative.startsWith('node_modules/') || generatedHookFiles.has(relative)) continue;
       const generatedShim = !sourceSet.has(relative) &&
         ((relative === 'bin/fgos' && entry.path === manifest.entries?.fgos) ||
          (relative === 'bin/fgos-runner' && entry.path === manifest.entries?.fgosRunner));
