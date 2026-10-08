@@ -459,6 +459,34 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'hook',
+    invoke: 'fgos hook <kind>',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols.',
+    parameters: {
+      type: 'object',
+      properties: {
+        kind: {
+          type: 'string',
+          enum: ['dispatch-decide', 'decision-question'],
+          description: 'The specific hook guard to execute.',
+        },
+        format: {
+          type: 'string',
+          enum: ['standard', 'agy'],
+          description: 'Output protocol format (standard exit codes or AGY stdout JSON).',
+        },
+      },
+      positional: ['kind'],
+      required: ['kind'],
+    },
+    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook dispatch-decide --format=agy'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'decision',
     invoke: 'fgos decision',
     description: 'Append a decision event to the log.',

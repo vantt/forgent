@@ -178,6 +178,7 @@
     "src/setup/instruction-registry.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agent-hooks.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",
     "src/setup/blind-steps-proven-pools.mjs": "use-case",

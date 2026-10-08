@@ -4534,8 +4534,148 @@ function isMutatingInvocation(verb, positional, flags) {
   return predicate ? predicate(positional, flags) : false;
 }
 
+const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question']);
+
+async function handleHook(rest) {
+  const [kind, ...flags] = rest;
+  if (!kind || kind === '--help' || kind === '-h') {
+    process.stdout.write(
+      'Usage: fgos hook <dispatch-decide|decision-question> [--format=standard|agy]\n\n' +
+        'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
+    );
+    process.exit(0);
+  }
+
+  if (!ALLOWED_HOOK_KINDS.has(kind)) {
+    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: dispatch-decide, decision-question\n`);
+    process.exit(1);
+  }
+
+  let rawStdin = '';
+  try {
+    rawStdin = fs.readFileSync(0, 'utf8');
+  } catch {
+    rawStdin = '';
+  }
+
+  let parsed = null;
+  if (rawStdin && rawStdin.trim()) {
+    try {
+      parsed = JSON.parse(rawStdin);
+    } catch {
+      parsed = null;
+    }
+  }
+
+  const isAgyFormat =
+    flags.includes('--format=agy') || (parsed && typeof parsed === 'object' && parsed.toolCall !== undefined);
+
+  if (isAgyFormat) {
+    if (kind === 'dispatch-decide') {
+      const toolInput = parsed?.toolCall?.args || {};
+      const payloadCwd =
+        Array.isArray(parsed?.workspacePaths) && parsed.workspacePaths[0]
+          ? parsed.workspacePaths[0]
+          : process.cwd();
+      const subagentType =
+        typeof toolInput.subagent_type === 'string' && toolInput.subagent_type.trim()
+          ? toolInput.subagent_type
+          : typeof toolInput.agent === 'string' && toolInput.agent.trim()
+            ? toolInput.agent
+            : 'general-purpose';
+
+      try {
+        const { decideExecutorCli } = await import('../src/runner/dispatch.mjs');
+        const decided = await decideExecutorCli(undefined, {
+          cwd: payloadCwd,
+          for: subagentType,
+          needsSoul: true,
+          hasLiveTaskAccess: true,
+        });
+        if (decided.mechanism !== 'in-process') {
+          process.stdout.write(
+            JSON.stringify({
+              decision: 'deny',
+              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run \`fgos dispatch execute\` instead.`,
+            }) + '\n',
+          );
+          process.exit(0);
+        }
+      } catch {
+        // fail-open
+      }
+      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
+      process.exit(0);
+    } else if (kind === 'decision-question') {
+      const toolName = parsed?.toolCall?.name || '';
+      if (toolName === 'AskUserQuestion' || toolName === 'ask' || toolName === 'ask_question') {
+        try {
+          const { checkDecisionQuestion, describeDecisionQuestion } = await import(
+            '../src/state/decision-question.mjs'
+          );
+          const questions = Array.isArray(parsed?.toolCall?.args?.questions)
+            ? parsed.toolCall.args.questions
+            : [];
+          const textToCheck = questions
+            .flatMap((q) => [
+              q?.question,
+              Array.isArray(q?.options) && q.options.length > 0
+                ? `Options:\n${q.options.map((o) => `- ${o?.label ?? ''}: ${o?.description ?? ''}`).join('\n')}`
+                : '',
+            ])
+            .filter(Boolean)
+            .join('\n');
+          const missing = checkDecisionQuestion(textToCheck);
+          if (missing.length > 0) {
+            process.stdout.write(
+              JSON.stringify({
+                decision: 'deny',
+                reason: `BLOCKED: write the analysis before asking. Missing parts of the decision-question template: ${missing.map((p) => p.title).join(', ')}.\n${describeDecisionQuestion()}`,
+              }) + '\n',
+            );
+            process.exit(0);
+          }
+        } catch {
+          // fail-open
+        }
+      }
+      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
+      process.exit(0);
+    }
+  }
+
+  const scriptPath = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'scripts',
+    `${kind}-hook.mjs`,
+  );
+  if (!fs.existsSync(scriptPath)) {
+    process.stderr.write(`Error: Hook script not found at ${scriptPath}\n`);
+    process.exit(1);
+  }
+
+  const child = spawnSync(process.execPath, [scriptPath, ...flags], {
+    input: rawStdin,
+    stdio: ['pipe', 'inherit', 'inherit'],
+    env: process.env,
+  });
+
+  if (child.error) {
+    process.stderr.write(`Error invoking hook script: ${child.error.message}\n`);
+    process.exit(1);
+  }
+
+  process.exit(child.status ?? (child.signal ? 1 : 0));
+}
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
+  if (verb === 'hook') {
+    await handleHook(rest);
+    return;
+  }
+
 
   if (verb === '--help') {
     handleHelp(rest.includes('--json'));

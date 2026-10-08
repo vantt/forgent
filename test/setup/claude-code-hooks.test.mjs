@@ -21,7 +21,7 @@ test('installClaudeCodeHook wires the PreToolUse dispatch-decide entry into a re
   assert.equal(claudeCodeHookWired(repoRoot), true);
   const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
   assert.equal(settings.hooks.PreToolUse[0].matcher, 'Agent|Task');
-  assert.match(settings.hooks.PreToolUse[0].hooks[0].command, /dispatch-decide-hook\.mjs/);
+  assert.match(settings.hooks.PreToolUse[0].hooks[0].command, /hook dispatch-decide/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
@@ -52,7 +52,7 @@ test('installClaudeCodeHook is idempotent -- running it twice adds exactly one P
   installClaudeCodeHook(repoRoot);
   installClaudeCodeHook(repoRoot);
   const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
-  const dispatchEntries = settings.hooks.PreToolUse.filter((e) => e.hooks.some((h) => h.command.includes('dispatch-decide-hook.mjs')));
+  const dispatchEntries = settings.hooks.PreToolUse.filter((e) => e.hooks.some((h) => h.command.includes('hook dispatch-decide')));
   assert.equal(dispatchEntries.length, 1);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -137,7 +137,7 @@ test('installClaudeCodeHook also wires the AskUserQuestion decision-question hoo
   installClaudeCodeHook(repoRoot);
   const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
   assert.deepEqual(settings.hooks.PreToolUse.map((entry) => entry.matcher), ['Agent|Task', 'AskUserQuestion']);
-  assert.match(settings.hooks.PreToolUse[1].hooks[0].command, /decision-question-hook\.mjs/);
+  assert.match(settings.hooks.PreToolUse[1].hooks[0].command, /hook decision-question/);
   assert.equal(claudeCodeHookWired(repoRoot), true);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });

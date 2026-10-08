@@ -80,7 +80,7 @@ Consumer rẽ nhánh theo mã thoát phạm trù, không bao giờ theo thông �
 
 ### Ngoại lệ có lý do
 
-Bốn luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
+Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — dùng chung
 đúng một chữ, "ngoại lệ có lý do", không gọi tuỳ hứng theo từng chỗ:
 
 1. **Sổ verb máy-đọc** (`--help`/`--help --json`, kể cả `<verb> --help`) —
@@ -93,7 +93,10 @@ Bốn luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng —
    làm-rõ/chia-việc, đuôi kết quả proof, thử lại, dừng — cộng dòng lifecycle
    "watch mode stopped" khi nhận tín hiệu dừng) — in console y nguyên như
    trước, một tính năng KHÁC (đã khoá) với hợp đồng này, không đụng.
-
+5. **Cửa hook thực thi agent** (`fgos hook <dispatch-decide|decision-question>`) —
+   bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,
+   `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,
+   hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.
 **Khối `fgos-discovered`** (worker phát cho runner nêu việc mới phát hiện)
 NẰM NGOÀI hợp đồng này — nó là giao thức worker→runner của CTR003, không
 phải cửa ra tới người.
