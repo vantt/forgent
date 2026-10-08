@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { loadDecisionShards } from '../../scripts/check-doc-inventory-gates.mjs';
+import { loadDecisionShards, buildConservationUnitLookup } from '../../scripts/check-doc-inventory-gates.mjs';
 
 const source = 'docs/specs/alpha.md';
 const owner = 'docs/platform/alpha/spec.md';
@@ -78,15 +78,18 @@ function receiptFixture(t, options = {}) {
   const reviewer = options.reviewer || 'reviewer:claude-session:reviewer@2026-10-08';
   const receiptPath = 'plans/fixture/ledger/candidate-classifications-alpha.json';
   const reportPath = 'plans/fixture/reports/phase-06/review-2-classifications.md';
-  const digest = createHash('sha256').update('Candidate navigation frame.').digest('hex');
-  const receipt = { claimId: 'native-unit', path: owner, anchor: 'native', unitDigest: digest, class: options.class || 'candidate-native-navigation', authoredBy: options.authoredBy ?? author };
-  write(owner, '# Alpha\n\nCandidate navigation frame.\n');
+  write(owner, '# Alpha\n\n## Native\n\nCandidate navigation frame.\n');
   git('add', '--', owner); git('commit', '-qm', 'candidate');
+  const nativeUnit = buildConservationUnitLookup(root, git('rev-parse', 'HEAD'))(owner).find(unit => unit.anchor === (options.heading ? 'native' : 'unheaded-block-1'));
+  const digest = nativeUnit.textDigest;
+  const shownText = nativeUnit.sectionText ?? nativeUnit.text;
+  const shownTextDigest = createHash('sha256').update(shownText).digest('hex');
+  const receipt = { claimId: 'native-unit', path: owner, anchor: nativeUnit.anchor, unitDigest: digest, shownText: options.shownText || shownText, shownTextDigest: options.receiptShownDigest || shownTextDigest, class: options.class || 'candidate-native-navigation', authoredBy: options.authoredBy ?? author };
   write(receiptPath, JSON.stringify({ version: 1, authorSession: options.authorSession ?? author, receipts: [receipt] }));
   if (!options.uncommittedReceipt) { git('add', '--', receiptPath); git('commit', '-qm', 'classification receipt'); }
   const receiptCommit = git('rev-parse', 'HEAD');
   const note = 'The shown unit is candidate-native material, not an unnamed legacy claim.';
-  write(reportPath, `# Independent classification review\nAuthor session: ${author}\nReviewer: ${options.reportReviewer || reviewer}\nReceipt commit: ${receiptCommit}\n\n| Claim | Class | Verdict | Unit digest | Note |\n|---|---|---|---|---|\n| native-unit | ${options.reportClass || receipt.class} | ${options.verdict || 'ok'} | ${options.reportDigest || digest} | ${note} |\n`);
+  write(reportPath, `# Independent classification review\nAuthor session: ${author}\nReviewer: ${options.reportReviewer || reviewer}\nReceipt commit: ${receiptCommit}\n\n| Claim | Class | Verdict | Unit digest | Shown text digest | Note |\n|---|---|---|---|---|---|\n| native-unit | ${options.reportClass || receipt.class} | ${options.verdict || 'ok'} | ${options.reportDigest || digest} | ${options.reportShownDigest || shownTextDigest} | ${note} |\n`);
   if (!options.uncommittedReport) { git('add', '--', reportPath); git('commit', '-qm', 'independent review'); }
   const commit = git('rev-parse', 'HEAD');
   const classification = { claimId: receipt.claimId, receiptPath, receiptCommit, reviewStatus: options.reviewStatus || 'reviewed', reviewedBy: reviewer, reviewedAt: '2026-10-08', reviewReport: reportPath, reviewReportCommit: commit, reviewNote: note };
@@ -146,3 +149,23 @@ test('the shard loader rejects a non-array classification reference list', (t) =
   fixture.write('shard.json', JSON.stringify({ ...fixture.nativeShard, candidateClassifications: {} }));
   assert.throws(() => loadDecisionShards(path.join(fixture.root, 'shard.json')), /candidateClassifications.*array/);
 });
+
+test('heading classification approval is invalidated when the shown section changes without changing its heading identity', (t) => {
+  const fixture = receiptFixture(t, { class: 'structural-frame', heading: true });
+  assert.deepEqual(fixture.check(), []);
+  fixture.write(owner, '# Alpha\n\n## Native\n\nA changed candidate claim.\n');
+  fixture.git('add', '--', owner); fixture.git('commit', '-qm', 'changed candidate');
+  fixture.nativeInventory.commit = fixture.git('rev-parse', 'HEAD');
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+});
+
+for (const [name, options] of [
+  ['a forged receipt payload', { shownText: 'A clause the reviewer did not see.' }],
+  ['a stale receipt payload digest', { receiptShownDigest: 'e'.repeat(64) }],
+  ['a stale reviewed payload digest', { reportShownDigest: 'e'.repeat(64) }],
+]) {
+  test(`a classification receipt does not close a unit with ${name}`, (t) => {
+    const fixture = receiptFixture(t, options);
+    assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+  });
+}
