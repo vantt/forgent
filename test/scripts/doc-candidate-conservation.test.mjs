@@ -92,6 +92,13 @@ function receiptFixture(t, options = {}) {
     commit: git('rev-parse', 'HEAD'), finding: options.evidenceFinding || 'true-and-current',
     citations: [{ path: evidencePath, startLine: 1, endLine: 1, blobSha: git('hash-object', evidencePath) }],
   };
+  if (options.commandEvidence) {
+    const output = execFileSync(process.execPath, ['--input-type=module', '-e', "import { driving } from './src/runtime.mjs'; console.log(driving)"], { cwd: root, encoding: 'utf8' });
+    receipt.currentEvidence = {
+      commit: git('rev-parse', 'HEAD'), finding: 'true-and-current', citations: [],
+      commands: [{ command: "node --input-type=module -e \"import { driving } from './src/runtime.mjs'; console.log(driving)\"", exitCode: options.commandExit ?? 0, output, outputDigest: createHash('sha256').update(output).digest('hex'), inputs: [{ path: evidencePath, blobSha: git('hash-object', evidencePath) }] }],
+    };
+  }
   const evidenceDigest = receipt.currentEvidence && createHash('sha256').update(JSON.stringify(receipt.currentEvidence)).digest('hex');
   write(receiptPath, JSON.stringify({ version: 1, authorSession: options.authorSession ?? author, receipts: [receipt] }));
   if (!options.uncommittedReceipt) { git('add', '--', receiptPath); git('commit', '-qm', 'classification receipt'); }
@@ -208,5 +215,19 @@ test('current-code evidence becomes stale when its cited implementation changes'
   fixture.write('src/runtime.mjs', 'export const driving = true;\n');
   fixture.git('add', '--', 'src/runtime.mjs'); fixture.git('commit', '-qm', 'changed runtime');
   fixture.nativeInventory.commit = fixture.git('rev-parse', 'HEAD');
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+});
+
+test('an independently accepted observed command can prove candidate-native behaviour', (t) => {
+  const fixture = receiptFixture(t, { class: 'candidate-native-content', commandEvidence: true });
+  assert.deepEqual(fixture.check(), []);
+  fixture.write('src/runtime.mjs', 'export const driving = true;\n');
+  fixture.git('add', '--', 'src/runtime.mjs'); fixture.git('commit', '-qm', 'changed runtime');
+  fixture.nativeInventory.commit = fixture.git('rev-parse', 'HEAD');
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
+});
+
+test('a failed command is not a true-and-current behaviour proof', (t) => {
+  const fixture = receiptFixture(t, { class: 'candidate-native-content', commandEvidence: true, commandExit: 1 });
   assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
 });
