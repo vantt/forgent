@@ -27,7 +27,7 @@ Why the current plan did not finish: the definition of done was "all seven live 
 
 ## Do not do
 
-- No change under `src/runner/dispatch/`, herdr or confinement in the M branch. No new file there.
+- No change under `src/runner/dispatch/`, herdr or confinement in the M branch, and no new file there, with exactly two named exceptions, both already listed under "Do now": the blind-input read access fix in `src/runner/dispatch/cli.mjs` (about 17 lines) and the settlement fix that keeps a reviewer's `findings` in `src/runner/dispatch/settlement.mjs` (about 5 lines). Take the minimal versions only, not the larger edits to those two files in the frozen branch (they also carry receipt and recovery work that belongs to the dispatch item). The stop criterion on dispatch patches does not trigger for these two; any other dispatch patch does.
 - Not in M, and not to be built here: `workflow start --definition`, the request-correction store event, input byte capture, durable Unit association and reconnect, launch-before-brief recovery, trust seeding, home lifetime, the orphan reaper, startup-dialog capture, receipt collection, the automatic mid-run specialist, any driver or continuation-graph chooser. They go to a separate dispatch item the owner decides on by 2026-10-12. Order inside it: Unit association first, because a controller death can re-run settled seats (a Unit is linked to its Workflow only after the run returns).
 - Do not touch the two open HIGH session-isolation gaps in M; list them in the dispatch item.
 
@@ -38,7 +38,7 @@ Why the current plan did not finish: the definition of done was "all seven live 
 
 ## Stop criteria (any one stops M; report to the owner, do not push on)
 
-- Any patch lands under dispatch, herdr or confinement.
+- Any patch lands under dispatch, herdr or confinement other than the two named exceptions above.
 - `--context-ref` gains a second field.
 - The skill reads or writes run state.
 - Any definition branches, or has a step that decides which step runs next.
