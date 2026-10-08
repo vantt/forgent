@@ -845,7 +845,7 @@ test('fgos run reclaims a private home whose owning process is gone before it do
 });
 
 // A worker that writes a file in its worktree and never touches git.
-function writeFileWritingWorker(repoRoot) {
+function writeFileWritingWorker(repoRoot, verdict = 'pass') {
   const script = path.join(repoRoot, 'settling-worker.mjs');
   fs.writeFileSync(
     script,
@@ -864,7 +864,7 @@ function writeFileWritingWorker(repoRoot) {
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Added the feature file', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Added the feature file', assessment: { verdict: ${JSON.stringify(verdict)} } }));
     }
     `,
   );
@@ -889,6 +889,28 @@ test('after a producer round passes, the runner commits what the worker wrote, w
   assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), '', 'nothing left uncommitted');
   const unitRecord = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
   assert.equal(Object.values(unitRecord.bindings)[0][0].commit.status, 'committed', 'the run record says what the runner committed');
+});
+
+test('mutating producer findings preserve dirty work and never create a runner commit', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeFileWritingWorker(repoRoot, 'findings');
+  const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreeDir, encoding: 'utf8' }).trim();
+  const res = await runUnit({
+    unitData: { id: 'u-findings-no-commit', objective: 'Implement feature while retaining findings', capability: 'docs:write', writes: ['src/feature.txt'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  assert.equal(res.outcome, 'findings');
+  assert.equal(res.results[0].runResult.classification.execution.status, 'completed');
+  assert.equal(res.results[0].runResult.classification.confidence.level, 'verified');
+  assert.equal(res.results[0].commit, undefined);
+  assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), before);
+  assert.equal(fs.readFileSync(path.join(worktreeDir, 'src', 'feature.txt'), 'utf8'), 'feature\n');
+  assert.match(execFileSync('git', ['status', '--porcelain'], { cwd: worktreeDir, encoding: 'utf8' }), /\?\? src\//);
+  const record = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
+  const attempt = Object.values(record.bindings)[0][0];
+  assert.equal(attempt.outcome, 'findings');
+  assert.equal(attempt.commit, undefined);
 });
 
 // A worker that reports whether it can read a peer's report and which assignment directories it can see.
