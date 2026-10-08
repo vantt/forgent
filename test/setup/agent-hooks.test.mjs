@@ -271,3 +271,22 @@ test('installAllAgentHooks configures all 5 agents and checkAllAgentHooks verifi
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
+
+test('the runnable probe works when doctor itself runs inside the fgos host (recursion guard set)', () => {
+  const repoRoot = mkTempDir('agent-hooks-guard-');
+  const shimPath = getProjectShimPath(repoRoot);
+  fs.mkdirSync(path.dirname(shimPath), { recursive: true });
+  // Like the real host: refuse when its recursion guard is inherited.
+  fs.writeFileSync(shimPath, `#!/usr/bin/env node
+if (process.env.FGOS_RUST_HOST_RECURSION_GUARD) process.exit(1);
+process.exit(process.argv[2] === 'hook' ? 0 : 1);
+`, { mode: 0o755 });
+  const saved = process.env.FGOS_RUST_HOST_RECURSION_GUARD;
+  process.env.FGOS_RUST_HOST_RECURSION_GUARD = '1';
+  try {
+    assert.deepEqual(isShimRunnable(repoRoot), { runnable: true, reason: null });
+  } finally {
+    if (saved === undefined) delete process.env.FGOS_RUST_HOST_RECURSION_GUARD;
+    else process.env.FGOS_RUST_HOST_RECURSION_GUARD = saved;
+  }
+});

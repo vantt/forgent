@@ -45,10 +45,15 @@ export function isShimRunnable(repoRoot) {
   const shim = getProjectShimPath(repoRoot);
   if (!existsSync(shim)) return { runnable: false, reason: 'shim-missing' };
   try {
+    // Probe the way an agent calls the hook: from a fresh process, not as a
+    // child of the host that runs doctor. The host's recursion guard would
+    // otherwise make the nested shim refuse and every probe read as broken.
+    const env = { ...process.env };
+    delete env.FGOS_RUST_HOST_RECURSION_GUARD;
     const res = spawnSync(shim, ['hook', 'dispatch-decide'], {
       input: '{}',
       timeout: 3000,
-      env: process.env,
+      env,
     });
     if (res.status === 0) return { runnable: true, reason: null };
     return { runnable: false, reason: `exit-${res.status}` };
