@@ -664,7 +664,7 @@ references.
 | Any `spec.operations[]` template | `contextAccess` | Binding-scoped only, exactly like `activation` (Phase 06, Step 09 MVP6). |
 | `CoordinationProtocol` profile | `profile.work`, `baseStepMap`, mandatory `task.taskSpec`, `result.kind: gate-verdict` | Would import Work lifecycle authority into a standalone protocol. |
 | Any `FlowDefinition` | a `missionId` field anywhere | ADR-008 Decision 5; Mission stays deferred-preserved. |
-| A literal `policy.preferExecutor` at definition/role/actor/operation scope, on any portable `CoordinationProtocol` or `Workflow` document | `preferExecutor` | A *portable* definition expresses requirements (`rigor`, `capabilities`), never a literal executor pin — that authority is trusted session/human/project-scope only (PolicyPatch, above). Runtime-enforced by `assertNoPortableExecutorPin` (`session-engine.mjs`); a request's own trusted per-actor `actors[].executor` field is the correct channel if a specific run needs one. |
+| A literal `policy.preferExecutor` at definition/role/actor/operation scope, on any portable `CoordinationProtocol` or `Workflow` document | `preferExecutor` | A *portable* definition expresses requirements (`rigor`, `capabilities`), never a literal executor pin — that authority is trusted session/human/project-scope only (PolicyPatch, above). Runtime-enforced by `assertNoPortableExecutorPin` (`session-engine.mjs`); a request's own trusted per-actor `actors[].executor` field is the correct channel instead (proven protocol-agnostic, `P10.1.md`/`P10.3.md`, Step 09 Phase 10). |
 
 ## Proposed Continuation Profile
 
