@@ -1,5 +1,22 @@
 # ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
 
+```txt
+Document type: Decision
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved decision material for ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Vision V-003/V-004](../vision.md), [ADR-002](ADR-002-stage-operation-compatibility.md), [ADR-003](ADR-003-assignment-run-runresult-separation.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented

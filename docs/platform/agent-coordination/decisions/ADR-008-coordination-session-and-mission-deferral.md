@@ -1,5 +1,22 @@
 # ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral
 
+```txt
+Document type: Decision
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved decision material for ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Vision V-001/V-005/V-009](../vision.md), [ADR-006 §6](ADR-006-assignment-provenance-and-contract-snapshot.md), [Intent Preservation Ledger AC-I001/AC-I002/AC-I007](../intent-preservation-ledger.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented (`src/runner/coordination/{schema,store,replay,session-engine}.mjs`,

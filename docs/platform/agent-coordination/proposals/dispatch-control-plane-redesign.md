@@ -1,5 +1,22 @@
 # Dispatch Control Plane Redesign
 
+```txt
+Document type: Proposal
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Dispatch Control Plane Redesign
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved proposal material for Dispatch Control Plane Redesign; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Vocabulary Map](../vocabulary/README.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Proposal
 Design status: Proposed
 Implementation: Partial

@@ -1,5 +1,22 @@
 # Coordination Foundation Baseline
 
+```txt
+Document type: Architecture
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Coordination Foundation Baseline
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved architecture material for Coordination Foundation Baseline; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Vision](../vision.md), [Runtime Model](runtime-model.md), [Protocol Model](protocol-model.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented for Steps 00-08 delivered surface; deferred items named below

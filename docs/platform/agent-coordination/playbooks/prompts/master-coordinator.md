@@ -1,5 +1,22 @@
 # Master Multi-Agent Implementation Coordinator Prompt
 
+```txt
+Document type: Guide / runbook
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Master Multi-Agent Implementation Coordinator Prompt
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved guide-runbook material for Master Multi-Agent Implementation Coordinator Prompt; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: None; source context is recorded in Provenance
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Playbook
 Design status: N/A
 Implementation: Active

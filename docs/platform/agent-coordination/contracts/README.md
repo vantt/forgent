@@ -1,5 +1,22 @@
 # Agent Coordination Contracts
 
+```txt
+Document type: Collection index
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Agent Coordination Contracts
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/contracts/README.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved collection-index material for Agent Coordination Contracts; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Agent Coordination Foundation Vision](../vision.md), [Workflow Stage Operation](workflow-stage-operation.md), [Assignment, Run, And RunResult](assignment-run-runresult.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Index
 Design status: Accepted
 Implementation: Partial

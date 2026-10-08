@@ -6,6 +6,23 @@ coverage: substantially-implemented
 
 # Runtime Recovery And Work Continuity
 
+```txt
+Document type: Architecture
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Runtime Recovery And Work Continuity
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/runtime-recovery-design.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved architecture material for Runtime Recovery And Work Continuity; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Run admission amendment](../contracts/assignment-run-runresult.md#proposed-runtime-recovery-amendment), [RunHandle and recovery material](run-handle.md), [Fallback eligibility and selection](executor-health-and-fallback.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Design status: PROPOSED detailed design; Slices S0-S4 and the session-recovery
 half of S5 are now IMPLEMENTED (runtime-recovery track, closed 2026-09-14 —
 see `plans/260911-2305-runtime-recovery/plan.md`'s Product Gates table and the

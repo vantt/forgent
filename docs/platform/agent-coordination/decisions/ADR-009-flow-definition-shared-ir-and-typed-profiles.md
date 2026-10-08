@@ -1,5 +1,22 @@
 # ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles
 
+```txt
+Document type: Decision
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved decision material for ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Vision V-006/V-008/V-012](../vision.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented (`src/runner/definitions/{schema,workflow-adapter,protocol-loader}.mjs`,

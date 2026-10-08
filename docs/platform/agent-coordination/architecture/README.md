@@ -1,5 +1,22 @@
 # Agent Coordination Architecture
 
+```txt
+Document type: Collection index
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Agent Coordination Architecture
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/README.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved collection-index material for Agent Coordination Architecture; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Implementation Alignment](../verification/implementation-alignment.md), [Proof Preservation](../history/documentation-migration/proof-preservation.md), [Agent Coordination Foundation Vision](../vision.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Index
 Design status: Accepted
 Implementation: Partial

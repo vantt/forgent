@@ -1,5 +1,22 @@
 # Group Thinking Trigger Surface
 
+```txt
+Document type: Architecture
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Group Thinking Trigger Surface
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved architecture material for Group Thinking Trigger Surface; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Protocol Model](protocol-model.md), [Dispatch Control Plane](dispatch-control-plane.md), [FlowDefinition Contract](../contracts/flow-definition.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented as skill and documentation routing

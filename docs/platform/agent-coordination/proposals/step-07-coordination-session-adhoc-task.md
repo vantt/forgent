@@ -1,5 +1,22 @@
 # Step 07 - CoordinationSession, AdhocTask, And Planning Boundary
 
+```txt
+Document type: Proposal
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Step 07 - CoordinationSession, AdhocTask, And Planning Boundary
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved proposal material for Step 07 - CoordinationSession, AdhocTask, And Planning Boundary; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md), [Agent Coordination Foundation Vision](../vision.md), [Step 07 Design Discussion Handoff Prompt](../playbooks/prompts/step-07-design-discussion-handoff.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Proposal
 Design status: Promoted history / partially superseded
 Implementation: Accepted portions implemented through Step 08; deferred portions remain unaccepted

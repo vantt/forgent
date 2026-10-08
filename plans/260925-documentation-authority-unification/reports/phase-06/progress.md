@@ -15,9 +15,9 @@ Owner queue items: none open; unseeded-ordinary-review resolved by committed A6
 Archive/delete lists: none authored
 Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root-authorities batch
 Holds: none authored
-Promoted-document edits: none
+Promoted-document edits: agent-coordination portal, header-only metadata completion logged in promoted-edits.md; body unchanged
 
-Next action: commit the frozen maps and measured baseline, then add header-only promotion metadata to the agent-coordination counterparts and author the first batch for independent review.
+Next action: commit the header-only completion, refresh inventory and both prior-registry proofs, then author mirror/exact/manual decision shards and their independent review request.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -70,3 +70,5 @@ Step 1 complete: A6 ordinary committed-report approval is exercised (40 fixture 
 Frozen placement matrix: 1,040 legacy files plus five reconciliation files; all 1,040 legacy sources covered, 0 uncovered. Twenty-one additive candidate route probes pass; existing area-status changes: 0. Q5 additive kinds use existing vocabulary and do not alter frozen rules. Constitution check has 0 fatal findings; placement has 446 files, 445 matches, one standing exception, 0 leftovers or ambiguities. `baseline-counts.md`, `frozen-map-inputs.json`, `frozen-map-verification.json` and nine `ledger/area-map-*.md` files hold the pinned inputs and proof.
 
 Measured source total is 22,429: 12,882 Mirror, 2,787 Unit-exact, 971 Weak-exact and 5,789 Judgment. Agent coordination contributes 17,034 rows from 937 files: 867 evidence files, 68 existing counterparts (67 Markdown plus one SVG) and two legacy-only plans. Content authoring, independent content approval, reduced promotion rehearsal and scoped E remain UNPROVEN.
+
+First content batch, header item: 67 Markdown headers completed, including 66 new fenced metadata blocks and one extended portal block. The SVG counterpart is unchanged. Actual command: `node plans/260925-documentation-authority-unification/reports/phase-06/verify-header-only-changes.mjs --before fcfe78cb89585bc9ab23f11bab67d41458834fc4 --after WORKTREE --files plans/260925-documentation-authority-unification/reports/phase-06/header-inputs.json`. It reports 68 files, 67 Markdown, 0 failures: stripping only the immediate fenced metadata block leaves byte-identical bodies in all cases, and all promotion fields exist. Before completion the same helper at the frozen pin reports 67 missing-metadata failures. No decision row has yet been authored or approved for this batch.

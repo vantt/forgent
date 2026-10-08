@@ -1,5 +1,22 @@
 # Step 08 - Standalone Coordination And Optional Protocols
 
+```txt
+Document type: Proposal
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Step 08 - Standalone Coordination And Optional Protocols
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved proposal material for Step 08 - Standalone Coordination And Optional Protocols; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Agent Coordination Intent Preservation Ledger](../intent-preservation-ledger.md), [Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md), [CoordinationSession](../contracts/coordination-session.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Proposal history
 Design status: Promoted history / superseded by accepted architecture and contracts
 Implementation: Delivered by `plans/260901-1542-step08-standalone-coordination/plan.md`

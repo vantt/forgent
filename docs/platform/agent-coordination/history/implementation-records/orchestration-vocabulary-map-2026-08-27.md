@@ -1,5 +1,22 @@
 # Orchestration Vocabulary Map
 
+```txt
+Document type: History
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Orchestration Vocabulary Map
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved history material for Orchestration Vocabulary Map; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Stage, Stage Operation, TaskSpec, and Skill relationship](../../vocabulary/stage-operation-taskspec-skill-relationship.svg)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: History
 Design status: Superseded
 Implementation: N/A

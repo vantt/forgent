@@ -1,5 +1,22 @@
 # Team Communication Protocol V1
 
+```txt
+Document type: Proposal
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Team Communication Protocol V1
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved proposal material for Team Communication Protocol V1; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Agent Coordination Foundation Vision](../vision.md), [coordination-operating-harness.md](../playbooks/coordination-operating-harness.md), [Step 08](step-08-standalone-coordination-protocols.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Proposal
 Design status: Proposed
 Implementation: Partial

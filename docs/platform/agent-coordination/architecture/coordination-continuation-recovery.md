@@ -6,6 +6,23 @@ coverage: proposed
 
 # Coordination Recovery Planning And Session Continuation
 
+```txt
+Document type: Architecture
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Coordination Recovery Planning And Session Continuation
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved architecture material for Coordination Recovery Planning And Session Continuation; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Runtime Recovery Design](runtime-recovery-design.md), [the proof matrix](runtime-recovery-design.md#10-proof-matrix)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Design status: PROPOSED detailed contract. Implementation: not implemented.
 Read [Runtime Recovery Design](runtime-recovery-design.md) for identity, ownership,
 versioning and proof. This file owns next-action planning and legal cross-session

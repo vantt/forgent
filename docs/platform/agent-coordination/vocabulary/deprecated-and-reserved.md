@@ -1,5 +1,22 @@
 # Deprecated And Reserved Coordination Terms
 
+```txt
+Document type: Vocabulary
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Deprecated And Reserved Coordination Terms
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved vocabulary material for Deprecated And Reserved Coordination Terms; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [SessionActor](canonical-concepts.md#sessionactor), [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md), [pre-migration vocabulary map](../history/implementation-records/orchestration-vocabulary-map-2026-08-27.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Vocabulary
 Design status: Accepted
 Implementation: Active

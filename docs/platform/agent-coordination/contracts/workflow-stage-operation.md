@@ -1,5 +1,22 @@
 # Workflow Stage Operation Contract
 
+```txt
+Document type: Contract
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Workflow Stage Operation Contract
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/contracts/workflow-stage-operation.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved contract material for Workflow Stage Operation Contract; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Agent Coordination Foundation Vision](../vision.md), [Step 02](../roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Contract
 Design status: Accepted
 Implementation: Implemented

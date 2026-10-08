@@ -1,5 +1,22 @@
 # Architecture Advisory Artifact Templates
 
+```txt
+Document type: Guide / runbook
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Architecture Advisory Artifact Templates
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved guide-runbook material for Architecture Advisory Artifact Templates; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [the role doctrine](architecture-advisory-role-doctrine.md), [the coordinator prompt](prompts/architecture-advisory-coordinator.md), [rubric](architecture-advisory-evaluation-rubric.md)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: Playbook
 Design status: N/A
 Implementation: Active (manual)

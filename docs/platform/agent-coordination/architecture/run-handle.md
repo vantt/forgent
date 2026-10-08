@@ -6,6 +6,23 @@ coverage: substantially-implemented
 
 # RunHandle And Recovery Material
 
+```txt
+Document type: Architecture
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for RunHandle And Recovery Material
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/run-handle.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved architecture material for RunHandle And Recovery Material; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related: [Runtime Recovery Design](runtime-recovery-design.md), [Local Concurrency And Durability](runtime-recovery-design.md#6-local-concurrency-and-durability), [the proof matrix](runtime-recovery-design.md#10-proof-matrix)
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Design status: PROPOSED detailed contract; the runtime-recovery track
 (closed 2026-09-14) implemented the recoverable-observation/control
 contract this file proposes — `run-lock.mjs` (control-epoch fencing),
