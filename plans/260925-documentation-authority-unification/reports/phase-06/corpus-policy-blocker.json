@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "status": "blocked-awaiting-owner",
+  "observedAt": "0a41d793e60631aa9073c73a941f641548862b6c",
+  "command": [
+    "node",
+    "--input-type=module",
+    "-e",
+    "import fs from 'node:fs'; import {loadProposalContext} from './scripts/propose-doc-decisions.mjs'; import {validateAgainstVocabulary} from './scripts/check-doc-inventory-gates.mjs'; const c=loadProposalContext(process.argv[1],process.cwd()); const v=JSON.parse(fs.readFileSync(process.argv[2],'utf8')); const items=c.inventory.items.filter(i=>i.fileClass==='generated'&&['history-evidence','user-knowledge'].includes(i.corpus)).map(i=>({...i,proposedDisposition:i.corpus==='history-evidence'?'retain-as-evidence':'reclassify-out-of-platform-scope',proposedRationale:'Diagnostic only; no reviewer approval is claimed.'})); const findings=validateAgainstVocabulary({items,claimLedger:[]},v); console.log(JSON.stringify({commit:c.inventory.commit,generatedItems:items.map(i=>({path:i.path,fileClass:i.fileClass,corpus:i.corpus,proposedDisposition:i.proposedDisposition})),findings},null,2)); process.exit(findings.length?1:0);",
+    "/tmp/phase06/review-doc-inventory.json",
+    "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json"
+  ],
+  "exit": 1,
+  "evidence": {
+    "commit": "0a41d793e60631aa9073c73a941f641548862b6c",
+    "generatedItems": [
+      {
+        "path": "docs/decisions/index.md",
+        "fileClass": "generated",
+        "corpus": "history-evidence",
+        "proposedDisposition": "retain-as-evidence"
+      },
+      {
+        "path": "docs/doc-registry.md",
+        "fileClass": "generated",
+        "corpus": "user-knowledge",
+        "proposedDisposition": "reclassify-out-of-platform-scope"
+      },
+      {
+        "path": "docs/enduser-docs-index.json",
+        "fileClass": "generated",
+        "corpus": "user-knowledge",
+        "proposedDisposition": "reclassify-out-of-platform-scope"
+      }
+    ],
+    "findings": [
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/decisions/index.md",
+        "message": "docs/decisions/index.md: fileClass \"generated\" is not allowed for disposition \"retain-as-evidence\" (allowed: history-evidence)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/doc-registry.md",
+        "message": "docs/doc-registry.md: fileClass \"generated\" is not allowed for disposition \"reclassify-out-of-platform-scope\" (allowed: maintained-authority, retained-source, history-evidence)"
+      },
+      {
+        "type": "file-class-not-allowed-for-disposition",
+        "path": "docs/enduser-docs-index.json",
+        "message": "docs/enduser-docs-index.json: fileClass \"generated\" is not allowed for disposition \"reclassify-out-of-platform-scope\" (allowed: maintained-authority, retained-source, history-evidence)"
+      }
+    ]
+  },
+  "affectedShards": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-history-evidence.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-user-knowledge.json"
+  ],
+  "constraint": "No approval was fabricated. Active D passes while these corpus rules remain pending. A5/A8 do not authorize the required corpus file-disposition semantic correction.",
+  "recommendation": "Authorize a narrowly tested T3 correction: preserve regenerate-from-source for generated file items while still reviewing and expanding all corpus claim rows; retain whole-corpus membership, mandatory independent committed review, file-class validation and N1.",
+  "alternatives": [
+    "Replace the affected corpus rules with independently reviewed per-row decisions and compatible per-file decisions without modifying tooling."
+  ],
+  "unproven": [
+    "Actual independently approved corpus expansion",
+    "Scoped strict E and reduced promotion rehearsal"
+  ]
+}

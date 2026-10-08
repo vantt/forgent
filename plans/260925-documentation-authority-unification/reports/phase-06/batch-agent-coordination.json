@@ -1,0 +1,945 @@
+{
+  "version": 1,
+  "status": "authoring-blocked-before-review",
+  "sourcePin": "76585861f718c7ef0dd6150d9b92a7c7baaa3ec4",
+  "candidatePin": "0a41d793e60631aa9073c73a941f641548862b6c",
+  "decisionDataPin": "576f9efea72de92d4191eb295afd9b2349bbb99a",
+  "sourceStats": {
+    "sourceFiles": 937,
+    "sourceRows": 17034,
+    "uniqueSourceRows": 17034,
+    "mirrorFiles": 863,
+    "mirrorRows": 12878,
+    "unitExactRows": 2722,
+    "pendingJudgments": 1434,
+    "blockingJudgments": 0,
+    "retiredCandidateUnitProposals": 1,
+    "sourceDrift": 0
+  },
+  "snapshots": {
+    "signal": null,
+    "status": 0,
+    "output": [
+      null,
+      "{\"historySnapshots\":2,\"byteExactSourceReconstructions\":2}\n",
+      ""
+    ],
+    "pid": 735413,
+    "stdout": "{\"historySnapshots\":2,\"byteExactSourceReconstructions\":2}\n",
+    "stderr": ""
+  },
+  "retiredCandidateProposal": {
+    "version": 1,
+    "authorSession": "codex-session:1@2026-10-08",
+    "sourceCommit": "76585861f718c7ef0dd6150d9b92a7c7baaa3ec4",
+    "candidateCommit": "0a41d793e60631aa9073c73a941f641548862b6c",
+    "rows": [
+      {
+        "claimId": "claim_ffa208224c13eeca2cdc3a874735b802",
+        "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+        "sourceAnchor": "unheaded-block-8",
+        "sourceUnitDigest": "22b24a25ec6e4c595e7c606a7b73285d58b6b54e028ed4070ea473010192b5ad",
+        "claimKind": "historical-context",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+        "targetAnchor": "unheaded-block-9",
+        "shownTargetDigest": "bf44559c4b5c8932d46252db67caad99b22dee4323050f6e6b4684cbdb7f1df3",
+        "authoredBy": "codex-session:1@2026-10-08",
+        "reviewStatus": "pending",
+        "rationale": "The candidate inventory unit is superseded by its current unit after the two A8-authorized history-reference updates. All other bytes of the complete 128009-character unit are identical; reversing only the two recorded row replacements reconstructs the prior source-unit digest. Each old classification and locator is explicitly retained as historical context, alongside the two newly owned non-authority history carriers. This is candidate bookkeeping, not a legacy-source retirement or an authority flip.",
+        "preservationReplacements": [
+          {
+            "before": "| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+            "after": "| `docs/architect/agent-coordination/documentation-governance.md` | documentation policy | navigation | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |"
+          },
+          {
+            "before": "| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md` | link-only | Phase 0 classification; verify detailed claims before promotion. |",
+            "after": "| `docs/architect/agent-coordination/documentation-standardization-plan.md` | migration plan | non-canonical | partial | Historical locator: `docs/platform/agent-coordination/history/documentation-migration/source-inventory.md`; Added in candidate: preserved copy `docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md` | link-only (earlier classification); Added in candidate: move into non-authority history | Phase 0 classification; verify detailed claims before promotion. |"
+          }
+        ]
+      }
+    ]
+  },
+  "dataOnlyRounds": {
+    "sameCandidatePin": "0a41d793e60631aa9073c73a941f641548862b6c",
+    "before": [
+      {
+        "previous": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "exit": 1,
+        "fatalFindings": [
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_dabaed7b51bdf5fdeaf510dc744a0b0e: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md"
+          },
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_4a4142d0946a140241ea46bb27bad1ee: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md"
+          },
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_1ba7c8521fca5c0280367fafc6d30164: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md"
+          },
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_cb3272972a3fb5250bf3b4a01848d7b7: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/flow-definition.md"
+          },
+          {
+            "type": "semantic-claim-multiple-owners",
+            "message": "semantic claim semantic_ca1c6607334f02c60d66e594 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md"
+          },
+          {
+            "type": "retired-row-disposition-missing",
+            "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+            "message": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md: retired claim claim_ffa208224c13eeca2cdc3a874735b802 (unheaded-block-8) has no vocabulary disposition, so its removal is not recorded"
+          }
+        ]
+      },
+      {
+        "previous": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "exit": 1,
+        "fatalFindings": [
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_dabaed7b51bdf5fdeaf510dc744a0b0e: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md"
+          },
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_4a4142d0946a140241ea46bb27bad1ee: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md"
+          },
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_1ba7c8521fca5c0280367fafc6d30164: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md"
+          },
+          {
+            "type": "decision-loss-without-partial-carry",
+            "message": "claim claim_cb3272972a3fb5250bf3b4a01848d7b7: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not promote",
+            "path": "docs/architect/agent-coordination/contracts/flow-definition.md"
+          },
+          {
+            "type": "semantic-claim-multiple-owners",
+            "message": "semantic claim semantic_ca1c6607334f02c60d66e594 names 2 different target owners: docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/7-synthesizer-raw.log, docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/synthesis.md"
+          },
+          {
+            "type": "retired-row-disposition-missing",
+            "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+            "message": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md: retired claim claim_ffa208224c13eeca2cdc3a874735b802 (unheaded-block-8) has no vocabulary disposition, so its removal is not recorded"
+          }
+        ]
+      }
+    ],
+    "firstCorrection": [
+      {
+        "previous": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "exit": 1,
+        "fatalFindings": [
+          {
+            "type": "retired-row-disposition-missing",
+            "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+            "message": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md: retired claim claim_ffa208224c13eeca2cdc3a874735b802 (unheaded-block-8) has no vocabulary disposition, so its removal is not recorded"
+          }
+        ]
+      },
+      {
+        "previous": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "exit": 1,
+        "fatalFindings": [
+          {
+            "type": "retired-row-disposition-missing",
+            "path": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
+            "message": "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md: retired claim claim_ffa208224c13eeca2cdc3a874735b802 (unheaded-block-8) has no vocabulary disposition, so its removal is not recorded"
+          }
+        ]
+      }
+    ],
+    "final": [
+      {
+        "previous": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "exit": 0,
+        "fatalFindings": []
+      },
+      {
+        "previous": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "exit": 0,
+        "fatalFindings": []
+      }
+    ]
+  },
+  "postCommitConservation": [
+    {
+      "previous": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1112,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 24649,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 71237,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 69441,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 335,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/architecture/run-handle.md, docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/contracts/coordination-session.md, docs/platform/agent-coordination/contracts/flow-definition.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+            "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 182,
+          "examples": [
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-4",
+            "docs/architecture-manifest.json#file-block",
+            "docs/architecture-manifest.json#file-block"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 17,
+          "examples": [
+            "dropped-001",
+            "dropped-002",
+            "dropped-003",
+            "dropped-004",
+            "dropped-005"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1447,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/README.md#migration-status",
+            "docs/platform/agent-coordination/architecture/README.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/README.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow",
+            "docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "previous": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1112,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 24649,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 71237,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 69441,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 335,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/architecture/run-handle.md, docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/contracts/coordination-session.md, docs/platform/agent-coordination/contracts/flow-definition.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+            "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 182,
+          "examples": [
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-4",
+            "docs/architecture-manifest.json#file-block",
+            "docs/architecture-manifest.json#file-block"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 17,
+          "examples": [
+            "dropped-001",
+            "dropped-002",
+            "dropped-003",
+            "dropped-004",
+            "dropped-005"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1447,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/README.md#migration-status",
+            "docs/platform/agent-coordination/architecture/README.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/README.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/system-context.md#component-and-runtime-flow",
+            "docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-4"
+          ]
+        }
+      ]
+    }
+  ],
+  "commands": {
+    "registryProjection": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs'; import assert from 'node:assert/strict'; const r=JSON.parse(fs.readFileSync(process.argv[1],'utf8')), d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));for(const p of d.rows){const u=r.retiredUnits.find(u=>u.claimId===p.claimId);assert.ok(u,p.claimId);assert.equal(u.sourcePath,p.sourcePath);assert.equal(u.sourceUnitDigest,p.sourceUnitDigest);Object.assign(u,{disposition:p.disposition,targetOwner:p.targetOwner,targetAnchor:p.targetAnchor,dispositionRationale:p.rationale,authoredBy:p.authoredBy,reviewStatus:p.reviewStatus});}fs.writeFileSync(process.argv[3],JSON.stringify(r,null,2)+String.fromCharCode(10));console.log(JSON.stringify({recordedRetirements:d.rows.length,approved:0}));",
+      "/tmp/phase06/identity-registry.json",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "/tmp/phase06/review-identity-registry.json"
+    ],
+    "refresh": [
+      "node",
+      "scripts/generate-doc-inventory.mjs",
+      "--refresh",
+      "--commit",
+      "HEAD",
+      "--identity-registry",
+      "/tmp/phase06/review-identity-registry.json",
+      "--json-out",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--md-out",
+      "/tmp/phase06/review-doc-inventory.md"
+    ],
+    "gate": [
+      [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/review-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/review-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ]
+    ],
+    "snapshotSmoke": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';const specs=[{\"target\":\"docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md\",\"headerBytes\":1220,\"sourceBlob\":\"f91c7350ac7189295d0d439aa61d76241dcc8fbb\",\"segments\":[{\"bytes\":1681,\"fenced\":false},{\"bytes\":252,\"fenced\":true},{\"bytes\":21,\"fenced\":false},{\"bytes\":98,\"fenced\":true},{\"bytes\":2578,\"fenced\":false}]},{\"target\":\"docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md\",\"headerBytes\":1240,\"sourceBlob\":\"92b7ce87f08ace8a1b4be9a7c8ca2ba3507b7663\",\"segments\":[{\"bytes\":57,\"fenced\":false},{\"bytes\":1060,\"fenced\":true},{\"bytes\":18592,\"fenced\":false},{\"bytes\":248,\"fenced\":true},{\"bytes\":12031,\"fenced\":false},{\"bytes\":1053,\"fenced\":true},{\"bytes\":1251,\"fenced\":false},{\"bytes\":168,\"fenced\":true},{\"bytes\":9890,\"fenced\":false},{\"bytes\":496,\"fenced\":true},{\"bytes\":5144,\"fenced\":false},{\"bytes\":268,\"fenced\":true},{\"bytes\":703,\"fenced\":false},{\"bytes\":126,\"fenced\":true},{\"bytes\":579,\"fenced\":false},{\"bytes\":618,\"fenced\":true},{\"bytes\":2265,\"fenced\":false},{\"bytes\":117,\"fenced\":true},{\"bytes\":164,\"fenced\":false},{\"bytes\":67,\"fenced\":true},{\"bytes\":863,\"fenced\":false},{\"bytes\":226,\"fenced\":true},{\"bytes\":1050,\"fenced\":false},{\"bytes\":136,\"fenced\":true},{\"bytes\":6243,\"fenced\":false}]}];for(const s of specs){const b=fs.readFileSync(s.target);let i=s.headerBytes;const chunks=[];for(const p of s.segments){if(!p.fenced){assert.equal(b.subarray(i,i+8).toString(),'```text'+String.fromCharCode(10));i+=8;}chunks.push(b.subarray(i,i+p.bytes));i+=p.bytes;if(!p.fenced){assert.equal(b.subarray(i,i+4).toString(),'```'+String.fromCharCode(10));i+=4;}}assert.equal(i,b.length);const src=Buffer.concat(chunks),h=crypto.createHash('sha1').update('blob '+src.length+String.fromCharCode(0)).update(src).digest('hex');assert.equal(h,s.sourceBlob,s.target);}console.log(JSON.stringify({historySnapshots:specs.length,byteExactSourceReconstructions:specs.length}));"
+    ],
+    "test": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/backfill-status-category.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-citation-drift.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-codes.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-supersession.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-candidate-status.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-conservation.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-constitution.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-retirement.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-locked-decisions-heading-drift.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/dispatch-decide-hook.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-alias-resolver.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-candidate-conservation.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-corpus-decisions.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-conservation.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-exact.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-mirrors.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-review.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-restoration-proofs.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-authorship.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/fgos-shell-integration.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/full-suite-queue.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-doc-inventory.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-shipped-path-inventory.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/herdr-cockpit-notify.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/install-git-hooks.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/is-main-module.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-classifier.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-migration.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/list-doc-anchors.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/migrate-actor-to-role.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/next-doc-id.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/prepare-release.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/probe-storytelling-material.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/project-agents.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-test-canary.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-tests.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-ownership-lint.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-plan-out.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-proof-inventory.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-compare.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-coverage-map.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-mutate.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote-report.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-timing.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/verify-phase-02.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-test-marker.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-wrapper-script.test.mjs"
+    ],
+    "corpusDiagnostic": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs'; import {loadProposalContext} from './scripts/propose-doc-decisions.mjs'; import {validateAgainstVocabulary} from './scripts/check-doc-inventory-gates.mjs'; const c=loadProposalContext(process.argv[1],process.cwd()); const v=JSON.parse(fs.readFileSync(process.argv[2],'utf8')); const items=c.inventory.items.filter(i=>i.fileClass==='generated'&&['history-evidence','user-knowledge'].includes(i.corpus)).map(i=>({...i,proposedDisposition:i.corpus==='history-evidence'?'retain-as-evidence':'reclassify-out-of-platform-scope',proposedRationale:'Diagnostic only; no reviewer approval is claimed.'})); const findings=validateAgainstVocabulary({items,claimLedger:[]},v); console.log(JSON.stringify({commit:c.inventory.commit,generatedItems:items.map(i=>({path:i.path,fileClass:i.fileClass,corpus:i.corpus,proposedDisposition:i.proposedDisposition})),findings},null,2)); process.exit(findings.length?1:0);",
+      "/tmp/phase06/review-doc-inventory.json",
+      "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json"
+    ]
+  },
+  "tests": {
+    "before": {
+      "exit": 1,
+      "tests": 872,
+      "suites": 0,
+      "pass": 871,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "after": {
+      "exit": 0,
+      "tests": 871,
+      "suites": 0,
+      "pass": 871,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "obsoleteTest": "Removed the source-wording/metadata test that pinned an exact amendment list and minorVersion; did not re-pin it to the new additive version."
+  },
+  "conflictProposals": {
+    "duplicate": 815,
+    "semantic": 205,
+    "total": 1020,
+    "independentAcceptance": false
+  },
+  "identicalSourceUnitExceptionProposals": 334,
+  "unreferencedCandidateUnits": 184,
+  "ownerLists": {
+    "archiveRows": [
+      {
+        "claimId": "claim_6febf72e4de937b588580a52cf4d72ca",
+        "sourcePath": "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md",
+        "sourceAnchor": "unheaded-block-2",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md#unheaded-block-2; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_8d881b361d4443335294b4224ea9de39",
+        "sourcePath": "docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_12f7d354e89bf31adade051f0525bd3e",
+        "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_093d27f04745f067a7169e8aedb78a12",
+        "sourcePath": "docs/architect/agent-coordination/architecture/evidence-and-results.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/evidence-and-results.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a6e29c7717d58ed735b0544b6e247188",
+        "sourcePath": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md",
+        "sourceAnchor": "unheaded-block-2",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-2; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_fbaddf0cb215991e1889417525646591",
+        "sourcePath": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_88c9403d24e0abdaf3b535beb03221f1",
+        "sourcePath": "docs/architect/agent-coordination/architecture/protocol-model.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_99cf66ed2949aaa9915872de4323d406",
+        "sourcePath": "docs/architect/agent-coordination/architecture/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_98786fc7d519345fbdad97d0f3940e92",
+        "sourcePath": "docs/architect/agent-coordination/architecture/run-handle.md",
+        "sourceAnchor": "unheaded-block-2",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/run-handle.md#unheaded-block-2; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_b94bcfa00d264aa8bddb6a326ec0a2c3",
+        "sourcePath": "docs/architect/agent-coordination/architecture/runtime-model.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/runtime-model.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_250d6defe7b01fcabfc840096ce296f7",
+        "sourcePath": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+        "sourceAnchor": "unheaded-block-2",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-2; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_20651bfadf99b005265936b27ebd1356",
+        "sourcePath": "docs/architect/agent-coordination/architecture/system-context.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/system-context.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a0224a4324a5648268fcc5ff8da50b07",
+        "sourcePath": "docs/architect/agent-coordination/architecture/visibility-and-herdr.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/visibility-and-herdr.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_9d23254bf1aa9b922820e8547793a573",
+        "sourcePath": "docs/architect/agent-coordination/architecture/work-integration.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/architecture/work-integration.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_aa718716626d7ee0345c944891312e5c",
+        "sourcePath": "docs/architect/agent-coordination/contracts/assignment-run-runresult.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_d58eb9832c4a77447b2c602c139302a1",
+        "sourcePath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_cbe9813d1ba4a682e963d995e8b1e896",
+        "sourcePath": "docs/architect/agent-coordination/contracts/flow-definition.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/contracts/flow-definition.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_4bb6cc828dde8be5788e51bdb6bd9b87",
+        "sourcePath": "docs/architect/agent-coordination/contracts/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/contracts/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_f07a0606f293d83632ba3264bb56ab51",
+        "sourcePath": "docs/architect/agent-coordination/contracts/workflow-stage-operation.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_3f1d030bd8bdef835e9b60ceeb6a1d58",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_764e4de0b5b1621250f8b3f5cce2c7e0",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_d93ae1e743129dac2c9dab8375aa92d0",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a8e129ff0dbc5a261220a871607a2278",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_e15f10cd12244de96644ee89f20504de",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_501e837d2490013fd9557e7ba5a5fae2",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_296d5a6708db2493ee42312c4df4edf6",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a2539223308dfda63f9e388eb7b29509",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_20703ceb233059c441fc7c3e2359ea9b",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_8d25f9b350558082f9533741079d9653",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_9649b4d09e50dac37b3a6c606c0fd867",
+        "sourcePath": "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_2774e9f8dd0771040e237e54fb45213a",
+        "sourcePath": "docs/architect/agent-coordination/decisions/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/decisions/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_e6d612caf2fa520603a20d44241e75dc",
+        "sourcePath": "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_9f872570278642a55081135db23eecb6",
+        "sourcePath": "docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_64bbeca2d64a99720f86a21e7bd2778b",
+        "sourcePath": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_88e17afcdcdedf37835a9f5add4d964f",
+        "sourcePath": "docs/architect/agent-coordination/history/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/history/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_fd57e08c806bdbf4946de636991a664b",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_b10dde794f06c33d3dd7c1903cc541f2",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_018a9273a10a98e634e991db10feb6dd",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_ca4540f0ba19f310b96d0d43a0289285",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_37d6d16ea17f0d8527d3b96e35959db8",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_c729dbd79dae7e74ee0873b5091c467a",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_899787b52c1a9d03883148b9cd1fad2c",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_7f9a28794df169f4d30d776fd0baff33",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_53ca62c8445b248440bdd5c3bff06448",
+        "sourcePath": "docs/architect/agent-coordination/playbooks/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/playbooks/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_ebfce575b608d59b3df109324480b2f8",
+        "sourcePath": "docs/architect/agent-coordination/proposals/dag-request-scheduler.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/proposals/dag-request-scheduler.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a574c3c48f8606ede4d6e3948f29ce9f",
+        "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_45d767b4facded4ccf49987523f80125",
+        "sourcePath": "docs/architect/agent-coordination/proposals/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/proposals/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_9778a0fd1e56c0959163ec4b2940b0b7",
+        "sourcePath": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_604edd0b64789b10e9731c037e82ce31",
+        "sourcePath": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_767962ca10cb7df00cb97760d4cf6817",
+        "sourcePath": "docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_866f1a0e0c7cd00800b6adace9496b3b",
+        "sourcePath": "docs/architect/agent-coordination/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_6c8da2503f5197e51400c7e2613864b5",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_d0aaf0e93977773fdf19722f3fa269b9",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_1adc73890863a54aa8aa99beb1bc675d",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_605ee8bb4257b60fa40469c9e0901431",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_68a48d97e28096fded456b7c131cbf1b",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_385c0fe727569b65c3a1f018c47636c2",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_c43e6e506a0a1ad52e9770f1bbf9cfc3",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a1eca46212aeebb099abb9da74fbda45",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_ed8e662a4fa087053b1ac2cb75857845",
+        "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_757256782a9fcd89eb7db89c2deedee6",
+        "sourcePath": "docs/architect/agent-coordination/verification/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/verification/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_74a252c064d9dd4907baf44a10db3ed0",
+        "sourcePath": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_b53fe4cde49f120bda8fe93cc01cea84",
+        "sourcePath": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_6e942f5479cfebf05e32039d927580a1",
+        "sourcePath": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      },
+      {
+        "claimId": "claim_a850f03482da7eadfd5c62f146d07a57",
+        "sourcePath": "docs/architect/agent-coordination/vocabulary/README.md",
+        "sourceAnchor": "unheaded-block-1",
+        "rationale": "Archive the temporary source-writing/migration notice for docs/architect/agent-coordination/vocabulary/README.md#unheaded-block-1; the source remains pinned and unchanged, while its substantive document content is carried separately. The notice regulates the old dual-location transition, not a retained runtime contract."
+      }
+    ],
+    "deleteAsObsolete": [],
+    "unknownBlockingHolds": [],
+    "resolvedEnumClaim": "claim_459cdfc305f52f6636bf73d1c56cccf1",
+    "corpusPolicyHolds": 2
+  },
+  "unproven": [
+    "Independent acceptance of 1434 judgments, retired candidate metadata and policies",
+    "Strict E and reduced promotion rehearsal",
+    "Reverse-check closure",
+    "Fresh-reader scenarios"
+  ]
+}
