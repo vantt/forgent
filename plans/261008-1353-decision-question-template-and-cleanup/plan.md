@@ -2,8 +2,8 @@
 title: Mẫu câu hỏi quyết định và gỡ các quy tắc hỏi trùng lặp
 status: pending
 created: 2026-10-08
-budget: "src ≤ 60 dòng đổi; test ≤ 300 dòng đổi (chỉ fixture có sẵn + 1 case, 0 test file mới), vượt thì dừng và hỏi; instructions/skills/AGENTS ≤ 60 dòng, net ≤ 0 ngoài file mẫu (Phase 01–02); Phase 03 ≤ 50 dòng, không code mới ngoài 1 hằng số test; tổng ≤ 1,5 ngày"
-paths: [core/skills/_shared/decision-question.md, core/instructions/decision-question.md, src/runner/prompt-templates/worker-prompt-discovery.txt, .fgos/instructions/effective/repo.json (sinh tự động), src/state/status-fsm.mjs, src/intake/plan.mjs, src/intake/discovery.mjs, test/ (chỉ fixture chứa '## Why this matters' và test validator), domains/coding/skills/fgos-coding-{discovering,exploring,implement,shaping,validating}/SKILL.md, core/skills/_shared/coordination-driver.md, core/skills/fgos-run/SKILL.md, docs/specs/platform-foundations.md (RUL11 + decision 0054), test/docs/rul11-anchor-phrase.test.mjs, domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md, docs/decisions/index.md (sinh tự động), AGENTS.md (khối luật sinh tự động + sửa tay dòng 19 và mục RUL11), CHANGELOG.md, bản render của build:skills, 2 memory file]
+budget: "tổng src ≤ 300 dòng (thêm + xoá, git diff --numstat); test ≤ 530 dòng; ≤ 2,5 ngày; không tính khối AGENTS.md sinh tự động và .fgos/instructions/effective/repo.json. Vượt thì dừng và hỏi theo mẫu."
+paths: [core/skills/_shared/decision-question.md, core/instructions/decision-question.md, src/runner/prompt-templates/worker-prompt-discovery.txt, scripts/decision-question-hook.mjs, src/setup/claude-code-hooks.mjs, .claude/settings.json, bin/fgos.mjs (answer --approve, bỏ --rationale/--alternatives), src/state/{store,replay,awaiting-context}.mjs, skill /fgOS:answer, .fgos/instructions/effective/repo.json (sinh tự động), src/state/status-fsm.mjs, src/intake/plan.mjs, src/intake/discovery.mjs, test/ (chỉ fixture chứa '## Why this matters' và test validator), domains/coding/skills/fgos-coding-{discovering,exploring,implement,shaping,validating}/SKILL.md, core/skills/_shared/coordination-driver.md, core/skills/fgos-run/SKILL.md, docs/specs/platform-foundations.md (RUL11 + decision 0054), test/docs/rul11-anchor-phrase.test.mjs, domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md, docs/decisions/index.md (sinh tự động), AGENTS.md (khối luật sinh tự động + sửa tay dòng 19 và mục RUL11), CHANGELOG.md, bản render của build:skills, 2 memory file]
 ---
 
 # Mẫu câu hỏi quyết định và gỡ các quy tắc hỏi trùng lặp
@@ -25,11 +25,14 @@ Quy tắc "hỏi cho rõ" đang nằm rải ở nhiều nơi dạng văn xuôi (
 | 01 | Mẫu câu hỏi quyết định + validator `fgos ask` | pending | [phase-01](phase-01-decision-question-template.md) |
 | 02 | Gỡ các chỗ nói trùng về cách hỏi | pending, sau 01 | [phase-02](phase-02-remove-duplicate-question-rules.md) |
 | 03 | Khung đã duyệt: điểm dừng chung, supersede ADR0036 thêm vế phạm vi cho RUL11 | pending, sau 01 | [phase-03](phase-03-approved-frame.md) |
+| 04 | Hook `PreToolUse` chặn `AskUserQuestion` thiếu mẫu | pending, sau 01 | [phase-04](phase-04-askuserquestion-hook.md) |
+| 05 | `fgos answer --approve` mới nhả gate; bỏ `--rationale`/`--alternatives` | pending, sau 01 | [phase-05](phase-05-explicit-approval-and-single-ask-channel.md) |
 
 ## Acceptance
 
-- Một nguồn mẫu duy nhất (`core/skills/_shared/decision-question.md`); luật ngắn trỏ tới nó, chiếu vào AGENTS.md; validator `fgos ask` đòi các heading theo D1 (chấp nhận alias tiếng Anh), lỗi in đủ mẫu; mọi nơi sinh câu hỏi (5 chỗ + prompt worker) theo mẫu.
-- Plan này **không** ràng buộc câu trả lời của owner vào phần "Phạm vi" và không có reviewer trên đường `fgos ask` (xem D2).
+- Một nguồn mẫu duy nhất (`core/skills/_shared/decision-question.md`); luật ngắn trỏ tới nó, chiếu vào AGENTS.md; validator `fgos ask` đòi 3 phần ở stage `discovery`/`exploring`, đủ 5 phần ở stage khác (D1) (chấp nhận alias tiếng Anh), lỗi in đủ mẫu; mọi nơi sinh câu hỏi (5 chỗ + prompt worker) theo mẫu.
+- Gate chỉ nhả với `fgos answer --approve`; trả lời chữ thường là lời nhắn làm rõ (Phase 05). Không có reviewer trên đường `fgos ask`; phần "Phạm vi" chỉ được kiểm là có mặt.
+- `AskUserQuestion` thiếu mẫu bị hook chặn kèm lý do (Phase 04). Câu hỏi viết thẳng trong chat không bị chặn bằng code; xem lại sau 2 tuần.
 - `git grep -E "Why this matters|Why this$|two-heading|hai heading"` trên src, test, core, domains, AGENTS.md ra 0; các skill chỉ còn 1 dòng trỏ tới mẫu.
 - Phase 03: luật có mục "Khung đã duyệt"; RUL11 có vế phạm vi qua ADR0054; khuôn plan của fgos-coding-planning có dòng phạm vi + ngân sách.
 - `npm test` xanh. Diff nằm trong `budget`/`paths`; vượt thì dừng và hỏi theo mẫu.
@@ -66,3 +69,14 @@ Quy tắc "hỏi cho rõ" đang nằm rải ở nhiều nơi dạng văn xuôi (
 
 ### Whole-Plan Consistency Sweep
 Đã đọc lại plan.md + 3 phase. Đã đổi mọi chỗ "mẫu ở core/instructions" sang `core/skills/_shared/decision-question.md`; "qua writer" sang lệnh chiếu từ worktree + sửa tay dòng 19/RUL11; grep kiểm thống nhất ở Phase 01/02/Acceptance. Còn mở: D1–D4 (chặn bắt đầu Phase 01).
+
+## Quyết định của owner (2026-10-08)
+
+| # | Câu hỏi | Owner chọn |
+|---|---|---|
+| D1 | Validator `fgos ask` áp lên loại câu hỏi nào | (d) theo stage của item: 3 phần (Chuyện gì, Nguyên nhân, Phạm vi) ở `discovery`/`exploring`; đủ 5 phần ở stage khác. Không có cờ tự khai loại |
+| D2 | Câu trả lời bất kỳ nhả gate | (b) sửa trong plan này: chỉ `fgos answer --approve` nhả gate (Phase 05) |
+| D3 | Kênh `--rationale`/`--alternatives` | (b) xoá trong plan này (Phase 05) |
+| D4 | Ngân sách | (a) nới; sau D2b, D3b và hook: src ≤ 300, test ≤ 530, 2,5 ngày |
+| D6 | Hai cửa hỏi | `fgos ask` và `AskUserQuestion` đi qua **một cửa kiểm duy nhất** `checkDecisionQuestion` (Phase 01), hook chỉ là lớp đọc input |
+| D5 | Chặn cửa chat | (a) hook `PreToolUse` cho `AskUserQuestion` (Phase 04); không hook `Stop`; xem lại sau 2 tuần. `fgos ask` giữ nguyên, chỉ chưa quay lại |
