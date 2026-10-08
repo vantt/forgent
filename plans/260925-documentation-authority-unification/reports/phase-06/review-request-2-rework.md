@@ -14,7 +14,7 @@ Status: authored rework; **blocked on two owner contract decisions before the co
 | Script proof | 12,878 mirror rows plus 2,721 Unit-exact rows | The changed scheduler introduction is explicitly demoted to pending manual review, never silently passed as exact. |
 | Legacy links | 17 target units queued | candidate-legacy-link-queue.json; 50 observed occurrences including heading/child overlap. Step 10 owns the rewrite. |
 
-Current text pin: 1f4f0b06274fa95fe94f10e904e1ff12a2898ef4. Approved application commit: fa39f6416984fce0804b25a05e23af55b9d1a72f. The final data commit and regenerated pack hashes are recorded in progress.md / rework-packet.json after release; do not use the historical first-review pack pins for corrected text.
+Current text pin: 1f4f0b06274fa95fe94f10e904e1ff12a2898ef4. Approved application commit: fa39f6416984fce0804b25a05e23af55b9d1a72f. Corrected data commit: 7df171219df1dab4662d609246d10fcc8c271fda. Five native ordinary packs at that commit contain 16/64/21/4/1 pending rows; hashes and exact commands are in rework-packet.json. They are prepared, not approved, and the complete re-review remains owner-blocked. Do not use historical first-review pack pins for corrected text.
 
 ## Owner decisions first
 
