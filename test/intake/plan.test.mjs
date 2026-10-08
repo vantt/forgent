@@ -910,7 +910,7 @@ test('resolvePlan routes a risk-heavy root through the human gate on a caller-su
 // human has genuinely answered ITS OWN prior ask, never a stale answer from
 // an unrelated question. ---
 
-test('resolvePlan releases a risk-heavy root once the human has answered THIS gate\'s own prior ask, proceeding with the caller-supplied verdict', () => {
+test('resolvePlan releases a risk-heavy root only after an explicit --approve on THIS gate\'s own prior ask, proceeding with the caller-supplied verdict', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ risk: 'heavy' }));
 
@@ -918,10 +918,15 @@ test('resolvePlan releases a risk-heavy root once the human has answered THIS ga
   assert.equal(first.outcome, 'need-human');
   assert.match(listWork(storeDir).gates['item-x'].ask, /risk cao \(heavy\)/);
 
-  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Đã xác nhận, cứ pass-through.' });
+  // A plain answer is a clarification, not consent: the gate asks again.
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'chưa hiểu, giải thích lại' });
+  const clarified = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
+  assert.equal(clarified.outcome, 'need-human', 'an answer without --approve must not release the gate');
+
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Đã xác nhận, cứ pass-through.', approved: true });
 
   const second = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
-  assert.equal(second.outcome, 'pass-through', 'the gate must release once its own prior ask has a real answer on record');
+  assert.equal(second.outcome, 'pass-through', 'the gate must release once its own prior ask has an explicit approval on record');
   const finalView = listWork(storeDir);
   assert.equal(finalView.work['item-x'].workflowStep, 'executing');
 
@@ -930,7 +935,7 @@ test('resolvePlan releases a risk-heavy root once the human has answered THIS ga
   // round 1, then the caller-supplied entry + the pass-through entry from
   // round 2.
   const entries = finalView.decisionsById['item-x'];
-  assert.equal(entries.length, 4);
+  assert.equal(entries.length, 6);
   assert.ok(entries.some((e) => /need-human/.test(e.text)));
   assert.ok(entries.some((e) => /pass-through/.test(e.text)));
   assert.ok(entries.every((e) => e.source === 'resolvePlan'));

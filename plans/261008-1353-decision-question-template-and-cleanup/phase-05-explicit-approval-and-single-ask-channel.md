@@ -33,3 +33,12 @@
 
 - Item đang treo với câu trả lời cũ phải hỏi lại một lần: chấp nhận được (một người dùng).
 - Agent tự chạy `fgos answer --approve` thay owner: `answer` không kiểm ai gọi (`bin/fgos.mjs:1787` luôn `role: 'human'`). Chỉ chặn bằng chữ (V1a); vẫn tốt hơn hiện nay (chữ bất kỳ nhả gate).
+
+## Kết quả (2026-10-08)
+
+- `fgos answer --approve` ghi `approved: true`; replay chỉ giữ `approved` sau đúng câu trả lời có `--approve`, xoá khi có ask mới hoặc câu trả lời thường. Hai gate (heavy-risk, blast-radius) trong `src/intake/plan.mjs` chỉ nhả khi `gate.approved === true`. Registry lệnh và skill `/fgOS:answer` mô tả `--approve`, cấm agent tự thêm (V1a).
+- Phía `ask`: bỏ `--rationale/--alternatives`, bỏ `askRationale/askAlternatives` ở store (moveWork, settleClaim, putInAwaiting), replay, awaiting-context. Giữ `askSource`, `answer --rationale/--alternatives`, `fgos decision`.
+- Sai ước tính trong plan: 8 file skill nhắc `--rationale` đều là `fgos decision` → không phải sửa.
+- Test intake/state/cli/direct/parity: 2450, 0 fail.
+- Ngân sách cả plan: src thêm 277/300 (xoá 126). Test: thêm 345, xoá 192, tổng đổi 537 — vượt 530 bảy dòng nếu tính cả dòng xoá; trong trần nếu đo test theo cách D7 (chỉ dòng thêm). Báo owner.
+- Còn mở (ngoài phạm vi): `fgos workflow answer` ở human gate của Workflow chưa phân biệt đồng ý với làm rõ.

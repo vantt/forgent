@@ -248,39 +248,29 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
 // tsk-19zm D2: ask's checkpoint distillate and answer's authoritative word
 // live in SEPARATE gates[id] fields -- neither overwrites the other, unlike
 // rationale/alternatives/source before this item (answer-only fields).
-test('ask --rationale and answer --rationale both persist on gates[id], neither overwriting the other', () => {
+test('ask keeps only --source beside its text; answer --rationale/--alternatives and --approve land on gates[id]', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'checkpoint-item');
 
-  run(cwd, [
-    'ask', 'checkpoint-item', '--text', VALID_ASK_TEXT,
-    '--rationale', 'leaning OAuth: fewer support tickets historically',
-    '--alternatives', 'password rejected: extra reset-flow maintenance',
-    '--source', 'session',
-  ]);
+  run(cwd, ['ask', 'checkpoint-item', '--text', VALID_ASK_TEXT, '--source', 'session']);
   const afterAsk = envelopeData(run(cwd, ['list']).stdout).gates['checkpoint-item'];
-  assert.equal(afterAsk.askRationale, 'leaning OAuth: fewer support tickets historically');
-  assert.equal(afterAsk.askAlternatives, 'password rejected: extra reset-flow maintenance');
   assert.equal(afterAsk.askSource, 'session');
   assert.equal(afterAsk.rationale, undefined);
+  assert.equal(afterAsk.approved, undefined);
 
   run(cwd, [
-    'answer', 'checkpoint-item', '--text', 'OAuth',
+    'answer', 'checkpoint-item', '--approve', '--text', 'OAuth',
     '--rationale', 'confirmed OAuth per compliance requirement',
-    '--alternatives', 'password: rejected, same reasons as checkpoint',
+    '--alternatives', 'password: rejected, extra reset-flow maintenance',
     '--source', 'human',
   ]);
   const afterAnswer = envelopeData(run(cwd, ['list']).stdout).gates['checkpoint-item'];
-  // Answer's fields land in the answer-only trio, still authoritative.
   assert.equal(afterAnswer.rationale, 'confirmed OAuth per compliance requirement');
-  assert.equal(afterAnswer.alternatives, 'password: rejected, same reasons as checkpoint');
+  assert.equal(afterAnswer.alternatives, 'password: rejected, extra reset-flow maintenance');
   assert.equal(afterAnswer.source, 'human');
-  // The agent's original checkpoint from `ask` is still there, untouched.
-  assert.equal(afterAnswer.askRationale, 'leaning OAuth: fewer support tickets historically');
-  assert.equal(afterAnswer.askAlternatives, 'password rejected: extra reset-flow maintenance');
   assert.equal(afterAnswer.askSource, 'session');
+  assert.equal(afterAnswer.approved, true);
 });
-
 
 // claim-lock §5.1, tsk-40m P1 fix + hard-cut (docs/architect/doing-
 // coordination-redesign.md): superseded by the redesign — asking a

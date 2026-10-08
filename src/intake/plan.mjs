@@ -277,7 +277,7 @@ function formatProposalAsk(verdict, reason) {
   return formatDecisionQuestion({
     happening: `Engine đề xuất ${proposal}`,
     cause: 'Đề xuất cần người xác nhận trước khi ghi thật vào queue: sai ở đây tốn công dọn lại sau.',
-    options: '(a) Đồng ý đề xuất như trên. (b) Không đồng ý hoặc cần sửa: trả lời kèm lý do. Engine không định giá được từng lựa chọn.',
+    options: '(a) Đồng ý đề xuất như trên: `fgos answer <id> --approve --text "..."`. (b) Không đồng ý hoặc cần sửa: trả lời không kèm --approve, nêu lý do; item sẽ được hỏi lại. Engine không định giá được từng lựa chọn.',
     recommendation: '(a) — đây là verdict của vòng phán; chọn (b) nếu đề xuất sai ý định của item.',
     scope: 'Đồng ý chỉ cho phép ghi đúng đề xuất trên vào queue; không mở rộng phạm vi của item.',
   });
@@ -710,7 +710,9 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // proposed as context, but writing nothing into the queue yet (Terms:
   // "Đề xuất chia" is the proposal BEFORE it is committed).
   //
-  // Heavy-risk gate release (tsk-3w8 follow-up): this hard risk gate used
+  // Heavy-risk gate release (tsk-3w8 follow-up): released only by an
+  // explicit `fgos answer --approve` on THIS gate's own ask (gate.approved);
+  // any other answer is a clarification and re-parks. This hard risk gate used
   // to re-fire unconditionally on every call — a human answering
   // `fgos answer` never released it, re-parking the exact same question
   // forever (dogfood, 2026-07-28). Bypassed only when the MOST RECENT gate
@@ -720,7 +722,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // over from an unrelated clarify-stage or explicit need-human question.
   const gate = view?.gates?.[id];
   const heavyRiskAlreadyConfirmed =
-    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
+    gate?.approved === true && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
   // tsk-wve D1: a heavy-risk verdict that cites a real, already-locked
   // decision from this item's own CONTEXT.md is grounded, not off-the-cuff
   // -- same D-ID-citation precedent normalizeChild already trusts for a
@@ -739,7 +741,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // answer from an unrelated gate) -- an INDEPENDENT gate, checked in
   // addition to keywordRiskGate, never instead of it.
   const blastRadiusAlreadyConfirmed =
-    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_BLAST_RADIUS_GATE_REASON);
+    gate?.approved === true && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_BLAST_RADIUS_GATE_REASON);
   const blastRadiusGate =
     Number.isFinite(verdict.blastRadius) && verdict.blastRadius >= BLAST_RADIUS_GATE_THRESHOLD && !blastRadiusAlreadyConfirmed;
   const risksGate = keywordRiskGate || blastRadiusGate;

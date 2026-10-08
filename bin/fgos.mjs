@@ -1759,13 +1759,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // compute the resume-safe `durableStatusAtAsk` themselves, from a
       // fresh durable read, ignoring this value entirely.
       const statusAtAsk = askView.work[id]?.status;
-      // rationale/alternatives/source (tsk-63c D1/D3): optional, same
-      // guarded-passthrough shape as the rest of ask's fields — fold into
-      // gates[id] alongside ask/parentSnapshotAtAsk/statusAtAsk.
-      const rationale = optionalField(flags.rationale, 'ask --rationale requires a non-empty value (omit --rationale entirely to skip it)');
-      const alternatives = optionalField(flags.alternatives, 'ask --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
+      // Options and reasoning belong in --text (decision-question template);
+      // only the question's source is stored apart.
       const source = optionalField(flags.source, 'ask --source requires a non-empty value (omit --source entirely to skip it)');
-      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source });
+      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk, source });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -1784,7 +1781,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const rationale = optionalField(flags.rationale, 'answer --rationale requires a non-empty value (omit --rationale entirely to skip it)');
       const alternatives = optionalField(flags.alternatives, 'answer --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'answer --source requires a non-empty value (omit --source entirely to skip it)');
-      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human', rationale, alternatives, source });
+      // --approve is the owner's explicit yes; only it releases a consent
+      // gate. An answer without it is a clarification, and the gate asks again.
+      const approved = flags.approve === true || flags.approve === 'true';
+      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human', rationale, alternatives, source, approved });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 

@@ -23,6 +23,13 @@ CLI. Never writes `.fgos/` state directly — every write goes through the
    after it (trimmed) is the answer text (`fgos answer <id> --text
    "..."`).
 
+   If the token right after the id is `--approve`, drop it from the text
+   and remember it: the person is giving an explicit yes to what the
+   question proposed. `--approve` is the only answer that releases a
+   consent gate (heavy-risk or blast-radius split); without it the answer is
+   a clarification and the item is asked again. Never add `--approve` on
+   the person's behalf unless they typed it or explicitly said to approve.
+
    If no text remains after the id, stop and ask the user for the answer
    text before doing anything else — `fgos answer` requires non-empty text
    and will reject an empty call anyway.
@@ -32,10 +39,11 @@ CLI. Never writes `.fgos/` state directly — every write goes through the
    See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
 
    ```
-   answer <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   answer <id> [--approve] --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-   substituting the id and text parsed in step 1, with `<text>`
+   substituting the id and text parsed in step 1 (and `--approve` only if
+   step 1 found it), with `<text>`
    double-quoted so it survives shell parsing as a single argument.
 
    `--dir`: the session may already be inside the claimed item's
