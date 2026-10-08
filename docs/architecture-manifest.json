@@ -102,6 +102,7 @@
     "src/runner/write-queue.mjs": "domain",
     "src/runner/root-affinity.mjs": "domain",
     "src/state/status-fsm.mjs": "domain",
+    "src/state/decision-question.mjs": "domain",
     "src/state/handoff.mjs": "domain",
     "src/state/porting.mjs": "domain",
     "src/state/frontier.mjs": "domain",
