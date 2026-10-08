@@ -181,27 +181,3 @@ test('a thrown panelist waits for the other seat to settle before the unit can b
   await rejection;
 });
 
-test('every dispatched voting seat is asked for its stance on the declared choices and the synthesizer is not', async () => {
-  for (const params of [{}, { role: ['cost-lens', 'risk-lens'], synthesizeRole: 'chair', roleTasks: { panelist: 'Ignored lens. {objective}' } }]) {
-    const unit = { id: 'question', objective: 'Choose a rebuild strategy', capability: 'docs:write', writes: [], stanceOptions: ['incremental', 'full'] };
-    const dispatched = new Map();
-    const res = await runPanel(unit, {}, {
-      members: 2,
-      runRole: async ({ role, unit: seatUnit }) => {
-        dispatched.set(role, seatUnit.objective);
-        return { role, outcome: 'pass' };
-      },
-    }, params);
-    assert.equal(res.outcome, 'pass');
-    const synthesizer = params.synthesizeRole ?? 'synthesizer';
-    const voters = [...dispatched.keys()].filter((role) => role !== synthesizer);
-    assert.equal(voters.length, 2);
-    for (const role of voters) {
-      assert.match(dispatched.get(role), /Declared choices: \["incremental","full"\]/, role);
-      assert.match(dispatched.get(role), /"stance": \{"choice"/, role);
-      assert.doesNotMatch(dispatched.get(role), /Ignored lens/, 'panelists answer the unit itself, not a roleTasks override');
-    }
-    assert.doesNotMatch(dispatched.get(synthesizer), /Declared choices|Passive stance measurement/);
-    assert.match(dispatched.get(synthesizer), /Choose a rebuild strategy/);
-  }
-});

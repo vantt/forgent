@@ -7,6 +7,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
+import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow } from './loader.mjs';
 import {
   createWorkflowRun,
@@ -24,7 +25,7 @@ import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
-import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../runner/execution/handoff-refs.mjs';
+import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -65,7 +66,7 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   // gets it as its own earlier result, and the brief only says so.
   const anonymize = template.anonymizeInputs === true;
   const index = [];
-  const inputs = [];
+  const inputs = [...(template.contextRefs ?? []), ...(step.dependsOn.length === 0 ? state.contextRefs ?? [] : [])];
   let anonymized = 0;
   for (const { prior, sameSeat, label } of picks) {
     for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
@@ -111,6 +112,25 @@ function buildUnitHandoff({ template, state, step, workflow }) {
     );
   }
   return { objective: parts.filter(Boolean).join('\n\n'), inputs };
+}
+
+function renderGateQuestion(step, state, mainRoot) {
+  return (step.gate.question || `Approve step "${step.id}"?`).replace(
+    /\{\{report:([^/{}:\s]+)\/([^{}:\s]+):missing expertise\}\}/g,
+    (_, stepId, unitId) => {
+      const unit = state.steps[stepId]?.units[unitId];
+      if (unit?.status !== 'completed' || !unit.unitRunId) throw new RunnerConfigError('gate report producer is not settled');
+      const producer = unit.results?.filter((record) => record.role === 'producer').at(-1);
+      if (!producer?.runResult?.settleReports?.length) throw new RunnerConfigError('gate requires a settled producer report');
+      const [file] = resolveUnitInputs([`unit-run:${unit.unitRunId}/producer`], mainRoot).refs;
+      const packet = JSON.parse(fs.readFileSync(file, 'utf8'));
+      const expertise = packet?.['missing expertise'];
+      if (!Array.isArray(expertise) || expertise.some((entry) => typeof entry !== 'string' || !entry.trim())) {
+        throw new RunnerConfigError('gate report requires "missing expertise" as an array of non-empty strings');
+      }
+      return JSON.stringify(expertise);
+    },
+  );
 }
 
 /**
@@ -271,7 +291,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             type: 'gate.park',
             payload: {
               stepId: step.id,
-              question: step.gate.question || `Approve step "${step.id}"?`,
+              question: renderGateQuestion(step, state, mainRoot),
               header: step.gate.header,
               parkedAt: new Date().toISOString(),
             },
@@ -424,9 +444,8 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           });
 
           stateChanged = true;
-          // A unit that did not pass stops its step: later units and dependent steps must not
-          // run on top of work that was refused, failed, or is still waiting on someone.
-          if (unitRunResult.outcome !== 'pass') {
+          // Only explicitly accepted semantic outcomes proceed; execution failures never do.
+          if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {
             failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error };
             break;
           }
@@ -703,6 +722,7 @@ function prepareWorkflowRun(params) {
     configSnapshot,
     request: params.request,
     stanceOptions: normalizeStanceOptions(params.stanceOptions),
+    contextRefs: normalizeContextRefs(params.contextRefs),
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };

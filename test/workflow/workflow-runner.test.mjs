@@ -26,6 +26,8 @@ import {
   resumeWorkflowDetached,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { normalizeContextRefs } from '../../src/workflow/definition.mjs';
+import { withProviderFamilies } from '../helpers/provider-families.mjs';
 
 // Worktrees created in the default location outlive the test unless removed here.
 const worktreeDirs = [];
@@ -1341,4 +1343,124 @@ test('workflow template option labels normalize without accepting malformed sets
   const make = (stanceOptions) => ({ id: 'options', steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', stanceOptions } }] }] });
   assert.deepEqual(validateWorkflow(make([' a ', 'b'])).steps[0].units[0].template.stanceOptions, ['a', 'b']);
   for (const value of ['a|b', [''], ['a', 'a'], ['other']]) assert.throws(() => validateWorkflow(make(value)), /stanceOptions/);
+});
+
+test('workflow context refs and reviewed outcome contracts refuse unsafe inputs', () => {
+  const make = (template) => ({ id: 'contract', steps: [{ id: 'root', units: [{ template: { capability: 'docs:write', ...template } }] }] });
+  for (const contextRefs of [null, 'notes.md', [true], ['../notes'], ['/tmp/notes'], ['a\\b'], ['unit-run:../producer'], ['gate-answer:wf/..']]) {
+    assert.throws(() => validateWorkflow(make({ contextRefs })), /contextRefs/);
+    assert.throws(() => normalizeContextRefs(contextRefs), /contextRefs/);
+  }
+  const refs = ['notes.md', 'unit-run:unit-1/producer', 'gate-answer:wf-1/approve'];
+  assert.deepEqual(validateWorkflow(make({ contextRefs: refs })).steps[0].units[0].template.contextRefs, refs);
+  for (const pattern of ['solo', 'panel', 'reviewed']) {
+    const normalized = validateWorkflow(make({ pattern }));
+    assert.deepEqual(validateWorkflow(normalized), normalized, 'a loader-normalized workflow remains valid when started');
+  }
+  assert.deepEqual(validateWorkflow(make({ pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'] })).steps[0].units[0].template.acceptOutcomes, ['pass', 'findings']);
+  for (const acceptOutcomes of [[], ['execution-failure'], ['pass', 'pass'], 'pass', null]) {
+    assert.throws(() => validateWorkflow(make({ pattern: 'reviewed', acceptOutcomes })), /acceptOutcomes/);
+  }
+  assert.throws(() => validateWorkflow(make({ pattern: 'solo', acceptOutcomes: ['pass'] })), /reviewed/);
+});
+
+test('workflow root context refs persist and reach only root Units across resume', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(tmp, 'owner.txt'), 'Owner context');
+  fs.writeFileSync(path.join(tmp, 'template.txt'), 'Template context');
+  const workflow = { id: 'context-root', steps: [
+    { id: 'root', gate: { kind: 'human', question: 'Start?' }, units: [
+      { id: 'first', template: { capability: 'docs:write', contextRefs: ['template.txt'] } },
+      { id: 'dependent-root', dependsOn: ['first'], template: { capability: 'docs:write' } },
+    ] },
+    { id: 'later', dependsOn: ['root'], units: [{ id: 'second', template: { capability: 'docs:write', contextRefs: ['template.txt'] } }] },
+  ] };
+  const parked = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, contextRefs: ['owner.txt'] });
+  assert.deepEqual(parked.contextRefs, ['owner.txt']);
+  assert.deepEqual(readWorkflowEvents({ repoRoot: tmp, workflowRunId: parked.workflowRunId })[0].payload.contextRefs, ['owner.txt']);
+  const completed = await answerWorkflow(parked.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'root', answer: 'yes' });
+  assert.equal(completed.status, 'completed');
+  const inputs = (step, unit) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', completed.steps[step].units[unit].unitRunId, 'unit.json'), 'utf8')).unit.inputs;
+  assert.ok(inputs('root', 'first').includes('owner.txt'));
+  assert.ok(inputs('root', 'first').includes('template.txt'));
+  assert.ok(inputs('root', 'dependent-root').includes('owner.txt'));
+  assert.ok(!inputs('later', 'second').includes('owner.txt'));
+  assert.ok(inputs('later', 'second').includes('template.txt'));
+  const resumed = await resumeWorkflow(parked.workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.deepEqual(resumed.contextRefs, ['owner.txt']);
+});
+
+test('gate renders settled producer JSON expertise and refuses malformed reports before parking', async (t) => {
+  for (const packet of [{ 'missing expertise': ['database sizing', 'security review'] }, { 'missing expertise': [] }, {}, { 'missing expertise': 'security' }, { 'missing expertise': [''] }]) {
+    const tmp = setupTestRepo();
+    t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+    fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
+      import fs from 'node:fs'; import path from 'node:path';
+      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      if (!target) process.exit(1);
+      const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
+      const dir = fs.existsSync(outbox) ? outbox : base;
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(JSON.stringify({ recommendation: 'Bound the design to its approved scope', ...packet }))});
+      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
+    `);
+    const workflow = { id: 'gate-report', steps: [
+      { id: 'synthesis', units: [{ id: 'synthesize-recommendation', template: { capability: 'docs:write' } }] },
+      { id: 'close', dependsOn: ['synthesis'], gate: { kind: 'human', question: 'Bring in {{report:synthesis/synthesize-recommendation:missing expertise}} or not?' } },
+      { id: 'check-sha', dependsOn: ['close'], gate: { kind: 'human', question: '{{report:synthesis/synthesize-recommendation:missing expertise}}' } },
+    ] };
+    if (Array.isArray(packet['missing expertise']) && packet['missing expertise'].every((entry) => entry.trim())) {
+      const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+      assert.equal(state.questions[0].question, `Bring in ${JSON.stringify(packet['missing expertise'])} or not?`);
+      assert.equal(state.steps.close.status, 'parked');
+      const settled = state.steps.synthesis.units['synthesize-recommendation'].results.find((record) => record.role === 'producer').runResult.settleReports[0];
+      fs.appendFileSync(path.resolve(tmp, settled.path), 'tampered');
+      await assert.rejects(answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'close', answer: 'yes' }), /report-changed-after-settle/);
+      assert.ok(!readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).some((event) => event.type === 'gate.park' && event.payload.stepId === 'check-sha'));
+    } else {
+      await assert.rejects(startWorkflow({ workflow, repoRoot: tmp, cwd: tmp }), /missing expertise/);
+      const runs = fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs'));
+      const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: runs[0] });
+      assert.ok(!events.some((event) => event.type === 'gate.park'));
+    }
+  }
+});
+
+test('reviewed findings acceptance proceeds while default and execution failure stop', async (t) => {
+  for (const [accepted, failed] of [[true, false], [false, false], [true, true]]) {
+    const tmp = setupTestRepo();
+    t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+    const configPath = path.join(tmp, '.fgos', 'config.json');
+    fs.writeFileSync(configPath, JSON.stringify(withProviderFamilies(JSON.parse(fs.readFileSync(configPath, 'utf8')))));
+    fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
+      import fs from 'node:fs'; import path from 'node:path';
+      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      if (!target || ${failed}) process.exit(1);
+      const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
+      const dir = fs.existsSync(outbox) ? outbox : base;
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Review\\nThe recommendation has a substantive correctness issue requiring owner consideration.\\n');
+      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify(target.includes('/reviewer/') ?
+        { status: 'done', summary: 'Review found a correctness issue', assessment: { verdict: 'findings' }, findings: ['Correctness issue'] } :
+        { status: 'done', summary: 'Producer completed' }));
+    `);
+    const state = await startWorkflow({ repoRoot: tmp, cwd: tmp, workflow: { id: 'accept-findings', steps: [
+      { id: 'review', units: [{ id: 'advice', template: { capability: 'docs:write', pattern: 'reviewed', ...(accepted ? { acceptOutcomes: ['pass', 'findings'] } : {}) } }] },
+      { id: 'close', dependsOn: ['review'], gate: { kind: 'human', question: 'Continue?' } },
+    ] } });
+    assert.equal(state.status, accepted && !failed ? 'parked' : 'failed', state.steps.review.reason);
+    if (!failed) assert.equal(state.steps.review.units.advice.outcome, 'findings');
+    if (failed) assert.notEqual(state.steps.review.units.advice.outcome, 'pass');
+  }
+});
+
+test('report gate refuses an absent producer without parking', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  await assert.rejects(startWorkflow({ repoRoot: tmp, cwd: tmp, workflow: {
+    id: 'absent-producer', steps: [{ id: 'close', gate: { kind: 'human', question: '{{report:synthesis/synthesize-recommendation:missing expertise}}' } }],
+  } }), /producer is not settled/);
+  const [workflowRunId] = fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs'));
+  assert.ok(!readWorkflowEvents({ repoRoot: tmp, workflowRunId }).some((event) => event.type === 'gate.park'));
 });

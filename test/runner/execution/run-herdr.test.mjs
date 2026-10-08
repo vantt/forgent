@@ -649,15 +649,21 @@ test('a claude REPL in a pane is given the run directory as a working directory;
   }
 });
 
-test('withRunDirReadAccess adds the run directory for a herdr claude invocation only, once', () => {
-  const base = ['--model', 'sonnet'];
-  const claude = { adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args: base, runDir: '/store/run/01' };
-  assert.deepEqual(withRunDirReadAccess(claude), ['--model', 'sonnet', '--add-dir', '/store/run/01']);
-  assert.deepEqual(withRunDirReadAccess({ ...claude, args: [...base, '--add-dir', '/elsewhere'] }), [...base, '--add-dir', '/elsewhere']);
-  assert.equal(withRunDirReadAccess({ ...claude, interactiveMode: { kind: 'codex' } }), base);
-  assert.equal(withRunDirReadAccess({ ...claude, adapter: 'cli-spawn' }), base);
-  assert.equal(withRunDirReadAccess({ ...claude, runDir: undefined }), base);
-  assert.deepEqual(base, ['--model', 'sonnet'], 'the configured args are not mutated');
+test('Claude reads blind inputs without granting the assignment or store root, preserving operator directories', () => {
+  const assignment = fixtureDir('fgos-blind-access-');
+  const runDir = path.join(assignment, 'runs', '01');
+  const inputsDir = path.join(assignment, 'inputs');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.mkdirSync(inputsDir);
+  const args = ['--add-dir', '/operator-approved', '--model', 'fixture'];
+  const options = { adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir };
+  const granted = withRunDirReadAccess(options);
+  assert.deepEqual(granted.slice(0, 4), ['--add-dir', runDir, inputsDir, '/operator-approved']);
+  assert.ok(!granted.includes(assignment));
+  assert.ok(!granted.includes(path.dirname(assignment)));
+  assert.deepEqual(args, ['--add-dir', '/operator-approved', '--model', 'fixture']);
+  assert.equal(withRunDirReadAccess({ ...options, adapter: 'cli-spawn' }), args);
+  assert.equal(withRunDirReadAccess({ ...options, interactiveMode: { kind: 'codex' } }), args);
 });
 
 test('the brief a reviewer reads in a pane says its claim needs assessment.verdict; the producer\'s does not', { skip: SKIP }, async () => {

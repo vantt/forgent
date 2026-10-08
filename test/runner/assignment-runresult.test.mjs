@@ -1595,3 +1595,35 @@ test('executeAssignment for reviewer findings produces execution.completed with 
   const validation = validateRunResultV3(storedResult);
   assert.ok(validation.valid, `Stored reviewer finding must be valid RunResult v3: ${validation.reasons?.join(', ')}`);
 });
+
+test('a done reviewer claim retains evidenced findings rather than becoming approval', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'done-findings.mjs');
+  fs.writeFileSync(executorScript, `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.at(-1));
+    if (!match) process.exit(2);
+    const dir = path.dirname(match[1]);
+    fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Review\\nThe review is complete, but the recommendation lacks evidence for its authorization boundary. This dissent must remain visible to the owner.\\n');
+    fs.writeFileSync(match[1], JSON.stringify({
+      contract: { id: 'agent-result-claim', version: 2 }, status: 'done',
+      summary: 'Review completed with unresolved authorization findings',
+      assessment: { verdict: 'findings', severityFloor: 'high' },
+    }));
+  `);
+  const assignment = buildAssignment({ workId: 'done-findings', stage: 'executing', operation: 'review-item', role: 'reviewer' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir, repoRoot: tempDir,
+    runnerConfig: {
+      executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+      modelPolicies: { claude: { standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+      timeoutMs: 5000,
+    },
+  });
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).verdict, 'findings');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.failure, null);
+});

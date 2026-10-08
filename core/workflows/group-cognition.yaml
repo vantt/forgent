@@ -25,6 +25,7 @@ steps:
         template:
           capability: group-cognition:critique
           pattern: reviewed
+          acceptOutcomes: [pass, findings]
           persona: critic
           objective: Subject sense-making hypotheses to critical challenge, counter-arguments, and red-team review
   - id: action-synthesis

@@ -233,15 +233,20 @@ function captureHeadSha(cwd) {
  * A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory,
  * and the run directory lives under the store, which is outside the worker's cwd (its
  * worktree). Claude asks the human before reading outside its working directories, and
- * nobody is there to answer -- the worker stalls on the prompt. The run directory is the
- * only place it must read that is not in its worktree (the brief) or write (the outbox),
- * so exactly that directory is added as a working directory, nothing broader. This is
- * claude's own permission prompt; the OS-level posture is unchanged.
+ * nobody is there to answer. Blind inputs are copied to assignmentDir/inputs,
+ * beside runs/NN, so grant only that directory (when present) and the run
+ * directory. This is claude's own prompt; the OS-level posture is unchanged.
  */
 export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir }) {
   if (adapter !== 'herdr-spawn' || interactiveMode?.kind !== 'claude' || !runDir) return args;
-  if (!Array.isArray(args) || args.includes('--add-dir')) return args;
-  return [...args, '--add-dir', path.resolve(runDir)];
+  if (!Array.isArray(args)) return args;
+  const run = path.resolve(runDir);
+  const inputs = path.join(path.dirname(path.dirname(run)), 'inputs');
+  const directories = [run, ...(fs.existsSync(inputs) ? [inputs] : [])];
+  const existing = args.indexOf('--add-dir');
+  return existing < 0
+    ? [...args, '--add-dir', ...directories]
+    : [...args.slice(0, existing + 1), ...directories, ...args.slice(existing + 1)];
 }
 
 /**

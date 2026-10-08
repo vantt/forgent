@@ -1540,6 +1540,7 @@ export const COMMAND_REGISTRY = [
         id: { type: 'string', description: 'Workflow ID or Workflow Run ID.' },
         plan: { type: 'string', description: '"start" only: path to AgentKit plan.md or plan directory.' },
         request: { type: 'string', description: '"start" only: the owner request this run serves; every unit receives it in its objective.' },
+        'context-ref': { type: 'array', items: { type: 'string' }, description: '"start" only, repeatable: safe repo-relative path or handoff reference; first-step Units receive these alongside template.contextRefs.' },
         foreground: { type: 'boolean', description: '"start", "answer" and "resume" only: advance the run in this process and return when it completes, fails, or parks. Without it, they record the run (or the answer), hand advancing to a detached process (log: .fgos/workflow-runs/<id>/advance.log) and return the run id at once; read progress with "status", which also reports `advance: { running, pid, logPath, lastLines, hint }`. A run already being advanced by a live process refuses a second advance.' },
         step: { type: 'string', description: '"answer" only: step ID to answer.' },
         answer: { type: 'string', description: '"answer" only: answer text.' },
