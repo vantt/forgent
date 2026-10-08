@@ -123,6 +123,7 @@ test('runner: executes business-discussion workflow up to approval gate and adva
   state = await answerWorkflow(state.workflowRunId, {
     stepId: 'approval',
     answer: 'Strategy approved for execution',
+    approved: true,
     repoRoot: tmp,
     cwd: tmp,
   });

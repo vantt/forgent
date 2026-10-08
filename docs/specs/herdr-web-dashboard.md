@@ -201,8 +201,9 @@ leaving a reader to discover them:
   server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to
   address more than one gateway, so no single fixed origin may be baked into
   it (per fgos-interface-daemon's per-machine-scope decision).
-- **R2.** Every write goes through an fgOS one-door-write verb — `answer`,
-  `approve`, the intake verb, `edit`, `move` — executed by the gateway, which
+- **R2.** Every write goes through an fgOS one-door-write verb — `answer`
+  (forwarding `--approve` when `approve: true`), `approve`, the intake verb, `edit`,
+  `move` (forwarding `--approve` when `approve: true`) — executed by the gateway, which
   is the sole component that runs those verbs on a client's behalf (per fgos-interface-daemon — gateway is the sole chokepoint that ever spawns fgos verbs). The web surface never writes fgOS state directly. No second write path
   is introduced by anything in this spec.
 - **R3.** A person may not read anything before signing in (mandatory token auth from v1). Sign-in is

@@ -195,3 +195,29 @@ test('move --to wontfix from awaiting-human still refuses with no --answer, same
   assert.match(result.stderr, /"answer" is required/);
   assert.equal(stateView(cwd).work['move-wontfix-no-answer'].status, 'awaiting-human', 'a refused move must leave the item parked, unchanged');
 });
+
+test('move --to todo from awaiting-human with --answer and --approve sets approved: true', () => {
+  const cwd = initGitCwdMainFast();
+  addOk(cwd, 'move-approve-item');
+  run(cwd, ['take', '--id', 'move-approve-item']);
+  run(cwd, ['ask', 'move-approve-item', '--text', '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: still relevant?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.']);
+  assert.equal(stateView(cwd).work['move-approve-item'].status, 'awaiting-human');
+
+  const result = run(cwd, ['move', 'move-approve-item', '--to', 'todo', '--answer', 'approved plan', '--approve']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['move-approve-item'].status, 'todo');
+  assert.equal(stateView(cwd).gates['move-approve-item'].approved, true);
+});
+
+test('move --to todo from awaiting-human with --answer without --approve does not set approved', () => {
+  const cwd = initGitCwdMainFast();
+  addOk(cwd, 'move-no-approve-item');
+  run(cwd, ['take', '--id', 'move-no-approve-item']);
+  run(cwd, ['ask', 'move-no-approve-item', '--text', '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome: still relevant?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.']);
+  assert.equal(stateView(cwd).work['move-no-approve-item'].status, 'awaiting-human');
+
+  const result = run(cwd, ['move', 'move-no-approve-item', '--to', 'todo', '--answer', 'clarification only']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['move-no-approve-item'].status, 'todo');
+  assert.ok(!('approved' in stateView(cwd).gates['move-no-approve-item']));
+});

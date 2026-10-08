@@ -1215,9 +1215,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const skipReturnGuard = to === 'awaiting-approval'
         ? optionalField(flags['skip-return-guard'], 'move --to awaiting-approval --skip-return-guard requires a non-empty reason value (omit --skip-return-guard entirely when the item is not "doing", or use "fgos return" to prove real progress for real)')
         : undefined;
+      const approved = flags.approve === true || flags.approve === 'true';
       return moveUseCase(
         { dir, repoRoot: process.cwd() },
-        { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role: 'human' },
+        { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role: 'human', approved },
       );
     }
 
@@ -2194,10 +2195,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (sub === 'answer') {
         const { answerWorkflow, answerWorkflowDetached } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text>');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text> [--approve]');
         const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
         const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
-        const answerParams = { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree };
+        const approved = flags.approve === true || flags.approve === 'true';
+        const answerParams = { stepId, answer, approved, repoRoot: flags.dir, worktree: flags.worktree };
         const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
       }

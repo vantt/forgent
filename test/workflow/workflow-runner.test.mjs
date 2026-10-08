@@ -168,11 +168,11 @@ test('workflow store: append and project state accurately', () => {
   assert.equal(state.questions.length, 1);
   assert.equal(state.questions[0].question, 'Continue?');
 
-  // Answer gate
+  // Answer gate with approval
   appendWorkflowEvent({
     repoRoot: tmp,
     workflowRunId,
-    event: { type: 'gate.answer', payload: { stepId: 's2', answer: 'yes' } },
+    event: { type: 'gate.answer', payload: { stepId: 's2', answer: 'yes', approved: true } },
   });
 
   state = projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId }));
@@ -304,10 +304,11 @@ test('runner: executes workflow with parallel steps and parks at human gate', as
   assert.equal(state.steps['step-a'].status, 'completed');
   assert.equal(state.steps['step-b'].status, 'completed');
 
-  // Answer human gate
+  // Answer human gate with approval
   state = await answerWorkflow(state.workflowRunId, {
     stepId: 'step-gate',
     answer: 'approved',
+    approved: true,
     repoRoot: tmp,
     cwd: tmp,
   });
@@ -336,7 +337,7 @@ test('a human gate answer reaches the units of the gated step and of every step 
   assert.equal(state.steps.side.status, 'completed');
 
   const answer = `Option B first. ${'because of cost '.repeat(20)}END-OF-ANSWER`;
-  state = await answerWorkflow(state.workflowRunId, { stepId: 'vote', answer, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  state = await answerWorkflow(state.workflowRunId, { stepId: 'vote', answer, approved: true, repoRoot: tmp, cwd: tmp, worktree: tmp });
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
 
   // The answer is written once, with the question and the time of the answer, in the run directory.
@@ -475,7 +476,7 @@ test('CLI: fgos workflow answer records the answer, returns at once and a detach
   const out = parseCliData(
     execFileSync(
       process.execPath,
-      [BIN_FGOS, 'workflow', 'answer', parked.workflowRunId, '--step', 'step-gate', '--answer', 'yes', '--dir', tmp],
+      [BIN_FGOS, 'workflow', 'answer', parked.workflowRunId, '--step', 'step-gate', '--answer', 'yes', '--approve', '--dir', tmp],
       { cwd: tmp, encoding: 'utf8' },
     ),
   );
@@ -516,7 +517,7 @@ test('a run already being advanced by a live process refuses a second advance an
   const eventCount = () => readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).length;
   const before = eventCount();
   const opts = { repoRoot: tmp, cwd: tmp };
-  const answer = { stepId: 'step-gate', answer: 'yes', ...opts };
+  const answer = { stepId: 'step-gate', answer: 'yes', approved: true, ...opts };
 
   assert.throws(() => resumeWorkflowDetached(id, opts), /already being advanced/);
   assert.throws(() => answerWorkflowDetached(id, answer), /already being advanced/);
@@ -1341,4 +1342,104 @@ test('workflow template option labels normalize without accepting malformed sets
   const make = (stanceOptions) => ({ id: 'options', steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', stanceOptions } }] }] });
   assert.deepEqual(validateWorkflow(make([' a ', 'b'])).steps[0].units[0].template.stanceOptions, ['a', 'b']);
   for (const value of ['a|b', [''], ['a', 'a'], ['other']]) assert.throws(() => validateWorkflow(make(value)), /stanceOptions/);
+});
+
+test('human consent gate: answering without --approve leaves gate parked with clarification note, and answering with --approve releases it', async () => {
+  const tmp = setupTestRepo();
+  const unit = (id, objective) => ({ id, template: { capability: 'docs:write', pattern: 'solo', objective, writes: [] } });
+  const workflow = validateWorkflow({
+    id: 'consent-gate-roundtrip',
+    steps: [
+      { id: 'prep', units: [unit('u-prep', 'Prepare proposal')] },
+      { id: 'gate-step', dependsOn: ['prep'], gate: { kind: 'human', question: 'Authorize scope change?' } },
+      { id: 'exec', dependsOn: ['gate-step'], units: [unit('u-exec', 'Execute approved scope')] },
+    ],
+  });
+
+  let state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+  const runId = state.workflowRunId;
+  const runDir = path.join(tmp, '.fgos', 'workflow-runs', runId);
+
+  // Runner parks at gate-step
+  assert.equal(state.status, 'parked');
+  assert.equal(state.questions.length, 1);
+  assert.equal(state.questions[0].stepId, 'gate-step');
+  assert.equal(state.steps['gate-step'].status, 'parked');
+
+  // Round 1: Clarification only (no --approve)
+  state = await answerWorkflow(runId, {
+    stepId: 'gate-step',
+    answer: 'chưa rõ, giải thích thêm ngân sách',
+    approved: false,
+    repoRoot: tmp,
+    cwd: tmp,
+  });
+
+  // Step and run MUST stay parked!
+  assert.equal(state.status, 'parked');
+  assert.equal(state.questions.length, 1);
+  assert.equal(state.questions[0].stepId, 'gate-step');
+  assert.equal(state.steps['gate-step'].status, 'parked');
+  assert.equal(state.steps['gate-step'].lastClarification, 'chưa rõ, giải thích thêm ngân sách');
+
+  // Verify answer file has recorded clarification round
+  const answerFile = path.join(runDir, 'gate-answers', 'gate-step.md');
+  assert.ok(fs.existsSync(answerFile));
+  let answerContent = fs.readFileSync(answerFile, 'utf8');
+  assert.ok(answerContent.includes('Clarification'));
+  assert.ok(answerContent.includes('chưa rõ, giải thích thêm ngân sách'));
+
+  // Round 2: Explicit approval
+  state = await answerWorkflow(runId, {
+    stepId: 'gate-step',
+    answer: 'đồng ý triển khai',
+    approved: true,
+    repoRoot: tmp,
+    cwd: tmp,
+  });
+
+  // Now gate is released and workflow completes!
+  assert.equal(state.status, 'completed');
+  assert.equal(state.outcome, 'pass');
+  assert.equal(state.steps['gate-step'].status, 'completed');
+  assert.equal(state.steps['gate-step'].approved, true);
+
+  // Answer file contains both clarification and approval rounds!
+  answerContent = fs.readFileSync(answerFile, 'utf8');
+  assert.ok(answerContent.includes('Clarification'));
+  assert.ok(answerContent.includes('Approved'));
+  assert.ok(answerContent.includes('đồng ý triển khai'));
+});
+
+test('human input gate (mode: input): answering without --approve releases the gate directly', async () => {
+  const tmp = setupTestRepo();
+  const unit = (id, objective) => ({ id, template: { capability: 'docs:write', pattern: 'solo', objective, writes: [] } });
+  const workflow = validateWorkflow({
+    id: 'input-gate-roundtrip',
+    steps: [
+      { id: 'prep', units: [unit('u-prep', 'Collect ideas')] },
+      { id: 'vote-step', dependsOn: ['prep'], gate: { kind: 'human', mode: 'input', question: 'Submit vote ranking' } },
+      { id: 'tally', dependsOn: ['vote-step'], units: [unit('u-tally', 'Tally votes')] },
+    ],
+  });
+
+  let state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+  const runId = state.workflowRunId;
+
+  assert.equal(state.status, 'parked');
+  assert.equal(state.questions.length, 1);
+  assert.equal(state.questions[0].stepId, 'vote-step');
+
+  // Answer input gate without approved flag
+  state = await answerWorkflow(runId, {
+    stepId: 'vote-step',
+    answer: 'Option A (1), Option B (2)',
+    repoRoot: tmp,
+    cwd: tmp,
+  });
+
+  // Released directly, workflow completes!
+  assert.equal(state.status, 'completed');
+  assert.equal(state.outcome, 'pass');
+  assert.equal(state.steps['vote-step'].status, 'completed');
 });
