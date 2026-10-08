@@ -39,3 +39,11 @@ Unresolved: whether the seat set differs enough between topics to justify any of
 - Consequence: topic-specific expertise has to come from the seats, which are fixed, which is why the missing-expertise field and the panel-composition options above matter. No rename or split now.
 - Check after the first M run: run the same flow on a non-software topic (business or policy). If the advice is still good the core is truly shared; if not, it is neutral only on paper.
 - Not checked: the rest of the 390-line skill for software-specific constraints on the seats.
+
+## Parked: the name `architecture-advisory` is misleading against its contents
+
+- Owner agreed with the assessment. The skill's intent matches the name (software-architecture specialist), but the YAML carries no architecture-specific content; the reusable part is the generic shape (frame, three seats, critique with red-team, synthesis, explanation).
+- Leaning: the YAML is a shared advisory shape and the name is the wrong part; specialist knowledge belongs in the seats chosen at run time, not in a fixed definition.
+- No rename now. Order: run M first, run the same shape on a non-software topic, and rename only if the advice holds up.
+- Before any rename, find every use of `architecture:*` capability names (provider pool preferences in config, routing, skills, tests); a rename is wide for a label change. Not yet measured.
+
