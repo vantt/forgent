@@ -3,23 +3,23 @@
 Date: 2026-10-08
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: routing prerequisite; first content batch paused after header preparation
+Step: first content batch, Agent Coordination authoring
 State: authoring
-Blocker: stop condition 10, H still reports 41 new inherited findings after one data-only correction; committed owner amendment required
-Last green conservation commit: a8986765ebbebc20765c85c8fcfb2aaf27b01529
+Blocker: none; A7 resolves the inherited-routing baseline stop without a checker change
+Last green conservation commit: 17b4de5225126a27e732fbf8cd9e753a8963a984
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
-SYNC: 5d6467093217a6869b31afb28866732400767267
-Main at sync: c2aa9e374a8cee57c676809dab4849273ed71855
+SYNC: 17b4de5225126a27e732fbf8cd9e753a8963a984
+Main at sync: 2bc76ced1f60e32b5d713adf2487416e464dcf4f
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
 Latest commits: e7fa77404 (A6 cutover), cc92094c9 (ordinary/checkpoint proof), 5d6467093 (main sync), fd6c9ab9e (source accounting), fcfe78cb8 (maps/counts), 7693331b0 (header-only preparation).
 Pending review requests: no further tooling re-review under A5; content review has not started
-Owner queue items: candidate-routing-H open; A6 ordinary approval question resolved
+Owner queue items: A7 resolved; Agent Coordination owns 15 inherited H tuples and Host Invocation owns 26, each required to reach zero by its batch end
 Archive/delete lists: none authored
 Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root-authorities batch
 Holds: none authored
 Promoted-document edits: agent-coordination portal, header-only metadata completion logged in promoted-edits.md; body unchanged
 
-Next action: await a committed owner amendment resolving the H routing/baseline conflict, execute only that amendment, then finish first-batch candidate and decision authoring to its independent review request.
+Next action: finish Agent Coordination candidate authoring, fix its inherited H references, decide all source rows into pending/script-proven entries, commit the ordinary review request and stop.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -80,3 +80,5 @@ Routing correction and required stop: a broad agent-coordination route incorrect
 Corrected scripts: 872/872; ratchet exit 0 (995 files, 24 accounted edits, one accounted new file); placement exit 0 (446/445, one standing exception). No first-batch decision shard or approval is written. This stop is not ready-for-review. Archive/delete lists and holds remain unauthored; observed source/target differences are not adjudicated. Manual authoring, independent content approval, scoped E and reduced promotion rehearsal remain UNPROVEN. Exact blocker and owner options: candidate-routing-blocker.md/json and owner-queue.md.
 
 Committed correction/stop checkpoint: a8986765e. Scratch refreshed at that commit; D against each owner-specified prior registry exits 0 with 0 fatal findings, 0 lost-id or self-review findings. Pinned header/body helper compares fcfe78cb8 to a8986765e: 68 files, 67 Markdown, 0 failures. Source map coverage remains 1,040/1,040. Complete commands and outputs: routing-correction-verification.json. H is still blocked by the unchanged corrected data; no additional fix attempt, baseline relaxation or content decision is made after the stop.
+
+A7 resume: committed ea6620028. Required main merge 17b4de522 imports only three advisory review/report files, no source or target changes and no ratchet exception needed. Clean resume; HEAD descends from the prior conservation checkpoint. Both D prior-registry proofs: exit 0, 0 fatal findings. A/B/I unchanged, C retains all pre-existing area statuses; ratchet exit 0 and placement exit 0. H exact-tuple comparison against the original baseline plus only the 41 authorized inherited findings: 45 current, 0 unaccounted. No checker or baseline file change. Per-batch closure obligations: Agent Coordination 15, Host Invocation 26; final corpus goal remains zero.
