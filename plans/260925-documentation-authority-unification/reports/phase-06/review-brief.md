@@ -88,3 +88,18 @@ Run the ratchet, constitution placement and candidate checks. Record expected gl
 Only after Steps 3 and 6 and in Step 10, inspect the step-group diff adversarially: find lost or weakened claims, wrong owners, invented claims, stale anchors/digests, unaccounted remainders, pointer-back carriers, unjustified archive/delete decisions, authority leaks and unsupported conflict closure. Cite source and candidate paths/units and state severity. Commit `red-team-<step>.md`; close with zero open Critical/High unless the owner explicitly accepts them.
 
 Retain the phase's stratified candidate-block draw at these checkpoints: 50 blocks, comprising 20 unnamed by decisions, 20 carried with rewritten rationale and 10 random, with seed and population recorded. Two unlabelled invented-claim defects trigger the stop condition. Record short strata honestly; never fill them with duplicate samples. Fresh-reader checks and other batch-specific acceptance requirements remain as specified in the phase contract.
+
+## Committed candidate classification receipts
+
+Owner amendment A10 adds a reverse-only classification channel. It does not approve source claims, replace whole-unit carry or waive checkpoint sensitivity review. The only classes are `candidate-native-navigation`, `structural-frame` and `bookkeeping`. Receipt artifacts are committed at `ledger/candidate-classifications-<batch>.json`, shape `{version:1, authorSession, receipts:[{claimId,path,anchor,unitDigest,shownText,shownTextDigest,class,authoredBy,rationale}]}`. For headings, `shownText` includes the full section payload rendered by `buildConservationUnitLookup`; the native unit identity digest alone is insufficient to bind that payload.
+
+Read every proposed receipt and its full shown text at the receipt commit. For each accepted classification, commit an ordinary report with `Author session`, `Reviewer` and `Receipt commit` headers and this separate table:
+
+| Claim | Class | Verdict | Unit digest | Shown text digest | Note |
+|---|---|---|---|---|---|
+
+Use `ok` only for a fixed allowed class; otherwise `rework` or `hold`. The gate requires the committed receipt, both full digests, exact class/verdict/note, independent author/reviewer sessions, report ancestry and current candidate path/anchor/payload. Pending, invalid, changed or uncommitted receipts leave the unit reverse-open. Existing review-2-reverse classifications without this new binding remain historical acceptance, not automatically promoted into new receipts.
+
+After the independent report commit, the executor records only its accepted references in the decision shard's `candidateClassifications`: `{claimId,receiptPath,receiptCommit,reviewStatus,reviewedBy,reviewedAt,reviewReport,reviewReportCommit,reviewNote}`. Pending references carry no approval identity/date. This is a separate reverse receipt binding, not a source claim verdict; `--apply-review` continues to apply ordinary source-claim reports unchanged. Checkpoint-named reports cannot close this ordinary channel; checkpoint sensitivity requirements remain unchanged.
+
+Semantic ownership: only targets classified as noncanonical `evidence-payload` have separate physical carriers. Every legacy payload binds its own same-path platform copy; canonical kinds retain fatal one-owner uniqueness. The identical-unit exceptions check is unchanged and must still account all physical-carrier groups explicitly.

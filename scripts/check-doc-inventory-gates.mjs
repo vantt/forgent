@@ -687,7 +687,7 @@ export function loadDecisionShards(target) {
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
     }
-    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors', 'exact', 'corpusRules'].filter((field) => field in shard)]) {
+    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors', 'exact', 'corpusRules', 'candidateClassifications'].filter((field) => field in shard)]) {
       if (!Array.isArray(shard[field])) throw new Error(`decision shard ${file}: "${field}" must be an array`);
     }
     if ('authorshipRequired' in shard && typeof shard.authorshipRequired !== 'boolean') throw new Error(`decision shard ${file}: "authorshipRequired" must be boolean`);
@@ -995,9 +995,71 @@ export function pathInScope(p, scope) {
   return typeof p === 'string' && scope.some((s) => p === s || p.startsWith(s.endsWith('/') ? s : `${s}/`));
 }
 
-export function unreferencedCandidateRows(inventory, shards, { scope = null } = {}) {
+/** Classification closes only the committed, independently accepted unit and shown payload. */
+function acceptedCandidateClassifications(inventory, shards, repoRoot) {
+  const accepted = new Set();
+  const references = (shards || []).flatMap(shard => (shard.candidateClassifications || []).filter(ref => ref.reviewStatus === 'reviewed' && !isCheckpointReviewReport(ref.reviewReport)).map(ref => ({ ref, shard })));
+  if (!repoRoot || !inventory.commit || references.length === 0) return accepted;
+  const wanted = new Set(references.map(({ ref }) => ref.claimId));
+  const rows = new Map();
+  for (const row of inventory.claimLedger || []) if (wanted.has(row.claimId)) rows.set(row.claimId, row);
+  const reportOf = buildCommittedReviewReportLookup(repoRoot, inventory.commit);
+  const unitsOf = buildConservationUnitLookup(repoRoot, inventory.commit);
+  const receipts = new Map();
+  const ancestors = new Map([[inventory.commit, true]]);
+  const classes = ['candidate-native-navigation', 'structural-frame', 'bookkeeping'];
+  const receiptOf = (ref) => {
+    if (!/^[0-9a-f]{40}$/.test(ref.receiptCommit || '') || typeof ref.receiptPath !== 'string' ||
+        path.posix.normalize(ref.receiptPath) !== ref.receiptPath || !/^plans\/[^/]+\/ledger\/candidate-classifications-[a-z0-9-]+\.json$/.test(ref.receiptPath)) return null;
+    if (!ancestors.has(ref.receiptCommit)) {
+      let ancestor = false;
+      try { execFileSync('git', ['merge-base', '--is-ancestor', ref.receiptCommit, inventory.commit], { cwd: repoRoot, stdio: 'pipe' }); ancestor = true; } catch {}
+      ancestors.set(ref.receiptCommit, ancestor);
+    }
+    if (!ancestors.get(ref.receiptCommit)) return null;
+    const key = `${ref.receiptCommit}:${ref.receiptPath}`;
+    if (!receipts.has(key)) {
+      let receipt = null;
+      try { receipt = JSON.parse(readBlobAtCommit(ref.receiptCommit, ref.receiptPath, repoRoot)); } catch {}
+      receipts.set(key, receipt?.version === 1 && Array.isArray(receipt.receipts) ? receipt : null);
+    }
+    return receipts.get(key);
+  };
+  for (const { ref, shard } of references) {
+    const artifact = receiptOf(ref);
+    const matches = artifact?.receipts.filter(receipt => receipt.claimId === ref.claimId) || [];
+    if (matches.length !== 1) continue;
+    const receipt = matches[0];
+    const row = rows.get(ref.claimId);
+    if (!row || !classes.includes(receipt.class) || !/^[0-9a-f]{64}$/.test(receipt.unitDigest || '') ||
+        receipt.path !== row.sourcePath || receipt.anchor !== row.sourceAnchor || receipt.unitDigest !== row.sourceUnitDigest) continue;
+    const authors = [receipt.authoredBy, artifact.authorSession, shard.authorSession];
+    if (authors.some(author => !nonEmpty(author) || author.startsWith('script:') ||
+        reviewSessionIdentity(author) === reviewSessionIdentity(ref.reviewedBy)) || artifact.authorSession !== shard.authorSession) continue;
+    const unit = unitsOf(receipt.path)?.find(unit => unit.anchor === receipt.anchor && unit.textDigest === receipt.unitDigest);
+    const shown = unit && (unit.sectionText ?? unit.text);
+    if (typeof receipt.shownText !== 'string' || receipt.shownText !== shown ||
+        receipt.shownTextDigest !== sha256Buffer(Buffer.from(receipt.shownText))) continue;
+    const report = reportOf(ref.reviewReport, ref.reviewReportCommit);
+    const header = name => typeof report === 'string' ? report.match(new RegExp(`^${name}:\\s*(.+)$`, 'mi'))?.[1].trim() : null;
+    if (!/^reviewer:[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(ref.reviewedBy || '') ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(ref.reviewedAt || '') || !nonEmpty(ref.reviewNote) ||
+        header('Reviewer') !== ref.reviewedBy || reviewReportAuthor(report) !== artifact.authorSession ||
+        header('Receipt commit') !== ref.receiptCommit) continue;
+    const acceptedVerdict = report.split(/\r?\n/).some(line => {
+      const cells = line.trim().split(/(?<!\\)\|/).slice(1, -1).map(cell => cell.trim().replace(/\\\|/g, '|'));
+      return cells.length === 6 && cells[0] === receipt.claimId && cells[1] === receipt.class && cells[2] === 'ok' &&
+        cells[3] === receipt.unitDigest && cells[4] === receipt.shownTextDigest && cells[5] === ref.reviewNote;
+    });
+    if (acceptedVerdict) accepted.add(receipt.claimId);
+  }
+  return accepted;
+}
+
+export function unreferencedCandidateRows(inventory, shards, { scope = null, repoRoot = null } = {}) {
   const candidates = new Set((inventory.items || []).filter((item) => item.authorityStatus === 'candidate').map((item) => item.path));
   const canonical = new Set((inventory.items || []).filter((item) => ['candidate', 'promoted'].includes(item.authorityStatus)).map((item) => item.path));
+  const classified = acceptedCandidateClassifications(inventory, shards, repoRoot);
   const claimIds = new Set();
   const mirrorSources = new Set();
   for (const shard of shards || []) {
@@ -1020,7 +1082,7 @@ export function unreferencedCandidateRows(inventory, shards, { scope = null } = 
   const scoped = Array.isArray(scope) && scope.length > 0;
   return (inventory.claimLedger || []).filter((row) => candidates.has(row.sourcePath) &&
     (!scoped || pathInScope(row.sourcePath, scope) || namespaces.some((prefix) => prefix.endsWith('/') ? row.sourcePath.startsWith(prefix) : row.sourcePath === prefix)) &&
-    !named.has(`${row.sourcePath}#${row.sourceAnchor}`)).map((row) => ({
+    !named.has(`${row.sourcePath}#${row.sourceAnchor}`) && !classified.has(row.claimId)).map((row) => ({
       claimId: row.claimId, path: row.sourcePath, anchor: row.sourceAnchor, unitDigest: row.sourceUnitDigest,
     }));
 }
@@ -1061,7 +1123,7 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
 }
 
 /** Runs every conservation rule; invariant findings are fatal in all modes, open findings only when strict. */
-export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null, scope = null, decisions = null }) {
+export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null, scope = null, decisions = null, repoRoot = null }) {
   const invariant = [
     ...previousRegistries.flatMap(({ registry: previous, label }) => validateRowSetConservation(registry, previous, label)),
     ...validateSemanticClaimOwners(inventory?.claimLedger),
@@ -1069,8 +1131,8 @@ export function checkConservation({ inventory, registry, previousRegistries = []
     ...validateRetiredRowDispositions(registry, vocabulary),
     ...(ratchetResult ? validateLegacyGrowth(ratchetResult) : []),
   ];
-  const reverseEnabled = (decisions || []).some((shard) => shard.authorshipRequired === true);
-  const reverseRows = reverseEnabled ? unreferencedCandidateRows(inventory, decisions, { scope }) : [];
+  const reverseEnabled = (decisions || []).some((shard) => shard.authorshipRequired === true || Array.isArray(shard.candidateClassifications));
+  const reverseRows = reverseEnabled ? unreferencedCandidateRows(inventory, decisions, { scope, repoRoot }) : [];
   const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister, scope, unreferencedCandidateRows: reverseRows });
   return { invariant, open, ...(reverseEnabled ? { unreferencedCandidateRows: reverseRows } : {}) };
 }
@@ -1097,7 +1159,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
     ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
     ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry, unitsOf: inventory.commit ? buildConservationUnitLookup(repoRoot, inventory.commit) : null }) : []),
   ];
-  const conservation = checkConservation({ inventory, registry: conservationRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope, decisions });
+  const conservation = checkConservation({ inventory, registry: conservationRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope, decisions, repoRoot });
   fatalFindings.push(...validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes }), ...conservation.invariant);
   const strictFindings = strict ? [
     ...conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })),

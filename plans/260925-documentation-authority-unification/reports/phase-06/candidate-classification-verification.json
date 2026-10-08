@@ -1,0 +1,3874 @@
+{
+  "version": 1,
+  "ownerDecision": "ea33f3d30304c8e4975d72e373dbad741ae47350",
+  "redCommits": [
+    "a2d6d4099c324b825b10b490fc2ad13d3981ea7c",
+    "45792a17d625529bd7270468ac32e64d78e67a71",
+    "25a32bcc506b75a267ad767e2b9e2b4c12c29ebc"
+  ],
+  "tests": {
+    "initialRed": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-candidate-conservation.test.mjs"
+      ],
+      "exit": 1,
+      "tests": 27,
+      "suites": 0,
+      "pass": 21,
+      "fail": 6,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "payloadRed": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-candidate-conservation.test.mjs"
+      ],
+      "exit": 1,
+      "tests": 31,
+      "suites": 0,
+      "pass": 24,
+      "fail": 7,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "checkpointRed": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-candidate-conservation.test.mjs"
+      ],
+      "exit": 1,
+      "tests": 32,
+      "suites": 0,
+      "pass": 31,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "targeted": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "test/scripts/doc-candidate-conservation.test.mjs"
+      ],
+      "exit": 0,
+      "tests": 32,
+      "suites": 0,
+      "pass": 32,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "scripts": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/backfill-status-category.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-citation-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-codes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-supersession.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-candidate-status.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-constitution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-retirement.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-locked-decisions-heading-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/dispatch-decide-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-alias-resolver.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-candidate-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-corpus-decisions.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-exact.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-mirrors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-review.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-restoration-proofs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-authorship.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/fgos-shell-integration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/full-suite-queue.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-doc-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-shipped-path-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/herdr-cockpit-notify.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/install-git-hooks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/is-main-module.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-classifier.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-migration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/list-doc-anchors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/migrate-actor-to-role.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/next-doc-id.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/prepare-release.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/probe-storytelling-material.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/project-agents.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-test-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-tests.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-ownership-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-plan-out.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-proof-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-compare.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-coverage-map.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-mutate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote-report.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-timing.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/verify-phase-02.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-test-marker.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-wrapper-script.test.mjs"
+      ],
+      "exit": 0,
+      "tests": 901,
+      "suites": 0,
+      "pass": 901,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "full": {
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "--test-concurrency=4",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/architecture.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/command-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dir-differs-from-cwd.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dispatch-inspect.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dispatch-operability.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/dispatch-reconcile.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-5.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-6.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve-7.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-approve.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-claim-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-claim.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-decision-kind.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-decision.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-disconnected-worktree-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-edit-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-edit-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-edit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-gate-approve.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-gateway.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-handoff.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-help.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-5.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-6.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake-7.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-intake.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-iron-law-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-manifest.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-merge-next-idle-turn.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-merge-next-no-config-write.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-move.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-post-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-preflight.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-4.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read-5.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-read.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-return.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-review-pr-precedence.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-setup.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stage-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stage-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stage.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-stale-orphaned-runs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-tool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-version.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/fgos-workflow.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/invocation-fault-log.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/knowledge-attest-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/knowledge-deprecation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/knowledge-verbs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/plan-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/run-verb.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/cli/take-pick-claim-eligibility.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/config/global-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/config/shared-config-file.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/fgos-edit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/fgos-read.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/fgos-step.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/direct/merge-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/docs/decisions-corpus-retired.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/docs/rul11-anchor-phrase.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/coexistence-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/compound-learn-lifecycle.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/domain-aware-stage-literals.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/fixture-marketing-domain.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/main-checkout-lock-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/pr-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/rebuild-determinism.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/resync-worktree-bare-invocation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/root-file-guard-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/runner-loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/self-improve-loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/e2e/synthetic-domain.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/evolve/iron-law.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/helpers/fixture-dir.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/helpers/js-source-lexer.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/install-packaging.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/install/coexist.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/install/install-sh.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/classify.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/discovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/judge-verify-second-pass-stability.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/plan-verdict-from-plan-md.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/intake/plan.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/observe/observe-contracts-fixtures.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/parity/edit-parity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/parity/read-parity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/parity/step-parity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/authoritative-match.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/capability-plan-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/context-render.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/decision-index.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/enduser-index.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/frontmatter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/report/knowledge-resolver.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/agent-result-claim-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/anti-loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-cwd-mutex-concurrency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-dispatch.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-enumerator-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-layout.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-normalizer.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-policy.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-provenance.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment-runresult.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/assignment.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/attestation-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/claim-liveness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/claim-port.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/cli-spawn-reconciliation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/codex-cli-glm-cli-live-executors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/concurrent-claim-eventlog-loss.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dead-vocabulary-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-assignment-id-claim-concurrency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-brief.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-config-patterns.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-authority.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-backend-p03.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-blind.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-credential-hygiene.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-p04.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-p05.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-confinement-policies.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-effect-guarantee.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-executor-profile.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-governance-operability.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-governance-provider-denylist.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-i08b-remediation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-liveness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-operability-production-door.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-production-call-sites.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-r9-performance-cache.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconcile-operation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconciliation-concurrency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconciliation-import-graph.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-reconciliation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-recovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-runtime-inspect.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-trust-store.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-visibility-session.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-worker-home.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-worker-session-boot.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch-worker-session.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/dispatch.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/effective-execution-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/egress-governance.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/enrich-and-validate-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/evidence-attribution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/bind-committed-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/bind.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/handoff-refs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/architecture-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/index.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/panel.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/presets.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/reviewed.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/role-tasks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/patterns/solo.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/run-herdr.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/run-posture.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/run.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/unit-run-outcome.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/unit-summary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/execution/unit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/fanout-batch-runner-commit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/frozen-judge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/gateway-control.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/github-adapter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/goal-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-agent.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-claude-invocations.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-launcher-env.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-private-home-trust.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-prompt-ready.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-provider-invocations.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-read-agent-state.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-reconciliation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-round-reconcile.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-spawn-adapter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/herdr-spawn-assignment-dispatch.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/lock-wait.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/lock.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/loop.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/main-checkout-lock.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/main-checkout-reset-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/merge-target-slot-multiprocess.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/operation-choice.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/operation-prompt-templates.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/paths.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/process-identity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/promote-engine.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/promote-preflight.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/prompt-templates.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-adapter.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-capacity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-credential-probe.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/provider-quarantine-probe.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/recovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/root-affinity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-lock-identity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-outcome.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-result-source-scan.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-result-v2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/run-result-v3-reader.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/session.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/usage-parsers.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/worker-log.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/worktree-callsite-wrapper.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/worktree.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/runner/write-queue.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/command-routes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/dev-host.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/envelope-contract.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/fgctl-init.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/fgctl-stage.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/fgctl-upgrade.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/harness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/rust-host/release-tree.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/backfill-status-category.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-citation-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-codes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-supersession.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-candidate-status.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-constitution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-retirement.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-legacy-docs-ratchet.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-locked-decisions-heading-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/dispatch-decide-hook.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-alias-resolver.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-candidate-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-corpus-decisions.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-conservation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-exact.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-mirrors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-review.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-restoration-proofs.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-authorship.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/fgos-shell-integration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/full-suite-queue.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-doc-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-shipped-path-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/herdr-cockpit-notify.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/install-git-hooks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/is-main-module.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-classifier.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-migration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/list-doc-anchors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/migrate-actor-to-role.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/next-doc-id.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/prepare-release.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/probe-storytelling-material.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/project-agents.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-test-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-tests.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-ownership-lint.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-plan-out.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-proof-inventory.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-compare.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-coverage-map.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-mutate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote-report.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-timing.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/verify-phase-02.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-test-marker.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-wrapper-script.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/active-release-drift-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/agent-cli-trust-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/agy-permissions.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/ansi.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/bin-discovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/blind-steps-proven-pools-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/bwrap-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/capability-catalog-doctrine.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-doctor-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-config.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-envelope.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-hookspath.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-idempotent.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks-setup-rc-line.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/claude-code-hooks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/config-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/confinement-doctor-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/dir-resolution.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/doctor-coordination-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/doctor-fresh-run.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/doctor-strict-exit.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/executor-profile-warnings.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/gitignore-docs-history-not-excluded.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/instruction-composition.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/instruction-projections.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/instruction-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/knowledge-doctor.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/observe-doctor-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/plugin-marketplace-doctor-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/readme-tag-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/registrations.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/self-uninstall-spike.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/shell-rc.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/skill-wrappers.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/uninstall-wiring-2.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/uninstall-wiring-3.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/uninstall-wiring.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/visibility-checks.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/setup/workflow-pool-independence-check.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/fgos-coding-exploring-root-fix.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/fgos-coding-knowledge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/fgos-mirror.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/skills/knowledge-canary.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/smoke.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/awaiting-context.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/awaiting.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/backward-compat.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/cleanup-harness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/cleanup-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/compound-learn-done-gate.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/cursor.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/decision-relation.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/decision-scope-field.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/dep-graph.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/discover-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/discover-verdict-override.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/domain-fields.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/domain-registry-compiled.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/domain-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/drift-status.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/envelope.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-compaction.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-jsonl-truncation-guard.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-legacy-absence.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events-shard-gitattributes-union-merge.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/events.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/fgos-logs-bucket.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/frontier.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/fsm.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/gate-bypass.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/graph-harness.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/graph-metrics.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/handoff.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/impact.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/knowledge-bootstrap.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/knowledge-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/plan-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/porting-store.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/porting.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/postland-drift.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/priority-formula.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/replay.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/retro-pool.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/retrospective-doors.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/runtime-coordination.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/show-list-move-consistency.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/status-category.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/step.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/store.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/tool-registry.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/work-size-rigor.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/work.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/worker-slots.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/workflow-multiplicity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/state/working-tree-clean-unified.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/format-bytes.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/format-duration.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/host-bin.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/session-identity.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/util/unique-tmp-tag.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/verbs/dispatch-observe.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/verbs/dispatch-recovery.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/verbs/merge/approve.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/architecture-advisory-workflow.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/business-discussion-workflow.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/discussion-workflows.test.mjs",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/workflow/workflow-runner.test.mjs"
+      ],
+      "exit": 0,
+      "tests": 7391,
+      "suites": 22,
+      "pass": 7318,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 8,
+      "todo": 65
+    }
+  },
+  "cliSmoke": {
+    "command": [
+      "node",
+      "/tmp/phase06/classification-cli-smoke.mjs"
+    ],
+    "genesisCommand": [
+      "node",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/generate-doc-inventory.mjs",
+      "--bootstrap-identity-registry",
+      "--commit",
+      "HEAD",
+      "--json-out",
+      "/tmp/phase06/classification-cli-registry.json"
+    ],
+    "root": "/tmp/phase06/classification-cli-smoke",
+    "firstGeneration": {
+      "args": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/generate-doc-inventory.mjs",
+        "--refresh",
+        "--commit",
+        "HEAD",
+        "--identity-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--json-out",
+        "/tmp/phase06/classification-cli-inventory.json",
+        "--md-out",
+        "/tmp/phase06/classification-cli-inventory.md"
+      ],
+      "exit": 0,
+      "stdout": "generate-doc-inventory: identity registry (commit d003792604f9e78317e8727c46db2eab65e7ba76) is bound to d003792604f9e78317e8727c46db2eab65e7ba76; no carry-forward needed\ngenerate-doc-inventory: wrote ../classification-cli-inventory.json and ../classification-cli-inventory.md\n"
+    },
+    "finalGeneration": {
+      "args": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/generate-doc-inventory.mjs",
+        "--refresh",
+        "--commit",
+        "HEAD",
+        "--identity-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--json-out",
+        "/tmp/phase06/classification-cli-inventory.json",
+        "--md-out",
+        "/tmp/phase06/classification-cli-inventory.md"
+      ],
+      "exit": 0,
+      "stdout": "generate-doc-inventory: identity registry (commit d003792604f9e78317e8727c46db2eab65e7ba76) is bound to 9830813b9504973fd4f452b7c6f79e012000240e; no carry-forward needed\ngenerate-doc-inventory: wrote ../classification-cli-inventory.json and ../classification-cli-inventory.md\n"
+    },
+    "receiptCommit": "2be28c51e38df6bbe8df740a56ccf7f336875b2f",
+    "reportCommit": "5ac81d8dcf4ecb311a13b343b87545acc131b58b",
+    "receipts": [
+      {
+        "claimId": "claim_e64e0acb6c649f16cf057aa698255884",
+        "path": "docs/platform/alpha/spec.md",
+        "anchor": "alpha",
+        "unitDigest": "e224a1ea926b3afeaf1090bd755326d4d6dccbdd4c8437477acf1774f0f2eeff",
+        "shownText": "# Alpha\n\nMigration bookkeeping.\n\n[Area navigation](#alpha)",
+        "shownTextDigest": "53801b341e279084469b6daaff6d37ece5f6262cfbb3bdbe262d26f577b69ec7",
+        "class": "structural-frame",
+        "authoredBy": "codex-session:fixture-author@2026-10-08"
+      },
+      {
+        "claimId": "claim_ffc5c3d2e9b3caf3fc1d1f89883e0ad7",
+        "path": "docs/platform/alpha/spec.md",
+        "anchor": "unheaded-block-1",
+        "unitDigest": "fee444f62f9ed7a6b830d27f1fd62b9e1d5a574de34f2f0f9e1772f87bedb035",
+        "shownText": "Migration bookkeeping.",
+        "shownTextDigest": "fee444f62f9ed7a6b830d27f1fd62b9e1d5a574de34f2f0f9e1772f87bedb035",
+        "class": "bookkeeping",
+        "authoredBy": "codex-session:fixture-author@2026-10-08"
+      },
+      {
+        "claimId": "claim_01c5b34dbde8a6d923125bfe7580b6bd",
+        "path": "docs/platform/alpha/spec.md",
+        "anchor": "unheaded-block-2",
+        "unitDigest": "dd3cfcdb524d0f9b1151e4b79b1b5e484a102da16eb98edb8013e5e4587011c9",
+        "shownText": "[Area navigation](#alpha)",
+        "shownTextDigest": "dd3cfcdb524d0f9b1151e4b79b1b5e484a102da16eb98edb8013e5e4587011c9",
+        "class": "candidate-native-navigation",
+        "authoredBy": "codex-session:fixture-author@2026-10-08"
+      }
+    ],
+    "before": {
+      "name": "pre-change",
+      "command": [
+        "node",
+        "/tmp/phase06/owner-before-cli.mjs",
+        "--repo-root",
+        "/tmp/phase06/classification-cli-smoke",
+        "--inventory",
+        "/tmp/phase06/classification-cli-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--vocabulary",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+        "--decisions",
+        "/tmp/phase06/classification-cli-smoke/plans/260925-documentation-authority-unification/ledger/decisions/classifications.json",
+        "--previous-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--json"
+      ],
+      "exit": 1,
+      "fatal": [
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-001: phase3Ledger.claimId claim_efd5afeb35b4352c0229ea2f7be2356b is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-002: phase3Ledger.claimId claim_bbaec409dcbaee8f33968727aa0abed5 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-003: phase3Ledger.claimId claim_75c780a31188a0fa1e19d03ccbd3b6b1 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-004: phase3Ledger.claimId claim_54536d1078dc6a2b6eacd17105389f2b is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-005: phase3Ledger.claimId claim_d90840823918415e74ddd353dae32ea3 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-006: phase3Ledger.claimId claim_6ac894a939b9efb6725758fd6c4eb039 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-007: phase3Ledger.claimId claim_d1c4102dc6dea3ae86434fb12c0abf71 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-008: phase3Ledger.claimId claim_08172f75766eb1d002d4cba2669f9bbd is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-009: phase3Ledger.claimId claim_7046eb56f67c02ef82f621a3fa30286c is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-010: phase3Ledger.claimId claim_6a37273a0a45d24c53e344928c3edf22 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-011: phase3Ledger.claimId claim_8c44796ac827f6b1287421778b56511c is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-012: phase3Ledger.claimId claim_2519e82bb2a6054b1b822fc266471424 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-013: phase3Ledger.claimId claim_38ab2fca27e14c583debbe4bd42386c9 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-014: phase3Ledger.claimId claim_9f2283b25ef4be9f0e68b4381f1ce08e is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-015: phase3Ledger.claimId claim_a1c1085c9d77a84ca5e5aefe1de6d059 is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-016: phase3Ledger.claimId claim_89e8b193eb339f06478bf6998576080c is absent from the claim ledger and the identity registry"
+        },
+        {
+          "type": "dropped-claim-absent-from-ledger",
+          "message": "dropped claim dropped-017: phase3Ledger.claimId claim_ca69fde84ef390b737cc841f2e0722f8 is absent from the claim ledger and the identity registry"
+        }
+      ],
+      "reverse": [
+        {
+          "claimId": "claim_e64e0acb6c649f16cf057aa698255884",
+          "path": "docs/platform/alpha/spec.md",
+          "anchor": "alpha",
+          "unitDigest": "e224a1ea926b3afeaf1090bd755326d4d6dccbdd4c8437477acf1774f0f2eeff"
+        },
+        {
+          "claimId": "claim_ffc5c3d2e9b3caf3fc1d1f89883e0ad7",
+          "path": "docs/platform/alpha/spec.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "fee444f62f9ed7a6b830d27f1fd62b9e1d5a574de34f2f0f9e1772f87bedb035"
+        },
+        {
+          "claimId": "claim_01c5b34dbde8a6d923125bfe7580b6bd",
+          "path": "docs/platform/alpha/spec.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "dd3cfcdb524d0f9b1151e4b79b1b5e484a102da16eb98edb8013e5e4587011c9"
+        }
+      ],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1,
+          "examples": [
+            "docs/platform/alpha/spec.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 17,
+          "examples": [
+            "dropped-001",
+            "dropped-002",
+            "dropped-003",
+            "dropped-004",
+            "dropped-005"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        }
+      ]
+    },
+    "approved": {
+      "name": "approved",
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/classification-cli-smoke",
+        "--inventory",
+        "/tmp/phase06/classification-cli-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--vocabulary",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+        "--decisions",
+        "/tmp/phase06/classification-cli-smoke/plans/260925-documentation-authority-unification/ledger/decisions/classifications.json",
+        "--previous-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatal": [],
+      "reverse": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1,
+          "examples": [
+            "docs/platform/alpha/spec.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        }
+      ]
+    },
+    "pending": {
+      "name": "pending",
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/classification-cli-smoke",
+        "--inventory",
+        "/tmp/phase06/classification-cli-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--vocabulary",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+        "--decisions",
+        "/tmp/phase06/classification-cli-pending.json",
+        "--previous-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatal": [],
+      "reverse": [
+        {
+          "claimId": "claim_e64e0acb6c649f16cf057aa698255884",
+          "path": "docs/platform/alpha/spec.md",
+          "anchor": "alpha",
+          "unitDigest": "e224a1ea926b3afeaf1090bd755326d4d6dccbdd4c8437477acf1774f0f2eeff"
+        },
+        {
+          "claimId": "claim_ffc5c3d2e9b3caf3fc1d1f89883e0ad7",
+          "path": "docs/platform/alpha/spec.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "fee444f62f9ed7a6b830d27f1fd62b9e1d5a574de34f2f0f9e1772f87bedb035"
+        },
+        {
+          "claimId": "claim_01c5b34dbde8a6d923125bfe7580b6bd",
+          "path": "docs/platform/alpha/spec.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "dd3cfcdb524d0f9b1151e4b79b1b5e484a102da16eb98edb8013e5e4587011c9"
+        }
+      ],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1,
+          "examples": [
+            "docs/platform/alpha/spec.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        }
+      ]
+    },
+    "committedBytes": {
+      "name": "committed-bytes",
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/classification-cli-smoke",
+        "--inventory",
+        "/tmp/phase06/classification-cli-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--vocabulary",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+        "--decisions",
+        "/tmp/phase06/classification-cli-smoke/plans/260925-documentation-authority-unification/ledger/decisions/classifications.json",
+        "--previous-registry",
+        "/tmp/phase06/classification-cli-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatal": [],
+      "reverse": [],
+      "open": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1,
+          "examples": [
+            "docs/platform/alpha/spec.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 3,
+          "examples": [
+            "docs/platform/alpha/spec.md#alpha",
+            "docs/platform/alpha/spec.md#unheaded-block-1",
+            "docs/platform/alpha/spec.md#unheaded-block-2"
+          ]
+        }
+      ]
+    }
+  },
+  "baselineDefault": [
+    {
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/owner-step0-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "sha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "identical": true
+    },
+    {
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/owner-step0-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/owner-step0-baseline/plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "sha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "identical": true
+    }
+  ],
+  "codeIntelligence": [
+    {
+      "symbol": "loadDecisionShards",
+      "exit": 0,
+      "report": {
+        "target": {
+          "id": "Function:scripts/check-doc-inventory-gates.mjs:loadDecisionShards",
+          "name": "loadDecisionShards",
+          "type": "Function",
+          "filePath": "scripts/check-doc-inventory-gates.mjs"
+        },
+        "direction": "upstream",
+        "impactedCount": 112,
+        "risk": "CRITICAL",
+        "epistemic": "exact",
+        "summary": {
+          "direct": 2,
+          "processes_affected": 19,
+          "modules_affected": 20
+        },
+        "byDepthCounts": {
+          "1": 2,
+          "2": 1,
+          "3": 109
+        },
+        "affected_processes": [
+          {
+            "name": "Main → Is_valid_id",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 10,
+            "total_hits": 10,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Require_token → Parse",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 5,
+            "total_hits": 5,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Next_tab_event_cycles_the_active_tab → Prev",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Pane_rescan_skips_pane_refresh_when_no_registry_is_configured → Next",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "main",
+            "type": "Function",
+            "filePath": "apps/fgctl/src/main.rs",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 3
+          },
+          {
+            "name": "Esc_closes_detail_modal_without_quitting_dashboard → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Auto_discover_skips_without_panic_when_no_pane_can_be_placed → Next",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "verify_release_tree",
+            "type": "Function",
+            "filePath": "packages/distribution/rust/src/verify.rs",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 3
+          },
+          {
+            "name": "App → FetchList",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Spawn_fgos_verb → Is_confined",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "dispatch_harness",
+            "type": "Function",
+            "filePath": "packages/observe/rust/src/metrics_cli/harness.rs",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 4
+          },
+          {
+            "name": "Mouse_click_outside_pick_button_rect_fires_nothing → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Work_item_enter_opens_detail_modal_and_pick_only_fires_on_second_enter → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Discover_button_is_inert_when_item_is_blocked_even_at_eligible_stage → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Discover_button_fires_pane_open_when_item_is_at_discovery_stage → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Main → TrustStoreError",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Mouse_click_inside_pick_button_rect_fires_pick → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Ensure_operation_tab → Parse",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Discover_button_is_inert_when_item_is_not_at_discovery_stage → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          }
+        ],
+        "affected_modules": [
+          {
+            "name": "Scripts",
+            "hits": 3,
+            "impact": "direct"
+          },
+          {
+            "name": "Screens",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_122",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_108",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_0",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_130",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "R5-parity",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_106",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_20",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_117",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_135",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_9",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_126",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Wiring",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_10",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_11",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_129",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Api",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_3",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "2026-09-07-v0",
+            "hits": 1,
+            "impact": "indirect"
+          }
+        ],
+        "pagination": {
+          "limit": 100,
+          "offset": 0,
+          "truncated": true
+        },
+        "byDepth": {
+          "1": [
+            {
+              "depth": 1,
+              "id": "Function:scripts/check-doc-inventory-gates.mjs:runCli",
+              "name": "runCli",
+              "filePath": "scripts/check-doc-inventory-gates.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 1,
+              "id": "Function:scripts/propose-doc-decisions.mjs:runCli",
+              "name": "runCli",
+              "filePath": "scripts/propose-doc-decisions.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            }
+          ],
+          "2": [
+            {
+              "depth": 2,
+              "filePath": "",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            }
+          ],
+          "3": [
+            {
+              "depth": 3,
+              "id": "File:scripts/write-test-marker.mjs",
+              "name": "write-test-marker.mjs",
+              "filePath": "scripts/write-test-marker.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/graph-metrics.mjs",
+              "name": "graph-metrics.mjs",
+              "filePath": "src/state/graph-metrics.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/gate-bypass.mjs",
+              "name": "gate-bypass.mjs",
+              "filePath": "src/state/gate-bypass.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/events.mjs",
+              "name": "events.mjs",
+              "filePath": "src/state/events.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/events-jsonl-truncation-guard.mjs",
+              "name": "events-jsonl-truncation-guard.mjs",
+              "filePath": "src/state/events-jsonl-truncation-guard.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/events-compaction.mjs",
+              "name": "events-compaction.mjs",
+              "filePath": "src/state/events-compaction.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/domain-registry.mjs",
+              "name": "domain-registry.mjs",
+              "filePath": "src/state/domain-registry.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/dep-graph.mjs",
+              "name": "dep-graph.mjs",
+              "filePath": "src/state/dep-graph.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/cursor.mjs",
+              "name": "cursor.mjs",
+              "filePath": "src/state/cursor.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/setup/registrations.mjs",
+              "name": "registrations.mjs",
+              "filePath": "src/setup/registrations.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/setup/instruction-registry.mjs",
+              "name": "instruction-registry.mjs",
+              "filePath": "src/setup/instruction-registry.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/worktree.mjs",
+              "name": "worktree.mjs",
+              "filePath": "src/runner/worktree.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/work-dispatch.mjs",
+              "name": "work-dispatch.mjs",
+              "filePath": "src/runner/work-dispatch.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/work-compat.mjs",
+              "name": "work-compat.mjs",
+              "filePath": "src/runner/work-compat.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/merge.mjs",
+              "name": "merge.mjs",
+              "filePath": "src/runner/merge.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/loop.mjs",
+              "name": "loop.mjs",
+              "filePath": "src/runner/loop.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/lock-wait.mjs",
+              "name": "lock-wait.mjs",
+              "filePath": "src/runner/lock-wait.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/fanout-batch.mjs",
+              "name": "fanout-batch.mjs",
+              "filePath": "src/runner/fanout-batch.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch.mjs",
+              "name": "dispatch.mjs",
+              "filePath": "src/runner/dispatch.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch-log.mjs",
+              "name": "dispatch-log.mjs",
+              "filePath": "src/runner/dispatch-log.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/claim-port.mjs",
+              "name": "claim-port.mjs",
+              "filePath": "src/runner/claim-port.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/observe/friction-client.mjs",
+              "name": "friction-client.mjs",
+              "filePath": "src/observe/friction-client.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/report/enduser-index-generate.mjs",
+              "name": "enduser-index-generate.mjs",
+              "filePath": "src/report/enduser-index-generate.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/report/decision-index.mjs",
+              "name": "decision-index.mjs",
+              "filePath": "src/report/decision-index.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/intake/plan.mjs",
+              "name": "plan.mjs",
+              "filePath": "src/intake/plan.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/intake/discovery.mjs",
+              "name": "discovery.mjs",
+              "filePath": "src/intake/discovery.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/intake/classify.mjs",
+              "name": "classify.mjs",
+              "filePath": "src/intake/classify.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/cli/invocation-fault-log.mjs",
+              "name": "invocation-fault-log.mjs",
+              "filePath": "src/cli/invocation-fault-log.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/261006-1445-fgctl-dev-activation/phase-00-research-and-spec.md",
+              "name": "phase-00-research-and-spec.md",
+              "filePath": "plans/261006-1445-fgctl-dev-activation/phase-00-research-and-spec.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/261006-1415-fgos-convention-component/phase-00-spec.md",
+              "name": "phase-00-spec.md",
+              "filePath": "plans/261006-1415-fgos-convention-component/phase-00-spec.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/minimum-constitution.md",
+              "name": "minimum-constitution.md",
+              "filePath": "plans/260925-documentation-authority-unification/minimum-constitution.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/evidence-payload-relocation-policy.md",
+              "name": "evidence-payload-relocation-policy.md",
+              "filePath": "plans/260925-documentation-authority-unification/evidence-payload-relocation-policy.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/cutover-write-lease-design.md",
+              "name": "cutover-write-lease-design.md",
+              "filePath": "plans/260925-documentation-authority-unification/cutover-write-lease-design.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.md",
+              "name": "claim-and-disposition-vocabulary.md",
+              "filePath": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/verification.md",
+              "name": "verification.md",
+              "filePath": "docs/templates/verification.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/subcomponent-readme.md",
+              "name": "subcomponent-readme.md",
+              "filePath": "docs/templates/subcomponent-readme.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/decision.md",
+              "name": "decision.md",
+              "filePath": "docs/templates/decision.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/contract.md",
+              "name": "contract.md",
+              "filePath": "docs/templates/contract.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/architecture.md",
+              "name": "architecture.md",
+              "filePath": "docs/templates/architecture.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/vision.md",
+              "name": "vision.md",
+              "filePath": "docs/platform/vision.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/migration-authoring-rules.md",
+              "name": "migration-authoring-rules.md",
+              "filePath": "docs/platform/migration-authoring-rules.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/intent-preservation-ledger.md",
+              "name": "intent-preservation-ledger.md",
+              "filePath": "docs/platform/intent-preservation-ledger.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/README.md",
+              "name": "README.md",
+              "filePath": "docs/platform/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+              "name": "install-fgos-in-a-project-and-use-doctor.md",
+              "filePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+              "name": "fanout-batch-per-child-sync-spawn-and-listwork.md",
+              "filePath": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+              "name": "d0026-native-first-dispatch-narrative-reconciliation.md",
+              "filePath": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/step.mjs",
+              "name": "step.mjs",
+              "filePath": "src/verbs/state/step.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/read.mjs",
+              "name": "read.mjs",
+              "filePath": "src/verbs/state/read.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/move.mjs",
+              "name": "move.mjs",
+              "filePath": "src/verbs/state/move.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/edit.mjs",
+              "name": "edit.mjs",
+              "filePath": "src/verbs/state/edit.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/sync-root.mjs",
+              "name": "sync-root.mjs",
+              "filePath": "src/verbs/merge/sync-root.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/review.mjs",
+              "name": "review.mjs",
+              "filePath": "src/verbs/merge/review.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/reject.mjs",
+              "name": "reject.mjs",
+              "filePath": "src/verbs/merge/reject.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/promote-to-component.mjs",
+              "name": "promote-to-component.mjs",
+              "filePath": "src/verbs/merge/promote-to-component.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/merge.mjs",
+              "name": "merge.mjs",
+              "filePath": "src/verbs/merge/merge.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/iron-law-level.mjs",
+              "name": "iron-law-level.mjs",
+              "filePath": "src/verbs/merge/iron-law-level.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/catchup.mjs",
+              "name": "catchup.mjs",
+              "filePath": "src/verbs/merge/catchup.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/approve.mjs",
+              "name": "approve.mjs",
+              "filePath": "src/verbs/merge/approve.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/visibility-session.mjs",
+              "name": "visibility-session.mjs",
+              "filePath": "src/runner/dispatch/visibility-session.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/trust-store.mjs",
+              "name": "trust-store.mjs",
+              "filePath": "src/runner/dispatch/trust-store.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/transport.mjs",
+              "name": "transport.mjs",
+              "filePath": "src/runner/dispatch/transport.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/reconciliation-planner.mjs",
+              "name": "reconciliation-planner.mjs",
+              "filePath": "src/runner/dispatch/reconciliation-planner.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/cli.mjs",
+              "name": "cli.mjs",
+              "filePath": "src/runner/dispatch/cli.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:test/setup/helpers/setup-checks-harness.mjs",
+              "name": "setup-checks-harness.mjs",
+              "filePath": "test/setup/helpers/setup-checks-harness.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:test/report/helpers/docs-index-state-fixture.mjs",
+              "name": "docs-index-state-fixture.mjs",
+              "filePath": "test/report/helpers/docs-index-state-fixture.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:test/cli/helpers/fgos-cli-harness.mjs",
+              "name": "fgos-cli-harness.mjs",
+              "filePath": "test/cli/helpers/fgos-cli-harness.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/261006-1415-fgos-single-door-mechanisms/reports/phase-00-baseline.md",
+              "name": "phase-00-baseline.md",
+              "filePath": "plans/261006-1415-fgos-single-door-mechanisms/reports/phase-00-baseline.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:dogfood-fixture/src/expr/evaluate.mjs",
+              "name": "evaluate.mjs",
+              "filePath": "dogfood-fixture/src/expr/evaluate.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/work-state/spec.md",
+              "name": "spec.md",
+              "filePath": "docs/platform/work-state/spec.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/work-state/README.md",
+              "name": "README.md",
+              "filePath": "docs/platform/work-state/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/host-invocation-routing/roadmap.md",
+              "name": "roadmap.md",
+              "filePath": "docs/platform/host-invocation-routing/roadmap.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/README.md",
+              "name": "README.md",
+              "filePath": "docs/platform/agent-coordination/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+              "name": "architecture-advisory-panel-v1-material-context-reopen.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+              "name": "architecture-advisory-panel-v1-final-decision-and-defer.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+              "name": "architecture-advisory-panel-v1-decision-request-and-resume.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+              "name": "architecture-advisory-panel-v1-clear-start.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+              "name": "architecture-advisory-panel-v1-clarification-and-challenge.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/proposals/coordination-capability-envelope.md",
+              "name": "coordination-capability-envelope.md",
+              "filePath": "docs/architect/proposals/coordination-capability-envelope.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+              "name": "documentation-standardization-plan.md",
+              "filePath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/domainization/README.md",
+              "name": "README.md",
+              "filePath": "docs/architect/domainization/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/component-boundary/component-boundary-advisory.md",
+              "name": "component-boundary-advisory.md",
+              "filePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/component-boundary/README.md",
+              "name": "README.md",
+              "filePath": "docs/architect/component-boundary/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/documentation-standardization-plan.md",
+              "name": "documentation-standardization-plan.md",
+              "filePath": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/history/tsk-ozk-purpose-slug-length-fix/apply-topic-renames.mjs",
+              "name": "apply-topic-renames.mjs",
+              "filePath": "docs/history/tsk-ozk-purpose-slug-length-fix/apply-topic-renames.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/confinement/authority.mjs",
+              "name": "authority.mjs",
+              "filePath": "src/runner/dispatch/confinement/authority.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-target-map.md",
+              "name": "pilot-b-target-map.md",
+              "filePath": "plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-target-map.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/reports/phase-06/verify-header-only-changes.mjs",
+              "name": "verify-header-only-changes.mjs",
+              "filePath": "plans/260925-documentation-authority-unification/reports/phase-06/verify-header-only-changes.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs",
+              "name": "structural-mutation-probe.mjs",
+              "filePath": "plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/work-state/contracts/cli-io-contract.md",
+              "name": "cli-io-contract.md",
+              "filePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+              "name": "implementation-alignment.md",
+              "filePath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+              "name": "legacy-payload.md",
+              "filePath": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+              "name": "migrate-porting-state-backfill.mjs",
+              "filePath": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:core/skills/distill/scripts/distill.mjs",
+              "name": "distill.mjs",
+              "filePath": "core/skills/distill/scripts/distill.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+              "name": "p02h-reopen.md",
+              "filePath": "docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+              "name": "p1-agy-conformance.mjs",
+              "filePath": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+              "name": "from-config-probe.mjs",
+              "filePath": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/from-config-probe.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+              "name": "v0-live-probe.mjs",
+              "filePath": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+              "name": "v0-failure-probe.mjs",
+              "filePath": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+              "name": "p1-agy-conformance.mjs",
+              "filePath": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+              "name": "confinement-probe.mjs",
+              "filePath": "docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/confinement-probe.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "symbol": "checkConservation",
+      "exit": 0,
+      "report": {
+        "target": {
+          "id": "Function:scripts/check-doc-inventory-gates.mjs:checkConservation",
+          "name": "checkConservation",
+          "type": "Function",
+          "filePath": "scripts/check-doc-inventory-gates.mjs"
+        },
+        "direction": "upstream",
+        "impactedCount": 5,
+        "risk": "CRITICAL",
+        "epistemic": "exact",
+        "summary": {
+          "direct": 1,
+          "processes_affected": 4,
+          "modules_affected": 20
+        },
+        "byDepthCounts": {
+          "1": 1,
+          "2": 2,
+          "3": 2
+        },
+        "affected_processes": [
+          {
+            "name": "checkInventory",
+            "type": "Function",
+            "filePath": "scripts/check-doc-inventory-gates.mjs",
+            "affected_process_count": 7,
+            "total_hits": 7,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "gatherInputs",
+            "type": "Function",
+            "filePath": "scripts/check-doc-retirement.mjs",
+            "affected_process_count": 4,
+            "total_hits": 4,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "App → FetchList",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Main → TrustStoreError",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          }
+        ],
+        "affected_modules": [
+          {
+            "name": "Scripts",
+            "hits": 5,
+            "impact": "direct"
+          },
+          {
+            "name": "Screens",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_122",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_108",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_106",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_20",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_117",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_135",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_9",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_126",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Wiring",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_10",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_11",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_129",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Api",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_3",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "2026-09-07-v0",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_123",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Runner",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Panel-depth-experiment",
+            "hits": 1,
+            "impact": "indirect"
+          }
+        ],
+        "byDepth": {
+          "1": [
+            {
+              "depth": 1,
+              "id": "Function:scripts/check-doc-inventory-gates.mjs:checkInventory",
+              "name": "checkInventory",
+              "filePath": "scripts/check-doc-inventory-gates.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": [
+                {
+                  "id": "proc_183_checkinventory",
+                  "label": "CheckInventory → GithubSlugText",
+                  "processType": "intra_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_184_checkinventory",
+                  "label": "CheckInventory → StableHash",
+                  "processType": "intra_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_100_checkinventory",
+                  "label": "CheckInventory → Sha256Buffer",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_185_checkinventory",
+                  "label": "CheckInventory → Sha256",
+                  "processType": "intra_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_187_checkinventory",
+                  "label": "CheckInventory → ReadBlobAtCommit",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_99_checkinventory",
+                  "label": "CheckInventory → IsNormativeUnheaded",
+                  "processType": "intra_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_186_checkinventory",
+                  "label": "CheckInventory → NormalizePosix",
+                  "processType": "intra_community",
+                  "step": 1
+                }
+              ]
+            }
+          ],
+          "2": [
+            {
+              "depth": 2,
+              "id": "Function:scripts/check-doc-inventory-gates.mjs:runCli",
+              "name": "runCli",
+              "filePath": "scripts/check-doc-inventory-gates.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 2,
+              "id": "Function:scripts/check-doc-retirement.mjs:gatherInputs",
+              "name": "gatherInputs",
+              "filePath": "scripts/check-doc-retirement.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": [
+                {
+                  "id": "proc_257_gatherinputs",
+                  "label": "GatherInputs → CurrentCommit",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_258_gatherinputs",
+                  "label": "GatherInputs → Sha256Buffer",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_125_gatherinputs",
+                  "label": "GatherInputs → NormalizePosix",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_259_gatherinputs",
+                  "label": "GatherInputs → PosixJoin",
+                  "processType": "cross_community",
+                  "step": 1
+                }
+              ]
+            }
+          ],
+          "3": [
+            {
+              "depth": 3,
+              "id": "Function:scripts/check-doc-retirement.mjs:runCli",
+              "name": "runCli",
+              "filePath": "scripts/check-doc-retirement.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "filePath": "",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "symbol": "checkInventory",
+      "exit": 0,
+      "report": {
+        "target": {
+          "id": "Function:scripts/check-doc-inventory-gates.mjs:checkInventory",
+          "name": "checkInventory",
+          "type": "Function",
+          "filePath": "scripts/check-doc-inventory-gates.mjs"
+        },
+        "direction": "upstream",
+        "impactedCount": 161,
+        "risk": "CRITICAL",
+        "epistemic": "exact",
+        "summary": {
+          "direct": 2,
+          "processes_affected": 22,
+          "modules_affected": 20
+        },
+        "byDepthCounts": {
+          "1": 2,
+          "2": 2,
+          "3": 157
+        },
+        "affected_processes": [
+          {
+            "name": "Main → Is_valid_id",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 10,
+            "total_hits": 10,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "main",
+            "type": "Function",
+            "filePath": "apps/fgctl/src/main.rs",
+            "affected_process_count": 7,
+            "total_hits": 8,
+            "earliest_broken_step": 2
+          },
+          {
+            "name": "verify_release_tree",
+            "type": "Function",
+            "filePath": "packages/distribution/rust/src/verify.rs",
+            "affected_process_count": 5,
+            "total_hits": 7,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Require_token → WebDashboardSettings",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 5,
+            "total_hits": 5,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "invoke_with_cancellation",
+            "type": "Function",
+            "filePath": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs",
+            "affected_process_count": 5,
+            "total_hits": 5,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "gatherInputs",
+            "type": "Function",
+            "filePath": "scripts/check-doc-retirement.mjs",
+            "affected_process_count": 4,
+            "total_hits": 4,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Esc_closes_detail_modal_without_quitting_dashboard → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Next_tab_event_cycles_the_active_tab → Next",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Pane_rescan_skips_pane_refresh_when_no_registry_is_configured → Prev",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Auto_discover_skips_without_panic_when_no_pane_can_be_placed → Next",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "grant_refused",
+            "type": "Function",
+            "filePath": "packages/host-runtime/rust/src/invocation_service.rs",
+            "affected_process_count": 3,
+            "total_hits": 3,
+            "earliest_broken_step": 3
+          },
+          {
+            "name": "App → WriteBoardView",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "dispatch_harness",
+            "type": "Function",
+            "filePath": "packages/observe/rust/src/metrics_cli/harness.rs",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 3
+          },
+          {
+            "name": "Spawn_fgos_verb → Is_confined",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 2,
+            "total_hits": 2,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Discover_button_fires_pane_open_when_item_is_at_discovery_stage → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Main → TrustStoreError",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Discover_button_is_inert_when_item_is_not_at_discovery_stage → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Mouse_click_outside_pick_button_rect_fires_nothing → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Work_item_enter_opens_detail_modal_and_pick_only_fires_on_second_enter → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Discover_button_is_inert_when_item_is_blocked_even_at_eligible_stage → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Mouse_click_inside_pick_button_rect_fires_pick → Matches",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          },
+          {
+            "name": "Ensure_operation_tab → Parse",
+            "type": "Function",
+            "filePath": "",
+            "affected_process_count": 1,
+            "total_hits": 1,
+            "earliest_broken_step": 1
+          }
+        ],
+        "affected_modules": [
+          {
+            "name": "Cluster_0",
+            "hits": 11,
+            "impact": "indirect"
+          },
+          {
+            "name": "Scripts",
+            "hits": 5,
+            "impact": "direct"
+          },
+          {
+            "name": "Cluster_135",
+            "hits": 4,
+            "impact": "indirect"
+          },
+          {
+            "name": "Tests",
+            "hits": 4,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_134",
+            "hits": 3,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_178",
+            "hits": 3,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_136",
+            "hits": 3,
+            "impact": "indirect"
+          },
+          {
+            "name": "External_process",
+            "hits": 2,
+            "impact": "indirect"
+          },
+          {
+            "name": "Screens",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_122",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_108",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_130",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "R5-parity",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_106",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_20",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_117",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_9",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_126",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Wiring",
+            "hits": 1,
+            "impact": "indirect"
+          },
+          {
+            "name": "Cluster_10",
+            "hits": 1,
+            "impact": "indirect"
+          }
+        ],
+        "pagination": {
+          "limit": 100,
+          "offset": 0,
+          "truncated": true
+        },
+        "byDepth": {
+          "1": [
+            {
+              "depth": 1,
+              "id": "Function:scripts/check-doc-inventory-gates.mjs:runCli",
+              "name": "runCli",
+              "filePath": "scripts/check-doc-inventory-gates.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 1,
+              "id": "Function:scripts/check-doc-retirement.mjs:gatherInputs",
+              "name": "gatherInputs",
+              "filePath": "scripts/check-doc-retirement.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": [
+                {
+                  "id": "proc_125_gatherinputs",
+                  "label": "GatherInputs → NormalizePosix",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_257_gatherinputs",
+                  "label": "GatherInputs → CurrentCommit",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_259_gatherinputs",
+                  "label": "GatherInputs → PosixJoin",
+                  "processType": "cross_community",
+                  "step": 1
+                },
+                {
+                  "id": "proc_258_gatherinputs",
+                  "label": "GatherInputs → Sha256Buffer",
+                  "processType": "cross_community",
+                  "step": 1
+                }
+              ]
+            }
+          ],
+          "2": [
+            {
+              "depth": 2,
+              "filePath": "",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 2,
+              "id": "Function:scripts/check-doc-retirement.mjs:runCli",
+              "name": "runCli",
+              "filePath": "scripts/check-doc-retirement.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            }
+          ],
+          "3": [
+            {
+              "depth": 3,
+              "id": "File:scripts/write-wrapper-script.mjs",
+              "name": "write-wrapper-script.mjs",
+              "filePath": "scripts/write-wrapper-script.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:scripts/write-test-marker.mjs",
+              "name": "write-test-marker.mjs",
+              "filePath": "scripts/write-test-marker.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/graph-metrics.mjs",
+              "name": "graph-metrics.mjs",
+              "filePath": "src/state/graph-metrics.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/gate-bypass.mjs",
+              "name": "gate-bypass.mjs",
+              "filePath": "src/state/gate-bypass.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/events.mjs",
+              "name": "events.mjs",
+              "filePath": "src/state/events.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/events-jsonl-truncation-guard.mjs",
+              "name": "events-jsonl-truncation-guard.mjs",
+              "filePath": "src/state/events-jsonl-truncation-guard.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/events-compaction.mjs",
+              "name": "events-compaction.mjs",
+              "filePath": "src/state/events-compaction.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/domain-registry.mjs",
+              "name": "domain-registry.mjs",
+              "filePath": "src/state/domain-registry.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/dep-graph.mjs",
+              "name": "dep-graph.mjs",
+              "filePath": "src/state/dep-graph.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/state/cursor.mjs",
+              "name": "cursor.mjs",
+              "filePath": "src/state/cursor.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/setup/registrations.mjs",
+              "name": "registrations.mjs",
+              "filePath": "src/setup/registrations.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/setup/instruction-registry.mjs",
+              "name": "instruction-registry.mjs",
+              "filePath": "src/setup/instruction-registry.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/worktree.mjs",
+              "name": "worktree.mjs",
+              "filePath": "src/runner/worktree.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/work-dispatch.mjs",
+              "name": "work-dispatch.mjs",
+              "filePath": "src/runner/work-dispatch.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/work-compat.mjs",
+              "name": "work-compat.mjs",
+              "filePath": "src/runner/work-compat.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/merge.mjs",
+              "name": "merge.mjs",
+              "filePath": "src/runner/merge.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/loop.mjs",
+              "name": "loop.mjs",
+              "filePath": "src/runner/loop.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/lock-wait.mjs",
+              "name": "lock-wait.mjs",
+              "filePath": "src/runner/lock-wait.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/fanout-batch.mjs",
+              "name": "fanout-batch.mjs",
+              "filePath": "src/runner/fanout-batch.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch.mjs",
+              "name": "dispatch.mjs",
+              "filePath": "src/runner/dispatch.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch-log.mjs",
+              "name": "dispatch-log.mjs",
+              "filePath": "src/runner/dispatch-log.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/claim-port.mjs",
+              "name": "claim-port.mjs",
+              "filePath": "src/runner/claim-port.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/observe/friction-client.mjs",
+              "name": "friction-client.mjs",
+              "filePath": "src/observe/friction-client.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/report/enduser-index-generate.mjs",
+              "name": "enduser-index-generate.mjs",
+              "filePath": "src/report/enduser-index-generate.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/report/decision-index.mjs",
+              "name": "decision-index.mjs",
+              "filePath": "src/report/decision-index.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/intake/plan.mjs",
+              "name": "plan.mjs",
+              "filePath": "src/intake/plan.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/intake/discovery.mjs",
+              "name": "discovery.mjs",
+              "filePath": "src/intake/discovery.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/intake/classify.mjs",
+              "name": "classify.mjs",
+              "filePath": "src/intake/classify.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/cli/invocation-fault-log.mjs",
+              "name": "invocation-fault-log.mjs",
+              "filePath": "src/cli/invocation-fault-log.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/261006-1445-fgctl-dev-activation/phase-00-research-and-spec.md",
+              "name": "phase-00-research-and-spec.md",
+              "filePath": "plans/261006-1445-fgctl-dev-activation/phase-00-research-and-spec.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/261006-1415-fgos-convention-component/phase-00-spec.md",
+              "name": "phase-00-spec.md",
+              "filePath": "plans/261006-1415-fgos-convention-component/phase-00-spec.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/minimum-constitution.md",
+              "name": "minimum-constitution.md",
+              "filePath": "plans/260925-documentation-authority-unification/minimum-constitution.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/evidence-payload-relocation-policy.md",
+              "name": "evidence-payload-relocation-policy.md",
+              "filePath": "plans/260925-documentation-authority-unification/evidence-payload-relocation-policy.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/cutover-write-lease-design.md",
+              "name": "cutover-write-lease-design.md",
+              "filePath": "plans/260925-documentation-authority-unification/cutover-write-lease-design.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.md",
+              "name": "claim-and-disposition-vocabulary.md",
+              "filePath": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/verification.md",
+              "name": "verification.md",
+              "filePath": "docs/templates/verification.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/subcomponent-readme.md",
+              "name": "subcomponent-readme.md",
+              "filePath": "docs/templates/subcomponent-readme.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/decision.md",
+              "name": "decision.md",
+              "filePath": "docs/templates/decision.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/contract.md",
+              "name": "contract.md",
+              "filePath": "docs/templates/contract.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/templates/architecture.md",
+              "name": "architecture.md",
+              "filePath": "docs/templates/architecture.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/vision.md",
+              "name": "vision.md",
+              "filePath": "docs/platform/vision.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/migration-authoring-rules.md",
+              "name": "migration-authoring-rules.md",
+              "filePath": "docs/platform/migration-authoring-rules.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/intent-preservation-ledger.md",
+              "name": "intent-preservation-ledger.md",
+              "filePath": "docs/platform/intent-preservation-ledger.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/README.md",
+              "name": "README.md",
+              "filePath": "docs/platform/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+              "name": "install-fgos-in-a-project-and-use-doctor.md",
+              "filePath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+              "name": "fanout-batch-per-child-sync-spawn-and-listwork.md",
+              "filePath": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+              "name": "d0026-native-first-dispatch-narrative-reconciliation.md",
+              "filePath": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/step.mjs",
+              "name": "step.mjs",
+              "filePath": "src/verbs/state/step.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/read.mjs",
+              "name": "read.mjs",
+              "filePath": "src/verbs/state/read.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/move.mjs",
+              "name": "move.mjs",
+              "filePath": "src/verbs/state/move.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/state/edit.mjs",
+              "name": "edit.mjs",
+              "filePath": "src/verbs/state/edit.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/sync-root.mjs",
+              "name": "sync-root.mjs",
+              "filePath": "src/verbs/merge/sync-root.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/review.mjs",
+              "name": "review.mjs",
+              "filePath": "src/verbs/merge/review.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/reject.mjs",
+              "name": "reject.mjs",
+              "filePath": "src/verbs/merge/reject.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/promote-to-component.mjs",
+              "name": "promote-to-component.mjs",
+              "filePath": "src/verbs/merge/promote-to-component.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/merge.mjs",
+              "name": "merge.mjs",
+              "filePath": "src/verbs/merge/merge.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/iron-law-level.mjs",
+              "name": "iron-law-level.mjs",
+              "filePath": "src/verbs/merge/iron-law-level.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/catchup.mjs",
+              "name": "catchup.mjs",
+              "filePath": "src/verbs/merge/catchup.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/verbs/merge/approve.mjs",
+              "name": "approve.mjs",
+              "filePath": "src/verbs/merge/approve.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/visibility-session.mjs",
+              "name": "visibility-session.mjs",
+              "filePath": "src/runner/dispatch/visibility-session.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/trust-store.mjs",
+              "name": "trust-store.mjs",
+              "filePath": "src/runner/dispatch/trust-store.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/transport.mjs",
+              "name": "transport.mjs",
+              "filePath": "src/runner/dispatch/transport.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/reconciliation-planner.mjs",
+              "name": "reconciliation-planner.mjs",
+              "filePath": "src/runner/dispatch/reconciliation-planner.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/cli.mjs",
+              "name": "cli.mjs",
+              "filePath": "src/runner/dispatch/cli.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:test/setup/helpers/setup-checks-harness.mjs",
+              "name": "setup-checks-harness.mjs",
+              "filePath": "test/setup/helpers/setup-checks-harness.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:test/report/helpers/docs-index-state-fixture.mjs",
+              "name": "docs-index-state-fixture.mjs",
+              "filePath": "test/report/helpers/docs-index-state-fixture.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:test/cli/helpers/fgos-cli-harness.mjs",
+              "name": "fgos-cli-harness.mjs",
+              "filePath": "test/cli/helpers/fgos-cli-harness.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/261006-1415-fgos-single-door-mechanisms/reports/phase-00-baseline.md",
+              "name": "phase-00-baseline.md",
+              "filePath": "plans/261006-1415-fgos-single-door-mechanisms/reports/phase-00-baseline.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:dogfood-fixture/src/expr/evaluate.mjs",
+              "name": "evaluate.mjs",
+              "filePath": "dogfood-fixture/src/expr/evaluate.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/work-state/spec.md",
+              "name": "spec.md",
+              "filePath": "docs/platform/work-state/spec.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/work-state/README.md",
+              "name": "README.md",
+              "filePath": "docs/platform/work-state/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/host-invocation-routing/roadmap.md",
+              "name": "roadmap.md",
+              "filePath": "docs/platform/host-invocation-routing/roadmap.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/README.md",
+              "name": "README.md",
+              "filePath": "docs/platform/agent-coordination/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+              "name": "architecture-advisory-panel-v1-material-context-reopen.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-material-context-reopen.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+              "name": "architecture-advisory-panel-v1-final-decision-and-defer.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-final-decision-and-defer.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+              "name": "architecture-advisory-panel-v1-decision-request-and-resume.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-decision-request-and-resume.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+              "name": "architecture-advisory-panel-v1-clear-start.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clear-start.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+              "name": "architecture-advisory-panel-v1-clarification-and-challenge.md",
+              "filePath": "docs/how-to/coordination-examples/architecture-advisory-panel-v1-clarification-and-challenge.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/proposals/coordination-capability-envelope.md",
+              "name": "coordination-capability-envelope.md",
+              "filePath": "docs/architect/proposals/coordination-capability-envelope.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+              "name": "documentation-standardization-plan.md",
+              "filePath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/domainization/README.md",
+              "name": "README.md",
+              "filePath": "docs/architect/domainization/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/component-boundary/component-boundary-advisory.md",
+              "name": "component-boundary-advisory.md",
+              "filePath": "docs/architect/component-boundary/component-boundary-advisory.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/component-boundary/README.md",
+              "name": "README.md",
+              "filePath": "docs/architect/component-boundary/README.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/documentation-standardization-plan.md",
+              "name": "documentation-standardization-plan.md",
+              "filePath": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/history/tsk-ozk-purpose-slug-length-fix/apply-topic-renames.mjs",
+              "name": "apply-topic-renames.mjs",
+              "filePath": "docs/history/tsk-ozk-purpose-slug-length-fix/apply-topic-renames.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:src/runner/dispatch/confinement/authority.mjs",
+              "name": "authority.mjs",
+              "filePath": "src/runner/dispatch/confinement/authority.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-target-map.md",
+              "name": "pilot-b-target-map.md",
+              "filePath": "plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-target-map.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/reports/phase-06/verify-header-only-changes.mjs",
+              "name": "verify-header-only-changes.mjs",
+              "filePath": "plans/260925-documentation-authority-unification/reports/phase-06/verify-header-only-changes.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs",
+              "name": "structural-mutation-probe.mjs",
+              "filePath": "plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs",
+              "relationType": "IMPORTS",
+              "confidence": 1,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/work-state/contracts/cli-io-contract.md",
+              "name": "cli-io-contract.md",
+              "filePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+              "name": "implementation-alignment.md",
+              "filePath": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+              "name": "legacy-payload.md",
+              "filePath": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+              "name": "migrate-porting-state-backfill.mjs",
+              "filePath": "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:core/skills/distill/scripts/distill.mjs",
+              "name": "distill.mjs",
+              "filePath": "core/skills/distill/scripts/distill.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/smoke-test-standard-variant.mjs",
+              "name": "smoke-test-standard-variant.mjs",
+              "filePath": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/smoke-test-standard-variant.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+              "name": "p02h-reopen.md",
+              "filePath": "docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md",
+              "relationType": "IMPORTS",
+              "confidence": 0.8,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/build-packets.mjs",
+              "name": "build-packets.mjs",
+              "filePath": "archive/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/build-packets.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+              "name": "v0-live-probe.mjs",
+              "filePath": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-live-probe.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+              "name": "v0-failure-probe.mjs",
+              "filePath": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/v0-failure-probe.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            },
+            {
+              "depth": 3,
+              "id": "File:docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+              "name": "p1-agy-conformance.mjs",
+              "filePath": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/p1-agy-conformance.mjs",
+              "relationType": "CALLS",
+              "confidence": 0.85,
+              "processes": []
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "unproven": [
+    "Eight skipped/65 todo paths",
+    "Real classification receipt approval",
+    "Batch strict closure, fresh readers and promotion rehearsal"
+  ],
+  "noChange": [
+    "Source claim review procedure",
+    "Canonical ownership",
+    "Checkpoint sensitivity thresholds/path",
+    "Extractor",
+    "Baselines",
+    "Legacy roots",
+    "Authority statuses"
+  ]
+}

@@ -59,6 +59,26 @@
         }
       }
     },
+    "candidateClassifications": {
+      "type": "array",
+      "description": "References to committed classification receipts. Only an independently committed ok verdict for the fixed class, native unit digest and shown text digest closes reverse-open data; labels and pending references do not.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claimId", "receiptPath", "receiptCommit", "reviewStatus"],
+        "properties": {
+          "claimId": { "type": "string", "pattern": "^claim_[0-9a-f]{32}$" },
+          "receiptPath": { "type": "string", "pattern": "^plans/[^/]+/ledger/candidate-classifications-[a-z0-9-]+\\.json$" },
+          "receiptCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+          "reviewStatus": { "type": "string", "x-vocabulary": "reviewStatuses" },
+          "reviewedBy": { "type": "string", "minLength": 1 },
+          "reviewedAt": { "type": "string", "format": "date" },
+          "reviewReport": { "type": "string", "minLength": 1 },
+          "reviewReportCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+          "reviewNote": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
     "corpusRules": {
       "type": "array",
       "description": "Independently reviewed policy for a whole classified non-authority corpus. Sources must name every selected item; pending rules do not expand approvals.",
