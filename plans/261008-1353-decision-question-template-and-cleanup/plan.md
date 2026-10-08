@@ -80,3 +80,21 @@ Quy tắc "hỏi cho rõ" đang nằm rải ở nhiều nơi dạng văn xuôi (
 | D4 | Ngân sách | (a) nới; sau D2b, D3b và hook: src ≤ 300, test ≤ 530, 2,5 ngày |
 | D6 | Hai cửa hỏi | `fgos ask` và `AskUserQuestion` đi qua **một cửa kiểm duy nhất** `checkDecisionQuestion` (Phase 01), hook chỉ là lớp đọc input |
 | D5 | Chặn cửa chat | (a) hook `PreToolUse` cho `AskUserQuestion` (Phase 04); không hook `Stop`; xem lại sau 2 tuần. `fgos ask` giữ nguyên, chỉ chưa quay lại |
+
+## Validation Log
+
+### Session 1 — 2026-10-08
+**Verification Results** (Full tier, Phase 04–05; Phase 01–03 đã kiểm ở red-team)
+- Verified: `.claude/settings.json` được track; `materializeInstructionProjection` tồn tại (`src/setup/instruction-projections.mjs:329`); skill answer ở `plugins/fgOS/skills/answer/SKILL.md`.
+- Failed: (1) "`answer` đã giới hạn ai trả lời" — sai, `bin/fgos.mjs:1787` luôn ghi `role: 'human'`; (2) D3 chỉ đếm phía `ask` — `--rationale/--alternatives` còn ở `answer` và `fgos decision`, ~8 file skill.
+- Unverified: trường `transcript_path` trong input hook (có trong tài liệu Claude Code, chưa có tiền lệ trong repo).
+
+| # | Câu hỏi | Owner chọn | Áp vào |
+|---|---|---|---|
+| V1 | Agent có thể tự `--approve` | (a) chỉ chữ trong skill `/fgOS:answer` + mẫu: agent không `--approve` thay owner trừ khi owner cho phép rõ; không thêm code | Phase 05 |
+| V2 | D3b xoá đến đâu | (a) chỉ phía `ask` (`askRationale`/`askAlternatives`, cờ `ask --rationale/--alternatives`, chữ trong skill); giữ `answer --rationale/--alternatives` và `fgos decision` | Phase 05 |
+| V3 | Hook không đọc được transcript | (a) vẫn kiểm câu hỏi + mô tả option; thiếu mẫu vẫn chặn. Bắt buộc 1 lần chạy thật xác nhận `transcript_path` | Phase 04 |
+| V4 | Cách triển khai | Lead tự làm tuần tự 01→02→03→04→05 trong worktree `forgentX-worktrees/decision-question-template`, commit mỗi phase, `npm test` + 1 review độc lập cuối; vượt trần thì dừng và hỏi | toàn plan |
+
+### Whole-Plan Consistency Sweep
+Phase 05 sửa theo V1, V2; Phase 04 sửa theo V3. Không còn câu "answer đã giới hạn role". Không còn mâu thuẫn mở.

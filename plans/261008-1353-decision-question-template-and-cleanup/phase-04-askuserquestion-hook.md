@@ -17,18 +17,18 @@ Hook nhận input `PreToolUse` (`tool_name`, `tool_input`, `transcript_path`):
 1. Lấy văn bản xem xét = đoạn chữ assistant ngay trước lời gọi tool (đọc phần cuối `transcript_path`) + `tool_input.questions[].question` + mô tả các option.
 2. Gọi đúng hàm `checkDecisionQuestion` của Phase 01 (cùng một cửa kiểm với validator `fgos ask`) với đủ 5 phần.
 3. Đủ → cho qua. Thiếu → chặn, `reason` liệt kê phần thiếu và in mẫu 5 phần để agent viết lại.
-4. Không đọc được transcript, JSON hỏng, hay tool khác → cho qua (fail-open, giống hook dispatch), không bao giờ làm treo session.
+4. Không đọc được transcript → vẫn kiểm `tool_input` (câu hỏi + mô tả option); thiếu mẫu vẫn chặn (V3a). JSON stdin hỏng hay tool khác → cho qua, không bao giờ làm treo session.
 
 ## Việc cần làm
 
 1. `scripts/decision-question-hook.mjs` (≤ 60 dòng): chỉ đọc stdin + transcript rồi gọi `checkDecisionQuestion`; không tự so heading.
 2. `installClaudeCodeHook`: thêm entry matcher `AskUserQuestion` cạnh `Agent|Task`; `claudeCodeHookWired` kiểm cả hai. Chạy installer trong worktree để cập nhật `.claude/settings.json` nếu file được track (xác minh trước).
-3. Test (sửa file test có sẵn, không tạo file mới nếu được; nếu cần thì 1 file `test/scripts/decision-question-hook.test.mjs` theo khuôn hook dispatch): cho qua khi đủ 5 phần; chặn khi thiếu "Phạm vi"; cho qua khi transcript không đọc được.
+3. Test (sửa file test có sẵn, không tạo file mới nếu được; nếu cần thì 1 file `test/scripts/decision-question-hook.test.mjs` theo khuôn hook dispatch): cho qua khi đủ 5 phần; chặn khi thiếu "Phạm vi"; khi transcript không đọc được thì vẫn kiểm `tool_input` (đủ → qua, thiếu → chặn).
 
 ## Kiểm chứng
 
 - Test hẹp ở trên + `test/setup/*`; rồi `npm test`.
-- Thử thật trong một session Claude Code của worktree: gọi `AskUserQuestion` thiếu mẫu → bị chặn với lý do; đủ mẫu → qua.
+- **Bắt buộc** thử thật trong một session Claude Code của worktree để xác nhận trường `transcript_path` có trong input: gọi `AskUserQuestion` thiếu mẫu → bị chặn với lý do; đủ mẫu → qua.
 
 ## Rủi ro
 

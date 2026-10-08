@@ -11,9 +11,10 @@
 
 ## D3b — bỏ kênh song song
 
-- Xoá `--rationale`/`--alternatives` của `fgos ask` (`bin/fgos.mjs:1759-1768`) và trường `askRationale`/`askAlternatives` trong `src/state/store.mjs:1372-1397`, `src/state/replay.mjs:308-319`, `src/state/awaiting-context.mjs:79-91`. Lựa chọn và lý do nằm trong thân câu hỏi theo mẫu.
+- Chỉ phía `ask` (V2a): xoá cờ `--rationale`/`--alternatives` của `fgos ask` (`bin/fgos.mjs:1759-1768`) và trường `askRationale`/`askAlternatives` trong `src/state/store.mjs`, `src/state/replay.mjs:308-319`, `src/state/awaiting-context.mjs:79-91`, `src/cli/command-registry.mjs`; sửa chữ trong khoảng 8 file skill nhắc tới chúng (`git grep -E "ask .*--rationale|askRationale"` trong `core/` và `domains/`). Lựa chọn và lý do nằm trong thân câu hỏi theo mẫu.
+- **Giữ nguyên** `fgos answer --rationale/--alternatives` (lý do của owner) và `fgos decision --rationale/--alternatives`.
 - Event cũ có các trường này vẫn đọc được: replay bỏ qua trường lạ (xác minh), không cần di trú.
-- Xoá/sửa 3 file test đang dùng các trường này.
+- Sửa các test đang dùng phía `ask` (khoảng 6–8 file, chủ yếu xoá dòng).
 
 ## Việc cần làm
 
@@ -21,14 +22,14 @@
 2. `src/state/*`: ghi/đọc `approved`; bỏ `askRationale`/`askAlternatives`.
 3. `src/intake/plan.mjs`: hai điều kiện nhả gate dùng `approved`.
 4. Test: 1 case "trả lời không --approve không nhả gate", 1 case "có --approve thì nhả"; sửa test cũ của gate và 3 file test của hai trường bị xoá.
-5. Skill `/fgOS:answer`; CHANGELOG 1 dòng.
+5. Skill `/fgOS:answer` (`plugins/fgOS/skills/answer/SKILL.md`) và mẫu: nói rõ `--approve` là đồng ý; agent không `--approve` thay owner trừ khi owner đã cho phép rõ (V1a). CHANGELOG 1 dòng.
 
 ## Kiểm chứng
 
 - Test hẹp: `test/intake/plan.test.mjs`, test của `answer`/awaiting, `test/state/*` liên quan; rồi `npm test`.
-- `git grep -n -E "askRationale|askAlternatives|--rationale|--alternatives" -- src bin test` ra 0 (trừ đọc event cũ nếu cần).
+- `git grep -n -E "askRationale|askAlternatives" -- src bin test core domains` ra 0 (trừ đọc event cũ nếu cần); `answer`/`decision` vẫn nhận `--rationale`.
 
 ## Rủi ro
 
 - Item đang treo với câu trả lời cũ phải hỏi lại một lần: chấp nhận được (một người dùng).
-- Agent tự chạy `fgos answer --approve` thay owner: `answer` đã giới hạn ai được trả lời theo role hiện có (xác minh); không thêm cơ chế mới trong plan này.
+- Agent tự chạy `fgos answer --approve` thay owner: `answer` không kiểm ai gọi (`bin/fgos.mjs:1787` luôn `role: 'human'`). Chỉ chặn bằng chữ (V1a); vẫn tốt hơn hiện nay (chữ bất kỳ nhả gate).
