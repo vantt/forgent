@@ -1,11 +1,11 @@
 # Execution progress
 
-Date: 2026-10-09
+Date: 2026-10-10
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: first content batch, Agent Coordination; whole-area retirement handoff
-State: ready for review
-Blocker: committed independent whole-area reports required by A16; stop here, no next batch or author approval.
+Step: first content batch, Agent Coordination; liveness-first section rework
+State: authoring under A17
+Blocker: none; whole-area classification rejected in f9575e2a6 and corrected method authorized in 3d8ee0d11. No gate, checker, baseline or vocabulary change.
 Last green conservation commit: 6df71985bf87b30a7a865e31f22c37ec22a8c8c8 (full/scoped D twice each against both prior registries, zero fatal findings; whole-area-verification.json)
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: d98a5c5e75e4529cd99dd9c8bce95a0032806d95 (imports main 90a4fb27c8e43fca9e73714f1c3f235e832ce38a under A12)
@@ -219,3 +219,5 @@ Next: publish the single whole-area review request. The area is narrower but not
 Ready-for-review: review-request-2-whole-area.md publishes ten native unseeded diff packs, complete whole-file classification and historical containment, all pending source/retired/classification material, current-sentence evidence and exact reproducible gate/test commands. The author stops for a committed independent report from a different session. No next batch, self-approval, push, PR, main merge or ship.
 
 Committed review handoff: 5e41415ab contains the single request, ten native unseeded packs/sidecars, pending receipt references and full proof/list artifacts. Fresh native refresh and standalone projection reproduce all four zero-fatal D results after that commit. Strict E against both prior registries reproduces exactly 3,065 unreviewed source rows, 545 reverse units and 342 identical-unit groups. Exact commands and observed results are in whole-area-postcommit.json. Author stops ready for the committed independent reports; batch closure and Phase 6 completion remain UNPROVEN.
+
+Authorized liveness-first rework: read all seventeen committed whole-area reports. Exact review targets are nineteen wrongly moved files (including the six mixed files), fifteen retained-file reworks, and the two owner-protected operating prompts. The read-only script scan covers all 569 tracked textual inputs in src, packages, apps, bin, core/skills, domains, scripts, docs/specs and AGENTS.md; 68 source files and 997 heading slices are recorded with direct references, surviving implementation paths and type-symbol matches. Lexical hits protect current material by default, not prove every old statement implemented. Scan, input and section classification are committed before content edits. No new retirement is inferred solely from a title, proposal status or absent exact path reference.
