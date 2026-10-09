@@ -2,29 +2,24 @@
 
 ```txt
 Document type: Architecture
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Preserve source material for Agent Coordination System Context
+Audience: Human reviewer, maintainer and implementation agent
+Purpose: Navigate preserved design and historical material without asserting a retired runtime
 Design status: Candidate
-Implementation: Not re-verified; source implementation statements remain in the body
-Provenance: Retained from docs/architect/agent-coordination/architecture/system-context.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Preserved architecture material for Agent Coordination System Context; no authority cutover
-Use this when: Comparing this candidate with its pinned legacy source
-Do not use this for: Inferring current implementation or supersession of retained sources
-Last reviewed: UNPROVEN; independent content review pending
+Implementation: Retired engine material is non-authority history; verified retained units remain unchanged
+Provenance: Reframed under owner A15; complete previous document preserved in history/retired-engine
+Writer type: Human + agent coauthor
+Canonical for: Retained-document navigation only; no current engine authority
+Use this when: Locating current execution owners or auditing historical claims
+Do not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation
+Last reviewed: Pending independent reframe review
 Related:
-- docs/platform/agent-coordination/vision.md
-- docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
-- docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+- docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md
+Supersedes: Stale current-state framing only; all old claims are preserved verbatim
+Superseded by: Runtime ownership in docs/specs/runner.md
+Added in candidate: Retirement framing and current-owner navigation
 ```
-Document type: Architecture
-Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-09-01
-Canonical for: system purpose, actors, layers, and top-level boundaries
 
 ## Purpose
 
@@ -39,32 +34,7 @@ prerequisites for coordination.
 
 ## Component And Runtime Flow
 
-```mermaid
-flowchart TB
-  Intent[Objective or selected Work operation]
-  Structure[Optional Workflow or CoordinationProtocol]
-  Domain[Optional domain policy and evidence harness]
-  Session[CoordinationSession or agent-led planner]
-  Assignment[Validated Assignment]
-  Dispatch[Governed DispatchPlan]
-  Run[Run attempt]
-  Worker[Provider, model, executor, or CLI]
-  Result[Immutable RunResult]
-  Evidence[Artifacts and normalized evidence]
-  Work[Work Lifecycle Engine]
-  Herdr[Herdr process visibility]
-
-  Intent --> Session
-  Structure -.->|constrains legal operations when selected| Session
-  Domain -.->|augments policy and proof| Session
-  Session --> Assignment --> Dispatch --> Run --> Worker
-  Worker -->|claims and artifacts| Result
-  Result --> Evidence
-  Result -->|recommendation or evidence| Work
-  Work -.->|optional integration context| Session
-  Herdr -.->|observation only| Run
-  Herdr -.->|observation only| Worker
-```
+Historical content moved verbatim to the [retired-engine snapshot](../history/retired-engine/architecture/system-context.md#literal-snapshot). The engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; this retained section is not a current runtime description.
 
 The diagram separates execution from delivery lifecycle: a result can inform a
 Work driver, but cannot move Work lifecycle state by itself. Dashed paths are

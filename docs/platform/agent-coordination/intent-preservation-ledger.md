@@ -2,29 +2,24 @@
 
 ```txt
 Document type: Intent preservation ledger
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Preserve source material for Agent Coordination Intent Preservation Ledger
+Audience: Human reviewer, maintainer and implementation agent
+Purpose: Navigate preserved design and historical material without asserting a retired runtime
 Design status: Candidate
-Implementation: Not re-verified; source implementation statements remain in the body
-Provenance: Retained from docs/architect/agent-coordination/intent-preservation-ledger.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Preserved intent-preservation-ledger material for Agent Coordination Intent Preservation Ledger; no authority cutover
-Use this when: Comparing this candidate with its pinned legacy source
-Do not use this for: Inferring current implementation or supersession of retained sources
-Last reviewed: UNPROVEN; independent content review pending
+Implementation: Retired engine material is non-authority history; verified retained units remain unchanged
+Provenance: Reframed under owner A15; complete previous document preserved in history/retired-engine
+Writer type: Human + agent coauthor
+Canonical for: Retained-document navigation only; no current engine authority
+Use this when: Locating current execution owners or auditing historical claims
+Do not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation
+Last reviewed: Pending independent reframe review
 Related:
-- docs/platform/agent-coordination/vision.md
-- docs/architect/agent-coordination/documentation-governance.md
-- docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+- docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md
+Supersedes: Stale current-state framing only; all old claims are preserved verbatim
+Superseded by: Runtime ownership in docs/specs/runner.md
+Added in candidate: Retirement framing and current-owner navigation
 ```
-Document type: Index
-Design status: N/A
-Implementation: Active
-Last reviewed: 2026-09-04
-Canonical for: traceability of explicitly preserved intent, not architecture or runtime contracts
 
 ## Reading Rule
 
@@ -364,39 +359,7 @@ must-not-preclude checks.
 
 ### AC-I010: One Shared Driver Discipline Across Coordination Facades
 
-- **Original intent:** the judgment loop a coordination driver runs (observe
-  status, choose one legal action, dispatch, verify evidence independently,
-  disposition, revise/recheck/retry/ask a person, explicit close, cold resume)
-  is written once and shared by every coordination facade -- coding,
-  architecture advisory, generic panels, and future research/business loops --
-  instead of being fused into one coding facade or copied per skill.
-- **Source:** owner decision recorded on 2026-09-26 in
-  the coordination skill/harness simplification plan (`../../../plans/260919-coordination-skill-harness-simplification/plan.md`; Added in candidate: historical path absent at the batch pin)
-  ("Layering above the control layer"), consistent with
-  [V-005](vision.md#v-005-agents-own-adaptive-reasoning-the-foundation-owns-authority),
-  [V-008](vision.md#v-008-domain-and-organization-augmentation-creates-differentiation),
-  [V-011](vision.md#v-011-the-foundation-core-stays-small), and
-  [V-012](vision.md#v-012-generalization-requires-two-unlike-consumers).
-- **Status:** `deferred-preserved` -- decided, not yet built.
-- **Current slice:** Phase 4 extracted the discipline as a shared doctrine
-  fragment (`_shared/coordination-driver.md`, no code, no state) with
-  plan-loop as the first consumer; Phase 5 proved it with
-  `fgos-architecture-panel` as the second, unlike consumer. Phase 6 has now
-  merged the coding facades: `fgos-plan-loop` and `fgos-code-panel` are
-  deprecated stubs (Phase 7 compatibility window), and `fgos-code-change`
-  is the live consumer of the shared fragment plus coding-cell policy.
-- **Deferred:** moving any deterministic part of the discipline into the
-  control layer (for example, as action-view blockers) until at least two
-  unlike consumers need the identical mechanic.
-- **Must not preclude:** a non-coding facade can drive a protocol with the
-  same discipline without loading coding rules; interaction protocols never
-  encode driver judgment; no loop engine, track entity, scheduler, or second
-  ledger is introduced to hold the discipline; explicit close remains the sole
-  close action.
-- **Revisit when:** Phase 5 cannot consume the fragment unchanged, a third
-  facade (research/business loop) is proposed, or the same deterministic step
-  is duplicated across facades after Phase 6.
-- **Abandonment rule:** explicit owner decision only.
+Historical content moved verbatim to the [retired-engine snapshot](history/retired-engine/intent-preservation-ledger.md#literal-snapshot). The engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; this retained section is not a current runtime description.
 
 ## Current Step 08 Decision Trace
 

@@ -1,0 +1,448 @@
+{
+  "snapshots": [
+    {
+      "source": "docs/platform/agent-coordination/architecture/system-context.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "byteIdentical": true,
+      "digest": "bb94d3bfb023d6184dcd90ed110eb65b7906fc997c1bde839e1d7ee34f5178e4"
+    },
+    {
+      "source": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "byteIdentical": true,
+      "digest": "233d2606af01d75300ade167e27c1532469f27f3687d8bef4fe50ff383694eb8"
+    },
+    {
+      "source": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+      "byteIdentical": true,
+      "digest": "27a764f652bfa3a5e53cf98618b37e1fb4f542db089b585f73804af72f84b869"
+    },
+    {
+      "source": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+      "byteIdentical": true,
+      "digest": "f9651ea7369d0274e9b9bf50b38155811fc0fd53ed747810064c65207e513b7c"
+    },
+    {
+      "source": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "byteIdentical": true,
+      "digest": "b9e37bbf8a88c3a13a5331dff8e089f5747d6cb0260a8234a730bbb22672333c"
+    },
+    {
+      "source": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "byteIdentical": true,
+      "digest": "81d1f96b3381a7a22fbf268375e84c9a05da79facbb22691cd970342952bf6b4"
+    },
+    {
+      "source": "docs/platform/agent-coordination/spec.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "byteIdentical": true,
+      "digest": "5a016bb65b7c8ebab5b20c338062836f45413bdb0141111f0729fddf9feae7af"
+    },
+    {
+      "source": "docs/platform/agent-coordination/subcomponents/README.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "byteIdentical": true,
+      "digest": "6c3a06c5d863fea84ce59c3ddcc6dd53cc8b195b1ce0bac29fd55062364483b7"
+    },
+    {
+      "source": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "byteIdentical": true,
+      "digest": "d35fd9a2357a9df55942661b6d8919320205486aefc763bca92bd47199517776"
+    },
+    {
+      "source": "docs/platform/agent-coordination/README.md",
+      "target": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "byteIdentical": true,
+      "digest": "82fc75648e7cf6613130e4c1b02b3db30fd6c5cf74a8e7bd0a0bd7e4331d45d4"
+    }
+  ],
+  "units": [
+    {
+      "claimId": "claim_57cc129eeedc6624d9e0f94e0419b1ec",
+      "sourcePath": "docs/platform/agent-coordination/architecture/system-context.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_2d663f66649fd2758f3d44e4a947b4a3",
+      "sourcePath": "docs/platform/agent-coordination/architecture/system-context.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_52f4171b7ac9f5564387abedae33fc32",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_2db60db20f1add588148186e717afe91",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_0c3e7ed818f9688e17bf5f12cfde51a7",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_e6f5d79f58c2cffd6a636d0e28eaed92",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_6271a36fcf399262c449faa29fcacda3",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_c72016c6ceb4f84343b61c0118b2b359",
+      "sourcePath": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_9c354eeb6f4a61966d0d015575eb331f",
+      "sourcePath": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_e6e7562209436621ff85518d0ad18fd5",
+      "sourcePath": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_7fae909de31694f1b661ac18211cad57",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_4d2603d2448b20475b2a89ca2ea1ad6f",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_c3bfb7cedbf63ea5a56ea1ee0f922bf9",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_b14e1fac0d2b3e70231806099e41a6e8",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_9d6ab3d626cdbbc2272d2de3a04ac0b4",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_86b6325d4e0e524b97f2a9f028ba6795",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_09fafb51d4b29cf1109cd0c9404b610b",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_b926a2b6954443f07915268fba55e008",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_3e99c9ba0ea20c44649583632fef547f",
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_de43346a8b673d9ea0272947c5c752dc",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_6c4f618a99c27c8d995e5ae4ea838c31",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_bff3a2cc2c15603593f120c3671296a9",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_bc2a036bfb370b61dfc459ae5a77cd8c",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_3273f8bddcca9ea46c529152326ad314",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_e55374f22025f86c63d8706a582e280d",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_9d18f68c54b13d881dc32c17f0524337",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_1c3292ad19c922c586854d5d126e6f3b",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_4e688aaf38cb9b831a4bdd80ea2f499d",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_bdc686550bc36d7563154fd33098741d",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_5020e11c44b6b053c400adc46cda95a1",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_1289fd071fae40e82e7dba2d1b9bcbb2",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_2a0f67663daf206e2883bd79216cd084",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_abd1a1964d80a8d3e5635ba17cd386cf",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_c4d21a728479825bedb7f7eedf6e15c9",
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
+      "sourcePath": "docs/platform/agent-coordination/subcomponents/README.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_c908b3b595d16211e94263026e278842",
+      "sourcePath": "docs/platform/agent-coordination/subcomponents/README.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
+      "sourcePath": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "preserved": true
+    },
+    {
+      "claimId": "claim_d1a817c37e5972f83310d2c7ca022f3d",
+      "sourcePath": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "preserved": true
+    }
+  ],
+  "verifiedContent": [
+    {
+      "claimId": "claim_a70a115136cadba4cacc52197e9436c5",
+      "path": "docs/platform/agent-coordination/architecture/system-context.md",
+      "anchor": "unheaded-block-5",
+      "currentUnitDigest": "016e54429b645e450dafc1fcb957976819543e16afad4c0713a18de49ec73436",
+      "expectedUnitDigest": "016e54429b645e450dafc1fcb957976819543e16afad4c0713a18de49ec73436",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_e85e6a1bc650842a19a2fb94032a37a8",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
+      "anchor": "agent-coordination-documentation-governance",
+      "currentUnitDigest": "f218e3addfb039ce41426ab72f33835e0a11e11fb666ef90e2ac23202f26eef1",
+      "expectedUnitDigest": "f218e3addfb039ce41426ab72f33835e0a11e11fb666ef90e2ac23202f26eef1",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_ac50db5d5bcefe61f0d4b4773b7ae29c",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+      "anchor": "agent-coordination-documentation-standardization-plan",
+      "currentUnitDigest": "b11eff289671f3513c50d8a465cd1af3d600188e4ad25a550da0f770ede1706a",
+      "expectedUnitDigest": "b11eff289671f3513c50d8a465cd1af3d600188e4ad25a550da0f770ede1706a",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_02537525d046da73f1d54b948df6a567",
+      "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "anchor": "unheaded-block-5",
+      "currentUnitDigest": "222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656",
+      "expectedUnitDigest": "222cfb8b1db9127fc2a4792873473f1e78a42f8512df2f975d4e5440ae83a656",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_ed22864a98055aea6246f39fbf5fd690",
+      "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "anchor": "4-bề-mặt-cli-mới-10-verbs-1-view",
+      "currentUnitDigest": "e5b929b76fb55e7bbed61f2e2910c5201d1489a887c0a10f3a73985edca425df",
+      "expectedUnitDigest": "e5b929b76fb55e7bbed61f2e2910c5201d1489a887c0a10f3a73985edca425df",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_a47a993b15a1e33eaa33ca65335d5328",
+      "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "anchor": "unheaded-block-8",
+      "currentUnitDigest": "2b3f5b4cf2e0adb864e785cd2a0e764de42ed743f7de2e0dbfbabeaeb6a35245",
+      "expectedUnitDigest": "2b3f5b4cf2e0adb864e785cd2a0e764de42ed743f7de2e0dbfbabeaeb6a35245",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_ae5516781ff44fff8a98d70c53612ffd",
+      "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "anchor": "unheaded-block-9",
+      "currentUnitDigest": "217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74",
+      "expectedUnitDigest": "217f5acfc09baab45923f87dde80ed35bbabba1bb3f0d3d7bc1907aab9fe4c74",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_0dff379203820718ecc15bb86854ccdc",
+      "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "anchor": "unheaded-block-10",
+      "currentUnitDigest": "c5498ea438b2534a19a52dede74e3d5f1d053f1c83516d95a04c4b276f76479c",
+      "expectedUnitDigest": "c5498ea438b2534a19a52dede74e3d5f1d053f1c83516d95a04c4b276f76479c",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_3e2f14324bce265fe7fdc776f88c6eae",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "anchor": "unheaded-block-3",
+      "currentUnitDigest": "574e4dfab034e6c87838a168d4d5277e8b4681e85a90ff1b14b99dc0c3de8693",
+      "expectedUnitDigest": "574e4dfab034e6c87838a168d4d5277e8b4681e85a90ff1b14b99dc0c3de8693",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_7c7e5b0cd65941649f09dccaccc3fcb8",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "anchor": "non-scope",
+      "currentUnitDigest": "3f1ec225afa6433d22c0f73618c80e364ea4bb5549a9975efa550e145785cb88",
+      "expectedUnitDigest": "3f1ec225afa6433d22c0f73618c80e364ea4bb5549a9975efa550e145785cb88",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_74b00b519bc6b0b62131eef05e5e7061",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "anchor": "unheaded-block-7",
+      "currentUnitDigest": "4c8e935895facbb1f259c6edb468f9dd1db54862a636775f8d239e1176361a96",
+      "expectedUnitDigest": "4c8e935895facbb1f259c6edb468f9dd1db54862a636775f8d239e1176361a96",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_021a84c1334927bc8bba62ec12584496",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "anchor": "contracts-consumed",
+      "currentUnitDigest": "fd489432e02ca2a2c1d097327a760a14ca503a032f340ea92de6104237105961",
+      "expectedUnitDigest": "fd489432e02ca2a2c1d097327a760a14ca503a032f340ea92de6104237105961",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_cc3d4a2db8370a93c4a7a6e8aba18e0c",
+      "path": "docs/platform/agent-coordination/spec.md",
+      "anchor": "unheaded-block-13",
+      "currentUnitDigest": "de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18",
+      "expectedUnitDigest": "de32833c4792dca40f9cbb619d396f8431aa46f2e7781560575c9fdae4e5be18",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    },
+    {
+      "claimId": "claim_0addbf1edb5e3a5c36c84d1febb9e2d6",
+      "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+      "anchor": "unheaded-block-2",
+      "currentUnitDigest": "1f2df29fba3d3c07c0645d1bb81d0c2302ae41e051c8ca1e1800899ef368a880",
+      "expectedUnitDigest": "1f2df29fba3d3c07c0645d1bb81d0c2302ae41e051c8ca1e1800899ef368a880",
+      "anchorFound": true,
+      "shownTextRetained": true,
+      "digestEqual": true
+    }
+  ]
+}
