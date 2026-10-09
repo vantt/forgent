@@ -36,7 +36,7 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 
 | # | Phase | Why this position | Done = one named check | Verified by | Shared code -> review |
 |---|---|---|---|---|---|
-| 01 | Read-only worker agent-config masks | Blocks every run on an fgOS-workspace target today; mission #1; independent | Live run R1 (below) | Lead, not builder | yes (confinement, every confined dispatch) |
+| 01 | Worker agent-config hygiene: codex hook trust seeded at the root; masks only for faults R1 still shows | Blocks every run on an fgOS-workspace target today; mission #1; independent | Live run R1 (below) | Lead, not builder | yes (trust seeding, every codex dispatch) |
 | 02 | Unit association before dispatch | Highest cost per incident; disjoint files from 01, may run in parallel with it | Test T2 | Lead re-runs test + suite | yes (workflow runner, every workflow) |
 | 03 | herdr session identity for reaper and recovery | HIGH but rare; makes 02's resume safe for in-flight seats; shares `bwrap.mjs` with 01 -> after 01 | Test T3 | Lead re-runs test + suite | yes (herdr round, reaper) |
 | 04 | Owner-set quarantine and reset date | Auto-quarantine starts working once 01 removes the dialog; this covers the rest | Test T4 | Lead | no (one verb + one parse function) |
@@ -118,9 +118,9 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 
 ## Unresolved questions (owner: yes/no)
 
-1. Order masks (P01) before unit association (P02), unlike the 2026-10-08 note's order? **Recommend yes**: masks block every target run; they can run in parallel anyway.
-2. Masks only for read-only confined workers? **Recommend yes**; mutating workers keep hooks (enforcement) and avoid the commit hazard.
-3. Defer the hook-installer fail-open change? **Recommend yes**, trigger: an interactive or mutating agent in a target hits exit 127 from an fgOS hook.
-4. Keep `inconclusive`/`blocked`/`not-applicable` -> `pass` in settlement for now? **Recommend yes (defer)**; changing it alters every panel's outcome with `acceptOutcomes: [pass, findings]`. Trigger: a non-answer seat counted as a vote in a real run.
-5. R1 (~26 min, real quota) run by Lead after P01 merge, as P01's only done-check? **Recommend yes.**
-6. Run the credential-rotation plan after P03+P04? **Recommend yes.**
+1. Order hygiene (P01) before unit association (P02), unlike the 2026-10-08 note's order? **Answered yes**: masks block every target run; they can run in parallel anyway.
+2. Masks only for read-only confined workers? **Superseded 2026-10-09**: diagnosis showed the codex hook dialog is cured at its root by seeding hook trust (phase 01); masks are added only for faults R1 still shows, and then only for read-only workers.
+3. Defer the hook-installer fail-open change? **Answered yes (deferred)**, reason changed: the proven cause of exit 127 is the cwd-relative hook command, so the fix, if needed, is the path, never fail-open. Trigger: an interactive or mutating agent in a target hits exit 127 from an fgOS hook.
+4. Keep `inconclusive`/`blocked`/`not-applicable` -> `pass` in settlement for now? **Answered yes (defer)**; changing it alters every panel's outcome with `acceptOutcomes: [pass, findings]`. Trigger: a non-answer seat counted as a vote in a real run.
+5. R1 (~26 min, real quota) run by Lead after P01 merge, as P01's only done-check? **Answered yes**; codex account `tetcu72`.
+6. Run the credential-rotation plan after P03+P04? **Answered yes.**
