@@ -14,7 +14,7 @@ import {
   seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
   codexHookTrustHash, seedCodexHookTrust,
 } from '../../src/runner/dispatch/trust-store.mjs';
-import { trustRoots, trustStorePaths } from '../../src/runner/dispatch/herdr-round.mjs';
+import { trustRoots, trustStorePaths, seedWorkspaceTrust } from '../../src/runner/dispatch/herdr-round.mjs';
 
 const dirs = [];
 const tmp = (prefix) => {
@@ -206,4 +206,53 @@ test('codex hooks: a path with a quote or backslash is escaped so the config sta
   seedCodexHookTrust(config, { projectPath: project, repoRoot: root });
 
   assert.match(fs.readFileSync(config, 'utf8'), /\[hooks\.state\."[^\n]*we\\"ird\\\\dir[^\n]*"\]/);
+});
+
+test('codex hooks: a control character in the path is escaped so the header stays one line', () => {
+  const project = tmp('fgos-codex-hooks-ctl-') + '/line\nbreak';
+  fs.mkdirSync(path.join(project, '.codex'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const root = tmp('fgos-codex-hooks-root-');
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(config, `[projects."${root}"]\ntrust_level = "trusted"\n`);
+
+  seedCodexHookTrust(config, { projectPath: project, repoRoot: root });
+
+  const header = fs.readFileSync(config, 'utf8').split('\n').find((line) => line.startsWith('[hooks.state.'));
+  assert.ok(header.includes('line\\nbreak'), 'the newline is written as an escape sequence');
+});
+
+test('codex hooks: a key present in dotted form is not given a second table', () => {
+  const project = tmp('fgos-codex-hooks-dotted-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(config, `[projects."${project}"]\ntrust_level = "trusted"\n\n[hooks.state]\n"${project}/.codex/hooks.json:pre_tool_use:0:0" = { trusted_hash = "sha256:person" }\n`);
+
+  const { keys } = seedCodexHookTrust(config, { projectPath: project, repoRoot: project });
+
+  assert.deepEqual(keys, [`${project}/.codex/hooks.json:pre_tool_use:1:0`]);
+});
+
+test('codex hooks: hook trust goes only to a private home, never into the account config the worker would share', () => {
+  const project = tmp('fgos-codex-hooks-wire-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const realHome = tmp('fgos-codex-real-home-');
+  const realConfig = path.join(realHome, 'config.toml');
+  const realBody = `[projects."${project}"]\ntrust_level = "trusted"\n`;
+  fs.writeFileSync(realConfig, realBody);
+  const trustStore = { kind: 'codex-toml' };
+  const notes = [];
+  const round = { trustWritten: false, note: (patch) => notes.push(patch) };
+
+  seedWorkspaceTrust({ trustStore, round, cwd: project, repoRoot: project, fullEnv: { CODEX_HOME: realHome }, workerEnv: null });
+  assert.equal(fs.readFileSync(realConfig, 'utf8'), realBody, 'no private home: the real config is left as it was');
+  assert.ok(!notes.some((n) => n.hookTrustSeeded), 'nothing is reported as seeded');
+
+  const privateHome = tmp('fgos-codex-private-home-');
+  seedWorkspaceTrust({ trustStore, round, cwd: project, repoRoot: project, fullEnv: { CODEX_HOME: realHome }, workerEnv: { CODEX_HOME: privateHome } });
+  assert.equal(fs.readFileSync(realConfig, 'utf8'), realBody, 'the real config is still untouched');
+  assert.match(fs.readFileSync(path.join(privateHome, 'config.toml'), 'utf8'), /\[hooks\.state\./);
+  assert.ok(notes.some((n) => n.hookTrustSeeded === 2));
 });

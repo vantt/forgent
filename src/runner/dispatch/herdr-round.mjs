@@ -648,7 +648,7 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
  * already be trusted by some other route, and the dialog it might still hit
  * is reported by name by the very next step anyway.
  */
-function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
+export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
   const projectPath = path.resolve(cwd);
   const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
   const stores = trustStorePaths({ trustStore, fullEnv, workerEnv });

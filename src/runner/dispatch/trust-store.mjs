@@ -384,9 +384,10 @@ export function codexHookTrustEntries(hooksJsonPath) {
   return { entries, skipped };
 }
 
-/** A TOML basic-string key: backslash and quote escaped so any path stays valid TOML. */
+/** A TOML basic-string key. JSON string escapes (quote, backslash, control characters) are valid
+ * TOML escapes; DEL is the one extra character TOML requires escaped. */
 function codexHookHeader(key) {
-  return `[hooks.state."${key.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`;
+  return `[hooks.state.${JSON.stringify(key).replace(/\x7f/g, '\\u007f')}]`;
 }
 
 /**
@@ -415,7 +416,9 @@ export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConf
   } catch (err) {
     if (err.code !== 'ENOENT') throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
   }
-  const fresh = entries.filter(({ key }) => !body.includes(codexHookHeader(key)));
+  // A key already present in any TOML form (standard table, dotted, single-quoted) is left alone:
+  // appending a second table would make codex refuse the whole config.
+  const fresh = entries.filter(({ key }) => !body.includes(codexHookHeader(key)) && !body.includes(key));
   if (fresh.length === 0) return { keys: [], skipped };
   const sections = fresh.map(({ key, hash }) => `\n${codexHookHeader(key)}\ntrusted_hash = "${hash}"\n`).join('');
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
