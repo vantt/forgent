@@ -1538,6 +1538,45 @@ test('producer expertise gate parks clearly on malformed packets and remains ans
   }
 });
 
+test('expertise gate reads the settled report, then an untouched packet file beside it, with either key spelling', async (t) => {
+  const cases = [
+    { name: 'underscore key in the raw JSON report', report: JSON.stringify({ missing_expertise: ['database sizing'] }), expect: '["database sizing"]' },
+    { name: 'prose report with a packet file using the spaced key', report: '# Advice in prose', packet: JSON.stringify({ 'missing expertise': [] }), expect: '[]' },
+    { name: 'prose report with a packet file using the underscore key', report: '# Advice in prose', packet: JSON.stringify({ missing_expertise: ['security review'] }), expect: '["security review"]' },
+    { name: 'the report wins over a packet file', report: JSON.stringify({ 'missing expertise': ['from report'] }), packet: JSON.stringify({ missing_expertise: ['from packet'] }), expect: '["from report"]' },
+    { name: 'packet file touched after the report settled is ignored', report: '# Advice in prose', packet: JSON.stringify({ missing_expertise: [] }), future: true, parks: true },
+    { name: 'malformed packet file is ignored', report: '# Advice in prose', packet: '{ not json', parks: true },
+    { name: 'packet file without the key is ignored', report: '# Advice in prose', packet: JSON.stringify({ verdict: 'x' }), parks: true },
+  ];
+  for (const scenario of cases) {
+    const tmp = setupTestRepo();
+    t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+    fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
+      import fs from 'node:fs'; import path from 'node:path';
+      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      if (!target) process.exit(1);
+      const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
+      const dir = fs.existsSync(outbox) ? outbox : base;
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(scenario.report)});
+      if (${JSON.stringify(scenario.packet ?? null)} !== null) {
+        const packet = path.join(dir, 'packet-1.json');
+        fs.writeFileSync(packet, ${JSON.stringify(scenario.packet ?? '')});
+        if (${JSON.stringify(Boolean(scenario.future))}) { const later = new Date(Date.now() + 86400000); fs.utimesSync(packet, later, later); }
+      }
+      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
+    `);
+    const workflow = { id: 'gate-packet-file', steps: [
+      { id: 'synthesis', units: [{ id: 'synthesize-recommendation', template: { capability: 'docs:write' } }] },
+      { id: 'close', dependsOn: ['synthesis'], gate: { kind: 'human', mode: 'input', question: 'Bring in {{report:synthesis/synthesize-recommendation:missing expertise}} or not?' } },
+    ] };
+    const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+    assert.equal(state.status, 'parked', scenario.name);
+    if (scenario.parks) assert.match(state.questions[0].question, /Cannot read settled producer "missing expertise"/, scenario.name);
+    else assert.equal(state.questions[0].question, `Bring in ${scenario.expect} or not?`, scenario.name);
+  }
+});
+
 test('reviewed findings acceptance proceeds while default and execution failure stop', async (t) => {
   for (const [accepted, failed] of [[true, false], [false, false], [true, true]]) {
     const tmp = setupTestRepo();
