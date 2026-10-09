@@ -192,6 +192,7 @@ Năm luồng KHÔNG bọc phong bì, mỗi luồng mang một lý do riêng — 
    bypass phong bì CLI và kiểm tra store admission để giữ nguyên vẹn luồng `stdin`,
    `stdout`, `stderr` và exit code `0`/`2` cho các công cụ như Claude Code và Codex,
    hoặc xuất JSON stdout trực tiếp cho AGY. Bọc phong bì sẽ phá vỡ giao thức chặn công cụ của agent host.
+
 **Khối `fgos-discovered`** (worker phát cho runner nêu việc mới phát hiện)
 NẰM NGOÀI hợp đồng này — nó là giao thức worker→runner của CTR003, không
 phải cửa ra tới người.
