@@ -80,249 +80,249 @@
     {
       "path": "docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/dispatch-control-plane.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/dispatch-control-plane.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/evidence-and-results.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/evidence-and-results.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/evidence-and-results.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/evidence-and-results.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/executor-health-and-fallback.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/executor-health-and-fallback.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/protocol-model.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/protocol-model.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/protocol-model.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/protocol-model.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/run-handle.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/run-handle.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/run-handle.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/run-handle.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/runtime-model.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/runtime-model.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/runtime-model.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/runtime-model.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/runtime-recovery-design.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/runtime-recovery-design.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/system-context.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/system-context.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/system-context.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/system-context.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/visibility-and-herdr.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/visibility-and-herdr.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/visibility-and-herdr.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/visibility-and-herdr.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/architecture/work-integration.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/architecture/work-integration.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/architecture/work-integration.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/architecture/work-integration.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/contracts/assignment-run-runresult.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/contracts/assignment-run-runresult.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/contracts/assignment-run-runresult.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/contracts/assignment-run-runresult.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/contracts/coordination-session.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/contracts/coordination-session.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/contracts/coordination-session.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/contracts/flow-definition.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/contracts/flow-definition.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/contracts/flow-definition.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/contracts/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/contracts/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/contracts/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/contracts/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/contracts/workflow-stage-operation.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/contracts/workflow-stage-operation.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/contracts/workflow-stage-operation.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/contracts/workflow-stage-operation.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-004-reserve-job.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/decisions/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/decisions/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/decisions/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/decisions/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md"
       ]
     },
     {
@@ -376,265 +376,265 @@
     {
       "path": "docs/architect/agent-coordination/intent-preservation-ledger.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/intent-preservation-ledger.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/intent-preservation-ledger.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/intent-preservation-ledger.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/coordination-operating-harness.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/coordination-operating-harness.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/coordination-operating-harness.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/playbooks/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/playbooks/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/playbooks/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/playbooks/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/proposals/dag-request-scheduler.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/proposals/dag-request-scheduler.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/proposals/dag-request-scheduler.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/proposals/dag-request-scheduler.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/proposals/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/proposals/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/proposals/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/proposals/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/verification/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/verification/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/verification/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/verification/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/vision.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/vision.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/vision.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/vision.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/vision.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/vocabulary/canonical-concepts.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/vocabulary/canonical-concepts.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/vocabulary/canonical-concepts.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/vocabulary/concept-relationships.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/vocabulary/concept-relationships.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/vocabulary/README.md",
       "disposition": "split",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/vocabulary/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/vocabulary/README.md; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/vocabulary/README.md"
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md"
       ]
     },
     {
       "path": "docs/architect/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
       "disposition": "promote",
-      "rationale": "Carry substantive units into docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
+      "rationale": "The prior candidate is retained whole in non-authority history after engine retirement 2180b4e72701bb090288af8fe8021008d9d42079; docs/specs/runner.md historical section is the current owner. Source claim decisions separately distinguish surviving current units and historical carry. Carry substantive units into docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg; independently decide weak/rewritten units and archive only temporary migration notices. No physical retirement is performed by this shard.",
       "targets": [
-        "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg"
+        "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/stage-operation-taskspec-skill-relationship.svg"
       ]
     }
   ]
