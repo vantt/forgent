@@ -3040,7 +3040,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/verification/README.md#evidence-sets at docs/platform/agent-coordination/verification/README.md#evidence-sets. The source evidence list and verification limits are retained; the pre-existing candidate migration paragraph and eight-row evidence navigation table are now explicitly labelled additions, not claimed to be source material.",
+      "rationale": "Preserve docs/architect/agent-coordination/verification/README.md#evidence-sets at docs/platform/agent-coordination/verification/README.md#evidence-sets. The source evidence list and verification limits are retained; the pre-existing candidate migration paragraph and eight-row evidence navigation table are now explicitly labelled additions, not claimed to be source material. The Added in candidate label now also names the pre-existing Proof Preservation pointer below the evidence-root table; it routes to move policy and known gaps without claiming new conformance.",
       "reviewNote": "Evidence Sets now labels the migration paragraph and the eight-row proof-root table, but the target also adds a Proof Preservation sentence ('phase-by-phase move policy and known gaps are in ...') that the label does not name and the rationale omits. Extend the Added-in-candidate label and rationale to cover it."
     },
     {
@@ -3461,7 +3461,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/vision.md#reading-down-from-the-vision at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind navigation records reading-order links. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/vision.md#reading-down-from-the-vision at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind navigation records reading-order links. The eight reading-order links are retained as navigation, with relative paths rewritten for the candidate directory and no new authority granted.",
       "reviewNote": "Reading Down From The Vision now has the navigation kind and its eight links are carried whole with valid rewrites, fixing round one. But the rationale says the index 'does not turn this source rule into navigation' while the kind is navigation, a self-contradiction; drop that templated sentence."
     },
     {
@@ -3473,7 +3473,7 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/vision.md#unheaded-block-65 at docs/platform/agent-coordination/vision.md#unheaded-block-65. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind navigation records reading-order link list. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/vision.md#unheaded-block-65 at docs/platform/agent-coordination/vision.md#unheaded-block-65. The reviewed source clauses remain whole in the relocated unit. Relative links are normalized for the relocated owner; any historical absent-path annotation is explicit. This is not a claim that promotion metadata changed this body section. Kind navigation records reading-order link list. This eight-item reading list remains navigation; its destinations are retained through relative architect-path rewrites.",
       "reviewNote": "The eight-item reading list is correctly relabelled navigation and all links are carried with valid architect-path rewrites. However the rationale adds that the index 'does not turn this source rule into navigation', contradicting kind=navigation; the templated sentence must be removed or corrected."
     },
     {
@@ -4944,7 +4944,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary at docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records historical vocabulary pointer and non-override context. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary at docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records historical vocabulary pointer and non-override context. The vocabulary document retains a pointer to historical vocabulary and its explicit non-override context; this is historical context, not an index rule.",
       "reviewNote": "Historical Vocabulary in vocabulary/deprecated-and-reserved.md is byte-equal and historical-context is the right kind (round-one mislabel fixed), but the rationale still ends with the copied sentence that the enclosing retained index does not turn this source rule into navigation; this unit sits in a vocabulary document, not an index, and is a pointer note, not a rule, so the sentence is false here. Rewrite the closing sentence specifically."
     },
     {

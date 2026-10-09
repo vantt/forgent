@@ -1570,12 +1570,6 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_8e9fe8f689ee7544cd727803b9d951c0",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
-      "receiptCommit": "1727b03d14e5b4161eae2c578219b066acf038d6",
-      "reviewStatus": "pending"
-    },
-    {
       "claimId": "claim_acfddb49837c4f852fcf2f25350ca71e",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "1727b03d14e5b4161eae2c578219b066acf038d6",
@@ -2035,12 +2029,7 @@
       "claimId": "claim_0d33c7237aa3cccd8a5bd654bb567d86",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "1727b03d14e5b4161eae2c578219b066acf038d6",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-08",
-      "reviewedAt": "2026-10-08",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-classifications.md",
-      "reviewReportCommit": "8e2fc315f45da800bf11076f539d3bd44a1dcde3",
-      "reviewNote": "Added in candidate note saying target docs link to retained legacy proof roots and mirrored directories are navigable copies that do not replace dated evidence artifacts. It records migration handling only, with no conformance claim."
+      "reviewStatus": "pending"
     },
     {
       "claimId": "claim_7fcf75a651ef6cf082e72a9dd87ddea9",

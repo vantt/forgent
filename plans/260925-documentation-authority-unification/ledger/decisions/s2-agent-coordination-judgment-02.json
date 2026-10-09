@@ -3910,7 +3910,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records dated implementation/review snapshot. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records dated implementation/review snapshot. This dated proposal snapshot records its narrow implementation status, not a reading index or a new implementation verification.",
       "reviewNote": "Section 14 Narrow Implementation Status is byte-equal and historical-context fits, but the rationale's closing sentence about an enclosing retained index and a source rule becoming navigation is boilerplate that does not describe this proposal snapshot; restate it specifically."
     },
     {
@@ -3922,7 +3922,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-126. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records review branch provenance. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-126. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records review branch provenance. This lead-in identifies the reviewed candidate branch as dated proposal-review provenance.",
       "reviewNote": "'Reviewed candidate branch:' is a byte-equal lead-in and historical-context fits as review provenance, yet the rationale ends with a copied sentence about an enclosing index and navigation rules that does not match a proposal-document branch note; rewrite the rationale."
     },
     {
@@ -3934,7 +3934,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-128 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records literal reviewed branch identifier. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-128 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records literal reviewed branch identifier. The literal fgw/tsk-5x7 fence preserves the reviewed branch identifier as proposal-review provenance.",
       "reviewNote": "The fence holding branch name fgw/tsk-5x7 is identical in the target and historical-context is a sound kind, but the rationale's trailing 'enclosing retained index ... source rule ... navigation' sentence is a template that fits neither this literal identifier nor its document."
     },
     {
@@ -4309,13 +4309,17 @@
       "claimId": "claim_144fa27b22fdb2c9520ccd5f08de61fb",
       "sourceUnitDigest": "5aeda891560748b8081de815e442b3ea1f0e21781b2f08643fba7a76799241d8",
       "targetOwner": "docs/platform/agent-coordination/proposals/README.md",
-      "targetAnchor": "unheaded-block-3",
+      "targetAnchor": "unheaded-block-2",
       "claimKind": "normative-law",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/README.md#unheaded-block-3 at docs/platform/agent-coordination/proposals/README.md#unheaded-block-3. The reviewed source clauses remain whole in the relocated unit. This is not a claim that promotion metadata changed this body section. Kind normative-law records proposal subordination to accepted foundation boundaries. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
-      "reviewNote": "The subordination paragraph (All proposals are subordinate to the Foundation Vision; reconcile with the Intent Preservation Ledger before narrowing a proposal) is bound to target unheaded-block-3, but after the author restored the paragraph under the H1 the extractor numbers it unheaded-block-2 (lines 29-33 at the review tree); unheaded-block-3 is now the Migration Status sentence 'This target directory preserves the proposal frontier', so the shown target is not the source. Retarget this row to unheaded-block-2 and rewrite the rationale, which still says the source clauses remain whole in the relocated unit and still carries the copied index sentence."
+      "rationale": "Preserve the complete legacy proposal-subordination paragraph at the candidate README under H1, unheaded-block-2. Both clauses remain verbatim: every proposal is subordinate to the Foundation Vision, and narrowing a proposal requires reconciliation with the Intent Preservation Ledger. This normative-law binding is the actual paragraph, not the later Migration Status sentence.",
+      "reviewNote": "The subordination paragraph (All proposals are subordinate to the Foundation Vision; reconcile with the Intent Preservation Ledger before narrowing a proposal) is bound to target unheaded-block-3, but after the author restored the paragraph under the H1 the extractor numbers it unheaded-block-2 (lines 29-33 at the review tree); unheaded-block-3 is now the Migration Status sentence 'This target directory preserves the proposal frontier', so the shown target is not the source. Retarget this row to unheaded-block-2 and rewrite the rationale, which still says the source clauses remain whole in the relocated unit and still carries the copied index sentence.",
+      "targetUnitDigest": "5aeda891560748b8081de815e442b3ea1f0e21781b2f08643fba7a76799241d8",
+      "targetAncestry": [
+        "Agent Coordination Proposals"
+      ]
     },
     {
       "claimId": "claim_ec01e2c22c11db825905d42b17f8493c",
@@ -6930,7 +6934,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records recommended decisions and reasons. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records recommended decisions and reasons. The proposal decision table preserves the recommended answers and reasons for all open decisions; it does not confer acceptance on those recommendations.",
       "reviewNote": "Step 08 'Answers to all open decisions' table is byte-equal and kind decision is right, but the rationale's final sentence about an enclosing retained index and a source rule not becoming navigation is boilerplate unrelated to this proposal's decision table; rewrite it."
     },
     {
@@ -7274,7 +7278,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records human decisions recorded on 2026-09-01. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records human decisions recorded on 2026-09-01. This dated table preserves the ten human decisions recorded on 2026-09-01 within the standalone-coordination proposal.",
       "reviewNote": "Affected Open Decisions (ten human decisions dated 2026-09-01) is byte-equal and decision is the right kind, yet the rationale ends with a copied index/navigation sentence that does not describe this step-08 proposal section; it needs a specific closing statement."
     },
     {
@@ -7286,7 +7290,7 @@
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-239 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-238. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records lead-in to the recorded human decisions. The enclosing retained index does not turn this source rule into navigation or grant new portal authority.",
+      "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-239 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-238. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records lead-in to the recorded human decisions. The lead-in introduces the proposal’s human decisions recorded on 2026-09-01 and is preserved with that decision table.",
       "reviewNote": "'Human decisions recorded on 2026-09-01:' lead-in is byte-equal with a correct decision kind, but the rationale's trailing sentence about a retained index and a source rule not turning into navigation is template text that misdescribes this one-line proposal lead-in."
     },
     {
@@ -8366,11 +8370,11 @@
       "sourceUnitDigest": "35a993f5e2f972a578387280bf1fa8d7831877f9704d80a24ae64a0d74939e5a",
       "targetOwner": "docs/platform/agent-coordination/README.md",
       "targetAnchor": "unheaded-block-32",
-      "claimKind": "navigation",
+      "claimKind": "normative-law",
       "disposition": "promote",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-08",
-      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-20 at docs/platform/agent-coordination/README.md#unheaded-block-32. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding.",
+      "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-20 at docs/platform/agent-coordination/README.md#unheaded-block-32. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. The fenced frontier scope names the group-thinking substrate and the ADR-010 section 5 mutating-proof gate; it constrains scope and gating, rather than merely routing readers.",
       "reviewNote": "The txt fence listing Step 09, Step 10 and Component Authority Boundary Map scope (group-thinking substrate, ADR-010 section 5 mutating proof gate) is byte-equal, but it states substantive frontier scope and a gating constraint, not routing. Navigation misstates it; use the section's kind (normative-law) or intent."
     },
     {
