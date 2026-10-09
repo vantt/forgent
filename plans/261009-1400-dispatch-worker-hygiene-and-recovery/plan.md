@@ -23,8 +23,8 @@ created: 2026-10-09
 
 | | Added src lines | New files under `src/runner/dispatch` | New durable state | Stop date |
 |---|---|---|---|---|
-| Whole plan | <= 250 | 0 | one workflow event type, two fields on existing records | 2026-10-14 |
-| [P01](phase-01-read-only-worker-agent-config-masks.md) | <= 60 | 0 (1 static asset under `core/`) | none | 2026-10-11 |
+| Whole plan | <= 350 | 0 | one workflow event type, two fields on existing records | 2026-10-14 |
+| [P01](phase-01-read-only-worker-agent-config-masks.md) | <= 160 (raised from 60 by the owner 2026-10-09: hook-trust seeding replaced masks as the first fix; 157 measured) | 0 | none | 2026-10-11 |
 | [P02](phase-02-unit-association-before-dispatch.md) | <= 50 | 0 | event `unit.started` in the existing workflow journal | 2026-10-11 |
 | [P03](phase-03-herdr-session-identity-for-reaper-and-recovery.md) | <= 70 | 0 | `herdrSession` on launch-command record and ownership marker | 2026-10-13 |
 | [P04](phase-04-owner-set-quarantine-and-reset-date.md) | <= 60 | 0 | none (reuses quarantine record) | 2026-10-14 |
