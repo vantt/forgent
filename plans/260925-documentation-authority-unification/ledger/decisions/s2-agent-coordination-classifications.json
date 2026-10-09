@@ -1685,379 +1685,534 @@
       "claimId": "claim_57cc129eeedc6624d9e0f94e0419b1ec",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Heading plus diagram present the runtime flow with 'Structure[Optional Workflow or CoordinationProtocol]' and 'Session[CoordinationSession or agent-led planner]' as live components (Intent --> Session --> Assignment). CoordinationSession/CoordinationProtocol engine was retired in 2180b4e72; shown text has no historical/retired framing. The closing prose invariant is still true, but the diagram nodes are not current. Evidence: src/runner/dispatch/assignment-runner.mjs:445 -> error text 'CoordinationProtocol engine has been retired'; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, src/cli/command-registry.mjs coordination entries; docs/platform/agent-coordination/README.md:23 -> transition note: CoordinationSession/CoordinationProtocol/FlowDefinition engine retired (D-0050), replaced by Unit run + CollaborationPattern and Workflow run [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_2d663f66649fd2758f3d44e4a947b4a3",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "The mermaid block asserts Structure[...CoordinationProtocol] and Session[CoordinationSession...] as flow components feeding Assignment; both were retired (2180b4e72) and nothing in the block frames it as historical. Assignment/DispatchPlan/Run/RunResult/Herdr nodes still exist, but the Session and CoordinationProtocol nodes and edges do not. Evidence: src/runner/dispatch/assignment-runner.mjs:445 -> error text 'CoordinationProtocol engine has been retired'; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, src/cli/command-registry.mjs coordination entries; docs/platform/agent-coordination/README.md:23 -> transition note: CoordinationSession/CoordinationProtocol/FlowDefinition engine retired (D-0050), replaced by Unit run + CollaborationPattern and Workflow run [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_a70a115136cadba4cacc52197e9436c5",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Prose says results inform a Work driver but cannot move Work lifecycle state, and dashed paths (structure/augmentation/context/visibility) create no execution authority or terminal truth. This invariant holds in code: Assignment/Run never mutate Work lifecycle, and visibility is explicitly 'never evidence'. It names no retired entity; its only referent is the sibling diagram, which is described, not asserted as runtime. Agree with author's true-and-current only for this prose-only unit. Evidence: src/runner/dispatch/assignment-runner.mjs:10 -> 'Never mutates Work lifecycle state as a side effect.'; src/runner/dispatch/assignment.mjs:39 -> 'Assignment != Work (Assignment does not own lifecycle...)'; src/runner/dispatch/visibility-session.mjs:3-8 -> visibility.json is 'never evidence of anything'; result.json written by collector [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_52f4171b7ac9f5564387abedae33fc32",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table rows AC-CLAIM-002/003/005/006 mark claims 'implemented / partial' with Proof citing src/runner/coordination/**, src/verbs/coordination/schema.mjs, src/runner/definitions/**, test/runner/coordination-*.test.mjs; AC-CLAIM-021 cites src/runner/dispatch/placement-policy.mjs and AC-CLAIM-022 src/runner/provider-capacity.mjs. None exist now; the coordination runtime was retired in 2180b4e72. AC-CLAIM-001 'Evidence through Step 08 coordination implementation' and AC-CLAIM-012 'implemented mechanism' likewise rest on the removed engine. No framing banner says these are historical statuses. Evidence: ls src/runner/coordination src/runner/definitions src/verbs/coordination -> no such directories; ls test/runner / grep coordination -> none; ls src/runner/dispatch/placement-policy.mjs src/runner/provider-capacity.mjs -> No such file; node bin/fgos.mjs --help --json advertises no coordination verb (COMMON.md fact); claim-preservation.md header says 'Implementation: Partial', 'Last reviewed: 2026-09-18', no history banner [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_75f9a993ffc8cbff63f08200959c1ffb",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Relabel confirmed. The two-sentence rule (use unknown or track-complete instead of guessing; mark a claim implemented only when current-checkout code, test, contract or proof supports it) governs how the migration table is filled; it describes no system behaviour, implementation status or scope, and is a bare note under the H1, not a heading or lead-in, so bookkeeping is the true class.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_2db60db20f1add588148186e717afe91",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table rows AC-CLAIM-002/003/005/006 mark claims 'implemented / partial' with Proof citing src/runner/coordination/**, src/verbs/coordination/schema.mjs, src/runner/definitions/**, test/runner/coordination-*.test.mjs; AC-CLAIM-021 cites src/runner/dispatch/placement-policy.mjs and AC-CLAIM-022 src/runner/provider-capacity.mjs. None exist now; the coordination runtime was retired in 2180b4e72. AC-CLAIM-001 'Evidence through Step 08 coordination implementation' and AC-CLAIM-012 'implemented mechanism' likewise rest on the removed engine. No framing banner says these are historical statuses. Evidence: ls src/runner/coordination src/runner/definitions src/verbs/coordination -> no such directories; ls test/runner / grep coordination -> none; ls src/runner/dispatch/placement-policy.mjs src/runner/provider-capacity.mjs -> No such file; node bin/fgos.mjs --help --json advertises no coordination verb (COMMON.md fact); claim-preservation.md header says 'Implementation: Partial', 'Last reviewed: 2026-09-18', no history banner [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_e85e6a1bc650842a19a2fb94032a37a8",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Wrapper says 'Document type: History', 'not a live runtime or documentation policy', 'Canonical for: Historical evidence only', and labels the fenced block a literal snapshot with original status fields preserved as historical text. Verified verbatim: diff against docs/architect/agent-coordination/documentation-governance.md differs only by added fence-escaping lines. Related paths exist and README.md:129 lists it as 'retired area policy (non-authority history)'; docs/doc-governance.md is the repo-wide governance doc. The snapshot's 'Implementation: Active' etc. are quoted history, not asserted. Evidence: diff of snapshot text block vs docs/architect/agent-coordination/documentation-governance.md -> only ``` / ```text escape lines differ; docs/platform/agent-coordination/README.md:129 -> 'retired area policy (non-authority history)' links this file; ls docs/platform/agent-coordination/history/documentation-migration -> README.md sibling path exists, source-inventory.md exists; docs/doc-governance.md exists [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_ac50db5d5bcefe61f0d4b4773b7ae29c",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Wrapper explicitly frames the page as non-authority verbatim history ('Implementation: Historical record; not a live runtime or documentation policy'; original status fields and references kept as historical text). Snapshot body is byte-identical to the legacy source apart from added fences; present-tense statements (Implementation: Complete, src/ paths, find/rg commands) are inside the quoted historical plan. Evidence: git diff --no-index docs/architect/agent-coordination/documentation-standardization-plan.md <snapshot lines 26-1025> -> only 25 inserted fence lines, no content change (so 'legacy source is unchanged' holds); docs/platform/agent-coordination/README.md:125,131 lists it as 'migration plan (retired; non-authority history)' and 'retained verbatim as literal history snapshots'; All Related paths exist (docs/doc-governance.md, docs/platform/intent-preservation-ledger.md, component-boundary.md, source-inventory.md, architect README/ledger) [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_0c3e7ed818f9688e17bf5f12cfde51a7",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table lists proof roots as present-tense link targets, but ten `plans/...` paths (e.g. plans/260916-account-rotator/plan.md, plans/260917-cold-resumable-coordination-dag/plan.md, plans/260915-code-implementation-track-policy/reports/track-closeout.md) no longer exist; they moved to archive/plans/. Also rows such as step-08-standalone-coordination 'Supports core implemented claims' and step-09 'remains legacy-current' describe the retired coordination engine as implemented with no historical framing in the shown text. Offending: the table's `plans/...` Proof root cells and 'Supports core implemented claims'. Evidence: ls plans/260916-account-rotator/plan.md, plans/260915-dispatch-operability-implementation/reports/track-closeout.md etc. -> missing in W; ls archive/plans -> 260915-*, 260916-account-rotator, 260917-cold-resumable-coordination-dag now live under archive/plans (git 22e54f834 'archive 38 completed plans'); git ls-files path loop over table -> 10 of ~31 'plans/...' proof roots MISSING at the stated path [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_2dc89f0f9de15746e118fba37b267e3b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Corrected Proof Preservation pointer: 'Proof trees must remain linkable; summary rows here do not replace the proof roots, logs, current-cell files, reviews, red-team reports or known gaps.' It is migration housekeeping about this ledger's own rows and asserts nothing about code or status, so bookkeeping fits (a bare note, not a structural frame).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_e6f5d79f58c2cffd6a636d0e28eaed92",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table lists proof roots as present-tense link targets, but ten `plans/...` paths (e.g. plans/260916-account-rotator/plan.md, plans/260917-cold-resumable-coordination-dag/plan.md, plans/260915-code-implementation-track-policy/reports/track-closeout.md) no longer exist; they moved to archive/plans/. Also rows such as step-08-standalone-coordination 'Supports core implemented claims' and step-09 'remains legacy-current' describe the retired coordination engine as implemented with no historical framing in the shown text. (this unit is the table body only). Evidence: ls plans/260916-account-rotator/plan.md, plans/260915-dispatch-operability-implementation/reports/track-closeout.md etc. -> missing in W; ls archive/plans -> 260915-*, 260916-account-rotator, 260917-cold-resumable-coordination-dag now live under archive/plans (git 22e54f834 'archive 38 completed plans'); git ls-files path loop over table -> 10 of ~31 'plans/...' proof roots MISSING at the stated path [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_6271a36fcf399262c449faa29fcacda3",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table gives present-tense 'Current status' values that are stale: the cold-resumable DAG plan is 'ready for implementation' though its plan is now status: completed and archived, the DAG/coordination engine was retired in 2180b4e72, and Step 08 is called 'largely promoted' with 'public CLI accepted' though that CLI is gone. Five `plans/...` source paths no longer exist (moved to archive/plans/). Not framed as a dated historical snapshot in the shown text. Offending: row 'plans/260917-cold-resumable-coordination-dag/plan.md ... ready for implementation' and the Step 08 row. Evidence: plans/260917-cold-resumable-coordination-dag/plan.md, plans/260916-account-rotator/{design,plan}.md, plans/260915-executor-policy-dispatch-seams/phase-05*.md, phase-08*.md -> all MISSING in W (moved to archive/plans/); archive/plans/260917-cold-resumable-coordination-dag/plan.md:2 -> frontmatter 'status: completed' (table says 'ready for implementation / not runtime truth'); git show --stat 2180b4e72 -> src/runner/coordination/dag-declaration.mjs deleted; engine retired, so 'CoordinationSession, FlowDefinition, protocol loader, and public CLI were accepted' is no longer a live fact [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_2ca0795aef5b17299adc20b0792f7c3f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Relabel confirmed. 'Proposal status is conservative; accepted pieces must be extracted into architecture, contract, decision or spec targets before becoming authority' is a rule for how the proposal-status ledger is maintained, not a claim about any proposal's content or implementation; bookkeeping is right.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_c72016c6ceb4f84343b61c0118b2b359",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table gives present-tense 'Current status' values that are stale: the cold-resumable DAG plan is 'ready for implementation' though its plan is now status: completed and archived, the DAG/coordination engine was retired in 2180b4e72, and Step 08 is called 'largely promoted' with 'public CLI accepted' though that CLI is gone. Five `plans/...` source paths no longer exist (moved to archive/plans/). Not framed as a dated historical snapshot in the shown text. (table-body unit). Evidence: plans/260917-cold-resumable-coordination-dag/plan.md, plans/260916-account-rotator/{design,plan}.md, plans/260915-executor-policy-dispatch-seams/phase-05*.md, phase-08*.md -> all MISSING in W (moved to archive/plans/); archive/plans/260917-cold-resumable-coordination-dag/plan.md:2 -> frontmatter 'status: completed' (table says 'ready for implementation / not runtime truth'); git show --stat 2180b4e72 -> src/runner/coordination/dag-declaration.mjs deleted; engine retired, so 'CoordinationSession, FlowDefinition, protocol loader, and public CLI were accepted' is no longer a live fact [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_5de78c1fd792873d0e980291add1c433",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Relabel confirmed. 'No component-boundary change in Phase 7.' is the explicit no-change note the project documentation rule asks for (source-inventory.md line 42, beside the Phase 0/1 note on line 23) in the old migration-phase ledger; it records a migration decision and claims no runtime truth, so bookkeeping, not a structural frame.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_9c354eeb6f4a61966d0d015575eb331f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "'Current slice' sentence states Phase 6 merged the coding facades: fgos-plan-loop and fgos-code-panel are deprecated stubs and fgos-code-change 'is the live consumer'. None of those three skills exist now (fgos-code-change deleted in 2180b4e72; the other two absent from core/skills). The Phase 4/5 clauses (_shared/coordination-driver.md, fgos-architecture-panel) are still true, but the status line 'decided, not yet built' sits beside a stale 'live consumer' claim. Evidence: git ls-files / grep -E 'fgos-code-change/fgos-plan-loop/fgos-code-panel' -> no skill files; ls core/skills -> no such skills; git show --stat 2180b4e72 -> plugins/fgOS/skills/fgos-code-change/SKILL.md deleted (184 lines); core/skills/_shared/coordination-driver.md and core/skills/fgos-architecture-panel/SKILL.md exist (Phase 4/5 parts still true) [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_e6e7562209436621ff85518d0ad18fd5",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "'Current slice' sentence states Phase 6 merged the coding facades: fgos-plan-loop and fgos-code-panel are deprecated stubs and fgos-code-change 'is the live consumer'. None of those three skills exist now (fgos-code-change deleted in 2180b4e72; the other two absent from core/skills). The Phase 4/5 clauses (_shared/coordination-driver.md, fgos-architecture-panel) are still true, but the status line 'decided, not yet built' sits beside a stale 'live consumer' claim. (unit is the body without the heading). Evidence: git ls-files / grep -E 'fgos-code-change/fgos-plan-loop/fgos-code-panel' -> no skill files; ls core/skills -> no such skills; git show --stat 2180b4e72 -> plugins/fgOS/skills/fgos-code-change/SKILL.md deleted (184 lines); core/skills/_shared/coordination-driver.md and core/skills/fgos-architecture-panel/SKILL.md exist (Phase 4/5 parts still true) [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_1ccdc1ea2272f773cca540a31f19bf9f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Relabel confirmed. The playbooks README note says the directory preserves operational and bootstrap material from docs/architect/agent-coordination/playbooks/ and stays non-normative; both directories exist (checked with ls) and the sentence only records provenance and non-authority, so bookkeeping fits.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_7fae909de31694f1b661ac18211cad57",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Sentence 'Hiện tại, bề mặt ... chỉ có một lệnh duy nhất: fgos coordination run --file' is present-tense and false; the verb and engine were retired by 2180b4e72. Whole section 1 is framed as the live problem. Evidence: env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> exit 0, no 'coordination' verb; 'fgos coordination run' -> 'unknown verb ... Usage: fgos <version/init/.../main-checkout-reset>' (no coordination); git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/* [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_4d2603d2448b20475b2a89ca2ea1ad6f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "'Hiện tại ... chỉ có một lệnh duy nhất: fgos coordination run --file <request.json>' asserts a present CLI that no longer exists. Evidence: env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> exit 0, no 'coordination' verb; 'fgos coordination run' -> 'unknown verb ... Usage: fgos <version/init/.../main-checkout-reset>' (no coordination); bin/fgos.mjs:2476-2482 only an orphan comment about coordination run/show remains; no case 'coordination' (git grep \"case 'coordination'\" -> none) [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_c3bfb7cedbf63ea5a56ea1ee0f922bf9",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Describes in present tense the live workflow (LLM sequencing authorize->dispatch->disposition inside one JSON file, $ref batch refuse, F5 dischargeOn fix 'ở dưới') of an engine that no longer exists; no retired/historical qualifier. Author's true-and-current proposal not accepted. Evidence: git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/*; git grep runCoordinationUseCase/dispositionValues -- src packages apps crates bin -> no hits (only unrelated runner config orgPolicy.dischargeOn at src/runner/dispatch/config.mjs:185) [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Design is to push into 'một cửa runCoordinationUseCase', which no longer exists; the proposed layer has no engine to wrap. Bullets (parity, no new MCP wrapper, --cwd) are fine as principles but the section's core sentence is stale. Evidence: git grep runCoordinationUseCase/dispositionValues -- src packages apps crates bin -> no hits (only unrelated runner config orgPolicy.dischargeOn at src/runner/dispatch/config.mjs:185); git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/* (runCoordinationUseCase lived in src/verbs/coordinatio [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_b14e1fac0d2b3e70231806099e41a6e8",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Single sentence directs the CLI into runCoordinationUseCase, a function deleted with src/verbs/coordination. Evidence: git grep runCoordinationUseCase/dispositionValues -- src packages apps crates bin -> no hits (only unrelated runner config orgPolicy.dischargeOn at src/runner/dispatch/config.mjs:185); git show 2180b4e72^:src/verbs/coordination/run.mjs -> contained runCoordinationUseCase; path absent now [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_02537525d046da73f1d54b948df6a567",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Pure design principles stated as prohibitions/requirements of a proposal (human-agent parity, no new MCP wrapper, deterministic keys, mandatory --cwd); dispatch.mjs exists and --cwd is a live flag. Asserts no shipped feature. Caveat: document header still says Implementation Pending with no retirement note (document-level, not this unit). Evidence: src/runner/dispatch.mjs exists (git grep 'dispatch.mjs' bin/fgos.mjs:46 imports it); proposal header: 'Design status: Draft (V2.1) / Implementation status: Pending / Last reviewed: 2026-09-18' (no retirement note); unit contains no claim that status/coordination verbs exist; it uses 'Giữ ... làm contract' as proposal guidance Closes only as retained design/proposal text: the area README (README.md:25) frames the directory as historical design of the retired engine and the proposal header says Draft/Pending; no sentence of the unit asserts current engine behaviour. A document-level retirement banner is advisable but does not change this unit's text. [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_9d6ab3d626cdbbc2272d2de3a04ac0b4",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "'Engine phải được sửa 3 lỗi kiến trúc đang tồn tại', 'Hàm run.mjs hiện tại auto-close', 'Sửa store.mjs ... canonicalize', YAML FlowDefinition loader: the engine files and flow YAML no longer exist, so the 'existing' defects are not current. Evidence: git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/*; git show 2180b4e72^:src/runner/coordination/store.mjs has canonicalize at ~L1762; neither store.mjs nor core/coordination-protocols/*.yaml exist now (deleted in 2180b4e72) [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_86b6325d4e0e524b97f2a9f028ba6795",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "'Engine phải được sửa 3 lỗi kiến trúc đang tồn tại' asserts present engine defects; engine removed. Evidence: git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/*; git grep runCoordinationUseCase/dispositionValues -- src packages apps crates bin -> no hits (only unrelated runner config orgPolicy.dischargeOn at src/runner/dispatch/config.mjs:185) [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_09fafb51d4b29cf1109cd0c9404b610b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Names run.mjs 'hiện tại' auto-closing, store.mjs canonicalize, FlowDefinition YAML dispositionValues/dischargeOn; all targets deleted, and dispositionValues/dischargeOn exist nowhere in current code. Evidence: git grep runCoordinationUseCase/dispositionValues -- src packages apps crates bin -> no hits (only unrelated runner config orgPolicy.dischargeOn at src/runner/dispatch/config.mjs:185); git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/* [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_ed22864a98055aea6246f39fbf5fd690",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Forward-looking proposal ('sẽ cung cấp 10 verb') under a document marked Draft/Pending; it does not claim the verbs exist. None of the 10 verbs nor status are in the current verb list, consistent with proposal framing. Document needs a top-level note that the target engine was retired. Evidence: env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> exit 0, no 'coordination' verb; 'fgos coordination run' -> 'unknown verb ... Usage: fgos <version/init/.../main-checkout-reset>' (no coordination); fgos --help --json verb list has none of start/authorize-and-dispatch/operation/fan-out/contribution/human-turn/reveal/disposition/close/recover as coordination verbs Closes only as retained design/proposal text: the area README (README.md:25) frames the directory as historical design of the retired engine and the proposal header says Draft/Pending; no sentence of the unit asserts current engine behaviour. A document-level retirement banner is advisable but does not change this unit's text. [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_a47a993b15a1e33eaa33ca65335d5328",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Proposal sentence ('sẽ cung cấp 10 verb ... bắt buộc có --cwd'); future tense, no shipped claim. Evidence: proposal header: 'Design status: Draft (V2.1) / Implementation status: Pending / Last reviewed: 2026-09-18' (no retirement note); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> exit 0, no 'coordination' verb; 'fgos coordination run' -> 'unknown verb ... Usage: fgos <version/init/.../main-checkout-reset>' (no coordination) Closes only as retained design/proposal text: the area README (README.md:25) frames the directory as historical design of the retired engine and the proposal header says Draft/Pending; no sentence of the unit asserts current engine behaviour. A document-level retirement banner is advisable but does not change this unit's text. [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_ae5516781ff44fff8a98d70c53612ffd",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "List of proposed verb names with descriptions; a design list, no claim that they exist. Evidence: proposal header: 'Design status: Draft (V2.1) / Implementation status: Pending / Last reviewed: 2026-09-18' (no retirement note); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> exit 0, no 'coordination' verb; 'fgos coordination run' -> 'unknown verb ... Usage: fgos <version/init/.../main-checkout-reset>' (no coordination) Closes only as retained design/proposal text: the area README (README.md:25) frames the directory as historical design of the retired engine and the proposal header says Draft/Pending; no sentence of the unit asserts current engine behaviour. A document-level retirement banner is advisable but does not change this unit's text. [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_0dff379203820718ecc15bb86854ccdc",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Proposed `status` view returning --json; no present-tense claim of existence. Evidence: proposal header: 'Design status: Draft (V2.1) / Implementation status: Pending / Last reviewed: 2026-09-18' (no retirement note); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> exit 0, no 'coordination' verb; 'fgos coordination run' -> 'unknown verb ... Usage: fgos <version/init/.../main-checkout-reset>' (no coordination) Closes only as retained design/proposal text: the area README (README.md:25) frames the directory as historical design of the retired engine and the proposal header says Draft/Pending; no sentence of the unit asserts current engine behaviour. A document-level retirement banner is advisable but does not change this unit's text. [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_b926a2b6954443f07915268fba55e008",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Roadmap steps 2b/3/4/5 schedule work on 'YAML Loader và Engine', 'Tách Auto-close khỏi run', 'dispositionKey' engine fix and 10 CLI verbs, all on code deleted by 2180b4e72; '583 local sessions' / '43 session' corpus counts have no current backing (no .fgos/coordination store, no test/fixtures/coordination/sessions). Evidence: git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/*; ls /home/vantt/projects/forgentX/.fgos/coordination -> no such dir; test/fixtures has only coordination-baseline and coordination-legacy-schema-1-session [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_3e99c9ba0ea20c44649583632fef547f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Same roadmap table rows (including 583 / 43 session counts and engine-fix steps F3/F4/F5 on removed run/store/loader code); actionable plan for a retired runtime. Evidence: git ls-tree/ls: src/runner/coordination and src/verbs/coordination do not exist in W; git show --stat 2180b4e72 deletes session-engine.mjs, store.mjs, src/verbs/coordination/*; git grep runCoordinationUseCase/dispositionValues -- src packages apps crates bin -> no hits (only unrelated runner config orgPolicy.dischargeOn at src/runner/dispatch/config.mjs:185) [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_0d0a49d39a15a6b9a4150e859cfe0f9d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Relabel confirmed. The roadmap README note says the directory preserves rollout sequencing from docs/architect/agent-coordination/roadmap/ and that a roadmap cannot establish current architecture, contracts or decisions; both directories exist and no behaviour is claimed, so bookkeeping is the correct class.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Heading plus block asserts 'Current implemented behavior' centred on CoordinationSession as V1 root and FlowDefinition as shared IR; both concepts and their code were retired (bin/fgos.mjs has no coordination case, only a stale comment at 2476). Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_3e2f14324bce265fe7fdc776f88c6eae",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Definitional paragraph; it does not assert a coordination engine. Ad-hoc dispatch runs without Work/Workflow (src/runner/dispatch/cli.mjs:323 ad-hoc execute) and still builds an effective execution contract; naming CoordinationProtocol as something not required is vacuously true. Borderline because it uses retired vocabulary, but no sentence is contradicted. Evidence: src/runner/dispatch/cli.mjs:323 -> comment describes an ad-hoc `execute` with no run directory; dispatch decide/execute need no Work item; src/runner/dispatch/assignment-runner.mjs:113-116 -> buildEffectiveExecutionContract/readEffectiveExecutionContract used for dispatch; docs/platform/component-boundary.md:65-69 -> Agent Coordination area still a boundary row (dispatch/Run Result Evaluator) alongside retired-engine note [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_de43346a8b673d9ea0272947c5c752dc",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "First two bullets (`CoordinationSession` as V1 executable/recovery root; `FlowDefinition` shared IR) are presented as current implemented behaviour but are retired; remaining bullets (Assignment/Run, dispatch, Herdr, Work) are true but the unit as a whole is not. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding false; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_6c4f618a99c27c8d995e5ae4ea838c31",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Heading+list says the area owns coordination session identity/storage/replay/recovery-root, FlowDefinition/CoordinationProtocol semantics, and group-thinking built on CoordinationSession/FlowDefinition; none of these exist now. Dispatch/Run/Herdr items remain true. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_bff3a2cc2c15603593f120c3671296a9",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Bullets 1, 3 and 7 (session identity/local storage/replay, FlowDefinition and CoordinationProtocol consumers, CoordinationSession/FlowDefinition-based group-thinking) own retired concepts; unframed as history. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_7c7e5b0cd65941649f09dccaccc3fcb8",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Non-scope list is accurate: Work lifecycle lives in src/state/store.mjs and verbs outside this area; both linked portals exist; provider account inventory is global-only so not project-local-owned here. Evidence: docs/platform/host-invocation-routing/README.md and docs/platform/packaging-distribution/README.md -> both exist (link targets resolve); src/runner/dispatch/provider-capacity.mjs:62 -> 'runner.providers.<p>.accounts is global-only ... not project config'; docs/platform/agent-coordination/README.md:113-114 -> same two cross-area boundaries [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_74b00b519bc6b0b62131eef05e5e7061",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Same list as the Non-Scope heading unit; every bullet is a negative ownership statement that remains correct and its two links resolve. Evidence: docs/platform/host-invocation-routing/README.md, docs/platform/packaging-distribution/README.md -> exist; src/runner/dispatch/provider-capacity.mjs:62 -> provider accounts global-only; docs/platform/agent-coordination/README.md:113-114 -> consistent boundary table [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_bc2a036bfb370b61dfc459ae5a77cd8c",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Rows `fgos coordination run`/`show`, 'Headless adapter', 'Declared protocol definitions' and 'Agent-led sessions' are marked implemented but the verb, adapter and definitions are gone; `fgos coordination run` is refused as unknown. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_3273f8bddcca9ea46c529152326ad314",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table body: same stale rows (coordination run/show verbs, headless adapter, declared protocol definitions, agent-led sessions); only the Herdr row is accurate. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_e55374f22025f86c63d8706a582e280d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "CoordinationSession and FlowDefinition rows claim 'Implemented' with sources `src/runner/coordination/**` and `src/runner/definitions/**`, which do not exist; Assignment/Run/RunResult/DispatchPlan rows are fine. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding partly-stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_9d18f68c54b13d881dc32c17f0524337",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table body: CoordinationSession and FlowDefinition rows state Implemented with nonexistent source paths. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding partly-stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_1c3292ad19c922c586854d5d126e6f3b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "'Agent-led coordination', 'Declared coordination protocol', 'Runtime recovery (session-recovery half of S5 implemented)' and 'PlacementPolicy ... implemented' are stale: session/protocol engine retired; config.mjs:1154 throws that runner.placementPolicy was retired. inspect/reconcile, Herdr launcher, provider rotator and DAG-proposed rows are fine. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding partly-stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_4e688aaf38cb9b831a4bdd80ea2f499d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table body: same stale Agent-led, Declared protocol, session-recovery and PlacementPolicy rows. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (all three); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> command names include dispatch, workflow, run, session; no coordination; git show --stat 2180b4e72 -> deletes src/runner/coordination/*, core/coordination-protocols/*, packages/coordination-state [Independent finding partly-stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_bdc686550bc36d7563154fd33098741d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Rows CoordinationSession and FlowDefinition say 'accepted / implemented / partial', but the engine and src/runner/definitions that implemented them were retired; only Assignment/Run/RunResult still ships (src/runner/dispatch). Also the lead sentence 'remains legacy-current until Phase 4 promotion' is a migration-era claim. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> 68 commands, no coordination verb; docs/platform/agent-coordination/spec.md:113 -> Contracts Owned table [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_5020e11c44b6b053c400adc46cda95a1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Same table: CoordinationSession and FlowDefinition rows state 'implemented / partial' though their implementation was removed; only packages/observe/contracts/coordination-session.read.v1.json remains as a read contract. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> 68 commands, no coordination verb [Independent finding partly-stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_021a84c1334927bc8bba62ec12584496",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "All four consumed-contract owners exist (host-invocation-routing, packaging-distribution, specs/confinement-authority.md) and dispatch still consumes confinement (src/runner/dispatch/confinement/). Nothing in the table asserts a retired engine. Evidence: ls docs/platform/host-invocation-routing/README.md docs/platform/packaging-distribution/README.md docs/specs/confinement-authority.md -> all exist; ls src/runner/dispatch/confinement -> drivers/ probes/ attestation-store.mjs ... [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_cc3d4a2db8370a93c4a7a6e8aba18e0c",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Same consumed-contracts table without heading; every owner link resolves and ownership direction (host/packaging/confinement own, coordination consumes) matches code. Evidence: same link targets exist (ls); src/runner/dispatch/provider-adapter.mjs, config.mjs, confinement/ present as consumers [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_1289fd071fae40e82e7dba2d1b9bcbb2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Implementation Status rows assert implemented/partial for src/runner/coordination/**, src/verbs/coordination/schema.mjs, session-engine.mjs, src/runner/definitions/** (CoordinationSession V1 root, FlowDefinition IR, Work optional integration); all those paths are gone. Also dispatch rows cite tests/DAG as proposed for a retired coordination run path. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> 68 commands, no coordination verb; docs/platform/agent-coordination/spec.md:133 [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_2a0f67663daf206e2883bd79216cd084",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Same status table body: cites retired src/runner/coordination/**, src/verbs/coordination/schema.mjs, src/runner/definitions/** as implemented evidence. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> 68 commands, no coordination verb [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_abd1a1964d80a8d3e5635ba17cd386cf",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Known gaps 'pending Phase 3/4' and 'pending Phase 5' are stale: platform/agent-coordination already holds promoted architecture/contracts/decisions and 869 verification files. 'Cold-resumable DAG scheduler: proposed' and 'PlacementPolicy redirect retirement' describe retired-coordination or nonexistent code (placement-policy.mjs absent), so the gap list is no longer accurate. Evidence: find docs/platform/agent-coordination/{architecture,contracts,decisions,verification} -type f -> 14/5/12/869 files; ls src/runner/dispatch/placement-policy.mjs; ls test/runner / grep coordination -> missing / no match; git ls-files shows no placement-policy source; git grep -il cold-resumable src -> only src/state/store.mjs; coordination run removed [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_c4d21a728479825bedb7f7eedf6e15c9",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Same Known Gaps table body: promotion-pending Phase rows are done, DAG scheduler and PlacementPolicy rows refer to code no longer present. Evidence: same as above: platform dirs populated; ls src/runner/dispatch/placement-policy.mjs; ls test/runner / grep coordination -> missing / no match; git ls-files shows no placement-policy source [Independent finding stale; differs from the author proposal (true-and-current).]"
     },
     {
       "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Rows assert implemented/partial for CoordinationSession, FlowDefinition, Work integration, Protocol optional, with 'Target directory' entries like subcomponents/coordination-session/ though subcomponents/ holds only README.md; the engine they describe was retired. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); find docs/platform/agent-coordination/subcomponents -type f -> only README.md; env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> 68 commands, no coordination verb [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_3a9d27a1c16851e02c5952da2ae1db86",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Relabel confirmed. The rule 'create subcomponents/<name>/ directories only after the source inventory proves a child needs local navigation; until then this map preserves vocabulary and points to owning sources' is a housekeeping rule, and it is accurate today because subcomponents/ holds only README.md (ls). It states no component behaviour, so bookkeeping, not structural frame.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_c908b3b595d16211e94263026e278842",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Table body: CoordinationSession and FlowDefinition status 'implemented / partial', Cold-Resumable DAG 'proposed / ready for implementation', Executor Policy 'implemented' are contradicted by removal of the coordination engine. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs --help --json -> 68 commands, no coordination verb [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Alignment table maps claims to src/runner/coordination/**, src/verbs/coordination/schema.mjs, src/runner/definitions/**, test/runner/coordination-*.test.mjs, src/runner/dispatch/placement-policy.mjs, src/runner/provider-capacity.mjs; none exist (provider-capacity lives at src/runner/dispatch/provider-capacity.mjs) yet marked implemented. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); ls src/runner/dispatch/placement-policy.mjs; ls test/runner / grep coordination -> missing / no match; git ls-files shows no placement-policy source; ls src/runner/provider-capacity.mjs -> missing (actual: src/runner/dispatch/provider-capacity.mjs) [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_0addbf1edb5e3a5c36c84d1febb9e2d6",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Definitional paragraph about how to read the status column ('implemented' means checkout evidence supports it; do not silently upgrade); it asserts no code, file or count, and stays correct as a reading convention. Evidence: docs/platform/agent-coordination/verification/implementation-alignment.md:21 -> text is policy prose only; the paragraph names no verb/file/test [Independent finding true-and-current; agrees with the author proposal (true-and-current).]",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_d1a817c37e5972f83310d2c7ca022f3d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "reviewNote": "Same alignment table body: evidence column cites retired coordination/definitions paths and absent placement-policy.mjs and coordination tests as implemented. Evidence: ls src/runner/coordination src/verbs/coordination src/runner/definitions -> No such file or directory (retired by 2180b4e72); ls src/runner/dispatch/placement-policy.mjs; ls test/runner / grep coordination -> missing / no match; git ls-files shows no placement-policy source [Independent finding stale; agrees with the author proposal (stale).]"
     },
     {
       "claimId": "claim_f4550fe2cf13770d34cfa8e2929fbe41",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "The Added in candidate label paragraph of verification/README.md: its factual statement that the migration paragraph, evidence-root table and Proof Preservation pointer predate this batch (fcfe78cb8) is true (lines 11, 15 and 27 of that file at fcfe78cb8), it says the table is navigation and not newly verified conformance, and it makes no claim about code, so it is migration bookkeeping that invents no legacy authority.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     },
     {
       "claimId": "claim_90a0972f21543efcdb889d72b7c3f125",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination.json",
       "receiptCommit": "a7d561538a9ec6192ce5a513b3cc7f006f995fb7",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Migration Status note newly exposed once the subordination paragraph moved under the H1: it says the directory preserves the proposal frontier from docs/architect/agent-coordination/proposals/ and that a path copy promotes no design, with status governed by Proposal Status; the link target exists. Unit digest 5ad40f63 recomputed with the repository extractor equals the receipt, and it is a pure provenance note, so bookkeeping is right.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-classifications.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a"
     }
   ]
 }

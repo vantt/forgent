@@ -21,10 +21,15 @@
       "targetAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
       "targetUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
       "shownTargetDigest": "53ac9f9ff1a0476287e5746059f0dd1681d73d704b010f7ef12b61b325d1d9fe",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "mainCommit": "f33612119f1158716b6797859598033cda6eb89c",
-      "rationale": "Owner A13 supersede: main commit f33612119f1158716b6797859598033cda6eb89c renames the RUL11 heading from D-ADR0036 to D-ADR0054, explicitly retaining the superseded decision reference. This is instruction identity accounting only; no law or instruction text is edited."
+      "rationale": "Owner A13 supersede: main commit f33612119f1158716b6797859598033cda6eb89c renames the RUL11 heading from D-ADR0036 to D-ADR0054, explicitly retaining the superseded decision reference. This is instruction identity accounting only; no law or instruction text is edited.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-retired-unit.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a",
+      "reviewNote": "Supersede from AGENTS.md#rul11-...-d-adr0036-... to the heading renamed in f33612119. Old unit digest 4485eb54 and successor unit digest 52ff86d6 recomputed with the repository extractor at f33612119^ and f33612119; shown successor text hashes to the recorded shown digest. Every old clause survives in the successor, which adds only the owner-decided ADR0054 scope refinement; vocabulary supersede (target replaces the whole unit, possibly reworded) fits and no AGENTS.md text is touched."
     },
     {
       "sourcePath": "docs/io-contract.md",
@@ -44,10 +49,15 @@
       "targetAnchor": "5-reasoned-envelope-exceptions",
       "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
       "shownTargetDigest": "5ca1201a0e7c0df5e8a9b04c1cc2e1f9b07e92e48d295648597c3a6e63a554ba",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "mainCommit": "3ea75475d911ca02c9d8b5011dca4f748cc5820f",
-      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f folds the unchanged fgos-discovered paragraph into the source exception-list unit. Its entire text is preserved verbatim inside the current candidate reasoned-exceptions heading section, together with the fifth hook exception. The candidate retains the prior paragraph separator to preserve unrelated block identities. Supersede is pending; no approval is inherited."
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f folds the unchanged fgos-discovered paragraph into the source exception-list unit. Its entire text is preserved verbatim inside the current candidate reasoned-exceptions heading section, together with the fifth hook exception. The candidate retains the prior paragraph separator to preserve unrelated block identities. Supersede is pending; no approval is inherited.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-retired-unit.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a",
+      "reviewNote": "Retired unheaded-block-16 of docs/io-contract.md (the fgos-discovered paragraph, digest 549dded9 at 3ea75475d^). Main folded it into the exception-list unit; the paragraph text is present byte-equal in the shown candidate section 5, so supersede loses nothing and the separator difference is the declared intentional one. Shown target hashes to 5ca1201a."
     }
   ],
   "gaps": [
@@ -66,10 +76,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "5-reasoned-envelope-exceptions",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "mainCommit": "3ea75475d911ca02c9d8b5011dca4f748cc5820f",
-      "rationale": "Predecessor identity preserved in the registry after main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f edits the non-heading source unit. The full successor unit is independently pending; no gap identity is deleted."
+      "rationale": "Predecessor identity preserved in the registry after main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f edits the non-heading source unit. The full successor unit is independently pending; no gap identity is deleted.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-retired-unit.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a",
+      "reviewNote": "Identity-gap predecessor unheaded-block-14 (the 'Bốn luồng KHÔNG bọc phong bì... ' lead-in, digest e24cc261 at 3ea75475d^). The successor sentence is the same text with the count changed from four to five, which is exactly the main-side edit; the claim is carried in candidate section 5 and in the pending successor row 992a812b. Supersede is right because the whole unit is replaced by the reworded one. Target digest is the shown section 5 digest because the gap record has none of its own."
     },
     {
       "sourcePath": "docs/io-contract.md",
@@ -86,10 +101,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "5-reasoned-envelope-exceptions",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "mainCommit": "3ea75475d911ca02c9d8b5011dca4f748cc5820f",
-      "rationale": "Predecessor identity preserved in the registry after main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f edits the non-heading source unit. The full successor unit is independently pending; no gap identity is deleted."
+      "rationale": "Predecessor identity preserved in the registry after main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f edits the non-heading source unit. The full successor unit is independently pending; no gap identity is deleted.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-retired-unit.md",
+      "reviewReportCommit": "f309594fd9b6074c696c8aa458e300f995c1713a",
+      "reviewNote": "Identity-gap predecessor unheaded-block-15 (exceptions 1-4, digest 74809b03 at 3ea75475d^). I checked the ten source lines are byte-contained in candidate section 5, where item 5 is the main-side addition; the whole predecessor is carried by the pending successor row dd296404 and section 5, so supersede holds. Target digest is the shown section 5 digest because the gap record has none of its own."
     }
   ],
   "changedIo": [

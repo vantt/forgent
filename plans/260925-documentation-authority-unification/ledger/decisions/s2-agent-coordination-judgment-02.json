@@ -3908,10 +3908,19 @@
       "targetAnchor": "14-narrow-implementation-status",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#14-narrow-implementation-status. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records dated implementation/review snapshot. This dated proposal snapshot records its narrow implementation status, not a reading index or a new implementation verification.",
-      "reviewNote": "Section 14 Narrow Implementation Status is byte-equal and historical-context fits, but the rationale's closing sentence about an enclosing retained index and a source rule becoming navigation is boilerplate that does not describe this proposal snapshot; restate it specifically."
+      "reviewNote": "Round-2 defect fixed: the rationale no longer ends with the copied index/navigation sentence; it now says this dated proposal snapshot records the narrow implementation status and is neither a reading index nor a new verification. Heading and section payload are byte-equal to the source (digest ee16240e... on both sides, section 483 characters), historical-context fits a snapshot, and the anchor passes list-doc-anchors --check.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ee16240ef4b8ed7b6f3ca303dc2d04975f622a9ee582af5d9a596c604b9c0cde",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_2f2d45fe2b01f5a443997ec695abba97",
@@ -3920,10 +3929,20 @@
       "targetAnchor": "unheaded-block-126",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-126. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records review branch provenance. This lead-in identifies the reviewed candidate branch as dated proposal-review provenance.",
-      "reviewNote": "'Reviewed candidate branch:' is a byte-equal lead-in and historical-context fits as review provenance, yet the rationale ends with a copied sentence about an enclosing index and navigation rules that does not match a proposal-document branch note; rewrite the rationale."
+      "reviewNote": "Round-2 defect fixed: the copied closing sentence is gone and the rationale now calls the lead-in review-branch provenance. The shown unit 'Reviewed candidate branch:' is byte-equal (source block 127 to target block 126, the one-block offset of this document), the anchor passes list-doc-anchors --check and the kind historical-context fits.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d0f60b18c91c5993b590bdbc65cb9e8a10f415878d394ebb6150a5d7861a672f",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "14. Narrow Implementation Status"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_0a635df1d38c3d0223aa2bc43724b20c",
@@ -3932,10 +3951,20 @@
       "targetAnchor": "unheaded-block-127",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-128 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind historical-context records literal reviewed branch identifier. The literal fgw/tsk-5x7 fence preserves the reviewed branch identifier as proposal-review provenance.",
-      "reviewNote": "The fence holding branch name fgw/tsk-5x7 is identical in the target and historical-context is a sound kind, but the rationale's trailing 'enclosing retained index ... source rule ... navigation' sentence is a template that fits neither this literal identifier nor its document."
+      "reviewNote": "Round-2 defect fixed: the template sentence is replaced by a statement specific to the literal fence, the reviewed branch identifier fgw/tsk-5x7 kept as proposal-review provenance. The txt fence is byte-equal (source block 128 to target block 127) and the anchor passes list-doc-anchors --check.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "93a595d6830406dc8eb35124beefaf90bbc387ae3dc0034d8b7abaeaf52d922a",
+      "targetAncestry": [
+        "Dispatch Control Plane Redesign",
+        "14. Narrow Implementation Status"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_770adf625e9fcc1ddb72f8b86bb7e554",
@@ -4312,14 +4341,19 @@
       "targetAnchor": "unheaded-block-2",
       "claimKind": "normative-law",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve the complete legacy proposal-subordination paragraph at the candidate README under H1, unheaded-block-2. Both clauses remain verbatim: every proposal is subordinate to the Foundation Vision, and narrowing a proposal requires reconciliation with the Intent Preservation Ledger. This normative-law binding is the actual paragraph, not the later Migration Status sentence.",
-      "reviewNote": "The subordination paragraph (All proposals are subordinate to the Foundation Vision; reconcile with the Intent Preservation Ledger before narrowing a proposal) is bound to target unheaded-block-3, but after the author restored the paragraph under the H1 the extractor numbers it unheaded-block-2 (lines 29-33 at the review tree); unheaded-block-3 is now the Migration Status sentence 'This target directory preserves the proposal frontier', so the shown target is not the source. Retarget this row to unheaded-block-2 and rewrite the rationale, which still says the source clauses remain whole in the relocated unit and still carries the copied index sentence.",
+      "reviewNote": "Round-2 defect fixed on both counts: the row now targets proposals/README.md#unheaded-block-2 (target lines 29-33), whose 310-character text is byte-equal to the legacy subordination paragraph (Foundation Vision subordination, Intent Preservation Ledger reconciliation) with digest 5aeda891... on both sides, and unheaded-block-3 is the separate Migration Status sentence (digest 5ad40f63...). The rationale now names the actual paragraph and both clauses without the copied sentence; ancestry 'Agent Coordination Proposals' (the H1) is recorded and normative-law fits.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5aeda891560748b8081de815e442b3ea1f0e21781b2f08643fba7a76799241d8",
       "targetAncestry": [
         "Agent Coordination Proposals"
-      ]
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_ec01e2c22c11db825905d42b17f8493c",
@@ -6932,10 +6966,22 @@
       "targetAnchor": "answers-to-all-open-decisions",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#answers-to-all-open-decisions. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records recommended decisions and reasons. The proposal decision table preserves the recommended answers and reasons for all open decisions; it does not confer acceptance on those recommendations.",
-      "reviewNote": "Step 08 'Answers to all open decisions' table is byte-equal and kind decision is right, but the rationale's final sentence about an enclosing retained index and a source rule not becoming navigation is boilerplate unrelated to this proposal's decision table; rewrite it."
+      "reviewNote": "Round-2 defect fixed: the rationale now states what the unit is, the 13-row table of recommended answers with reasons (consult first, defer-preserve Mission, shared graph IR and so on), and says it confers no acceptance, instead of the copied index sentence. Heading and section (2,488 characters) are byte-equal to the source and the anchor passes list-doc-anchors --check; decision is the right kind.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f23d4e46ae28aa9c8c4281792589760f8101bc48cd6f2bcd7073cb8f2a43d0a3",
+      "targetAncestry": [
+        "Step 08 - Standalone Coordination And Optional Protocols",
+        "22. Discussion Checkpoints",
+        "Discussion Checkpoint: Step 08 Recommended Decisions And Plan (2026-09-01)",
+        "Claims"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_15deeeb58feab7672ed8be7a2883c53f",
@@ -7276,10 +7322,21 @@
       "targetAnchor": "affected-open-decisions-1",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#affected-open-decisions-1. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records human decisions recorded on 2026-09-01. This dated table preserves the ten human decisions recorded on 2026-09-01 within the standalone-coordination proposal.",
-      "reviewNote": "Affected Open Decisions (ten human decisions dated 2026-09-01) is byte-equal and decision is the right kind, yet the rationale ends with a copied index/navigation sentence that does not describe this step-08 proposal section; it needs a specific closing statement."
+      "reviewNote": "Round-2 defect fixed: the rationale now describes this section, the ten human decisions recorded on 2026-09-01, and I counted ten numbered decisions in the 1,669-character section, which is byte-equal to the source (digest 89b85c7e... both sides). The copied index/navigation sentence is gone; decision fits and the anchor passes list-doc-anchors --check.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "89b85c7ed9f067dd47f3435211784a449029ead209d1774a874fe9c59fd57151",
+      "targetAncestry": [
+        "Step 08 - Standalone Coordination And Optional Protocols",
+        "22. Discussion Checkpoints",
+        "Discussion Checkpoint: Step 08 Recommended Decisions And Plan (2026-09-01)"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_ef043cf401f2ff93f24f15736b5f08c4",
@@ -7288,10 +7345,22 @@
       "targetAnchor": "unheaded-block-238",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-239 at docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-238. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. Kind decision records lead-in to the recorded human decisions. The lead-in introduces the proposal’s human decisions recorded on 2026-09-01 and is preserved with that decision table.",
-      "reviewNote": "'Human decisions recorded on 2026-09-01:' lead-in is byte-equal with a correct decision kind, but the rationale's trailing sentence about a retained index and a source rule not turning into navigation is template text that misdescribes this one-line proposal lead-in."
+      "reviewNote": "Round-2 defect fixed: the rationale now identifies the one-line lead-in 'Human decisions recorded on 2026-09-01:' as introducing the proposal's recorded human decisions, with no copied sentence. The unit is byte-equal (source block 239 to target block 238), the anchor passes list-doc-anchors --check and decision fits the lead-in of a decision list.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a443737003a00fc48582165071860a99b04e5cb7b4deadb896365914bdbf1f0b",
+      "targetAncestry": [
+        "Step 08 - Standalone Coordination And Optional Protocols",
+        "22. Discussion Checkpoints",
+        "Discussion Checkpoint: Step 08 Recommended Decisions And Plan (2026-09-01)",
+        "Affected Open Decisions"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_66353e264359143847ecd9339f733f51",
@@ -8372,10 +8441,21 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "normative-law",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-08",
       "rationale": "Preserve docs/architect/agent-coordination/README.md#unheaded-block-20 at docs/platform/agent-coordination/README.md#unheaded-block-32. The complete native source unit is byte-equal at this exact target anchor; the locator below, not the previous block number, is the binding. The fenced frontier scope names the group-thinking substrate and the ADR-010 section 5 mutating-proof gate; it constrains scope and gating, rather than merely routing readers.",
-      "reviewNote": "The txt fence listing Step 09, Step 10 and Component Authority Boundary Map scope (group-thinking substrate, ADR-010 section 5 mutating proof gate) is byte-equal, but it states substantive frontier scope and a gating constraint, not routing. Navigation misstates it; use the section's kind (normative-law) or intent."
+      "reviewNote": "Round-2 defect fixed: the kind is now normative-law (as the previous review proposed) and the rationale says the fence constrains scope and gating (Step 09 and Step 10 scope, mutating live proof gated on ADR-010 section 5, Component Authority Boundary Map) rather than merely routing. The 561-character txt fence is byte-equal to the legacy block (source README lines 139-154, target lines 269-284) and the anchor passes list-doc-anchors --check.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "35a993f5e2f972a578387280bf1fa8d7831877f9704d80a24ae64a0d74939e5a",
+      "targetAncestry": [
+        "Agent Coordination",
+        "Agent Coordination Documentation",
+        "Active Design Frontier"
+      ],
+      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
     },
     {
       "claimId": "claim_77c22cc44269a12d78fdd3cb5468144e",
@@ -10757,5 +10837,5 @@
       "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-02.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-s2-agent-coordination-judgment-02.md"
 }
