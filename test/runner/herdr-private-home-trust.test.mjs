@@ -10,7 +10,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
+import {
+  seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
+  codexHookTrustHash, seedCodexHookTrust, removeCodexHookTrust,
+} from '../../src/runner/dispatch/trust-store.mjs';
 import { trustRoots, trustStorePaths } from '../../src/runner/dispatch/herdr-round.mjs';
 
 const dirs = [];
@@ -116,4 +119,65 @@ test('a linked worktree may derive its trust from the main checkout that owns it
   assert.deepEqual(trustRoots(main, main), [main], 'a checkout that is its own root yields one candidate');
   const notGit = tmp('fgos-trust-nogit-');
   assert.deepEqual(trustRoots(notGit, store), [store], 'a directory outside any checkout has only the declared root');
+});
+
+// Hashes codex itself stored for the two hooks fgOS installs (copied from a real account config).
+const DISPATCH_DECIDE = '.fgos/installation/bin/fgos hook dispatch-decide';
+const DECISION_QUESTION = '.fgos/installation/bin/fgos hook decision-question';
+const HOOKS_JSON = JSON.stringify({
+  hooks: {
+    PreToolUse: [
+      { matcher: '.*', hooks: [{ type: 'command', command: DISPATCH_DECIDE }] },
+      { matcher: 'RequestUserInput|ask.*', hooks: [{ type: 'command', command: DECISION_QUESTION }] },
+    ],
+  },
+});
+
+test('codex hooks: the trust hash is the one codex stores for the same hook', () => {
+  assert.equal(
+    codexHookTrustHash('pre_tool_use', '.*', { command: DISPATCH_DECIDE }),
+    'sha256:1fc36c0dc7df159e3dec9de401733c5ad2a9c5d3099fc484f68369c36941389c',
+  );
+  assert.equal(
+    codexHookTrustHash('pre_tool_use', 'RequestUserInput|ask.*', { command: DECISION_QUESTION }),
+    'sha256:c63f37e29ab42cb29938cb131108f93cc2666ba31b6919872627261f9dd5de78',
+  );
+});
+
+test('codex hooks: seeding writes one entry per hook into the private config and removal takes back only those', () => {
+  const project = tmp('fgos-codex-hooks-project-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const real = path.join(tmp('fgos-codex-real-'), 'config.toml');
+  fs.writeFileSync(real, `[projects."${project}"]\ntrust_level = "trusted"\n`);
+  const privateConfig = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(privateConfig, '[projects."/keep/me"]\ntrust_level = "trusted"\n');
+
+  const { keys, skipped } = seedCodexHookTrust(privateConfig, { projectPath: project, repoRoot: project, rootConfigPath: real });
+
+  assert.equal(skipped, 0);
+  assert.deepEqual(keys, [
+    `${project}/.codex/hooks.json:pre_tool_use:0:0`,
+    `${project}/.codex/hooks.json:pre_tool_use:1:0`,
+  ]);
+  const body = fs.readFileSync(privateConfig, 'utf8');
+  assert.ok(body.includes('trusted_hash = "sha256:1fc36c0dc7df159e3dec9de401733c5ad2a9c5d3099fc484f68369c36941389c"'));
+  assert.deepEqual(seedCodexHookTrust(privateConfig, { projectPath: project, repoRoot: project, rootConfigPath: real }).keys, [], 'seeding twice writes nothing');
+
+  assert.equal(removeCodexHookTrust(privateConfig, keys), 2);
+  assert.equal(fs.readFileSync(privateConfig, 'utf8'), '[projects."/keep/me"]\ntrust_level = "trusted"\n');
+});
+
+test('codex hooks: no hooks file seeds nothing, and an untrusted root derives nothing', () => {
+  const project = tmp('fgos-codex-hooks-none-');
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  assert.deepEqual(seedCodexHookTrust(config, { projectPath: project, repoRoot: project, rootConfigPath: config }), { keys: [], skipped: 0 });
+
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  fs.writeFileSync(config, 'model = "x"\n');
+  assert.throws(
+    () => seedCodexHookTrust(config, { projectPath: project, repoRoot: project, rootConfigPath: config }),
+    (err) => err instanceof TrustStoreError && err.code === 'untrusted-root',
+  );
 });
