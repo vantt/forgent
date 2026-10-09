@@ -338,3 +338,19 @@ test('real builder selection and staged production dependency payload agree with
   counts(checked, 0, 0, 0);
   assert.match(checked.message, new RegExp(`artifactDigest=${result.artifactDigest}`));
 });
+
+test('per-machine agent hook file under a declared payload directory is not counted as drift', (t) => {
+  const f = fixture(t);
+  put(f.source, 'package.json', { name: 'drift-fixture', files: ['bin', 'src', '.agents'] });
+  put(f.source, '.agents/keep.md', 'kept');
+  f.manifest.files = listLegacyNodeSourceFiles(f.source).map((relative) => {
+    const staged = put(f.release, `libexec/legacy-node/${relative}`, fs.readFileSync(path.join(f.source, relative)));
+    return { path: `libexec/legacy-node/${relative}`, kind: 'file', digest: hashFile(staged) };
+  });
+  f.writeManifest();
+  counts(run(f.source), 0, 0, 0);
+  put(f.source, '.agents/hooks.json', '{"hooks":{}}');
+  const result = run(f.source);
+  assert.equal(result.passed, true, result.message);
+  counts(result, 0, 0, 0);
+});

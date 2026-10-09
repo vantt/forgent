@@ -36,6 +36,7 @@ test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
   const cwd = mkTemp('uninstall-cli-noyes-');
   const home = mkTemp('uninstall-cli-noyes-home-');
   initGitRepo(cwd);
+  fs.mkdirSync(path.join(cwd, '.githooks'));
   assert.equal(run(cwd, ['init']).status, 0);
   const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home, USERPROFILE: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);

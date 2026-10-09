@@ -89,6 +89,16 @@ export function currentDispatchDepth() {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
+/**
+ * The environment an executor-launched agent starts from: the caller's own, minus the Rust host's
+ * recursion guard. The agent's hooks call the project shim, and a nested host refuses (exit 1)
+ * whenever that guard is inherited, which would silently disable every hook for dispatched agents.
+ */
+export function workerBaseEnv(baseEnv = process.env) {
+  const { FGOS_RUST_HOST_RECURSION_GUARD: _guard, ...rest } = baseEnv;
+  return rest;
+}
+
 export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
   if (!rawEnv || typeof rawEnv !== 'object') return {};
   const resolved = {};

@@ -156,55 +156,41 @@ test('gate present but no ask recorded -> no ask key', () => {
   assert.ok(!('ask' in ctx));
 });
 
-// tsk-19zm D2/D4: the checkpoint distillate (askRationale/askAlternatives/
-// askSource) and the answer's authoritative word (rationale/alternatives/
-// source) are two independent, independently-guarded field trios.
+// The ask's source (askSource) and the answer's authoritative word
+// (rationale/alternatives/source) are independently guarded fields; the
+// question's own options live in its text.
 
-test('no gate fields set -> none of the 6 checkpoint/answer keys appear', () => {
+test('no gate fields set -> none of the 4 source/answer keys appear', () => {
   const view = baseView();
   const ctx = computeAwaitingContext(view, 'item-x');
-  for (const key of ['askRationale', 'askAlternatives', 'askSource', 'rationale', 'alternatives', 'source']) {
+  for (const key of ['askSource', 'rationale', 'alternatives', 'source']) {
     assert.ok(!(key in ctx), `expected no "${key}" key`);
   }
 });
 
-test('askRationale/askAlternatives/askSource set (asked, not yet answered) -> projected, answer-side keys absent', () => {
-  const view = baseView({
-    gates: {
-      'item-x': {
-        askRationale: 'leaning OAuth: fewer support tickets historically',
-        askAlternatives: 'password rejected: extra reset-flow maintenance',
-        askSource: 'session',
-      },
-    },
-  });
+test('askSource set (asked, not yet answered) -> projected, answer-side keys absent', () => {
+  const view = baseView({ gates: { 'item-x': { askSource: 'session' } } });
   const ctx = computeAwaitingContext(view, 'item-x');
-  assert.equal(ctx.askRationale, 'leaning OAuth: fewer support tickets historically');
-  assert.equal(ctx.askAlternatives, 'password rejected: extra reset-flow maintenance');
   assert.equal(ctx.askSource, 'session');
   assert.ok(!('rationale' in ctx));
   assert.ok(!('alternatives' in ctx));
   assert.ok(!('source' in ctx));
 });
 
-test('rationale/alternatives/source set alongside askRationale/askAlternatives/askSource -> both trios projected independently', () => {
+test('rationale/alternatives/source set alongside askSource -> projected independently', () => {
   const view = baseView({
     gates: {
       'item-x': {
-        askRationale: 'leaning OAuth: fewer support tickets historically',
-        askAlternatives: 'password rejected: extra reset-flow maintenance',
         askSource: 'session',
         rationale: 'confirmed OAuth per compliance requirement',
-        alternatives: 'password: rejected, same reasons as checkpoint',
+        alternatives: 'password: rejected, extra reset-flow maintenance',
         source: 'human',
       },
     },
   });
   const ctx = computeAwaitingContext(view, 'item-x');
-  assert.equal(ctx.askRationale, 'leaning OAuth: fewer support tickets historically');
   assert.equal(ctx.rationale, 'confirmed OAuth per compliance requirement');
-  assert.equal(ctx.askAlternatives, 'password rejected: extra reset-flow maintenance');
-  assert.equal(ctx.alternatives, 'password: rejected, same reasons as checkpoint');
+  assert.equal(ctx.alternatives, 'password: rejected, extra reset-flow maintenance');
   assert.equal(ctx.askSource, 'session');
   assert.equal(ctx.source, 'human');
 });

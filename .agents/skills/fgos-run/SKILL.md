@@ -54,7 +54,7 @@ When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("ru
 
 When a workflow step declares a human gate (`gate: { kind: "human" }`) or when an owner review is required:
 1. The Workflow runner parks at the gate with outcome `parked` and records the pending question(s).
-2. `fgos-run` gathers **all open questions across all parked steps** into a single structured batch.
+2. `fgos-run` gathers **all open questions across all parked steps** into a single structured batch; each question follows the decision-question template (`../_shared/decision-question.md`).
 3. The user answers all questions in one interaction.
 4. Answers are recorded via:
    ```sh

@@ -1,18 +1,31 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { transitionWork, FsmError, STATUSES, TRANSITIONS } from '../../src/state/status-fsm.mjs';
+import { describeDecisionQuestion } from '../../src/state/decision-question.mjs';
 
 function work(status, overrides = {}) {
   return { id: 'w1', status, ...overrides };
 }
 
-const VALID_ASK = `## Context
+const VALID_ASK = `## Chuyện gì đang xảy ra
 
 We are configuring authentication for the user service and have two viable mechanisms.
 
-## Why this matters
+## Nguyên nhân
 
-Selecting the proper auth mechanism impacts security and integration across all API endpoints.`;
+Selecting the proper auth mechanism impacts security and integration across all API endpoints.
+
+## Các lựa chọn
+
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
 
 test('STATUSES exposes the full flat status domain', () => {
   assert.deepEqual(STATUSES, [
@@ -285,58 +298,42 @@ test('transitionWork rejects entry into awaiting-human without a non-empty ask a
   }
 });
 
-test('transitionWork rejects entry into awaiting-human with incomplete ask structure as validation', () => {
+test('transitionWork checks the ask against the decision-question template as validation', () => {
+  const three =
+    '## Chuyện gì đang xảy ra\n\nThe item needs an auth provider before it can move on.\n\n' +
+    '## Nguyên nhân\n\nDiscovery could not tell which provider the item intends.\n\n' +
+    '## Phạm vi của câu trả lời\n\nThe answer only clarifies intent; it widens nothing.';
+  const isValidation = (...names) => (err) =>
+    err instanceof FsmError && err.category === 'validation' && names.every((name) => err.message.includes(name));
   for (const from of ['todo', 'doing']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'awaiting-human', ask: 'just a bare question without headings' }),
-      (err) =>
-        err instanceof FsmError &&
-        err.category === 'validation' &&
-        err.message.includes('## Context') &&
-        err.message.includes('## Why this matters'),
+      isValidation('Chuyện gì đang xảy ra', 'Nguyên nhân', 'Các lựa chọn', 'Khuyến nghị', 'Phạm vi của câu trả lời'),
     );
-
+    const noScope = VALID_ASK.slice(0, VALID_ASK.indexOf('## Phạm vi'));
     assert.throws(
-      () =>
-        transitionWork({
-          work: work(from),
-          to: 'awaiting-human',
-          ask: '## Context\n\nThis is a sufficiently long context section with more than 20 chars.',
-        }),
-      (err) =>
-        err instanceof FsmError &&
-        err.category === 'validation' &&
-        !err.message.includes('## Context') &&
-        err.message.includes('## Why this matters'),
+      () => transitionWork({ work: work(from, { workflowStep: 'planning' }), to: 'awaiting-human', ask: noScope }),
+      (err) => isValidation('Phạm vi của câu trả lời')(err) && !err.message.includes('Nguyên nhân,'),
     );
-
+    // Discovery-shaped stages need only the three shared parts; others need all five.
+    assert.equal(transitionWork({ work: work(from, { workflowStep: 'exploring' }), to: 'awaiting-human', ask: three }).payload.ask, three);
     assert.throws(
-      () =>
-        transitionWork({
-          work: work(from),
-          to: 'awaiting-human',
-          ask: '## Why this matters\n\nThis is a sufficiently long why this matters section with >20 chars.',
-        }),
-      (err) =>
-        err instanceof FsmError &&
-        err.category === 'validation' &&
-        err.message.includes('## Context') &&
-        !err.message.includes('## Why this matters'),
+      () => transitionWork({ work: work(from, { workflowStep: 'planning' }), to: 'awaiting-human', ask: three }),
+      isValidation('Các lựa chọn', 'Khuyến nghị'),
     );
-
-    assert.throws(
-      () =>
-        transitionWork({
-          work: work(from),
-          to: 'awaiting-human',
-          ask: '## Context\n\nToo short\n\n## Why this matters\n\nThis is a sufficiently long why this matters section with >20 chars.',
-        }),
-      (err) =>
-        err instanceof FsmError &&
-        err.category === 'validation' &&
-        err.message.includes('## Context'),
-    );
+    // Vietnamese headings match in decomposed (NFD) form too, and English names are accepted.
+    assert.ok(transitionWork({ work: work(from), to: 'awaiting-human', ask: VALID_ASK.normalize('NFD') }).payload.ask);
+    const english = VALID_ASK.replace('## Chuyện gì đang xảy ra', '## What is happening').replace('## Khuyến nghị', '## Recommendation');
+    assert.ok(transitionWork({ work: work(from), to: 'awaiting-human', ask: english }).payload.ask);
+    // A sentence that starts with a label word is not a new part.
+    const naturalRecommendation = VALID_ASK.replace(/## Khuyến nghị\n\n.*/, '## Khuyến nghị\n\nLựa chọn (b), vì rẻ nhất và không đụng tầng dispatch.');
+    assert.ok(transitionWork({ work: work(from), to: 'awaiting-human', ask: naturalRecommendation }).payload.ask);
   }
+  // Echoing the template's own hints is not an answer to it.
+  assert.throws(
+    () => transitionWork({ work: work('todo'), to: 'awaiting-human', ask: describeDecisionQuestion() }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
 });
 
 test('transitionWork allows awaiting-human -> todo (resume) and carries the answer in the payload', () => {

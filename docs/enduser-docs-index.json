@@ -3578,6 +3578,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+    "title": "Compare discussion setups with metrics eval",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/configure-and-operate-agent-confinement.md",
     "title": "How to Configure and Operate Agent Confinement",
     "sourceCaptureId": null
@@ -5074,6 +5082,14 @@
     "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/coding-worker-contract-shape.md",
     "title": "`coding-worker-contract.md` — shape and what proved it",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/discussion-quality-rubric.md",
+    "title": "Discussion quality rubric",
     "sourceCaptureId": null
   },
   {

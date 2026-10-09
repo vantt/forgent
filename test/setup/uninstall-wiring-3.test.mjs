@@ -37,6 +37,7 @@ test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source
   const home = mkTemp('uninstall-cli-yes-home-');
   fs.writeFileSync(path.join(home, '.bashrc'), '# pre-existing rc content\n');
   initGitRepo(cwd);
+  fs.mkdirSync(path.join(cwd, '.githooks'));
   assert.equal(run(cwd, ['init']).status, 0);
   const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home, USERPROFILE: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);

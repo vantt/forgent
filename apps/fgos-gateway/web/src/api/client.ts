@@ -106,8 +106,12 @@ export function createApiClient(config: ApiClientConfig) {
       request<WorkItem>(config, `/work/${encodeURIComponent(id)}/ask`, jsonBody({ text })),
 
     // POST /work/{id}/answer (fgos-gateway-api-v1.yaml:246-264)
-    answerWork: (id: string, text: string) =>
-      request<WorkItem>(config, `/work/${encodeURIComponent(id)}/answer`, jsonBody({ text })),
+    answerWork: (id: string, text: string, approve?: boolean) =>
+      request<WorkItem>(
+        config,
+        `/work/${encodeURIComponent(id)}/answer`,
+        jsonBody({ text, ...(approve !== undefined ? { approve } : {}) }),
+      ),
 
     // POST /work/{id}/take (fgos-gateway-api-v1.yaml:266-289)
     takeWork: (id: string, role: 'human' | 'session' = 'session') =>

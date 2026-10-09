@@ -24,6 +24,11 @@ steps:
           capability: architecture:shape
           pattern: panel
           blind: true
+          params:
+            roleTasks:
+              panelist-1: 'SYSTEM LENS: Propose a coherent primary architecture grounded in the framed repository evidence, ownership, and boundaries. {objective}'
+              panelist-2: 'ALTERNATIVE LENS: Develop a genuinely different architecture, including a smaller or no-build option when credible; never provide a designated loser. {objective}'
+              panelist-3: 'CONSTRAINT LENS: Test security, production operations, migration, cost, and reversibility; propose a constraint-led design rather than merely endorsing another seat. {objective}'
           objective: Diverge into system, alternative, and constraint-focused proposals across 3 panelists
   - id: critique
     title: Critique & Stress-Test
@@ -33,7 +38,8 @@ steps:
         template:
           capability: architecture:critique
           pattern: reviewed
-          objective: Critique proposals, identify risks, and stress-test constraints with red-team
+          acceptOutcomes: [pass, findings]
+          objective: Critique proposals, identify risks, and stress-test constraints; preserve attributed findings and dissent without claiming approval.
   - id: synthesis
     title: Converge & Synthesize
     dependsOn: [critique]
@@ -41,8 +47,21 @@ steps:
       - id: synthesize-recommendation
         template:
           capability: architecture:synthesize
-          pattern: solo
-          objective: Converge findings into a coherent, balanced architectural recommendation
+          pattern: reviewed
+          rigor: high
+          acceptOutcomes: [pass, findings]
+          params:
+            minCheckers: [reviewer, red-team]
+            roleTasks:
+              reviewer: 'Read the producer final RAW JSON packet listed in Context refs for this round. Review that packet, not git changes or earlier proposals. Check required missing expertise array, evidence, verdict, dispositions, and preserved dissent. Do not rewrite the packet or change files; report concrete findings or explicitly none. {objective}'
+              red-team: 'Read the producer final RAW JSON packet listed in Context refs for this round. Attack that packet, not git changes or earlier proposals: framing, authority, unsupported claims, residual risks, missing expertise, and dissent laundering. Do not rewrite it or change files; report concrete failures with evidence or explicitly none. {objective}'
+          objective: >-
+            Produce the final recommendation packet as a RAW JSON object, without Markdown fences.
+            Require "missing expertise" as an array of nonempty expertise names, or [] when none.
+            Include the verdict, evidence, alternatives, attributed findings, dispositions, unresolved
+            dissent, named defaults, residual risks, and reversal triggers; never invent consensus or approval.
+            Reviewers and red-team must challenge THIS final packet, not merely the earlier proposals:
+            check evidence, framing, authority, dissent preservation, and the required missing-expertise array.
   - id: explanation
     title: Explain for Ownership
     dependsOn: [synthesis]
@@ -52,4 +71,14 @@ steps:
           capability: architecture:explain
           pattern: solo
           persona: advisor
-          objective: Produce ownership-focused explanation and actionable adoption guidance
+          objective: >-
+            Explain the settled final packet for ownership with evidence and one reversible next action.
+            Preserve its verdict, "missing expertise" array, attributed findings and unresolved dissent;
+            do not replace the recommendation, invent approval, or silently clear review findings.
+  - id: close
+    title: Owner Expertise Decision
+    dependsOn: [explanation]
+    gate:
+      kind: human
+      mode: input
+      question: 'The final packet names missing expertise: {{report:synthesis/synthesize-recommendation:missing expertise}}. Bring in that expertise or not? Answer once for the whole list; [] means none is requested. Completion is not approval of the advice or permission to implement.'

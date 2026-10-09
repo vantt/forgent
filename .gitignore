@@ -74,6 +74,8 @@ output.txt
 !/.agents/skills/distill/
 !/.agents/skills/_shared/
 /.codex/
+/.omp/
+/.pi/
 /upstreams/
 
 # scripts/export-command-selectors.mjs's own crash-safe write-then-rename

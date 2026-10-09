@@ -111,7 +111,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, durableStatusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, durableStatusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askSource, approved } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -305,20 +305,19 @@ function applyEvent(view, event) {
           // parentSnapshotAtAsk/statusAtAsk above — only stamped when
           // present, overwritten by a fresh ask/answer the same way. Only
           // `answer` ever carries these now (tsk-19zm D2 moved `ask`'s own
-          // values to askRationale/askAlternatives/askSource below), so
-          // this trio stays the human's answer, still authoritative.
+          // value to askSource below), so this trio stays the human's
+          // answer, still authoritative.
           ...(rationale !== undefined ? { rationale } : {}),
           ...(alternatives !== undefined ? { alternatives } : {}),
           ...(source !== undefined ? { source } : {}),
-          // askRationale/askAlternatives/askSource (tsk-19zm D2): the
-          // agent's checkpoint distillate as of the latest `ask` — kept
-          // separate from rationale/alternatives/source above so a later
-          // `answer` never overwrites it; a fresh `ask` overwrites only
-          // this trio, never the answer-side one.
-          ...(askRationale !== undefined ? { askRationale } : {}),
-          ...(askAlternatives !== undefined ? { askAlternatives } : {}),
+          // askSource (tsk-19zm D2): where the latest `ask` came from, kept
+          // apart from the answer's `source` above.
           ...(askSource !== undefined ? { askSource } : {}),
         };
+        // approved: true only on an explicit `fgos answer --approve`. A fresh
+        // ask or any other answer clears it, so consent never carries over.
+        if (answer && approved === true) view.gates[id].approved = true;
+        else if (ask || answer) delete view.gates[id].approved;
       }
       // Settlement channel (kênh 1 của capture 2 kênh, per Phase 3
       // S3-closeout, vision §8) — two of the three settling kinds ride on

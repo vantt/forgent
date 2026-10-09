@@ -25,7 +25,7 @@ function eventsFilePath(repoRoot, workflowRunId) {
  * @param {object} [params.configSnapshot]
  * @returns {{ workflowRunId: string, runDir: string }}
  */
-export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request, stanceOptions = [] }) {
+export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request, stanceOptions = [], contextRefs = [] }) {
   if (!repoRoot) throw new RunnerConfigError('createWorkflowRun requires repoRoot');
   if (!workflowId) throw new RunnerConfigError('createWorkflowRun requires workflowId');
 
@@ -44,6 +44,7 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
       configSnapshot: configSnapshot || null,
       request: typeof request === 'string' && request.trim() ? request : null,
       stanceOptions: [...stanceOptions],
+      contextRefs: [...contextRefs],
     },
   };
 
@@ -135,6 +136,7 @@ export function projectWorkflowState(events) {
   let workflow = null;
   let request = null;
   let stanceOptions = [];
+  let contextRefs = [];
   let status = 'running';
   let outcome = null;
   let worktrees = null;
@@ -151,6 +153,7 @@ export function projectWorkflowState(events) {
         workflow = p.workflow;
         request = p.request ?? null;
         stanceOptions = p.stanceOptions ?? [];
+        contextRefs = p.contextRefs ?? [];
         if (workflow?.steps) {
           for (const s of workflow.steps) {
             steps[s.id] = {
@@ -194,22 +197,37 @@ export function projectWorkflowState(events) {
       case 'gate.park':
         if (steps[p.stepId]) {
           steps[p.stepId].status = 'parked';
-          questions.push({
-            stepId: p.stepId,
-            question: p.question,
-            header: p.header,
-          });
+          if (!questions.some((q) => q.stepId === p.stepId)) {
+            questions.push({
+              stepId: p.stepId,
+              question: p.question,
+              header: p.header,
+            });
+          }
         }
         status = 'parked';
         break;
 
       case 'gate.answer':
         if (steps[p.stepId]) {
+          const stepGate = steps[p.stepId].gate;
+          const isConsentGate = !stepGate?.mode || stepGate.mode === 'consent';
+          const isApproved = p.approved === true;
+
           steps[p.stepId].answer = p.answer;
-          steps[p.stepId].status = 'answered';
-          // Remove from active questions
-          const qIdx = questions.findIndex((q) => q.stepId === p.stepId);
-          if (qIdx !== -1) questions.splice(qIdx, 1);
+          if (isConsentGate && !isApproved) {
+            // Clarification only: consent gate stays parked, question remains active
+            steps[p.stepId].status = 'parked';
+            steps[p.stepId].lastClarification = p.answer;
+            status = 'parked';
+          } else {
+            // Either input gate or explicitly approved consent gate
+            steps[p.stepId].status = 'answered';
+            steps[p.stepId].approved = isApproved;
+            // Remove from active questions
+            const qIdx = questions.findIndex((q) => q.stepId === p.stepId);
+            if (qIdx !== -1) questions.splice(qIdx, 1);
+          }
         }
         if (questions.length === 0 && status === 'parked') {
           status = 'running';
@@ -256,6 +274,7 @@ export function projectWorkflowState(events) {
     workflow,
     request,
     stanceOptions,
+    contextRefs,
     status,
     outcome,
     worktrees,

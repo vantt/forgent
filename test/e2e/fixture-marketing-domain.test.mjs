@@ -215,7 +215,7 @@ test('e2e: moving a fixture-marketing item into "blocked" stamps statusCategory 
   // (domain-registry.mjs's own fixture-marketing comment: "doing/
   // awaiting-human keep coding's own in-progress grouping"). Entered via
   // the dedicated `ask` verb (the generic `move` verb has no --ask flag).
-  const ASK = '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome.';
+  const ASK = '## Chuyện gì đang xảy ra\n\nBackground needed to understand this question without opening another file.\n\n## Nguyên nhân\n\nThis directly affects the outcome.\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
   assert.equal(fgos(repoRoot, ['ask', 'fx-cat', '--text', ASK]).status, 0);
   assert.equal(fgos(repoRoot, ['ask', 'coding-cat', '--text', ASK]).status, 0);
   view = stateView(repoRoot);

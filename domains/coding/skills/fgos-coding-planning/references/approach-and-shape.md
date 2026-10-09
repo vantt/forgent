@@ -39,6 +39,11 @@ must not regress, concurrent access, partial failure — at a depth
 matching the mode; a `tiny` item does not need the same sketch a
 `high-risk` one does.
 
+Every `plan.md` states its approved frame near the top, in one line each:
+`paths:` (files/contracts it may change) and `budget:` (lines added to src and
+test — deletions are never capped — and days). Leaving the frame is a decision question
+(`../../_shared/decision-question.md`), never a silent overrun.
+
 End `plan.md` with a section using this exact heading (nothing appended
 on that line), body `None` when nothing is outstanding, or a real list
 otherwise:

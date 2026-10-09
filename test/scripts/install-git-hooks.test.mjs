@@ -28,6 +28,7 @@ function mkTempDir(prefix) {
 test('installGitHooks sets core.hooksPath to this repo root\'s absolute .githooks path inside a real git checkout', () => {
   const repoRoot = mkTempDir('install-git-hooks-fn-');
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, '.githooks'));
 
   installGitHooks(repoRoot);
 
@@ -45,9 +46,20 @@ test('installGitHooks no-ops silently when no .git entry exists', () => {
   fs.rmSync(noGitDir, { recursive: true, force: true });
 });
 
+test('installGitHooks leaves core.hooksPath unset in a project that ships no .githooks/ directory', () => {
+  const repoRoot = mkTempDir('install-git-hooks-no-hooks-dir-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+
+  assert.deepEqual(installGitHooks(repoRoot), { wired: false, skippedExisting: null });
+  assert.throws(() => execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: repoRoot }), 'core.hooksPath must stay unset');
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 test('installGitHooks is idempotent -- running it twice does not throw and leaves the same config', () => {
   const repoRoot = mkTempDir('install-git-hooks-idempotent-');
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, '.githooks'));
 
   installGitHooks(repoRoot);
   installGitHooks(repoRoot);
@@ -61,6 +73,7 @@ test('installGitHooks is idempotent -- running it twice does not throw and leave
 test('installGitHooks returns { wired: true, skippedExisting: null } on a fresh repo, { wired: false, skippedExisting: null } with no .git', () => {
   const repoRoot = mkTempDir('install-git-hooks-return-');
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, '.githooks'));
   assert.deepEqual(installGitHooks(repoRoot), { wired: true, skippedExisting: null });
   fs.rmSync(repoRoot, { recursive: true, force: true });
 
@@ -72,6 +85,7 @@ test('installGitHooks returns { wired: true, skippedExisting: null } on a fresh 
 test('installGitHooks never overwrites a pre-existing custom core.hooksPath -- fill-only, matches this verb\'s other side effects', () => {
   const repoRoot = mkTempDir('install-git-hooks-custom-');
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, '.githooks'));
   execFileSync('git', ['config', 'core.hooksPath', 'husky-hooks'], { cwd: repoRoot });
 
   assert.deepEqual(installGitHooks(repoRoot), { wired: false, skippedExisting: 'husky-hooks' });
@@ -85,6 +99,7 @@ test('installGitHooks never overwrites a pre-existing custom core.hooksPath -- f
 test('installGitHooks treats a pre-existing absolute core.hooksPath resolving to repoRoot/.githooks as already wired, not a foreign custom hook', () => {
   const repoRoot = mkTempDir('install-git-hooks-absolute-');
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, '.githooks'));
   execFileSync('git', ['config', 'core.hooksPath', path.join(repoRoot, '.githooks')], { cwd: repoRoot });
 
   assert.deepEqual(installGitHooks(repoRoot), { wired: true, skippedExisting: null });
@@ -122,6 +137,7 @@ function setupCliFixture() {
 test('CLI: running install-git-hooks.mjs inside a fresh temp git clone sets core.hooksPath to the fixture root\'s absolute .githooks path', () => {
   const { fixtureRoot, scriptCopyPath } = setupCliFixture();
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: fixtureRoot });
+  fs.mkdirSync(path.join(fixtureRoot, '.githooks'), { recursive: true });
 
   const result = spawnSync(process.execPath, [scriptCopyPath], { cwd: fixtureRoot, encoding: 'utf8' });
 

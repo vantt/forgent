@@ -7,6 +7,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
+import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow } from './loader.mjs';
 import {
   createWorkflowRun,
@@ -24,7 +25,7 @@ import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
-import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../runner/execution/handoff-refs.mjs';
+import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -65,7 +66,7 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   // gets it as its own earlier result, and the brief only says so.
   const anonymize = template.anonymizeInputs === true;
   const index = [];
-  const inputs = [];
+  const inputs = [...(template.contextRefs ?? []), ...(step.dependsOn.length === 0 ? state.contextRefs ?? [] : [])];
   let anonymized = 0;
   for (const { prior, sameSeat, label } of picks) {
     for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
@@ -111,6 +112,25 @@ function buildUnitHandoff({ template, state, step, workflow }) {
     );
   }
   return { objective: parts.filter(Boolean).join('\n\n'), inputs };
+}
+
+function renderGateQuestion(step, state, mainRoot) {
+  return (step.gate.question || `Approve step "${step.id}"?`).replace(
+    /\{\{report:([^/{}:\s]+)\/([^{}:\s]+):missing expertise\}\}/g,
+    (_, stepId, unitId) => {
+      const unit = state.steps[stepId]?.units[unitId];
+      if (unit?.status !== 'completed' || !unit.unitRunId) throw new RunnerConfigError('gate report producer is not settled');
+      const producer = unit.results?.filter((record) => record.role === 'producer').at(-1);
+      if (!producer?.runResult?.settleReports?.length) throw new RunnerConfigError('gate requires a settled producer report');
+      const [file] = resolveUnitInputs([`unit-run:${unit.unitRunId}/producer`], mainRoot).refs;
+      const packet = JSON.parse(fs.readFileSync(file, 'utf8'));
+      const expertise = packet?.['missing expertise'];
+      if (!Array.isArray(expertise) || expertise.some((entry) => typeof entry !== 'string' || !entry.trim())) {
+        throw new RunnerConfigError('gate report requires "missing expertise" as an array of non-empty strings');
+      }
+      return JSON.stringify(expertise);
+    },
+  );
 }
 
 /**
@@ -264,6 +284,13 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // 1. Human gate check
       if (step.gate && step.gate.kind === 'human' && stepState.status !== 'answered') {
+        let question;
+        try {
+          question = renderGateQuestion(step, state, mainRoot);
+        } catch (error) {
+          const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code || error.message;
+          question = `Cannot read settled producer "missing expertise": ${reason}. No expertise decision was inferred. Review the packet manually and answer this gate with your decision and acknowledged limitation.`;
+        }
         recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
@@ -271,7 +298,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             type: 'gate.park',
             payload: {
               stepId: step.id,
-              question: step.gate.question || `Approve step "${step.id}"?`,
+              question,
               header: step.gate.header,
               parkedAt: new Date().toISOString(),
             },
@@ -424,9 +451,8 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           });
 
           stateChanged = true;
-          // A unit that did not pass stops its step: later units and dependent steps must not
-          // run on top of work that was refused, failed, or is still waiting on someone.
-          if (unitRunResult.outcome !== 'pass') {
+          // Only explicitly accepted semantic outcomes proceed; execution failures never do.
+          if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {
             failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error };
             break;
           }
@@ -695,6 +721,13 @@ function prepareWorkflowRun(params) {
     throw new RunnerConfigError('startWorkflow requires workflowId, workflow, or planPath');
   }
 
+  const contextRefs = normalizeContextRefs(params.contextRefs);
+  const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
+  if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
+      && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
+    throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
+  }
+
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
@@ -703,6 +736,7 @@ function prepareWorkflowRun(params) {
     configSnapshot,
     request: params.request,
     stanceOptions: normalizeStanceOptions(params.stanceOptions),
+    contextRefs,
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };
@@ -831,9 +865,10 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
 
   // The file comes first: an answer that cannot be kept where later units read it is refused,
   // not recorded.
+  const approved = params.approved === true || params.approved === 'true';
   const answeredAt = new Date().toISOString();
   const question = state.questions.find((q) => q.stepId === params.stepId)?.question ?? state.steps[params.stepId]?.gate?.question ?? '';
-  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt });
+  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt, approved });
 
   appendWorkflowEvent({
     repoRoot: mainRoot,
@@ -843,6 +878,7 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
       payload: {
         stepId: params.stepId,
         answer: params.answer,
+        approved,
         answeredAt,
       },
     },
@@ -855,30 +891,60 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
  * units are handed it from (`gate-answer:<workflowRunId>/<stepId>`). A second answer to the same
  * gate replaces the first.
  */
-function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt }) {
+function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt, approved }) {
   const file = gateAnswerFile(mainRoot, workflowRunId, stepId);
   if (!file) {
     throw new RunnerConfigError(`gate answer refused: "${stepId}" is not a step id that can name an answer file`);
   }
-  const text = [
-    `# Owner's answer at the "${stepId}" gate`,
+  let baseHeader = '';
+  let priorRounds = '';
+  if (fs.existsSync(file)) {
+    const existing = fs.readFileSync(file, 'utf8');
+    const roundsIndex = existing.indexOf('## Rounds');
+    if (roundsIndex !== -1) {
+      baseHeader = existing.slice(0, roundsIndex).trim();
+      priorRounds = existing.slice(roundsIndex).trim();
+    } else {
+      baseHeader = existing.trim();
+    }
+  }
+
+  const roundEntry = [
+    `### Round at ${answeredAt} (${approved ? 'Approved' : 'Clarification'})`,
     '',
-    `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
+    `- Approved: ${approved ? 'yes' : 'no'}`,
     '',
-    `- Workflow run: ${workflowRunId}`,
-    `- Step: ${stepId}`,
-    `- Answered by: the owner, through "fgos workflow answer"`,
-    `- Answered at: ${answeredAt}`,
-    '',
-    '## Question',
-    '',
-    question,
-    '',
-    '## Answer',
+    '#### Answer',
     '',
     answer,
     '',
   ].join('\n');
+
+  let text;
+  if (!baseHeader) {
+    text = [
+      `# Owner's answer at the "${stepId}" gate`,
+      '',
+      `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
+      '',
+      `- Workflow run: ${workflowRunId}`,
+      `- Step: ${stepId}`,
+      `- Answered by: the owner, through "fgos workflow answer"`,
+      '',
+      '## Question',
+      '',
+      question,
+      '',
+      '## Rounds',
+      '',
+      roundEntry,
+    ].join('\n');
+  } else if (priorRounds) {
+    text = `${baseHeader}\n\n${priorRounds}\n\n${roundEntry}\n`;
+  } else {
+    text = `${baseHeader}\n\n## Rounds\n\n${roundEntry}\n`;
+  }
+
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const tmp = `${file}.${process.pid}.tmp`;
   fs.writeFileSync(tmp, text);

@@ -56,10 +56,23 @@ import { DEFAULTS, validateWorkShape } from '../state/work.mjs';
 import { listWork, moveStep, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { getDomain, stepForPhase, resolveDomainName, discoverableSteps, effectiveStep } from '../state/domain-registry.mjs';
 import { rankImpact } from '../state/impact.mjs';
+import { checkDecisionQuestion, formatDecisionQuestion, requiredPartsForStage } from '../state/decision-question.mjs';
 import { computeImpact, computePriority, isRecognizedRisk } from '../state/priority-formula.mjs';
 
 const DEFAULT_UNCLEAR_QUESTION =
   'Không phán được rõ ràng — cần người xác nhận thủ công.';
+
+// A worker's raw question (headless runners return one sentence) or the
+// default above is wrapped into the decision-question template's shared
+// parts; a question that already carries them passes through unchanged.
+function asDiscoveryQuestion(question) {
+  if (checkDecisionQuestion(question, requiredPartsForStage('discovery')).length === 0) return question;
+  return formatDecisionQuestion({
+    happening: question,
+    cause: 'Vòng discovery không tự phán được item này đủ rõ để đi tiếp; cần người làm rõ ý định.',
+    scope: 'Câu trả lời chỉ làm rõ ý định của item; không cho phép mở rộng phạm vi của nó.',
+  });
+}
 
 // D10: when a clear verdict carries no `verify` (the model failed to propose
 // one despite being asked), this is the fallback the item moves out of
@@ -297,10 +310,11 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
         verdict.verify = callerVerdict.verify;
       }
     } else {
-      verdict.question =
+      verdict.question = asDiscoveryQuestion(
         typeof callerVerdict.question === 'string' && callerVerdict.question.trim()
           ? callerVerdict.question
-          : DEFAULT_UNCLEAR_QUESTION;
+          : DEFAULT_UNCLEAR_QUESTION,
+      );
     }
     addDecision(dir, {
       id,
@@ -452,12 +466,13 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
             rationale: `second pass disagreed: ${secondPass.reason}`,
           });
         } else {
-          const ask =
-            `## Context\n\n` +
-            `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->planning, cần xác nhận) — ` +
-            `vòng 1 đề xuất: ${verdict.verify}\n\n` +
-            `## Why this matters\n\n` +
-            `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
+          const ask = formatDecisionQuestion({
+            happening: `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->planning) — vòng 1 đề xuất: ${verdict.verify}`,
+            cause: `Vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`,
+            options: `(a) Giữ verify vòng 1: chạy lại "fgos discover ${id} --force". (b) Sửa verify trước khi sang planning.`,
+            recommendation: 'Engine không chọn thay: hai vòng phán mâu thuẫn nhau, cần người đọc lý do ở trên.',
+            scope: 'Câu trả lời chỉ quyết verify của item này; không đổi phạm vi item.',
+          });
           // statusAtAsk (claim-lock §5.1, tsk-40m P1 fix): informational/
           // audit only — `work` comes from the EFFECTIVE view (listWork),
           // legitimately 'doing' for a claimed item. putInAwaiting/moveWork

@@ -3497,6 +3497,25 @@ test('spawnWorker threads a FGOS_DISPATCH_DEPTH of "1" into a fresh (non-nested)
   }
 });
 
+test('spawnWorker does not hand the Rust host recursion guard to the agent, so its hooks can call the shim', async () => {
+  const dir = mkTempDir();
+  const scriptPath = path.join(dir, 'guard-echo-executor.mjs');
+  fs.writeFileSync(scriptPath, `process.stdout.write(JSON.stringify({ guard: process.env.FGOS_RUST_HOST_RECURSION_GUARD ?? null, kept: process.env.FGOS_GUARD_TEST_KEPT ?? null }));`);
+  const cfg = baseConfig([scriptPath]);
+  const prior = { guard: process.env.FGOS_RUST_HOST_RECURSION_GUARD, kept: process.env.FGOS_GUARD_TEST_KEPT };
+  process.env.FGOS_RUST_HOST_RECURSION_GUARD = '1';
+  process.env.FGOS_GUARD_TEST_KEPT = 'yes';
+  try {
+    const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+    assert.deepEqual(JSON.parse(result.stdout), { guard: null, kept: 'yes' });
+  } finally {
+    for (const [key, value] of [['FGOS_RUST_HOST_RECURSION_GUARD', prior.guard], ['FGOS_GUARD_TEST_KEPT', prior.kept]]) {
+      if (value !== undefined) process.env[key] = value;
+      else delete process.env[key];
+    }
+  }
+});
+
 test('spawnWorker refuses with DispatchError(dispatch-depth-exceeded) once FGOS_DISPATCH_DEPTH already sits at the cap -- never spawns', async () => {
   const dir = mkTempDir();
   const scriptPath = writeDepthEchoExecutor(dir);

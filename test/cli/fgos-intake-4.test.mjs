@@ -103,13 +103,25 @@ import {
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
-const VALID_ASK_TEXT = `## Context
+const VALID_ASK_TEXT = `## Chuyện gì đang xảy ra
 
 We need to decide on the authentication mechanism for the application endpoints.
 
-## Why this matters
+## Nguyên nhân
 
-The chosen mechanism determines security requirements and user authentication flows.`;
+The chosen mechanism determines security requirements and user authentication flows.
+
+## Các lựa chọn
+
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
 
 
 test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
@@ -236,39 +248,29 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
 // tsk-19zm D2: ask's checkpoint distillate and answer's authoritative word
 // live in SEPARATE gates[id] fields -- neither overwrites the other, unlike
 // rationale/alternatives/source before this item (answer-only fields).
-test('ask --rationale and answer --rationale both persist on gates[id], neither overwriting the other', () => {
+test('ask keeps only --source beside its text; answer --rationale/--alternatives and --approve land on gates[id]', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'checkpoint-item');
 
-  run(cwd, [
-    'ask', 'checkpoint-item', '--text', VALID_ASK_TEXT,
-    '--rationale', 'leaning OAuth: fewer support tickets historically',
-    '--alternatives', 'password rejected: extra reset-flow maintenance',
-    '--source', 'session',
-  ]);
+  run(cwd, ['ask', 'checkpoint-item', '--text', VALID_ASK_TEXT, '--source', 'session']);
   const afterAsk = envelopeData(run(cwd, ['list']).stdout).gates['checkpoint-item'];
-  assert.equal(afterAsk.askRationale, 'leaning OAuth: fewer support tickets historically');
-  assert.equal(afterAsk.askAlternatives, 'password rejected: extra reset-flow maintenance');
   assert.equal(afterAsk.askSource, 'session');
   assert.equal(afterAsk.rationale, undefined);
+  assert.equal(afterAsk.approved, undefined);
 
   run(cwd, [
-    'answer', 'checkpoint-item', '--text', 'OAuth',
+    'answer', 'checkpoint-item', '--approve', '--text', 'OAuth',
     '--rationale', 'confirmed OAuth per compliance requirement',
-    '--alternatives', 'password: rejected, same reasons as checkpoint',
+    '--alternatives', 'password: rejected, extra reset-flow maintenance',
     '--source', 'human',
   ]);
   const afterAnswer = envelopeData(run(cwd, ['list']).stdout).gates['checkpoint-item'];
-  // Answer's fields land in the answer-only trio, still authoritative.
   assert.equal(afterAnswer.rationale, 'confirmed OAuth per compliance requirement');
-  assert.equal(afterAnswer.alternatives, 'password: rejected, same reasons as checkpoint');
+  assert.equal(afterAnswer.alternatives, 'password: rejected, extra reset-flow maintenance');
   assert.equal(afterAnswer.source, 'human');
-  // The agent's original checkpoint from `ask` is still there, untouched.
-  assert.equal(afterAnswer.askRationale, 'leaning OAuth: fewer support tickets historically');
-  assert.equal(afterAnswer.askAlternatives, 'password rejected: extra reset-flow maintenance');
   assert.equal(afterAnswer.askSource, 'session');
+  assert.equal(afterAnswer.approved, true);
 });
-
 
 // claim-lock §5.1, tsk-40m P1 fix + hard-cut (docs/architect/doing-
 // coordination-redesign.md): superseded by the redesign — asking a

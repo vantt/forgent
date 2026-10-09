@@ -93,7 +93,7 @@ test('parity: discover clear verdict direct in-process vs CLI', () => {
 });
 
 test('parity: discover unclear verdict direct in-process vs CLI', () => {
-  const ask = '## Context\n\nNeed clarity on provider.\n\n## Why this matters\n\nDirect impact: Which auth provider?';
+  const ask = '## Chuyện gì đang xảy ra\n\nNeed clarity on provider.\n\n## Nguyên nhân\n\nDirect impact: Which auth provider?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
 
   // 1. Direct in-process
   const cwdDirect = tmpCwdFast();

@@ -17,17 +17,35 @@ import {
   staleUseCase,
 } from '../../src/verbs/state/read.mjs';
 
-const VALID_ASK_A = `## Context
+const VALID_ASK_A = `## Chuyện gì đang xảy ra
 Here is context about A with more than twenty characters of text.
 
-## Why this matters
-Here is why this matters for A with more than twenty characters.`;
+## Nguyên nhân
+Here is why this matters for A with more than twenty characters.
 
-const VALID_ASK_B = `## Context
+## Các lựa chọn
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
+
+const VALID_ASK_B = `## Chuyện gì đang xảy ra
 Here is context about B with more than twenty characters of text.
 
-## Why this matters
-Here is why this matters for B with more than twenty characters.`;
+## Nguyên nhân
+Here is why this matters for B with more than twenty characters.
+
+## Các lựa chọn
+(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.
+
+## Khuyến nghị
+(b), vì nó giải quyết đúng vấn đề đã nêu.
+
+## Phạm vi của câu trả lời
+Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
 
 function addTestWork(dir, id, extra = {}) {
   return addWork(dir, {

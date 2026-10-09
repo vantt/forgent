@@ -310,12 +310,13 @@ function classifyEvidenceToOutcomeFacts({
   }
 
   if (agentClaim && agentClaim.status === 'done') {
+    const verdict = agentClaim.assessment?.verdict === 'findings' ? 'findings' : 'pass';
     if (isReadOnlyOperation) {
       if (hasWorkerReport) {
         return {
           execStatus: 'completed',
           confidenceLevel: 'reported',
-          verdict: 'pass',
+          verdict,
           failure: null,
           policy: { disposition: 'allow', code: null },
         };
@@ -332,7 +333,7 @@ function classifyEvidenceToOutcomeFacts({
       return {
         execStatus: 'completed',
         confidenceLevel: 'verified',
-        verdict: 'pass',
+        verdict,
         failure: null,
         policy: { disposition: 'allow', code: null },
       };

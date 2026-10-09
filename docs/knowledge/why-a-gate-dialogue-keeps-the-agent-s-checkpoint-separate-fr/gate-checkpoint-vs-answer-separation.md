@@ -4,6 +4,8 @@ mode: explanation
 ---
 # Why a gate dialogue keeps the agent's checkpoint separate from the human's answer
 
+> Superseded 2026-10-08: `fgos ask --rationale/--alternatives` and the `askRationale`/`askAlternatives` fields were removed. The question carries its options and reasoning in its own text (decision-question template, `core/skills/_shared/decision-question.md`); only `askSource` remains beside it.
+
 Source: `docs/history/checkpoint-distillate-gate-provenance/CONTEXT.md`
 (tsk-19zm, implementing STR70a of
 `docs/history/gate-dialogue-continuity/CONTEXT.md`, repo `forgent`).

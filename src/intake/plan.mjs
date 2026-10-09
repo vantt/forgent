@@ -28,6 +28,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStep, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
+import { formatDecisionQuestion } from '../state/decision-question.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
@@ -263,15 +264,23 @@ export function resolveCallerPlanVerdict(raw, lockedContext) {
   return { kind: 'invalid' };
 }
 
-function formatProposalAsk(verdict, reason) {
-  if (verdict.kind === 'decompose') {
-    const list = verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n');
-    return `## Context\n\nĐề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue — sai sót ở đây tốn công dọn lại sau.`;
-  }
-  if (verdict.kind === 'pass-through') {
-    return `## Context\n\nĐề xuất: không chia (pass-through) — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi việc này được coi là một khối duy nhất, không tách nhỏ.`;
-  }
-  return `## Context\n\nĐề xuất chia — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue.`;
+function formatProposalAsk(verdict, reason, id) {
+  // The verdict itself is the engine's recommendation; it cannot price the
+  // alternatives, and says so instead of padding. A consent gate releases only
+  // when the owner approved this exact text (heavyRiskAlreadyConfirmed).
+  const proposal =
+    verdict.kind === 'decompose'
+      ? `chia thành các việc con dưới đây (chưa ghi vào queue) — ${reason}\n${verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n')}`
+      : verdict.kind === 'pass-through'
+        ? `không chia, giữ item là một khối (pass-through) — ${reason}`
+        : `chia — ${reason}`;
+  return formatDecisionQuestion({
+    happening: `Engine đề xuất ${proposal}`,
+    cause: 'Đề xuất cần người xác nhận trước khi ghi thật vào queue: sai ở đây tốn công dọn lại sau.',
+    options: `(a) Đồng ý đề xuất như trên: "fgos answer ${id} --approve --text ...". (b) Không đồng ý hoặc cần sửa: trả lời không kèm --approve, nêu lý do; item sẽ được hỏi lại. Engine không định giá được từng lựa chọn.`,
+    recommendation: '(a) — đây là verdict của vòng phán; chọn (b) nếu đề xuất sai ý định của item.',
+    scope: 'Đồng ý chỉ cho phép ghi đúng đề xuất trên vào queue; không mở rộng phạm vi của item.',
+  });
 }
 
 // tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
@@ -548,12 +557,13 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
           `plan --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
         );
       }
-      const ask =
-        `## Context\n\n` +
-        `Verify hiện tại của item (sẽ được stamp lúc sang executing) bị nghi ngờ ở vòng kiểm tra thứ hai: ${planVerifyDispute.reason}\n` +
-        `Verify: ${planApproveVerify}\n\n` +
-        `## Why this matters\n\n` +
-        `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
+      const ask = formatDecisionQuestion({
+        happening: `Verify của item (sẽ được stamp lúc sang executing) bị nghi ngờ. Verify: ${planApproveVerify}`,
+        cause: `Vòng kiểm tra thứ hai không đồng ý: ${planVerifyDispute.reason}`,
+        options: `(a) Giữ verify này: chạy lại "fgos plan ${id} --force". (b) Sửa verify trước khi sang executing.`,
+        recommendation: 'Engine không chọn thay: hai vòng phán mâu thuẫn nhau, cần người đọc lý do ở trên.',
+        scope: 'Câu trả lời chỉ quyết verify của item này; không đổi phạm vi item.',
+      });
       putInAwaiting(dir, { id, ask, statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
     }
@@ -700,17 +710,19 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // proposed as context, but writing nothing into the queue yet (Terms:
   // "Đề xuất chia" is the proposal BEFORE it is committed).
   //
-  // Heavy-risk gate release (tsk-3w8 follow-up): this hard risk gate used
+  // Heavy-risk gate release (tsk-3w8 follow-up): released only by an
+  // explicit `fgos answer --approve` on THIS gate's own ask (gate.approved);
+  // any other answer is a clarification and re-parks. This hard risk gate used
   // to re-fire unconditionally on every call — a human answering
   // `fgos answer` never released it, re-parking the exact same question
   // forever (dogfood, 2026-07-28). Bypassed only when the MOST RECENT gate
-  // ask/answer on record is genuinely THIS gate's own prior ask (matched
-  // by DEFAULT_RISK_GATE_REASON's own text, the one string
-  // formatProposalAsk always embeds for it) — never a stale answer left
-  // over from an unrelated clarify-stage or explicit need-human question.
+  // ask/answer on record is genuinely THIS gate's own prior ask for THIS
+  // exact proposal (the ask text formatProposalAsk would write again) — never
+  // a stale answer from an unrelated question, and never an approval of a
+  // different proposal.
   const gate = view?.gates?.[id];
   const heavyRiskAlreadyConfirmed =
-    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
+    gate?.approved === true && gate.ask === formatProposalAsk(verdict, DEFAULT_RISK_GATE_REASON, id);
   // tsk-wve D1: a heavy-risk verdict that cites a real, already-locked
   // decision from this item's own CONTEXT.md is grounded, not off-the-cuff
   // -- same D-ID-citation precedent normalizeChild already trusts for a
@@ -729,7 +741,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // answer from an unrelated gate) -- an INDEPENDENT gate, checked in
   // addition to keywordRiskGate, never instead of it.
   const blastRadiusAlreadyConfirmed =
-    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_BLAST_RADIUS_GATE_REASON);
+    gate?.approved === true && gate.ask === formatProposalAsk(verdict, DEFAULT_BLAST_RADIUS_GATE_REASON, id);
   const blastRadiusGate =
     Number.isFinite(verdict.blastRadius) && verdict.blastRadius >= BLAST_RADIUS_GATE_THRESHOLD && !blastRadiusAlreadyConfirmed;
   const risksGate = keywordRiskGate || blastRadiusGate;
@@ -743,7 +755,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     // verdict.kind -- a risk-heavy root can force this parking out of a
     // pass-through/decompose verdict underneath it.
     logDecomposeVerdict(dir, id, 'need-human', reason);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason, id), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
     return { outcome: 'need-human', id, verdict };
   }
 
@@ -801,7 +813,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       // fall through -- proceed to write children below, same as no dispute
     } else {
       logDecomposeVerdict(dir, id, 'need-human', reason);
-      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
+      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason, id), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
       return { outcome: 'need-human', id, verdict };
     }
   }
@@ -882,7 +894,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   if (footprintConflicts.length > 0) {
     const reason = formatFootprintOverlapReason(footprintConflicts);
     logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason, id), statusAtAsk: work.status }); // tsk-40m P1 fix: statusAtAsk is informational only now; moveWork computes the resume-safe durableStatusAtAsk itself
     return { outcome: 'need-human', id, verdict };
   }
 

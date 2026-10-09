@@ -89,6 +89,10 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'readme-install-tag-exists',
       'iron-law-configured',
       'dispatch-decide-hook-wired',
+      'codex-hook-wired',
+      'agy-hook-wired',
+      'omp-hook-wired',
+      'pi-hook-wired',
       'task-specs-resolve',
       'agent-claims-resolve',
       'agent-type-names-unique',
@@ -674,12 +678,35 @@ test('enduser-docs-index-stale fix regenerates the index via the same path fgos 
 test('enduser-docs-index-stale fix is idempotent -- a second run reports changed:false', () => {
   const tmp = mkTemp('fgos-enduser-index-fix-');
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), '[]\n');
   fixById('enduser-docs-index-stale').fix(tmp);
   const second = fixById('enduser-docs-index-stale').fix(tmp);
   assert.equal(second.changed, false);
   assert.match(second.message, /already up to date/);
   fs.rmSync(tmp, { recursive: true, force: true });
 });
+
+test('outside the fgOS source repo, doctor --fix never creates the end-user or decision index -- it only refreshes an adopted one', () => {
+  const tmp = mkTemp('fgos-outside-project-fixes-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  assert.match(fixById('enduser-docs-index-stale').fix(tmp).message, /skipped/);
+  assert.match(fixById('decision-index-stale').fix(tmp).message, /skipped/);
+  assert.equal(checkById('decision-index-stale').check(tmp).passed, true);
+  assert.equal(fs.existsSync(path.join(tmp, 'docs', 'enduser-docs-index.json')), false);
+  assert.equal(fs.existsSync(path.join(tmp, 'docs', 'decisions', 'index.md')), false);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+// A fixture that looks like the fgOS source repo, where the decision index is
+// mandatory and doctor --fix creates it; any other project only refreshes it.
+function markFgosSourceCheckout(root) {
+  fs.mkdirSync(path.join(root, 'apps', 'fgos'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'apps', 'fgos', 'Cargo.toml'), '[package]\nname = "fgos"\n');
+}
 
 test('decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)', () => {
   const tmp = mkTemp('fgos-decision-index-check-');
@@ -709,6 +736,7 @@ test('decision-index-stale passes when the on-disk index already matches state.d
   const tmp = mkTemp('fgos-decision-index-check-');
   const fgosDir = path.join(tmp, '.fgos');
   initStore(fgosDir);
+  markFgosSourceCheckout(tmp);
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
   fixById('decision-index-stale').fix(tmp);
 
@@ -742,6 +770,7 @@ test('decision-index-stale fix is idempotent -- a second run reports changed:fal
   const tmp = mkTemp('fgos-decision-index-fix-');
   const fgosDir = path.join(tmp, '.fgos');
   initStore(fgosDir);
+  markFgosSourceCheckout(tmp);
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
   fixById('decision-index-stale').fix(tmp);
   const second = fixById('decision-index-stale').fix(tmp);
@@ -754,6 +783,7 @@ test('decision-index-stale check FAILS when the index is missing but state.decis
   const tmp = mkTemp('fgos-decision-index-check-');
   const fgosDir = path.join(tmp, '.fgos');
   initStore(fgosDir);
+  markFgosSourceCheckout(tmp);
   addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
 
   const { passed, message } = checkById('decision-index-stale').check(tmp);
@@ -767,6 +797,7 @@ test('decision-index-stale fix reports a graceful skip (changed:false, no throw)
   const tmp = mkTemp('fgos-decision-index-fix-');
   const populatedFgosDir = path.join(tmp, '.fgos');
   initStore(populatedFgosDir);
+  markFgosSourceCheckout(tmp);
   addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
   fixById('decision-index-stale').fix(tmp);
   const before = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
@@ -1585,6 +1616,10 @@ test('mainCheckoutHookWired is true from inside a linked worktree when the main 
 test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {
   const cwd = mkTemp('doctor-hook-check-');
   execFileSync('git', ['init', '-q'], { cwd });
+  const notApplicable = checkById('main-checkout-hook-wired').check(cwd);
+  assert.equal(notApplicable.passed, true);
+  assert.match(notApplicable.message, /not applicable/);
+  fs.mkdirSync(path.join(cwd, '.githooks'));
   const before = checkById('main-checkout-hook-wired').check(cwd);
   assert.equal(before.passed, false);
   assert.match(before.message, /run fgos setup/);
