@@ -34,13 +34,22 @@ Order 01 → 02 → 03 → 04. Each of 01–03 ships on its own and is measured 
 - Decision outcome ledger: Observe item, separate.
 - Copying council's 18 personas or its 950-line protocol.
 
-## Facts to respect (checked 2026-10-07 on main)
+## Facts to respect (re-checked 2026-10-09 on main 9d6ec1311)
 
-- `resolvePanelRoles` takes pattern `params` (role list, synthesizeRole), and commit `52c53eee8` passes a template's persona and params down to the Unit run. But `panel.mjs` still builds each panelist's task with `roleUnit(unit, { role, kind })` without `params` (line 66; only the synthesizer gets them, line 92), so `params.roleTasks` does not reach panelists. The advisory plan's statement that panelist calls omit params is therefore still true on main.
-- `template.contextRefs` and `acceptOutcomes` do not exist in `src/workflow/definition.mjs`.
+- `panel.mjs` now passes `params` to every panelist: `roleUnit(unit, { role, kind, params })` (`src/runner/execution/patterns/panel.mjs:66`), same as the synthesizer (line 92). So `params.roleTasks` reaches panelists. The 2026-10-07 statement that panelist calls omit params is obsolete (advisory path M landed).
+- `template.contextRefs` and `template.acceptOutcomes` exist in `src/workflow/definition.mjs:316-354` (`acceptOutcomes` only on `reviewed` templates, values `pass`/`findings`). The two seams the "Scope — out" row says are missing now exist; re-read that row before phase 04 if a gap remains.
 - Persona renderer injects only `description/voice/style/archetype/decision_boundary`; extending it to `method`/`blind_spot` is a renderer change (decide in Phase 02, may fold method into `description`, as the experiment did).
 - `core/agents/` holds only the generic roles; the three experiment personas live in `plans/reports/council-lens-experiment-261004/personas/`.
 - Skills render from `core/skills` via `npm run build:skills`; never hand-edit `.agents/` or `plugins/`.
+
+## Observe baseline before persona changes (2026-10-09 08:33Z, read-only)
+
+Command: `.fgos/installation/bin/fgos metrics discussions --since 2026-10-01` (data_hash `58fb5276…ec0e3a`, 97 unit runs). Panel units only (pattern `panel`, 10 runs: 2026-10-02 x3, 2026-10-07 x1, 2026-10-09 x6):
+
+- Outcomes: 6 pass, 4 execution-failure (all four on 10-07/10-09, before the hook/MCP workaround).
+- Stance/agreement: **all 10 are `measurement: unmeasured`** (stancesValid 0, stancesMissing 3, `stanceOptions` empty, agreement/genuineSplit null). No stance baseline exists yet.
+- Consequence: the acceptance row "stance + agreement for every run" cannot be compared before/after until a template declares `stanceOptions`. Phase 04 must either add that declaration in the re-run or fall back to the blind A/B score alone (pre-slice reference: council 8, fgOS 5). Decide in phase 04; do not count this as a metric that moved.
+- Re-run the same command with `--since` set to the day persona changes merge to get the after-set.
 
 ## Acceptance criteria
 
