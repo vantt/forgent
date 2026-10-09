@@ -1,14 +1,14 @@
 # Execution progress
 
-Date: 2026-10-08
+Date: 2026-10-09
 Executor: codex-session:1@2026-10-08
 Session counter: 1
 Step: first content batch, Agent Coordination; independent re-review applied, targeted final corrections authorized
-State: executing-targeted-final-check
-Blocker: none requiring another owner decision. A11 authorizes twelve source-row fixes, seven receipt relabels, one receipt withdrawal and evidence-backed candidate-native-content receipts; no third full review.
+State: blocked-after-authorized-main-sync
+Blocker: inherited AGENTS.md RUL11 heading identity retired without a disposition; post-merge native D reports retired-row-disposition-missing. A12 explicitly authorizes IO-contract rebinding, not disposition of this instruction-law identity. No instruction text, gate or baseline changed by the executor.
 Last green conservation commit: 1727b03d14e5b4161eae2c578219b066acf038d6
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
-SYNC: 17b4de5225126a27e732fbf8cd9e753a8963a984
+SYNC: d98a5c5e75e4529cd99dd9c8bce95a0032806d95 (imports main 90a4fb27c8e43fca9e73714f1c3f235e832ce38a under A12)
 Main at sync: 2bc76ced1f60e32b5d713adf2487416e464dcf4f
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
 Latest approvals: independent re-review 8e2fc315f applied through native --apply-review after A11 (8dd0140ce). Current 1,423 reviewed / 12 pending manual source rows; no author approval.
@@ -20,7 +20,7 @@ Real conflicts: all 74 corrected conflict receipts independently accepted; all 1
 Holds: zero unknown-blocking source-row/corpus holds. Twelve source rows and 62 classifications pending; no pending approval identity/date.
 Promoted-document edits: e4650e585 preserved portal guidance plus 0a41d793e authorized history references; exact changes logged in promoted-edits.md. No area-status change.
 
-Next action: fix only the A11 targeted items, add the fourth receipt class tests first, prepare current-code/behaviour evidence for 55 substantive units, regenerate and publish the limited final-check request; then stop ready-for-review. P6 batch closure and next batch remain UNPROVEN.
+Next action: owner resolves disposition of retired AGENTS.md claim_c3ef3a4ddc116883db10a70d55ba7bd5 after D-ADR0054 supersedes D-ADR0036. Then rebind the four changed Pilot B IO-contract rows, finish current-evidence receipts, regenerate and publish the limited final-check request. No reviewer should start yet.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -147,3 +147,14 @@ Ready-for-review release: A10 tooling green a207f4266/a63b50749; complete post-c
 At owner commit 8dd0140ce, both native D invocations (`node scripts/check-doc-inventory-gates.mjs`, with each of the two prior registries and the existing inventory/decision arguments) pass: exit 0, zero fatal findings. A3 exact commit/path exceptions respected; extractor closure, area status and protected instructions unchanged; ratchet clean (995 files, 24 edits, one new file); placement 448/447 with its one recorded exception. H remains 30 accounted findings, zero in Agent Coordination.
 
 Five native `node scripts/propose-doc-decisions.mjs --apply-review <shard> --verdicts <committed-report> --reviewer reviewer:claude-session:4df9e88c@2026-10-08 --inventory /tmp/phase06/review-doc-inventory.json --repo-root <worktree>` invocations pass. The unchanged scoped D gate passes against both prior registries after application: twelve not-reviewed rows, 342 identical-unit groups still accounted separately, 62 reverse-open units. Strict P6 remains UNPROVEN, as expected before the limited independent final check.
+
+## Authorized dirty-state recovery and main sync
+
+A12 `fb79d9eb2` authorizes the four unfinished ledger files. Diff inspection found only the twelve specified row corrections, seven bookkeeping relabels, withdrawn subordination receipt and invalidated receipt for the changed Proof Preservation addition label. Both scoped D invocations passed with zero fatal findings before the explicit four-path commit `c2b17ba2b`; source judgments remain 1,423 reviewed / twelve pending. No author approval or unrelated rebind retained.
+
+Authorized `git merge main` completed at `d98a5c5e7`, importing main `90a4fb27c` with no merge conflict. Exactly four inherited legacy-root files are re-accounted in the ratchet: runner, platform-foundations, herdr-web-dashboard and distribution specs. Native ratchet passes: 995 files, 25 accounted edits, one new file. Extractor refresh succeeds with 4,320 documents and 87,214 units.
+
+Both post-merge D invocations exit 1 with the same six findings: one stale Pilot B IO-contract source digest, three old IO-contract claim ids absent from the current ledger, and missing dispositions for one retired IO-contract unit and one retired AGENTS.md heading. IO drift is explicitly authorized for rebinding by A12. The AGENTS.md heading changed from D-ADR0036 to D-ADR0054; its retired identity lacks a disposition. That instruction-law accounting requires an owner decision, not a gate waiver or executor-authored approval. Exact findings/commands are in `resume-sync-verification.json`.
+
+Authorized isolated Herdr rerun: `env -u CLAUDE_CODE_SESSION_ID node --test test/runner/herdr-reconciliation.test.mjs` passes 28/28, including the actual live confined-launch scenario. A12 therefore does not require a main-checkout run. The earlier full-suite failure cause remains UNPROVEN; a new post-sync full-suite green is also UNPROVEN.
+

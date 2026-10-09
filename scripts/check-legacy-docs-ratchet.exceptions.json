@@ -87,9 +87,9 @@
       "path": "docs/specs/distribution.md",
       "kind": "allowed-edit",
       "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 26 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | chore: pools for the discussion capabilities, more proven blind pairs, retire the coordination sessions check | docs(spec): keep the blind pool check row to registered check ids only (+23 more) Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06; prior sync exceptions retained; sync 2026-10-08 at 5d6467093217a6869b31afb28866732400767267 imports main c2aa9e374a8cee57c676809dab4849273ed71855 under the standing sync policy (plan.md §7.5b); content-review-owed, per-file review pending before cutover",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06; prior sync exceptions retained; sync 2026-10-08 at 5d6467093217a6869b31afb28866732400767267 imports main c2aa9e374a8cee57c676809dab4849273ed71855 under the standing sync policy (plan.md §7.5b); content-review-owed, per-file review pending before cutover; owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "6e44ee51f7e210351ba79ab6ddd28f4512e908621cd218cd5908b0de2c19df22",
+      "expectedDigest": "064ba25062c95cbd7e05b250a27de942461f67bbb626787c60a86945c8c54982",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
@@ -97,9 +97,9 @@
       "path": "docs/specs/runner.md",
       "kind": "allowed-edit",
       "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 54 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+51 more) Re-accounted 2026-10-06: carried in by sync of main at 36dc5f083 (Phase 4 sync): docs(observe): record the third acceptance round and close the plan | fix(observe): a panel needs more than half of its voters before agreement is measured Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Phase 4 sync under the standing sync policy (plan.md §7.5b), per-file content review pending; sync 2026-10-07 under the standing sync policy (plan.md §7.5b), per-file content review pending",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Phase 4 sync under the standing sync policy (plan.md §7.5b), per-file content review pending; sync 2026-10-07 under the standing sync policy (plan.md §7.5b), per-file content review pending; owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "d43f10bc2f85dd443af1f624b803d9077b167eda94631147ed84d64875131a7b",
+      "expectedDigest": "7117cd188b4fe6994dc9940235985d960c702a48192dc1ec6e0f38d62b337f50",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
@@ -217,9 +217,9 @@
       "path": "docs/specs/herdr-web-dashboard.md",
       "kind": "allowed-edit",
       "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names",
-      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "1468244f4fa316bac35b1e270a79ea3cbe881e4f4c6f5926300bc26afc0aa9b1",
+      "expectedDigest": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
     },
@@ -252,6 +252,16 @@
       "expectedDigest": "745c1786a6fccf856592af56429ac0a6c2fed4b4651f2ebeeaf039f337e340ab",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/specs/platform-foundations.md",
+      "kind": "allowed-edit",
+      "rationale": "Inherited main edit imported at d98a5c5e75e4529cd99dd9c8bce95a0032806d95 from 90a4fb27c8e43fca9e73714f1c3f235e832ce38a; accounted without changing legacy content.",
+      "approvedBy": "Owner amendment A12 at fb79d9eb2, 2026-10-09; content review owed",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "80242347886ffd2d34dabe5a328928d07abec916cbecb210782fd74cb11030b3",
+      "reviewedAt": "2026-10-09",
+      "revisitTrigger": "atomic platform-authority cutover"
     }
   ]
 }
