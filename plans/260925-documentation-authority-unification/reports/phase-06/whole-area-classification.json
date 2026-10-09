@@ -1,0 +1,1864 @@
+{
+  "version": 1,
+  "ownerDecision": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+  "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+  "enumeration": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from'node:fs';import{loadShardedJsonArtifact as l}from'/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/doc-inventory-artifact.mjs';const i=l('/tmp/phase06/review-doc-inventory.json'),all=i.items.filter(d=>d.path.startsWith('docs/platform/agent-coordination/'));const eligible=all.filter(d=>!d.path.includes('/history/')&&d.fileClass!=='evidence-payload'&&d.corpus!=='evidence-payload');console.log(JSON.stringify({all:all.length,eligible:eligible.map(d=>{const text=fs.readFileSync(d.path,'utf8'),lines=text.split(String.fromCharCode(10));return{path:d.path,fileClass:d.fileClass,documentType:d.documentType,blobSha:d.blobSha,sha256:d.sourceDigest,headings:d.headings.map(h=>h.text),evidence:lines.map((s,k)=>({line:k+1,text:s})).filter(o=>/^(# |Purpose:)|CoordinationSession|FlowDefinition|CoordinationProtocol|fgos coordination|Step 0[89]|step-0[89]|Team Dispatch|runtime profiles/i.test(o.text)).slice(0,8)};})}));"
+    ],
+    "areaFiles": 957,
+    "historyExcluded": 22,
+    "payloadExcluded": 867,
+    "eligibleFiles": 68,
+    "payloadRule": "minimum-constitution.json documentKinds evidence-payload: docs/platform/<area>/verification/<collection>/**; classified by location only, regardless of inventory fileClass"
+  },
+  "files": [
+    {
+      "path": "docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "1ada7847446773912cdc9d654027a0bf6859fe1c",
+      "sourceSha256": "3c116095c0f9fd25085add37f282ffd97063978d40db61bf46725e5885a5e24e",
+      "mainSubject": "Coordination Recovery Planning And Session Continuation",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 169,
+            "text": "Proposed optional `CoordinationProtocol.profile.continuation.points[]`:"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "b7721d633c71549f58d6a56c573ea3e7ca8585a9",
+      "sourceSha256": "2a7c083b0635c1a7679b9a5c3a3337e9c4b44cc3e3ae6ce5e5987ae9ca640b24",
+      "mainSubject": "Coordination Foundation Baseline",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 31,
+            "text": "[CoordinationSession Contract](../contracts/coordination-session.md),"
+          },
+          {
+            "line": 32,
+            "text": "[FlowDefinition Contract](../contracts/flow-definition.md),"
+          },
+          {
+            "line": 33,
+            "text": "[Team Dispatch V1 roadmap history](../roadmap/team-dispatch-v1/README.md),"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "ebfb75859400aafb1e0843214b65480edc656b1a",
+      "sourceSha256": "2f963016f1573db89f8b19cdea4c767a59238a12dc1a4b4bc620d8bd0089cd6f",
+      "mainSubject": "surviving dispatch runtime, mixed obsolete resolver contract",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 32,
+            "text": "(draft), [FlowDefinition Contract](../contracts/flow-definition.md),"
+          },
+          {
+            "line": 168,
+            "text": "the [FlowDefinition Contract](../contracts/flow-definition.md#policypatch)"
+          },
+          {
+            "line": 313,
+            "text": "Work Driver, Coordination Engine/FlowDefinition, Domain Harness, and"
+          }
+        ],
+        "owner": "src/runner/dispatch/assignment-runner.mjs:1262-1265"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "ac3547d5d9ee9bd0d47ba07387fbe79b6ff36a33",
+      "sourceSha256": "09d3074a859abf556cb7fee54034af799fcc938b9a3c844f18d7f796435ebd43",
+      "mainSubject": "surviving normalized evidence trust boundary",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Evidence And Result Architecture"
+          }
+        ],
+        "owner": "src/runner/dispatch/run-result.mjs:350-365"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "54dad9b79ca9cf2753d04647f1baa6c966ecf6b5",
+      "sourceSha256": "969ba5f64da76515a222214955eaac68d6fb40bd1e73ddd904be4815f43410fa",
+      "mainSubject": "surviving fallback/recovery design; old proposal details mixed",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Executor Fallback And Effect Eligibility"
+          }
+        ],
+        "owner": "src/runner/dispatch/recovery-planner.mjs:243-253"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "dc5c9b1441854e6e1dea3b0467d9caf4fbb97257",
+      "sourceSha256": "d869ea5af7be444e8a18d79f1836fb947426d38b75c86383c5c8e34dad13a5f8",
+      "mainSubject": "Group Thinking Trigger Surface",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 31,
+            "text": "[FlowDefinition Contract](../contracts/flow-definition.md), and"
+          },
+          {
+            "line": 58,
+            "text": "| Direct `fgos coordination run/show` | Low-level session control | Request JSON, operation ids, actors, grants, resume ids | Correct power-user door, too low-level as a first contact | Surface launches through `run`; replay remains `show` |"
+          },
+          {
+            "line": 82,
+            "text": "FlowDefinition remains authoritative for actors, legal operations, visibility,"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "2ff3289128fd58fcb39d6929df44bfbcc32d5980",
+      "sourceSha256": "412c6549eef2c2a3e2e8e3c86201cd814831e664fe01fe7254f416cf43bb1eae",
+      "mainSubject": "Coordination Protocol Model",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 29,
+            "text": "hints (`policy` on an operation, see the [FlowDefinition"
+          },
+          {
+            "line": 128,
+            "text": "protocol uses a graph, it uses the shared, versioned `FlowDefinition`"
+          },
+          {
+            "line": 129,
+            "text": "intermediate representation typed with the `CoordinationProtocol` profile,"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "b664414456accb50d6dace3e25d9af81d265ccac",
+      "sourceSha256": "6ac092c31c002281cde491c707e20d29e722e3797c7aafbacd99d840308e961b",
+      "mainSubject": "Agent Coordination Architecture",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 116,
+            "text": "CoordinationSession's identity/persistence boundary and the shared"
+          },
+          {
+            "line": 117,
+            "text": "FlowDefinition graph/operation/policy IR are accepted per"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "14f07378643cd1e96245c779f78d105bba3e3f33",
+      "sourceSha256": "d6715088af75b954a9642034e607f04a9a0c4432723830fb50b2963d6e7f9a23",
+      "mainSubject": "surviving run-control/recovery design; mixed old contract details",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "RunHandle And Recovery Material"
+          }
+        ],
+        "owner": "src/runner/dispatch/run-lock.mjs:306-317"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "67ae4524022dd75dd288e5733eac581c3695ddc6",
+      "sourceSha256": "fd162fbe58d911dff7c0a821bea4cfbee4e531f312d580e93db1119fee81ddc9",
+      "mainSubject": "surviving Assignment/Run execution chain; old session membership mixed",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 81,
+            "text": "CoordinationSession persists membership as a one-way reference to these"
+          },
+          {
+            "line": 85,
+            "text": "and the [CoordinationSession Contract](../contracts/coordination-session.md)."
+          },
+          {
+            "line": 86,
+            "text": "A declared `CoordinationProtocol` lowers into this same execution chain"
+          }
+        ],
+        "owner": "src/runner/dispatch/assignment-runner.mjs:1262-1265"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "df37ba603366748e9bb674ed062d033c61008543",
+      "sourceSha256": "b564291e08611ef3b017f03788f78ea05211ca619a524783a7a757c9e8595d6d",
+      "mainSubject": "surviving dispatch recovery; old session continuation mixed",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 65,
+            "text": "| Lead conversation/session | Agent harness outside Coordination | May drive many cells; not a persisted CoordinationSession identity. |"
+          },
+          {
+            "line": 67,
+            "text": "| CoordinationSession | Coordination engine/store | Bounded ledger, actors, authority, graph and budget; not a cell acceptance authority. |"
+          },
+          {
+            "line": 72,
+            "text": "A consumer may map multiple cells to nodes/bindings in one CoordinationSession,"
+          }
+        ],
+        "owner": "src/runner/dispatch/recovery-planner.mjs:243-253"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/system-context.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "3585ce87cc87e70f5f32cbe78212136c15f30195",
+      "sourceSha256": "3328892b0f4f35ab5ac2ccf184290693c6531ce25ab964a2f81a26388060e90a",
+      "mainSubject": "Agent Coordination System Context",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 90,
+            "text": "## Runtime Profiles"
+          },
+          {
+            "line": 92,
+            "text": "The implemented baseline is Work-attached Team Dispatch plus a read-only"
+          },
+          {
+            "line": 103,
+            "text": "  Work Stage Operation -> optional CoordinationSession -> tasks/Assignments"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "26e03371b3fb3b125949827afa746c23e157e1c5",
+      "sourceSha256": "cb491b29d61eb39a5a3e32d00078d2b5f0140717a7743f6dc1f62466f7d32f61",
+      "mainSubject": "surviving visibility/outcome boundary; old implementation claims mixed",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Visibility And Herdr"
+          }
+        ],
+        "owner": "src/runner/dispatch/visibility-session.mjs:130-133"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "51956fe10b6f3cad4d284df3b8004c0cef708712",
+      "sourceSha256": "70378870d687f1b8e575f520deeb133d1eb81c867c7963d3ebed0eb691af515a",
+      "mainSubject": "surviving Work-versus-execution authority boundary; old stage/session model mixed",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 81,
+            "text": "applies to the Work Driver whether or not a CoordinationSession is involved."
+          },
+          {
+            "line": 92,
+            "text": "A CoordinationSession's local runtime state (`.fgos/coordination/`) may"
+          }
+        ],
+        "owner": "src/runner/execution/run.mjs:532-540"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "e086b1be49730b7ab330860a2abef8f3984ba928",
+      "sourceSha256": "e25c355b00520577a9fb2262ecefdee906703024ec9d9af1eef184677d2c5c44",
+      "mainSubject": "surviving Assignment/Run/RunResult ownership, mixed old session/effect schema",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 98,
+            "text": "  (`run-retried` in CoordinationSession; standalone dispatch records the"
+          },
+          {
+            "line": 132,
+            "text": "`src/runner/dispatch/run-lock.mjs`, CoordinationSession store/replay). Atomic"
+          }
+        ],
+        "owner": "src/runner/dispatch/run-result.mjs:350-365"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "86daee671333096fbc0582a6f14109d4e9366695",
+      "sourceSha256": "38bfc02b54d412ba0a412f778c147915fac6305dbfaac1e05ff8f363eff20601",
+      "mainSubject": "CoordinationSession Persistence And Recovery Contract",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 33,
+            "text": "Phase 07: public CLI (`fgos coordination run/show`) and headless adapter"
+          },
+          {
+            "line": 38,
+            "text": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`."
+          },
+          {
+            "line": 39,
+            "text": "Phase 00 (Step 09): driver-authorized optional operations, disposition,"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/flow-definition.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "2af9f1db26294fdad9420f0d3dace5e931a3b51a",
+      "sourceSha256": "54d5c541879c9c2d48b2125cd702f12d9831389f84009d332190bc86ef7e18c8",
+      "mainSubject": "FlowDefinition And Profile Schema Contract",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 26,
+            "text": "Step 08 Phase 02; Workflow-profile projection additive at zero diff to"
+          },
+          {
+            "line": 27,
+            "text": "`src/state/workflow-stage-graphs.mjs`; CoordinationProtocol-profile fixtures"
+          },
+          {
+            "line": 30,
+            "text": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`."
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "12c825c0e88e2c383b80dc38680662b6dd3c5835",
+      "sourceSha256": "5fbb019e87a413ea2a85b1f07b9eaf297f723d71b5f6f2893b4e6f80d7ec09d6",
+      "mainSubject": "Agent Coordination Contracts",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 29,
+            "text": "> **Ghi chú chuyển tiếp (2026-10-02):** Khái niệm `CoordinationSession` và `FlowDefinition` đã được thu hồi ở P4 per D-0050; thay bằng **Unit run** qua **CollaborationPattern** (`solo`, `reviewed`, `panel` + preset) và **Workflow run** (`src/workflow/**`)."
+          },
+          {
+            "line": 46,
+            "text": "3. [CoordinationSession](coordination-session.md) defines the CoordinationSession"
+          },
+          {
+            "line": 49,
+            "text": "4. [FlowDefinition](flow-definition.md) defines the shared graph/operation/policy"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "72d7696b8f24be85682471d11693a787b4e12640",
+      "sourceSha256": "980c6dce1a43aae09769995508966b8652079a97ed608fc519cade334b4de24d",
+      "mainSubject": "Workflow Stage Operation Contract",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/contracts/workflow-stage-operation.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Workflow Stage Operation Contract"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "82929554d98e92f91723bad214aeb9b8c43dfcd3",
+      "sourceSha256": "7e5e23e2afdf4b9f8380b8bebb2d7c65e344625993764dd79e6a8abe1cd7921a",
+      "mainSubject": "surviving delivery authority decision, mixed retired Work-stage statement",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "ADR-001: Work Owns Delivery Lifecycle"
+          }
+        ],
+        "owner": "src/runner/execution/run.mjs:532-540"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "45e0b6fa143e6035b449c2847911cc1b4210fb84",
+      "sourceSha256": "b865cce18a8f7d167d3a9e1b855c274e05f16dbc11d7df8130494ab9bac811e0",
+      "mainSubject": "ADR-002: Preserve Stage Primary Operation Compatibility",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 30,
+            "text": "Team Dispatch needs multiple legal operations per Stage without breaking that"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "9e3a36156195ef6823bed085a67e356ed27ebf22",
+      "sourceSha256": "4368136590c62d3888562191aa46fd999173a08aace9894ee7a192708db388bf",
+      "mainSubject": "surviving request/attempt/result separation",
+      "classification": "still-current",
+      "mixed": false,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "ADR-003: Separate Assignment, Run, And RunResult"
+          }
+        ],
+        "owner": "src/runner/dispatch/run-result.mjs:350-365"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "9d72a197f44bf1c8744ac01d64e7429dc3a5c78e",
+      "sourceSha256": "a60ce5298c77d43edee04c299a0a0eb71b3515833c743f937cba009ce421453a",
+      "mainSubject": "ADR-004: Reserve Job For A Future Scheduler",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 29,
+            "text": "Queue/scheduler terminology can be useful later, but Team Dispatch V1 executes"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "f75059d97309e18ec87e0aa404c9414f82967e2b",
+      "sourceSha256": "5fcce47bd72f70e053189a2fb58659000ce3ddd3e3d9b6651f793940d045430f",
+      "mainSubject": "surviving visibility-is-not-result decision",
+      "classification": "still-current",
+      "mixed": false,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "ADR-005: Herdr Is Visibility, Not Evidence"
+          }
+        ],
+        "owner": "src/runner/dispatch/visibility-session.mjs:130-133"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "62785f7b7126fabdf698c417d64af1c3bbfc8d96",
+      "sourceSha256": "685c84e23f4b080f880c0e53d08f11d7fdf3c40da0c97af3e433a0aa60868881",
+      "mainSubject": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "a53eaf1cf91a345d6507a0517c3b8e2490492541",
+      "sourceSha256": "f0a2a38c872c18d9f1e86f11a0b0a0788b7108ef8a49e5a17e9b3e5076bcabe9",
+      "mainSubject": "ADR-007: Domain Harness Seam And Non-Driving Inline Evidence",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "ADR-007: Domain Harness Seam And Non-Driving Inline Evidence"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "a8667e506b5351788a7e466ddbb551cc6748c36f",
+      "sourceSha256": "ec77c692f0fe9e73c4fb86d35de3f7567fdd5b0c7cdd20bf4ade373feb9621bf",
+      "mainSubject": "ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 26,
+            "text": "Step 08 Phases 01-07; see `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`"
+          },
+          {
+            "line": 29,
+            "text": "Canonical for: CoordinationSession identity/persistence boundary, session-to-Assignment membership direction, mission-lite cutover posture, and the Role/SessionActor/Persona/Stance actor-instance vocabulary"
+          },
+          {
+            "line": 30,
+            "text": "Related: [Vision V-001/V-005/V-009](../vision.md), [ADR-006 §6](ADR-006-assignment-provenance-and-contract-snapshot.md), [Intent Preservation Ledger AC-I001/AC-I002/AC-I007](../intent-preservation-ledger.md), [CoordinationSession Contract](../contracts/coordination-session.md), [Step 08 checkpoint](../proposals/step-08-standalone-coordination-protocols.md#discussion-checkpoint-step-08-recommended-decisions-and-plan-2026-09-01)"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "994fcecef1cff51e105507da588d004bff498cb0",
+      "sourceSha256": "f17cb3fdcefa9b44dd3bd63fcf7dc7077cc74f42952fb12e49fff3101b964307",
+      "mainSubject": "ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 26,
+            "text": "Step 08 Phase 02; see `docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`"
+          },
+          {
+            "line": 29,
+            "text": "Canonical for: the FlowDefinition intermediate representation, the Workflow/CoordinationProtocol profile split, and the V1 operation-primitive field set"
+          },
+          {
+            "line": 30,
+            "text": "Related: [Vision V-006/V-008/V-012](../vision.md), [Protocol Model](../architecture/protocol-model.md), [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md), [FlowDefinition Contract](../contracts/flow-definition.md), [ADR-008](ADR-008-coordination-session-and-mission-deferral.md), [Intent Preservation Ledger AC-I003/AC-I005/AC-I006](../intent-preservation-ledger.md)"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "782e118411f8d3236aba1eb96c2d4a39bbd14ccd",
+      "sourceSha256": "362e65352d18c3f0e0d0eeeefc6051bd983b4e03c9985eefb2d5aa1d5c152f54",
+      "mainSubject": "ADR-010: Interactive/Headless Capability Parity As An Intended Future Property, And Domain-Owned Work Isolation",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 26,
+            "text": "`src/runner/coordination/headless-adapter.mjs`, Step 08 Phase 07; capability"
+          },
+          {
+            "line": 27,
+            "text": "parity proven live at P07.2 R5, `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/`;"
+          },
+          {
+            "line": 30,
+            "text": "`docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md`"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "b225066ad470c28bbcf69dd374c5d7b0e28af94e",
+      "sourceSha256": "18e4002d3b920fd09a28f22cd4cfec9f9531e56f0eae6ec5ff870cfcadb8fa59",
+      "mainSubject": "surviving transport-versus-receipt boundary",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt"
+          }
+        ],
+        "owner": "src/runner/dispatch/assignment-runner.mjs:2471-2492"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "aa4a6be9849131df3cf27d7886252158c0add6f5",
+      "sourceSha256": "56b43bba7aeeb2cf49bed25052064808b6f654ef521614446e630d2026eb9854",
+      "mainSubject": "Agent Coordination Architecture Decisions",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 49,
+            "text": "8. [ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral](ADR-008-coordination-session-and-mission-deferral.md)"
+          },
+          {
+            "line": 50,
+            "text": "9. [ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles](ADR-009-flow-definition-shared-ir-and-typed-profiles.md)"
+          },
+          {
+            "line": 56,
+            "text": "checkpoints. ADR-008, ADR-009, and ADR-010 extract the Step 08 Phase 00"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "adfa47ad363b40d8f5bc69deecdcebf51c6de035",
+      "sourceSha256": "29ed3888ab8539f922a352d63bc4cbaf4050210455e1abb1d0dedc159a7fd681",
+      "mainSubject": "Agent Coordination Intent Preservation Ledger",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 82,
+            "text": "| 11 | Arbitrary `addSessionEdge` / runtime topology overlay | AC-I002, AC-I004 | Powerful but high-risk: it can weaken static FlowDefinition legality and isolation fixtures. Prefer declared optional operations and predeclared specialist slots first. | Multiple real consumers prove that declared optional operations plus specialist slots cannot express the needed runtime graph change. |"
+          },
+          {
+            "line": 93,
+            "text": "- **Status:** `implemented` -- Step 08 P01.1/P01.2 built and live-proved a"
+          },
+          {
+            "line": 94,
+            "text": "  persistent standalone CoordinationSession with `workId: null`, no"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "4915b7c4b08662297c5a9d90686db7b953222173",
+      "sourceSha256": "0e959640b0f2ca28b7bf90d533567b2d6b09a9e557d25b4e50f726893fa22050",
+      "mainSubject": "still-consumed cognitive artifact aids, not runtime recipes",
+      "classification": "still-current",
+      "mixed": false,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 90,
+            "text": "# Intake — <case slug>"
+          },
+          {
+            "line": 139,
+            "text": "# Interpretation — <case slug>"
+          },
+          {
+            "line": 189,
+            "text": "# Scout Report — <case slug>"
+          }
+        ],
+        "owner": "core/skills/fgos-architecture-panel/SKILL.md:135-142"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "55f949e24d6ee09c887cc0b7e1b58a69b3f3cc9d",
+      "sourceSha256": "f8608622222cf2444210aa51f6ca478d11a3e8b95f08ad185c16a45aa57ed264",
+      "mainSubject": "still-consumed cognitive evaluation criteria, not runtime recipes",
+      "classification": "still-current",
+      "mixed": false,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Architecture Advisory Evaluation Rubric"
+          }
+        ],
+        "owner": "core/skills/fgos-architecture-panel/SKILL.md:135-142"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "fe5f08b49151ed508a03ec86f4e60e0caf3d90df",
+      "sourceSha256": "610ffe2502a39b0f5aa3654239bb91f955b4e872daa58e54471b9cd97b682cf9",
+      "mainSubject": "still-consumed advisory role doctrine; mixed historical dispatch/confinement recipes",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Architecture Advisory Role Doctrine"
+          }
+        ],
+        "owner": "core/skills/fgos-architecture-panel/SKILL.md:135-142"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "da0c5a31daecda9633132e1608d106acde830b87",
+      "sourceSha256": "dff5fbaeb0361da18dfa4485cb2721d4ecf6fb9090b5c71c4dca6cf198b90178",
+      "mainSubject": "Coordination Operating Harness",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/coordination-operating-harness.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 47,
+            "text": "[Step 07 - CoordinationSession, AdhocTask, And Planning Boundary](../proposals/step-07-coordination-session-adhoc-task.md)."
+          },
+          {
+            "line": 51,
+            "text": "Step 06 proves Work-attached Team Dispatch can run on real Work items. Step 08"
+          },
+          {
+            "line": 107,
+            "text": "- Do not implement Step 08 mission-lite yet."
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "b38250abccd49016a2c78113471ae897ae73100d",
+      "sourceSha256": "ce9a316aed566a1402b920541fedb34c06a382aa67681f4a5a3ac6f71d54c1ec",
+      "mainSubject": "MVP6+ Dogfood Handoff",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 32,
+            "text": "[CoordinationSession Contract](../contracts/coordination-session.md),"
+          },
+          {
+            "line": 33,
+            "text": "[FlowDefinition Contract](../contracts/flow-definition.md),"
+          },
+          {
+            "line": 34,
+            "text": "[Thin Launcher Surface Readiness](../verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md),"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "b91b3b1625964c447527969642d33b369f9f76a9",
+      "sourceSha256": "f9337117388f9a064b22ad405c1b3133331366c72165643624a88cc186a15d76",
+      "mainSubject": "still-consumed cognitive prompt; mixed manual runtime instructions superseded by registered skill",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Architecture Advisory Coordinator Prompt"
+          }
+        ],
+        "owner": "core/skills/fgos-architecture-panel/SKILL.md:135-142"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "9e279746e3446c8902a302a86360ad862ec73fdb",
+      "sourceSha256": "aaf07417070112d6d6e5898381b9b7c012eefffb631cf44b2c10f67d4f3ad47c",
+      "mainSubject": "Master Multi-Agent Implementation Coordinator Prompt",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Master Multi-Agent Implementation Coordinator Prompt"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "811d1b86f7122194222ba10465a12e666e38aaf4",
+      "sourceSha256": "0db2ff00a16d57e49ae5881e8844495cecc715bc127fbf2b8739ad58e7632085",
+      "mainSubject": "Step 07 Design Discussion Handoff Prompt",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 49,
+            "text": "- làm rõ CoordinationSession, AdhocTask, planning materialization, validated"
+          },
+          {
+            "line": 53,
+            "text": "- giữ Step 08 standalone protocols là consumer tương lai, không để Step 08 kéo"
+          },
+          {
+            "line": 84,
+            "text": "15. docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "0a3a309bdcc60fcaf4ee8736ab25fc709ff16b72",
+      "sourceSha256": "895690fa0cc87de7e14becadf95b274d57f89186c116d6315e0964beb5caa337",
+      "mainSubject": "Agent Coordination Playbooks",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 48,
+            "text": "  starting point for using the real `fgos coordination` runtime/surface path"
+          },
+          {
+            "line": 89,
+            "text": "This is useful while the CoordinationSession/AdhocTask/protocol runtime is not"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "330f18b53963605a834d294676280d6a6f19751d",
+      "sourceSha256": "49a95abb6178800148fe6a465c1e642bfd105a6b5c03ae6283052b037319b99e",
+      "mainSubject": "DAG Request Scheduler For Coordination Runs",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 27,
+            "text": "Canonical for: nothing; the accepted contracts remain [FlowDefinition](../contracts/flow-definition.md) and [CoordinationSession](../contracts/coordination-session.md)."
+          },
+          {
+            "line": 28,
+            "text": "Related: [Step 07 CoordinationSession / AdhocTask](step-07-coordination-session-adhoc-task.md), [Runtime Model](../architecture/runtime-model.md), Standalone Master Coordination Protocol (`../../../../core/coordination-protocols/standalone-master-coordination-loop.yaml`; Added in candidate: historical path absent at the batch pin)"
+          },
+          {
+            "line": 35,
+            "text": "the public `fgos coordination run` request path awaits every declared"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "510a0ce36b8b912b8f5149e32eba861948c68388",
+      "sourceSha256": "3ac2655fe07216ab4087fd1e80b7f7adafbb1cd1d929fbd0c6b0f2508dc9793c",
+      "mainSubject": "Dispatch Control Plane Redesign",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 299,
+            "text": "Team dispatch adds one layer before `DispatchPlan`: an effective execution"
+          },
+          {
+            "line": 577,
+            "text": "For Team Dispatch V1, the concrete post-merge rule is:"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "c857b8e5ccba14598d8cae477b72d30af2f1ae52",
+      "sourceSha256": "6aa7be3a449e9fc2812793629c0687960e569954317408f881e0d024289368ce",
+      "mainSubject": "Agent Coordination Proposals",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 57,
+            "text": "1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](step-07-coordination-session-adhoc-task.md)"
+          },
+          {
+            "line": 58,
+            "text": "   is historical discussion. CoordinationSession, runtime boundaries, and"
+          },
+          {
+            "line": 61,
+            "text": "2. [Step 08: Standalone Coordination And Optional Protocols](step-08-standalone-coordination-protocols.md)"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "feba76a39fb70cabeed00dac1bd451c2c6dde6a7",
+      "sourceSha256": "3c29467db4973eb357442225fbcfc14a4aacd60660eeebfcd4041c64162e8bc9",
+      "mainSubject": "Semantic CLI Surface for Agent Coordination",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Semantic CLI Surface for Agent Coordination"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "e9fdfd60b20ad1cf8306fa3d5c696a4cd2bafe98",
+      "sourceSha256": "dceae9599d635680848956835527382b82bd39ffba2fccf4369f0a016194acee",
+      "mainSubject": "Step 07 - CoordinationSession, AdhocTask, And Planning Boundary",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 25,
+            "text": "Implementation: Accepted portions implemented through Step 08; deferred portions remain unaccepted"
+          },
+          {
+            "line": 37,
+            "text": "CoordinationSession, FlowDefinition, runtime, evidence, and Work-boundary"
+          },
+          {
+            "line": 161,
+            "text": "workflow stages. It has no explicit CoordinationSession or AdhocTask graph."
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "1d634c2d9ecf936de981167dee5a16c874a055d2",
+      "sourceSha256": "ad00271c276f81ce73a51c9229597cf4ef50962562231560506f296ee3fea2b5",
+      "mainSubject": "Step 08 - Standalone Coordination And Optional Protocols",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 26,
+            "text": "(track `step-08-standalone-coordination`, Phases 00-07, closed) -- see that"
+          },
+          {
+            "line": 28,
+            "text": "(`docs/architect/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md`)"
+          },
+          {
+            "line": 37,
+            "text": "CoordinationSession/AdhocTask runtime"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "18883a702b91436d227cae67625ec5776eec6284",
+      "sourceSha256": "6f9d87a2f4189617629be45686edcbbb794e74bf823d9a319645576c9b5cb357",
+      "mainSubject": "Team Communication Protocol V1",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/proposals/team-communication-protocol-v1.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 33,
+            "text": "Team Dispatch V1 needs a communication protocol, but it must stay smaller than"
+          },
+          {
+            "line": 243,
+            "text": "evidence for a Team Dispatch operation once the result influences a lifecycle"
+          },
+          {
+            "line": 335,
+            "text": "[Step 08](step-08-standalone-coordination-protocols.md) and depends on the relevant"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "1ee328dbdf862da773c34a0746bb2cab624410e1",
+      "sourceSha256": "fc8c55194c9512f9a46728d9dfb0b1079529eb2adccb5b2af142b004d50eeff4",
+      "mainSubject": "current-owner navigation",
+      "classification": "still-current",
+      "mixed": false,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 30,
+            "text": "Read [the runner spec](../../specs/runner.md) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities."
+          }
+        ],
+        "owner": "src/runner/execution/patterns/index.mjs:34-46"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "e5e1460761dbffc21784f44154b4035e9c6fdd53",
+      "sourceSha256": "e23effba87631a93ae85d7861bfea634e1f036472cff3a6dad385920a36b9e2d",
+      "mainSubject": "Agent Coordination Roadmap",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 37,
+            "text": "- [Team Dispatch V1](team-dispatch-v1/README.md) records Steps 00-06 from baseline"
+          },
+          {
+            "line": 44,
+            "text": "- [Step 09](../../../architect/proposals/step-09-group-thinking-substrate.md)"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "2375b5555bb70fed21c8d508c835e51bb1fa15c1",
+      "sourceSha256": "2e37db98aa30162e507166469a01780d7e4c58236de18f9654b5b11a97339518",
+      "mainSubject": "Team Dispatch V1 Roadmap",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 27,
+            "text": "Canonical for: Team Dispatch V1 step history and implementation sequence"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "30f5782bed362fadb08d6e7dbab3c3020eda9c63",
+      "sourceSha256": "fd4e0935684a5c4215574f6b8908cc8eb72b140777a41f40a7b3b20ab2ae14f3",
+      "mainSubject": "Step 00 - Team Dispatch V1 Overview",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 28,
+            "text": "Scope: first practical team dispatch slice over existing work, workflow/stage config, task-specs, skills, cli-spawn executors, and result evidence"
+          },
+          {
+            "line": 44,
+            "text": "V1 should build team dispatch with five practical objects:"
+          },
+          {
+            "line": 65,
+            "text": "- Herdr remains optional visibility and is not required for team dispatch V1."
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "9c351fa2fc1421d615bd5ff7edfbe3d8efa4c9f0",
+      "sourceSha256": "33c7c3d74ea55089c583194cdd549dcc0a8e5dacf355a4fae99fee130c316087",
+      "mainSubject": "Step 01 - Team Dispatch V1 Rollout",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 28,
+            "text": "Scope: safe sequence for moving from current coding workflow to operation-based team dispatch"
+          },
+          {
+            "line": 139,
+            "text": "11. Step 06: adopt Work-attached team dispatch on real planning/executing"
+          },
+          {
+            "line": 142,
+            "text": "13. Step 08: try mission-lite read-only brainstorming/debate after Work-attached"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "9a86ef794ca20b0a9ec720175ee3a4db5a0effbd",
+      "sourceSha256": "08fbdde579a7c179826183d8409fba50bef5cb68176a4a95fba5a050aa168009",
+      "mainSubject": "Step 02 - Workflow Stage Operations",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Step 02 - Workflow Stage Operations"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "7523fb8653154cae8b6d61cc38e2351ca8104ca8",
+      "sourceSha256": "cf9de163dc8d1d70eb61bd6c8e9b481e7e2e2f80e0292094187fac598caa8e8d",
+      "mainSubject": "Step 03 - Assignment, Run, And RunResult",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Step 03 - Assignment, Run, And RunResult"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "77ce6b233f799f7c828ea039fb83913fa31d729f",
+      "sourceSha256": "550a1d7a9031fa3effbf2466cf934691410863744db2c82b8f8479b6be445009",
+      "mainSubject": "Step 04 - Assignment RunResult Evidence Hardening",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Step 04 - Assignment RunResult Evidence Hardening"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "70a49161888b25276fc81f875b17ba8120effd6a",
+      "sourceSha256": "7bdefd0cd2c3f213503925ffd346cdfea825d488e4636015e929157d275029f8",
+      "mainSubject": "Step 05 - Coding Driver Operation Choice",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Step 05 - Coding Driver Operation Choice"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "9c0bedeb52a45984eb7f65dd34a8d967710cf7b6",
+      "sourceSha256": "c0bbece69bbb35da684164a9f460d2fa6005140b29c2d6f30fceba8c9f065045",
+      "mainSubject": "Step 06 - Work-Attached Team Dispatch Adoption",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 28,
+            "text": "Scope: use operation-aware team dispatch on real Work items in planning and executing, with conservative rollout and live evidence checks"
+          },
+          {
+            "line": 32,
+            "text": "Move Team Dispatch V1 from tested infrastructure into real coding-domain"
+          },
+          {
+            "line": 53,
+            "text": "- `fgos doctor` Team Dispatch checks pass:"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/spec.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "790db518eb65087d7e392407d09b5048e5fa6968",
+      "sourceSha256": "9d7faa4227e606991b16f9a7cd1fdf094d06c2e7daf0c6969153ab823f28d177",
+      "mainSubject": "current-owner navigation with mixed historical clause",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 30,
+            "text": "CoordinationProtocol, while still requiring runtime execution contracts for any"
+          },
+          {
+            "line": 37,
+            "text": "- Their current contract: [docs/specs/runner.md](../../specs/runner.md), not the retired CoordinationSession engine."
+          },
+          {
+            "line": 65,
+            "text": "The current data and execution owners are [Unit](../../../src/runner/execution/unit.mjs), [CollaborationPattern](../../../src/runner/execution/patterns/index.mjs) and the [Workflow runner](../../../src/workflow/runner.mjs). Retired CoordinationSession and FlowDefinition claims remain verbatim in [history](history/retired-engine/spec.md#literal-snapshot), not this current-state map."
+          }
+        ],
+        "owner": "src/workflow/runner.mjs:419-428"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/subcomponents/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "28d8d7a9211aca0f50d89720769d66eaee80731c",
+      "sourceSha256": "51ef47d23b93a5086e7166d0f9cb1aa9890f328c72da686841beb1b77c2c6368",
+      "mainSubject": "Agent Coordination Subcomponents",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Agent Coordination Subcomponents"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "7596345fafc1a407356a82d7f5a31aeb0e1a7233",
+      "sourceSha256": "8d3358888aadd05dc759f677f0d5051f9698faeeca3ea85081785e65e59eade1",
+      "mainSubject": "Agent Coordination Implementation Alignment",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Agent Coordination Implementation Alignment"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "956f04a1889235b5f1f6495c0ebe558349c3e46b",
+      "sourceSha256": "e78bac480615f20e753369e8b8d624ff3a67a123d17e8a6c8c396a6fed201f40",
+      "mainSubject": "dated evidence navigation; constitution-required owner of 867 physical payloads",
+      "classification": "still-current",
+      "mixed": true,
+      "operation": "retain current sections; preserve replaced sections verbatim in history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 35,
+            "text": "- [Team Dispatch V1 trace](team-dispatch-v1/index.md) records cell-level"
+          },
+          {
+            "line": 40,
+            "text": "| Foundation and standalone coordination | CoordinationSession, FlowDefinition, and Work-isolation boundaries | [Step 08](../../../architect/agent-coordination/verification/step-08-standalone-coordination/index.md) |"
+          },
+          {
+            "line": 45,
+            "text": "| Group thinking | protocol, cohort, and advisory-panel evidence, including known quality gaps | [Step 09 evidence](../../../architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md) |"
+          }
+        ],
+        "owner": "core/skills/fgos-architecture-panel/SKILL.md:135-142"
+      },
+      "rationale": "The main subject has a surviving executable or registered cognitive consumer. Keep only code-checked current-state text and durable cognitive guidance; split retired sections rather than presenting the prior document wholesale as current.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vision.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "954501a150fed5dda792a8a670ec8b2725e4664b",
+      "sourceSha256": "88eb066b1cc3f59286bd62a9ba4cfea02536bef3fe4ddd9ddfe1ea6bafa1022a",
+      "mainSubject": "Agent Coordination Foundation Vision",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 327,
+            "text": "1. Every CoordinationSession must reference a predeclared Workflow, Stage, or"
+          },
+          {
+            "line": 353,
+            "text": "### CoordinationSession And AdhocTask"
+          },
+          {
+            "line": 355,
+            "text": "A CoordinationSession, if persisted, is a thin execution and recovery boundary;"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "2382748550d0cc63c355a6029fdd6b9e973edad0",
+      "sourceSha256": "fafc46fdb1d07dd3432fff2cab80ab916f0bd69cec2302c8710e17d7a1550e7c",
+      "mainSubject": "Canonical Agent Coordination Concepts",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 55,
+            "text": "### FlowDefinition"
+          },
+          {
+            "line": 59,
+            "text": "A FlowDefinition declares a common `spec` kernel (graph, roles, actors,"
+          },
+          {
+            "line": 62,
+            "text": "`CoordinationProtocol` (Phase semantics, topology/cohort/synthesis, no Work"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "ee586e4e65b2b628b3eeec7b06b2822854e5c74c",
+      "sourceSha256": "43dcd3a7cdda7e5713dc2d56765a3fb0ddb9effde8cba820a919a1c07acb8cf5",
+      "mainSubject": "Agent Coordination Concept Relationships",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 33,
+            "text": "             -> CoordinationSession <-"
+          },
+          {
+            "line": 42,
+            "text": "  CoordinationSession -> optional AdhocTask graph -> Assignment"
+          },
+          {
+            "line": 55,
+            "text": "## Runtime Profiles"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "d0af4f6a807c1bbcd656cebdbc4bfb505c729340",
+      "sourceSha256": "64772305e549d11f0a822655718281dd4b6f7c37abb6a549666a3a991c3a1d35",
+      "mainSubject": "Deprecated And Reserved Coordination Terms",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 45,
+            "text": "Reserved for a future durable queue/scheduler unit. Team Dispatch V1 does not"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/README.md",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "6821ad2cf41f4a9a584b9b072d18f32a557f19cf",
+      "sourceSha256": "595ef132a7c493d37af7a5bf1d6a63beb80cb336eb513b177c37a5db0c02cbb2",
+      "mainSubject": "Agent Coordination Vocabulary",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Agent Coordination Vocabulary"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+      "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "sourceBlob": "d9b6d34f75a79b5910909a555c32298e922bdbfb",
+      "sourceSha256": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
+      "mainSubject": "Workflow-stage/operation relationship diagram",
+      "classification": "retired-engine",
+      "mixed": false,
+      "operation": "move whole file verbatim to kind history",
+      "targetHistory": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+      "evidence": {
+        "subject": [
+          {
+            "line": 1,
+            "text": "Stage, Stage Operation, TaskSpec, and Skill (SVG title)"
+          }
+        ],
+        "owner": "docs/specs/runner.md:1312-1319,3048-3058,3072-3080; retirement commit 2180b4e72701bb090288af8fe8021008d9d42079"
+      },
+      "rationale": "The main subject is the retired coordination engine, its declared stage/session/flow vocabulary, step-08/09 runtime, contracts, operating prompts, proposals, proof navigation or rollout history. Retirement 2180b4e72 and docs/specs/runner.md historical section require non-authority history; moving preserves all original claims rather than reviving the engine.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-09"
+    }
+  ]
+}
