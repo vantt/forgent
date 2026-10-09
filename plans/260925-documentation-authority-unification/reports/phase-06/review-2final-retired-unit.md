@@ -1,0 +1,27 @@
+# Independent targeted final check: main-sync retired successors and IO identity gaps
+
+Reviewer: reviewer:claude-session:4df9e88c@2026-10-09
+Author session: codex-session:1@2026-10-08
+Review mode: ordinary
+
+Request: reports/phase-06/review-request-2-final-check.md (A13); records: ledger/retired-unit-decisions.json (only the pending rows) and ledger/main-sync-successors.json (rows and gaps); successor packet: reports/phase-06/final-check-successors.md. Review tree: feb17a8cc0524ce2e51bb962449c1d4db3cd8bea. Main commits compared: f33612119 (AGENTS.md RUL11 heading and body) and 3ea75475d (docs/io-contract.md exception list).
+
+## Reading method
+
+Diff-based reading with full text for every changed row; content of candidate-native units checked against current code; owner-approved 2026-10-08/09. The old and successor units were extracted with the repository's own extractor (`extractMarkdownConservationUnits` from scripts/generate-doc-inventory.mjs) at the parent and the main commit, and the displayed target texts were hashed. Both predecessor ids stay in registry accounting; these are accounting decisions, not source-text edits.
+
+## Result
+
+- Items: 4 (2 retired rows, 2 identity-gap predecessors); ok 4; rework 0; hold 0.
+- claim_c3ef3a4d (RUL11): old heading unit at f33612119^ has unit digest 4485eb54... and the successor at f33612119 has 52ff86d6..., both equal to the record; the sha256 of the shown successor text is 53ac9f9f.... The successor carries every clause of the old unit (the opening sentence, 'gom tới khi hết', 'quy mô không bao giờ là lý do miễn trừ', the single-shape goal, the closing line) and adds, by the explicit owner decision recorded in the main commit message (ADR0054 supersedes ADR0036), a scope qualifier for in-scope consolidation, a rule that out-of-scope mess becomes its own item, and that consolidating by building a new tool is a decision question. A13 authorizes supersede for the renamed heading; no law or instruction text is edited here.
+- claim_3c993001 and the two gaps: the unit digests e24cc261... (old block 14), 74809b03... (old block 15) and 549dded9... (old block 16) are the old units at 3ea75475d^ exactly as recorded. All of their text survives in the candidate section 5 (`5-reasoned-envelope-exceptions`): items 1-4 byte-equal, the fgos-discovered paragraph byte-equal, and the leading count sentence differs only by Bốn changed to Năm because main added the fifth exception; the fifth exception (fgos hook door) is the labelled main-side addition and `fgos hook` exists (bin/fgos.mjs:4540-4553). The anchor passes `node scripts/list-doc-anchors.mjs --check`. The gap rows carry no target digest of their own, so the digest of the shown target section (5ca1201a...) is used.
+- The three current IO source units that replace these predecessors are reviewed in review-2final-b-io-contract.md.
+
+## Verdicts
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_c3ef3a4ddc116883db10a70d55ba7bd5 | ok | Supersede from AGENTS.md#rul11-...-d-adr0036-... to the heading renamed in f33612119. Old unit digest 4485eb54 and successor unit digest 52ff86d6 recomputed with the repository extractor at f33612119^ and f33612119; shown successor text hashes to the recorded shown digest. Every old clause survives in the successor, which adds only the owner-decided ADR0054 scope refinement; vocabulary supersede (target replaces the whole unit, possibly reworded) fits and no AGENTS.md text is touched. | 4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940 | 53ac9f9ff1a0476287e5746059f0dd1681d73d704b010f7ef12b61b325d1d9fe |
+| claim_3c993001919f57e0f96a36c2a4d92c43 | ok | Retired unheaded-block-16 of docs/io-contract.md (the fgos-discovered paragraph, digest 549dded9 at 3ea75475d^). Main folded it into the exception-list unit; the paragraph text is present byte-equal in the shown candidate section 5, so supersede loses nothing and the separator difference is the declared intentional one. Shown target hashes to 5ca1201a. | 549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe | 5ca1201a0e7c0df5e8a9b04c1cc2e1f9b07e92e48d295648597c3a6e63a554ba |
+| claim_b92ac199356ff830e5554647ab143a90 | ok | Identity-gap predecessor unheaded-block-14 (the 'Bốn luồng KHÔNG bọc phong bì... ' lead-in, digest e24cc261 at 3ea75475d^). The successor sentence is the same text with the count changed from four to five, which is exactly the main-side edit; the claim is carried in candidate section 5 and in the pending successor row 992a812b. Supersede is right because the whole unit is replaced by the reworded one. Target digest is the shown section 5 digest because the gap record has none of its own. | e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5 | 5ca1201a0e7c0df5e8a9b04c1cc2e1f9b07e92e48d295648597c3a6e63a554ba |
+| claim_6a8087a3f502f37f9c7b729e871bee9c | ok | Identity-gap predecessor unheaded-block-15 (exceptions 1-4, digest 74809b03 at 3ea75475d^). I checked the ten source lines are byte-contained in candidate section 5, where item 5 is the main-side addition; the whole predecessor is carried by the pending successor row dd296404 and section 5, so supersede holds. Target digest is the shown section 5 digest because the gap record has none of its own. | 74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6 | 5ca1201a0e7c0df5e8a9b04c1cc2e1f9b07e92e48d295648597c3a6e63a554ba |
