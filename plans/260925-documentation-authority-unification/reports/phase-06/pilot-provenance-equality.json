@@ -1,0 +1,266 @@
+{
+  "ownerCommit": "a07a4d6ea",
+  "priorCommit": "7df871822",
+  "authorSession": "codex-session:1@2026-10-08",
+  "rows": [
+    {
+      "claimId": "claim_9466cce125cf03619e4d50ff9f340dcb",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "f72297b85c91b398",
+      "targetUnitDigest": "11a6e0e929f3ed69d0f883a5385618ea"
+    },
+    {
+      "claimId": "claim_1b5bd12129cc41ea75fc7dd3993142f3",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "476e7efba05e358c",
+      "targetUnitDigest": "fb2a927391a144152bec76f586c13c1f"
+    },
+    {
+      "claimId": "claim_882ee3f986d0dacee87764a5b6bb75d8",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "accb25b08ef0d839",
+      "targetUnitDigest": "accb25b08ef0d839f5a86e898250752f"
+    },
+    {
+      "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "698037f4efe95080",
+      "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516"
+    },
+    {
+      "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "4d3e5ba86bd907ab",
+      "targetUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e28"
+    },
+    {
+      "claimId": "claim_b5ef9b491d020583ac6ca1379e4115a0",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "eed0b8520401ce77",
+      "targetUnitDigest": "eed0b8520401ce77b1b75379282e3390"
+    },
+    {
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "fa53d50b84fef302",
+      "targetUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83"
+    },
+    {
+      "claimId": "claim_cb629f70ad6029530d70253f96ad3221",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "bd8b780f96dd2ecc",
+      "targetUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b3"
+    },
+    {
+      "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "25e4a007d2fc9a15",
+      "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15"
+    },
+    {
+      "claimId": "claim_e9c39f67bc2eab533faa3053ff482708",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "e067ab7149569e51",
+      "targetUnitDigest": "01eac1846cb1ba744cb0732c6b1b4773"
+    },
+    {
+      "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "6dcf0faa76d27fed",
+      "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b7"
+    },
+    {
+      "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "18c5d821a55d3517",
+      "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e"
+    },
+    {
+      "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "84367855d92bb2e3",
+      "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce"
+    },
+    {
+      "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "6a5b9a01b0427971",
+      "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de1"
+    },
+    {
+      "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "bdeca0144b587f82",
+      "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e8"
+    },
+    {
+      "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "3f95d2bd43575ae5",
+      "targetUnitDigest": "36cd92b838deaea9ab436d4ea4f625f0"
+    },
+    {
+      "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "3727b3fa0ee79f8b",
+      "targetUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e33"
+    },
+    {
+      "claimId": "claim_27d4d4dca46d6a8859628c443df0b31e",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "413cdab72d47c625",
+      "targetUnitDigest": "302bf7838a49e51804feb94da762bf7a"
+    },
+    {
+      "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "c34e8e9c9dbf41ce",
+      "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb8"
+    },
+    {
+      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "b82a558166f118f3",
+      "targetUnitDigest": "b82a558166f118f339210d9a47521404"
+    },
+    {
+      "claimId": "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "07e9c25f094955f0",
+      "targetUnitDigest": "4af102d0a390692f1d71ae14123acf45"
+    },
+    {
+      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "83773dda67db8d5f",
+      "targetUnitDigest": "83773dda67db8d5f71205bb8c7106186"
+    },
+    {
+      "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+      "priorReviewStatus": "pending",
+      "equal": true,
+      "sourceUnitDigest": "39e4ab1f30a6acc9",
+      "targetUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd34"
+    },
+    {
+      "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "78393c0183b6bda3",
+      "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2"
+    },
+    {
+      "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "1a437d176164754d",
+      "targetUnitDigest": "3e7cfb35e58461211cd5f01de9abfc2e"
+    },
+    {
+      "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "a8eaefe3669a194a",
+      "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d5"
+    },
+    {
+      "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "a1b267899ca12fa9",
+      "targetUnitDigest": "934cee435d2ab0ff2f52c0731e412fd7"
+    },
+    {
+      "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "ae0e60ec193e0ac5",
+      "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c5"
+    },
+    {
+      "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "c9d3ad96d4b03b02",
+      "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7"
+    },
+    {
+      "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "03c9a0137385cea3",
+      "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2"
+    },
+    {
+      "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "6e8ef157c4c9861c",
+      "targetUnitDigest": "f57aa1458563f22d63881b3372998ece"
+    },
+    {
+      "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "36d44c8bdf5ad1f0",
+      "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d4"
+    },
+    {
+      "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "fa405ec4333b4351",
+      "targetUnitDigest": "fa405ec4333b43518de9831ea52cd472"
+    },
+    {
+      "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "30a3d1465b852976",
+      "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1"
+    },
+    {
+      "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "fd7e473ad76cf591",
+      "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744f"
+    },
+    {
+      "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "701eefe16b5100fc",
+      "targetUnitDigest": "9b906d61cd8f824de9ce5a5b203808e7"
+    },
+    {
+      "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+      "priorReviewStatus": "reviewed",
+      "equal": true,
+      "sourceUnitDigest": "7fddf59545c800c1",
+      "targetUnitDigest": "7fddf59545c800c11029e0609a32bd90"
+    }
+  ]
+}

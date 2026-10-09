@@ -12,11 +12,10 @@
       "targetAnchor": "1-purpose-and-scope",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Document H1 of the legacy contract; the frozen map section 5 places it under the candidate heading 1. Purpose And Scope (the candidate H1 'CLI I/O Contract' is the document title), so the Vietnamese title is replaced by an English heading title.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "11a6e0e929f3ed69d0f883a5385618ea"
+      "targetUnitDigest": "11a6e0e929f3ed69d0f883a5385618ea",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_1b5bd12129cc41ea75fc7dd3993142f3",
@@ -25,11 +24,10 @@
       "targetAnchor": "unheaded-block-2",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Intro paragraph carried into 1. Purpose And Scope as its own block but CHANGED in two links: the 0014 link (decisions/0014-... .md, dead after the decision corpus retired) is rewritten to plain code text `0014` plus its path, and the 0011 link is repointed to retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the rest of the text is verbatim.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fb2a927391a144152bec76f586c13c1f"
+      "targetUnitDigest": "fb2a927391a144152bec76f586c13c1f",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_882ee3f986d0dacee87764a5b6bb75d8",
@@ -38,11 +36,10 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The 'Mục tiêu' goal paragraph (new transport plugs in via transport-to-verb and envelope/manifest) is carried verbatim as the second block of 1. Purpose And Scope.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "accb25b08ef0d839f5a86e898250752f"
+      "targetUnitDigest": "accb25b08ef0d839f5a86e898250752f",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
@@ -51,11 +48,10 @@
       "targetAnchor": "2-input-direction-verb-and-identity",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Section heading 'Chiều vào — verb + danh tính' maps to the frozen heading '2. Input Direction Verb And Identity'; only the title language and numbering differ.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516"
+      "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
@@ -64,11 +60,10 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Single write door rule (CTR001/CTR002, no second write path into .fgos/) carried verbatim under the new H3 Single Write Door; not stated in work-state.md so no merge.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e28"
+      "targetUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e28",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_b5ef9b491d020583ac6ca1379e4115a0",
@@ -77,11 +72,10 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Lead-in sentence for the writer field; the candidate keeps it verbatim inside Writer Identity next to the work-state.md writer text (map section 6 pairs io 22, 33-39 with ws 154-167), though it sits after the ws paragraph and before the io rationale paragraph.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "eed0b8520401ce77b1b75379282e3390"
+      "targetUnitDigest": "eed0b8520401ce77b1b75379282e3390",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
@@ -90,11 +84,10 @@
       "targetAnchor": "unheaded-block-10",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "writer.id / writer.source bullet list with the four trust values, carried verbatim under Writer Source Trust Levels; the same four-value claim is the table of work-state.md 169-174 under the same heading (map section 6).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83"
+      "targetUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_cb629f70ad6029530d70253f96ad3221",
@@ -103,11 +96,10 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Attribution-not-authentication paragraph (D1, D9 never-block rationale, STR38/STR48 out of scope) carried verbatim in Writer Identity alongside the overlapping work-state.md 154-167 text; io-contract is the side that adds the never-block rationale.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b3"
+      "targetUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b3",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
@@ -116,11 +108,10 @@
       "targetAnchor": "unheaded-block-13",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15"
+      "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_e9c39f67bc2eab533faa3053ff482708",
@@ -129,11 +120,10 @@
       "targetAnchor": "3-output-direction-unified-envelope",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Section heading 'Chiều ra — envelope thống nhất' maps to the frozen heading '3. Output Direction Unified Envelope'; only the title language and numbering differ.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "01eac1846cb1ba744cb0732c6b1b4773"
+      "targetUnitDigest": "01eac1846cb1ba744cb0732c6b1b4773",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
@@ -142,11 +132,10 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "First paragraph of the envelope statement (every successful verb in both binaries prints the fgos.v1 envelope), carried verbatim under Envelope Shape; the same four-field envelope is stated by work-state.md 622-634 in the preceding block (map section 6).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b7"
+      "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b7",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
@@ -155,11 +144,10 @@
       "targetAnchor": "unheaded-block-16",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The fenced envelope shape { contract: 'fgos.v1', generated_at, data_hash, data }, carried verbatim as its own block in Envelope Shape; the work-state.md envelope text under the same heading describes the same four fields. Note: the mechanical suggestion pointed at README.md and was wrong.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e"
+      "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
@@ -168,11 +156,10 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The data-is-structured and error-path-not-enveloped paragraph, carried verbatim in Envelope Shape; work-state.md 622-634 states the same (the ws error-path claim 636-639 also lands in the next H3).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce"
+      "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
@@ -181,11 +168,10 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "One envelope per call for fgos.mjs and one single-line envelope per --once/--watch cycle for fgos-runner, carried verbatim under Runner Stdout Envelope; duplicate of work-state.md 641-645 (map section 6).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de1"
+      "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de1",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
@@ -194,11 +180,10 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Real-envelope recognition rule (parse JSON, check contract === 'fgos.v1', never a text heuristic) carried verbatim under the new H3 Recognizing A Real Envelope; no counterpart in work-state.md.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e8"
+      "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e8",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
@@ -207,11 +192,10 @@
       "targetAnchor": "4-exit-codes",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H3 'Mã thoát (exit code) — một nguồn duy nhất' becomes the H2 '4. Exit Codes' in the frozen layout (level and title changed, single-source claim kept in the body).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "36cd92b838deaea9ab436d4ea4f625f0"
+      "targetUnitDigest": "36cd92b838deaea9ab436d4ea4f625f0",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
@@ -220,63 +204,10 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "EXIT_CODES table plus EXIT_BUSY (6) as the only exit-code table, branch on category not message, carried verbatim under 4. Exit Codes.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e33"
-    },
-    {
-      "claimId": "claim_2b155082055823ccabf6fb40242abe42",
-      "sourceUnitDigest": "1ff0b91638812235",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "5-reasoned-envelope-exceptions",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H3 'Ngoại lệ có lý do' becomes the H2 '5. Reasoned Envelope Exceptions'; title language and level change only.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "2ee9bcc753dcb07d3bb150eb6bb9c240"
-    },
-    {
-      "claimId": "claim_b92ac199356ff830e5554647ab143a90",
-      "sourceUnitDigest": "e24cc26161b01726",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-23",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Opening sentence of the four reasoned envelope exceptions, carried verbatim under 5. Reasoned Envelope Exceptions.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "e24cc26161b017265526e8e287d7ddb0"
-    },
-    {
-      "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
-      "sourceUnitDigest": "74809b036d96332c",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-24",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "The four-item list of unenveloped streams (verb registry, setup/doctor --pretty, worker log, runner progress-trace), carried verbatim as one block.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "74809b036d96332c8fd99e73be67a5ab"
-    },
-    {
-      "claimId": "claim_3c993001919f57e0f96a36c2a4d92c43",
-      "sourceUnitDigest": "549dded9fe85b1cf",
-      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "unheaded-block-25",
-      "claimKind": "contract",
-      "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "fgos-discovered block is outside this contract (CTR003 worker-to-runner protocol), carried verbatim at the end of 5. Reasoned Envelope Exceptions.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "549dded9fe85b1cfd57f1ec7079141e4"
+      "targetUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e33",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_27d4d4dca46d6a8859628c443df0b31e",
@@ -285,11 +216,10 @@
       "targetAnchor": "6-cursor-pagination",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H3 'Phân trang — con trỏ đục' becomes the H2 '6. Cursor Pagination'; title language and level change only.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "302bf7838a49e51804feb94da762bf7a"
+      "targetUnitDigest": "302bf7838a49e51804feb94da762bf7a",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_da21278ab32966f6631c82420552ed2b",
@@ -298,11 +228,10 @@
       "targetAnchor": "unheaded-block-27",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Opaque-cursor paragraph (four paginated verbs, {items, nextCursor}, validation error for a departed item, conflicts not paginated) carried verbatim; it is a strict subset of the longer work-state.md 678-702 paragraph held in the preceding block under the same heading (map section 6).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb8"
+      "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb8",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
@@ -311,11 +240,10 @@
       "targetAnchor": "unheaded-block-28",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The paginated field is declared on every verb in the manifest; carried verbatim as the last block of 6. Cursor Pagination, where the work-state.md paragraph also states the paginated flag.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "b82a558166f118f339210d9a47521404"
+      "targetUnitDigest": "b82a558166f118f339210d9a47521404",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
@@ -324,11 +252,10 @@
       "targetAnchor": "7-machine-readable-verb-registry",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H2 'Sổ verb máy-đọc — CLI tự mô tả' maps to '7. Machine-Readable Verb Registry'; title language and numbering differ.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "4af102d0a390692f1d71ae14123acf45"
+      "targetUnitDigest": "4af102d0a390692f1d71ae14123acf45",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
@@ -337,11 +264,10 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "fgos --help --json returns {schema_version, commands}, schema_version 2.0 raised from 1.0 because access was removed; carried verbatim under Manifest Shape, duplicating the manifest claim of work-state.md 647-663 (which adds the positional-parameter rule).",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "83773dda67db8d5f71205bb8c7106186"
+      "targetUnitDigest": "83773dda67db8d5f71205bb8c7106186",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
@@ -352,7 +278,8 @@
       "disposition": "merge",
       "reviewStatus": "pending",
       "rationale": "Per-entry fields list with touchesState and externalEffect axes and the externalEffect examples review, approve, coordination; carried verbatim under Entry Fields And Effect Axes alongside the work-state.md 665-676 text. This io wording is the one the frozen map keeps (the ws exclusive list is the superseded side), but the coordination example is stale (COMMAND_REGISTRY marks 15 verbs and coordination is not among them) and is carried as written. OPEN SEMANTIC CONFLICT: the carried `coordination` example (and the exclusive \"only review and approve\" claim of the other source) contradicts the code, which marks 15 verbs `externalEffect: true` and not `coordination`; the row stays pending until the owner resolves the conflict (see semantic-conflicts.md).",
-      "targetUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd34"
+      "targetUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd34",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
@@ -361,11 +288,10 @@
       "targetAnchor": "unheaded-block-33",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Both axes remain declarative only; the who-may-call-which-verb gate belongs to STR38. Carried verbatim under Entry Fields And Effect Axes, where work-state.md 665-676 states the same declarative-only point.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2"
+      "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
@@ -374,11 +300,10 @@
       "targetAnchor": "8-multi-value-flag-convention",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H3 'Quy ước cờ nhiều-giá-trị' becomes the H2 '8. Multi-Value Flag Convention'; title language and level change only.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "3e7cfb35e58461211cd5f01de9abfc2e"
+      "targetUnitDigest": "3e7cfb35e58461211cd5f01de9abfc2e",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
@@ -387,11 +312,10 @@
       "targetAnchor": "unheaded-block-35",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "multiValueFormat csv vs json-array convention (deps/refs/footprint/targets vs acceptance), carried verbatim under 8. Multi-Value Flag Convention; duplicate of work-state.md 704-711 held in the preceding block.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d5"
+      "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d5",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
@@ -400,11 +324,10 @@
       "targetAnchor": "10-version-tokens",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H2 'Version token' maps to '10. Version Tokens' (section 9 Per-Verb Help sits between, owned only by work-state.md); only title language and numbering differ.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "934cee435d2ab0ff2f52c0731e412fd7"
+      "targetUnitDigest": "934cee435d2ab0ff2f52c0731e412fd7",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
@@ -413,11 +336,10 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Version-token lead sentence carried into 10. Version Tokens, but CHANGED in the link: the 0011 link decisions/0011-version-tuong-minh-cho-moi-contract.md (dead) is repointed to ../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the wording is otherwise verbatim. The located-file match missed it for that reason.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c5"
+      "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c5",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
@@ -426,11 +348,10 @@
       "targetAnchor": "unheaded-block-39",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "The five-row version-token table (fgos.v1, runner reuse, manifest 2.0, event v 3, gates CTR004/v1), carried verbatim under 10. Version Tokens.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7"
+      "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
@@ -439,11 +360,10 @@
       "targetAnchor": "unheaded-block-40",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "CTR006 routing-handoff is outside the version tokens (full spec but no code yet), carried verbatim.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2"
+      "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
@@ -452,11 +372,10 @@
       "targetAnchor": "11-scope-boundary",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H2 'Ranh giới — điều gì KHÔNG thuộc hợp đồng này' maps to '11. Scope Boundary'; title language and numbering differ.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "f57aa1458563f22d63881b3372998ece"
+      "targetUnitDigest": "f57aa1458563f22d63881b3372998ece",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
@@ -465,11 +384,10 @@
       "targetAnchor": "unheaded-block-41",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "STR46 unifies existing in/out directions and does not extend to push; three items locked outside the boundary, carried verbatim under 11. Scope Boundary.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d4"
+      "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d4",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
@@ -478,11 +396,10 @@
       "targetAnchor": "unheaded-block-42",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Three out-of-scope bullets with named owners (STR48 initiating output, STR83/STR38 terminal/chat increment, STR38 permission layer), carried verbatim; a contract boundary obligation.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fa405ec4333b43518de9831ea52cd472"
+      "targetUnitDigest": "fa405ec4333b43518de9831ea52cd472",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
@@ -491,11 +408,10 @@
       "targetAnchor": "unheaded-block-43",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Explains why the original STR46 close-of-story (written when the backlog item opened) was deliberately narrowed to the spec-contract part: provenance of a past scope decision, not a normative obligation, so historical-context per the vocabulary (provenance / retired context). Text carried verbatim under 11. Scope Boundary; owner and anchor unchanged because the candidate keeps it there as part of the boundary section.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1"
+      "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
@@ -504,11 +420,10 @@
       "targetAnchor": "unheaded-block-44",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Also out of scope: the daemon, core verb-logic extracted as a lib, and the fgos-discovered block; carried verbatim.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744f"
+      "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744f",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
@@ -517,11 +432,10 @@
       "targetAnchor": "12-references",
       "claimKind": "navigation",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "H2 'Tham chiếu' maps to '12. References'; title language and numbering differ. Reference lists are navigation, not contract.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "9b906d61cd8f824de9ce5a5b203808e7"
+      "targetUnitDigest": "9b906d61cd8f824de9ce5a5b203808e7",
+      "authoredBy": "codex-session:1@2026-10-08"
     },
     {
       "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
@@ -530,11 +444,47 @@
       "targetAnchor": "unheaded-block-45",
       "claimKind": "navigation",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "rationale": "Reference list of legacy paths (decisions 0014/0011, specs, architecture-map, history) carried verbatim as inline code, not links; the map flags that authoring may later rewrite them, but the candidate text is currently identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-io-contract)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "7fddf59545c800c11029e0609a32bd90"
+      "targetUnitDigest": "7fddf59545c800c11029e0609a32bd90",
+      "authoredBy": "codex-session:1@2026-10-08"
+    },
+    {
+      "claimId": "claim_2b155082055823ccabf6fb40242abe42",
+      "sourceUnitDigest": "f63dfd5438d66a7145bd622f82c7ed32a5fd0426cfb6fb77d4fc6d5aa5bb9e18",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "authoredBy": "codex-session:1@2026-10-08"
+    },
+    {
+      "claimId": "claim_992a812b2fcaa4f93dd86d2190d7ac3a",
+      "sourceUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "authoredBy": "codex-session:1@2026-10-08"
+    },
+    {
+      "claimId": "claim_dd296404e1163caafba00641cf0adc79",
+      "sourceUnitDigest": "8b0c15df567594f067a267c8afb4414b290877d5f086aff68d1aab192ad5e908",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "authoredBy": "codex-session:1@2026-10-08"
     }
-  ]
+  ],
+  "authorSession": "codex-session:1@2026-10-08"
 }
