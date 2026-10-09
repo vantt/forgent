@@ -14,7 +14,7 @@ stop: 2026-10-11
 - `BLIND_HIDDEN_ROOTS` + token resolution: `src/runner/dispatch/confinement/resources.mjs:26-34,194-215`.
 - Driver mount order: `src/runner/dispatch/confinement/drivers/bwrap.mjs:470-524`.
 - Read-only policy (no workspace grant): `src/runner/dispatch/confinement/policies.mjs:27-43`.
-- Observed 2026-10-09 on mcp-skill-hub: agy blocks every tool on a failing PreToolUse hook (exit 127); codex hook-trust dialog per fresh home (idle 300 s, killed); codex stalls on target MCP `skillhub` `internal_error`. Earlier: claude stuck on target `.mcp.json` dialog ([evidence table row 1](../reports/discussion-advisory-approach-current-261008.md)).
+- Observed 2026-10-09 on mcp-skill-hub: agy blocks every tool on a failing PreToolUse hook (exit 127); codex hook-trust dialog per fresh home (idle 300 s, killed); codex stalls on target MCP `skillhub` `internal_error`. Earlier: claude stuck on target `.mcp.json` dialog ([evidence table row 1](../../archive/reports/discussion-advisory-approach-current-261008.md)).
 
 ## Decision
 

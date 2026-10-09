@@ -15,9 +15,9 @@ Act as a critical discussion partner, not an implementer. Challenge the causal s
 | File | What it is | Reliability note |
 |---|---|---|
 | `opus-genesis-drift-forensics-261008.md` | Independent forensic report from genesis: growth curve, four episodes, eight structural causes, twelve ranked guardrails | One agent's analysis. Several figures I checked (below); the rest are its own. States what it could not check |
-| `opus-advisory-adjustment-redteam-261008.md` | Independent red-team of the proposed correction to the advisory plan | Measured with git numstat; did not check whether main's dispatch can finish a live run |
-| `kongming-advisory-plan-review-261008.md` | Second opinion, verdict "continue with cuts" | Could not read the worktree diff; its numbers were supplied to it |
-| `opus-advisory-phase02-review-261008.md` | Independent review of advisory Phase 02 (request changes) | Spec compliance first; lists unproven items |
+| `archive/reports/opus-advisory-adjustment-redteam-261008.md` | Independent red-team of the proposed correction to the advisory plan | Measured with git numstat; did not check whether main's dispatch can finish a live run |
+| `archive/reports/kongming-advisory-plan-review-261008.md` | Second opinion, verdict "continue with cuts" | Could not read the worktree diff; its numbers were supplied to it |
+| `archive/reports/opus-advisory-phase02-review-261008.md` | Independent review of advisory Phase 02 (request changes) | Spec compliance first; lists unproven items |
 | `/home/vantt/projects/forgentX-worktrees/advisory-capability-completion/plans/261006-1408-advisory-capability-completion/reports/owner-challenges-and-rationale.md` | The owner's own questions when the advisory plan was split off, including "will bringing it back bloat the system" | Primary source for the plan's original intent. Lives in a worktree that is not on main |
 
 ## 4. Numbers the lead verified on 2026-10-08

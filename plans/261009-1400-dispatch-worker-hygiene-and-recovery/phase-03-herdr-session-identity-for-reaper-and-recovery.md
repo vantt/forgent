@@ -15,7 +15,7 @@ stop: 2026-10-13
 - Marker gets `paneId` only on failure: `cleanup.mjs:72-81`, `confinement/authority.mjs:1172`.
 - Resume reconcile with no env: `assignment-runner.mjs:1977` -> `herdr-reconcile.mjs:212-213`. Launch record writer: `herdr-reconcile.mjs:66`. Pane split: `herdr-round.mjs:1664-1676`; round session key `:1580`.
 - Session helpers: `socketPathForSession` (`worker-session.mjs:62`), fixed worker session `fgos-worker` (`worker-session-boot.mjs:28`).
-- Prior evidence: [rows 8, 9, 15](../reports/discussion-advisory-approach-current-261008.md).
+- Prior evidence: [rows 8, 9, 15](../../archive/reports/discussion-advisory-approach-current-261008.md).
 
 ## Requirements
 
