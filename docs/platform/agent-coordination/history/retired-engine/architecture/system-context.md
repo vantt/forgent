@@ -1,0 +1,190 @@
+# Retired engine snapshot: architecture/system-context.md
+
+```txt
+Document type: History
+Audience: Independent reviewer and maintainer
+Purpose: Preserve the complete pre-reframe document verbatim after engine retirement
+Design status: Candidate
+Implementation: Historical snapshot; not current implementation or authority
+Provenance: docs/platform/agent-coordination/architecture/system-context.md at 54c2698ee8c5b8f1baeac7244e946c793a637d29
+Writer type: Agent
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing preserved retired-engine claims
+Do not use this for: Current runtime behaviour or proposal acceptance
+Last reviewed: Pending independent review
+Related:
+- docs/platform/agent-coordination/README.md
+Supersedes: None; no legacy source is edited
+Superseded by: Current execution owners in docs/specs/runner.md
+Added in candidate: Snapshot framing only; the literal body is unchanged
+```
+
+The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. The complete source below is retained verbatim as non-authority history; its original statuses, paths and proposals are dated evidence, not current claims.
+
+## Literal Snapshot
+
+~~~~text
+# Agent Coordination System Context
+
+```txt
+Document type: Architecture
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Agent Coordination System Context
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/system-context.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved architecture material for Agent Coordination System Context; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+- docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
+Document type: Architecture
+Design status: Accepted
+Implementation: Partial
+Last reviewed: 2026-09-01
+Canonical for: system purpose, actors, layers, and top-level boundaries
+
+## Purpose
+
+fgOS coordinates semantic work across agents, providers, models, tiers, roles,
+and execution mechanisms while preserving one authoritative Work lifecycle and
+independently verifiable runtime evidence.
+
+Per the [Agent Coordination Foundation Vision](../vision.md), this is a
+domain-neutral foundation. Work, a predeclared Workflow, and a predeclared
+Coordination Protocol are optional integration or augmentation layers, not
+prerequisites for coordination.
+
+## Component And Runtime Flow
+
+```mermaid
+flowchart TB
+  Intent[Objective or selected Work operation]
+  Structure[Optional Workflow or CoordinationProtocol]
+  Domain[Optional domain policy and evidence harness]
+  Session[CoordinationSession or agent-led planner]
+  Assignment[Validated Assignment]
+  Dispatch[Governed DispatchPlan]
+  Run[Run attempt]
+  Worker[Provider, model, executor, or CLI]
+  Result[Immutable RunResult]
+  Evidence[Artifacts and normalized evidence]
+  Work[Work Lifecycle Engine]
+  Herdr[Herdr process visibility]
+
+  Intent --> Session
+  Structure -.->|constrains legal operations when selected| Session
+  Domain -.->|augments policy and proof| Session
+  Session --> Assignment --> Dispatch --> Run --> Worker
+  Worker -->|claims and artifacts| Result
+  Result --> Evidence
+  Result -->|recommendation or evidence| Work
+  Work -.->|optional integration context| Session
+  Herdr -.->|observation only| Run
+  Herdr -.->|observation only| Worker
+```
+
+The diagram separates execution from delivery lifecycle: a result can inform a
+Work driver, but cannot move Work lifecycle state by itself. Dashed paths are
+optional structure, augmentation, integration context, or visibility; they do
+not create execution authority or terminal truth.
+
+## Context
+
+```txt
+Human/operator
+  -> objective / Mission / Work intake
+  -> lifecycle decisions where Work exists
+  -> optional workflow/protocol/domain configuration
+
+fgOS control plane
+  -> coordinator / launcher / router / driver
+  -> agent-led, declared, or domain-assisted planning
+  -> validated semantic execution-contract construction
+  -> dispatch governance
+  -> Run and RunResult storage
+
+Optional augmentation
+  -> declared Workflow or Coordination Protocol
+  -> domain knowledge / doctrine / Skills
+  -> planning, resource, isolation, and evidence harnesses
+  -> organization-specific policy / roles / souls
+
+Execution environment
+  -> provider/model/executor/CLI
+  -> structured result and artifacts
+
+Visibility
+  -> Herdr panes/process observation
+```
+
+## Accepted Boundaries
+
+- Agent Coordination is usable without Work and without a predeclared graph.
+- Work is the only delivery lifecycle authority.
+- Workflow and protocol definitions constrain legal operations when selected.
+- Agent-led execution still requires a validated semantic contract and cannot
+  bypass authority, budget, dispatch, mutation, or evidence policy.
+- Planning may be agent-led, declared, domain-assisted, or composed.
+- Assignment expresses semantic intent.
+- Dispatch selects governed execution infrastructure.
+- Run records one attempt.
+- RunResult normalizes claims, evidence, artifacts, and failure.
+- Herdr is visibility, not truth or evidence.
+- Job is reserved for a future queue/scheduler and is absent from V1.
+- Domain-specific problem-solving rules augment the foundation rather than
+  becoming universal core policy.
+
+## Runtime Profiles
+
+The implemented baseline is Work-attached Team Dispatch plus a read-only
+mission-lite prototype. The accepted target direction supports:
+
+```txt
+Standalone, agent-led
+  objective -> dynamic semantic tasks/Assignments -> dispatch/runtime
+
+Standalone, declared
+  objective -> optional Coordination Protocol -> tasks/Assignments
+
+Work-attached
+  Work Stage Operation -> optional CoordinationSession -> tasks/Assignments
+
+Domain-assisted
+  any profile -> domain context/plan/resource/evidence augmentation
+```
+
+CoordinationSession's identity, persistence, one-way Assignment-membership
+boundary, and the shared `FlowDefinition` graph/operation/policy IR are
+accepted per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+and [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md);
+their schemas are in the [CoordinationSession](../contracts/coordination-session.md)
+and [FlowDefinition](../contracts/flow-definition.md) contracts. The
+CoordinationSession runtime itself, the AdhocTask graph, and the exact dynamic
+execution-contract shape remain under implementation in the Step 08 roadmap
+and, for AdhocTask specifically, under discussion in
+[Step 07](../proposals/step-07-coordination-session-adhoc-task.md). Optional
+standalone protocol packages beyond the accepted FlowDefinition/profile shape,
+and full agent-led adoption, remain under discussion in
+[Step 08](../proposals/step-08-standalone-coordination-protocols.md).
+
+## Trust Boundaries
+
+- Agent prose is untrusted until normalized and checked against TaskSpec and
+  evidence policy, or against the equivalent validated inline execution
+  contract when no TaskSpec is selected.
+- Executor output cannot grant Work lifecycle authority.
+- Provider/model selection must pass dispatch governance.
+- Coordinator prose cannot grant itself mutation, budget, privacy, or dispatch
+  authority.
+- Terminal/process visibility cannot establish semantic completion.
+- Synthesis cannot strengthen weak evidence by repetition or consensus.
+~~~~
