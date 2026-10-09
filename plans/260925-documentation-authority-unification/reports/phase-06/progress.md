@@ -6,7 +6,7 @@ Session counter: 1
 Step: first content batch, Agent Coordination; independent re-review applied, targeted final corrections authorized
 State: ready-for-review
 Blocker: no unresolved owner-authority question. A15 reframe is authored and proven mechanically; committed independent verdicts are required before approval or batch closure. No gate, fingerprint, H1, checker, baseline, vocabulary or authority-status change.
-Last green conservation commit: 72e4a8a22fcbd15551df6904bef696c1fc1da92c (committed handoff and pending references; post-commit full/scoped D pass against both prior registries, zero fatal findings)
+Last green conservation commit: fc2a6250b34fd6b36f5f1b6b37f1af5eacc3bb74 (committed limited reframe handoff; post-commit full/scoped D twice each, both prior registries, zero fatal findings; reframe-postcommit.json)
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: d98a5c5e75e4529cd99dd9c8bce95a0032806d95 (imports main 90a4fb27c8e43fca9e73714f1c3f235e832ce38a under A12)
 Main at sync: 90a4fb27c8e43fca9e73714f1c3f235e832ce38a
@@ -193,3 +193,5 @@ A15 (7f8d12784) resolves the 40 stale content verdicts from f309594fd. Commit 54
 - `env -u CLAUDE_CODE_SESSION_ID node --test <the 51 explicit files in reframe-verification.json>`: 912/912 pass, zero failures/cancelled/skipped/todo. Actual current CLI and 10/10 snapshot byte comparisons pass; 40/40 moved units and 14/14 verified units are preserved. Next: publish the single A15 targeted reframe request with four native limited diff packs and the full classification/move/retired reading material, then stop for a committed independent report.
 
 Ready-for-review: review-request-2-reframe.md publishes four native limited diff packs and complete reading material for 106 current/history classifications, 40 original stale versions and 45 retired portal units. Full command arrays, standalone scratch projection, tests and exact baseline/frozen-blob proof are in reframe-verification.json. The author stops for the committed independent reports; no self-review or further batch dispatch.
+
+Post-commit handoff proof: fc2a6250b commits the limited review request, complete native diff packs/sidecars, full classification/move/retired material and pending receipt references. Fresh native refresh and the standalone ledger projection reproduce all four zero-fatal D results. Both strict diagnostics reproduce exactly 37 pending source rows, 106 reverse-open units and the unchanged 342 accounted identical-unit groups. Counts, command arrays and committed-tree pin are in reframe-postcommit.json. No approval, checker or baseline change is claimed. The author has reached and stops at the A15 ready-for-review point.
