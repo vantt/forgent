@@ -3,9 +3,9 @@
 Date: 2026-10-09
 Executor: codex-session:1@2026-10-08
 Session counter: 1
-Step: first content batch, Agent Coordination; independent re-review applied, targeted final corrections authorized
-State: ready-for-review
-Blocker: no unresolved owner-authority question. A15 reframe is authored and proven mechanically; committed independent verdicts are required before approval or batch closure. No gate, fingerprint, H1, checker, baseline, vocabulary or authority-status change.
+Step: first content batch, Agent Coordination; whole-file retirement classification authorized
+State: authoring
+Blocker: none at resume. A16 extends the reframe to every non-history, non-payload file; no authority, gate, checker, baseline, vocabulary or extractor change is authorized.
 Last green conservation commit: fc2a6250b34fd6b36f5f1b6b37f1af5eacc3bb74 (committed limited reframe handoff; post-commit full/scoped D twice each, both prior registries, zero fatal findings; reframe-postcommit.json)
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: d98a5c5e75e4529cd99dd9c8bce95a0032806d95 (imports main 90a4fb27c8e43fca9e73714f1c3f235e832ce38a under A12)
@@ -13,14 +13,14 @@ Main at sync: 90a4fb27c8e43fca9e73714f1c3f235e832ce38a
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
 Latest approvals: f309594fd ok verdicts were applied in 54c2698ee. After A15 target changes, exactly 37 Agent Coordination source bindings are pending again; untouched accepted bindings remain unchanged. IO retains 39 reviewed/one corrected pending row. Standing A14 sends the overlapping b-data-dictionary shard's 90 rows to this limited check: one changed row, 89 byte-identical content/decision/digest rows for provenance only.
 Receipt pins are unchanged for 75 valid accepted references, including all 14 verified native-content units. Fifteen changed-frame approvals are withheld. Forty old stale versions are preserved in the move ledger; exactly 106 new current/history receipts remain pending at d870fe07f. All 867 physical evidence files retain their original own-path equal-blob bindings.
-Pending review request: reports/phase-06/review-request-2-reframe.md. One A15 limited independent check only; no tooling re-review, per-batch seed or author approval.
+Previous reframe review: 35abc9604 / 8bba2eabf committed. Its ok verdicts are applied; 11 source rationale reworks and five dangling classifications remain pending and are folded into the whole-area pass. The next review request is not yet authored.
 Owner queue items: A15 and standing A14 authorize this reframe/provenance scope. Agent Coordination inherited H findings are zero; the same 30 exact baseline findings elsewhere remain for their owning batches. No new owner decision requested.
 Archive/delete lists: 65 previously accepted migration-notice proposals; ten new complete candidate history snapshots, 40 original stale-unit moves and 45 retired portal-unit moves pending this check. No physical legacy archive/deletion or lost claim ID.
 Real conflicts: existing accepted conflict and identical-unit receipts are unchanged. SC-1 follows the current 15-verb manifest; its two overlapping bindings await independent acceptance. Strict E still reports the unchanged 342 accounted identical-unit groups and now 106 reverse-open units; batch closure is UNPROVEN.
 Holds: zero new unknown-blocking holds. Pending review lists and provenance-only rows are enumerated in review-request-2-reframe.md; no pending row carries new approval identity/date.
 Promoted-document edits: A15 authorizes the current-only portal rewrite; the entire prior portal remains verbatim in history/retired-engine/README.md. Exact diff and current code/CLI evidence are logged. No area-status change.
 
-Next action: owner starts a different reviewer session with review-request-2-reframe.md and commits its scoped reports. Only afterward may the author apply ok verdicts and prove P6/strict E before batch closure. This is ready for review, not Phase 6 completion.
+Next action: classify and commit every eligible file's main subject with evidence before whole-file moves; preserve all moved bytes, split mixed sections, rebind accounting and publish one independent whole-area review request.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -195,3 +195,9 @@ A15 (7f8d12784) resolves the 40 stale content verdicts from f309594fd. Commit 54
 Ready-for-review: review-request-2-reframe.md publishes four native limited diff packs and complete reading material for 106 current/history classifications, 40 original stale versions and 45 retired portal units. Full command arrays, standalone scratch projection, tests and exact baseline/frozen-blob proof are in reframe-verification.json. The author stops for the committed independent reports; no self-review or further batch dispatch.
 
 Post-commit handoff proof: fc2a6250b commits the limited review request, complete native diff packs/sidecars, full classification/move/retired material and pending receipt references. Fresh native refresh and the standalone ledger projection reproduce all four zero-fatal D results. Both strict diagnostics reproduce exactly 37 pending source rows, 106 reverse-open units and the unchanged 342 accounted identical-unit groups. Counts, command arrays and committed-tree pin are in reframe-postcommit.json. No approval, checker or baseline change is claimed. The author has reached and stops at the A15 ready-for-review point.
+
+### Whole-file retirement authorization and resumed verdicts
+
+A16 (d23045c2d) extends A15 to the entire area outside history and constitution-defined evidence payloads. Resume HEAD is clean and descends from fc2a6250b. Native refresh and both prior-registry D commands exit 0 with zero fatal findings. Exact commit/path isolation has zero violations; five frozen extractor/import blobs match; area statuses are unchanged; H retains the same 30 exact inherited findings with none new. Ratchet and placement pass.
+
+Committed independent verdict application: the four ordinary source reports leave exactly 11 rationale rows pending (two in judgment-01, nine in judgment-02), with IO 40/40 and data dictionary 90/90 reviewed. The classification report binds 101 ok receipts by unit, shown-text and evidence digests; its five reworks remain pending. Independent preservation reports accept 40 original stale-version moves and 45 retired portal units. Both unchanged D invocations remain zero-fatal after application. These acceptances do not pre-approve the forthcoming file moves or replacement text.

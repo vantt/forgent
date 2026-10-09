@@ -14,9 +14,18 @@
       "targetAnchor": "3-work-item-data-dictionary",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H2 Data Dictionary is carried as the numbered H2 \"3. Work Item Data Dictionary\"; the title differs, the section scope is the same.",
-      "targetUnitDigest": "827361074e830d7578a9647026a99ed3"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L40-40 (heading \"Data Dictionary\") -> spec.md#3-work-item-data-dictionary L50-50; targetOwner/targetAnchor spec.md#3-work-item-data-dictionary. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "827361074e830d7578a9647026a99ed3167345d915247ea3b82cbfe48f718984",
+      "targetAncestry": [
+        "Work State Specification"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
@@ -26,9 +35,19 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The 20-element work item table (lines 42-75) is carried verbatim as one block under section 3 (candidate lines 52-85).",
-      "targetUnitDigest": "1cedade3c4b6ebc117d2a584b597abfb"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L42-75 (unheaded-block-4) -> spec.md#unheaded-block-4 L52-85; targetOwner/targetAnchor spec.md#unheaded-block-4. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37",
+      "targetAncestry": [
+        "Work State Specification",
+        "3. Work Item Data Dictionary"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_f4fb783783bb1ad062f39d73e0165f86",
@@ -38,9 +57,19 @@
       "targetAnchor": "outcome-record",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 Outcome record becomes the H3 \"Outcome Record\" in the English-titled candidate; only the title changed.",
-      "targetUnitDigest": "a168e3fe6dda648968686b558ed3c53a"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L77-77 (heading \"Bản ghi kết quả (outcome) — dự đoán / thực tế\") -> spec.md#outcome-record L91-91; targetOwner/targetAnchor spec.md#outcome-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a168e3fe6dda648968686b558ed3c53a94ff85685a8501224570d6462a348425",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a9bc0a5c1e4d634958dce841f0e8c44e",
@@ -50,9 +79,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Intro paragraph on the outcome record having two halves arriving at different times is carried verbatim.",
-      "targetUnitDigest": "2036267728ec19e4c861fb80c37a2102"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L79-81 (unheaded-block-5) -> spec.md#unheaded-block-6 L93-95; targetOwner/targetAnchor spec.md#unheaded-block-6. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2036267728ec19e4c861fb80c37a21024deb862018786e34c723b685d1cf9000",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Outcome Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_ef20fa89f544c95d36bedd6842407afc",
@@ -62,9 +102,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The O-row table of the outcome record fields (13 lines) is carried verbatim under Outcome Record.",
-      "targetUnitDigest": "ff1feada8730be0c2c0f9dfa7c5be392"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L83-95 (unheaded-block-6) -> spec.md#unheaded-block-7 L97-109; targetOwner/targetAnchor spec.md#unheaded-block-7. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ff1feada8730be0c2c0f9dfa7c5be3927cf2faad6056cceb6f9a5cc57102d942",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Outcome Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_5eb3738c1994942ff2c0127bd0c5144a",
@@ -74,9 +125,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence rule for items that never ran (no outcome record) is carried verbatim.",
-      "targetUnitDigest": "cf725e032c48a71007b0fafa2a0378dd"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L97-99 (unheaded-block-7) -> spec.md#unheaded-block-8 L111-113; targetOwner/targetAnchor spec.md#unheaded-block-8. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cf725e032c48a71007b0fafa2a0378dd2919d5cf50358de2a7d34a2835940aae",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Outcome Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_3e0b2d8ae4ea0740c26e216e927e001b",
@@ -86,9 +148,19 @@
       "targetAnchor": "friction-record",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 Friction record becomes the H3 \"Friction Record\"; only the title differs.",
-      "targetUnitDigest": "ec1aa6de3ff234de129cf1ac211eea60"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L101-101 (heading \"Bản ghi friction — kênh 2 của capture (Phase 3 Slice 2)\") -> spec.md#friction-record L115-115; targetOwner/targetAnchor spec.md#friction-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ec1aa6de3ff234de129cf1ac211eea608f176a68f472e589103900af32a0ab61",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_45d8c9d960daf36ad9a1ff2448b77509",
@@ -98,9 +170,20 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph on a friction record created when an item ends parked or halted is carried verbatim.",
-      "targetUnitDigest": "81624ef90ec06c15d1fe97548de6ee21"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L103-106 (unheaded-block-8) -> spec.md#unheaded-block-9 L117-120; targetOwner/targetAnchor spec.md#unheaded-block-9. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "81624ef90ec06c15d1fe97548de6ee216e9299aea8dea2e59d1b6ce725e6958f",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Friction Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_2d4168e1156696a5a8708e28af6ab369",
@@ -110,9 +193,20 @@
       "targetAnchor": "unheaded-block-10",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The F-row friction field table is carried verbatim; the mechanical locator was confirmed by line-set match against candidate block 10 (lines 122-129).",
-      "targetUnitDigest": "cd6d9c4f74d86fedc3fd1d0bc9f150fc"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L108-115 (unheaded-block-9) -> spec.md#unheaded-block-10 L122-129; targetOwner/targetAnchor spec.md#unheaded-block-10. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cd6d9c4f74d86fedc3fd1d0bc9f150fc56ba3dffbc0fc2fdec0fdeed5df29a4e",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Friction Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_27d2b4184ee135467e1305fe686ca129",
@@ -122,9 +216,20 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence and backward-compat note for items that never failed (friction record) is carried verbatim.",
-      "targetUnitDigest": "bd9df710198dd3461f8b9538bf3a16c3"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L117-121 (unheaded-block-10) -> spec.md#unheaded-block-11 L131-135; targetOwner/targetAnchor spec.md#unheaded-block-11. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bd9df710198dd3461f8b9538bf3a16c38947d113ba5d445e5e7fff62abaf5915",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Friction Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_f7fe1d20b37bc8712bd364582e015c3b",
@@ -134,9 +239,19 @@
       "targetAnchor": "settlement-record",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 Settlement record becomes the H3 \"Settlement Record\"; only the title differs.",
-      "targetUnitDigest": "5cb3e656cf57f4ae9600cf7a1f21d94a"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L123-123 (heading \"Bản ghi settlement — kênh 1 của capture 2 kênh (Phase 3 S3-closeout)\") -> spec.md#settlement-record L137-137; targetOwner/targetAnchor spec.md#settlement-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5cb3e656cf57f4ae9600cf7a1f21d94aa85f767d626277391e23f559bf4f4436",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_2a02b2bc8eb92cd35ad50762115b65e4",
@@ -146,9 +261,20 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Intro paragraph defining a settlement point and the settlement record is carried verbatim.",
-      "targetUnitDigest": "bf76999817d9cf208bb7c3634fc835e0"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L125-128 (unheaded-block-11) -> spec.md#unheaded-block-12 L139-142; targetOwner/targetAnchor spec.md#unheaded-block-12. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bf76999817d9cf208bb7c3634fc835e0154c0520a6eb90e6bce39c20dbaf3ce0",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Settlement Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_0ca5b222fd5b2535bb36c3974551ae09",
@@ -158,9 +284,20 @@
       "targetAnchor": "unheaded-block-13",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The S-row settlement field table is carried verbatim; line-set match confirms candidate block 13 (lines 144-148), not the locator hint of block 10.",
-      "targetUnitDigest": "79d33485a7951e73e67a2e485f8a2bbf"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L130-134 (unheaded-block-12) -> spec.md#unheaded-block-13 L144-148; targetOwner/targetAnchor spec.md#unheaded-block-13. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "79d33485a7951e73e67a2e485f8a2bbf8b839c71868bd303cecd35c16489225a",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Settlement Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_96a7c5f5dac19f6d9ff63e1dfcc28962",
@@ -170,9 +307,20 @@
       "targetAnchor": "unheaded-block-14",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph stating the settlement record is a derived read surface over three existing settlements is carried verbatim.",
-      "targetUnitDigest": "ba396ad09ac0efb0cc666893e0e8dd34"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L136-141 (unheaded-block-13) -> spec.md#unheaded-block-14 L150-155; targetOwner/targetAnchor spec.md#unheaded-block-14. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ba396ad09ac0efb0cc666893e0e8dd34a46cb8061530b304c475e8de681f7774",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Settlement Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_9ffaa331817e1de82f93b7c56ff228c7",
@@ -182,9 +330,20 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Backward-compat guard for answer/close settlements keyed on the event schema version is carried verbatim.",
-      "targetUnitDigest": "77b57cc2fc23f47de457fcf8628c30c6"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L143-147 (unheaded-block-14) -> spec.md#unheaded-block-15 L157-161; targetOwner/targetAnchor spec.md#unheaded-block-15. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "77b57cc2fc23f47de457fcf8628c30c67ad965f283d657c41dfb2217e10a3652",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Settlement Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_6845513e9a6cde1e5ebfde966451a579",
@@ -194,9 +353,20 @@
       "targetAnchor": "unheaded-block-16",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence rule for items that never reached a settlement is carried verbatim.",
-      "targetUnitDigest": "e05bfd6579e6f7322e1de065ea2da563"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L149-152 (unheaded-block-15) -> spec.md#unheaded-block-16 L163-166; targetOwner/targetAnchor spec.md#unheaded-block-16. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e05bfd6579e6f7322e1de065ea2da5632c47959bcad3901679a770737e7ca648",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Settlement Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_b846b2039547198ed6ff7d51f777f951",
@@ -206,9 +376,19 @@
       "targetAnchor": "writer-identity",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 writer identity is moved out of the spec into the contract document as \"Writer Identity\" (map section 4, contract kind); the title is English in the candidate, the heading unit itself carries no claim of its own.",
-      "targetUnitDigest": "feea2119b2cc9f32fa0ab4f059db649d"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L154-154 (heading \"Danh tính người ghi (writer) — cá thể, tách bạch khỏi vai (str46-io-contract)\") -> contracts/cli-io-contract.md#writer-identity L41-41; targetOwner/targetAnchor contracts/cli-io-contract.md#writer-identity. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "feea2119b2cc9f32fa0ab4f059db649d2db68e954726324f0caab96db3ec0d7e",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_caf68e55508f56223358d2924374d8cc",
@@ -218,9 +398,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Writer field description (id/source, role versus writer, latest attribution) is stated in both work-state.md and io-contract.md and the candidate carries both texts under Writer Identity; the embedded English gates[id] CTR004/v1 sentence is present in the same block.",
-      "targetUnitDigest": "7921981cad27a6f1ab7b07c1a0594ac7"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L156-163 (unheaded-block-16) -> contracts/cli-io-contract.md#unheaded-block-5 L43-50; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-5. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7921981cad27a6f1ab7b07c1a0594ac78eb752b9c94840b960a8dd8aeefc621b",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Identity"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_4d07d73af27f68f9ee6b807edba9c10f",
@@ -230,9 +421,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The writer.id and writer.source intro is stated in both sources; the candidate keeps both texts under Writer Identity (this one verbatim, plus the io-contract paragraph), nothing dropped.",
-      "targetUnitDigest": "4c38a75e22d4372a55c06012cac31ed3"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L165-167 (unheaded-block-17) -> contracts/cli-io-contract.md#unheaded-block-6 L52-54; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-6. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4c38a75e22d4372a55c06012cac31ed30fba52e7eeeced0af78c932e5ab49e1b",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Identity"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_44f0caaa1a43f739279c7ae528de786a",
@@ -242,9 +444,20 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The four-value source trust table is stated in both sources; candidate carries the work-state wording (longer) and the io-contract list under one heading.",
-      "targetUnitDigest": "b3d95b30cc6cd2a1b0bb6bd8bec47976"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L169-174 (unheaded-block-18) -> contracts/cli-io-contract.md#unheaded-block-9 L68-73; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-9. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b3d95b30cc6cd2a1b0bb6bd8bec47976bedba54191c94aeec67ff6441ebdefb6",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Source Trust Levels"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a07b191015c5200e7934215d59875aa0",
@@ -254,9 +467,20 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Registry-only-correlates rule is only in work-state.md, carried verbatim into Writer Resolution Rules; no io-contract duplicate was found by grep.",
-      "targetUnitDigest": "882fdc920bae5cb93953dd540d22527c"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L176-182 (unheaded-block-19) -> contracts/cli-io-contract.md#unheaded-block-11 L86-92; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-11. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "882fdc920bae5cb93953dd540d22527c18f91455de1d3de225d2ab0a51734fb7",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Resolution Rules"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_642c9f33b6f971fbe68ee92bbf3f7be9",
@@ -266,9 +490,20 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Malformed id rejection and latest-wins fold rule exist only in work-state.md; carried verbatim into the contract block (candidate lines 93-100).",
-      "targetUnitDigest": "2d77bba4c7bc7482c07dae5e2af85f29"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L184-191 (unheaded-block-20) -> contracts/cli-io-contract.md#unheaded-block-12 L94-101; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-12. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2d77bba4c7bc7482c07dae5e2af85f29439884bb5f1e2f55533c2bef5aa56b63",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Resolution Rules"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_270cbd193260c5730c24a2c8cbbf21b6",
@@ -278,9 +513,19 @@
       "targetAnchor": "close-lesson-record",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 close lesson record becomes the H3 \"Close Lesson Record\"; only the title differs.",
-      "targetUnitDigest": "f2388cf0fece03b5c1935ada5691f17b"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L193-193 (heading \"Bài học lúc đóng — câu-6 tự động (Phase 3 S3-closeout)\") -> spec.md#close-lesson-record L168-168; targetOwner/targetAnchor spec.md#close-lesson-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f2388cf0fece03b5c1935ada5691f17bb210fa4a67efc9404fa236cc344fa0c8",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_93255b1a693bc8ecf8b8c2a3f4142d23",
@@ -290,9 +535,20 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph on the lesson record generated when an item reaches done through any entry is carried verbatim.",
-      "targetUnitDigest": "ed3f6a8a9333f6cbfdb1187f55a82008"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L195-200 (unheaded-block-21) -> spec.md#unheaded-block-17 L170-175; targetOwner/targetAnchor spec.md#unheaded-block-17. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ed3f6a8a9333f6cbfdb1187f55a82008fc78796370ede7849c7bf3c257fc8517",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Close Lesson Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a26454c04b35c87528dd999234ba8454",
@@ -302,9 +558,20 @@
       "targetAnchor": "unheaded-block-18",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The L-row lesson field table is carried verbatim; line-set match confirms block 18 (lines 177-181), not the locator hint of block 10.",
-      "targetUnitDigest": "0681984fac4769d49011b503c68adca7"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L202-206 (unheaded-block-22) -> spec.md#unheaded-block-18 L177-181; targetOwner/targetAnchor spec.md#unheaded-block-18. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "0681984fac4769d49011b503c68adca746cd05a063b9e9817bad86d013fc85e8",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Close Lesson Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_bf6de92ca9b78df2593568bab051a27f",
@@ -314,9 +581,20 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Minimal-but-real lesson for items closed with no prior outcome/friction/settlement is carried verbatim.",
-      "targetUnitDigest": "e3a661dc407ab6ebaf346d91bd15be94"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L208-211 (unheaded-block-23) -> spec.md#unheaded-block-19 L183-186; targetOwner/targetAnchor spec.md#unheaded-block-19. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e3a661dc407ab6ebaf346d91bd15be94f8d960f02348b44b0704321b1adab82a",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Close Lesson Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_075dc0205dabeaa5646879d220249ce1",
@@ -326,9 +604,20 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence rule for items that never closed (no lesson record) is carried verbatim.",
-      "targetUnitDigest": "99b20d7c045112465b1d253548fc4859"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L213-215 (unheaded-block-24) -> spec.md#unheaded-block-20 L188-190; targetOwner/targetAnchor spec.md#unheaded-block-20. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "99b20d7c045112465b1d253548fc4859c472b437bcbd994aa2013061dba24ca1",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Close Lesson Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_e9322d0e436e48b5d231ccd1b8bd441d",
@@ -338,9 +627,19 @@
       "targetAnchor": "human-gate-record",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 human gate record becomes the H3 \"Human Gate Record\"; only the title differs.",
-      "targetUnitDigest": "2904ab915782c373f2b068423862e8bb"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L217-217 (heading \"Bản ghi cổng-người (gate) — câu hỏi / câu trả lời / ảnh chụp gốc\") -> spec.md#human-gate-record L192-192; targetOwner/targetAnchor spec.md#human-gate-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2904ab915782c373f2b068423862e8bb1e517e006fa150db1abe68996e11c0e8",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_e9dddaee950b4f57b89587a1087c3ed1",
@@ -350,9 +649,20 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Intro on the gate record carried by items that passed a human-wait gate is carried verbatim.",
-      "targetUnitDigest": "3f166793a6f5bfa2554d671367e7edd5"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L219-222 (unheaded-block-25) -> spec.md#unheaded-block-21 L194-197; targetOwner/targetAnchor spec.md#unheaded-block-21. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3f166793a6f5bfa2554d671367e7edd5c3e1d0ab4dd081a3cf9f6ce8ac72cef4",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Human Gate Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_0735ed9860115c04597c2ce9dab4dbfc",
@@ -362,9 +672,20 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The G-row gate field table is carried verbatim; line-set match gives block 22 (lines 199-204), not the locator hint of block 7.",
-      "targetUnitDigest": "896856e1509a84929acc35bbf336ab20"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L224-229 (unheaded-block-26) -> spec.md#unheaded-block-22 L199-204; targetOwner/targetAnchor spec.md#unheaded-block-22. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "896856e1509a84929acc35bbf336ab20a94a6f95415423205fa32a2bfe54d45c",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Human Gate Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_fefa9cbccf0ff78f6ab65866bf0419a0",
@@ -374,9 +695,20 @@
       "targetAnchor": "unheaded-block-23",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence rule and note for items that never entered a human-wait gate is carried verbatim.",
-      "targetUnitDigest": "809b90b8be2eb5c55bb312e2db97291c"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L231-237 (unheaded-block-27) -> spec.md#unheaded-block-23 L206-212; targetOwner/targetAnchor spec.md#unheaded-block-23. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "809b90b8be2eb5c55bb312e2db97291c9bd63a027c5e2b9ace3fa3c7d0fc9129",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Human Gate Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_eb9f287c141e9c763699b81d466f8561",
@@ -386,9 +718,19 @@
       "targetAnchor": "workflow-step-replaces-stage",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 about work no longer carrying stage becomes \"Workflow Step Replaces Stage\"; title changed.",
-      "targetUnitDigest": "4b198e448003e829b23d32152cf3d518"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L239-239 (heading \"Work không còn `stage` — bước đến từ Workflow (đường đọc dữ liệu cũ)\") -> spec.md#workflow-step-replaces-stage L236-236; targetOwner/targetAnchor spec.md#workflow-step-replaces-stage. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4b198e448003e829b23d32152cf3d51811de020e687a9a661b4868f327dfb836",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_04a1bb7bd0c04178542bfa2a14329e4d",
@@ -398,9 +740,20 @@
       "targetAnchor": "unheaded-block-28",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Statement that an item carries workflowStep rather than stage is carried verbatim.",
-      "targetUnitDigest": "4c51cdea46faa78544375c980fc34c07"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L241-247 (unheaded-block-28) -> spec.md#unheaded-block-28 L238-244; targetOwner/targetAnchor spec.md#unheaded-block-28. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4c51cdea46faa78544375c980fc34c07d03ffd4ec7bf8153fc9df7cb1b141800",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Workflow Step Replaces Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_cac64e9c719a1d145d2fcf014695434a",
@@ -410,9 +763,20 @@
       "targetAnchor": "unheaded-block-29",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "VIEW_SCHEMA_VERSION = 4 note (no stage in the view, old snapshots refolded) is carried verbatim.",
-      "targetUnitDigest": "332cc03c0827f2cbfab57ea56e59828a"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L249-251 (unheaded-block-29) -> spec.md#unheaded-block-29 L246-248; targetOwner/targetAnchor spec.md#unheaded-block-29. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "332cc03c0827f2cbfab57ea56e59828a43b0ce6d113aaf2720e103ddea5ad8ca",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Workflow Step Replaces Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_b5dc9a45ef1f87d4eb34401d878d9aae",
@@ -422,9 +786,20 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The single legacy read path (replay.mjs foldLegacyStage/canonicalStep) paragraph is carried verbatim.",
-      "targetUnitDigest": "509d6750254a6802e862d838af1177d1"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L253-257 (unheaded-block-30) -> spec.md#unheaded-block-30 L250-254; targetOwner/targetAnchor spec.md#unheaded-block-30. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "509d6750254a6802e862d838af1177d127df2fad450ac289d027f57e307d335b",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Workflow Step Replaces Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_337c33a9b9d06d358bee210ba002a8df",
@@ -434,9 +809,20 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Rename list (workflowStep, workflowStepEffective, stepByItem) is carried verbatim.",
-      "targetUnitDigest": "26c7bc289872ab33201af4b02bb9b649"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L259-262 (unheaded-block-31) -> spec.md#unheaded-block-31 L256-259; targetOwner/targetAnchor spec.md#unheaded-block-31. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "26c7bc289872ab33201af4b02bb9b6499f805b51d9c8848c53ff88b42ab66fda",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Workflow Step Replaces Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_0c44dd8aa02800039adbb9c39e5a11c7",
@@ -446,9 +832,19 @@
       "targetAnchor": "discovery-and-exploring-stages",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 on the discovery and exploring stages becomes \"Discovery And Exploring Stages\"; title changed.",
-      "targetUnitDigest": "fd8dbb8574d07360d5c80574ef2031a6"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L264-264 (heading \"Giai đoạn Soi-rõ (bước discovery) và Đào-sâu (bước exploring)\") -> spec.md#discovery-and-exploring-stages L261-261; targetOwner/targetAnchor spec.md#discovery-and-exploring-stages. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "fd8dbb8574d07360d5c80574ef2031a6e68e0b78e375379a1a255d89b838152a",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_87c97f553a4be174e760b6ac1d2b37ea",
@@ -458,9 +854,20 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph on workflowStep running alongside status is carried verbatim.",
-      "targetUnitDigest": "3ef0991bbca1a01f425854ee2163524c"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L266-274 (unheaded-block-32) -> spec.md#unheaded-block-32 L263-271; targetOwner/targetAnchor spec.md#unheaded-block-32. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3ef0991bbca1a01f425854ee2163524cce0cb46d05a4cb874d795c894b2d284d",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Discovery And Exploring Stages"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_f264a15a6f892e76499a4c229b253533",
@@ -470,9 +877,20 @@
       "targetAnchor": "unheaded-block-33",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Statement that clarify is no longer a stage (clarify now at Init) is carried verbatim.",
-      "targetUnitDigest": "023a0fbc2a4e4f7fb07374d8652f2cc3"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L276-289 (unheaded-block-33) -> spec.md#unheaded-block-33 L273-286; targetOwner/targetAnchor spec.md#unheaded-block-33. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "023a0fbc2a4e4f7fb07374d8652f2cc37553e270a9b9011ee0e3e2416f42ade1",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Discovery And Exploring Stages"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_eabba66d92b6698280157a68ce6db216",
@@ -482,9 +900,20 @@
       "targetAnchor": "unheaded-block-34",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Context-discovery paragraph for items entering discovery is carried verbatim.",
-      "targetUnitDigest": "58e2979350417bb923ddde74629df8f6"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L291-297 (unheaded-block-34) -> spec.md#unheaded-block-34 L288-294; targetOwner/targetAnchor spec.md#unheaded-block-34. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "58e2979350417bb923ddde74629df8f6d081f3ed3e390a5f77e54ca288d5825a",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Discovery And Exploring Stages"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_e16f4959b70560b663e9a81c3c5556b4",
@@ -494,9 +923,20 @@
       "targetAnchor": "unheaded-block-35",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Clear/unclear verdict bullets (discovery to planning or exploring) are carried verbatim.",
-      "targetUnitDigest": "e179ab994ffccea20065605932a825cd"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L299-312 (unheaded-block-35) -> spec.md#unheaded-block-35 L296-309; targetOwner/targetAnchor spec.md#unheaded-block-35. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e179ab994ffccea20065605932a825cd29a76101c538f88e5569ac53113ebdf7",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Discovery And Exploring Stages"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_9aa212c8f3269e0c3e14cbfdec685caf",
@@ -506,9 +946,20 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Discovery context (reads description and refs, STR30) paragraph is carried verbatim.",
-      "targetUnitDigest": "534a5eb27e492a380e76da117108b0c9"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L314-325 (unheaded-block-36) -> spec.md#unheaded-block-36 L311-322; targetOwner/targetAnchor spec.md#unheaded-block-36. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "534a5eb27e492a380e76da117108b0c9517d5f4351e287d0cb4e655594c7ebf0",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Discovery And Exploring Stages"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_e2caa35f52aff74de3e25b4a30ea81cd",
@@ -518,9 +969,20 @@
       "targetAnchor": "unheaded-block-37",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Who runs context-discovery and when (two call points) is carried verbatim.",
-      "targetUnitDigest": "f19a83a8922ba1a536d6698b742a5836"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L327-337 (unheaded-block-37) -> spec.md#unheaded-block-37 L324-334; targetOwner/targetAnchor spec.md#unheaded-block-37. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f19a83a8922ba1a536d6698b742a5836d828f7acad56a6edc1ae4888bfc146f6",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Discovery And Exploring Stages"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_8ddaf275a9286c13d4d7b21c67477ef4",
@@ -530,9 +992,19 @@
       "targetAnchor": "discovery-gate-record",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 discovery gate record becomes \"Discovery Gate Record\"; title changed.",
-      "targetUnitDigest": "b54621bc3c29c78c30db728bd1946889"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L339-339 (heading \"Bản ghi cổng discovery\") -> spec.md#discovery-gate-record L214-214; targetOwner/targetAnchor spec.md#discovery-gate-record. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b54621bc3c29c78c30db728bd19468892d5b74aa8e1389ca478778cfd1c9c915",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_7553a4868205098ba82d4c03382acce2",
@@ -542,9 +1014,20 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph that every context-discovery pass writes a discovery record is carried verbatim; block lies under Discovery Gate Record (candidate lines 216-221).",
-      "targetUnitDigest": "5c9201d70578877abf44602c087ab21d"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L341-346 (unheaded-block-38) -> spec.md#unheaded-block-24 L216-221; targetOwner/targetAnchor spec.md#unheaded-block-24. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5c9201d70578877abf44602c087ab21de9d8966cca3adf8e3f9531bf324084f7",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Discovery Gate Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_d0ae088797942a95c43f0ca52517d9bc",
@@ -554,9 +1037,20 @@
       "targetAnchor": "unheaded-block-25",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The C-row discovery field table is carried verbatim; line-set match gives block 25 (lines 223-227), not the locator hint of block 10.",
-      "targetUnitDigest": "4f6b857125193bca6a36ed7697dfb8ee"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L348-352 (unheaded-block-39) -> spec.md#unheaded-block-25 L223-227; targetOwner/targetAnchor spec.md#unheaded-block-25. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4f6b857125193bca6a36ed7697dfb8ee813d9ea8bf4144712c45a413e410010d",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Discovery Gate Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a87d58b31ca7cf73cb343cadbde4b654",
@@ -566,9 +1060,20 @@
       "targetAnchor": "unheaded-block-26",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence rule for items with no discovery pass is carried verbatim.",
-      "targetUnitDigest": "a8677c227421e6f9687f292d21ccebfb"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L354-355 (unheaded-block-40) -> spec.md#unheaded-block-26 L229-230; targetOwner/targetAnchor spec.md#unheaded-block-26. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a8677c227421e6f9687f292d21ccebfb0e577e4ba14300875bffe1274261ccee",
+      "targetAncestry": [
+        "Work State Specification",
+        "4. Capture And Evidence Records",
+        "Discovery Gate Record"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_44e9aa951025f9b7e71066c325ec7df1",
@@ -578,9 +1083,19 @@
       "targetAnchor": "planning-stage",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 on the planning stage becomes \"Planning Stage\"; title changed.",
-      "targetUnitDigest": "ad4b3ce7e44af669b6d5a850c82c1127"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L357-357 (heading \"Giai đoạn Lập-kế-hoạch (stage planning)\") -> spec.md#planning-stage L336-336; targetOwner/targetAnchor spec.md#planning-stage. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ad4b3ce7e44af669b6d5a850c82c1127c6bb32dfe343da691e1d7a1ab2c53ab2",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_2bd0e21953de64329d9feda590cd9ed0",
@@ -590,9 +1105,20 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Statement that every item leaving discovery meets at planning is carried verbatim.",
-      "targetUnitDigest": "e2481ec8c127789704ae95a8a010c633"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L359-363 (unheaded-block-41) -> spec.md#unheaded-block-38 L338-342; targetOwner/targetAnchor spec.md#unheaded-block-38. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e2481ec8c127789704ae95a8a010c633b29d84225a8547df5151576390070fcb",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_05086f8eb3a7fe8c76475c68250251ce",
@@ -602,9 +1128,20 @@
       "targetAnchor": "unheaded-block-39",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "decompose as a drain-only legacy alias paragraph is carried verbatim.",
-      "targetUnitDigest": "fadda0c2061d00de158fb62f8d16aba1"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L365-374 (unheaded-block-42) -> spec.md#unheaded-block-39 L344-353; targetOwner/targetAnchor spec.md#unheaded-block-39. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "fadda0c2061d00de158fb62f8d16aba1e58002c1165e5b3d416be97331217f3e",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_279762092baa449be7ad373bf71de87e",
@@ -614,9 +1151,20 @@
       "targetAnchor": "unheaded-block-40",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Decomposition judgment on items entering planning is carried verbatim.",
-      "targetUnitDigest": "b92d70625fb3063d776322ca266f0138"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L376-379 (unheaded-block-43) -> spec.md#unheaded-block-40 L355-358; targetOwner/targetAnchor spec.md#unheaded-block-40. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b92d70625fb3063d776322ca266f01380490d9f9181509fb252a558059b1cbdf",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_3bc58175c497e265863a431437a26a14",
@@ -626,9 +1174,20 @@
       "targetAnchor": "unheaded-block-41",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Pass-through and split outcomes of the planning judgment (31 lines) are carried verbatim.",
-      "targetUnitDigest": "6fd1889b01d12af05ea88205763f14af"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L381-411 (unheaded-block-44) -> spec.md#unheaded-block-41 L360-390; targetOwner/targetAnchor spec.md#unheaded-block-41. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6fd1889b01d12af05ea88205763f14af71126996f95ec74a66ed60f794fbd583",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_d151153b93496051a7f37890910a941f",
@@ -638,9 +1197,20 @@
       "targetAnchor": "unheaded-block-42",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Who runs the decomposition judgment and when (fgos plan, sync mode) is carried verbatim.",
-      "targetUnitDigest": "86cba6c33b5a8fe95261ed07c3e670db"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L413-419 (unheaded-block-45) -> spec.md#unheaded-block-42 L392-398; targetOwner/targetAnchor spec.md#unheaded-block-42. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "86cba6c33b5a8fe95261ed07c3e670db494beb82c49fb80f0cb7cd32c6241e41",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_0fb104a786e5dd82b98f0d9c61a4dc30",
@@ -650,9 +1220,20 @@
       "targetAnchor": "unheaded-block-43",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Lineage (parent) versus deps paragraph is carried verbatim.",
-      "targetUnitDigest": "86aefb98f6caa2bf4768e5d81ec4fdf6"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L421-435 (unheaded-block-46) -> spec.md#unheaded-block-43 L400-414; targetOwner/targetAnchor spec.md#unheaded-block-43. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "86aefb98f6caa2bf4768e5d81ec4fdf67e88eb486cc2e7256ae196ac0204c16a",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_606f88cc7605c316e1b735724ed595f9",
@@ -662,9 +1243,20 @@
       "targetAnchor": "unheaded-block-44",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Absence rule for items without a parent is carried verbatim.",
-      "targetUnitDigest": "ffb0d2ad1ac7bdf66ed226440e16fe3d"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L437-439 (unheaded-block-47) -> spec.md#unheaded-block-44 L416-418; targetOwner/targetAnchor spec.md#unheaded-block-44. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ffb0d2ad1ac7bdf66ed226440e16fe3dc0e2d6b5963d808d9bcc47da39690ad0",
+      "targetAncestry": [
+        "Work State Specification",
+        "5. Workflow Step And Stage Model",
+        "Planning Stage"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_79b8aa6e1e59ca0593c2e3f1a409a459",
@@ -674,9 +1266,18 @@
       "targetAnchor": "6-domain-model",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 domain model becomes the numbered H2 \"6. Domain Model\"; level and title changed, same scope.",
-      "targetUnitDigest": "4b12f710732bcb366502200ee43245c3"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L441-441 (heading \"Mô hình domain (base-workflow + domain-extension)\") -> spec.md#6-domain-model L420-420; targetOwner/targetAnchor spec.md#6-domain-model. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4b12f710732bcb366502200ee43245c3ea649ab7ea953f79748ad6e2ad02cd77",
+      "targetAncestry": [
+        "Work State Specification"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_da3d8025b23815d0c6645830b5cb9ff8",
@@ -686,9 +1287,19 @@
       "targetAnchor": "unheaded-block-45",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Domain model opening (base-workflow plus domain extension, 16 lines) is carried verbatim.",
-      "targetUnitDigest": "feed8c8b2f035f912247b8dfe19899b6"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L443-458 (unheaded-block-48) -> spec.md#unheaded-block-45 L422-437; targetOwner/targetAnchor spec.md#unheaded-block-45. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "feed8c8b2f035f912247b8dfe19899b63332ce0e071eeac988ea9880223fc98a",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a15768b48d9cf3023d96e63365674b27",
@@ -698,9 +1309,19 @@
       "targetAnchor": "unheaded-block-46",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Statement that the registry has four domains and coding is the only production one is carried verbatim.",
-      "targetUnitDigest": "ff1cf9a54d7cc40a4006675ccdb21f00"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L460-463 (unheaded-block-49) -> spec.md#unheaded-block-46 L439-442; targetOwner/targetAnchor spec.md#unheaded-block-46. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ff1cf9a54d7cc40a4006675ccdb21f00fe1240264e956c4c6d92c66d3883cda6",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_726c1f9d57c58c41a038e7f8150d23bb",
@@ -710,9 +1331,19 @@
       "targetAnchor": "unheaded-block-47",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Per-domain stage bullets (synthetic and others) are carried verbatim.",
-      "targetUnitDigest": "bce9d9e284ba2841c098c5258894d6fd"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L465-475 (unheaded-block-50) -> spec.md#unheaded-block-47 L444-454; targetOwner/targetAnchor spec.md#unheaded-block-47. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bce9d9e284ba2841c098c5258894d6fdc1a4b5eb2885630d586f146ae0bd3ae1",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_8dd85ee8dcda8f6914207ed85be88040",
@@ -722,9 +1353,19 @@
       "targetAnchor": "unheaded-block-48",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Statement that all four dispatch through one registry and one execution path is carried verbatim.",
-      "targetUnitDigest": "b4fd3392f55abbeae560ec53ebb763fd"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L477-480 (unheaded-block-51) -> spec.md#unheaded-block-48 L456-459; targetOwner/targetAnchor spec.md#unheaded-block-48. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b4fd3392f55abbeae560ec53ebb763fdf048ff1c40e2f856e0750dc935c6fc8a",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_419ab4fb5b449c511e9dfb616e074a8d",
@@ -734,9 +1375,19 @@
       "targetAnchor": "unheaded-block-49",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "compound-learn is no longer a stage (it moved to status retrospective) paragraph is carried verbatim.",
-      "targetUnitDigest": "2c3f5010803fe3d713f8b30038cc78b8"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L482-488 (unheaded-block-52) -> spec.md#unheaded-block-49 L461-467; targetOwner/targetAnchor spec.md#unheaded-block-49. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2c3f5010803fe3d713f8b30038cc78b81ba34cc5f33b32247d528140d6baa436",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_843ed209b05a1ea29568bfa9215da324",
@@ -746,9 +1397,19 @@
       "targetAnchor": "unheaded-block-50",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Domain skills layer (str89) paragraph reading the domain field is carried verbatim.",
-      "targetUnitDigest": "80c14ec598a82f09f8da9596853c9e1c"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L490-501 (unheaded-block-53) -> spec.md#unheaded-block-50 L469-480; targetOwner/targetAnchor spec.md#unheaded-block-50. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "80c14ec598a82f09f8da9596853c9e1c2fef1759c97869fc7cbbf2f2a19be6fe",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a1109777c368dc5834c63a5934b8fd69",
@@ -758,9 +1419,19 @@
       "targetAnchor": "unheaded-block-51",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The retrospective status key in the same table is carried verbatim.",
-      "targetUnitDigest": "b0d658bc1e1493990ff4c2e5d0a83aaa"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L503-508 (unheaded-block-54) -> spec.md#unheaded-block-51 L482-487; targetOwner/targetAnchor spec.md#unheaded-block-51. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b0d658bc1e1493990ff4c2e5d0a83aaa694a76a63c1ba805de687ac544446484",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_5390e705c15f6a42a817fe0329064073",
@@ -770,9 +1441,19 @@
       "targetAnchor": "unheaded-block-52",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A domain need not satisfy all 5 base-workflow steps; consequence paragraph carried verbatim.",
-      "targetUnitDigest": "621c91d31cc07f4e090993c8b83d5b3f"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L510-517 (unheaded-block-55) -> spec.md#unheaded-block-52 L489-496; targetOwner/targetAnchor spec.md#unheaded-block-52. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "621c91d31cc07f4e090993c8b83d5b3fdd1f76796fc8c4c066faccfc6b456aee",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_9432efe67b01c2c7e33c093ec71102e1",
@@ -782,9 +1463,19 @@
       "targetAnchor": "unheaded-block-53",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Narrowed-limit paragraph (the two engines no longer fixed to stage names) is carried verbatim.",
-      "targetUnitDigest": "ad648524d48fcbd3683cb44c82929a17"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L519-525 (unheaded-block-56) -> spec.md#unheaded-block-53 L498-504; targetOwner/targetAnchor spec.md#unheaded-block-53. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ad648524d48fcbd3683cb44c82929a1787b813d7101548813fbd89440e034d7a",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_5430b3f4676f8ecc0c94b8f0680f45c6",
@@ -794,9 +1485,19 @@
       "targetAnchor": "unheaded-block-54",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Lazy default coding for items without a domain field is carried verbatim.",
-      "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L527-536 (unheaded-block-57) -> spec.md#unheaded-block-54 L506-515; targetOwner/targetAnchor spec.md#unheaded-block-54. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "fcc3b5bc63c02eeb3180877c80fe6e2d2bb620cb2ffd41bd865d2f9624bac9a0",
+      "targetAncestry": [
+        "Work State Specification",
+        "6. Domain Model"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_34205657a84c4f1e6610db2ea48aecde",
@@ -806,9 +1507,18 @@
       "targetAnchor": "7-pull-door-take-and-return",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 pull door becomes the numbered H2 \"7. Pull Door Take And Return\"; level and title changed.",
-      "targetUnitDigest": "69eb01f3f5134b71523424d41de4c6e5"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L538-538 (heading \"Cửa pull giao–nhận việc (take/return)\") -> spec.md#7-pull-door-take-and-return L517-517; targetOwner/targetAnchor spec.md#7-pull-door-take-and-return. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "69eb01f3f5134b71523424d41de4c6e5215d81a6c0448dec0ae378e3eb3cbb97",
+      "targetAncestry": [
+        "Work State Specification"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_be95c2d548d7fa5a1d2406be5584a36a",
@@ -818,9 +1528,19 @@
       "targetAnchor": "unheaded-block-55",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Opening paragraph defining the pull door alongside the runner is carried verbatim.",
-      "targetUnitDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L540-546 (unheaded-block-58) -> spec.md#unheaded-block-55 L519-525; targetOwner/targetAnchor spec.md#unheaded-block-55. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0e1bbb55662a39329bc271641ef99f6b0",
+      "targetAncestry": [
+        "Work State Specification",
+        "7. Pull Door Take And Return"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_d3260e19b2405cb88b80137d2765db86",
@@ -830,9 +1550,19 @@
       "targetAnchor": "unheaded-block-56",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "take/return verb bullets (33 lines) are carried verbatim.",
-      "targetUnitDigest": "e56d40369e1c3ef2d969b256915fe94a"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L548-580 (unheaded-block-59) -> spec.md#unheaded-block-56 L527-559; targetOwner/targetAnchor spec.md#unheaded-block-56. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e56d40369e1c3ef2d969b256915fe94a2512432214a4c1f6eb8b84cf8adb8d01",
+      "targetAncestry": [
+        "Work State Specification",
+        "7. Pull Door Take And Return"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_f6857f25bdb3f59d3afcd03e2089ed74",
@@ -842,9 +1572,19 @@
       "targetAnchor": "unheaded-block-57",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Statement that return only completes a take is carried verbatim.",
-      "targetUnitDigest": "b6f12056369ca7e5650f2f58f585a9df"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L582-585 (unheaded-block-60) -> spec.md#unheaded-block-57 L561-564; targetOwner/targetAnchor spec.md#unheaded-block-57. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b6f12056369ca7e5650f2f58f585a9df16b8b6a1c04e7b237beda6f36667ab45",
+      "targetAncestry": [
+        "Work State Specification",
+        "7. Pull Door Take And Return"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_d2b3576164c7a12b25979e8dfb68d7b5",
@@ -854,9 +1594,19 @@
       "targetAnchor": "branch-proposal-completion",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 on completing a parked branch proposal becomes the H3 \"Branch Proposal Completion\"; level and title changed.",
-      "targetUnitDigest": "7949ca542ba953e6f041b76bd0440493"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L587-587 (heading \"Cửa pull mở rộng: hoàn tất một đề xuất nguồn-nhánh bị đỗ\") -> spec.md#branch-proposal-completion L566-566; targetOwner/targetAnchor spec.md#branch-proposal-completion. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7949ca542ba953e6f041b76bd0440493df4879bb72d157566ce0346a59d5d75f",
+      "targetAncestry": [
+        "Work State Specification",
+        "7. Pull Door Take And Return"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_59a22b2c3443dfe4e6a316c584d885a8",
@@ -866,9 +1616,20 @@
       "targetAnchor": "unheaded-block-58",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph on a blocked item carrying a live proposal branch fgw/<id> is carried verbatim.",
-      "targetUnitDigest": "169457cec66b3a789d636951cf5ce82e"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L589-591 (unheaded-block-61) -> spec.md#unheaded-block-58 L568-570; targetOwner/targetAnchor spec.md#unheaded-block-58. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "169457cec66b3a789d636951cf5ce82ee55e64668f0c1355eae9047b67ba22a1",
+      "targetAncestry": [
+        "Work State Specification",
+        "7. Pull Door Take And Return",
+        "Branch Proposal Completion"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_f3ac7531969ff1ba2b8080d6fc83bd1a",
@@ -878,9 +1639,20 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "take/return behavior bullets for blocked items with a live branch (28 lines) are carried verbatim.",
-      "targetUnitDigest": "6bdca3cb587dc58cb5388b2a2e34d929"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L593-620 (unheaded-block-62) -> spec.md#unheaded-block-59 L572-599; targetOwner/targetAnchor spec.md#unheaded-block-59. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6bdca3cb587dc58cb5388b2a2e34d9298183b50b61f7a2267033853fc6c68528",
+      "targetAncestry": [
+        "Work State Specification",
+        "7. Pull Door Take And Return",
+        "Branch Proposal Completion"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_2b2aa99a73a8e330673e26d15ac171e3",
@@ -890,9 +1662,19 @@
       "targetAnchor": "envelope-shape",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 envelope becomes \"Envelope Shape\" under the contract document (map section 4); title changed and the claim kind is contract, not specification.",
-      "targetUnitDigest": "66e458351046f7cb0b354aed583e73c7"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L622-622 (heading \"Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)\") -> contracts/cli-io-contract.md#envelope-shape L113-113; targetOwner/targetAnchor contracts/cli-io-contract.md#envelope-shape. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "66e458351046f7cb0b354aed583e73c70e99bab5f1ef4eb25f69ca0742e176c7",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
@@ -902,9 +1684,20 @@
       "targetAnchor": "unheaded-block-14",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Four-field envelope description is stated in both sources; candidate carries the work-state block (this one) plus the io-contract block (lines 49-60 of io) under Envelope Shape, nothing dropped.",
-      "targetUnitDigest": "8b3e099723160029770c62469f14db6c"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L624-634 (unheaded-block-63) -> contracts/cli-io-contract.md#unheaded-block-14 L115-125; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-14. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
@@ -914,9 +1707,20 @@
       "targetAnchor": "unheaded-block-18",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Error path not enveloped (stderr, exit code) is carried verbatim as its own block under Error Path Is Not Enveloped; io-contract states the same claim inside its envelope unit, so it also exists elsewhere in that heading, but this block was not merged.",
-      "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c7"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L636-639 (unheaded-block-64) -> contracts/cli-io-contract.md#unheaded-block-18 L142-145; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-18. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Error Path Is Not Enveloped"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
@@ -926,9 +1730,20 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Runner single-line envelope rule is stated in both sources; candidate carries both texts under Runner Stdout Envelope.",
-      "targetUnitDigest": "75bf5b6af00287e081d243556f44f8e1"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L641-645 (unheaded-block-65) -> contracts/cli-io-contract.md#unheaded-block-19 L149-153; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-19. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Runner Stdout Envelope"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_9c6c68acbcd413ec5d826804b07650c0",
@@ -938,9 +1753,19 @@
       "targetAnchor": "manifest-shape",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 manifest becomes \"Manifest Shape\" in the contract document; title changed.",
-      "targetUnitDigest": "f7201259d68259d70be0b14e5989837d"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L647-647 (heading \"Sổ verb máy-đọc (manifest) — `--help --json`\") -> contracts/cli-io-contract.md#manifest-shape L244-244; targetOwner/targetAnchor contracts/cli-io-contract.md#manifest-shape. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f7201259d68259d70be0b14e5989837d13de80f1a0f46817c02bca93603a9250",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
@@ -950,9 +1775,20 @@
       "targetAnchor": "unheaded-block-29",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Manifest fields (schema_version 2.0, commands) are stated in both sources; candidate carries both texts, the work-state one adds the positional-parameter rule.",
-      "targetUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L649-663 (unheaded-block-66) -> contracts/cli-io-contract.md#unheaded-block-29 L246-260; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-29. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
@@ -962,9 +1798,20 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Code is truth for both effect axes and the whole source field definition. Owner A15 resolves SC-1: the stale exclusive only-review-and-approve assertion is superseded by the current registry contract and a run example, not coordination. Actual --help --json exposes 15 externalEffect verbs including run and no coordination verb. The candidate preserves the source field definitions and corrects its obsolete enumeration; independent review of this changed binding is pending.",
-      "targetUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2"
+      "reviewNote": "SC-1 changed row (contract, supersede). work-state.md L665-676 (unheaded-block-67) -> contracts/cli-io-contract.md#unheaded-block-31 L269-279. Source says \"hôm nay chỉ `review` và `approve` mang externalEffect: true\"; code (--help --json and COMMAND_REGISTRY) has 15 such verbs incl. run and no coordination, so the exclusive claim is stale and is replaced by a deferral to `fgos --help --json` plus examples review/approve/run (all real). Surrounding text compared by diff: touchesState/externalEffect definitions, review touchesState:false rationale, declarative-only/STR38 clause byte-identical; the HEAD target no longer contains `coordination`. Dropped only the false exclusivity; review's --github rationale is kept in the first sentences of the same unit. Both digests recomputed with scripts/generate-doc-inventory.mjs extractor at HEAD and d870fe07 and match; at 54c2698ee the target digest differed (expected, 32-hex 9880ec12... -> full 97e66153...).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
@@ -974,9 +1821,19 @@
       "targetAnchor": "unheaded-block-26",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present.",
-      "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c2"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L678-702 (unheaded-block-68) -> contracts/cli-io-contract.md#unheaded-block-26 L202-226; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-26. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
@@ -986,9 +1843,19 @@
       "targetAnchor": "unheaded-block-34",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8.",
-      "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748"
+      "reviewNote": "Unchanged under A14. merge/contract: work-state.md L704-711 (unheaded-block-69) -> contracts/cli-io-contract.md#unheaded-block-34 L298-305; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-34. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "8. Multi-Value Flag Convention"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_522c26efde7ef029b3ce6e25829a8915",
@@ -998,9 +1865,18 @@
       "targetAnchor": "9-per-verb-help",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 per-verb help becomes the numbered H2 \"9. Per-Verb Help\" in the contract document; level and title changed.",
-      "targetUnitDigest": "c57c03b28277a6a6bb5608ca73c026fa"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L713-713 (heading \"Trợ giúp theo từng verb — `fgos <verb> --help`\") -> contracts/cli-io-contract.md#9-per-verb-help L313-313; targetOwner/targetAnchor contracts/cli-io-contract.md#9-per-verb-help. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "c57c03b28277a6a6bb5608ca73c026fab2a79333bccf9bc89a53208ea9d16dcb",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_f1eca3e6fcc3886007fa5de37d686e54",
@@ -1010,9 +1886,19 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Per-verb --help intro is carried verbatim into the contract document; only in work-state.md.",
-      "targetUnitDigest": "49da8c71336ea054dce887759a9eea0e"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L715-718 (unheaded-block-70) -> contracts/cli-io-contract.md#unheaded-block-36 L315-318; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-36. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "49da8c71336ea054dce887759a9eea0ef5f841792858d401b66341c4d0d8734d",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "9. Per-Verb Help"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
@@ -1022,9 +1908,19 @@
       "targetAnchor": "unheaded-block-37",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee.",
-      "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63f"
+      "reviewNote": "Unchanged under A14. promote/contract: work-state.md L720-731 (unheaded-block-71) -> contracts/cli-io-contract.md#unheaded-block-37 L320-331; targetOwner/targetAnchor contracts/cli-io-contract.md#unheaded-block-37. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "9. Per-Verb Help"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_a374334e7c5dc565cac42c0fa641f78f",
@@ -1034,9 +1930,19 @@
       "targetAnchor": "registry-projection-and-registration-standard",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 tool registry becomes \"Registry Projection And Registration Standard\"; title changed.",
-      "targetUnitDigest": "bd97137715f092dd3d8e4496cf57d1da"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L733-733 (heading \"Sổ đăng ký công cụ (tool registry) — hai chiều, tách chuẩn \"đăng ký\" khỏi \"đang hiện diện\"\") -> spec.md#registry-projection-and-registration-standard L605-605; targetOwner/targetAnchor spec.md#registry-projection-and-registration-standard. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bd97137715f092dd3d8e4496cf57d1da65c5b7f06dea827f5312fb2e13ce602a",
+      "targetAncestry": [
+        "Work State Specification",
+        "8. Tool Registry"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_3a86c90c7384251f37bec19876c084db",
@@ -1046,9 +1952,20 @@
       "targetAnchor": "unheaded-block-61",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Opening on the ported distillery tool-registry capability (tsk-1dj) is carried verbatim.",
-      "targetUnitDigest": "acb4c4f353694a4680b5527ac1a9d33e"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L735-741 (unheaded-block-72) -> spec.md#unheaded-block-61 L607-613; targetOwner/targetAnchor spec.md#unheaded-block-61. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "acb4c4f353694a4680b5527ac1a9d33e984465f985bbb03fb727426ef11b671a",
+      "targetAncestry": [
+        "Work State Specification",
+        "8. Tool Registry",
+        "Registry Projection And Registration Standard"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_712d6e9b9a98f37be1985d416565b2b5",
@@ -1058,9 +1975,20 @@
       "targetAnchor": "unheaded-block-62",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "view.tools projection and registration standard bullets (26 lines) are carried verbatim.",
-      "targetUnitDigest": "19368a15d5d1a609f1138d1fe8c79a53"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L743-768 (unheaded-block-73) -> spec.md#unheaded-block-62 L615-640; targetOwner/targetAnchor spec.md#unheaded-block-62. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "19368a15d5d1a609f1138d1fe8c79a53a1f555576c365a30087b4a1c4724be4e",
+      "targetAncestry": [
+        "Work State Specification",
+        "8. Tool Registry",
+        "Registry Projection And Registration Standard"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_07b1d2ac34bdddeb8112613640a65ab5",
@@ -1070,9 +1998,19 @@
       "targetAnchor": "tool-registry-verbs",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 on tool register/check/query/remove becomes \"Tool Registry Verbs\"; title changed.",
-      "targetUnitDigest": "5dff99d34cce8282fc33c703b20af8a5"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L770-770 (heading \"Đăng ký/gỡ/probe/hỏi công cụ (tool register / check / query / remove)\") -> spec.md#tool-registry-verbs L642-642; targetOwner/targetAnchor spec.md#tool-registry-verbs. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5dff99d34cce8282fc33c703b20af8a564a2f474b8574b4491c758ec171263a0",
+      "targetAncestry": [
+        "Work State Specification",
+        "8. Tool Registry"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_fcf82f5b62ebf92bd2bd6adf11cea633",
@@ -1082,9 +2020,21 @@
       "targetAnchor": "unheaded-block-63",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Runs-when / Blocked-when bullets of the tool verbs (28 lines) are carried verbatim.",
-      "targetUnitDigest": "2b77791d889b05af4bf68e9d0af5f3a7"
+      "reviewNote": "Unchanged under A14. promote/specification: work-state.md L772-799 (unheaded-block-74) -> spec.md#unheaded-block-63 L644-671; targetOwner/targetAnchor spec.md#unheaded-block-63. 54c2698ee vs HEAD decision: disposition, targetOwner/Anchor, claimKind, rationale, sourceUnitDigest and targetUnitDigest byte-equal; only authoredBy/reviewStatus/reviewedBy/reviewedAt reset. Source and target unit digests re-extracted at HEAD, d870fe07 and 54c2698ee with the repo extractor and equal the stated full digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2b77791d889b05af4bf68e9d0af5f3a70ac232324ffd3e5290b5df0eb734f8af",
+      "targetAncestry": [
+        "Work State Specification",
+        "8. Tool Registry",
+        "Tool Registry Verbs"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     }
-  ]
+  ],
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-data-dictionary.md"
 }

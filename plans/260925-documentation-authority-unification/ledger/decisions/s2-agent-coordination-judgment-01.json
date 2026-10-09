@@ -2521,9 +2521,8 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-09",
       "rationale": "The coordination engine was retired in 2180b4e72701bb090288af8fe8021008d9d42079. Under owner A15, the complete previously bound target unit from docs/platform/agent-coordination/architecture/system-context.md#agent-coordination-system-context is preserved verbatim in the literal historical snapshot, including every original qualification and implementation-status assertion. It is non-authority evidence, not a current engine claim. The entire old shown target text is contained in the committed snapshot; this is a whole-unit move, not partial carry or silent claim deletion. Independent review of this new historical binding is pending.",
-      "targetUnitDigest": "3d500396d86af8a042cdec8998b1d349753e1586d0b77f535c3e6bc36bc93f88",
-      "targetAncestry": ["Retired engine snapshot: architecture/system-context.md"],
-      "targetKind": "history-evidence"
+      "targetKind": "history-evidence",
+      "reviewNote": "Source unit (system-context.md lines 1-9, H1 plus section) is not byte-contained: the three-line blockquote 'Migration status: This document is a legacy/current source for ... Do not edit divergent design claims here without also updating the target doc or migration inventory' is absent from the snapshot body (a line-anchored search of the 54c2698ee-identical body finds none of the three lines); the other six lines (Document type..Canonical for) are present but split by the inserted promotion header block. No design claim is lost, but a dropped legacy-status obligation is exactly the kind of loss the rationale must name; the boilerplate rationale says the entire shown text is contained, which is false for this source."
     },
     {
       "claimId": "claim_20651bfadf99b005265936b27ebd1356",
@@ -2549,12 +2548,20 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-09",
       "rationale": "The coordination engine was retired in 2180b4e72701bb090288af8fe8021008d9d42079. Under owner A15, the complete previously bound target unit from docs/platform/agent-coordination/architecture/system-context.md#unheaded-block-1 is preserved verbatim in the literal historical snapshot, including every original qualification and implementation-status assertion. It is non-authority evidence, not a current engine claim. The entire old shown target text is contained in the committed snapshot; this is a whole-unit move, not partial carry or silent claim deletion. Independent review of this new historical binding is pending.",
+      "targetKind": "history-evidence",
+      "reviewNote": "unheaded-block unheaded-block-2 (legacy lines 7-11, starts 'Document type: Architecture'): recomputed both digests from committed bytes at d870fe07 with extractMarkdownConservationUnits and they equal the sidecar; the shown source text is found line-anchored and byte-identical inside the literal fence of the snapshot (which is byte-equal to 54c2698ee old target; old bound unit unheaded-block-1); move to history-evidence is allowed, rationale names 2180b4e72701bb090288af8fe8021008d9d42079 and A15; nothing lost or added.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3d500396d86af8a042cdec8998b1d349753e1586d0b77f535c3e6bc36bc93f88",
-      "targetAncestry": ["Retired engine snapshot: architecture/system-context.md"],
-      "targetKind": "history-evidence"
+      "targetAncestry": [
+        "Retired engine snapshot: architecture/system-context.md"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_3680b52d872d34ca8e71f513bb8dc5b4",
@@ -8395,9 +8402,8 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-09",
       "rationale": "The coordination engine was retired in 2180b4e72701bb090288af8fe8021008d9d42079. Under owner A15, the complete previously bound target unit from docs/platform/agent-coordination/intent-preservation-ledger.md#agent-coordination-intent-preservation-ledger is preserved verbatim in the literal historical snapshot, including every original qualification and implementation-status assertion. It is non-authority evidence, not a current engine claim. The entire old shown target text is contained in the committed snapshot; this is a whole-unit move, not partial carry or silent claim deletion. Independent review of this new historical binding is pending.",
-      "targetUnitDigest": "22433abdc7e7363140744967a458d197b3d1a0fed1a90e7302632cc8242b9d26",
-      "targetAncestry": ["Retired engine snapshot: intent-preservation-ledger.md"],
-      "targetKind": "history-evidence"
+      "targetKind": "history-evidence",
+      "reviewNote": "Source unit (ledger lines 1-6: H1 plus Document type: Index / Design status: N/A / Implementation: Active / Last reviewed: 2026-09-04 / Canonical for) is present line by line in the snapshot, but not contiguously: the 54c2698ee candidate body inserts its promotion metadata txt block between the H1 and the 'Document type: Index' line. Nothing is lost or invented (inserted block is labelled 'Added in candidate'); fix is a rationale that names the interleaved candidate metadata, or supersede, instead of claiming a whole contiguous move."
     },
     {
       "claimId": "claim_d8c833114214b5c51f2a6490bcfee5e3",
@@ -8406,12 +8412,20 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "intent",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-09",
       "rationale": "The coordination engine was retired in 2180b4e72701bb090288af8fe8021008d9d42079. Under owner A15, the complete previously bound target unit from docs/platform/agent-coordination/intent-preservation-ledger.md#unheaded-block-1 is preserved verbatim in the literal historical snapshot, including every original qualification and implementation-status assertion. It is non-authority evidence, not a current engine claim. The entire old shown target text is contained in the committed snapshot; this is a whole-unit move, not partial carry or silent claim deletion. Independent review of this new historical binding is pending.",
+      "targetKind": "history-evidence",
+      "reviewNote": "unheaded-block unheaded-block-1 (legacy lines 3-7, starts 'Document type: Index'): recomputed both digests from committed bytes at d870fe07 with extractMarkdownConservationUnits and they equal the sidecar; the shown source text is found line-anchored and byte-identical inside the literal fence of the snapshot (which is byte-equal to 54c2698ee old target; old bound unit unheaded-block-1); move to history-evidence is allowed, rationale names 2180b4e72701bb090288af8fe8021008d9d42079 and A15; nothing lost or added.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-s2-agent-coordination-judgment-01.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "22433abdc7e7363140744967a458d197b3d1a0fed1a90e7302632cc8242b9d26",
-      "targetAncestry": ["Retired engine snapshot: intent-preservation-ledger.md"],
-      "targetKind": "history-evidence"
+      "targetAncestry": [
+        "Retired engine snapshot: intent-preservation-ledger.md"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_2970edb369265480bce99fc459a78f9f",
@@ -10476,5 +10490,5 @@
       "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-judgment-01.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-s2-agent-coordination-judgment-01.md"
 }

@@ -16,12 +16,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "3d500396d86af8a042cdec8998b1d349753e1586d0b77f535c3e6bc36bc93f88",
       "targetShownTextDigest": "c858083226dff30770acc915360f0a0e3fa15d285f8f71d4a6347870df1364a5",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (architecture/system-context.md#component-and-runtime-flow, 1253 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in architecture/system-context.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_2d663f66649fd2758f3d44e4a947b4a3",
@@ -35,12 +40,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "3d500396d86af8a042cdec8998b1d349753e1586d0b77f535c3e6bc36bc93f88",
       "targetShownTextDigest": "c858083226dff30770acc915360f0a0e3fa15d285f8f71d4a6347870df1364a5",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (architecture/system-context.md#unheaded-block-4, 936 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in architecture/system-context.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_52f4171b7ac9f5564387abedae33fc32",
@@ -54,12 +64,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "6657f094853e04e4f0b24ba50d84450cbe1cfd4612483bccfb0d221be92fadf0",
       "targetShownTextDigest": "bbef75c32aa5b79cd57f611d2e1eded89f3cb76f05ad4d8ba76d0209299792e4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (history/documentation-migration/claim-preservation.md#agent-coordination-claim-preservation, 14592 chars, 27 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in history/documentation-migration/claim-preservation.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_2db60db20f1add588148186e717afe91",
@@ -73,12 +88,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "6657f094853e04e4f0b24ba50d84450cbe1cfd4612483bccfb0d221be92fadf0",
       "targetShownTextDigest": "bbef75c32aa5b79cd57f611d2e1eded89f3cb76f05ad4d8ba76d0209299792e4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (history/documentation-migration/claim-preservation.md#unheaded-block-3, 13611 chars, 24 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in history/documentation-migration/claim-preservation.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_0c3e7ed818f9688e17bf5f12cfde51a7",
@@ -92,12 +112,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "75b9a3360d8f8f3b7379b2b4c25e4a1f47eda07f38f6f0a4f7a0c2a55a5d6f39",
       "targetShownTextDigest": "c357a8d433a5f657e4066c54c02658e642fff61362b2c8ed977111969148e80c",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (history/documentation-migration/proof-preservation.md#agent-coordination-proof-preservation, 9159 chars, 10 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in history/documentation-migration/proof-preservation.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_e6f5d79f58c2cffd6a636d0e28eaed92",
@@ -111,12 +136,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "75b9a3360d8f8f3b7379b2b4c25e4a1f47eda07f38f6f0a4f7a0c2a55a5d6f39",
       "targetShownTextDigest": "c357a8d433a5f657e4066c54c02658e642fff61362b2c8ed977111969148e80c",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (history/documentation-migration/proof-preservation.md#unheaded-block-3, 8220 chars, 7 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in history/documentation-migration/proof-preservation.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_6271a36fcf399262c449faa29fcacda3",
@@ -130,12 +160,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "559267e1d11d1d703a03a445fd102188619ca9e2de0b7b79a10b3939afecbb47",
       "targetShownTextDigest": "cc64ae9adf81463b814288268b2eb134527f0472aa06b4ab1f4d2cb58fa6976b",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (history/documentation-migration/proposal-status.md#agent-coordination-proposal-status, 5534 chars, 14 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in history/documentation-migration/proposal-status.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_c72016c6ceb4f84343b61c0118b2b359",
@@ -149,12 +184,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "559267e1d11d1d703a03a445fd102188619ca9e2de0b7b79a10b3939afecbb47",
       "targetShownTextDigest": "cc64ae9adf81463b814288268b2eb134527f0472aa06b4ab1f4d2cb58fa6976b",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (history/documentation-migration/proposal-status.md#unheaded-block-3, 4524 chars, 11 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in history/documentation-migration/proposal-status.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_9c354eeb6f4a61966d0d015575eb331f",
@@ -168,12 +208,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "22433abdc7e7363140744967a458d197b3d1a0fed1a90e7302632cc8242b9d26",
       "targetShownTextDigest": "6ef531566b394360d566578749f47eec0999fe77cf4af8fe414245f2a6d61c16",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (intent-preservation-ledger.md#ac-i010-one-shared-driver-discipline-across-coordination-facades, 2463 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in intent-preservation-ledger.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_e6e7562209436621ff85518d0ad18fd5",
@@ -187,12 +232,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "22433abdc7e7363140744967a458d197b3d1a0fed1a90e7302632cc8242b9d26",
       "targetShownTextDigest": "6ef531566b394360d566578749f47eec0999fe77cf4af8fe414245f2a6d61c16",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (intent-preservation-ledger.md#unheaded-block-20, 2392 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in intent-preservation-ledger.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_7fae909de31694f1b661ac18211cad57",
@@ -206,12 +256,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (proposals/semantic-cli-surface.md#1-vấn-đề-the-problem, 847 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_4d2603d2448b20475b2a89ca2ea1ad6f",
@@ -225,12 +280,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (proposals/semantic-cli-surface.md#unheaded-block-2, 199 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_c3bfb7cedbf63ea5a56ea1ee0f922bf9",
@@ -244,12 +304,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (proposals/semantic-cli-surface.md#unheaded-block-3, 618 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
@@ -263,12 +328,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (proposals/semantic-cli-surface.md#2-giải-pháp-kiến-trúc-the-solution, 788 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_b14e1fac0d2b3e70231806099e41a6e8",
@@ -282,12 +352,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (proposals/semantic-cli-surface.md#unheaded-block-4, 208 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_9d6ab3d626cdbbc2272d2de3a04ac0b4",
@@ -301,12 +376,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (proposals/semantic-cli-surface.md#3-các-sửa-đổi-tầng-engine-core-fixes, 1264 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_86b6325d4e0e524b97f2a9f028ba6795",
@@ -320,12 +400,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (proposals/semantic-cli-surface.md#unheaded-block-6, 81 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_09fafb51d4b29cf1109cd0c9404b610b",
@@ -339,12 +424,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (proposals/semantic-cli-surface.md#unheaded-block-7, 1137 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_b926a2b6954443f07915268fba55e008",
@@ -358,12 +448,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (proposals/semantic-cli-surface.md#5-lộ-trình-triển-khai-execution-order, 930 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_3e99c9ba0ea20c44649583632fef547f",
@@ -377,12 +472,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
       "targetShownTextDigest": "85712ca5226508233fb1a7e7bc4f421e2a30e1d2b3915637df2773b24ce4d4b4",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (proposals/semantic-cli-surface.md#unheaded-block-11, 885 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in proposals/semantic-cli-surface.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
@@ -396,12 +496,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#current-summary, 740 chars, 1 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_de43346a8b673d9ea0272947c5c752dc",
@@ -415,12 +520,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-5, 406 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_6c4f618a99c27c8d995e5ae4ea838c31",
@@ -434,12 +544,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#scope, 608 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_bff3a2cc2c15603593f120c3671296a9",
@@ -453,12 +568,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-6, 598 chars, 0 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_bc2a036bfb370b61dfc459ae5a77cd8c",
@@ -472,12 +592,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#actors-and-surfaces, 925 chars, 5 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_3273f8bddcca9ea46c529152326ad314",
@@ -491,12 +616,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-8, 901 chars, 5 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_e55374f22025f86c63d8706a582e280d",
@@ -510,12 +640,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#core-entities, 1559 chars, 3 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_9d18f68c54b13d881dc32c17f0524337",
@@ -529,12 +664,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-9, 1541 chars, 3 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_1c3292ad19c922c586854d5d126e6f3b",
@@ -548,12 +688,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#operations-and-flows, 1546 chars, 9 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_4e688aaf38cb9b831a4bdd80ea2f499d",
@@ -567,12 +712,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-10, 1521 chars, 9 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_bdc686550bc36d7563154fd33098741d",
@@ -586,12 +736,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#contracts-owned, 771 chars, 3 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_5020e11c44b6b053c400adc46cda95a1",
@@ -605,12 +760,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-12, 679 chars, 3 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_1289fd071fae40e82e7dba2d1b9bcbb2",
@@ -624,12 +784,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#implementation-status, 1861 chars, 8 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_2a0f67663daf206e2883bd79216cd084",
@@ -643,12 +808,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-14, 1719 chars, 8 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_abd1a1964d80a8d3e5635ba17cd386cf",
@@ -662,12 +832,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (spec.md#known-gaps, 1111 chars, 4 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_c4d21a728479825bedb7f7eedf6e15c9",
@@ -681,12 +856,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/spec.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "8bb3651c8786d5021ec43207b983e47b4c671aba96498b1979749e976017e498",
       "targetShownTextDigest": "16fece58299f39826a29f2ed47710de9fbf05739b59fa76c9ce41dea9c00d9d9",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (spec.md#unheaded-block-16, 1096 chars, 4 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in spec.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
@@ -700,12 +880,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "28c6ed748d6b29beb4e8bfb2b653df34516b6498d9d435d95636210f65cd510a",
       "targetShownTextDigest": "ede8941d08f8c048955a1b49abb6c9d3fc6a099d1202168b7b9dcca6b5c61747",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (subcomponents/README.md#agent-coordination-subcomponents, 7278 chars, 11 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in subcomponents/README.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_c908b3b595d16211e94263026e278842",
@@ -719,12 +904,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "28c6ed748d6b29beb4e8bfb2b653df34516b6498d9d435d95636210f65cd510a",
       "targetShownTextDigest": "ede8941d08f8c048955a1b49abb6c9d3fc6a099d1202168b7b9dcca6b5c61747",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (subcomponents/README.md#unheaded-block-3, 6221 chars, 9 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in subcomponents/README.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
@@ -738,12 +928,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "69b0ef4c8e480d23ec2a05e6b118d449e03079c04560a6541d66214e1a227998",
       "targetShownTextDigest": "7acfd7183a0f16b83cd0d0fb6864c180955dd2862100f2f44b6192062304e15b",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "heading-section at 54c2698ee (verification/implementation-alignment.md#agent-coordination-implementation-alignment, 8268 chars, 26 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in verification/implementation-alignment.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     },
     {
       "claimId": "claim_d1a817c37e5972f83310d2c7ca022f3d",
@@ -757,12 +952,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Owner A15: engine retired in 2180b4e72701bb090288af8fe8021008d9d42079. Preserve the entire former unit verbatim inside the complete non-authority document snapshot; no historical claim or qualifier is deleted. Current owners are CollaborationPattern and the Workflow runner, not this historical engine design.",
       "preserved": true,
       "targetUnitDigest": "69b0ef4c8e480d23ec2a05e6b118d449e03079c04560a6541d66214e1a227998",
       "targetShownTextDigest": "7acfd7183a0f16b83cd0d0fb6864c180955dd2862100f2f44b6192062304e15b",
-      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9"
+      "snapshotCommit": "f719eeff972f3784bfd4faf0a14f46c0eba915f9",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-moves.md",
+      "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+      "reviewNote": "unheaded block at 54c2698ee (verification/implementation-alignment.md#unheaded-block-3, 7148 chars, 22 status-word hits kept verbatim): digest recomputed via extractMarkdownConservationUnits = ledger; shown text == exact unit slice; contained byte-for-byte in source file and in verification/implementation-alignment.md at f719eeff9 and HEAD; target unit digest of #literal-snapshot recomputed equal; section digest equal; rationale names 2180b4e72 and non-authority history."
     }
   ],
   "snapshots": [

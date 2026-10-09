@@ -496,16 +496,26 @@
     },
     {
       "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
-      "targetUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
       "sourceUnitDigest": "39e4ab1f30a6acc9",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-32",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Code is truth for the whole effect-axis field list. Owner A15 resolves SC-1: replace the retired coordination example with run, preserving every other entry-field definition and qualifier. The actual current machine-readable manifest has 15 externalEffect verbs including run and no coordination verb; both candidate examples now agree. This corrected whole-unit carry supersedes the stale source example, not a claim of verbatim copying or a silent partial carry. Independent review is pending.",
       "authoredBy": "codex-session:1@2026-10-09",
-      "reviewNote": "Carried text names `coordination` as an example verb with externalEffect:true. Current fgos --help --json (schema 2.0, 73 verbs) has no coordination verb and 15 externalEffect:true verbs (cleanup, decision-index, context-render, dispatch, run, review, approve, sync-root, promote-to-component, docs-index, doc-registry, gateway, resync-worktree, main-checkout-reset, workflow); target cli-io-contract.md L289-290 still repeats the stale example, and the owner decision in phase-05 semantic-conflicts.md SC-1 says code is truth and the text resolution is deferred to Phase 6. Fix: drop `coordination` (use e.g. review, approve, dispatch, run) or defer to manifest without examples, then re-review."
+      "reviewNote": "supersede of docs/io-contract.md#unheaded-block-19 into cli-io-contract.md#unheaded-block-32 (contract). Whole 5-bullet field list compared line by line via git diff: only the example verb changed `coordination` -> `run`; qualifiers (\"dispatch executor thật tính là effect ngoài .fgos/\", review mutation/--github rationale, \"xem fgos --help --json\" deferral) intact. Code check: manifest has 15 externalEffect verbs incl. run, no coordination; examples review/approve/run all present. Target bytes at HEAD and d870fe07 hash to the stated digest; rationale does not claim verbatim copying.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-09",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-io-contract.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ],
+      "reviewReportCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
     },
     {
       "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
@@ -877,5 +887,5 @@
     }
   ],
   "authorSession": "codex-session:1@2026-10-08",
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-io-contract.md"
 }
