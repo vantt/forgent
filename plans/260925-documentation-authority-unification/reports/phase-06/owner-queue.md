@@ -60,3 +60,17 @@ A15 (7f8d12784) authorizes this correction; no new owner-authority question. f30
 - Baselines: H's 30 findings are byte-identical to the committed prior final-check proof, all in the existing exact-tuple baseline; zero additions. No baseline, checker, extractor, main, legacy-root or AGENTS.md change.
 
 Next owner action: start a different reviewer session with review-request-2-reframe.md and commit its scoped reports. This is a review handoff, not Agent Coordination batch closure or Phase 6 completion.
+
+## Whole-area retirement review
+
+A16 whole-file scope is authored in 9134ff4e5 and pending accounting in 6df71985b. Independent acceptance of the new round remains UNPROVEN.
+
+- Move/archive/delete: 48 obsolete candidate files moved to kind-history locations; 74 full original inputs preserved. No physical legacy archive/delete and no claim dropped. Exact paths: whole-area-classification.json and whole-area-owner-lists.json.
+- Current footprint: twenty files remain, not almost empty; thirteen surviving runtime/boundary references, four registered cognitive companions, portal/spec and evidence owner.
+- Promoted edits: authorized portal and shared navigation changes are recorded in promoted-edits.md and post-review-edits.md. No area-status promotion.
+- Conflicts: the unchanged strict diagnostic retains 342 identical-owner groups. Current diagnostic member sets and semantic-conflict groups are exported in whole-area-owner-lists.json for the reviewer; historical acceptances do not authorize changed membership.
+- Holds: zero new unknown-blocking holds. Review 3,065 pending source rows, 3,007 retired move identities and 545 shown-text classification receipts. Eighty unchanged receipt approvals retain pins; 96 drifted approvals are withheld.
+- Links: two immutable physical payload references still name retired locations; preserve payload bytes and use the explicit historical-resolution queue in whole-area-owner-lists.json during the closing link pass. All 404 inherited reference records are classified in whole-area-link-plan.json; no runtime-authority alias is added.
+- Proof: both prior-registry D paths and both scoped D paths are zero-fatal, tests 912/912 pass, H has zero new/Agent Coordination findings. Strict batch closure remains UNPROVEN pending independent review.
+
+Next owner action: start a different reviewer session with review-request-2-whole-area.md and commit the limited reports. No further content batch starts before this ready-for-review gate is cleared.
