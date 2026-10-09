@@ -1,7 +1,7 @@
 # Reframe classification receipts: independent review
 Reviewer: reviewer:claude-session:4df9e88c@2026-10-09
 Review mode: ordinary
-Author session: codex-session:1
+Author session: codex-session:1@2026-10-08
 Receipt commit: d870fe07f79d115c6a4bf783a386c6f1c3bd4081
 Request: reports/phase-06/review-request-2-reframe.md
 Receipt artifact: ledger/candidate-classifications-agent-coordination-reframe.json

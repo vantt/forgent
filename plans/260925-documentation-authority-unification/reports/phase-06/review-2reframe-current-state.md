@@ -1,7 +1,7 @@
 # Reframe current-state framing: independent review
 Reviewer: reviewer:claude-session:4df9e88c@2026-10-09
 Review mode: ordinary
-Author session: codex-session:1
+Author session: codex-session:1@2026-10-08
 Receipt commit: d870fe07f79d115c6a4bf783a386c6f1c3bd4081
 Text pin: 5d2587228e1bae5bdf947ef5b5c88314736f928f (documents unchanged between this pin and HEAD 94b104aba: `git diff --stat 5d2587228 HEAD -- docs/platform/agent-coordination` is empty)
 Pinned blobs: docs/platform/agent-coordination/README.md blob 1ee328dbdf862da773c34a0746bb2cab624410e1 (sha256 fc8c55194c9512f9a46728d9dfb0b1079529eb2adccb5b2af142b004d50eeff4); docs/platform/agent-coordination/spec.md blob 790db518eb65087d7e392407d09b5048e5fa6968 (sha256 9d7faa4227e606991b16f9a7cd1fdf094d06c2e7daf0c6969153ab823f28d177)
