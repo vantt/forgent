@@ -44,7 +44,7 @@ import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-h
 import {
   seedTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   removeTrust, removeCodexTrust, removeAgyTrust,
-  seedCodexHookTrust, removeCodexHookTrust,
+  seedCodexHookTrust,
 } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
@@ -490,8 +490,6 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     // True only when this round wrote a trust entry, so teardown removes what it wrote and
     // never an entry a person vouched for.
     trustWritten: false,
-    // Hook trust keys this round wrote into the codex store, removed on teardown.
-    hookTrustKeys: [],
     note(patch) {
       try { writeVisibility(runDir, patch); } catch { /* a courtesy, not a contract */ }
     },
@@ -660,7 +658,8 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerE
       let wrote;
       if (trustStore.kind === 'codex-toml') {
         wrote = seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
-        seedHookTrust({ round, target: stores.target, projectPath, repoRoot: root, rootConfigPath: stores.root });
+        // Only into a worker's own private home: hook trust is never written to the account's real config.
+        if (stores.target !== stores.root) seedHookTrust({ round, target: stores.target, projectPath, repoRoot: root, rootConfigPath: stores.root });
       } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
         wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
       } else {
@@ -685,10 +684,7 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerE
 function seedHookTrust({ round, target, projectPath, repoRoot, rootConfigPath }) {
   try {
     const { keys, skipped } = seedCodexHookTrust(target, { projectPath, repoRoot, rootConfigPath });
-    if (keys.length) {
-      round.hookTrustKeys.push(...keys);
-      round.note({ hookTrustSeeded: keys.length });
-    }
+    if (keys.length) round.note({ hookTrustSeeded: keys.length });
     if (skipped) round.note({ hookTrustSkipped: skipped });
   } catch (err) {
     round.note({ hookTrustSeedFailed: err.message });
@@ -746,13 +742,12 @@ function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, worke
   // Only an entry this round wrote. A read-only dispatch runs in the main checkout, whose
   // entry is the one the person vouched for: deleting it makes every later claude start in
   // that folder stop at the trust dialog.
-  if (!trustStore || (!round.trustWritten && round.hookTrustKeys.length === 0)) return;
+  if (!trustStore || !round.trustWritten) return;
   const projectPath = path.resolve(cwd);
   try {
     const { target } = trustStorePaths({ trustStore, fullEnv, workerEnv });
     if (trustStore.kind === 'codex-toml') {
-      if (round.hookTrustKeys.length) removeCodexHookTrust(target, round.hookTrustKeys);
-      if (round.trustWritten) removeCodexTrust(target, projectPath);
+      removeCodexTrust(target, projectPath);
     } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
       removeAgyTrust(target, projectPath);
     } else {

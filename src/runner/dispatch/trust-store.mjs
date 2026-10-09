@@ -384,16 +384,16 @@ export function codexHookTrustEntries(hooksJsonPath) {
   return { entries, skipped };
 }
 
-/** The exact block `seedCodexHookTrust` appends for one key, so removal restores the file as it was. */
-function codexHookSectionPattern(key) {
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`\\n\\[hooks\\.state\\."${escaped}"\\]\\ntrusted_hash = "[^"]*"\\n`);
+/** A TOML basic-string key: backslash and quote escaped so any path stays valid TOML. */
+function codexHookHeader(key) {
+  return `[hooks.state."${key.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`;
 }
 
 /**
- * Trust the project's codex hooks in `configPath`. Append-only and idempotent: a key already
- * present is left as it is. Returns `{ keys, skipped }` -- the keys this call wrote, which are
- * the only ones the caller may remove later.
+ * Trust the project's codex hooks in `configPath`, which must be a worker's PRIVATE config: it is
+ * created by fgOS and deleted with the home, so nothing here is ever removed again and the
+ * operator's own config is never edited. Idempotent: a key already present (at any indentation)
+ * is left as it is. Returns `{ keys, skipped }`.
  */
 export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConfigPath } = {}) {
   if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
@@ -415,9 +415,9 @@ export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConf
   } catch (err) {
     if (err.code !== 'ENOENT') throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
   }
-  const fresh = entries.filter(({ key }) => !codexHookSectionPattern(key).test(body));
+  const fresh = entries.filter(({ key }) => !body.includes(codexHookHeader(key)));
   if (fresh.length === 0) return { keys: [], skipped };
-  const sections = fresh.map(({ key, hash }) => `\n[hooks.state."${key}"]\ntrusted_hash = "${hash}"\n`).join('');
+  const sections = fresh.map(({ key, hash }) => `\n${codexHookHeader(key)}\ntrusted_hash = "${hash}"\n`).join('');
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
     fs.mkdirSync(path.dirname(configPath), { recursive: true });
@@ -427,31 +427,6 @@ export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConf
     throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
   }
   return { keys: fresh.map(({ key }) => key), skipped };
-}
-
-/** Drop hook trust entries by key. Returns how many were there. */
-export function removeCodexHookTrust(configPath, keys) {
-  let body;
-  try {
-    body = fs.readFileSync(configPath, 'utf8');
-  } catch {
-    return 0;
-  }
-  let removed = 0;
-  let next = body;
-  for (const key of keys) {
-    const pattern = codexHookSectionPattern(key);
-    if (pattern.test(next)) { next = next.replace(pattern, ''); removed += 1; }
-  }
-  if (removed === 0) return 0;
-  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
-  try {
-    writeFileKeepingMode(tmp, configPath, next);
-  } catch (err) {
-    try { fs.rmSync(tmp, { force: true }); } catch { /* nothing further to do */ }
-    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
-  }
-  return removed;
 }
 
 // ---------------------------------------------------------------------------
