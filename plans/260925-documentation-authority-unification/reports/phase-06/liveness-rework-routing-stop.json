@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "ownerDecisionCommit": "3d8ee0d11",
+  "scanCommit": "5130cce8c",
+  "state": "blocked-by-new-routing-regressions; not-ready-for-review",
+  "command": ["node", "scripts/check-doc-candidate-status.mjs", "--json"],
+  "exitCode": 0,
+  "totalFindings": 33,
+  "inheritedBaselineFindings": 30,
+  "newFindings": [
+    {"type": "unresolved-link", "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md", "message": "link target does not exist: ../history/retired-engine/files/contracts/workflow-step-operation.md"},
+    {"type": "unresolved-link", "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md", "message": "link target does not exist: ../roadmap/team-dispatch-v1/step-02-workflow-step-operations.md"},
+    {"type": "unresolved-link", "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md", "message": "link target does not exist: ../history/retired-engine/files/decisions/ADR-002-step-operation-compatibility.md"}
+  ],
+  "cause": "Author's Stage/stage-to-Workflow-step/step prose normalization also changed existing physical filenames in link destinations. File identities and snapshot filenames were never authorized to change.",
+  "proposedCorrection": "Restore the original stage-bearing physical filenames in exactly these links; point the removed roadmap location at its existing historical snapshot. Keep step terminology in prose. Do not change checker, baseline, vocabulary or file identity.",
+  "actionTaken": "Stopped at the first observed new regression as required by standing A7. No new finding is baselined, no content commit or independent approval is issued, no re-review request is published.",
+  "dirtyWork": {"areaDocumentPaths": 38, "returnedWronglyMovedFiles": 19, "ownerProtectedOperatingFiles": 2, "retainedReworkDrafts": 15, "portalAndSpec": 2, "contentCommitted": false},
+  "unproven": ["Corrected H", "Final liveness scan after basename-boundary refinement", "Every current-state sentence", "New source/retired/classification accounting", "Both-prior D/E conservation on corrected committed content", "Affected test run", "Independent re-review acceptance"],
+  "nextStep": "Owner authorizes the narrow data-only link repair and resumption; repair links, rerun and commit refined scan/classification, complete sentence-level/code adjudication and changed-row accounting, prove unchanged gates/tests, publish the limited A17 re-review request and stop ready for review."
+}

@@ -74,3 +74,14 @@ A16 whole-file scope is authored in 9134ff4e5 and pending accounting in 6df71985
 - Proof: both prior-registry D paths and both scoped D paths are zero-fatal, tests 912/912 pass, H has zero new/Agent Coordination findings. Strict batch closure remains UNPROVEN pending independent review.
 
 Next owner action: start a different reviewer session with review-request-2-whole-area.md and commit the limited reports. No further content batch starts before this ready-for-review gate is cleared.
+
+## Liveness-first rework routing stop
+
+A17 3d8ee0d11 authorizes the rejected-classification rework after f9575e2a6. Initial scan/classification is committed in 5130cce8c; thirty-eight area-document changes are authored/staged but not committed or independently accepted.
+
+- Owner action required by standing A7: authorize narrow repair of three author-caused link regressions and resumption. Restore the physical stage-bearing filenames in the two affected documents; the roadmap link resolves to its existing historical snapshot. No gate/checker/baseline/vocabulary change is proposed.
+- Command: `node scripts/check-doc-candidate-status.mjs --json`; exit 0, thirty inherited findings plus three NEW unresolved-link tuples. Exact findings/cause/proposed correction: liveness-rework-routing-stop.json.
+- Review: no reviewer action yet; not ready for review. The current-state sentence proof, refined scan, changed-row accounting, new D/E and tests are UNPROVEN. Preserve the staged authoring state rather than interpreting the old whole-area request as a fresh approval gate.
+- Archive/delete/conflicts/holds: no new legacy archive/delete, real-conflict decision or unknown-blocking hold; prior lists remain recorded. Existing history carriers/payloads are unchanged. Promoted portal edit is logged under A17 and remains uncommitted.
+
+Exact next step after authorization: repair only the three links, rerun/refine the committed liveness scan and section classification, complete current/proposal sentence adjudication and changed-row accounting, prove unchanged gates/tests, publish the limited A17 re-review request, stop ready for review.
