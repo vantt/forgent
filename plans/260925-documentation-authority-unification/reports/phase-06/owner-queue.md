@@ -47,3 +47,16 @@ Ready-for-review: reports/phase-06/review-request-2-final-check.md. No unresolve
 The current read-only CLI proof contradicts live coordination-engine claims in 21 substantive units. Those receipts explicitly say stale and cannot close the gate; the reviewer must return rework and they remain open until text correction. The other 33 proposed content findings are UNPROVEN pending complete independent semantic review. These are review outcomes, not owner holds or new authority decisions.
 
 Visibility lists remain unchanged: 65 previously accepted migration-notice archive proposals; no physical legacy archive/delete; no new real-conflict resolution; zero unknown-blocking holds; no new promoted-doc edit. Prior promoted-portal diffs remain recorded for the checkpoint after Step 3.
+
+## Current-only reframe check
+
+A15 (7f8d12784) authorizes this correction; no new owner-authority question. f309594fd ok verdicts are applied in 54c2698ee. f719eeff9 preserves ten complete old documents verbatim before replacement; 977509d5f/5d2587228 reframe stale text; d870fe07f binds the historical moves and SC-1 corrections.
+
+- Archive/delete: ten candidate history snapshots, 40 stale-unit move proposals and 45 retired portal-unit moves. No physical legacy deletion/archive, no lost claim ID. The complete former portal is retained, including material beyond the 40 stale units.
+- Promoted edit: the authorized current-only area portal rewrite, with complete before/after preservation and exact diff logged in promoted-edits.md; inspect at this check and the checkpoint after Step 3. No authority-status change.
+- Real conflicts: SC-1 follows current code: 15 externalEffect verbs, run present, coordination absent. Both overlapping source bindings are pending independent acceptance. Existing conflict/identical receipts are unchanged; strict E and batch closure remain UNPROVEN.
+- Provenance: the overlapping SC-1 row in b-data-dictionary cannot retain the frozen legacy exemption after editing. Standing A14 sends all 90 rows to this check: one changed row and 89 byte-identical content/decision/digest rows for provenance re-confirmation only. Gate, fingerprint and H1 unchanged.
+- Holds: zero new unknown-blocking holds. Exactly 37 source moves, one IO correction, 90 pilot rows, 106 current/history classifications, 40 original move proposals and 45 retired portal units require the committed limited independent verdicts. All new approval fields are absent.
+- Baselines: H's 30 findings are byte-identical to the committed prior final-check proof, all in the existing exact-tuple baseline; zero additions. No baseline, checker, extractor, main, legacy-root or AGENTS.md change.
+
+Next owner action: start a different reviewer session with review-request-2-reframe.md and commit its scoped reports. This is a review handoff, not Agent Coordination batch closure or Phase 6 completion.
