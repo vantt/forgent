@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-08",
+  "ownerDecision": "765fee1fb",
+  "rows": [
+    {
+      "sourcePath": "AGENTS.md",
+      "unitDigest": "68bd036dcb1c088227e41c53d967140ee4ba34b3adfe2f3669044f4aa463dddd",
+      "identityFingerprint": "6f882a01917473e188404cf5d22111820f6dbf1e80e8c69ba66d7a9eeb2464ef",
+      "claimId": "claim_c3ef3a4ddc116883db10a70d55ba7bd5",
+      "sourceAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd",
+      "unitKind": "heading",
+      "sourceUnitDigest": "4485eb54512289665baad03b45714d0d19bdb4b46f1ce565850aea8aa969b940",
+      "claimKind": "unclassified",
+      "status": "removed-pending-disposition",
+      "priorStatus": "current",
+      "retiredAtCommit": "d98a5c5e75e4529cd99dd9c8bce95a0032806d95",
+      "retiredReason": "no counterpart in current source",
+      "disposition": "supersede",
+      "targetOwner": "AGENTS.md",
+      "targetAnchor": "rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd",
+      "targetUnitDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+      "shownTargetDigest": "52ff86d66f342109d00adeffc09b80352fec793ccd934413bf59a0d8dd0d32c2",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "mainCommit": "f33612119f1158716b6797859598033cda6eb89c",
+      "rationale": "Owner A13 supersede: main commit f33612119f1158716b6797859598033cda6eb89c renames the RUL11 heading from D-ADR0036 to D-ADR0054, explicitly retaining the superseded decision reference. This is instruction identity accounting only; no law or instruction text is edited."
+    },
+    {
+      "sourcePath": "docs/io-contract.md",
+      "unitDigest": "57878f62bf37872a990b4b836ca7d25169a2ad4edf5b608c06201b1d772e2f63",
+      "identityFingerprint": "57878f62bf37872a990b4b836ca7d25169a2ad4edf5b608c06201b1d772e2f63",
+      "claimId": "claim_3c993001919f57e0f96a36c2a4d92c43",
+      "sourceAnchor": "unheaded-block-16",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "549dded9fe85b1cfd57f1ec7079141e4feb9e6468a31e93485ab91a2305e79fe",
+      "claimKind": "contract",
+      "status": "removed-pending-disposition",
+      "priorStatus": "current",
+      "retiredAtCommit": "d98a5c5e75e4529cd99dd9c8bce95a0032806d95",
+      "retiredReason": "no counterpart in current source",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "shownTargetDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "mainCommit": "3ea75475d911ca02c9d8b5011dca4f748cc5820f",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f folds the unchanged fgos-discovered paragraph into the source exception-list unit. Its entire text is preserved verbatim inside the current candidate reasoned-exceptions heading section, together with the fifth hook exception. The candidate retains the prior paragraph separator to preserve unrelated block identities. Supersede is pending; no approval is inherited."
+    }
+  ],
+  "gaps": [
+    {
+      "sourcePath": "docs/io-contract.md",
+      "unitDigest": "965bdb8cc2868325f9b53a4dbf6b1bd70386dcb28bb74a1b05196fa315652ebc",
+      "identityFingerprint": "965bdb8cc2868325f9b53a4dbf6b1bd70386dcb28bb74a1b05196fa315652ebc",
+      "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+      "sourceAnchor": "unheaded-block-14",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
+      "claimKind": "contract",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "mainCommit": "3ea75475d911ca02c9d8b5011dca4f748cc5820f",
+      "rationale": "Predecessor identity preserved in the registry after main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f edits the non-heading source unit. The full successor unit is independently pending; no gap identity is deleted."
+    },
+    {
+      "sourcePath": "docs/io-contract.md",
+      "unitDigest": "54672da4c0afc227d30bc36d63356cab7a4ac051fe9be3222a6aea4ef03e08c3",
+      "identityFingerprint": "54672da4c0afc227d30bc36d63356cab7a4ac051fe9be3222a6aea4ef03e08c3",
+      "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+      "sourceAnchor": "unheaded-block-15",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
+      "claimKind": "contract",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-15 is not a stable heading anchor",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-08",
+      "mainCommit": "3ea75475d911ca02c9d8b5011dca4f748cc5820f",
+      "rationale": "Predecessor identity preserved in the registry after main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f edits the non-heading source unit. The full successor unit is independently pending; no gap identity is deleted."
+    }
+  ],
+  "changedIo": [
+    {
+      "oldClaimId": "claim_2b155082055823ccabf6fb40242abe42",
+      "current": {
+        "claimId": "claim_2b155082055823ccabf6fb40242abe42",
+        "sourceUnitDigest": "f63dfd5438d66a7145bd622f82c7ed32a5fd0426cfb6fb77d4fc6d5aa5bb9e18",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "5-reasoned-envelope-exceptions",
+        "claimKind": "contract",
+        "disposition": "promote",
+        "reviewStatus": "pending",
+        "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+        "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+        "authoredBy": "codex-session:1@2026-10-08"
+      }
+    },
+    {
+      "oldClaimId": "claim_b92ac199356ff830e5554647ab143a90",
+      "current": {
+        "claimId": "claim_992a812b2fcaa4f93dd86d2190d7ac3a",
+        "sourceUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "5-reasoned-envelope-exceptions",
+        "claimKind": "contract",
+        "disposition": "promote",
+        "reviewStatus": "pending",
+        "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+        "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+        "authoredBy": "codex-session:1@2026-10-08"
+      }
+    },
+    {
+      "oldClaimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+      "current": {
+        "claimId": "claim_dd296404e1163caafba00641cf0adc79",
+        "sourceUnitDigest": "8b0c15df567594f067a267c8afb4414b290877d5f086aff68d1aab192ad5e908",
+        "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+        "targetAnchor": "5-reasoned-envelope-exceptions",
+        "claimKind": "contract",
+        "disposition": "promote",
+        "reviewStatus": "pending",
+        "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+        "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+        "authoredBy": "codex-session:1@2026-10-08"
+      }
+    }
+  ],
+  "pendingCurrentIo": [
+    {
+      "claimId": "claim_2b155082055823ccabf6fb40242abe42",
+      "sourceUnitDigest": "f63dfd5438d66a7145bd622f82c7ed32a5fd0426cfb6fb77d4fc6d5aa5bb9e18",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "authoredBy": "codex-session:1@2026-10-08"
+    },
+    {
+      "claimId": "claim_992a812b2fcaa4f93dd86d2190d7ac3a",
+      "sourceUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "authoredBy": "codex-session:1@2026-10-08"
+    },
+    {
+      "claimId": "claim_dd296404e1163caafba00641cf0adc79",
+      "sourceUnitDigest": "8b0c15df567594f067a267c8afb4414b290877d5f086aff68d1aab192ad5e908",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Main commit 3ea75475d911ca02c9d8b5011dca4f748cc5820f changes this IO source unit. All source sentences are carried verbatim within the complete reasoned-exceptions heading section, including the fifth hook exception and fgos-discovered exclusion. Paragraph boundaries in the candidate remain stable to avoid changing unrelated target identities. A manual whole-section carry, not a claimed script-proven exact block. Independent targeted review pending.",
+      "targetUnitDigest": "bc5d36dad759ec51b5aeab14930524be6e9814c9d2a85cb8af2cbecccdd846a2",
+      "authoredBy": "codex-session:1@2026-10-08"
+    }
+  ],
+  "status": "pending-owner-resolution-of-frozen-pilot-fingerprint",
+  "blocker": {
+    "gate": "isLegacyDecisionShard",
+    "currentSourceChanges": 4,
+    "legacyRows": 41,
+    "otherwiseUnchangedRows": 37,
+    "requiredDecision": "Either authorize full nonlegacy provenance migration/re-review of this shard, or narrowly authorize per-row grandfather verification for unchanged frozen pilot rows; no gate change performed."
+  },
+  "candidateCommit": "cde82095e5535db54c48b94df9e50e8fdcaea890"
+}
