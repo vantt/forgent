@@ -327,3 +327,11 @@ Standalone actual receipt-channel smoke passes: independently committed fixture 
 
 Complete suite command (393 explicit files, `env -u CLAUDE_CODE_SESSION_ID node --test --test-concurrency=4 ...`) has 7,401 tests, 7,327 pass, one failure, eight skip, 65 todo. The failure is the live Herdr confined-launch scenario at `test/runner/herdr-reconciliation.test.mjs:1123`: foreground argv mismatch (`worker-spawn-fail`, `confinement-mismatch`). No Herdr code, gate, test or environment skip was changed; cause and passing full-suite result remain UNPROVEN. That file is outside the authorized tooling edit set.
 
+
+## Current-shape provenance application
+
+A14 (a07a4d6ea) authorizes data-only modernization of b-io-contract, not a tool change. The shard and every row now have current authorship, and all current rows are pending without inherited approval fields. The exact equality audit preserves content, decisions and digests of 36 previously reviewed rows plus the one already-pending row. The whole shard enters the next independent check; gate, fingerprint and H1 are unchanged.
+
+Current native-content authoring provides 54 current full-text-bound receipts and accounts for the original 55th substantive unit through the withdrawn receipt and corrected legacy-source binding. The actual current CLI advertises no coordination verb; 21 receipts explicitly record stale runtime evidence and remain non-closable. The other 33 author-proposed findings remain UNPROVEN until independent semantic review of the complete text and evidence, not merely its shape.
+
+Executed scripts suite: 912/912 in 51 explicit files, command recorded in final-check-verification.json. Both full and scoped conservation commands pass against each prior registry with zero fatal findings; strict diagnostics remain open for pending source decisions and 63 candidate units. Actual --pack commands pass for the modern IO shard and both changed judgment shards. No tool, test, checker, baseline, frozen fingerprint, H1 or sensitivity behavior changed. Post-sync complete-suite proof and real substantive acceptance remain UNPROVEN.
