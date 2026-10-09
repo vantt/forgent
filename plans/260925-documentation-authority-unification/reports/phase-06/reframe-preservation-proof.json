@@ -444,5 +444,75 @@
       "shownTextRetained": true,
       "digestEqual": true
     }
-  ]
+  ],
+  "actualCommand": {
+    "command": [
+      "node",
+      "-e",
+      "const fs=require('node:fs'),cp=require('node:child_process'),crypto=require('node:crypto');const pairs=[[\"docs/platform/agent-coordination/architecture/system-context.md\",\"docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md\"],[\"docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md\",\"docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md\"],[\"docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md\",\"docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md\"],[\"docs/platform/agent-coordination/history/documentation-migration/proposal-status.md\",\"docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md\"],[\"docs/platform/agent-coordination/intent-preservation-ledger.md\",\"docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md\"],[\"docs/platform/agent-coordination/proposals/semantic-cli-surface.md\",\"docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md\"],[\"docs/platform/agent-coordination/spec.md\",\"docs/platform/agent-coordination/history/retired-engine/spec.md\"],[\"docs/platform/agent-coordination/subcomponents/README.md\",\"docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md\"],[\"docs/platform/agent-coordination/verification/implementation-alignment.md\",\"docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md\"],[\"docs/platform/agent-coordination/README.md\",\"docs/platform/agent-coordination/history/retired-engine/README.md\"]];const rows=pairs.map(([source,target])=>{const original=cp.execFileSync('git',['show',\"54c2698ee8c5b8f1baeac7244e946c793a637d29\"+':'+source],{encoding:'utf8'});const t=fs.readFileSync(target,'utf8');const body=t.slice(t.indexOf('~~~~text\\n')+9,t.lastIndexOf('~~~~\\n'));return {source,target,byteIdentical:body===original,sha256:crypto.createHash('sha256').update(body).digest('hex')};});console.log(JSON.stringify(rows));if(rows.some(r=>!r.byteIdentical))process.exitCode=1;"
+    ],
+    "exitCode": 0,
+    "rows": [
+      {
+        "source": "docs/platform/agent-coordination/architecture/system-context.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+        "byteIdentical": true,
+        "sha256": "bb94d3bfb023d6184dcd90ed110eb65b7906fc997c1bde839e1d7ee34f5178e4"
+      },
+      {
+        "source": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/claim-preservation.md",
+        "byteIdentical": true,
+        "sha256": "233d2606af01d75300ade167e27c1532469f27f3687d8bef4fe50ff383694eb8"
+      },
+      {
+        "source": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md",
+        "byteIdentical": true,
+        "sha256": "27a764f652bfa3a5e53cf98618b37e1fb4f542db089b585f73804af72f84b869"
+      },
+      {
+        "source": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md",
+        "byteIdentical": true,
+        "sha256": "f9651ea7369d0274e9b9bf50b38155811fc0fd53ed747810064c65207e513b7c"
+      },
+      {
+        "source": "docs/platform/agent-coordination/intent-preservation-ledger.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+        "byteIdentical": true,
+        "sha256": "b9e37bbf8a88c3a13a5331dff8e089f5747d6cb0260a8234a730bbb22672333c"
+      },
+      {
+        "source": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+        "byteIdentical": true,
+        "sha256": "81d1f96b3381a7a22fbf268375e84c9a05da79facbb22691cd970342952bf6b4"
+      },
+      {
+        "source": "docs/platform/agent-coordination/spec.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+        "byteIdentical": true,
+        "sha256": "5a016bb65b7c8ebab5b20c338062836f45413bdb0141111f0729fddf9feae7af"
+      },
+      {
+        "source": "docs/platform/agent-coordination/subcomponents/README.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+        "byteIdentical": true,
+        "sha256": "6c3a06c5d863fea84ce59c3ddcc6dd53cc8b195b1ce0bac29fd55062364483b7"
+      },
+      {
+        "source": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+        "byteIdentical": true,
+        "sha256": "d35fd9a2357a9df55942661b6d8919320205486aefc763bca92bd47199517776"
+      },
+      {
+        "source": "docs/platform/agent-coordination/README.md",
+        "target": "docs/platform/agent-coordination/history/retired-engine/README.md",
+        "byteIdentical": true,
+        "sha256": "82fc75648e7cf6613130e4c1b02b3db30fd6c5cf74a8e7bd0a0bd7e4331d45d4"
+      }
+    ]
+  }
 }
