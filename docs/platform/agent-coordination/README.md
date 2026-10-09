@@ -33,7 +33,7 @@ Read [the runner spec](../../specs/runner.md) for the current execution contract
 
 The [complete previous portal](history/retired-engine/README.md#literal-snapshot) and [previous spec](history/retired-engine/spec.md#literal-snapshot) remain verbatim, including all original qualifications and statuses. They are non-authority history, not present implementation claims.
 
-The retained-document trees remain navigation and evidence for the [targeted preservation/reframe check](../../../../plans/260925-documentation-authority-unification/reports/phase-06/review-request-2-reframe.md), not permission to promote stale runtime statements.
+Use the snapshots to audit preserved claims. They do not reinstate the retired engine or strengthen proposal/implementation status.
 
 - [Historical architecture](history/retired-engine/architecture/system-context.md#literal-snapshot)
 - [Historical CLI proposal](history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot)
