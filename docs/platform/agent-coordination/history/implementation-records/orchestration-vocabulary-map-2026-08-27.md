@@ -710,7 +710,7 @@ An assignment may have multiple runs if it retries or runs on several executors.
 
 ### 5.4 Stage vs Stage Operation vs TaskSpec vs Skill
 
-![Stage, Stage Operation, TaskSpec, and Skill relationship](../../vocabulary/stage-operation-taskspec-skill-relationship.svg)
+![Stage, Stage Operation, TaskSpec, and Skill relationship](../retired-engine/files/vocabulary/stage-operation-taskspec-skill-relationship.svg)
 
 ```txt
 Stage           = phase in the workflow

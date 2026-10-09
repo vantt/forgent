@@ -1,0 +1,153 @@
+# Historical File: Agent Coordination Architecture
+
+```txt
+Document type: History
+Audience: Human reviewer, maintainer and documentation agent
+Purpose: Preserve the complete classified input as non-authority historical evidence
+Design status: Candidate
+Implementation: Historical snapshot; not current implementation or authority
+Provenance: docs/platform/agent-coordination/architecture/README.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 6ac092c31c002281cde491c707e20d29e722e3797c7aafbacd99d840308e961b
+Writer type: Documentation maintainer
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing original claims or section-level retirement
+Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+Last reviewed: Pending independent whole-area review
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: None; this is an exact historical carrier
+Superseded by: Current execution ownership in docs/specs/runner.md
+Added in candidate: Historical framing only; literal file bytes are unchanged
+```
+
+The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.
+
+## Literal Snapshot
+
+~~~~text
+# Agent Coordination Architecture
+
+```txt
+Document type: Collection index
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Agent Coordination Architecture
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/architecture/README.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved collection-index material for Agent Coordination Architecture; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related:
+- docs/platform/agent-coordination/verification/implementation-alignment.md
+- docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md
+- docs/platform/agent-coordination/vision.md
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
+Document type: Index
+Design status: Accepted
+Implementation: Partial
+Last reviewed: 2026-09-11
+Canonical for: navigation across accepted architecture
+
+## Migration Status
+
+This directory has been promoted from
+`docs/architect/agent-coordination/architecture/` during the platform
+documentation migration.
+
+Accepted architecture documents keep their authority. Runtime-recovery-family
+documents that are marked as proposals or partial designs remain
+proposal/partial even though they now live beside accepted architecture.
+Current implemented claims must still line up with
+[Implementation Alignment](../verification/implementation-alignment.md) and
+the proof roots linked from
+[Proof Preservation](../history/documentation-migration/proof-preservation.md).
+
+## Documents
+
+Read the [Agent Coordination Foundation Vision](../vision.md) before this
+directory. Architecture refines that direction into accepted system boundaries.
+
+1. [System Context](system-context.md) defines system purpose and major
+   authority boundaries.
+2. [Coordination Foundation Baseline](coordination-foundation-baseline.md)
+   summarizes the accepted Step 00-08 shape promoted out of roadmap/proposal
+   history.
+3. [Protocol Model](protocol-model.md) defines declared and agent-led planning
+   sources plus the hard/soft coordination model around Workflow, Stage,
+   Operation, TaskSpec, Skill, and Role.
+4. [Runtime Model](runtime-model.md) defines Assignment, dispatch, Run,
+   RunResult, and evidence flow.
+5. [Work Integration](work-integration.md) defines how coordination may attach
+   to Work without becoming a second lifecycle authority.
+6. [Dispatch Control Plane](dispatch-control-plane.md) defines the separation
+   between semantic operation choice and execution infrastructure.
+7. [Evidence And Results](evidence-and-results.md) defines outcome confidence
+   and false-success boundaries.
+8. [Visibility And Herdr](visibility-and-herdr.md) defines the observability
+   boundary.
+9. [RunHandle](run-handle.md) proposes the runtime-layer handle and recoverable
+   work material: repository/runtime ports, a guard service, independent
+   execution/attachment/observation facts, pending-command reconciliation and
+   adapter-owned incarnation. In-cell takeover needs no worker checkpoint.
+10. [Coordination Continuation And Recovery](coordination-continuation-recovery.md)
+    proposes evaluator-backed snapshots, a pure typed planner, idempotent apply
+    and protocol-declared parent/child transfer through existing engine doors.
+11. [Executor Fallback Activation And Health](executor-health-and-fallback.md)
+    proposes activating the reserved `fallbackExecutors` on signal-ladder
+    outcomes through the existing compiler; health observation store is the
+    future of the same contract.
+12. [Runtime Recovery And Work Continuity](runtime-recovery-design.md) is the
+    proposed detailed-design entry point for documents 9-11: current identity
+    mapping, ownership, local concurrency, long-horizon scope, rollout and the
+    shared bug/proof matrix. It is not a fourth runtime component. Read it first
+    when implementing or reviewing these proposals.
+
+Documents 9–11 share one admission authority: the Run contract's
+[Run Phases And Admission](../contracts/assignment-run-runresult.md#run-phases-and-admission).
+
+## Runtime Recovery Principles
+
+Shared by documents 9–11; each applies them without restating them.
+
+- An observed incident never creates execution authority. Every new attempt
+  needs a valid admission through the Run contract; a missing RunHandle,
+  an expired retry-after, or a timeout grants nothing.
+- Three guarantees stay distinct: control fencing (one controller per
+  un-settled Run), result fencing (a superseded Run cannot publish the
+  authoritative result), effect protection (owned by the operation adapter;
+  no exactly-once promise).
+- Facts before conclusions: worker result beats every runtime signal; a
+  failed liveness read is `unknown`, never `absent`; delivery without
+  acknowledgment is `unknown`, never "launch failed"; cancel requested is
+  not worker stopped.
+- Domain semantics and application ports first; wire/persistence schemas
+  only at boundaries that are stored or exchanged. Existing semantic
+  contracts (`liveness.mjs` ladder, `recovery.mjs` matrix, `run-retried`
+  supersession, exclusive-create lock) are ported, not re-derived.
+- Node/Rust coexistence: the runtime that spawned owns the state it wrote;
+  the other reads; a reader that does not understand a `contract` version
+  refuses explicitly.
+- Default implementations are minimal and reuse repository primitives;
+  unsupported future capabilities refuse explicitly; optional fields alone do
+  not provide distributed leases, generic checkpoints or effect guarantees.
+- Recoverable work does not require a worker-authored checkpoint. Deliberate
+  protocol handoff and arbitrary crash takeover have different preconditions.
+- Cell/session correlation belongs to the consuming track; neither replacing a
+  worker nor opening a child session constitutes cell acceptance.
+
+CoordinationSession's identity/persistence boundary and the shared
+FlowDefinition graph/operation/policy IR are accepted per
+[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)
+and [ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md)
+(schemas in [contracts/](../contracts/README.md)). The promoted Step 00-08
+baseline is summarized in
+[Coordination Foundation Baseline](coordination-foundation-baseline.md).
+Unaccepted extensions, including AdhocTask, AgentMessage, runtime topology
+deviation, and broader group-cognitive protocol expansion, remain proposals or
+architecture-wide intent until separately accepted.
+~~~~

@@ -3,15 +3,15 @@
 ```txt
 Document type: Guide / runbook
 Audience: Human reviewers, maintainers, documentation agents
-Purpose: Preserve source material for Architecture Advisory Role Doctrine
+Purpose: Retain cognitive quality guidance consumed by the registered architecture-advisory skill
 Design status: Candidate
-Implementation: Not re-verified; source implementation statements remain in the body
+Implementation: Cognitive companion only; registered Workflow owns execution and safety
 Provenance: Retained from docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
 Writer type: Documentation maintainer
-Canonical for: Preserved guide-runbook material for Architecture Advisory Role Doctrine; no authority cutover
-Use this when: Comparing this candidate with its pinned legacy source
-Do not use this for: Inferring current implementation or supersession of retained sources
-Last reviewed: UNPROVEN; independent content review pending
+Canonical for: Candidate cognitive guidance only; not runtime routing, model selection or execution authority
+Use this when: Applying role posture, artifact reasoning or evaluation criteria
+Do not use this for: Launching historical runtime recipes or treating dated roster examples as live configuration
+Last reviewed: Pending independent whole-area review
 Related:
 - docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md
 - docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
@@ -20,12 +20,11 @@ Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
 ```
-Document type: Playbook
-Design status: N/A
-Implementation: Active (manual)
-Last reviewed: 2026-09-05
-Canonical for: what each advisory role is for, how it should think, and how to
-tell when it has done its job badly
+## Current Boundary
+
+The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
+
+The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md`’s historical CoordinationSession section.
 
 ## How To Read This
 
@@ -1541,83 +1540,6 @@ converts a HIGH irreversible finding into packet decoration.
 
 ---
 
-## Role-Routing Roster
+## Historical Operational Roster
 
-Routing is decided per actor, per case, before any advisor has an opinion — so
-that routing cannot be retro-fitted to a conclusion. The coordinator records the
-requested executor/tier/persona and the derived provider/model for every actor.
-
-### Cognitive Needs And Default Tiers
-
-| Role | Cognitive need | Default tier | Diversity posture |
-|---|---|---|---|
-| external driver | Authorization, disposition, bounds, human handoff | critical | Persistent coordinator; never authors panel interpretation |
-| lead advisor | Intent interpretation, question discipline, human-facing explanation | critical | Independently dispatched actor; never the driver |
-| context investigator | Broad evidence retrieval and falsification | standard or analytical | May share a provider with the lead; must be a fresh execution |
-| system shaper | Deep architecture synthesis | analytical | Prefer provider family A |
-| alternative shaper | Different priors, different solution-class search | analytical | Prefer provider family B — this is where diversity earns the most |
-| constraint advocate | Operations, security, migration, data reasoning | analytical | Prefer a third family when one is available |
-| architecture critic | Cross-proposal attack | analytical | Must not inherit any shaper's private context |
-| synthesizer | Whole-ledger integration and explanation | critical | Strongest derived model; sees only granted artifacts |
-| independent red-team | Falsification and authority attack | analytical or critical | Family distinct from the synthesizer, deliberately |
-| specialist | Named bounded expertise | as the slot requires | Bound only after driver authorization |
-
-### How Selection Actually Happens, Per Actor
-
-1. **Filter to the proven-safe roster.** Only executor/confinement pairs with a
-   live-proven containment envelope are eligible. At time of writing that is
-   `codex-readonly`, `claude-bwrap`, and `agy-bwrap`
-   ([P00.1](../verification/architecture-advisory-panel/P00.1.md)). Convenience
-   never admits a pair.
-2. **Satisfy the minimum tier** from the table above.
-3. **Apply the diversity posture.** Assign the two shapers to different provider
-   families first — that pairing buys the most independence — then the critic,
-   then keep the red-team off the synthesizer's family. If the roster cannot
-   satisfy all of these, satisfy them in that order and record what was given up.
-4. **Choose the persona** for the slot, and record it. Persona is prose posture,
-   not capability; it does not substitute for role doctrine and it never
-   overrides this document.
-5. **Run the decision door** — `node src/runner/dispatch.mjs decide <executor>
-   --has-live-task-access` — and obey the mechanism it returns. `unavailable`
-   means this actor has no independent dispatch; record the gap rather than
-   performing the role inline.
-6. **Record the derived provider and model**, and state whether tier materially
-   changed it. On `codex-readonly` every tier derives `gpt-5.5`, so tier is
-   immaterial there — recording that honestly is more useful than implying a
-   tier choice that did nothing.
-7. **Fall back** in order: another safe pair in the same family; then the same
-   pair in a fresh isolated assignment with a distinct prompt package. Never to
-   the coordinator.
-
-### Derived Models On The Current Roster
-
-| Pair | Family | lightweight | standard | creative | analytical | critical |
-|---|---|---|---|---|---|---|
-| `claude-bwrap` | claude | haiku | sonnet | sonnet | sonnet | opus |
-| `codex-readonly` | openai-codex | gpt-5.5 | gpt-5.5 | gpt-5.5 | gpt-5.5 | gpt-5.5 |
-| `agy-bwrap` | gemini | gemini-3.6-flash-medium | gemini-3.6-flash-medium | gemini-3.6-flash-high | gemini-3.1-pro-low | gemini-3.1-pro-high |
-
-A worked assignment for a three-family panel: system shaper →
-`claude-bwrap`/analytical/`sonnet`; alternative shaper →
-`agy-bwrap`/analytical/`gemini-3.1-pro-low`; constraint advocate →
-`codex-readonly`/analytical/`gpt-5.5`; critic → `codex-readonly` (fresh
-assignment, distinct prompt package); synthesizer →
-`claude-bwrap`/critical/`opus`; red-team → `agy-bwrap`/critical/
-`gemini-3.1-pro-high`, deliberately off the synthesizer's family.
-
-**Bwrap runnability — proven fixed, not an open limitation.** Both `bwrap`
-pairs are proven safe at the OS-mount boundary, and a bare `--ro-bind / /`
-alone does break the agent CLI's own init (no writable scratch for its
-private state) — but the fix is proven and has been used live 13 times
-across P01.2 and P01.3 without a runnability failure: place `--tmpfs /tmp`
-before re-pinning `--ro-bind PROJECT_ROOT PROJECT_ROOT`/`--bind EVIDENCE_DIR
-EVIDENCE_DIR`, since bwrap mounts apply in argument order and a later bind
-shadows an earlier tmpfs (P02.1 B7). Use that mount order every time a
-substantive role is routed through either pair.
-
-**Diversity is a hedge, not a decoration.** At the end of the session, state what
-the diversity actually bought: which advisor saw something its counterpart did
-not. If the honest answer is "nothing distinguishable this time", say that. A
-roster that lists three providers and produced three interchangeable outputs has
-spent budget on the appearance of independence, and the
-[rubric](architecture-advisory-evaluation-rubric.md) asks about it directly.
+The prior roster, tier/model derivations, direct dispatch commands and bwrap recipe are [historical sections](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot), not current execution support. Current model and executor selection remains with config/bind through the registered Workflow.

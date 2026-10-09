@@ -90,7 +90,7 @@ The remaining constitution deferrals are covered by existing entries: origin and
 
 | Area | Ledger | Notes |
 |---|---|---|
-| Agent coordination | [agent-coordination/intent-preservation-ledger.md](agent-coordination/intent-preservation-ledger.md) | Target ledger is the routed current surface; legacy ledger remains inventory input until H1 cutover. |
+| Agent coordination | [agent-coordination/intent-preservation-ledger.md](agent-coordination/history/retired-engine/files/intent-preservation-ledger.md#literal-snapshot) | Retired-engine historical ledger, preserved after 2180b4e72; not current runtime authority. Legacy source remains inventory input until authority cutover. |
 | Host invocation | [host-invocation-routing/intent-preservation-ledger.md](host-invocation-routing/intent-preservation-ledger.md) | Existing target ledger; preserve source lineage from the legacy standardization plan. |
 | Packaging-distribution | planned | Should be added if future implementation slices narrow the accepted packaging vision. |
 | Documentation system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) | Full-horizon proposal; active H1 plan is `plans/260925-documentation-authority-unification/plan.md`. |

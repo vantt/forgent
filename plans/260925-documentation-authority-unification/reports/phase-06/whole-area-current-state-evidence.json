@@ -1,0 +1,374 @@
+{
+  "version": 1,
+  "inputCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+  "classificationCommit": "7880fbc74b07c3667ebaa61f2b0561b5d80471b5",
+  "codeCommit": "7880fbc74b07c3667ebaa61f2b0561b5d80471b5",
+  "retirementCommit": "2180b4e72701bb090288af8fe8021008d9d42079",
+  "runtime": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "bin/fgos.mjs",
+      "--help",
+      "--json"
+    ],
+    "exitCode": 0,
+    "sha256": "8b7bac0124745c51dba3db30a8c3480165fbb51fbc350bfcb2c5518dbbac7b57",
+    "verbs": 73,
+    "coordinationAbsent": true,
+    "doors": [
+      "run",
+      "workflow"
+    ]
+  },
+  "documents": [
+    {
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "statements": [
+        {
+          "statement": "Current Unit execution calls CollaborationPattern through runPattern; Workflow nodes call the Unit runner.",
+          "evidence": [
+            "src/runner/execution/run.mjs:532-540",
+            "src/workflow/runner.mjs:419-428"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "The retained Assignment dispatch path validates execution legality before executing an Assignment.",
+          "evidence": [
+            "src/runner/dispatch/assignment-runner.mjs:1262-1265"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "statements": [
+        {
+          "statement": "The current execution-core pattern selector supports solo, reviewed and panel Unit patterns.",
+          "evidence": [
+            "src/runner/execution/patterns/index.mjs:34-46"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "The result normalizer accepts assignmentId, unitRunId and round alongside runId; these are distinct fields, not a restored CoordinationSession.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:350-355"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "statements": [
+        {
+          "statement": "The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence.",
+          "evidence": [
+            "src/runner/dispatch/recovery-planner.mjs:243-266"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again.",
+          "evidence": [
+            "src/runner/dispatch/recovery-planner.mjs:281-316"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/executor-health-and-fallback.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "statements": [
+        {
+          "statement": "Run-control acquisition checks the expected control epoch and refuses a settled generation.",
+          "evidence": [
+            "src/runner/dispatch/run-lock.mjs:306-320"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim.",
+          "evidence": [
+            "src/runner/dispatch/run-lock.mjs:321-334"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "Settlement verifies the exact epoch and token and publishes a settled generation.",
+          "evidence": [
+            "src/runner/dispatch/run-lock.mjs:390-412"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "statements": [
+        {
+          "statement": "A recovery recommendation is bound to snapshotHash, expectedControlEpoch, actionKey, evidenceIds and expiresAt.",
+          "evidence": [
+            "src/runner/dispatch/recovery-planner.mjs:251-265"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "The apply check refuses stale snapshots, changed control epochs and expired recommendations.",
+          "evidence": [
+            "src/runner/dispatch/recovery-planner.mjs:294-315"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "Replacement-authority evidence comes from controller-owned state, not the worker-writable outbox.",
+          "evidence": [
+            "src/runner/dispatch/recovery-planner.mjs:319-327"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "statements": [
+        {
+          "statement": "Detaching visibility writes the visibility state; it does not settle the Run.",
+          "evidence": [
+            "src/runner/dispatch/visibility-session.mjs:130-133"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "The structured result normalizer and its evidence floor determine outcome confidence, not terminal appearance.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:1276-1285",
+            "src/runner/dispatch/run-result.mjs:1305-1325"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/visibility-and-herdr.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "statements": [
+        {
+          "statement": "Workflow execution calls the Unit execution core; a separate CoordinationSession is not the owner of that call.",
+          "evidence": [
+            "src/workflow/runner.mjs:419-428"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "Work no longer has a stage: Workflow owns sequencing, while Work retains delivery/state authority.",
+          "evidence": [
+            "src/state/work.mjs:455-472",
+            "src/workflow/runner.mjs:419-428",
+            "docs/specs/runner.md:3072-3081"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/work-integration.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "statements": [
+        {
+          "statement": "normalizeRunResult accepts distinct runId, assignmentId, unitRunId and round fields and the worker claim, runtime and evidence inputs.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:350-385"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "A mutating done claim without external evidence yields no-evidence; a read-only done claim requires a worker report and remains reported.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:1276-1280"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "runOutcome interprets a result and fails closed for corrupt records.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:1305-1325"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/contracts/assignment-run-runresult.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "statements": [
+        {
+          "statement": "Work no longer has a stage; sequencing belongs to Workflow, not a parallel coordination engine.",
+          "evidence": [
+            "src/state/work.mjs:455-472",
+            "src/workflow/runner.mjs:419-428",
+            "docs/specs/runner.md:3072-3081"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "The Workflow runner invokes Unit execution for its executable nodes.",
+          "evidence": [
+            "src/workflow/runner.mjs:419-428"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "statements": [
+        {
+          "statement": "The normalizer takes distinct Assignment and Run identifiers; Unit execution identity and round are separate inputs.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:350-355"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-003-assignment-run-runresult-separation.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "statements": [
+        {
+          "statement": "Visibility detachment changes only visibility state, not Run settlement truth.",
+          "evidence": [
+            "src/runner/dispatch/visibility-session.mjs:130-133"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-005-herdr-visibility-only.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "statements": [
+        {
+          "statement": "The retained dispatch path watches the worker output artifact and ends its wait when that artifact exists; the artifact is the receipt.",
+          "evidence": [
+            "src/runner/dispatch/assignment-runner.mjs:2471-2492"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "statements": [
+        {
+          "statement": "Worker claims are normalized with evidence; a mutating done claim needs external evidence to become verified.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:1276-1285"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        },
+        {
+          "statement": "Corrupt result records fail closed when read through runOutcome.",
+          "evidence": [
+            "src/runner/dispatch/run-result.mjs:1305-1325"
+          ],
+          "method": "Direct reading of present code branches and owner declarations; no inferred live profile or old schema is claimed."
+        }
+      ],
+      "fullHistoricalInput": "docs/platform/agent-coordination/history/retired-engine/files/architecture/evidence-and-results.md"
+    }
+  ],
+  "cognitiveBoundary": {
+    "paths": [
+      "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md"
+    ],
+    "evidence": [
+      "core/skills/fgos-architecture-panel/SKILL.md:17-24",
+      "core/skills/fgos-architecture-panel/SKILL.md:26-35",
+      "core/skills/fgos-architecture-panel/SKILL.md:124-142"
+    ],
+    "retained": "Cognitive role posture, worked examples, artifact reasoning and quality criteria, not executable routing/API instructions.",
+    "historical": "Manual prompt, roster, tier/model claims and bwrap recipe are preserved as dated historical input."
+  },
+  "currentFootprint": {
+    "eligible": 68,
+    "retiredWholeFiles": 48,
+    "stillCurrent": 20,
+    "almostEmpty": false,
+    "qualification": "The former coordination engine has no current contract. Surviving dispatch/result/recovery boundaries and four consumed cognitive companions remain; detailed old engine and stale schema sections are history, not newly approved runtime design."
+  },
+  "reviewStatus": "pending",
+  "codeInputs": [
+    {
+      "path": "src/runner/execution/run.mjs",
+      "blob": "3f3202edfb9bc983cc042b441d45d10e8e089f6e\n",
+      "sha256": "1fe27abc1995160be5a3017e1a000696c92c74e2dbf2bf472169cfab43a68ace"
+    },
+    {
+      "path": "src/workflow/runner.mjs",
+      "blob": "82f25b3dc6a5d8121874ec75566fb439b751edc5\n",
+      "sha256": "effff0fa795d31e9808f58b0e790e92e0daaeab3a50aa2c902f2778d434bcfdd"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
+      "blob": "8489abd5368457a7bc8ac54b506d7e48183adc5f\n",
+      "sha256": "84bbf3a1d3b574627e31829bcf7c3c582dd0b25e9d9148b8ddfa7edd0ff63e8b"
+    },
+    {
+      "path": "src/runner/execution/patterns/index.mjs",
+      "blob": "b49d61dc717364a51ff83d2343d731344c98b99e\n",
+      "sha256": "d327c87fb17efbfcf10fbe0a8af8500495214081d39eef03737fc97014f69414"
+    },
+    {
+      "path": "src/runner/dispatch/run-result.mjs",
+      "blob": "a08dc676045d3775598287963ff8c157b5fabcba\n",
+      "sha256": "6c01bb056686fae3e16fa3ddeef7b05653730f1355cf00a3c8f1b5e382fb2b12"
+    },
+    {
+      "path": "src/runner/dispatch/recovery-planner.mjs",
+      "blob": "2135035f2ada68de6378dad78aed3a376a2f0c26\n",
+      "sha256": "ea76fab81768c1d003cadf5632ac63f5d50fb26adb7a2457f21d9d0250d8b0bf"
+    },
+    {
+      "path": "src/runner/dispatch/run-lock.mjs",
+      "blob": "d44e2aef594ad322fa5496601501431b6ce216b3\n",
+      "sha256": "4fe905899159baa52755203570a56efd376deb5262cbd6d0ee0a88cfd1c287e6"
+    },
+    {
+      "path": "src/runner/dispatch/visibility-session.mjs",
+      "blob": "936f5f7f3a3c1901109b9f92d44c54a2020edb6e\n",
+      "sha256": "144c7a8570a932cd0d5a20cd522c9832c7dc07ae7b099ad318aa3e8ee21c3d78"
+    },
+    {
+      "path": "src/state/work.mjs",
+      "blob": "154507cc747a6e83f3abc215c83f560cb02f459a\n",
+      "sha256": "ae5f1599cf36963602efd1e8b13ee2ac883997ea747cd99877364d0162c05059"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "blob": "06c457cbac36b98a5fbbc417377abb31d9002756\n",
+      "sha256": "7117cd188b4fe6994dc9940235985d960c702a48192dc1ec6e0f38d62b337f50"
+    },
+    {
+      "path": "core/skills/fgos-architecture-panel/SKILL.md",
+      "blob": "b0ba02ef448976223812f15bc560588b88cc9fe3\n",
+      "sha256": "48ad2cca689b1e44c96dd0401a1a3c69538adc765fd66ec9fc6e3d83a3420bca"
+    }
+  ]
+}

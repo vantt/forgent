@@ -6,12 +6,12 @@ Audience: Human reviewer, maintainer and implementation agent
 Purpose: Route current execution to its code and runner-spec owners, retaining verified boundaries
 Design status: Candidate
 Implementation: Current execution is owned by CollaborationPattern and the Workflow runner
-Provenance: Reframed under owner A15; complete previous document preserved in history/retired-engine
+Provenance: Whole-area reframe under owner A16; complete classified input preserved in history/retired-engine/files
 Writer type: Human + agent coauthor
 Canonical for: Current-owner navigation and verified boundaries; not a second runtime specification
 Use this when: Locating current execution owners or auditing historical claims
 Do not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation
-Last reviewed: Pending independent reframe review
+Last reviewed: Pending independent whole-area review
 Related:
 - docs/platform/agent-coordination/README.md
 - docs/specs/runner.md
@@ -25,10 +25,10 @@ The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079
 
 ## Current Summary
 
-Agent Coordination is the foundation layer for governed, evidence-aware agent
-activity. It can run without Work and without a predeclared Workflow or
-CoordinationProtocol, while still requiring runtime execution contracts for any
-dispatch that triggers work by an agent.
+Current Unit collaboration is selected by CollaborationPattern; executable
+Workflow nodes call the Unit execution core. This is a current-owner map,
+not an assertion that CoordinationProtocol is a current prerequisite or entity.
+Evidence: src/runner/execution/patterns/index.mjs:34-46; src/workflow/runner.mjs:419-428.
 
 Current execution owners are:
 

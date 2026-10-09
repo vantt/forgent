@@ -1,0 +1,394 @@
+{
+  "version": 1,
+  "ownerCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+  "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+  "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1",
+  "action": "Withdraw obsolete current-location classification references; retain historical source identities and complete shown bytes with pending move successors. No classification is accepted by this author.",
+  "rows": [
+    {
+      "claimId": "claim_57cc129eeedc6624d9e0f94e0419b1ec",
+      "previousReference": {
+        "claimId": "claim_57cc129eeedc6624d9e0f94e0419b1ec",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
+        "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "reviewStatus": "pending",
+        "reviewNote": "Dangling retained prose: the unit keeps \"The diagram separates execution from delivery lifecycle... Dashed paths are optional structure...\" but the Mermaid diagram it describes was moved to the snapshot, so the current page asserts a design rule about a figure that is no longer there and with no historical framing of its own beyond the pointer sentence. Same defect class as claim_2361d048c1d9443043e89eb5fb31a6d9 and claim_b27d445f9ef1a6c7e7d87ae491066f93. Pointer sentence and retirement commit 2180b4e72 are correct (git merge-base, src/runner/coordination absent). Fix: move the sentence into the snapshot or reword it as historical. Original assessment: Section 'Component And Runtime Flow': pointer sentence ('moved verbatim ... retired in 2180b4e72 ... not a current runtime description', link ../history/retired-engine/architecture/system-context.md#literal-snapshot resolves) plus the retained design paragraph, verified verbatim in the 54c2698ee source. Wrapper disclaims runtime status so the design principle is not presented as implemented. Non-blocking defect: 'The diagram separates ...' now has no diagram in this section (it moved to the snapshot); suggest 'The moved diagram'."
+      },
+      "previousReceipt": {
+        "claimId": "claim_57cc129eeedc6624d9e0f94e0419b1ec",
+        "path": "docs/platform/agent-coordination/architecture/system-context.md",
+        "anchor": "component-and-runtime-flow",
+        "unitDigest": "384e6a9ba23a2efa6b5066f41c244005840e0d6d168434f29308c1324bc98d8e",
+        "shownText": "## Component And Runtime Flow\n\nHistorical content moved verbatim to the [retired-engine snapshot](../history/retired-engine/architecture/system-context.md#literal-snapshot). The engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; this retained section is not a current runtime description.\n\nThe diagram separates execution from delivery lifecycle: a result can inform a\nWork driver, but cannot move Work lifecycle state by itself. Dashed paths are\noptional structure, augmentation, integration context, or visibility; they do\nnot create execution authority or terminal truth.",
+        "shownTextDigest": "b37815d0ac3533093dd691bfcac4538c8666c79a5312c4fa92d51730c0a58d8e",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "rationale": "The shown unit is newly reframed current-owner navigation, retirement context or an enclosing retained section. Current implementation assertions are limited to the actual CollaborationPattern and Workflow runner owners, with concrete invocation citations and the current CLI manifest. Unchanged verified clauses retain their independent pins; retained design is not promoted to live-engine implementation.",
+        "currentEvidence": {
+          "commit": "5d2587228e1bae5bdf947ef5b5c88314736f928f",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/execution/run.mjs",
+              "startLine": 532,
+              "endLine": 540,
+              "blobSha": "3f3202edfb9bc983cc042b441d45d10e8e089f6e"
+            },
+            {
+              "path": "src/runner/execution/patterns/index.mjs",
+              "startLine": 34,
+              "endLine": 46,
+              "blobSha": "b49d61dc717364a51ff83d2343d731344c98b99e"
+            },
+            {
+              "path": "src/workflow/runner.mjs",
+              "startLine": 419,
+              "endLine": 428,
+              "blobSha": "82f25b3dc6a5d8121874ec75566fb439b751edc5"
+            },
+            {
+              "path": "src/cli/command-registry.mjs",
+              "startLine": 1,
+              "endLine": 13,
+              "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+            }
+          ],
+          "commands": [
+            {
+              "command": "\"env\" \"-u\" \"CLAUDE_CODE_SESSION_ID\" \"node\" \"-e\" \"const cp=require('node:child_process');const h=JSON.parse(cp.execFileSync(process.execPath,['bin/fgos.mjs','--help','--json'],{encoding:'utf8'}));console.log(JSON.stringify({schema:h.schema_version,verbs:h.commands.length,coordination:h.commands.some(c=>c.name==='coordination'),doors:h.commands.filter(c=>['run','workflow'].includes(c.name)).map(c=>c.name),external:h.commands.filter(c=>c.externalEffect).map(c=>c.name)}));\"",
+              "exitCode": 0,
+              "output": "{\"schema\":\"2.0\",\"verbs\":73,\"coordination\":false,\"doors\":[\"run\",\"workflow\"],\"external\":[\"cleanup\",\"decision-index\",\"context-render\",\"dispatch\",\"run\",\"review\",\"approve\",\"sync-root\",\"promote-to-component\",\"docs-index\",\"doc-registry\",\"gateway\",\"resync-worktree\",\"main-checkout-reset\",\"workflow\"]}\n",
+              "outputDigest": "8bb9b5ac662d14be3a54f982d3d552dc13c76a5b779773cd26c0c86d588e9ea3",
+              "inputs": [
+                {
+                  "path": "bin/fgos.mjs",
+                  "blobSha": "c6cfad61dc0fc3b522994393bdbb0683ff82f961"
+                },
+                {
+                  "path": "src/cli/command-registry.mjs",
+                  "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "sourcePath": "docs/platform/agent-coordination/architecture/system-context.md",
+      "sourceAnchor": "component-and-runtime-flow",
+      "sourceUnitDigest": "384e6a9ba23a2efa6b5066f41c244005840e0d6d168434f29308c1324bc98d8e",
+      "historySuccessor": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "targetAnchor": "literal-snapshot",
+      "status": "pending-independent-history-move-review",
+      "reason": "The dangling caption/map/table or retired CLI assertions are now contained in a complete historical file, not claimed current or silently structurally closed."
+    },
+    {
+      "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
+      "previousReference": {
+        "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
+        "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "reviewStatus": "pending",
+        "reviewNote": "Heading + wrapper are fine, but the unit also contains the retained 'Nguyên lý cốt lõi' bullets with no historical framing: 'Giữ `--json` ở output (`status`) làm contract chuẩn cho máy đọc', 'Cấm đẻ thêm MCP Tools bọc ngoài cho riêng Agent Coordination (tránh mâu thuẫn với `dispatch.mjs`). CLI là cửa duy nhất', 'Mọi verb có khả năng ghi/chạy mã đều BẮT BUỘC có cờ `--cwd`'. They are normative present-tense rules about a semantic coordination CLI and `status` verb that do not exist (no 'coordination' in `node bin/fgos.mjs --help --json`, not in src/cli/command-registry.mjs); the sentence that scoped them as a proposal ('CLI sẽ không bypass Engine ... runCoordinationUseCase') was moved to the snapshot, leaving them dangling and ungrounded in code. Fix: move into the snapshot or prefix with a historical-proposal frame."
+      },
+      "previousReceipt": {
+        "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
+        "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+        "anchor": "2-giải-pháp-kiến-trúc-the-solution",
+        "unitDigest": "2021191451ed040d4062fb6b1937db86106797aa73cd9e214b9a976b383cc3d8",
+        "shownText": "## 2. Giải pháp Kiến trúc (The Solution)\n\nHistorical content moved verbatim to the [retired-engine snapshot](../history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot). The engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; this retained section is not a current runtime description.\n\n**Nguyên lý cốt lõi:**\n- **Human-Agent Parity:** Cả người và máy đều gọi chung lệnh CLI. Giữ `--json` ở output (`status`) làm contract chuẩn cho máy đọc.\n- **Không có MCP Wrapper mới:** Cấm đẻ thêm MCP Tools bọc ngoài cho riêng Agent Coordination (tránh mâu thuẫn với `dispatch.mjs`). CLI là cửa duy nhất.\n- **Tính Deterministic:** CLI tự sinh Key an toàn, tuyệt đối không dùng Random UUID.\n- **An toàn đột biến (Mutation Safety):** Mọi verb có khả năng ghi/chạy mã đều BẮT BUỘC có cờ `--cwd` tường minh, cấm dùng ambient cwd của shell.",
+        "shownTextDigest": "adb1710804b6e9f8ee1cdf5b6183a6ac97ba91b5e5dedca4bd19e56163b77ab2",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "rationale": "The shown unit is newly reframed current-owner navigation, retirement context or an enclosing retained section. Current implementation assertions are limited to the actual CollaborationPattern and Workflow runner owners, with concrete invocation citations and the current CLI manifest. Unchanged verified clauses retain their independent pins; retained design is not promoted to live-engine implementation.",
+        "currentEvidence": {
+          "commit": "5d2587228e1bae5bdf947ef5b5c88314736f928f",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/execution/run.mjs",
+              "startLine": 532,
+              "endLine": 540,
+              "blobSha": "3f3202edfb9bc983cc042b441d45d10e8e089f6e"
+            },
+            {
+              "path": "src/runner/execution/patterns/index.mjs",
+              "startLine": 34,
+              "endLine": 46,
+              "blobSha": "b49d61dc717364a51ff83d2343d731344c98b99e"
+            },
+            {
+              "path": "src/workflow/runner.mjs",
+              "startLine": 419,
+              "endLine": 428,
+              "blobSha": "82f25b3dc6a5d8121874ec75566fb439b751edc5"
+            },
+            {
+              "path": "src/cli/command-registry.mjs",
+              "startLine": 1,
+              "endLine": 13,
+              "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+            }
+          ],
+          "commands": [
+            {
+              "command": "\"env\" \"-u\" \"CLAUDE_CODE_SESSION_ID\" \"node\" \"-e\" \"const cp=require('node:child_process');const h=JSON.parse(cp.execFileSync(process.execPath,['bin/fgos.mjs','--help','--json'],{encoding:'utf8'}));console.log(JSON.stringify({schema:h.schema_version,verbs:h.commands.length,coordination:h.commands.some(c=>c.name==='coordination'),doors:h.commands.filter(c=>['run','workflow'].includes(c.name)).map(c=>c.name),external:h.commands.filter(c=>c.externalEffect).map(c=>c.name)}));\"",
+              "exitCode": 0,
+              "output": "{\"schema\":\"2.0\",\"verbs\":73,\"coordination\":false,\"doors\":[\"run\",\"workflow\"],\"external\":[\"cleanup\",\"decision-index\",\"context-render\",\"dispatch\",\"run\",\"review\",\"approve\",\"sync-root\",\"promote-to-component\",\"docs-index\",\"doc-registry\",\"gateway\",\"resync-worktree\",\"main-checkout-reset\",\"workflow\"]}\n",
+              "outputDigest": "8bb9b5ac662d14be3a54f982d3d552dc13c76a5b779773cd26c0c86d588e9ea3",
+              "inputs": [
+                {
+                  "path": "bin/fgos.mjs",
+                  "blobSha": "c6cfad61dc0fc3b522994393bdbb0683ff82f961"
+                },
+                {
+                  "path": "src/cli/command-registry.mjs",
+                  "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
+      "sourceAnchor": "2-giải-pháp-kiến-trúc-the-solution",
+      "sourceUnitDigest": "2021191451ed040d4062fb6b1937db86106797aa73cd9e214b9a976b383cc3d8",
+      "historySuccessor": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "status": "pending-independent-history-move-review",
+      "reason": "The dangling caption/map/table or retired CLI assertions are now contained in a complete historical file, not claimed current or silently structurally closed."
+    },
+    {
+      "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
+      "previousReference": {
+        "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
+        "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "reviewStatus": "pending",
+        "reviewNote": "Retains legacy sentence as a 'Current Summary' fact: 'It can run without Work and without a predeclared Workflow or CoordinationProtocol, while still requiring runtime execution contracts for any dispatch that triggers work by an agent.' CoordinationProtocol is a retired concept (docs/specs/runner.md:1314 says it was withdrawn; src/verbs/coordination and src/runner/coordination are gone) yet it is named as a live optional predeclared artefact. The legacy source of this sentence is the engine claims 'Protocol optional' and 'Runtime execution contract required' (old spec Implementation Status rows citing src/verbs/coordination/schema.mjs, src/runner/coordination/session-engine.mjs), both deleted code. The first sentence ('foundation layer') is legacy-sourced prose and acceptable. The owner bullets in the same unit are true (see 82). Fix: drop or reword the second sentence in terms of Unit run via runPattern, or move it to the snapshot."
+      },
+      "previousReceipt": {
+        "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
+        "path": "docs/platform/agent-coordination/spec.md",
+        "anchor": "current-summary",
+        "unitDigest": "9155a131b848d3c11ab12b832707d2f850689101d958b5ece74dc32f0b9b1c8a",
+        "shownText": "## Current Summary\n\nAgent Coordination is the foundation layer for governed, evidence-aware agent\nactivity. It can run without Work and without a predeclared Workflow or\nCoordinationProtocol, while still requiring runtime execution contracts for any\ndispatch that triggers work by an agent.\n\nCurrent execution owners are:\n\n- CollaborationPattern for Unit runs: `src/runner/execution/patterns/index.mjs`.\n- The Workflow runner: `src/workflow/runner.mjs`.\n- Their current contract: [docs/specs/runner.md](../../specs/runner.md), not the retired CoordinationSession engine.",
+        "shownTextDigest": "d002ccb97c26307998bac74800961fc6b11ec12dc8374bc6cf517b19eb5f95a0",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "rationale": "The shown unit is newly reframed current-owner navigation, retirement context or an enclosing retained section. Current implementation assertions are limited to the actual CollaborationPattern and Workflow runner owners, with concrete invocation citations and the current CLI manifest. Unchanged verified clauses retain their independent pins; retained design is not promoted to live-engine implementation.",
+        "currentEvidence": {
+          "commit": "5d2587228e1bae5bdf947ef5b5c88314736f928f",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/execution/run.mjs",
+              "startLine": 532,
+              "endLine": 540,
+              "blobSha": "3f3202edfb9bc983cc042b441d45d10e8e089f6e"
+            },
+            {
+              "path": "src/runner/execution/patterns/index.mjs",
+              "startLine": 34,
+              "endLine": 46,
+              "blobSha": "b49d61dc717364a51ff83d2343d731344c98b99e"
+            },
+            {
+              "path": "src/workflow/runner.mjs",
+              "startLine": 419,
+              "endLine": 428,
+              "blobSha": "82f25b3dc6a5d8121874ec75566fb439b751edc5"
+            },
+            {
+              "path": "src/cli/command-registry.mjs",
+              "startLine": 1,
+              "endLine": 13,
+              "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+            }
+          ],
+          "commands": [
+            {
+              "command": "\"env\" \"-u\" \"CLAUDE_CODE_SESSION_ID\" \"node\" \"-e\" \"const cp=require('node:child_process');const h=JSON.parse(cp.execFileSync(process.execPath,['bin/fgos.mjs','--help','--json'],{encoding:'utf8'}));console.log(JSON.stringify({schema:h.schema_version,verbs:h.commands.length,coordination:h.commands.some(c=>c.name==='coordination'),doors:h.commands.filter(c=>['run','workflow'].includes(c.name)).map(c=>c.name),external:h.commands.filter(c=>c.externalEffect).map(c=>c.name)}));\"",
+              "exitCode": 0,
+              "output": "{\"schema\":\"2.0\",\"verbs\":73,\"coordination\":false,\"doors\":[\"run\",\"workflow\"],\"external\":[\"cleanup\",\"decision-index\",\"context-render\",\"dispatch\",\"run\",\"review\",\"approve\",\"sync-root\",\"promote-to-component\",\"docs-index\",\"doc-registry\",\"gateway\",\"resync-worktree\",\"main-checkout-reset\",\"workflow\"]}\n",
+              "outputDigest": "8bb9b5ac662d14be3a54f982d3d552dc13c76a5b779773cd26c0c86d588e9ea3",
+              "inputs": [
+                {
+                  "path": "bin/fgos.mjs",
+                  "blobSha": "c6cfad61dc0fc3b522994393bdbb0683ff82f961"
+                },
+                {
+                  "path": "src/cli/command-registry.mjs",
+                  "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "sourcePath": "docs/platform/agent-coordination/spec.md",
+      "sourceAnchor": "current-summary",
+      "sourceUnitDigest": "9155a131b848d3c11ab12b832707d2f850689101d958b5ece74dc32f0b9b1c8a",
+      "historySuccessor": "docs/platform/agent-coordination/history/retired-engine/files/spec.md",
+      "targetAnchor": "literal-snapshot",
+      "status": "pending-independent-history-move-review",
+      "reason": "The CoordinationProtocol sentence is removed from current scope; its entire prior input remains in literal history."
+    },
+    {
+      "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
+      "previousReference": {
+        "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
+        "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "reviewStatus": "pending",
+        "reviewNote": "Title+header are fine, but the unit retains the prose 'Until then, this map preserves the component vocabulary and points to owning sources.' The map table was moved to the history snapshot, so this page no longer contains a map; the sentence asserts something false about the current page. The 'create subcomponents/<name>/ only after the source inventory proves' rule is a legacy rule and stays valid. Fix: say 'the former map is preserved in the snapshot' or move the paragraph into history. Header Related paths and snapshot link (../history/retired-engine/subcomponents/README.md#literal-snapshot) resolve."
+      },
+      "previousReceipt": {
+        "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
+        "path": "docs/platform/agent-coordination/subcomponents/README.md",
+        "anchor": "agent-coordination-subcomponents",
+        "unitDigest": "09a68ff935a020b46e63d9a0ba5d2b5f82c24c18595f365b5aa06ff7739aba78",
+        "shownText": "# Agent Coordination Subcomponents\n\n```txt\nDocument type: Subcomponent portal\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asserting a retired runtime\nDesign status: Candidate\nImplementation: Retired engine material is non-authority history; verified retained units remain unchanged\nProvenance: Reframed under owner A15; complete previous document preserved in history/retired-engine\nWriter type: Human + agent coauthor\nCanonical for: Retained-document navigation only; no current engine authority\nUse this when: Locating current execution owners or auditing historical claims\nDo not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation\nLast reviewed: Pending independent reframe review\nRelated:\n- docs/platform/agent-coordination/README.md\n- docs/specs/runner.md\n- docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md\nSupersedes: Stale current-state framing only; all old claims are preserved verbatim\nSuperseded by: Runtime ownership in docs/specs/runner.md\nAdded in candidate: Retirement framing and current-owner navigation\n```\n\nCreate `subcomponents/<name>/` directories only after the source inventory\nproves that a child needs local navigation. Until then, this map preserves the\ncomponent vocabulary and points to owning sources.\n\nHistorical content moved verbatim to the [retired-engine snapshot](../history/retired-engine/subcomponents/README.md#literal-snapshot). The engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; this retained section is not a current runtime description.",
+        "shownTextDigest": "0e0a542066c33d2831a7d24784957ae1bae8a1f741fabce5623620e4e3cd41e9",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "rationale": "The shown unit is newly reframed current-owner navigation, retirement context or an enclosing retained section. Current implementation assertions are limited to the actual CollaborationPattern and Workflow runner owners, with concrete invocation citations and the current CLI manifest. Unchanged verified clauses retain their independent pins; retained design is not promoted to live-engine implementation.",
+        "currentEvidence": {
+          "commit": "5d2587228e1bae5bdf947ef5b5c88314736f928f",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/execution/run.mjs",
+              "startLine": 532,
+              "endLine": 540,
+              "blobSha": "3f3202edfb9bc983cc042b441d45d10e8e089f6e"
+            },
+            {
+              "path": "src/runner/execution/patterns/index.mjs",
+              "startLine": 34,
+              "endLine": 46,
+              "blobSha": "b49d61dc717364a51ff83d2343d731344c98b99e"
+            },
+            {
+              "path": "src/workflow/runner.mjs",
+              "startLine": 419,
+              "endLine": 428,
+              "blobSha": "82f25b3dc6a5d8121874ec75566fb439b751edc5"
+            },
+            {
+              "path": "src/cli/command-registry.mjs",
+              "startLine": 1,
+              "endLine": 13,
+              "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+            }
+          ],
+          "commands": [
+            {
+              "command": "\"env\" \"-u\" \"CLAUDE_CODE_SESSION_ID\" \"node\" \"-e\" \"const cp=require('node:child_process');const h=JSON.parse(cp.execFileSync(process.execPath,['bin/fgos.mjs','--help','--json'],{encoding:'utf8'}));console.log(JSON.stringify({schema:h.schema_version,verbs:h.commands.length,coordination:h.commands.some(c=>c.name==='coordination'),doors:h.commands.filter(c=>['run','workflow'].includes(c.name)).map(c=>c.name),external:h.commands.filter(c=>c.externalEffect).map(c=>c.name)}));\"",
+              "exitCode": 0,
+              "output": "{\"schema\":\"2.0\",\"verbs\":73,\"coordination\":false,\"doors\":[\"run\",\"workflow\"],\"external\":[\"cleanup\",\"decision-index\",\"context-render\",\"dispatch\",\"run\",\"review\",\"approve\",\"sync-root\",\"promote-to-component\",\"docs-index\",\"doc-registry\",\"gateway\",\"resync-worktree\",\"main-checkout-reset\",\"workflow\"]}\n",
+              "outputDigest": "8bb9b5ac662d14be3a54f982d3d552dc13c76a5b779773cd26c0c86d588e9ea3",
+              "inputs": [
+                {
+                  "path": "bin/fgos.mjs",
+                  "blobSha": "c6cfad61dc0fc3b522994393bdbb0683ff82f961"
+                },
+                {
+                  "path": "src/cli/command-registry.mjs",
+                  "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "sourcePath": "docs/platform/agent-coordination/subcomponents/README.md",
+      "sourceAnchor": "agent-coordination-subcomponents",
+      "sourceUnitDigest": "09a68ff935a020b46e63d9a0ba5d2b5f82c24c18595f365b5aa06ff7739aba78",
+      "historySuccessor": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "targetAnchor": "literal-snapshot",
+      "status": "pending-independent-history-move-review",
+      "reason": "The dangling caption/map/table or retired CLI assertions are now contained in a complete historical file, not claimed current or silently structurally closed."
+    },
+    {
+      "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
+      "previousReference": {
+        "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
+        "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "reviewStatus": "pending",
+        "reviewNote": "Title+header fine, but the retained paragraph says 'This table is deliberately conservative. `implemented` means current checkout code/test/proof supports the claim. `partial` and `track-complete / verify` must not be silently upgraded during doc promotion.' The table was moved to the snapshot, so 'This table' has no referent on the page, and the sentence defines status vocabulary for a table that is now only retired-engine history. Not engine-as-current, but a dangling and misleading statement in a unit classed as current content. Fix: reword to 'The former table ...' or move into the snapshot."
+      },
+      "previousReceipt": {
+        "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
+        "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+        "anchor": "agent-coordination-implementation-alignment",
+        "unitDigest": "6ea8ab9c85f854df462a1f18f3af9d23cbbe5a1fe2697fd5fbcd758ff8bc054a",
+        "shownText": "# Agent Coordination Implementation Alignment\n\n```txt\nDocument type: Verification\nAudience: Human reviewer, maintainer and implementation agent\nPurpose: Navigate preserved design and historical material without asserting a retired runtime\nDesign status: Candidate\nImplementation: Retired engine material is non-authority history; verified retained units remain unchanged\nProvenance: Reframed under owner A15; complete previous document preserved in history/retired-engine\nWriter type: Human + agent coauthor\nCanonical for: Retained-document navigation only; no current engine authority\nUse this when: Locating current execution owners or auditing historical claims\nDo not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation\nLast reviewed: Pending independent reframe review\nRelated:\n- docs/platform/agent-coordination/README.md\n- docs/specs/runner.md\n- docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md\nSupersedes: Stale current-state framing only; all old claims are preserved verbatim\nSuperseded by: Runtime ownership in docs/specs/runner.md\nAdded in candidate: Retirement framing and current-owner navigation\n```\n\nThis table is deliberately conservative. `implemented` means current checkout\ncode/test/proof supports the claim. `partial` and `track-complete / verify`\nmust not be silently upgraded during doc promotion.\n\nHistorical content moved verbatim to the [retired-engine snapshot](../history/retired-engine/verification/implementation-alignment.md#literal-snapshot). The engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; this retained section is not a current runtime description.",
+        "shownTextDigest": "d28d58e520ba8bcca57402aaae67890662954e4a9e5886de6d353b3deec316ef",
+        "class": "candidate-native-content",
+        "authoredBy": "codex-session:1@2026-10-09",
+        "rationale": "The shown unit is newly reframed current-owner navigation, retirement context or an enclosing retained section. Current implementation assertions are limited to the actual CollaborationPattern and Workflow runner owners, with concrete invocation citations and the current CLI manifest. Unchanged verified clauses retain their independent pins; retained design is not promoted to live-engine implementation.",
+        "currentEvidence": {
+          "commit": "5d2587228e1bae5bdf947ef5b5c88314736f928f",
+          "finding": "true-and-current",
+          "citations": [
+            {
+              "path": "src/runner/execution/run.mjs",
+              "startLine": 532,
+              "endLine": 540,
+              "blobSha": "3f3202edfb9bc983cc042b441d45d10e8e089f6e"
+            },
+            {
+              "path": "src/runner/execution/patterns/index.mjs",
+              "startLine": 34,
+              "endLine": 46,
+              "blobSha": "b49d61dc717364a51ff83d2343d731344c98b99e"
+            },
+            {
+              "path": "src/workflow/runner.mjs",
+              "startLine": 419,
+              "endLine": 428,
+              "blobSha": "82f25b3dc6a5d8121874ec75566fb439b751edc5"
+            },
+            {
+              "path": "src/cli/command-registry.mjs",
+              "startLine": 1,
+              "endLine": 13,
+              "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+            }
+          ],
+          "commands": [
+            {
+              "command": "\"env\" \"-u\" \"CLAUDE_CODE_SESSION_ID\" \"node\" \"-e\" \"const cp=require('node:child_process');const h=JSON.parse(cp.execFileSync(process.execPath,['bin/fgos.mjs','--help','--json'],{encoding:'utf8'}));console.log(JSON.stringify({schema:h.schema_version,verbs:h.commands.length,coordination:h.commands.some(c=>c.name==='coordination'),doors:h.commands.filter(c=>['run','workflow'].includes(c.name)).map(c=>c.name),external:h.commands.filter(c=>c.externalEffect).map(c=>c.name)}));\"",
+              "exitCode": 0,
+              "output": "{\"schema\":\"2.0\",\"verbs\":73,\"coordination\":false,\"doors\":[\"run\",\"workflow\"],\"external\":[\"cleanup\",\"decision-index\",\"context-render\",\"dispatch\",\"run\",\"review\",\"approve\",\"sync-root\",\"promote-to-component\",\"docs-index\",\"doc-registry\",\"gateway\",\"resync-worktree\",\"main-checkout-reset\",\"workflow\"]}\n",
+              "outputDigest": "8bb9b5ac662d14be3a54f982d3d552dc13c76a5b779773cd26c0c86d588e9ea3",
+              "inputs": [
+                {
+                  "path": "bin/fgos.mjs",
+                  "blobSha": "c6cfad61dc0fc3b522994393bdbb0683ff82f961"
+                },
+                {
+                  "path": "src/cli/command-registry.mjs",
+                  "blobSha": "6f5189fcc6349daca9f0b8b131e194d21a4866a1"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "sourcePath": "docs/platform/agent-coordination/verification/implementation-alignment.md",
+      "sourceAnchor": "agent-coordination-implementation-alignment",
+      "sourceUnitDigest": "6ea8ab9c85f854df462a1f18f3af9d23cbbe5a1fe2697fd5fbcd758ff8bc054a",
+      "historySuccessor": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "targetAnchor": "literal-snapshot",
+      "status": "pending-independent-history-move-review",
+      "reason": "The dangling caption/map/table or retired CLI assertions are now contained in a complete historical file, not claimed current or silently structurally closed."
+    }
+  ]
+}

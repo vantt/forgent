@@ -1794,14 +1794,6 @@
       "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1"
     },
     {
-      "claimId": "claim_57cc129eeedc6624d9e0f94e0419b1ec",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
-      "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
-      "reviewNote": "Dangling retained prose: the unit keeps \"The diagram separates execution from delivery lifecycle... Dashed paths are optional structure...\" but the Mermaid diagram it describes was moved to the snapshot, so the current page asserts a design rule about a figure that is no longer there and with no historical framing of its own beyond the pointer sentence. Same defect class as claim_2361d048c1d9443043e89eb5fb31a6d9 and claim_b27d445f9ef1a6c7e7d87ae491066f93. Pointer sentence and retirement commit 2180b4e72 are correct (git merge-base, src/runner/coordination absent). Fix: move the sentence into the snapshot or reword it as historical. Original assessment: Section 'Component And Runtime Flow': pointer sentence ('moved verbatim ... retired in 2180b4e72 ... not a current runtime description', link ../history/retired-engine/architecture/system-context.md#literal-snapshot resolves) plus the retained design paragraph, verified verbatim in the 54c2698ee source. Wrapper disclaims runtime status so the design principle is not presented as implemented. Non-blocking defect: 'The diagram separates ...' now has no diagram in this section (it moved to the snapshot); suggest 'The moved diagram'."
-    },
-    {
       "claimId": "claim_e9359e8079004eca9d7f638f3e5014bf",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
       "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
@@ -2594,14 +2586,6 @@
       "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1"
     },
     {
-      "claimId": "claim_1ec34eb7139574fbbcaac476ee82a51a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
-      "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
-      "reviewNote": "Heading + wrapper are fine, but the unit also contains the retained 'Nguyên lý cốt lõi' bullets with no historical framing: 'Giữ `--json` ở output (`status`) làm contract chuẩn cho máy đọc', 'Cấm đẻ thêm MCP Tools bọc ngoài cho riêng Agent Coordination (tránh mâu thuẫn với `dispatch.mjs`). CLI là cửa duy nhất', 'Mọi verb có khả năng ghi/chạy mã đều BẮT BUỘC có cờ `--cwd`'. They are normative present-tense rules about a semantic coordination CLI and `status` verb that do not exist (no 'coordination' in `node bin/fgos.mjs --help --json`, not in src/cli/command-registry.mjs); the sentence that scoped them as a proposal ('CLI sẽ không bypass Engine ... runCoordinationUseCase') was moved to the snapshot, leaving them dangling and ungrounded in code. Fix: move into the snapshot or prefix with a historical-proposal frame."
-    },
-    {
       "claimId": "claim_1a0e3a76465b3b21fc87a8bd0c254342",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
       "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
@@ -2708,14 +2692,6 @@
       "reviewedAt": "2026-10-09",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-classifications.md",
       "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1"
-    },
-    {
-      "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
-      "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
-      "reviewNote": "Retains legacy sentence as a 'Current Summary' fact: 'It can run without Work and without a predeclared Workflow or CoordinationProtocol, while still requiring runtime execution contracts for any dispatch that triggers work by an agent.' CoordinationProtocol is a retired concept (docs/specs/runner.md:1314 says it was withdrawn; src/verbs/coordination and src/runner/coordination are gone) yet it is named as a live optional predeclared artefact. The legacy source of this sentence is the engine claims 'Protocol optional' and 'Runtime execution contract required' (old spec Implementation Status rows citing src/verbs/coordination/schema.mjs, src/runner/coordination/session-engine.mjs), both deleted code. The first sentence ('foundation layer') is legacy-sourced prose and acceptable. The owner bullets in the same unit are true (see 82). Fix: drop or reword the second sentence in terms of Unit run via runPattern, or move it to the snapshot."
     },
     {
       "claimId": "claim_a30dc75b0dcb7236915a511eed44ba34",
@@ -2958,14 +2934,6 @@
       "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1"
     },
     {
-      "claimId": "claim_2361d048c1d9443043e89eb5fb31a6d9",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
-      "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
-      "reviewNote": "Title+header are fine, but the unit retains the prose 'Until then, this map preserves the component vocabulary and points to owning sources.' The map table was moved to the history snapshot, so this page no longer contains a map; the sentence asserts something false about the current page. The 'create subcomponents/<name>/ only after the source inventory proves' rule is a legacy rule and stays valid. Fix: say 'the former map is preserved in the snapshot' or move the paragraph into history. Header Related paths and snapshot link (../history/retired-engine/subcomponents/README.md#literal-snapshot) resolve."
-    },
-    {
       "claimId": "claim_236577dce1bf232815489fb45896ea78",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
       "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
@@ -2988,14 +2956,6 @@
       "reviewedAt": "2026-10-09",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-classifications.md",
       "reviewReportCommit": "8bba2eabfc73231ea8dfa9b512db8859b57a46f1"
-    },
-    {
-      "claimId": "claim_b27d445f9ef1a6c7e7d87ae491066f93",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-reframe.json",
-      "receiptCommit": "d870fe07f79d115c6a4bf783a386c6f1c3bd4081",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "pending",
-      "reviewNote": "Title+header fine, but the retained paragraph says 'This table is deliberately conservative. `implemented` means current checkout code/test/proof supports the claim. `partial` and `track-complete / verify` must not be silently upgraded during doc promotion.' The table was moved to the snapshot, so 'This table' has no referent on the page, and the sentence defines status vocabulary for a table that is now only retired-engine history. Not engine-as-current, but a dangling and misleading statement in a unit classed as current content. Fix: reword to 'The former table ...' or move into the snapshot."
     },
     {
       "claimId": "claim_6c34d44e851e493c77c39bd0a1a76894",

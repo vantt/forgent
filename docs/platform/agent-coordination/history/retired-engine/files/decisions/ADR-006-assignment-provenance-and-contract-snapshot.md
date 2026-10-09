@@ -1,0 +1,127 @@
+# Historical File: ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
+
+```txt
+Document type: History
+Audience: Human reviewer, maintainer and documentation agent
+Purpose: Preserve the complete classified input as non-authority historical evidence
+Design status: Candidate
+Implementation: Historical snapshot; not current implementation or authority
+Provenance: docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 685c84e23f4b080f880c0e53d08f11d7fdf3c40da0c97af3e433a0aa60868881
+Writer type: Documentation maintainer
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing original claims or section-level retirement
+Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+Last reviewed: Pending independent whole-area review
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: None; this is an exact historical carrier
+Superseded by: Current execution ownership in docs/specs/runner.md
+Added in candidate: Historical framing only; literal file bytes are unchanged
+```
+
+The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.
+
+## Literal Snapshot
+
+~~~~text
+# ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
+
+```txt
+Document type: Decision
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved decision material for ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related:
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md
+- docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
+Document type: ADR
+Design status: Accepted
+Implementation: Implemented
+Last reviewed: 2026-09-01
+Canonical for: how declared and agent-led execution requests converge on one Assignment
+Related: [Vision V-003/V-004](../vision.md), [ADR-002](ADR-002-stage-operation-compatibility.md), [ADR-003](ADR-003-assignment-run-runresult-separation.md), [Assignment contract](../contracts/assignment-run-runresult.md)
+
+## Context
+
+`buildAssignment()` and `executeAssignment()` currently accept only a declared
+`domain + workflow + stage + operation` whose TaskSpec exists on disk. The
+standalone mission-lite prototype therefore borrows the coding `planning` Stage
+to reach dispatch. Mutation classification is derived from operation/role sets
+(`READ_ONLY_ROLES`, `KNOWN_MUTATING_OPS`, plus a `missionId || workId === null`
+heuristic), and evidence requirements are per-operation branches in result
+interpretation. A request without an operation id has no way to declare what it
+may mutate or what evidence satisfies it.
+
+The Vision requires agent-led planning to lower into the same governed
+Assignment path with equivalent objective, constraint, output, mutation,
+evidence, capability, budget, and provenance semantics.
+
+## Decision
+
+1. **Two provenance classes, one Assignment.** Every Assignment carries
+   `provenance.kind = declared | inline`, plus `contractPolicyVersion`,
+   `normalizerVersion`, and the validator chain that produced it.
+   - `declared`: existing domain/workflow/stage/operation/TaskSpec legality
+     validation, unchanged (ADR-002 preserved).
+   - `inline`: an agent-proposed contract validated by the foundation validator
+     and any selected domain harness (ADR-007), plus caller provenance
+     (writer identity, optional parent Assignment reference).
+2. **Normalizer stamps the snapshot.** At build time the normalizer stamps
+   `mutation` (`read-only | mutating`) and `evidence.required`
+   (`reported | verified`) onto the immutable Assignment. Declared operations
+   are stamped from the existing operation/role mapping; inline contracts must
+   declare them explicitly. A missing value is a build failure, never a default.
+3. **Interpretation reads the Assignment, not the operation id.** Result
+   confidence gating, mutation policy, and post-advance behavior are driven by
+   Assignment fields. Operation-specific behavior is declared on the operation
+   table or inline contract as `resultKind` (for example `gate-verdict`,
+   `advisory`, `work-product`) and an optional `onAdvance` action, replacing
+   `if (operation === ...)` branches.
+4. **Minimum inline contract.** objective; bounded context references;
+   constraints/authority; expected outputs; `mutation`; `evidence.required`;
+   role and capability hints; budget (`timeoutMs`, `maxRuns`; token counts are
+   telemetry only); caller provenance. Unknown fields are rejected.
+5. **Same stores and governance.** Both classes use `.fgos/assignments/`,
+   `executeAssignment()`, `compileDispatchPlan`, and the same Run/RunResult
+   normalization. Neither class may bypass dispatch governance.
+6. **First slice is read-only.** Until session-local isolation and
+   serialization are proven, an inline contract with `mutation: mutating` is
+   rejected fail-closed. The inline schema carries no session or coordination
+   reference in this slice.
+7. **Retire the standalone read-only heuristic.** Once no declared caller
+   passes `workId: null`, the `missionId || workId === null => read-only`
+   clauses are removed; read-only status comes only from the stamped
+   `mutation` field.
+
+## Consequences
+
+- Standalone coordination no longer fabricates a coding Stage; the Vision's
+  two-consumer proof becomes testable.
+- Declared operations gain an explicit, inspectable mutation/evidence snapshot
+  without parsing TaskSpec Markdown.
+- Result interpretation becomes contract-driven and testable per field.
+- A mutating inline path, session references, and dynamic task graphs remain
+  future decisions and must not be implied by this ADR.
+
+## Rejected Alternatives
+
+- A separate execution-contract entity in front of Assignment: no distinct
+  authority beyond what the stamped Assignment already carries.
+- Compiling TaskSpec Markdown into a universal contract object: opens an
+  unrelated migration project; the code-level mapping already exists.
+- Keeping operation-id switching in interpretation for declared operations
+  only: would fork the interpretation path between the two provenance classes.
+~~~~

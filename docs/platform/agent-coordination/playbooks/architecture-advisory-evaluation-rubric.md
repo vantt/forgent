@@ -3,26 +3,26 @@
 ```txt
 Document type: Guide / runbook
 Audience: Human reviewers, maintainers, documentation agents
-Purpose: Preserve source material for Architecture Advisory Evaluation Rubric
+Purpose: Retain cognitive quality guidance consumed by the registered architecture-advisory skill
 Design status: Candidate
-Implementation: Not re-verified; source implementation statements remain in the body
+Implementation: Cognitive companion only; registered Workflow owns execution and safety
 Provenance: Retained from docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
 Writer type: Documentation maintainer
-Canonical for: Preserved guide-runbook material for Architecture Advisory Evaluation Rubric; no authority cutover
-Use this when: Comparing this candidate with its pinned legacy source
-Do not use this for: Inferring current implementation or supersession of retained sources
-Last reviewed: UNPROVEN; independent content review pending
+Canonical for: Candidate cognitive guidance only; not runtime routing, model selection or execution authority
+Use this when: Applying role posture, artifact reasoning or evaluation criteria
+Do not use this for: Launching historical runtime recipes or treating dated roster examples as live configuration
+Last reviewed: Pending independent whole-area review
 Related:
 - docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
 Supersedes: None; retained source authority is unchanged
 Superseded by: None
 Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
 ```
-Document type: Playbook
-Design status: N/A
-Implementation: Active (manual)
-Last reviewed: 2026-09-05
-Canonical for: judging whether an advisory session actually advised well
+## Current Boundary
+
+The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
+
+The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md`’s historical CoordinationSession section.
 
 ## What This Rubric Is
 

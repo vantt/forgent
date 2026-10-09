@@ -1,0 +1,124 @@
+# Historical File: Agent Coordination Proposals
+
+```txt
+Document type: History
+Audience: Human reviewer, maintainer and documentation agent
+Purpose: Preserve the complete classified input as non-authority historical evidence
+Design status: Candidate
+Implementation: Historical snapshot; not current implementation or authority
+Provenance: docs/platform/agent-coordination/proposals/README.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 6aa7be3a449e9fc2812793629c0687960e569954317408f881e0d024289368ce
+Writer type: Documentation maintainer
+Canonical for: Historical evidence only; no current authority
+Use this when: Auditing original claims or section-level retirement
+Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+Last reviewed: Pending independent whole-area review
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: None; this is an exact historical carrier
+Superseded by: Current execution ownership in docs/specs/runner.md
+Added in candidate: Historical framing only; literal file bytes are unchanged
+```
+
+The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/specs/runner.md` **CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)**. Original statuses and instructions below are dated evidence, not current claims.
+
+## Literal Snapshot
+
+~~~~text
+# Agent Coordination Proposals
+
+```txt
+Document type: Collection index
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Agent Coordination Proposals
+Design status: Candidate
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Retained from docs/architect/agent-coordination/proposals/README.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+Writer type: Documentation maintainer
+Canonical for: Preserved collection-index material for Agent Coordination Proposals; no authority cutover
+Use this when: Comparing this candidate with its pinned legacy source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: UNPROVEN; independent content review pending
+Related:
+- docs/platform/agent-coordination/history/documentation-migration/proposal-status.md
+- docs/platform/agent-coordination/vision.md
+- docs/platform/agent-coordination/intent-preservation-ledger.md
+Supersedes: None; retained source authority is unchanged
+Superseded by: None
+Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+```
+Document type: Index
+Design status: Discussion
+Implementation: Partial
+Last reviewed: 2026-09-02
+Canonical for: nothing; proposals must be promoted into architecture/contracts/ADRs
+
+All proposals are subordinate to the
+[Agent Coordination Foundation Vision](../vision.md). They resolve open design
+shape and may not reopen its accepted foundation boundaries implicitly.
+Before narrowing an active proposal, reconcile it with the
+[Intent Preservation Ledger](../intent-preservation-ledger.md).
+
+## Migration Status
+
+This target directory preserves the proposal frontier from
+`docs/architect/agent-coordination/proposals/`. A target-path copy does not
+promote its design: the status of every frontier source remains governed by
+[Proposal Status](../history/documentation-migration/proposal-status.md).
+
+
+## Active Proposals
+
+1. [Dispatch Control Plane Redesign](dispatch-control-plane-redesign.md) contains
+   the detailed target and implementation-era findings behind the canonical
+   dispatch summary.
+2. [Team Communication Protocol V1](team-communication-protocol-v1.md) proposes
+   role-to-role message and operation doctrine.
+
+## Promoted History
+
+These proposals are no longer the active design frontier. Their accepted parts
+have been promoted into architecture, contracts, and ADRs; their unresolved
+parts remain explicitly deferred.
+
+1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](step-07-coordination-session-adhoc-task.md)
+   is historical discussion. CoordinationSession, runtime boundaries, and
+   Work authority decisions were promoted; AdhocTask and generalized inline
+   execution-contract schema remain unaccepted/deferred.
+2. [Step 08: Standalone Coordination And Optional Protocols](step-08-standalone-coordination-protocols.md)
+   is historical discussion for the delivered standalone coordination surface.
+   Read [Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md),
+   [CoordinationSession](../contracts/coordination-session.md), and
+   [FlowDefinition](../contracts/flow-definition.md) for canonical design.
+
+## Related Architect-Level Intentions
+
+- [Architecture Intent](../../../architect/architecture-intent.md) preserves the wider
+  design intent behind deferred architecture capabilities. Its first active
+  thread covers group-thinking/problem-solving capability and sits at
+  `docs/architect/` because the concern spans Agent Coordination, Work Driver,
+  Dispatch/Run, Run Result Evaluation, and the Coding Domain adoption track.
+- [Step 09: Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md)
+  discusses the standalone, no-Work group-thinking substrate expansion. The
+  first useful proof fixture is a Master Coordination style loop with external
+  driver authority, bounded optional rounds, recheck, and disposition.
+- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../../architect/proposals/step-10-coding-domain-adoption.md)
+  discusses bringing the existing coding domain onto the Step 08 foundation:
+  duplicate-mechanism inventory, seams, the foundation capabilities coding
+  still needs, and a candidate step sequence gated on ADR-010 §5's proof.
+- [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md)
+  is the parallel architect-level authority/layout draft for cross-component
+  placement and forbidden dependencies.
+
+## Promotion Rule
+
+Approving a proposal means extracting:
+
+- term changes into `vocabulary/`;
+- durable boundaries into `architecture/`;
+- exact behavior into `contracts/`;
+- accepted choices and rejected alternatives into `decisions/`;
+- implementation sequence into `roadmap/`.
+
+Do not relabel an entire mixed proposal as canonical.
+~~~~
