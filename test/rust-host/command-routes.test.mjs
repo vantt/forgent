@@ -75,6 +75,12 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
   assert.equal(routes['gate-bypass'].owner_path, 'packages/work-state/rust');
   assert.equal(routes['gate-bypass'].legacy_payload, undefined);
   assert.deepEqual(routes['gate-bypass'].compatibility_tests, ['test/rust-host/command-routes.test.mjs']);
+
+  assert.equal(routes.convention.route_kind, 'native');
+  assert.equal(routes.convention.operation_id, 'convention.query');
+  assert.equal(routes.convention.owner_path, 'packages/convention/rust');
+  assert.equal(routes.convention.legacy_payload, undefined);
+  assert.equal(routes.convention.subcommands, true);
 });
 
 test('drift detection: clean committed file passes --check silently', () => {

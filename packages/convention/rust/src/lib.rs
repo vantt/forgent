@@ -2,6 +2,8 @@ pub mod operations;
 pub mod provider;
 pub mod rules;
 
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["name", "path", "check", "classify"];
+
 pub use operations::{
     check_all, check_paths, classify, convention_name, convention_path, CheckOutcome,
     ClassifyOutcome, ConventionError, NameInput, NameOutcome, PathOutcome, Violation,

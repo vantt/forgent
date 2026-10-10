@@ -89,6 +89,16 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
+  "convention": {
+    "selector": "convention",
+    "route_kind": "native",
+    "operation_id": "convention.query",
+    "owner_path": "packages/convention/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true
+  },
   "decision": {
     "selector": "decision",
     "route_kind": "legacy-cli",

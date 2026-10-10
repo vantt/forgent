@@ -95,6 +95,7 @@ dependencies = [
 name = "fgos"
 version = "0.1.0"
 dependencies = [
+ "fgos-convention",
  "fgos-distribution",
  "fgos-host-runtime",
  "fgos-observe",
