@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Worker agent-config hygiene: hook trust first, masks only for what remains"
-status: pending
+status: done
 budget: "<= 160 added src lines (raised by the owner 2026-10-09; first measure 157); 0 new files under src/runner/dispatch; no durable state"
 stop: 2026-10-11
 ---

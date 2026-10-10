@@ -310,13 +310,17 @@ export function verifyProcessEnvironment(pid, expectedEnv) {
  * already live. `pInfo` may be passed in when the caller already has a
  * fresh read, to avoid asking herdr again for information it just gave.
  */
-function killPaneForegroundAndClose(client, paneId, pInfo = null) {
+function killPaneForegroundAndClose(client, paneId, pInfo = null, target = null) {
+  // The pane's last lines are read before it closes -- once closed the screen is gone.
+  let screen = null;
+  try { screen = screenTail(client.agentRead(target ?? paneId, { lines: 40 })); } catch { screen = null; }
   try {
     const info = pInfo ?? client.paneProcessInfo(paneId);
     const stray = info?.foregroundProcesses?.find((p) => p.pid && p.pid !== info.shellPid);
     if (stray?.pid) process.kill(stray.pid, 'SIGKILL');
   } catch { /* already gone, or pane info unavailable -- close regardless */ }
   try { client.paneClose(paneId); } catch { /* best effort */ }
+  return screen;
 }
 
 /**
@@ -331,11 +335,17 @@ function killPaneForegroundAndClose(client, paneId, pInfo = null) {
  * exact kill+close path a detected tamper already uses rather than a
  * second copy of it; an empty pane is left exactly as before.
  */
-function cleanupIfWorkerStillLive(client, paneId) {
+function cleanupIfWorkerStillLive(client, paneId, target = null) {
   let info = null;
-  try { info = client.paneProcessInfo(paneId); } catch { return; }
+  try { info = client.paneProcessInfo(paneId); } catch { return null; }
   const stray = info?.foregroundProcesses?.find((p) => p.pid && p.pid !== info.shellPid);
-  if (stray?.pid) killPaneForegroundAndClose(client, paneId, info);
+  return stray?.pid ? killPaneForegroundAndClose(client, paneId, info, target) : null;
+}
+
+/** Closing the pane for a failure keeps what was on its screen in the failure record. */
+export function cleanupAndKeepScreen(client, round, err) {
+  const screen = cleanupIfWorkerStillLive(client, round.paneId, round.targetName ?? round.agentName);
+  if (screen && err && typeof err === 'object' && !err.screen) err.screen = screen;
 }
 
 /**
@@ -426,6 +436,14 @@ const UNRULED_READY_MS = 15000;
 function lastScreenLine(text) {
   const lines = String(text ?? '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   return lines.length > 0 ? lines[lines.length - 1] : null;
+}
+
+/** The last `count` lines on screen with anything on them, for a pane that is
+ * about to close: a dialog is usually several lines, and its last line alone
+ * (`[y/N]`) does not say what it asked. */
+function screenTail(text, count = 40) {
+  const lines = String(text ?? '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return lines.length > 0 ? lines.slice(-count).join('\n') : null;
 }
 
 /**
@@ -991,7 +1009,7 @@ export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
   const why = readiness === 'blocked'
     ? 'the agent is showing a dialog that needs an answer'
     : 'the agent never reached a prompt that takes input';
-  cleanupIfWorkerStillLive(client, round.paneId);
+  cleanupIfWorkerStillLive(client, round.paneId, target);
   throw round.fail('worker-spawn-fail', reason,
     `executor for work "${round.workId}" not briefed: ${why}.${screenLine ? ` Last line on screen: ${screenLine}` : ''}`,
     { readiness, ...(readiness === 'blocked' ? { outcome: 'blocked' } : {}), ...(screenLine ? { screen: screenLine } : {}) });
@@ -1900,7 +1918,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         // someone to unknowingly keep watching a process that is not what
         // it claims -- actively kill whatever IS in the pane and close it,
         // rather than only refusing and reporting.
-        killPaneForegroundAndClose(client, round.paneId, pInfo);
+        const screen = killPaneForegroundAndClose(client, round.paneId, pInfo, round.targetName ?? round.agentName);
         throw round.fail('worker-spawn-fail', 'confinement-mismatch',
           scriptMismatch
             ? `launcher script at "${scriptPath}" no longer matches what this round wrote and read back before launching it in pane "${round.paneId}" -- possible script-content tamper (e.g. an injected command); process killed and pane closed.`
@@ -1910,7 +1928,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
                 ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
                 : cwdMismatch
                   ? `foreground process in pane "${round.paneId}" matched prepared argv, executable, and environment but its real working directory (/proc/<pid>/cwd) does not match the prepared invocation's cwd "${preparedCwd}" -- possible cwd-injection tamper (e.g. an injected "cd" in the launcher script), or /proc/<pid>/cwd was unreadable; process killed and pane closed.`
-                  : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
+                  : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`,
+          screen ? { screen } : {});
       }
     }
 
@@ -2007,7 +2026,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       await confirmBriefSubmitted({ client, target: round.targetName, message, paths, round });
     }
   } catch (err) {
-    cleanupIfWorkerStillLive(client, round.paneId);
+    cleanupAndKeepScreen(client, round, err);
     throw err;
   }
 
@@ -2023,7 +2042,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // ready -- every other outcome (timeout/died/blocked/settled) returns
     // normally and is handled by `concludeFailure`'s own considered
     // pane-fate policy below, which this must not interfere with.
-    cleanupIfWorkerStillLive(client, round.paneId);
+    cleanupAndKeepScreen(client, round, err);
     throw err;
   }
 

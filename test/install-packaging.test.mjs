@@ -161,6 +161,20 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
   }
 });
 
+test('the payload never declares generated per-machine hook files', () => {
+  // .agents/hooks.json is written by `fgos setup` with absolute paths of the machine that ran it;
+  // declaring the whole .agents directory would ship the builder's paths in every release.
+  const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  for (const entry of pkg.files) {
+    assert.notEqual(entry, '.agents', 'declare .agents/skills, not the whole .agents directory');
+    assert.ok(
+      !'.agents/hooks.json'.startsWith(entry.replace(/\/$/, '') + '/') && entry !== '.agents/hooks.json',
+      `files entry "${entry}" would pack .agents/hooks.json`,
+    );
+  }
+  assert.ok(pkg.files.includes('.agents/skills'), 'the rendered skills stay in the payload');
+});
+
 test('no stray pack artifact is left under repo/ after packing', () => {
   const stray = fs.readdirSync(REPO_ROOT).filter((f) => f.endsWith('.tgz'));
   assert.deepEqual(stray, [], `repo/ must contain no .tgz pack artifact: ${stray.join(', ')}`);

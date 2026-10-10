@@ -17,7 +17,7 @@
     "core",
     "domains",
     "packages/convention/contracts/convention.rules.v1.json",
-    ".agents",
+    ".agents/skills",
     "README.md",
     "LICENSE",
     "docs/how-to",
