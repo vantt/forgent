@@ -1,6 +1,6 @@
 # Lens persona evidence — 2026-10-09
 
-Status: implementation present; live council acceptance BLOCKED, not complete. No component-boundary change.
+Status: implementation present; live council acceptance MET on 2026-10-10 (see the second-run section); the 2026-10-09 sections below describe the first, blocked attempt. No component-boundary change.
 
 ## Existing seam and wording
 Dry probe used unchanged `runPanel` + `renderBrief`, with `params.roleTasks[panelist-N]`; each generated `brief-1.md:19` carried a different experiment persona path (socrates, torvalds, meadows). This was a local no-provider dry run, not a completed Workflow. Original `panel.mjs:66` passes params; `role-tasks.mjs:59,65` selects and wraps each role's task. Template `persona` alone remains unit-wide; no per-seat binding persona was invented. Prior art: commit `8a2373937` introduced advisory per-seat roleTasks. The dry probe and temporary control definition were removed after use.
@@ -32,3 +32,21 @@ GitNexus worktree-scoped detect_changes attempted, but the worktree is not regis
 Next: resolve the external Codex launch dialog outside this scope; rerun all three seats plus synthesizer. Only then close live acceptance. Next phase adds per-seat restatement before analysis; it is not implemented here. The paired observation does not justify claiming a quality gain; broader blind remeasurement remains separate.
 Final full run: `env -u CLAUDE_CODE_SESSION_ID npm test` exited 0: 7020 tests, 6947 pass, 0 fail, 8 skipped, 65 todo; no store leak. No rust-host failure. No runtime/renderer change.
 Retained additions: source personas 51 lines; generated personas 72; workflow 40; report 34; CHANGELOG/spec 2. Total 199 lines, zero deletions; outside source personas 148 lines against approximately 150 (stop threshold 225). Counting generated personas conservatively as outside source personas.
+
+## Second run, 2026-10-10 (after the dispatch hygiene fixes) and a full control
+Council: `council-lite`, `wf-run-1791612369512-27faacdb`, Unit `unit-run-1791612369544-1ae70a92`; `completed/pass`, no repository edits during the run.
+Control: same question and capability, `panel`, 3 members, no `roleTasks`, no persona refs, run through `fgos run`: Unit `unit-run-1791612985917-0ee3ea03`; `pass`. (A first control attempt, `unit-run-1791612578539-28a59b6e`, lost its Gemini seat to the hook exit-127 fault in this checkout; it is not used.)
+
+| Seat | With persona (executor) | Position | Control (executor) | Position |
+|---|---|---|---|---|
+| 1 | council-assumptions (Claude/Sonnet) | shadow trial; enable-now rejected | no persona (Claude/Sonnet) | keep manual by default; shadow trial only if automation is wanted |
+| 2 | council-ship-maintain (OpenAI/gpt-5.6-terra, account tetcu72) | shadow trial, then decide | no persona (OpenAI) | shadow trial, manual stays authoritative |
+| 3 | council-feedback-loops (Gemini 3.8 flash) | keep manual (stable loop, ~11-month payback, 20% audit blind spot); trial only if mandated | no persona (Gemini) | reject immediate; shadow trial as an explicit go/no-go gate |
+
+What the evidence supports:
+- Every persona brief carries a different posture (`brief-1.md:29`), and every report follows its method: assumptions tested and labelled, causal loops with delays and signals, shipping/maintenance cost and ownership. Control reports are cost/option essays of similar length.
+- Positions differ between the two runs for seats 1 and 3, and the persona run shows a real split (2 shadow trial vs 1 keep manual) where the control converges on "reject immediate, trial as gate". With one pair, each seat's difference can be the persona or ordinary run-to-run variance; this does not prove the persona moved the stance. The Gemini feedback-loops seat landing on "stable loop, keep manual" is consistent with its lens but is one observation.
+- Synthesizer: the council-lite synthesizer task (unknowns first, per-seat positions, agreement vs genuine split, reversal conditions, one next step) produced a report in that order; the control synthesizer used the default shape (agreement first, unresolved gaps last). That difference comes from the verdict schema, not from the personas.
+- Provider independence stayed with `bind()` (three families; the first synthesizer choice, xAI, failed on an expired login and the runner fell back to GLM). Executors in both runs used account tetcu72 for Codex and Gemini.
+
+Acceptance for this slice: distinct lens per seat in real briefs: met. Reports follow their method: met. One recorded comparison: done; effect on stance not established, on structure shown. No runtime or renderer change.
