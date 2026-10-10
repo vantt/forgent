@@ -1,7 +1,7 @@
 {
   "version": 1,
   "sourceCommit": "7880fbc74b07c3667ebaa61f2b0561b5d80471b5",
-  "scanCommit": "3d8ee0d1152303cf25f55303e4a4607388b97b5e",
+  "scanCommit": "c071b6c66c3e66b088bda65081803007fff76cd3",
   "roots": [
     "src/",
     "packages/",
@@ -8741,11 +8741,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -8755,39 +8750,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -8811,108 +8776,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 31,
           "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -9595,11 +9460,6 @@
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 85,
           "text": "\"docs/architect/agent-coordination/architecture/runtime-model.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5785,
-          "text": "\"docs/architect/packaging-distribution/workspace-runtime-model.md\": {"
         }
       ],
       "ownerCurrent": false,
@@ -15001,11 +14861,6 @@
           "path": "docs/specs/runner.md",
           "line": 1510,
           "text": "`docs/architect/agent-coordination/contracts/coordination-session.md`."
-        },
-        {
-          "path": "docs/specs/runner.md",
-          "line": 1524,
-          "text": "`docs/how-to/run-a-coordination-session.md`."
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
@@ -21738,11 +21593,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -21752,39 +21602,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -21808,108 +21628,13 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 115,
           "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
           "line": 117,
           "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -27492,11 +27217,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -27506,39 +27226,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -27562,108 +27252,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 211,
           "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -34622,11 +34212,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -34636,39 +34221,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -34692,108 +34247,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 259,
           "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -38960,11 +38415,6 @@
           "text": "\"docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md\": {"
         },
         {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5671,
-          "text": "\"docs/architect/dispatch-control-plane-redesign.md\": {"
-        },
-        {
           "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
           "line": 127,
           "text": "\"path\": \"docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md\","
@@ -41201,11 +40651,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -41215,39 +40660,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -41271,108 +40686,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 313,
           "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -52992,11 +52307,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -53006,39 +52316,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -53062,108 +52342,13 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 25,
           "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
           "line": 107,
           "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -53618,11 +52803,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -53632,39 +52812,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -53688,108 +52838,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 349,
           "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -53894,11 +52944,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -53908,39 +52953,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -53964,108 +52979,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 355,
           "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -67134,23 +66049,7 @@
     {
       "path": "docs/platform/agent-coordination/spec.md",
       "sourceBlob": "790db518eb65087d7e392407d09b5048e5fa6968",
-      "directReferences": [
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 12,
-          "text": "- docs/platform/packaging-distribution/spec.md"
-        },
-        {
-          "path": "scripts/generate-shipped-path-inventory.mjs",
-          "line": 722,
-          "text": "lines.push('retiring `docs/specs/runner.md` in favor of `docs/platform/runner/spec.md` at Phase 08 cutover)');"
-        },
-        {
-          "path": "src/setup/registrations.mjs",
-          "line": 818,
-          "text": "return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };"
-        }
-      ],
+      "directReferences": [],
       "ownerCurrent": false,
       "reviewVerdict": "ok",
       "sections": [
@@ -67615,7 +66514,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         },
@@ -67630,7 +66529,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         },
@@ -68053,7 +66952,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         },
@@ -68068,7 +66967,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         },
@@ -68083,7 +66982,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         },
@@ -68098,7 +66997,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         },
@@ -68113,7 +67012,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         }
@@ -68131,11 +67030,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -68145,39 +67039,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -68198,111 +67062,6 @@
           "path": "scripts/build-rust-distribution.mjs",
           "line": 60,
           "text": "if (sub.startsWith('docs/') || sub === 'README.md' || sub === 'LICENSE') {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -68589,13 +67348,7 @@
     {
       "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
       "sourceBlob": "7596345fafc1a407356a82d7f5a31aeb0e1a7233",
-      "directReferences": [
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 14,
-          "text": "- docs/platform/packaging-distribution/verification/implementation-alignment.md"
-        }
-      ],
+      "directReferences": [],
       "ownerCurrent": false,
       "reviewVerdict": "ok",
       "sections": [
@@ -68830,7 +67583,7 @@
           "liveSymbolHitCount": 0,
           "liveSymbolExamples": [],
           "implementationPaths": [],
-          "defaultClassification": "current-by-default",
+          "defaultClassification": "no-live-reference-found",
           "retirementEligible": false,
           "note": "Direct file citations protect all sections until individually adjudicated. Symbol examples are capped at 25; the count includes all matches. Historical/comment references are not silently excluded. A lexical hit protects content by default, but is not proof that every old sentence is implemented."
         }
@@ -68848,11 +67601,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -68862,39 +67610,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -68918,108 +67636,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 403,
           "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5617,
-          "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",
@@ -69308,84 +67926,9 @@
       "sourceBlob": "954501a150fed5dda792a8a670ec8b2725e4664b",
       "directReferences": [
         {
-          "path": "AGENTS.md",
-          "line": 111,
-          "text": "`docs/distribution-vision.md` sets the direction for this repo's own"
-        },
-        {
-          "path": "AGENTS.md",
-          "line": 123,
-          "text": "all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`"
-        },
-        {
-          "path": "bin/fgos.mjs",
-          "line": 3936,
-          "text": "// reversal of RUL9/RUL11 per distribution-vision.md §3): runs every"
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 274,
-          "text": "`docs/distribution-vision.md` §3's trụ cột 3."
-        },
-        {
-          "path": "docs/specs/platform-foundations.md",
-          "line": 279,
-          "text": "README's mission statement và `docs/distribution-vision.md`'s tự thừa"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 14,
-          "text": "- `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 16,
-          "text": "- `docs/distribution-vision.md` — tầm nhìn nền tảng lịch sử: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đã được promote/supersede từng phần vào `docs/platform/packaging-distribution/vision.md`."
-        },
-        {
-          "path": "docs/specs/work-state.md",
-          "line": 448,
-          "text": "Thực-thi/Compound-learning — `work-item-lifecycle-vision.md` §2), (c) cạnh"
-        },
-        {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 5611,
           "text": "\"docs/architect/agent-coordination/vision.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5665,
-          "text": "\"docs/architect/component-boundary/repo-layout-vision.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 147,
-          "text": "\"path\": \"docs/architect/component-boundary/repo-layout-vision.md\","
-        },
-        {
-          "path": "scripts/generate-shipped-path-inventory.mjs",
-          "line": 279,
-          "text": "norm === 'docs/work-item-lifecycle-vision.md' ||"
-        },
-        {
-          "path": "scripts/generate-shipped-path-inventory.mjs",
-          "line": 280,
-          "text": "norm === 'docs/distribution-vision.md' ||"
-        },
-        {
-          "path": "scripts/propose-doc-decisions.mjs",
-          "line": 11,
-          "text": "const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];"
-        },
-        {
-          "path": "src/runner/worktree.mjs",
-          "line": 624,
-          "text": "* `docs/distribution-vision.md`'s \"installed into other repos\" story)."
-        },
-        {
-          "path": "src/setup/registrations.mjs",
-          "line": 2971,
-          "text": "// docs/distribution-vision.md's \"context 3\") is just as valid a pass as a"
         }
       ],
       "ownerCurrent": false,
@@ -75187,11 +73730,6 @@
         },
         {
           "path": "docs/specs/distribution.md",
-          "line": 16,
-          "text": "Current reader entry: docs/platform/packaging-distribution/README.md"
-        },
-        {
-          "path": "docs/specs/distribution.md",
           "line": 61,
           "text": "| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |"
         },
@@ -75201,39 +73739,9 @@
           "text": "(`README.md`'s recommended path,"
         },
         {
-          "path": "docs/specs/distribution.md",
-          "line": 345,
-          "text": "- `repo/README.md` — `## Install` section states the exact command for users."
-        },
-        {
-          "path": "docs/specs/distribution.md",
-          "line": 359,
-          "text": "- `repo/README.md` — \"Dev shell helpers\" note under `## Install` links the"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 3,
-          "text": "> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md` và `docs/platform/README.md`"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 15,
-          "text": "- `docs/platform/packaging-distribution/README.md` — portal hiện hành cho packaging/distribution: `fgctl` bootstrap/init/repair/upgrade, workspace activation, doctor/fix readiness, legacy Node compatibility, skill/instruction projections. Khi mục này mâu thuẫn với `docs/specs/distribution.md`, đọc portal + implementation-alignment trước; `docs/specs/distribution.md` hiện là legacy/generated-curated source trong lúc migration."
-        },
-        {
           "path": "docs/specs/reading-map.md",
           "line": 21,
           "text": "- `package.json` (`version`, `files`, `bin.fgos`, `bin.fgos-runner`) + `README.md` (mục `## Install`) — cài `fgos` VÀ `fgos-runner` từ ngoài source repo qua GitHub install, cả hai executable ngay sau cài; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài, gồm cả hai binary); spec: docs/specs/distribution.md"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 23,
-          "text": "- `src/setup/` (`ansi.mjs`, `config-merge.mjs`, `shell-rc.mjs`, `checks.mjs`) + `bin/fgos.mjs`'s current legacy `setup`/`doctor` verbs + `src/cli/command-registry.mjs` entries — doctor/fix registry and legacy setup compatibility: `doctor` chẩn đoán read-only, `doctor --fix` chạy registered fixes, current Node `fgos setup` vẫn tồn tại nhưng target architecture supersedes onboarding bằng `fgctl init` + local `fgos init` / `fgos doctor --fix` / `fgos doctor`; manifest: `docs/architecture-manifest.json`; test: `test/setup/*.test.mjs`; current portal: `docs/platform/packaging-distribution/README.md`; legacy spec: docs/specs/distribution.md §Setup, §Doctor"
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 40,
-          "text": "- `docs/architect/README.md` + `docs/architect/architecture-intent.md` + `docs/architect/domainization/README.md` — portal architect-level, registry intention xuyên-khu-vực, và deep-dive domainization (core đóng vs `domains/<name>/` adapter mở: manifest/workflow YAML, task-spec, skill, knowledge, doctrine, agent, resolver, enforcement); active thread đầu tiên giữ intent mở rộng fgOS từ fan-out/fan-in + artifact mediation thành năng lực group-thinking/problem-solving rộng hơn (Delphi/NGT/RFC/adversarial/master-coordinator), giữ `group-cognition-framework.yaml` isolation-heavy không bị nới ngầm; liên quan Step 09 group-thinking substrate, Step 10 coding-domain adoption, component authority boundary map, và Domain Components And Extension Layer"
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -75257,108 +73765,8 @@
         },
         {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 19,
-          "text": "\"docs/architect/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 25,
-          "text": "\"docs/architect/agent-coordination/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 31,
-          "text": "\"docs/architect/agent-coordination/architecture/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 115,
-          "text": "\"docs/architect/agent-coordination/contracts/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 211,
-          "text": "\"docs/architect/agent-coordination/decisions/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 229,
-          "text": "\"docs/architect/agent-coordination/history/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 259,
-          "text": "\"docs/architect/agent-coordination/playbooks/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 313,
-          "text": "\"docs/architect/agent-coordination/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 349,
-          "text": "\"docs/architect/agent-coordination/roadmap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 355,
-          "text": "\"docs/architect/agent-coordination/roadmap/team-dispatch-v1/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 403,
-          "text": "\"docs/architect/agent-coordination/verification/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5545,
-          "text": "\"docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 5617,
           "text": "\"docs/architect/agent-coordination/vocabulary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5653,
-          "text": "\"docs/architect/component-boundary/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5695,
-          "text": "\"docs/architect/domainization/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5743,
-          "text": "\"docs/architect/packaging-distribution/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5791,
-          "text": "\"docs/architect/proposals/README.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 107,
-          "text": "\"path\": \"docs/architect/agent-coordination/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 117,
-          "text": "\"path\": \"docs/architect/agent-coordination/contracts/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 137,
-          "text": "\"path\": \"docs/architect/component-boundary/README.md\","
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 157,
-          "text": "\"path\": \"docs/architect/domainization/README.md\","
         },
         {
           "path": "src/setup/registrations.mjs",

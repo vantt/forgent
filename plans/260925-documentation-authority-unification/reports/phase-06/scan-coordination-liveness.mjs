@@ -32,10 +32,19 @@ const findings = input.files.map(file => {
   const text = git('show', `${base}:${file.path}`);
   const basename = path.basename(file.path);
   const adr = basename.match(/^(ADR-\d+)/)?.[1];
+  const basenameReference = new RegExp(`(^|[^A-Za-z0-9_./-])${basename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^A-Za-z0-9_.-])`);
   const references = [];
+  const relativeReferences = new Set();
+  for (const source of live) {
+    for (const reference of source.lines.join('\n').matchAll(/\]\(([^)\s#]+)(?:#[^)\s]*)?\)/g)) {
+      const raw = reference[1];
+      if (raw.startsWith('.') && path.normalize(path.join(path.dirname(source.path), raw)) === file.path) relativeReferences.add(source.path + '|' + raw);
+      if (raw.startsWith('.') && path.normalize(path.join(path.dirname(source.path), raw)) === file.path.replace('docs/platform/', 'docs/architect/')) relativeReferences.add(source.path + '|' + raw);
+    }
+  }
   for (const source of live) source.lines.forEach((line, i) => {
     if (line.includes(file.path) || line.includes(file.path.replace('docs/platform/', 'docs/architect/')) ||
-        line.includes(basename) || (adr && new RegExp(`\\b${adr}\\b`).test(line))) {
+        basenameReference.test(line) || [...relativeReferences].some(r => r.startsWith(source.path + '|') && line.includes(r.slice(source.path.length + 1))) || (adr && new RegExp(`\\b${adr}\\b`).test(line))) {
       references.push({ path: source.path, line: i + 1, text: line.trim() });
     }
   });
