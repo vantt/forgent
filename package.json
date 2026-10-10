@@ -16,6 +16,7 @@
     "scripts",
     "core",
     "domains",
+    "packages/convention/contracts/convention.rules.v1.json",
     ".agents/skills",
     "README.md",
     "LICENSE",

@@ -7,6 +7,10 @@ import { fileURLToPath } from 'node:url';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
+const HOST_TIMEOUT_MS = 5_000;
+const CONVENTION_UNKNOWN_VERB =
+  'fgos: unknown verb "convention". Usage: fgos <command> [args...]';
+
 /**
  * Resolves the host binary path according to the precedence:
  * 1. process.env.FGOS_HOST_BIN (if set, exists, and is a file).
@@ -80,7 +84,10 @@ export function invokeHost(args, { input, dir = process.cwd(), packageRoot } = {
 
   const cleanDir = typeof dir === 'string' && dir.endsWith('.fgos') ? path.dirname(dir) : dir;
   const mainRoot = resolveMainCheckoutRoot(cleanDir) || cleanDir;
-  const fullArgs = [...args, '--dir', mainRoot];
+  const separator = args.indexOf('--');
+  const fullArgs = separator === -1
+    ? [...args, '--dir', mainRoot]
+    : [...args.slice(0, separator), '--dir', mainRoot, ...args.slice(separator)];
 
   let stdout;
   try {
@@ -89,32 +96,56 @@ export function invokeHost(args, { input, dir = process.cwd(), packageRoot } = {
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
       maxBuffer: 10 * 1024 * 1024,
+      timeout: HOST_TIMEOUT_MS,
     });
   } catch (err) {
     const stderr = err.stderr ? err.stderr.toString('utf8') : '';
-    if (stderr.includes('unknown') && stderr.includes('subcommand')) {
+    const versionMismatch =
+      (err.status === 4 && stderr.trim() === CONVENTION_UNKNOWN_VERB)
+      || (
+        err.status === 4
+        && args[0] === 'metrics'
+        && args[1] === 'coverage'
+        && stderr.trim().startsWith('fgos: unknown metrics subcommand "coverage". Available:')
+      );
+    if (versionMismatch) {
       const mismatchErr = new Error(`Host version mismatch: ${stderr.trim()}`);
       mismatchErr.code = 'host-version-mismatch';
       mismatchErr.stderr = stderr;
       mismatchErr.status = err.status;
       throw mismatchErr;
     }
-    const hostErr = new Error(stderr.trim() || err.message);
-    hostErr.code = err.code || 'host-exec-error';
+    const timedOut = err.code === 'ETIMEDOUT';
+    const hostErr = new Error(
+      timedOut
+        ? `Rust host timed out after ${HOST_TIMEOUT_MS}ms`
+        : (stderr.trim() || err.message)
+    );
+    hostErr.code = 'host-exec-error';
+    hostErr.causeCode = err.code;
+    hostErr.timedOut = timedOut;
     hostErr.status = err.status;
     hostErr.stderr = stderr;
     throw hostErr;
   }
 
+  let envelope;
   try {
-    const envelope = JSON.parse(stdout);
-    if (envelope && typeof envelope === 'object' && 'data' in envelope) {
-      return envelope.data;
-    }
-    return envelope;
+    envelope = JSON.parse(stdout);
   } catch (parseErr) {
     const err = new Error(`Failed to parse host envelope JSON: ${parseErr.message}\nRaw stdout: ${stdout}`);
     err.code = 'host-invalid-envelope';
     throw err;
   }
+  if (
+    !envelope
+    || typeof envelope !== 'object'
+    || envelope.contract !== 'fgos.v1'
+    || !Object.hasOwn(envelope, 'data')
+  ) {
+    const err = new Error('Host returned an invalid fgos.v1 envelope');
+    err.code = 'host-invalid-envelope';
+    throw err;
+  }
+  return envelope.data;
 }

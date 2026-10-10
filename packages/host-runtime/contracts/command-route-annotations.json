@@ -1,4 +1,10 @@
 {
+  "convention": {
+    "route_kind": "native",
+    "operation_id": "convention.query",
+    "owner_path": "packages/convention/rust",
+    "subcommands": true
+  },
   "friction": {
     "route_kind": "native",
     "operation_id": "observe.friction",

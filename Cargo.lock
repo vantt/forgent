@@ -95,6 +95,7 @@ dependencies = [
 name = "fgos"
 version = "0.1.0"
 dependencies = [
+ "fgos-convention",
  "fgos-distribution",
  "fgos-host-runtime",
  "fgos-observe",
@@ -105,6 +106,17 @@ dependencies = [
  "sha2",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "fgos-convention"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "libc",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

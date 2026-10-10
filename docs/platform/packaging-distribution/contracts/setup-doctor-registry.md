@@ -57,6 +57,15 @@ without `layoutRule` identifies an old host positively and reports
 passed-but-degraded with an upgrade instruction; other host errors fail.
 This check is read-only, introduces no config default, and never rewrites runs.
 
+`convention-conformance` checks the packaged naming and placement rules only
+inside an fgOS source checkout. Violations on paths already present at the
+rule cutoff pass with counts and up to three examples; a violation on a path
+introduced after that cutoff fails the check, even while the rule posture is
+`warn`. A missing or old host pass-skips with the reason because doctor never
+reimplements the native rules. The check is read-only and has no registered
+fix or config default.
+
+
 `active-release-matches-checkout` compares a source checkout's Node payload
 working-tree bytes with its own activated manifest, using the release builder's
 source enumeration. It reports changed, missing and extra source files, excludes

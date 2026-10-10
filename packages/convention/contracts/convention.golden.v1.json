@@ -1,0 +1,174 @@
+{
+  "contract": "convention.golden.v1",
+  "cases": [
+    {
+      "name": "report name",
+      "operation": "name",
+      "input": {"kind":"report","type":"report","slug":"harness-audit","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"report","name":"report-261006-1415-harness-audit.md","at":"2026-10-06T14:15:00.000+07:00","offset":"+07:00"}
+    },
+    {
+      "name": "report path",
+      "operation": "path",
+      "input": {"kind":"report","type":"report","slug":"x","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"report","path":"plans/reports/report-261006-1415-x.md"}
+    },
+    {
+      "name": "report path under plan",
+      "operation": "path",
+      "input": {"kind":"report","type":"report","slug":"x","at":"2026-10-06T14:15:00+07:00","plan":"261006-1415-fgos-convention-component"},
+      "expected": {"kind":"report","path":"plans/261006-1415-fgos-convention-component/reports/report-261006-1415-x.md"}
+    },
+    {
+      "name": "plan name",
+      "operation": "name",
+      "input": {"kind":"plan","slug":"Convention Component","at":"2026-10-06T14:15:00-05:00"},
+      "expected": {"kind":"plan","name":"261006-1415-convention-component","at":"2026-10-06T14:15:00.000-05:00","offset":"-05:00"}
+    },
+    {
+      "name": "plan path",
+      "operation": "path",
+      "input": {"kind":"plan","slug":"convention-component","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"plan","path":"plans/261006-1415-convention-component"}
+    },
+    {
+      "name": "journal name",
+      "operation": "name",
+      "input": {"kind":"journal","slug":"release-notes","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"journal","name":"journal-261006-1415-release-notes.md","at":"2026-10-06T14:15:00.000+07:00","offset":"+07:00"}
+    },
+    {
+      "name": "journal path",
+      "operation": "path",
+      "input": {"kind":"journal","slug":"release-notes","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"journal","path":"plans/journals/journal-261006-1415-release-notes.md"}
+    },
+    {
+      "name": "valid initial paths and compatibility forms",
+      "operation": "check",
+      "input": {"paths":["plans/reports/report-261006-1415-x.md","plans/reports/report-261006-1415-x-report.md","plans/reports/GH-123-261006-1415-x.md","plans/reports/foo-261399-2561-bar-261006-1415-x.md","plans/261006-1415-fgos-convention-component","plans/261006-1415-fgos-convention-component/plan.md","plans/261006-1415-fgos-convention-component/reports/report-261006-1415-x.md","plans/journals/2026-10-06-release-notes.md","plans/journals/journal-261006-1415-release-notes.md"]},
+      "expected": {"checked":9,"violations":[]}
+    },
+    {
+      "name": "wrong report order",
+      "operation": "check",
+      "input": {"paths":["plans/reports/harness-audit-261006.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/reports/harness-audit-261006.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "missing report time",
+      "operation": "check",
+      "input": {"paths":["plans/reports/report-261006-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/reports/report-261006-x.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "invalid report timestamp",
+      "operation": "check",
+      "input": {"paths":["plans/reports/report-261399-2561-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/reports/report-261399-2561-x.md","code":"invalid-timestamp","message":"timestamp is not a valid civil date and time"}]}
+    },
+    {
+      "name": "invalid plan timestamp",
+      "operation": "check",
+      "input": {"paths":["plans/261399-2561-x"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/261399-2561-x","code":"invalid-timestamp","message":"timestamp is not a valid civil date and time"}]}
+    },
+    {
+      "name": "invalid journal timestamp",
+      "operation": "check",
+      "input": {"paths":["plans/journals/journal-261399-2561-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/journals/journal-261399-2561-x.md","code":"invalid-timestamp","message":"timestamp is not a valid civil date and time"}]}
+    },
+    {
+      "name": "report missing type prefix",
+      "operation": "check",
+      "input": {"paths":["plans/reports/261006-1415-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/reports/261006-1415-x.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "report type is not normalized",
+      "operation": "check",
+      "input": {"paths":["plans/reports/Bad_Type-261006-1415-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/reports/Bad_Type-261006-1415-x.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "journal has wrong prefix",
+      "operation": "check",
+      "input": {"paths":["plans/journals/report-261006-1415-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/journals/report-261006-1415-x.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "legacy journal slug is not normalized",
+      "operation": "check",
+      "input": {"paths":["plans/journals/2026-10-06-Bad_Name.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/journals/2026-10-06-Bad_Name.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "reject non-relative check path",
+      "operation": "check",
+      "input": {"paths":["../plans/reports/report-261006-1415-x.md"]},
+      "expectedError": "invalid-path: expected a repository-relative path without '..'"
+    },
+    {
+      "name": "wrong report location",
+      "operation": "check",
+      "input": {"paths":["plans/report-261006-1415-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/report-261006-1415-x.md","code":"wrong-location","message":"recognized report is outside an accepted location"}]}
+    },
+    {
+      "name": "classify singleton",
+      "operation": "classify",
+      "input": {"path":"fixtures/demo/spec.md"},
+      "expected": {"kind":"fixture-singleton","cardinality":"singleton","scope":["fixtures/**"]}
+    },
+    {
+      "name": "reject singleton near miss",
+      "operation": "classify",
+      "input": {"path":"fixtures/demo/other.md"},
+      "expectedError": "unknown-kind: path does not match a placement rule"
+    },
+    {
+      "name": "reject singleton placeholder crossing a segment",
+      "operation": "classify",
+      "input": {"path":"fixtures/demo/nested/spec.md"},
+      "expectedError": "unknown-kind: path does not match a placement rule"
+    },
+    {
+      "name": "classify collection nested item",
+      "operation": "classify",
+      "input": {"path":"fixtures/demo/contracts/nested/item.json"},
+      "expected": {"kind":"fixture-collection","cardinality":"collection","scope":["fixtures/**"]}
+    },
+    {
+      "name": "classify collection at double-star zero segment boundary",
+      "operation": "classify",
+      "input": {"path":"fixtures/demo/contracts"},
+      "expected": {"kind":"fixture-collection","cardinality":"collection","scope":["fixtures/**"]}
+    },
+    {
+      "name": "reject collection near miss",
+      "operation": "classify",
+      "input": {"path":"fixtures/demo/contract/item.json"},
+      "expectedError": "unknown-kind: path does not match a placement rule"
+    },
+    {
+      "name": "classify unknown",
+      "operation": "classify",
+      "input": {"path":"elsewhere/item.md"},
+      "expectedError": "unknown-kind: path does not match a placement rule"
+    },
+    {"name":"invalid kind","operation":"name","input":{"kind":"missing","slug":"x","at":"2026-10-06T14:15:00Z"},"expectedError":"invalid-kind: unsupported convention kind 'missing'"},
+    {"name":"invalid type","operation":"name","input":{"kind":"report","type":"---","slug":"x","at":"2026-10-06T14:15:00Z"},"expectedError":"invalid-type: report type is empty or malformed"},
+    {"name":"invalid slug","operation":"name","input":{"kind":"journal","slug":"---","at":"2026-10-06T14:15:00Z"},"expectedError":"invalid-slug: slug is empty after normalization"},
+    {"name":"invalid at","operation":"name","input":{"kind":"journal","slug":"x","at":"yesterday"},"expectedError":"invalid-at: expected an RFC3339 timestamp with an offset"},
+    {"name":"invalid plan dir","operation":"path","input":{"kind":"report","type":"report","slug":"x","at":"2026-10-06T14:15:00Z","plan":"bad"},"expectedError":"invalid-plan-dir: expected YYMMDD-HHMM-slug"}
+  ],
+  "invalidRules": [
+    {
+      "name": "unknown shape",
+      "ruleIndex": 0,
+      "shape": "mystery-shape",
+      "expectedError": "invalid-rule-shape: rule 'report' has an unsupported shape"
+    }
+  ]
+}

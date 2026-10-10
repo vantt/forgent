@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos convention name|path|check|classify` provides one native Rust authority for report, plan, and journal names and repository-relative paths. `convention-conformance` reports old violations without failing and fails for violations introduced after each rule cutoff; the source-repository pre-commit hook warns, but never blocks, on newly staged direct report and journal files.
 - A failed round that has to close its herdr pane (a detected tamper, or a failure after the worker was already live) now keeps up to the last 40 non-empty screen lines in the failure record as `screen`, instead of losing them with the pane.
 - Release packages and npm tarballs no longer carry `.agents/hooks.json`: that file is written by `fgos setup` with the absolute paths of the machine that ran it, so shipping it could hand another machine hook commands that exit 127. The payload now declares `.agents/skills` instead of the whole `.agents` directory.
 - A mutating assignment whose worker settled with a `findings` verdict now stops with the reason `assignment-<operation>-findings` instead of `-insufficient-confidence`, which read as missing evidence. It still stops.
