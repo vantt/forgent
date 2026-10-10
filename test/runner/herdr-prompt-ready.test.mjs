@@ -115,17 +115,17 @@ test('ready, unverified and no-detector panes are briefed as before', () => {
 // A pid no process can have, so the kill the close path attempts is a harmless no-op.
 const LIVE_WORKER = { shellPid: 1, foregroundProcesses: [{ pid: 2147483646 }] };
 
-test('a failure that closes the pane keeps the last screen lines in the failure record', () => {
+test('a failure that closes the pane keeps the last screen lines, not only the last one, in the failure record', () => {
   const closed = [];
   const client = {
-    agentRead: () => 'header\nrate limit reached\n\n',
+    agentRead: () => 'header\n  Continue anyway?\n\nrate limit reached\n\n',
     paneProcessInfo: () => LIVE_WORKER,
     paneClose: (id) => closed.push(id),
   };
   const err = new Error('brief failed');
   cleanupAndKeepScreen(client, roundStub(), err);
   assert.deepEqual(closed, ['p-1']);
-  assert.equal(err.screen, 'rate limit reached');
+  assert.equal(err.screen, 'header\nContinue anyway?\nrate limit reached', 'the whole dialog is kept, not only its last line');
 });
 
 test('a screen that cannot be read does not change how the pane is closed or the failure', () => {

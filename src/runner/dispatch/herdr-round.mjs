@@ -313,7 +313,7 @@ export function verifyProcessEnvironment(pid, expectedEnv) {
 function killPaneForegroundAndClose(client, paneId, pInfo = null, target = null) {
   // The pane's last lines are read before it closes -- once closed the screen is gone.
   let screen = null;
-  try { screen = lastScreenLine(client.agentRead(target ?? paneId, { lines: 40 })); } catch { screen = null; }
+  try { screen = screenTail(client.agentRead(target ?? paneId, { lines: 40 })); } catch { screen = null; }
   try {
     const info = pInfo ?? client.paneProcessInfo(paneId);
     const stray = info?.foregroundProcesses?.find((p) => p.pid && p.pid !== info.shellPid);
@@ -436,6 +436,14 @@ const UNRULED_READY_MS = 15000;
 function lastScreenLine(text) {
   const lines = String(text ?? '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   return lines.length > 0 ? lines[lines.length - 1] : null;
+}
+
+/** The last `count` lines on screen with anything on them, for a pane that is
+ * about to close: a dialog is usually several lines, and its last line alone
+ * (`[y/N]`) does not say what it asked. */
+function screenTail(text, count = 40) {
+  const lines = String(text ?? '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return lines.length > 0 ? lines.slice(-count).join('\n') : null;
 }
 
 /**
