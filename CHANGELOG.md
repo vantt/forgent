@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The `rfc` preset now briefs its reviewer and red-team checkers on the supplied artifact and the producer report instead of the latest commit (`git log -1`), so a document or decision review no longer sends them to git history.
 - The final synthesis step of the `delphi`, `nominal-group`, `group-cognition` and `business-discussion` workflows now writes its verdict in a fixed order: what is still unresolved, each seat's position by seat label, whether the seats agree or split, what would change the conclusion, and exactly one next step. A split is reported as a split, not averaged away.
 - The provider capacity state lock now waits up to 30 seconds for a live holder instead of 5 before failing; a lock held by a dead process is still reclaimed at once. On a busy disk the holder's fsync could outlast five seconds and fail a dispatch for no fault of its own.
 - Architecture advisory guidance now uses config-owned binding and the current Workflow door instead of retired executor/model pins and coordination APIs; it preserves role doctrine, requires fail-closed host-write-denied execution, and explicitly separates unsupported advisory capabilities from this hygiene cleanup.

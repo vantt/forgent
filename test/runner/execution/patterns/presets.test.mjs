@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PRESETS, resolvePattern } from '../../../../src/runner/execution/patterns/presets.mjs';
+import { roleUnit } from '../../../../src/runner/execution/patterns/role-tasks.mjs';
 
 test('PRESETS contains standard named presets with immutable shapes', () => {
   assert.ok(PRESETS['code-change'], 'code-change preset exists');
@@ -81,4 +82,17 @@ test('resolvePattern defaults to solo when falsy', () => {
   assert.deepEqual(resolvePattern(null), { patternName: 'solo', params: {} });
   assert.deepEqual(resolvePattern(undefined), { patternName: 'solo', params: {} });
   assert.deepEqual(resolvePattern(''), { patternName: 'solo', params: {} });
+});
+
+test('rfc checkers are briefed on the supplied artifact and the producer report, not the latest commit', () => {
+  const { params } = resolvePattern('rfc');
+  const unit = { id: 'u1', capability: 'advise', objective: 'Red-team the proposal in docs/pricing-v2.md' };
+  for (const role of ['reviewer', 'red-team']) {
+    const { objective } = roleUnit(unit, { role, params });
+    assert.ok(objective.includes(unit.objective), `${role} still sees the original task`);
+    assert.match(objective, /Context refs/, `${role} is pointed at the producer report`);
+    assert.doesNotMatch(objective, /git log|git show/, `${role} is not sent to the latest commit`);
+    assert.match(objective, /do not change any file/i);
+  }
+  assert.notEqual(roleUnit(unit, { role: 'reviewer', params }).objective, roleUnit(unit, { role: 'red-team', params }).objective);
 });
