@@ -1,7 +1,7 @@
 ---
 title: "Dispatch worker hygiene and crash recovery"
 description: "Make confined read-only workers immune to the target project's own agent hooks/MCP, resume a crashed workflow without re-running settled seats, keep reaper and recovery inside the worker's herdr session, and let the owner quarantine an exhausted account."
-status: pending
+status: in-progress (all phases merged to main 2026-10-10; R1 not yet completed)
 priority: P1
 effort: 5 sessions
 branch: main
@@ -136,3 +136,17 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 - Per-family probes after the fixes (one seat each, mcp-skill-hub main checkout): codex, xai, claude, gemini all `pass`; target agent-config files and `git status --ignored` unchanged.
 - Run 2 (full advisory workflow, no patches, codex account tetcu72): `framing`, `shaping`, `critique` completed; `synthesis` failed `policy-refusal`. No seat showed hook exit 127, a hook/MCP dialog, or `internal_error`; target status identical before/after. The refusal came from one codex red-team seat whose `agent-result.json` failed claim validation (`invalid-agent-result-claim`, `settlement.mjs:259`). That is an agent output fault outside this phase's file list: a separate item, not patched here. Whether the claim failed on evidence-reference shape or content is not yet diagnosed.
 - Reading: the faults this phase targeted are gone; the run is not yet `completed`, so the phase's named done-check is only partly met. A rerun is cheap evidence once the claim-validation fault is understood or if it does not recur.
+
+## Status 2026-10-10
+
+| Phase | Merged | Src lines (budget) | Proof |
+|---|---|---|---|
+| 01 hook trust seeding | yes | 129 (160) | codex probe pass; full run not yet `completed` (see R1 results) |
+| 02 unit id before dispatch | yes | 59 (50, within 1.5x) | T2 + missing-worktree test; fails without the fix |
+| 03 herdr session identity | yes | 39 (70) | reaper + recovery tests; fail without the fix |
+| 04 owner quarantine | yes | 57 (60) | verb test + CLI check; clock-time parse |
+| 05 findings reason | yes | 2 (10) | T5 |
+| 06 absolute hook path | yes | 18 (40) | gemini probe pass |
+| 07 claude MCP approval | yes | 61 (70) | claude probe pass; authority-level resume test |
+
+Left out on purpose, as separate items (not in this plan): early binding of the ownership marker at pane creation; hook commands of the OMP/Pi extensions still use the session cwd; `.agents/hooks.json` is packed into releases with the builder's absolute path; a pane closed by the round leaves no screen snapshot; claim validation failure of one codex seat in the second live run; the `Continue anyway?` dialog of a codex seat in a worktree without project hooks.
