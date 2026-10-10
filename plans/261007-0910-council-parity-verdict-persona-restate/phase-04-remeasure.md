@@ -29,7 +29,7 @@ Same method as 2026-10-04: same question through real council and through fgOS, 
 ## Success Criteria
 - [x] Table of scores per question and row, with judge prompt and inputs saved ([report](reports/phase-04-remeasure-report.md)).
 - [x] Explicit decision on the next gap: stop; no cross-exam, tally or ledger.
-- [ ] Full suite green; CHANGELOG/spec lines landed.
+- [x] Full suite green; CHANGELOG/spec lines landed.
 
 ## Risk Assessment
 n is small and the judge is one model; state that. A score that does not move is a valid result and stops further gate building.
