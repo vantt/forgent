@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A mutating assignment whose worker settled with a `findings` verdict now stops with the reason `assignment-<operation>-findings` instead of `-insufficient-confidence`, which read as missing evidence. It still stops.
 - `fgos dispatch reconcile provider-capacity quarantine --provider <p> --account <id> --until <ISO> --reason "<why>"` lets the owner take an exhausted account out of selection until a given time (clear stays `clear-quarantine`). A codex usage-limit message that names a clock time ("try again at 6:02 PM") now sets the quarantine end to that time instead of the one-hour default.
 - Confined claude workers no longer stop at the "new MCP server found in this project" dialog: the servers the project's `.mcp.json` declares are approved for that worker process only (never written to `~/.claude.json`), and only where the project root is already trusted.
 - Confined codex workers no longer stop at the hook review dialog in projects that ship `.codex/hooks.json`: the project's hooks are trusted in the worker's private home only (never in the account's own config, and only where the project root is already trusted); the home is deleted after the dispatch.

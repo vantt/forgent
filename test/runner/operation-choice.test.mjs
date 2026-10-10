@@ -1622,6 +1622,26 @@ test('implement-item: a real buildAssignment Assignment with reported confidence
   assert.equal(result.canProceed, undefined);
 });
 
+test('a settled findings verdict on mutating work stops with a findings reason', () => {
+  const tempDir = mkTempDir();
+  seedTaskSpecs(tempDir, ['implement-item']);
+  const assignment = buildAssignment({
+    workId: 'tsk-implement-findings',
+    stage: 'executing',
+    operation: 'implement-item',
+    options: { repoRoot: tempDir },
+  });
+  const settled = (verdict) => ({ outcome: { category: 'ok', executed: 'succeeded', verdict, refused: false, evidence: 'reported', satisfied: false, infraFailure: false, failure: null } });
+
+  const findings = interpretAssignmentRunResult({ choice: { operation: 'implement-item', assignment }, runResult: settled('findings'), repoRoot: tempDir });
+  assert.equal(findings.stop, true);
+  assert.equal(findings.canAdvanceEdge, false);
+  assert.equal(findings.reason, 'assignment-implement-item-findings');
+
+  const inconclusive = interpretAssignmentRunResult({ choice: { operation: 'implement-item', assignment }, runResult: settled('inconclusive'), repoRoot: tempDir });
+  assert.equal(inconclusive.reason, 'assignment-implement-item-insufficient-confidence', 'other non-satisfied outcomes keep the evidence reason');
+});
+
 test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunResult refuse a real undeclared-file mutation and allow a fully-declared one', async () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);

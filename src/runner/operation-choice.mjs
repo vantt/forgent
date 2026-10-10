@@ -1747,7 +1747,8 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
       return Object.freeze({
         canAdvanceEdge: false,
         stop: true,
-        reason: `assignment-${operation}-insufficient-confidence`,
+        // A settled `findings` verdict is the worker reporting problems, not missing evidence.
+        reason: `assignment-${operation}-${outcome?.verdict === 'findings' ? 'findings' : 'insufficient-confidence'}`,
       });
     }
   } else if (!hasReportConfidence && (!outcome || outcome.category !== 'verdict')) {
