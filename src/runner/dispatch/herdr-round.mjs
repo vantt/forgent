@@ -44,8 +44,9 @@ import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-h
 import {
   seedTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   removeTrust, removeCodexTrust, removeAgyTrust,
-  seedCodexHookTrust,
+  seedCodexHookTrust, trustRoots,
 } from './trust-store.mjs';
+export { trustRoots };
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
@@ -691,22 +692,6 @@ function seedHookTrust({ round, target, projectPath, repoRoot, rootConfigPath })
   }
 }
 
-/**
- * Roots a workspace's trust may be derived from: the repository root the run
- * was started for and, for a linked worktree, the main checkout that owns it
- * (the same repository, and the root codex itself asks about). Never invents
- * a root: each is only a candidate for the "already trusted" check.
- */
-export function trustRoots(projectPath, repoRoot) {
-  const roots = [repoRoot];
-  try {
-    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
-      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
-  } catch { /* not a checkout: only the declared root is a candidate */ }
-  return [...new Set(roots)];
-}
 
 /**
  * Where the trust decision is read (the account's real store) and where the

@@ -313,3 +313,25 @@ test('claudeMcpApprovalArgs approves exactly the servers the project declares, o
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('claudeMcpApprovalArgs trusts a linked worktree through the main checkout that owns it', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mcp-worktree-'));
+  try {
+    const main = path.join(dir, 'main');
+    fs.mkdirSync(main);
+    const git = (...a) => execFileSync('git', a, { cwd: main, stdio: 'ignore' });
+    git('init', '-q'); git('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'x');
+    const wt = path.join(dir, 'wt');
+    git('worktree', 'add', '-q', wt);
+    fs.writeFileSync(path.join(wt, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {} } }));
+    const store = path.join(dir, 'claude.json');
+    fs.writeFileSync(store, JSON.stringify({ projects: { [fs.realpathSync(main)]: { hasTrustDialogAccepted: true } } }));
+
+    const args = claudeMcpApprovalArgs({ cwd: wt, repoRoot: wt, storePath: store });
+
+    assert.deepEqual(JSON.parse(args[1]), { enabledMcpjsonServers: ['skillhub'] });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

@@ -27,6 +27,7 @@
 // (measured: the probes used /var/tmp). It is the caller's obligation, stated
 // here rather than dressed up as a check that does nothing.
 
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -146,6 +147,23 @@ export function trustedProjectEntry() {
 }
 
 /**
+ * Roots a workspace's trust may be derived from: the repository root the run
+ * was started for and, for a linked worktree, the main checkout that owns it
+ * (the same repository, and the root codex itself asks about). Never invents
+ * a root: each is only a candidate for the "already trusted" check.
+ */
+export function trustRoots(projectPath, repoRoot) {
+  const roots = [repoRoot];
+  try {
+    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
+  } catch { /* not a checkout: only the declared root is a candidate */ }
+  return [...new Set(roots)];
+}
+
+/**
  * Per-process approval of the MCP servers a project declares in its own `.mcp.json`, as extra
  * claude arguments. claude asks a person to approve each such server before it starts, which
  * stops an unattended worker at a dialog. The approval is derived, never invented: only where the
@@ -158,7 +176,8 @@ export function claudeMcpApprovalArgs({ cwd, repoRoot, storePath }) {
   try {
     const declared = JSON.parse(fs.readFileSync(path.join(cwd, '.mcp.json'), 'utf8'))?.mcpServers;
     names = declared && typeof declared === 'object' ? Object.keys(declared) : [];
-    if (names.length === 0 || readTrust(storePath, repoRoot) !== true) return [];
+    // A linked worktree is trusted through the main checkout that owns it, as for folder trust.
+    if (names.length === 0 || !trustRoots(path.resolve(cwd), repoRoot).some((root) => readTrust(storePath, root) === true)) return [];
   } catch {
     return [];
   }

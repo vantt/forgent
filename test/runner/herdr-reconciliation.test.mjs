@@ -228,6 +228,48 @@ test('1. Confinement Authority prepares herdr-spawn launch under required bwrap 
   assert.ok(fs.existsSync(path.join(runDir, 'protected', 'prepared-invocation', 'cmd-01.json')));
 });
 
+// A claude worker's project MCP servers are approved per process through its launch args. Those args
+// are part of the published invocation, so a retry must reuse them even if .mcp.json changed since.
+test('1b. a claude worker launch carries the project MCP approval once and a retry keeps the published args', async () => {
+  if (!HAS_WORKING_BWRAP) return;
+  const tmp = mkTempDir();
+  const fgosDir = path.join(tmp, '.fgos');
+  const runDir = path.join(fgosDir, 'runs', 'run-1b');
+  fs.mkdirSync(runDir, { recursive: true });
+  const store = path.join(tmp, 'claude.json');
+  fs.writeFileSync(store, JSON.stringify({ projects: { [tmp]: { hasTrustDialogAccepted: true } } }));
+  fs.writeFileSync(path.join(tmp, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {} } }));
+
+  const launchContext = {
+    contract: 'assignment-herdr-spawn-launch-context.v1',
+    run: { runId: 'run-1b', assignmentId: 'asgn-1b', attempt: 1, dispatchPlanDigest: 'sha256:abcd', evaluatorBaselineDigest: 'sha256:1234' },
+    command: { launchCommandId: 'cmd-1b', controlEpoch: 1, controlTokenDigest: computeSha256Digest('tok-1') },
+  };
+  const build = () => ({
+    ...buildConfinementRequest({
+      backendId: 'bwrap',
+      context: { runDir, cwd: tmp, repoRoot: tmp, fgosDir, workId: 'item-1b', tier: 'standard', model: 'sonnet' },
+      capability: 'code:implement',
+      requirement: { mode: 'required', policyId: 'host-write-denied', policy: BUILTIN_POLICIES['host-write-denied'] },
+      invocation: {
+        command: 'claude', args: ['--model', 'sonnet'], workerCommandSeam: true, adapter: 'herdr-spawn',
+        interactiveMode: { kind: 'claude', trustStore: { kind: 'claude-json', path: store } },
+      },
+    }),
+    assignmentLaunchContext: launchContext,
+  });
+
+  const first = await prepareConfinementForLaunch(build(), { adapterName: 'herdr-spawn' });
+  const args = first.preparedInvocation.workerInvocation.args;
+  assert.equal(args.filter((a) => a === '--settings').length, 1);
+  assert.deepEqual(JSON.parse(args[args.indexOf('--settings') + 1]), { enabledMcpjsonServers: ['skillhub'] });
+
+  fs.writeFileSync(path.join(tmp, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {}, extra: {} } }));
+  const retry = await prepareConfinementForLaunch(build(), { adapterName: 'herdr-spawn' });
+  assert.deepEqual(retry.preparedInvocation.workerInvocation.args, args, 'a retry launches with the published args');
+  assert.equal(retry.preparedInvocation.workerInvocation.workerCommandDigest, first.preparedInvocation.workerInvocation.workerCommandDigest);
+});
+
 // 2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false
 test('2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false', async () => {
   if (!HAS_WORKING_BWRAP) return;

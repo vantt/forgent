@@ -1377,7 +1377,12 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;
   const workerCommand = sourceInvocation.command;
   const claudeTrust = sourceInvocation.interactiveMode?.trustStore;
-  const workerArgs = [
+  // A prepared record that already exists is the invocation this launch was published with: its
+  // args do not change with files that can change between attempts (.mcp.json, the trust store).
+  const publishedInvocationPath = path.join(runDir ?? "", "protected", "prepared-invocation", `${launchCommandId}.json`);
+  let publishedArgs = null;
+  try { publishedArgs = JSON.parse(fs.readFileSync(publishedInvocationPath, 'utf8'))?.workerInvocation?.args ?? null; } catch { /* first attempt */ }
+  const workerArgs = Array.isArray(publishedArgs) ? publishedArgs : [
     ...(sourceInvocation.args || []),
     // The target project's own MCP servers are approved for this worker only, so the claude
     // dialog that asks a person cannot stop an unattended seat.
