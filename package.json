@@ -16,7 +16,7 @@
     "scripts",
     "core",
     "domains",
-    ".agents",
+    ".agents/skills",
     "README.md",
     "LICENSE",
     "docs/how-to",

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Release packages and npm tarballs no longer carry `.agents/hooks.json`: that file is written by `fgos setup` with the absolute paths of the machine that ran it, so shipping it could hand another machine hook commands that exit 127. The payload now declares `.agents/skills` instead of the whole `.agents` directory.
 - A mutating assignment whose worker settled with a `findings` verdict now stops with the reason `assignment-<operation>-findings` instead of `-insufficient-confidence`, which read as missing evidence. It still stops.
 - `fgos dispatch reconcile provider-capacity quarantine --provider <p> --account <id> --until <ISO> --reason "<why>"` lets the owner take an exhausted account out of selection until a given time (clear stays `clear-quarantine`). A codex usage-limit message that names a clock time ("try again at 6:02 PM") now sets the quarantine end to that time instead of the one-hour default.
 - Confined claude workers no longer stop at the "new MCP server found in this project" dialog: the servers the project's `.mcp.json` declares are approved for that worker process only (never written to `~/.claude.json`), and only where the project root is already trusted.
