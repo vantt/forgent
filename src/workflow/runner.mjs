@@ -411,11 +411,18 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             ...(u.template.blind ? { blind: true } : {}),
           };
 
+          // A unit left `running` with a recorded Unit run id was started by a controller that died:
+          // continue that run (settled seats are kept) and reuse the worktree it already has.
+          const resumeUnitRunId = uState?.status === 'running' ? (uState.unitRunId ?? null) : null;
+
           // If unit has writes, prepare worktree
           let unitWorktree = worktreePath;
           let uBranch = null;
           let ownsWorktree = false;
-          if (unitData.writes.length > 0) {
+          if (resumeUnitRunId && uState.worktreePath) {
+            unitWorktree = uState.worktreePath;
+            uBranch = uState.branch ?? null;
+          } else if (unitData.writes.length > 0) {
             uBranch = `wf/${workflowRunId}/${u.id}`;
             try {
               const wtInfo = createWorkflowWorktree({
@@ -429,18 +436,21 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             }
           }
 
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'unit.scheduled',
-              payload: {
-                stepId: step.id,
-                unitId: u.id,
-                ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch } : {}),
+          // Recording it again would reset the unit and lose the run id it already carries.
+          if (!resumeUnitRunId) {
+            recordEvent({
+              repoRoot: mainRoot,
+              workflowRunId,
+              event: {
+                type: 'unit.scheduled',
+                payload: {
+                  stepId: step.id,
+                  unitId: u.id,
+                  ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch } : {}),
+                },
               },
-            },
-          });
+            });
+          }
 
           // Run Unit via P1 execution door. A throw (an unresolvable hand-off ref, a refused
           // config) is a failed unit like any other: left uncaught it would end the advance with
@@ -455,6 +465,13 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               pattern: unitPatternOf(u.template),
               overrides: unitOverridesOf(u),
               workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
+              ...(resumeUnitRunId ? { resumeUnitRunId } : {
+                onUnitRunCreated: (unitRunId) => recordEvent({
+                  repoRoot: mainRoot,
+                  workflowRunId,
+                  event: { type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId } },
+                }),
+              }),
             });
           } catch (err) {
             unitRunResult = {

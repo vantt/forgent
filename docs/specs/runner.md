@@ -3131,7 +3131,7 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
 - **Quyết định:**
   1. **Một dạng:** đường dẫn tuyệt đối, chỉ đọc, tới report, trong `contextRefs`; không còn đường nhúng text. Xoá giới hạn 6000 ký tự, tìm report theo tên file và `role-input-refs.mjs`.
   2. **Một chỗ phân giải** trong Execution Core (`handoff-refs.mjs`), lúc tạo Unit run, kết quả ghi vào `unit.json` (`resolvedInputs`). Report lấy từ `settleReports` (đã kiểm sha256), không đoán theo tên file.
-  3. **Workflow store ghi `unitRunId`** trên `unit.complete`; bước sau thấy report của mọi vai của mọi bước phụ thuộc, như trước.
+  3. **Workflow store ghi `unitRunId`** ngay khi Unit run được tạo (event `unit.started`, trước ghế đầu tiên) và lặp lại trên `unit.complete`; một unit đang `running` có id được runner tiếp tục bằng `resumeUnitRunId` (ghế đã settle không chạy lại, worktree đã ghi được dùng lại) thay vì tạo Unit run mới; bước sau thấy report của mọi vai của mọi bước phụ thuộc, như trước.
   4. Không mở rộng quyền đọc của worker (xem "Ranh giới tin cậy" ở `docs/routing-handoff-contract.md`); không đổi ranh giới component.
 - **Giới hạn đã biết:** worker phải mở file; câu `Summary` giữ trong objective làm sàn khi một model bỏ qua ref. Câu trả lời của cổng người chưa tới unit sau.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

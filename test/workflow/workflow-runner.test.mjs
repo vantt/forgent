@@ -607,6 +607,41 @@ test('status says a running run has no live advance and names resume once the la
   assert.equal(held.hint, undefined);
 });
 
+test('a resumed workflow continues the unit run its dead controller started and dispatches no settled seat again', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'test/resume-unit-run',
+    steps: [{ id: 'only', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write' } }] }],
+  });
+  const first = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+  assert.equal(first.status, 'completed');
+  const id = first.workflowRunId;
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id });
+  const started = events.find((e) => e.type === 'unit.started');
+  const completed = events.find((e) => e.type === 'unit.complete');
+  assert.ok(started, 'the Unit run id is journaled when the run is created');
+  assert.equal(started.payload.unitRunId, completed.payload.unitRunId);
+  assert.ok(started.seq < completed.seq, 'and before the unit can complete');
+
+  // The controller dies after the Unit run settled its seat but before the unit completed.
+  const eventsFile = path.join(tmp, '.fgos', 'workflow-runs', id, 'events.jsonl');
+  const kept = events.filter((e) => e.seq < completed.seq);
+  fs.writeFileSync(eventsFile, kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+  assert.equal(projectWorkflowState(kept).steps.only.units.u1.unitRunId, started.payload.unitRunId, 'a running unit carries its run id');
+  const attemptsBefore = fs.readdirSync(path.join(tmp, '.fgos', 'assignments', started.payload.unitRunId, 'producer', '1', 'runs'));
+
+  const resumed = await resumeWorkflow(id, { repoRoot: tmp, cwd: tmp });
+
+  assert.equal(resumed.status, 'completed');
+  assert.equal(resumed.steps.only.units.u1.unitRunId, started.payload.unitRunId, 'the same Unit run was continued');
+  assert.deepEqual(fs.readdirSync(path.join(tmp, '.fgos', 'assignments')).filter((d) => d.startsWith('unit-run-')), [started.payload.unitRunId], 'no second Unit run was created');
+  assert.deepEqual(
+    fs.readdirSync(path.join(tmp, '.fgos', 'assignments', started.payload.unitRunId, 'producer', '1', 'runs')),
+    attemptsBefore,
+    'the settled seat was not dispatched again',
+  );
+});
+
 test('status shows no log tail for a completed run', async () => {
   const tmp = setupTestRepo();
   const state = await startWorkflow({
