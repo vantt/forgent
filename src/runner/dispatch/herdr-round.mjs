@@ -488,6 +488,8 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     model,
     agentName,
     paneId: null,
+    // The herdr session the pane lives in, so a later reaper or recovery asks the right server.
+    herdrSession: null,
     // True only when this round wrote a trust entry, so teardown removes what it wrote and
     // never an entry a person vouched for.
     trustWritten: false,
@@ -496,7 +498,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     },
     fail(errorClass, reason, message, extra = {}) {
       return new DispatchError(errorClass, message, {
-        workId, tier, model, reason, runDir, agentName, paneId: round.paneId, ...extra,
+        workId, tier, model, reason, runDir, agentName, paneId: round.paneId, herdrSession: round.herdrSession, ...extra,
       });
     },
   };
@@ -1578,6 +1580,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // a different pane-id namespace) than an unconfined one -- HERDR_SESSION is
   // what `isolatedSessionEnv` sets it to, so it is what distinguishes them.
   const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
+  round.herdrSession = sessionKey;
   const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
 
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
@@ -1775,7 +1778,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         patchCommandRecord({
           runDir, launchCommandId: ctx.launchCommandId,
           controlEpoch: ctx.controlEpoch, controlToken: ctx.controlToken,
-          patch: { paneId: round.paneId },
+          patch: { paneId: round.paneId, herdrSession: round.herdrSession },
         });
       } catch {}
     }

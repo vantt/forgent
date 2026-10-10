@@ -1171,7 +1171,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     // in it) away in the finally below.
     if (err?.paneRetained === true && err.paneId) {
       for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
-        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId }) ?? [])); } catch { /* best effort */ }
+        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId, herdrSession: err.herdrSession }) ?? [])); } catch { /* best effort */ }
       }
       if (retainedHomes.length > 0) {
         err.retainedPrivateHomes = [...retainedHomes];

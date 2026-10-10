@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
+import { envForSession } from '../worker-session.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -69,12 +70,12 @@ export function ensurePrivateDir(dir, { root } = {}) {
  * home (and the login copy in it) must outlive the failed run. The reaper
  * reclaims it once the pane is gone.
  */
-export function markResourceRetained(dirPath, { paneId } = {}) {
+export function markResourceRetained(dirPath, { paneId, herdrSession } = {}) {
   const marker = readOwnershipMarker(dirPath);
   if (!marker || !paneId) return false;
   fs.writeFileSync(
     path.join(dirPath, OWNERSHIP_MARKER_FILE),
-    JSON.stringify({ ...marker, paneId: String(paneId), retainedAt: new Date().toISOString() }, null, 2),
+    JSON.stringify({ ...marker, paneId: String(paneId), ...(herdrSession ? { herdrSession: String(herdrSession) } : {}), retainedAt: new Date().toISOString() }, null, 2),
     { encoding: 'utf8', mode: 0o600 },
   );
   return true;
@@ -169,9 +170,14 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
 /** Whether a herdr pane is still open: true / false, or null when herdr
  * cannot be asked (not installed, no reachable session). Imported lazily so
  * this module stays free of the transport unless a retained home exists. */
-function defaultPaneOpen(paneId) {
+function defaultPaneOpen(paneId, herdrSession) {
   try {
-    const out = spawnSync('herdr', ['pane', 'list'], { encoding: 'utf8', timeout: 5000 });
+    // The server that owns the pane: the recorded session's, never whichever one this process's own
+    // environment happens to name. A marker without a session cannot be asked, so the expiry rule decides.
+    if (!herdrSession) return null;
+    const out = spawnSync(process.env.FGOS_HERDR_BIN?.trim() || 'herdr', ['pane', 'list'], {
+      encoding: 'utf8', timeout: 5000, env: envForSession(process.env, herdrSession),
+    });
     if (out.status !== 0) return null;
     const parsed = JSON.parse(out.stdout);
     const panes = parsed?.result?.panes ?? parsed?.panes ?? [];
@@ -262,7 +268,7 @@ export function reapOrphanedConfinementResources({
       // over an unanswerable pane check (`checkPaneOpen` -> null), so a
       // credential copy cannot outlive maxAgeMs just because herdr is away.
       if (marker.paneId) {
-        const open = checkPaneOpen(marker.paneId);
+        const open = checkPaneOpen(marker.paneId, marker.herdrSession);
         if (open === true || (open === null && !isExpired)) {
           skipped.push({ path: cand, reason: 'pane-still-open' });
           continue;

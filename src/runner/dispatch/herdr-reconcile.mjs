@@ -9,6 +9,7 @@ import { DispatchError } from './dispatch-error.mjs';
 import { interpretRunResult } from './run-result.mjs';
 import { getProcessStartTime } from './process-identity.mjs';
 import { createHerdrClient } from './herdr-agent.mjs';
+import { envForSession } from './worker-session.mjs';
 import {
   publishImmutableProof,
   publishMutableProjection,
@@ -210,7 +211,10 @@ export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBi
   // cycle (herdr-reconcile.mjs -> transport.mjs -> herdr-round.mjs ->
   // herdr-reconcile.mjs). The expression itself is the same one-liner.
   const resolvedHerdrBin = (herdrBin && herdrBin.trim()) || (env ?? process.env).FGOS_HERDR_BIN?.trim() || 'herdr';
-  const client = herdrClient ?? createHerdrClient({ herdrBin: resolvedHerdrBin, cwd, env });
+  // The pane lives in the session it was launched in, which is not necessarily the one this process's
+  // own environment names; a record written without a session keeps asking the ambient one.
+  const clientEnv = command.herdrSession ? envForSession(env ?? process.env, command.herdrSession) : env;
+  const client = herdrClient ?? createHerdrClient({ herdrBin: resolvedHerdrBin, cwd, env: clientEnv });
 
   try {
     const { agentStatus } = client.agentGet(paneId);

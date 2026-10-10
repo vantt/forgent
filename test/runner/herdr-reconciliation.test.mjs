@@ -1382,10 +1382,10 @@ test('22. verifyProcessEnvironment catches value overrides and injected addition
 // isHerdrSpawnRunStillWorking's own decision table -- it previously had none
 // beyond indirect integration coverage (flagged in Phase 8a's own report).
 
-function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId }) {
+function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId, herdrSession }) {
   const commandsDir = path.join(runDir, 'controller', 'commands');
   fs.mkdirSync(commandsDir, { recursive: true });
-  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId }));
+  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId, ...(herdrSession ? { herdrSession } : {}) }));
 }
 
 test('isHerdrSpawnRunStillWorking returns false when no controller/commands record exists at all', async () => {
@@ -1466,6 +1466,30 @@ test('isHerdrSpawnRunStillWorking fails closed to "unknown" when both agentGet a
       paneProcessInfo: () => { throw new Error('herdr_call_timeout'); },
     };
     assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrClient: brokenClient }), 'unknown');
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('recovery asks the herdr session the worker was launched in, not the ambient one', async () => {
+  const runDir = mkTempDir('fgos-herdr-session-recovery-');
+  try {
+    // A fake herdr that knows the worker only inside its own session.
+    const bin = path.join(runDir, 'fake-herdr.sh');
+    fs.writeFileSync(bin, `#!/bin/sh
+if [ "$HERDR_SESSION" = "fgos-worker" ]; then
+  echo '{"result":{"agent":{"agent_status":"working","pane_id":"wS:pTest"}}}'
+else
+  echo '{"error":{"code":"pane_not_found"}}'; exit 1
+fi
+`, { mode: 0o755 });
+    const ambient = { ...process.env, HERDR_SESSION: 'operator-cockpit' };
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest', herdrSession: 'fgos-worker' });
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), true, 'found through the recorded session');
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+    assert.notEqual(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), true, 'a record without a session keeps asking the ambient one');
   } finally {
     fs.rmSync(runDir, { recursive: true, force: true });
   }

@@ -570,7 +570,7 @@ export function prepareBwrapSync(plan, request, backend) {
     // The worker's pane was left open after a failed run: keep the homes, tag
     // them with the pane, and hand back where they are so the failure record
     // can say. They are reaped once the pane is gone.
-    const retain = ({ paneId } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId }));
+    const retain = ({ paneId, herdrSession } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId, herdrSession }));
 
     return {
       invocation: preparedInvocation,

@@ -1099,6 +1099,8 @@ lại. Cleanup failure không được biến execution chưa rõ thành thành 
 không được che mất execution result đã có. Nếu Authority crash sau khi prepare,
 run record giữ phase cuối cùng và reaper xử lý resource chưa dọn.
 
+Reaper và recovery hỏi đúng herdr session mà worker được khởi chạy trong đó: bản ghi launch command và ownership marker của home được giữ lại mang `herdrSession` (socket suy ra từ tên, không lưu), `reconcile` dựng client theo session đó, reaper dùng `FGOS_HERDR_BIN` và cùng session; marker không có session thì trạng thái pane là không rõ và quy tắc hết hạn quyết định.
+
 Với profile remote/container detached, Authority cấp resource identity và ghi allocation intent bền vững trước mỗi
 side effect prepare; driver tạo theo identity đó một cách idempotent. Journal
 ghi dispatch id, backend snapshot reference, resource locator, lease/execution
