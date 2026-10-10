@@ -6,7 +6,7 @@ Session counter: 1
 Step: first content batch, Agent Coordination; liveness-first section rework
 State: ready for the limited independent liveness re-review; batch not closed
 Blocker: committed independent verdicts are required for the changed versions; no author self-approval or next content batch.
-Last green conservation commit: 6df71985bf87b30a7a865e31f22c37ec22a8c8c8 (full/scoped D twice each against both prior registries, zero fatal findings; whole-area-verification.json)
+Last green conservation commit: 562fbd22b (fresh native refresh/projection, full and scoped D twice each against both prior registries, zero fatal; liveness-rework-postcommit.json)
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: d98a5c5e75e4529cd99dd9c8bce95a0032806d95 (imports main 90a4fb27c8e43fca9e73714f1c3f235e832ce38a under A12)
 Main at sync: 90a4fb27c8e43fca9e73714f1c3f235e832ce38a
@@ -243,3 +243,5 @@ Preservation/isolation: all 74 previously contained historical inputs remain byt
 Limited re-review scope: 38 changed area documents; 1,298 pending source rows in eight native unseeded packs; 1,139 rebound retired rows plus 35 newly retired identities; 1,615 pending full shown-text classification receipts (including two substantive history-payload relabels); 71 changed identical-unit member sets. The four inherited payload retirements retain their earlier committed classification, unchanged bytes and successor anchors; they are not new retirements. Scan/classification covers all 68 input files and 997 slices over 569 live textual inputs. The area now retains 41 current surviving/design files, not an almost-empty current area; proposed schemas and manual cognitive guidance are not blanket shipped-runtime claims.
 
 Ready-for-review request: review-request-2-liveness-rework.md. Reviewer reads every changed judgment and full shown unit, checks current statements against pinned code/behaviour, spot-checks 100 independently random remaining script-proven exact rows, runs both-prior gates and commits independent ordinary reports. No seed/sensitivity requirement is restored for this batch. Exact commands/results and scope lists are in liveness-rework-verification.json. Strict closure, independent acceptance and batch/Phase 6 completion remain UNPROVEN. Stop here; no next batch, push, PR, merge or ship.
+
+Committed handoff: 562fbd22b contains the single limited request, eight native packs/sidecars, final classification/current-member lists, proof and owner queue. Post-commit native refresh/projection reproduces all four zero-fatal D results. Both strict E commands reproduce exactly the three documented diagnostics (1,298 / 342 / 756), with no additional finding type. Author stops at the required independent review point.
