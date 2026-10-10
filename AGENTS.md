@@ -47,6 +47,7 @@ dormant ones deleted), and read the area spec's "Lịch sử quyết định" an
 sections. A plan's facts phase answers "what existed before, and which change removed it,
 and was that intended?" next to its questions about current code. Reuse or extend what is
 found; say in the plan what was reused and what was missing.
+**Convention paths.** For report, plan, and journal names and locations—including paths placed in briefs for other agents—use `fgos convention name|path --json`, never construct them; parallel agents MUST choose distinct slugs, and pre-commit `convention check` warnings do not block commits.
 
 ## Definition of done (platform-foundations L5)
 
