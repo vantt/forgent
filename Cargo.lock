@@ -108,6 +108,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-convention"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "libc",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "fgos-distribution"
 version = "0.1.0"
 dependencies = [

@@ -6,6 +6,7 @@ members = [
     "packages/distribution/rust",
     "packages/work-state/rust",
     "packages/observe/rust",
+    "packages/convention/rust",
     "packages/run-result/rust",
     "packages/herdr-fgos-common/rust",
 ]
