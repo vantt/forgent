@@ -38,9 +38,9 @@ n = 1 per question and per row; one judge; adjacent scores (8 vs 9, 9 vs 9) are 
 
 ## Decision
 
-Stop here. The score moved, so personas + restate were worth shipping; no row lags badly enough to justify cross-exam, tally or an outcome ledger. The one lagging row is decision clarity in the split-first synthesizer (1 of 2 on Q1, Q2); that is prose in the synthesizer instruction, not a runtime seam, and one run per question does not justify rewriting it. Open item, separate from this plan: declare `stanceOptions` in `council-lite` so Observe can measure agreement; until then do not claim an Observe result.
+Stop here. The score moved, so personas + restate were worth shipping; no row lags badly enough to justify cross-exam, tally or an outcome ledger. The one lagging row is decision clarity in the split-first synthesizer (1 of 2 on Q1, Q2); that is prose in the synthesizer instruction, not a runtime seam, and one run per question does not justify rewriting it. Stance options are question-local: they are supplied per run as `params.stanceOptions` (or a template `stanceOptions`; `src/workflow/definition.mjs`, `src/workflow/runner.mjs`, `src/runner/execution/patterns/role-tasks.mjs`), and no run in this re-measure passed them, so Observe shows `unmeasured`. A fixed list inside `council-lite` would not fit arbitrary questions, so none is declared. When agreement should be measured, pass `params.stanceOptions` with the question. The acceptance row "stance + agreement for every run" stays unmet for the 2026-10-10 runs; do not claim an Observe result for them.
 
 ## Unresolved
 
 - Whether the decision-clarity dip repeats on more questions.
-- Whether `stanceOptions` can be declared without changing the seat output contract.
+- Stance measurement was not exercised: no run passed `params.stanceOptions`, so whether seats report a usable stance and agreement under `council-lite` is untested.

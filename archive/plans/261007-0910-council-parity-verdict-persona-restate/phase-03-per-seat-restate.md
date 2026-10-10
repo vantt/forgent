@@ -26,9 +26,9 @@ Catch "answering the wrong question" at the cheapest step: each seat first resta
 3. Record the extra output length and time versus before.
 
 ## Success Criteria
-- [ ] Restate appears in every seat report on a real run.
-- [ ] A mismatch case shows up in the synthesizer's unresolved list.
-- [ ] No added Workflow step, Unit or runtime change.
+- [x] Restate appears in every seat report on a real run (restate run, [evidence](reports/lens-personas-evidence.md)).
+- [x] A mismatch case shows up in the synthesizer's unresolved list (same run: two framing mismatches listed first).
+- [x] No added Workflow step, Unit or runtime change.
 
 ## Risk Assessment
 Restatements can all be near-identical paraphrases (no signal). Then drop the instruction and say so; do not make it a gate.
