@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A failed round that has to close its herdr pane (a detected tamper, or a failure after the worker was already live) now keeps the last screen lines in the failure record as `screen`, instead of losing them with the pane.
 - Release packages and npm tarballs no longer carry `.agents/hooks.json`: that file is written by `fgos setup` with the absolute paths of the machine that ran it, so shipping it could hand another machine hook commands that exit 127. The payload now declares `.agents/skills` instead of the whole `.agents` directory.
 - A mutating assignment whose worker settled with a `findings` verdict now stops with the reason `assignment-<operation>-findings` instead of `-insufficient-confidence`, which read as missing evidence. It still stops.
 - `fgos dispatch reconcile provider-capacity quarantine --provider <p> --account <id> --until <ISO> --reason "<why>"` lets the owner take an exhausted account out of selection until a given time (clear stays `clear-quarantine`). A codex usage-limit message that names a clock time ("try again at 6:02 PM") now sets the quarantine end to that time instead of the one-hour default.

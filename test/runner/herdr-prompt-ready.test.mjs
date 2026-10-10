@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { awaitPromptReady, refuseBriefIntoUnreadyPane } from '../../src/runner/dispatch/herdr-round.mjs';
+import { awaitPromptReady, cleanupAndKeepScreen, refuseBriefIntoUnreadyPane } from '../../src/runner/dispatch/herdr-round.mjs';
 
 const idle = { state: 'idle', visibleBlocker: false, visibleIdle: false, visibleWorking: false, matchedRule: null, promptText: '' };
 
@@ -110,4 +110,34 @@ test('ready, unverified and no-detector panes are briefed as before', () => {
   for (const readiness of ['ready', 'unverified', 'no-detector']) {
     assert.doesNotThrow(() => refuseBriefIntoUnreadyPane({ client: {}, round: roundStub(), readiness }));
   }
+});
+
+// A pid no process can have, so the kill the close path attempts is a harmless no-op.
+const LIVE_WORKER = { shellPid: 1, foregroundProcesses: [{ pid: 2147483646 }] };
+
+test('a failure that closes the pane keeps the last screen lines in the failure record', () => {
+  const closed = [];
+  const client = {
+    agentRead: () => 'header\nrate limit reached\n\n',
+    paneProcessInfo: () => LIVE_WORKER,
+    paneClose: (id) => closed.push(id),
+  };
+  const err = new Error('brief failed');
+  cleanupAndKeepScreen(client, roundStub(), err);
+  assert.deepEqual(closed, ['p-1']);
+  assert.equal(err.screen, 'rate limit reached');
+});
+
+test('a screen that cannot be read does not change how the pane is closed or the failure', () => {
+  const closed = [];
+  const client = {
+    agentRead: () => { throw new Error('herdr gone'); },
+    paneProcessInfo: () => LIVE_WORKER,
+    paneClose: (id) => closed.push(id),
+  };
+  const err = new Error('brief failed');
+  cleanupAndKeepScreen(client, roundStub(), err);
+  assert.deepEqual(closed, ['p-1']);
+  assert.equal(err.screen, undefined);
+  assert.equal(err.message, 'brief failed');
 });
