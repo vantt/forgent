@@ -1,0 +1,809 @@
+{
+  "version": 1,
+  "status": "authoring-native-accounting",
+  "authorizationCommit": "8af99d966",
+  "passStartCommit": "98427bec47a55aef64223c19e3f4f4fa293e67a6",
+  "priorAuthorSnapshot": "4add5ba7112a1792698e8a41a9c39b3f28eb438a",
+  "inheritedCorrections": [
+    {
+      "claimId": "claim_a5d7cd08266654056f95caaca04e2e7b",
+      "before": {
+        "claimId": "claim_a5d7cd08266654056f95caaca04e2e7b",
+        "sourcePath": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "sourceAnchor": "unheaded-block-18",
+        "sourceUnitDigest": "7e89be501e0db9edb0e49a5712a6e5d9f169db353ec4b9560e30b3d09410cb6e",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "targetAnchor": "unheaded-block-17",
+        "targetUnitDigest": "7e89be501e0db9edb0e49a5712a6e5d9f169db353ec4b9560e30b3d09410cb6e",
+        "shownTargetDigest": "7e89be501e0db9edb0e49a5712a6e5d9f169db353ec4b9560e30b3d09410cb6e",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "Unresolved pre-existing retired binding exposed by the authorized ordinal rebind. The old source witness, identity and historical carriage remain pinned, but the stored target proof does not match the actual target at pass start 98427bec4. No current target correctness or approval is asserted. Correct semantic retargeting and a carriage-label correction require the owner scope decision before an independent targeted check.",
+        "shownSourceText": "Domains and organizations may add knowledge, doctrine, Skills, declared\nprotocols, planning validators, resource/isolation analysis, evidence policy,\nroles, souls, and quality criteria. The foundation introduces a shared extension\nseam only after at least two unlike consumers prove the common responsibility.",
+        "shownSourceDigest": "7e89be501e0db9edb0e49a5712a6e5d9f169db353ec4b9560e30b3d09410cb6e",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "reviewNote": "Native rebind refuses the stored proof that was already stale at committed pass start 98427bec4. Pending owner scope decision; no current counterpart or approval is asserted.",
+        "targetAncestry": [
+          "Coordination Protocol Model",
+          "Domain Augmentation"
+        ]
+      },
+      "after": {
+        "claimId": "claim_a5d7cd08266654056f95caaca04e2e7b",
+        "sourcePath": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "sourceAnchor": "unheaded-block-18",
+        "sourceUnitDigest": "7e89be501e0db9edb0e49a5712a6e5d9f169db353ec4b9560e30b3d09410cb6e",
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "targetAnchor": "unheaded-block-18",
+        "targetUnitDigest": "55cb6ba79e492af45076c573cbd3a10cbe633ce0684f83856244121df23a3800",
+        "shownTargetDigest": "55cb6ba79e492af45076c573cbd3a10cbe633ce0684f83856244121df23a3800",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "Supersede the complete older domain-extension unit with its real current Domain Augmentation counterpart. The source names declared protocols; current text instead names Workflow definitions/operations and domain harnesses, preserving the full extension subjects and two-unlike-consumers foundation-seam condition while correcting the changed claim-bearing term. A24 authorizes this inherited label/binding correction. No structural-only move or byte-identical carry is asserted; source witness and identity remain pinned, and the whole replacement is pending independent review.",
+        "shownSourceText": "Domains and organizations may add knowledge, doctrine, Skills, declared\nprotocols, planning validators, resource/isolation analysis, evidence policy,\nroles, souls, and quality criteria. The foundation introduces a shared extension\nseam only after at least two unlike consumers prove the common responsibility.",
+        "shownSourceDigest": "7e89be501e0db9edb0e49a5712a6e5d9f169db353ec4b9560e30b3d09410cb6e",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "reviewNote": "A24 corrects the inherited binding and changed claim-bearing words; pending independent whole-unit verification, no approval carried.",
+        "targetAncestry": [
+          "Coordination Protocol Model",
+          "Domain Augmentation"
+        ]
+      },
+      "currentUnit": {
+        "anchor": "unheaded-block-18",
+        "textDigest": "55cb6ba79e492af45076c573cbd3a10cbe633ce0684f83856244121df23a3800",
+        "ancestry": [
+          "Coordination Protocol Model",
+          "Domain Augmentation"
+        ],
+        "text": "Domains and organizations may add knowledge, doctrine, Skills, declared\nWorkflow definitions/operations and domain harnesses, planning validators,\nresource/isolation analysis, evidence policy, roles, souls and quality criteria.\nThe foundation introduces a shared extension seam only after at least two unlike\nconsumers prove the common responsibility."
+      }
+    },
+    {
+      "claimId": "claim_63156a6026de7a0ff7fbad44aa1b4281",
+      "before": {
+        "claimId": "claim_63156a6026de7a0ff7fbad44aa1b4281",
+        "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "sourceAnchor": "unheaded-block-34",
+        "sourceUnitDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+        "claimKind": "contract",
+        "disposition": "move",
+        "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "targetAnchor": "unheaded-block-35",
+        "targetUnitDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+        "shownTargetDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "Unresolved pre-existing retired binding exposed by the authorized ordinal rebind. The old source witness, identity and historical carriage remain pinned, but the stored target proof does not match the actual target at pass start 98427bec4. No current target correctness or approval is asserted. Correct semantic retargeting and a carriage-label correction require the owner scope decision before an independent targeted check.",
+        "shownSourceText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |",
+        "shownSourceDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "reviewNote": "Native rebind refuses the stored proof that was already stale at committed pass start 98427bec4. Pending owner scope decision; no current counterpart or approval is asserted.",
+        "targetAncestry": [
+          "Team Communication Protocol V1",
+          "8. RunResult Confidence"
+        ]
+      },
+      "after": {
+        "claimId": "claim_63156a6026de7a0ff7fbad44aa1b4281",
+        "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "sourceAnchor": "unheaded-block-34",
+        "sourceUnitDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "targetAnchor": "unheaded-block-38",
+        "targetUnitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+        "shownTargetDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "Supersede the complete older confidence-ladder unit with the real current confidence table, not its introductory sentence. All five confidence classes are addressed in the replacement; the reported row and failed row now state the accepted blocked/read-only/findings branches, their evidence and separate status boundaries against run-result.mjs:1250-1285. Those claim-bearing corrections replace the old unconditional reported/explicit-failure statements; they are not a structural-only move. A24 authorizes this inherited semantic retarget and label correction. Source witness and identity remain pinned; no approval carries, and whole-unit replacement remains pending independent review.",
+        "shownSourceText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |",
+        "shownSourceDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "reviewNote": "A24 corrects the inherited binding and changed claim-bearing words; pending independent whole-unit verification, no approval carried.",
+        "targetAncestry": [
+          "Team Communication Protocol V1",
+          "8. RunResult Confidence"
+        ]
+      },
+      "currentUnit": {
+        "anchor": "unheaded-block-38",
+        "textDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+        "ancestry": [
+          "Team Communication Protocol V1",
+          "8. RunResult Confidence"
+        ],
+        "text": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed findings verdict with a report and exit 0 (`run-result.mjs:1261-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |"
+      }
+    }
+  ],
+  "scope": {
+    "authorizedRelabels": [
+      "claim_66366a2de3e810733eaaf6905e57628b",
+      "claim_432d7c4b1684e3d11aade76846dc2193",
+      "claim_11d149c1655503f91604b77b40e6a381",
+      "claim_5eef231348dcdc9566a29285fce97d59",
+      "claim_9431e63ec3fc3f89927e22abc8f14a91",
+      "claim_c0ec44efc62ae8bbbf2c114f387739f5",
+      "claim_1838df5e7c81c1fa79b336008e3b94bd",
+      "claim_1c155ab462849e3ec4136ee9fa08a218",
+      "claim_fb0f85ad508f7f857ba4c0963879790a",
+      "claim_234cfe4ee6319f76a699a920567daac2",
+      "claim_8c81cb12fcc0ff0408e9b5bb594cb1dc",
+      "claim_a3c5dcace145e25b55eeb9dca7a8221e",
+      "claim_d1ce767a2e3239b22d2e9fc6649dd9a5",
+      "claim_2ff575998d2ae90d5ecc1a2d414d078d",
+      "claim_d283a70392cc071ee19d103f77228841",
+      "claim_0a52ec5fcc2abb5870b350b23451da43",
+      "claim_e415506235b575bc5eb32b225a758f5b",
+      "claim_d245d70ae94106a208d95b6bfa6b6152",
+      "claim_f0b558c805f1b274d2df72fb6083acfb",
+      "claim_ab8a87d8a586e83cc0df72070e1c438f",
+      "claim_29768201e6d5a5c215e3a7e4a25873c3",
+      "claim_3bffcfe4496d0fec611c2d4cdfbf9149",
+      "claim_f07d01d9479baf2c23835b14f4038768",
+      "claim_15cac2a9bbfbbffc9af1c2dc16b5415a",
+      "claim_742532532aa9e696db78cb285b8b2178"
+    ],
+    "authorizedBindings": [
+      {
+        "claimId": "claim_1838df5e7c81c1fa79b336008e3b94bd",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_50cc0ff73dabd1642950365f358125c2",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_1c155ab462849e3ec4136ee9fa08a218",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_34284834ad2dd8f5a0fc5a924b8196a5",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_b602d530010f3b2f66ef5485bbff5bcb",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_c37da632abaadd051eff58492f71c8c7",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_c52e0d7342545a9365e507c17a99e946",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_f4f513bfd7ca5fd9708005243a624f95",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_b165c6ca3702ce5335599867e447ae55",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_8b6511ceef7788eaaecfbe1c17de0ccf",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_033a7b790516e8618c276525412173f8",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_6ed12fe83f43ad052bbcde7a88beee1d",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_312c758a5236381993df5c20d5827ec8",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_9431e63ec3fc3f89927e22abc8f14a91",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_7c56791bc2955ef63687b7134d2cd053",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_901dae1b8039d130359712125f4d69f9",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_37887f05ca0822cd7c415eaadda42c55",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_3d5dc31cf6cf90ba661de6bb1fafb486",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_57f26b5acbd6bb500ca353f84f486488",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_78524c36c6f57c543377be47620d748c",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_242208b542d4bb24c84796f43f775d4a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_88cf23510b37d2048b1a578efc2ebb10",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_abb60eb206ce120877cc9c06f826ab57",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_a6f71d465ebccd696428b94ff6f664af",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_6b4789439adfb6eb3b05c85b7ed8f7e0",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_8b79ab2d01c7ce85912eb9f0a25bf3ea",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_e16b56644d520a0fe0a4cd6b40c2459a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_a86887b78fbc23319db13f3bf4816dd8",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_fad0d749adc5ef611ee344c16b7c661e",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_d277029b4e3a80bc6eb3c33a7990b182",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_194da7d0a9b40e6ba93d40df2b58eaec",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_f35f68bb3feae40702d02c97d02cea0b",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_06019161f3eadb87a1a6fe714da0d8e6",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_9e039b5f6acdd3eb0fa002d35c2a3f54",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_6ce1d10cc50a8bd04bd82b4b65486125",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_f7388f36e2422375b8acf615e169e8c3",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_f0435011b158171bddbfd8053eb545be",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_00e1cb91d634a22b72c2256909cd407d",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_aca867e065269cdc1b7bff0124e41415",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_7e18dccb4fe896af8b83a2b5de4c266f",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_2ff575998d2ae90d5ecc1a2d414d078d",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_d283a70392cc071ee19d103f77228841",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_bf85c9cf436ce088c700c256f10da53f",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_0a52ec5fcc2abb5870b350b23451da43",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_4b3088ee72a27223da73fe4c6a014636",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_c4de8768ad9142c80e9ded5358a1704a",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_15cac2a9bbfbbffc9af1c2dc16b5415a",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_2bb820a8ff1c1a570b53e7c159213ba2",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_742532532aa9e696db78cb285b8b2178",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_84b7cd3e67c87c553e30f60243f2aaa9",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_91283c9936f0e12201b89acc09109179",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_3b5dc416320d1a6d45c254067dcb819d",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_cc49bf43e6fe30f0fb858e49ddd7ae81",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_377b337b7f62374e0380bde37a235300",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_78aa83e3a51cd866a2ac2bede23cbeb9",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_9a9308ce7c8e42934677d8cb5eabe705",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_f34be39fff111922b3bcfdececd9cbf5",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_0d2ea8d781366940476e413ce92981e3",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_7db5dc11f77d14fd3727322fc55d3f93",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_c57b759ed7febdde453483cdaa751b47",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_d9b5b1e4e476d7f6ef0b7d48d006e733",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_01076329b1d1de03c55e36f8f6083888",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_706f2bd1b37418db859990fb08c94d7c",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_b1ac27062ecb3e38aa015468ddde00f3",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_f5547cd37d69dfb14b002eefc64466ab",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_6f97739eb139794268dacb8d60dde14e",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_fa6023902614373a29e9bd46d7ffdee5",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_fac890b2535c30ea85082981768e751f",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_2b93e5dd494194b949188f9b77ceae8a",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_2898e0b9ca684155967180fa0230b8ae",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_69b011aac8a371496f54e1c681286bfd",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
+        "location": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      }
+    ],
+    "classificationInvalidations": [
+      {
+        "claimId": "claim_c70a8a1ffd7d36e49b31d6296cc31356",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_c26b6c8149e0b5bc78dab2b6e1fb6e0a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_aa0e400354f9f0b2a32e90249880fa78",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_d04f3528ac32bc6a0a67ecc6153e7879",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_241d8e8d42387c28dc30179f1bad66cb",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_78039339074d6cb799f0cc05212bc1b2",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_75b676acfa47fb48346fdb41a14eb88b",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_ad21fc833125360407f6b23ca8a6d951",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_3917668d815f67336de99ba9a7f2e81a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_4206c1d35ff143014142819046d69771",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_ad392d3c304da7625a3e2f75aa0753e6",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_a0dbbb8526785c8cf1c8bc658d6d38b5",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_747e62e56c75416974d865f34776dc1b",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_ba5969519e30f006a6eb0174c94d49b9",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_90f9d9a811588a6b3372cc53001045e1",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_36b0160e2c6b33c6b3b6958486805043",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_442970a9228617f16af5de16883fad2d",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "changed-shown-text-or-ancestry"
+      },
+      {
+        "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_03e3bf1a24b5712d6df990d5af622dcd",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_97229569942e2e64f1f92b89a23bd513",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_1c7027aa91b45aed495eaff739ad27a5",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_1fa64800fce6ec3602dc783078b1daef",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_9ccb2418b7aec6f7f91493359b13f7cb",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_223b98d1f2a5e3b6828b08b8e4370931",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_f842daa15a1440ce53c57b28b577a61d",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_80dd38236997a4794fe26e44e1dcfcad",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_19eb3db5e5020a16b00678f6a1912c64",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_94f214f5722011ac862fa96484a2e26a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_e47495f1bcf3abc217aa128346ffe56b",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_988e3a8a6c0362f62381f07d896adee4",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_f97e179a706fe5ce55a5ce146e23fb59",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_b80a6e9ecbbe65bdc1b568c9635c76fe",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_a3282845dc3dfd02de60631741d5f4fa",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_c5d72d517bde5f2eadf2afee05649af7",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_5906c3d46cacca0ac1ad8aae963a8304",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_1ab27a36fa860ce8e0ed9c1b5911979e",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_d0a734e0e2ffe167a8576cd898e4279d",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      },
+      {
+        "claimId": "claim_8de909df847b8689807abcfe156b704a",
+        "location": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "reason": "unique-native-digest-equal-ancestry-ordinal"
+      }
+    ],
+    "changedSections": [
+      {
+        "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+        "anchor": "component-internal-ownership"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "anchor": "2-production-ladder-semantics"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+        "anchor": "6-local-concurrency-and-durability"
+      },
+      {
+        "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+        "anchor": "decision"
+      },
+      {
+        "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+        "anchor": "compatibility"
+      },
+      {
+        "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+        "anchor": "7-agent-result-schema"
+      }
+    ]
+  },
+  "limits": [
+    "No prose, carriage path, history, gate/checker/baseline/vocabulary change",
+    "All changed bindings and labels pending independent review; no approval carry"
+  ],
+  "remaining": "Frozen refresh, genuine receipt/retired-successor derivation, separate D/E prior-registry proofs, final ordinary targeted packets"
+}
