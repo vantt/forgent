@@ -82,6 +82,21 @@ result: poll `fgos workflow status <workflowRunId>` (section 3) until the run is
 or parked at a gate. `answer` and `resume` return the same way (`answer` records the answer first,
 then the advance continues detached). Pass `--foreground` only when the caller must wait in place.
 
+### Stance options (so Observe can measure agreement)
+
+When the question has 2-4 discrete candidate answers, pass them at launch:
+
+```bash
+fgos workflow start nominal-group --stance-options "<a>|<b>|<c>"
+```
+
+- Labels are the candidate decisions, not seat names; they must be mutually exclusive
+  (`other` is added automatically) and fixed before any seat output is seen.
+- Each panelist then ends its report with a stance choice and confidence; read agreement
+  with `fgos metrics discussions`.
+- Open-ended question: omit the flag and expect `measurement: unmeasured`. Do not invent
+  options just to get a number. The measurement never changes pass/fail.
+
 The Workflow Runner parses the YAML definition, resolves unit capability bindings
 via `src/runner/execution/bind.mjs`, and executes steps sequentially or in parallel
 according to declared DAG dependencies (`dependsOn`).
