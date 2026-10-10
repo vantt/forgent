@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Absolute shim path in codex and agy hook commands"
-status: pending
+status: done
 budget: "<= 40 added src lines; 0 new files; no durable state"
 stop: 2026-10-14
 ---

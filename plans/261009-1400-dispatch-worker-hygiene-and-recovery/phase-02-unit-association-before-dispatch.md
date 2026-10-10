@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Unit association before dispatch"
-status: pending
+status: done
 budget: "<= 50 added src lines; 0 new files; one new event type unit.started in the existing workflow journal"
 stop: 2026-10-11
 ---

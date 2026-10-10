@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Owner-set quarantine and reset date"
-status: pending
+status: done
 budget: "<= 60 added src lines; 0 new files; no new state (reuses quarantine record)"
 stop: 2026-10-14
 ---
