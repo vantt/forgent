@@ -1,12 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveHostBin, invokeHost } from '../../src/util/host-bin.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const BUILT_HOST = path.join(REPO_ROOT, 'target', 'debug', 'fgos');
+const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(REPO_ROOT, 'target', 'debug', 'fgos');
 
 test('resolveHostBin prioritizes process.env.FGOS_HOST_BIN', () => {
   const original = process.env.FGOS_HOST_BIN;
@@ -109,5 +111,63 @@ test('invokeHost passes 64 KB payload with newlines and brackets through stdin i
     } else {
       delete process.env.FGOS_HOST_BIN;
     }
+  }
+});
+
+test('invokeHost recognizes only supported old-host diagnostics', {
+  skip: process.platform === 'win32',
+}, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-host-bin-old-'));
+  const host = path.join(root, 'fgos');
+  const original = process.env.FGOS_HOST_BIN;
+  try {
+    fs.writeFileSync(host, '#!/bin/sh\nprintf \'%s\\n\' \'fgos: unknown verb "convention". Usage: fgos <command> [args...]\' >&2\nexit 4\n', { mode: 0o755 });
+    process.env.FGOS_HOST_BIN = host;
+    assert.throws(
+      () => invokeHost(['convention', 'check', '--all'], { dir: root }),
+      (error) => error.code === 'host-version-mismatch' && error.status === 4,
+    );
+
+    fs.writeFileSync(host, '#!/bin/sh\nprintf \'%s\\n\' \'fgos: unknown convention subcommand "wat"\' >&2\nexit 4\n', { mode: 0o755 });
+    assert.throws(
+      () => invokeHost(['convention', 'wat'], { dir: root }),
+      (error) => error.code === 'host-exec-error' && error.status === 4,
+    );
+
+    fs.writeFileSync(host, '#!/bin/sh\nprintf \'%s\\n\' \'fgos: unknown metrics subcommand "coverage". Available: ping\' >&2\nexit 4\n', { mode: 0o755 });
+    assert.throws(
+      () => invokeHost(['metrics', 'coverage'], { dir: root }),
+      (error) => error.code === 'host-version-mismatch' && error.status === 4,
+    );
+
+    fs.writeFileSync(host, '#!/bin/sh\nprintf \'%s\\n\' \'{}\'\n', { mode: 0o755 });
+    assert.throws(
+      () => invokeHost(['convention', 'check', '--all'], { dir: root }),
+      (error) => error.code === 'host-invalid-envelope',
+    );
+  } finally {
+    if (original === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = original;
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('invokeHost bounds a hung host at five seconds', {
+  skip: process.platform === 'win32',
+}, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-host-bin-timeout-'));
+  const host = path.join(root, 'fgos');
+  const original = process.env.FGOS_HOST_BIN;
+  try {
+    fs.writeFileSync(host, '#!/bin/sh\nexec sleep 10\n', { mode: 0o755 });
+    process.env.FGOS_HOST_BIN = host;
+    assert.throws(
+      () => invokeHost(['convention', 'check', '--all'], { dir: root }),
+      (error) => error.code === 'host-exec-error' && error.timedOut === true,
+    );
+  } finally {
+    if (original === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = original;
+    fs.rmSync(root, { recursive: true, force: true });
   }
 });
