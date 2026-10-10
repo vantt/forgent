@@ -80280,6 +80280,68 @@
       "rationale": "Standing A13 main-side source-identity accounting: main a8b3ab38083904ba5249246a8191befbf1f0e4be and a48548ca26839eff0c0f0087297c204f5ec46bd1 revise the private-home trust and process-local approval explanation. The former three-item recipe at unheaded-block-139 is superseded by the current three-item recipe at unheaded-block-140, retaining resourceBindings and credential inventory/provisioning while correcting the trust detail. This is a pending identity successor for the owning confinement-spec batch, not another Agent Coordination truth fix or approval; no legacy text is edited.",
       "owningBatch": "specs-confinement-authority",
       "nextIndependentReview": "the next review of the owning specs batch (not closed); excluded from the 21-section/49-row Agent Coordination targeted check"
+    },
+    {
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "unitDigest": "b4284e94a8a25e0b29237dafd7c65ffe95f6e422aa6682663fdd36e5346f885e",
+      "identityFingerprint": "b4284e94a8a25e0b29237dafd7c65ffe95f6e422aa6682663fdd36e5346f885e",
+      "claimId": "claim_69b011aac8a371496f54e1c681286bfd",
+      "sourceAnchor": "unheaded-block-32",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "eb3336c5f0bc349a94bf04af7437d8fd2eefcf6e62208fe4a904b90187900a96",
+      "claimKind": "contract",
+      "status": "removed-pending-disposition",
+      "priorStatus": "future",
+      "retiredAtCommit": "f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f",
+      "retiredReason": "no counterpart in current source",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetUnitDigest": "4e1c2461b173b04586958e31079f42f54ec11bf937385817b3c4d55eb289ff18",
+      "targetAncestry": [
+        "Team Communication Protocol V1",
+        "7. Agent Result Schema"
+      ],
+      "shownTargetDigest": "4e1c2461b173b04586958e31079f42f54ec11bf937385817b3c4d55eb289ff18",
+      "sourceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "shownSourceText": "| Status | Required fields |\n|---|---|\n| `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |\n| `blocked` | `summary`; `blocker`; `evidenceRefs` when any evidence exists. |\n| `failed` | `summary`; `error`. |\n| `no-evidence` | `summary`; reason why evidence is absent. |",
+      "shownSourceDigest": "eb3336c5f0bc349a94bf04af7437d8fd2eefcf6e62208fe4a904b90187900a96",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "Pending successor accounting under A13 shape and the explicit A22 authorization: the authorized section correction in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f replaces the former unit with this code-checked counterpart. Every claim remains accounted; unchanged whole-source historical carriage retains the old text. Source/target shown texts and native digests are pinned; independent targeted review is required with no approval carry.",
+      "owningBatch": "agent-coordination",
+      "nextIndependentReview": "the targeted truth-fix check after A22"
+    },
+    {
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "unitDigest": "940b2605f5c56c53fec6ec4b6f5ac1f0e49706f308915bca88cde529ba7b7a95",
+      "identityFingerprint": "940b2605f5c56c53fec6ec4b6f5ac1f0e49706f308915bca88cde529ba7b7a95",
+      "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
+      "sourceAnchor": "unheaded-block-35",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+      "claimKind": "contract",
+      "status": "removed-pending-disposition",
+      "priorStatus": "future",
+      "retiredAtCommit": "f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f",
+      "retiredReason": "no counterpart in current source",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "targetAncestry": [
+        "Team Communication Protocol V1",
+        "8. RunResult Confidence"
+      ],
+      "shownTargetDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "sourceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "shownSourceText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |",
+      "shownSourceDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "Pending successor accounting under A13 shape and the explicit A22 authorization: the authorized section correction in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f replaces the former unit with this code-checked counterpart. Every claim remains accounted; unchanged whole-source historical carriage retains the old text. Source/target shown texts and native digests are pinned; independent targeted review is required with no approval carry.",
+      "owningBatch": "agent-coordination",
+      "nextIndependentReview": "the targeted truth-fix check after A22"
     }
   ]
 }

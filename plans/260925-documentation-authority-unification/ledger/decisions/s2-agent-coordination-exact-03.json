@@ -5306,46 +5306,36 @@
       "sourceUnitDigest": "34555a0470d333a0fdb8cb90fe3ec86b1b995f7eaeadb4045a94fe923af517f8",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-63 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-64. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-63 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-64. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-63",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-63 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-64: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "34555a0470d333a0fdb8cb90fe3ec86b1b995f7eaeadb4045a94fe923af517f8",
+      "reviewStatus": "pending",
+      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "targetUnitDigest": "1fbaaf88c36de2e7e4edd84567ee5fe71382be4b94cd04f3d9ad0f7b7e38994d",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_5eef231348dcdc9566a29285fce97d59",
       "sourceUnitDigest": "d21190bae4555d4ffb7422c076dc0aae42515ab18733c6e8d9206e97565bbca3",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-64 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-65. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-64 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-65. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-64",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-64 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-65: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d21190bae4555d4ffb7422c076dc0aae42515ab18733c6e8d9206e97565bbca3",
+      "reviewStatus": "pending",
+      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "targetUnitDigest": "02ee7e3e7835a160002d151febae81ba521e7a0346444890f38df54bdbf0cdaa",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_38aac4df7d285fdf53ffb4b24a909a4b",
@@ -6197,67 +6187,6 @@
     }
   ],
   "exact": [
-    {
-      "source": "docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
-      "target": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
-      "rows": [
-        {
-          "claimId": "claim_2c1c075bf865ad25f689a7bcff5a5ae1",
-          "sourceUnitDigest": "67a8be5b427b86807834a9edfc17c20003fea3d9d9356270c344795a581599ce",
-          "targetUnitDigest": "67a8be5b427b86807834a9edfc17c20003fea3d9d9356270c344795a581599ce"
-        },
-        {
-          "claimId": "claim_76d46bb8fbb8b5a54c06eb7f5ec5a6d5",
-          "sourceUnitDigest": "07630b5f84f01fd73770ef64cbdef5e9cb80ca1d05f2b9d72a8bf09a61a75059",
-          "targetUnitDigest": "07630b5f84f01fd73770ef64cbdef5e9cb80ca1d05f2b9d72a8bf09a61a75059"
-        },
-        {
-          "claimId": "claim_3c83721357bc53cfbbd07bc74ed08855",
-          "sourceUnitDigest": "cdff14b58a0687cf80ea68796a3a80416a958929f26613534f981b74a07e4456",
-          "targetUnitDigest": "cdff14b58a0687cf80ea68796a3a80416a958929f26613534f981b74a07e4456"
-        },
-        {
-          "claimId": "claim_046a56df8bafa56b39da741a0ded8235",
-          "sourceUnitDigest": "fa0be6628c7abb7e353c3ce2227684ddf4170d3d467887b4e9b42f4bd5898208",
-          "targetUnitDigest": "fa0be6628c7abb7e353c3ce2227684ddf4170d3d467887b4e9b42f4bd5898208"
-        },
-        {
-          "claimId": "claim_237467a67a081ab1728facf6b17e1cd4",
-          "sourceUnitDigest": "b060ff9c095dce3369991631feb933d98724393834a793dd777b7c5b3e2711c0",
-          "targetUnitDigest": "b060ff9c095dce3369991631feb933d98724393834a793dd777b7c5b3e2711c0"
-        },
-        {
-          "claimId": "claim_ea510114882c12807ce28686d0365332",
-          "sourceUnitDigest": "6d7938097a7c7b1059e400f09f5d4dad763e980c3d5fc7228eb669a7a8b06062",
-          "targetUnitDigest": "6d7938097a7c7b1059e400f09f5d4dad763e980c3d5fc7228eb669a7a8b06062"
-        },
-        {
-          "claimId": "claim_aeca3cda9965168aa5eb28c3b9685a03",
-          "sourceUnitDigest": "a23c4b803d000c8496517fc05703c23fad64828a342884785999b31bb5973e9b",
-          "targetUnitDigest": "a23c4b803d000c8496517fc05703c23fad64828a342884785999b31bb5973e9b"
-        },
-        {
-          "claimId": "claim_2355b0c098803869b71a5bba7b20a0a0",
-          "sourceUnitDigest": "35abc419de15833853939240873d1aa780f85b554b7965b57bbf9dbb4ab3037c",
-          "targetUnitDigest": "35abc419de15833853939240873d1aa780f85b554b7965b57bbf9dbb4ab3037c"
-        },
-        {
-          "claimId": "claim_cf44ea69b1d788b6a9febc3504c075f1",
-          "sourceUnitDigest": "a480a06b0285862fd1c586c362d6a71e4c32c70759e1f634480df314cc84b841",
-          "targetUnitDigest": "a480a06b0285862fd1c586c362d6a71e4c32c70759e1f634480df314cc84b841"
-        },
-        {
-          "claimId": "claim_925b901f329f4bbe1a1246ea428c4794",
-          "sourceUnitDigest": "a6a1af1118efae1f29b9535cb6f19a8d8a5b4948a23ee211b291ed977e75782e",
-          "targetUnitDigest": "a6a1af1118efae1f29b9535cb6f19a8d8a5b4948a23ee211b291ed977e75782e"
-        },
-        {
-          "claimId": "claim_a3c5dcace145e25b55eeb9dca7a8221e",
-          "sourceUnitDigest": "a976fc60a3892a75a48cec0a4158ba463d2e0f8acc1346ea6cfb37e196e73c7c",
-          "targetUnitDigest": "a976fc60a3892a75a48cec0a4158ba463d2e0f8acc1346ea6cfb37e196e73c7c"
-        }
-      ]
-    },
     {
       "source": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
       "target": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",

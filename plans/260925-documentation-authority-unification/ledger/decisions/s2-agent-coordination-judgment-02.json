@@ -6277,7 +6277,7 @@
       "claimId": "claim_007ac529305107d794a6aa0752c8fa85",
       "sourceUnitDigest": "17e9dc29da21e0e2df5f6e5e004fbe6b74a1cc0c9d34284c1dcdddc41e3e048c",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-29",
+      "targetAnchor": "unheaded-block-30",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "reviewed",
@@ -6299,7 +6299,7 @@
       "claimId": "claim_9797e67aadf80be198afbc69817c9ea2",
       "sourceUnitDigest": "9ef607d56f86c6bc94be4ced0016146ed19fb944f589fc01ce349378ad84a384",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-31",
+      "targetAnchor": "unheaded-block-32",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "reviewed",
@@ -6324,19 +6324,14 @@
       "targetAnchor": "8-runresult-confidence",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#8-runresult-confidence -> PLAT:proposals/team-communication-protocol-v1.md#8-runresult-confidence: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "b930743c66d1a445599637265e539d903ae758f754be54c8a992ce2eaf080872",
+      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "targetUnitDigest": "df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_afb1772a0dd83cd513d09e9dadf17e49",
