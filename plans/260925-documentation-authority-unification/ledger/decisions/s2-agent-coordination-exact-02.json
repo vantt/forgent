@@ -275,180 +275,238 @@
       "sourceUnitDigest": "e75651b37d276ea3ad60df661f1a75abdfe4b6a858396c5df38b40740035b887",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-3 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-5. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-5",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-3 (lines 15-18) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Context\" was cut from the retained current file but is live (src/runner/dispatch/herdr-round.mjs:12-30 (same three refusals), src/runner/dispatch/liveness.mjs:1-40; other current owner: none (only a code-comment copy)); Rationale for receipts over terminal heuristics is engine-independent and mirrored in code comments, but no longer documented in the ADR.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "e75651b37d276ea3ad60df661f1a75abdfe4b6a858396c5df38b40740035b887",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Context"
+      ]
     },
     {
       "claimId": "claim_e058ee730b7253c519dc8f38dd892f00",
       "sourceUnitDigest": "5dc425d1f0bad971e829261eb29409bf3848cc58867814796e2ab428a3287363",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-4 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-6. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-6",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-4 (lines 20-26) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Context\" was cut from the retained current file but is live (src/runner/dispatch/herdr-round.mjs:12-30 (same three refusals), src/runner/dispatch/liveness.mjs:1-40; other current owner: none (only a code-comment copy)); Rationale for receipts over terminal heuristics is engine-independent and mirrored in code comments, but no longer documented in the ADR.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "5dc425d1f0bad971e829261eb29409bf3848cc58867814796e2ab428a3287363",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Context"
+      ]
     },
     {
       "claimId": "claim_82e3f1824c9fb3f0f4c4c292ec067ef8",
       "sourceUnitDigest": "8726d0e02b20ac2beb203a002f2c7f99d3c6745fa01a188d7b5c91daceac34ec",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-5 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-7. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-7",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-5 (lines 28-31) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Context\" was cut from the retained current file but is live (src/runner/dispatch/herdr-round.mjs:12-30 (same three refusals), src/runner/dispatch/liveness.mjs:1-40; other current owner: none (only a code-comment copy)); Rationale for receipts over terminal heuristics is engine-independent and mirrored in code comments, but no longer documented in the ADR.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "8726d0e02b20ac2beb203a002f2c7f99d3c6745fa01a188d7b5c91daceac34ec",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Context"
+      ]
     },
     {
       "claimId": "claim_276d64851e2136e50539e46180122ceb",
       "sourceUnitDigest": "7b239f28d2bfe5f5d4ae21bb7345fc38fbdca034836bd0049ff5af965ad71930",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-6 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-8. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-8",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-6 (lines 33-35) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Context\" was cut from the retained current file but is live (src/runner/dispatch/herdr-round.mjs:12-30 (same three refusals), src/runner/dispatch/liveness.mjs:1-40; other current owner: none (only a code-comment copy)); Rationale for receipts over terminal heuristics is engine-independent and mirrored in code comments, but no longer documented in the ADR.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "7b239f28d2bfe5f5d4ae21bb7345fc38fbdca034836bd0049ff5af965ad71930",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Context"
+      ]
     },
     {
       "claimId": "claim_020a1e424ee511993f0797d7ead1dfdc",
       "sourceUnitDigest": "afdd3d1f20e74db0d8cbb32edd6793c277862dd5d413f615350b1a80dd84127a",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-7 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-9. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-9",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-7 (lines 39-41) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Decision\" was cut from the retained current file but is mixed (herdr-round.mjs:21-24 (agent_status never concludes a round; result file is receipt); herdr-agent.mjs:385; assignment-runner.mjs:2471-2492; visibility-session.mjs:136-146 (actor lease deliberately removed); other current owner: docs/platform/agent-coordination/decisions/ADR-011 Current Scope (one sentence on the artifact receipt)); Dispatch-owns-lifecycle, herdr-as-transport and receiver-writes-receipt are live; the 'exactly one actor holding a pid-and-token lease' clause was explicitly dropped.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "afdd3d1f20e74db0d8cbb32edd6793c277862dd5d413f615350b1a80dd84127a",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Decision"
+      ]
     },
     {
       "claimId": "claim_006a0abb9d507402215439fb23fdca5d",
       "sourceUnitDigest": "0df8ef05fe5ffd0192a1ff7a258d9fe2c62fe5f09fbe96db97b21c3e3382b925",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-8 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-10. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-10",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-8 (lines 43-49) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Decision\" was cut from the retained current file but is mixed (herdr-round.mjs:21-24 (agent_status never concludes a round; result file is receipt); herdr-agent.mjs:385; assignment-runner.mjs:2471-2492; visibility-session.mjs:136-146 (actor lease deliberately removed); other current owner: docs/platform/agent-coordination/decisions/ADR-011 Current Scope (one sentence on the artifact receipt)); Dispatch-owns-lifecycle, herdr-as-transport and receiver-writes-receipt are live; the 'exactly one actor holding a pid-and-token lease' clause was explicitly dropped.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "0df8ef05fe5ffd0192a1ff7a258d9fe2c62fe5f09fbe96db97b21c3e3382b925",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Decision"
+      ]
     },
     {
       "claimId": "claim_7804fb0af6accd3b19f0e927d5c64300",
       "sourceUnitDigest": "be45e63ac22d9bfb6f4e4d0c3ef9043a592ccb87096d220208b8cf602add14a8",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
+      "rationale": "This particular legacy unit docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-9 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-9 (lines 51-54) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Decision\" was cut from the retained current file but is mixed (herdr-round.mjs:21-24 (agent_status never concludes a round; result file is receipt); herdr-agent.mjs:385; assignment-runner.mjs:2471-2492; visibility-session.mjs:136-146 (actor lease deliberately removed); other current owner: docs/platform/agent-coordination/decisions/ADR-011 Current Scope (one sentence on the artifact receipt)); Dispatch-owns-lifecycle, herdr-as-transport and receiver-writes-receipt are live; the 'exactly one actor holding a pid-and-token lease' clause was explicitly dropped.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "05491a4d1abf1dfbd8d33e73027bb48caeb4f284bd7f6ef09e0c5c1124729950",
+      "targetAncestry": [
+        "Historical File: surviving transport-versus-receipt boundary"
+      ]
     },
     {
       "claimId": "claim_1fe2f9d8bcd07ea0d9cac3dd064f63cf",
       "sourceUnitDigest": "548acb199c1ea893fe110e379efb440d2105e6928665a144ed1455b3433b9cac",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
+      "rationale": "This particular legacy unit docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-10 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-10 (lines 56-59) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Decision\" was cut from the retained current file but is mixed (herdr-round.mjs:21-24 (agent_status never concludes a round; result file is receipt); herdr-agent.mjs:385; assignment-runner.mjs:2471-2492; visibility-session.mjs:136-146 (actor lease deliberately removed); other current owner: docs/platform/agent-coordination/decisions/ADR-011 Current Scope (one sentence on the artifact receipt)); Dispatch-owns-lifecycle, herdr-as-transport and receiver-writes-receipt are live; the 'exactly one actor holding a pid-and-token lease' clause was explicitly dropped.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "05491a4d1abf1dfbd8d33e73027bb48caeb4f284bd7f6ef09e0c5c1124729950",
+      "targetAncestry": [
+        "Historical File: surviving transport-versus-receipt boundary"
+      ]
     },
     {
       "claimId": "claim_1374dd72d941a06cc894364357e6e9be",
       "sourceUnitDigest": "ae92a69c02fd45641328aeba3d4ae2c41f72b2b2d6eb2585d5822399db5e484c",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-11 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-13. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-13",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-11 (lines 63-83) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Consequences\" was cut from the retained current file but is live (herdr-round.mjs:15-19 prompt-to-file pointer, :1275-1285 pane close != cancel, :344-358 outcome names; liveness.mjs:28-35 unknown never absent, consecutive absences; cli.mjs:212,788 run.json closed at settlement; confinement/authority.mjs pane kept; other current owner: none); All seven consequences are implemented and tested behaviours with no other doc owner.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "ae92a69c02fd45641328aeba3d4ae2c41f72b2b2d6eb2585d5822399db5e484c",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Consequences"
+      ]
     },
     {
       "claimId": "claim_f9be8311c31aa61219e25fe732c7a373",
       "sourceUnitDigest": "c89408caeabe8db8e23ef2e3e21858c6088f6d2f3c758d20a77063437e560ff5",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-12 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-14. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-14",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-12 (lines 87-96) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Open, and stated rather than hidden\" was cut from the retained current file but is live (herdr-round.mjs:340-358 blocked/paused-limit map to worker-timeout; liveness.mjs hang detection limited to idle timeout+ceiling; other current owner: none); Known gaps (credential copy in worker, error-class seam, hang detection) are still true and recorded only in code comments.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "c89408caeabe8db8e23ef2e3e21858c6088f6d2f3c758d20a77063437e560ff5",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Open, and stated rather than hidden"
+      ]
     },
     {
       "claimId": "claim_ab3ec78b6c0504016f5d6061946c2490",
       "sourceUnitDigest": "86f57f83225410f2d71e4493aa7563265c167cb74eaa4fb6cef09db6cdf3c778",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-13 is retained in docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-15. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "targetAnchor": "unheaded-block-15",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-13 (lines 98-100) of A:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: section-level defect: \"Open, and stated rather than hidden\" was cut from the retained current file but is live (herdr-round.mjs:340-358 blocked/paused-limit map to worker-timeout; liveness.mjs hang detection limited to idle timeout+ceiling; other current owner: none); Known gaps (credential copy in worker, error-class seam, hang detection) are still true and recorded only in code comments.. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "86f57f83225410f2d71e4493aa7563265c167cb74eaa4fb6cef09db6cdf3c778",
+      "targetAncestry": [
+        "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
+        "Open, and stated rather than hidden"
+      ]
     },
     {
       "claimId": "claim_f7be1d8a794e7f9c867378b67fbc3158",
       "sourceUnitDigest": "4220e3a9675537c9fe609c9cfbf7324d589f26b484441c45a0ebf1ec2d0fa4dc",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-3 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-4. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "unheaded-block-4",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-3 (lines 15-16) of A:decisions/README.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: file-level classification defect (Low): index of a directory that still holds current ADR-001, 003, 005 and 011 (and ADR-002, 004, 006, 007 if restored); the directory is left without an index and the old index overstates the Step 08 runtime as live-proved. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "4220e3a9675537c9fe609c9cfbf7324d589f26b484441c45a0ebf1ec2d0fa4dc",
+      "targetAncestry": [
+        "Agent Coordination Architecture Decisions",
+        "Accepted Decisions"
+      ]
     },
     {
       "claimId": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
       "sourceUnitDigest": "0a311d99026944161e5c278e27c04c9751122d186dd7718cac1293e704bd2104",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-4 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-5. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "unheaded-block-5",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-4 (lines 18-27) of A:decisions/README.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: file-level classification defect (Low): index of a directory that still holds current ADR-001, 003, 005 and 011 (and ADR-002, 004, 006, 007 if restored); the directory is left without an index and the old index overstates the Step 08 runtime as live-proved. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "21acf7661a71b9ec029ec6b1ec397b838869dc77513c4fd865d05c6c85fa9b56",
+      "targetAncestry": [
+        "Agent Coordination Architecture Decisions",
+        "Accepted Decisions"
+      ]
     },
     {
       "claimId": "claim_a8914714b51091a9f0a487f739172da2",
       "sourceUnitDigest": "5ba4d36d43461dcc3047edaf13a0aa0685b4352f9e177191e29dd1bd980a66bf",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-5 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-6. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "unheaded-block-6",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-5 (lines 29-43) of A:decisions/README.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: file-level classification defect (Low): index of a directory that still holds current ADR-001, 003, 005 and 011 (and ADR-002, 004, 006, 007 if restored); the directory is left without an index and the old index overstates the Step 08 runtime as live-proved. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "636a563c6077dbd3f7c921c88b79cc72e434704a2bbf618e7333618ec296d11c",
+      "targetAncestry": [
+        "Agent Coordination Architecture Decisions",
+        "Accepted Decisions"
+      ]
     },
     {
       "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
       "sourceUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/README.md",
-      "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-6 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-7. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+      "targetAnchor": "unheaded-block-7",
+      "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "unheaded-block unheaded-block-6 (lines 45-47) of A:decisions/README.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind decision unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. REWORK: file-level classification defect (Low): index of a directory that still holds current ADR-001, 003, 005 and 011 (and ADR-002, 004, 006, 007 if restored); the directory is left without an index and the old index overstates the Step 08 runtime as live-proved. Content is preserved verbatim, nothing is lost; the disposition labels live material as retired history, so the row must be re-decided when the file is corrected"
+      "targetUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
+      "targetAncestry": [
+        "Agent Coordination Architecture Decisions",
+        "Accepted Decisions"
+      ]
     },
     {
       "claimId": "claim_4a2d082437d31677a4344a224ac8e5a3",
@@ -917,63 +975,45 @@
       "sourceUnitDigest": "8b9baa9b064545c4a5a410f454196e725c3de7abbf62837a17cd9f3a5b4ae332",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
+      "rationale": "This particular legacy unit docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-8 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "reviewed",
-      "reviewNote": "unheaded-block unheaded-block-8 (lines 41-45) of A:playbooks/architecture-advisory-artifact-templates.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind architecture unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-exact-02.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
-      ],
-      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
+      ]
     },
     {
       "claimId": "claim_04f1628604d93c06b98725adcba6ff25",
       "sourceUnitDigest": "a8c85eb3f072d709234caa4ef3203a664684078f52724f769de9a2297e27f26a",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
+      "rationale": "This exact dated source unit docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#16-run-record-runs-json is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "reviewed",
-      "reviewNote": "heading 16-run-record-runs-json (lines 850-850) of A:playbooks/architecture-advisory-artifact-templates.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind architecture unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-exact-02.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
-      ],
-      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
+      ]
     },
     {
       "claimId": "claim_d191b4b9f457b50a8936302973698733",
       "sourceUnitDigest": "1f302e037705db620ff2a1a1c3e4ce869227eb09e90f10fac01e0cb6c45db1c3",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The old exact target is now removed or deliberately narrowed; no script approval is carried across that change. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: The previously script-proven exact source unit was bound to the pre-retirement candidate rendering.",
+      "rationale": "This particular legacy unit docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-68 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:1@2026-10-09",
-      "reviewStatus": "reviewed",
-      "reviewNote": "unheaded-block unheaded-block-68 (lines 873-877) of A:playbooks/architecture-advisory-artifact-templates.md: formerly script-exact (source and candidate digests equal, candidate unit located by digest in the 7880fbc candidate and byte-identical to the source); the candidate file is embedded unchanged in the snapshot and the unit text is found verbatim in its body. Source and target digests recomputed from git bytes equal the sidecar; disposition move, kind architecture unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-exact-02.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
-      ],
-      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
+      ]
     },
     {
       "claimId": "claim_06f3dda173fae1c8b12b31f4d0fd2486",

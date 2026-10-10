@@ -100,7 +100,7 @@
       "node",
       "--input-type=module",
       "-e",
-      "<the exact operation helper smoke recorded in currentSmoke>"
+      "import { operationsForStep,taskSpecForStep,skillForStep } from './src/workflow/steps.mjs'; import assert from 'node:assert/strict'; const wf={steps:[{id:'shape',skill:'advisor',operations:[]},{id:'review',skill:null,operations:[{id:'primary',primary:true,taskSpec:'review-contract'},{id:'second',taskSpec:'critique'}]}]};const inferred=operationsForStep(wf,'shape');assert.deepEqual(inferred,[{id:'shape',primary:true,taskSpec:'shape',role:'implementer',skills:['advisor']}]);assert.equal(operationsForStep(wf,'review'),wf.steps[1].operations);assert.equal(taskSpecForStep(wf,'review'),'review-contract');assert.equal(skillForStep(wf,'shape'),'advisor');assert.deepEqual(operationsForStep(wf,'unknown'),[]);console.log(JSON.stringify({checks:5,explicitOperations:2,synthesizedTaskSpec:inferred[0].taskSpec,unknownStepOperations:0}));"
     ],
     "exit": 0,
     "output": "{\"checks\":5,\"explicitOperations\":2,\"synthesizedTaskSpec\":\"shape\",\"unknownStepOperations\":0}\n"
