@@ -1,7 +1,7 @@
 ---
 title: "Council parity, first slice: verdict schema, lens personas, restate"
 description: "Close most of the remaining gap to council-of-high-intelligence with output schema, persona files and one cheap first step, using existing Workflow/Pattern owners and no runtime change."
-status: pending
+status: done
 priority: P1
 branch: main
 tags: [discussion, council, workflow, persona, measurement]

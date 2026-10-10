@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Re-measure against council"
-status: pending
+status: done
 priority: P1
 effort: "0.5d"
 dependencies: [3]
@@ -27,8 +27,8 @@ Same method as 2026-10-04: same question through real council and through fgOS, 
 4. Decide with evidence: stop, or extract shared seams with the advisory plan for the remaining rows.
 
 ## Success Criteria
-- [ ] Table of scores per question and row, with judge prompt and inputs saved.
-- [ ] Explicit decision on the next gap, backed by the rows that lag.
+- [x] Table of scores per question and row, with judge prompt and inputs saved ([report](reports/phase-04-remeasure-report.md)).
+- [x] Explicit decision on the next gap: stop; no cross-exam, tally or ledger.
 - [ ] Full suite green; CHANGELOG/spec lines landed.
 
 ## Risk Assessment
