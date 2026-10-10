@@ -50,3 +50,9 @@ What the evidence supports:
 - Provider independence stayed with `bind()` (three families; the first synthesizer choice, xAI, failed on an expired login and the runner fell back to GLM). Executors in both runs used account tetcu72 for Codex and Gemini.
 
 Acceptance for this slice: distinct lens per seat in real briefs: met. Reports follow their method: met. One recorded comparison: done; effect on stance not established, on structure shown. No runtime or renderer change.
+
+## Restate step, 2026-10-10 (run on main after the change merged)
+Question: a deliberately ambiguous one ("move to the new system?", no system named, no period length). Workflow `council-lite`, `wf-run-1791614056*`, Unit `unit-run-1791614056153-258a6078`; `completed/pass`, 126 s. An earlier run of the same question before the instruction reached the seats (the workflow had been loaded from main, which lacked it; invalid for this step) took 134 s with reports of 541/386/876 words.
+- Every seat report opens with a three-line `Restatement` (question, out of scope): 624/403/792 words, so +83/+17/-84 words against the run without it: no consistent length cost, no added step, Unit or provider call.
+- The restatements were not copies: seat 3 (feedback loops) read the question as migrating *during* "the upcoming three-week quiet period" (timing fixed, period length assumed), while seats 1 and 2 left timing and length open. The synthesizer listed both as the first two unresolved items ("two genuine framing mismatches"), and tied seat 3's recommendation to its framing instead of averaging it away.
+- Verdict: the mismatch case surfaced as required. One run is not a rate; whether restatements usually differ is not shown (here two of three were near-identical paraphrases, one differed in a way that mattered).

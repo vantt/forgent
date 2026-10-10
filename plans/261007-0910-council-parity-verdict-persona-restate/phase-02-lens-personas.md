@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Lens personas per seat"
-status: pending
+status: done
 priority: P2
 effort: "1d"
 dependencies: [1]

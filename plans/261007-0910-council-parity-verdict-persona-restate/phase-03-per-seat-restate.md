@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Per-seat restate"
-status: pending
+status: done
 priority: P2
 effort: "0.5d"
 dependencies: [2]
