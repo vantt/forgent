@@ -57,6 +57,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
       'config-not-stale',
+      'convention-conformance',
       'main-checkout-hook-wired',
       'node-version-and-git',
       'shell-integration-sourced',

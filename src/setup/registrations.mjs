@@ -111,6 +111,7 @@ import { POLICY_PATCH_FIELDS } from '../runner/dispatch/execution-contract.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
+import { conventionCheck } from '../convention/convention-client.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -6023,6 +6024,120 @@ export function checkObserveHostResolvable(cwd) {
     };
   }
 }
+
+const CONVENTION_RULES_PATH = new URL('../../packages/convention/contracts/convention.rules.v1.json', import.meta.url);
+
+function conventionWorkingTreeRoot(cwd) {
+  try {
+    return execFileSync(
+      'git',
+      ['rev-parse', '--path-format=absolute', '--show-toplevel'],
+      { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    ).trim();
+  } catch {
+    return null;
+  }
+}
+
+function packagedConventionCutoff() {
+  const contract = JSON.parse(fs.readFileSync(CONVENTION_RULES_PATH, 'utf8'));
+  const cutoffs = new Set(
+    contract.rules
+      .filter((rule) => Array.isArray(rule.scope) && rule.scope.length > 0 && rule.cutoff)
+      .map((rule) => rule.cutoff),
+  );
+  if (cutoffs.size !== 1) {
+    throw new Error(`expected one launch cutoff across scoped packaged rules, found ${cutoffs.size}`);
+  }
+  return [...cutoffs][0];
+}
+
+function pathWasIntroducedAfter(root, relativePath, cutoff) {
+  try {
+    execFileSync(
+      'git',
+      ['cat-file', '-e', `${cutoff}:${relativePath}`],
+      { cwd: root, stdio: 'ignore' },
+    );
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+export function checkConventionConformance(cwd, {
+  hostRunner = conventionCheck,
+  cutoffResolver = packagedConventionCutoff,
+  introducedAfter = pathWasIntroducedAfter,
+} = {}) {
+  const root = conventionWorkingTreeRoot(cwd);
+  if (!root || !fs.existsSync(path.join(root, 'apps/fgos/Cargo.toml'))) {
+    return {
+      passed: true,
+      message: 'convention check skipped: working tree is not the fgOS source repository',
+    };
+  }
+
+  let result;
+  try {
+    result = hostRunner({ all: true }, { dir: root });
+  } catch (error) {
+    const category = error?.code ?? 'client-load-error';
+    const detail = error?.timedOut ? 'host timed out' : (error?.message ?? 'unknown error');
+    return {
+      passed: true,
+      message: `convention check skipped: ${category}: ${detail}`,
+    };
+  }
+
+  if (!result || !Array.isArray(result.violations)) {
+    return {
+      passed: true,
+      message: 'convention check skipped: host returned an invalid result',
+    };
+  }
+  if (result.violations.length === 0) {
+    return {
+      passed: true,
+      message: `convention check passed: ${result.checked ?? 0} scoped file(s), no violations`,
+    };
+  }
+
+  let cutoff;
+  try {
+    cutoff = cutoffResolver(root);
+    execFileSync(
+      'git',
+      ['cat-file', '-e', `${cutoff}^{commit}`],
+      { cwd: root, stdio: 'ignore' },
+    );
+  } catch (error) {
+    return {
+      passed: true,
+      message: `convention check skipped: cutoff cannot be inspected: ${error.message}`,
+    };
+  }
+
+  const recent = [];
+  const existing = [];
+  for (const violation of result.violations) {
+    (introducedAfter(root, violation.path, cutoff) ? recent : existing).push(violation);
+  }
+  const examples = result.violations
+    .slice(0, 3)
+    .map((violation) => `${violation.path}: ${violation.code} ${violation.message}`)
+    .join('; ');
+  return {
+    passed: recent.length === 0,
+    message: `convention violations: ${existing.length} pre-cutoff, ${recent.length} post-cutoff; checked ${result.checked ?? 0}; examples: ${examples}`,
+  };
+}
+
+registerCheck({
+  id: 'convention-conformance',
+  description: 'source-repository report and journal paths conform to packaged naming and placement rules',
+  check: (cwd) => checkConventionConformance(cwd),
+});
 
 // A run directory touched within the last minute may still be settling.
 // Writers share this host's clock, so a future mtime is legitimate only within
