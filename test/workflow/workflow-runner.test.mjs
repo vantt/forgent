@@ -607,6 +607,64 @@ test('status says a running run has no live advance and names resume once the la
   assert.equal(held.hint, undefined);
 });
 
+test('a resumed workflow continues the unit run its dead controller started and dispatches no settled seat again', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'test/resume-unit-run',
+    steps: [{ id: 'only', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write' } }] }],
+  });
+  const first = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+  assert.equal(first.status, 'completed');
+  const id = first.workflowRunId;
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id });
+  const started = events.find((e) => e.type === 'unit.started');
+  const completed = events.find((e) => e.type === 'unit.complete');
+  assert.ok(started, 'the Unit run id is journaled when the run is created');
+  assert.equal(started.payload.unitRunId, completed.payload.unitRunId);
+  assert.ok(started.seq < completed.seq, 'and before the unit can complete');
+
+  // The controller dies after the Unit run settled its seat but before the unit completed.
+  const eventsFile = path.join(tmp, '.fgos', 'workflow-runs', id, 'events.jsonl');
+  const kept = events.filter((e) => e.seq < completed.seq);
+  fs.writeFileSync(eventsFile, kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+  assert.equal(projectWorkflowState(kept).steps.only.units.u1.unitRunId, started.payload.unitRunId, 'a running unit carries its run id');
+  const attemptsBefore = fs.readdirSync(path.join(tmp, '.fgos', 'assignments', started.payload.unitRunId, 'producer', '1', 'runs'));
+
+  const resumed = await resumeWorkflow(id, { repoRoot: tmp, cwd: tmp });
+
+  assert.equal(resumed.status, 'completed');
+  assert.equal(resumed.steps.only.units.u1.unitRunId, started.payload.unitRunId, 'the same Unit run was continued');
+  assert.deepEqual(fs.readdirSync(path.join(tmp, '.fgos', 'assignments')).filter((d) => d.startsWith('unit-run-')), [started.payload.unitRunId], 'no second Unit run was created');
+  assert.deepEqual(
+    fs.readdirSync(path.join(tmp, '.fgos', 'assignments', started.payload.unitRunId, 'producer', '1', 'runs')),
+    attemptsBefore,
+    'the settled seat was not dispatched again',
+  );
+});
+
+test('a running unit whose recorded worktree is gone starts a fresh Unit run instead of failing the workflow', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'test/resume-missing-worktree',
+    steps: [{ id: 'only', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write' } }] }],
+  });
+  const first = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+  const id = first.workflowRunId;
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id });
+  const completed = events.find((e) => e.type === 'unit.complete');
+  const oldRunId = completed.payload.unitRunId;
+  // Died before completing, and the worktree it ran in no longer exists (temp-dir cleanup, reboot).
+  const kept = events.filter((e) => e.seq < completed.seq).map((e) => (
+    e.type === 'unit.scheduled' ? { ...e, payload: { ...e.payload, worktreePath: path.join(tmp, 'gone-worktree'), branch: 'wf/x/u1' } } : e
+  ));
+  fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'events.jsonl'), kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+
+  const resumed = await resumeWorkflow(id, { repoRoot: tmp, cwd: tmp });
+
+  assert.equal(resumed.status, 'completed', 'the workflow carries on rather than failing for good');
+  assert.notEqual(resumed.steps.only.units.u1.unitRunId, oldRunId, 'a fresh Unit run replaced the one that could not be continued');
+});
+
 test('status shows no log tail for a completed run', async () => {
   const tmp = setupTestRepo();
   const state = await startWorkflow({
@@ -1535,6 +1593,45 @@ test('producer expertise gate parks clearly on malformed packets and remains ans
       assert.equal(next.status, 'parked');
       assert.equal((await answerWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, stepId: 'check-sha', answer: 'Retain the unreadable-report limitation and close.' })).status, 'completed');
     }
+  }
+});
+
+test('expertise gate reads the settled report, then an untouched packet file beside it, with either key spelling', async (t) => {
+  const cases = [
+    { name: 'underscore key in the raw JSON report', report: JSON.stringify({ missing_expertise: ['database sizing'] }), expect: '["database sizing"]' },
+    { name: 'prose report with a packet file using the spaced key', report: '# Advice in prose', packet: JSON.stringify({ 'missing expertise': [] }), expect: '[]' },
+    { name: 'prose report with a packet file using the underscore key', report: '# Advice in prose', packet: JSON.stringify({ missing_expertise: ['security review'] }), expect: '["security review"]' },
+    { name: 'the report wins over a packet file', report: JSON.stringify({ 'missing expertise': ['from report'] }), packet: JSON.stringify({ missing_expertise: ['from packet'] }), expect: '["from report"]' },
+    { name: 'packet file touched after the report settled is ignored', report: '# Advice in prose', packet: JSON.stringify({ missing_expertise: [] }), future: true, parks: true },
+    { name: 'malformed packet file is ignored', report: '# Advice in prose', packet: '{ not json', parks: true },
+    { name: 'packet file without the key is ignored', report: '# Advice in prose', packet: JSON.stringify({ verdict: 'x' }), parks: true },
+  ];
+  for (const scenario of cases) {
+    const tmp = setupTestRepo();
+    t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+    fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
+      import fs from 'node:fs'; import path from 'node:path';
+      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      if (!target) process.exit(1);
+      const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
+      const dir = fs.existsSync(outbox) ? outbox : base;
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(scenario.report)});
+      if (${JSON.stringify(scenario.packet ?? null)} !== null) {
+        const packet = path.join(dir, 'packet-1.json');
+        fs.writeFileSync(packet, ${JSON.stringify(scenario.packet ?? '')});
+        if (${JSON.stringify(Boolean(scenario.future))}) { const later = new Date(Date.now() + 86400000); fs.utimesSync(packet, later, later); }
+      }
+      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
+    `);
+    const workflow = { id: 'gate-packet-file', steps: [
+      { id: 'synthesis', units: [{ id: 'synthesize-recommendation', template: { capability: 'docs:write' } }] },
+      { id: 'close', dependsOn: ['synthesis'], gate: { kind: 'human', mode: 'input', question: 'Bring in {{report:synthesis/synthesize-recommendation:missing expertise}} or not?' } },
+    ] };
+    const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+    assert.equal(state.status, 'parked', scenario.name);
+    if (scenario.parks) assert.match(state.questions[0].question, /Cannot read settled producer "missing expertise"/, scenario.name);
+    else assert.equal(state.questions[0].question, `Bring in ${scenario.expect} or not?`, scenario.name);
   }
 });
 

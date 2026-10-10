@@ -4,6 +4,8 @@
 import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
+import os from "node:os";
+import { claudeMcpApprovalArgs } from "../trust-store.mjs";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
 import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
@@ -1169,7 +1171,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     // in it) away in the finally below.
     if (err?.paneRetained === true && err.paneId) {
       for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
-        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId }) ?? [])); } catch { /* best effort */ }
+        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId, herdrSession: err.herdrSession }) ?? [])); } catch { /* best effort */ }
       }
       if (retainedHomes.length > 0) {
         err.retainedPrivateHomes = [...retainedHomes];
@@ -1374,7 +1376,24 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   // Prepared Worker Invocation
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;
   const workerCommand = sourceInvocation.command;
-  const workerArgs = sourceInvocation.args || [];
+  const claudeTrust = sourceInvocation.interactiveMode?.trustStore;
+  // A prepared record that already exists is the invocation this launch was published with: its
+  // args do not change with files that can change between attempts (.mcp.json, the trust store).
+  const publishedInvocationPath = path.join(runDir ?? "", "protected", "prepared-invocation", `${launchCommandId}.json`);
+  let publishedArgs = null;
+  try { publishedArgs = JSON.parse(fs.readFileSync(publishedInvocationPath, 'utf8'))?.workerInvocation?.args ?? null; } catch { /* first attempt */ }
+  const workerArgs = Array.isArray(publishedArgs) ? publishedArgs : [
+    ...(sourceInvocation.args || []),
+    // The target project's own MCP servers are approved for this worker only, so the claude
+    // dialog that asks a person cannot stop an unattended seat.
+    ...(claudeTrust?.kind === 'claude-json'
+      ? claudeMcpApprovalArgs({
+        cwd: request.context.cwd,
+        repoRoot: request.context.repoRoot ?? request.context.cwd,
+        storePath: claudeTrust.path ?? path.join(os.homedir(), '.claude.json'),
+      })
+      : []),
+  ];
   const workerCwd = request.context.cwd;
   const depth = currentDispatchDepth();
   const writerId = resolveWriterIdentity(request.context.fgosDir).id;
@@ -1630,6 +1649,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       herdrName,
       agentSession: existingCmd?.agentSession || null,
       paneId: existingCmd?.paneId || null,
+      herdrSession: existingCmd?.herdrSession || null,
       resourceIncarnation: existingCmd?.resourceIncarnation || null,
       outcome: existingCmd?.outcome || null,
     };

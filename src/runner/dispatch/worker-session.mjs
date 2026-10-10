@@ -66,6 +66,15 @@ export function socketPathForSession(name, { home = process.env.HOME } = {}) {
 }
 
 /**
+ * `baseEnv` pointed at a session a worker was launched in, so a later caller (the reaper, a
+ * recovery) asks the server that owns the worker's pane instead of whichever one its own
+ * environment names. Returns a new object.
+ */
+export function envForSession(baseEnv, name, { home = baseEnv?.HOME ?? process.env.HOME } = {}) {
+  return { ...(baseEnv ?? {}), HERDR_SESSION: name, HERDR_SOCKET_PATH: socketPathForSession(name, { home }) };
+}
+
+/**
  * Refuse to launch a worker into the operator's own session (C3).
  *
  * Two ways a target can be the operator's: it matches the session the caller is

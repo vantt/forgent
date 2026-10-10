@@ -10,8 +10,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
-import { trustRoots, trustStorePaths } from '../../src/runner/dispatch/herdr-round.mjs';
+import {
+  seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
+  codexHookTrustHash, seedCodexHookTrust,
+} from '../../src/runner/dispatch/trust-store.mjs';
+import { trustRoots, trustStorePaths, seedWorkspaceTrust } from '../../src/runner/dispatch/herdr-round.mjs';
 
 const dirs = [];
 const tmp = (prefix) => {
@@ -116,4 +119,140 @@ test('a linked worktree may derive its trust from the main checkout that owns it
   assert.deepEqual(trustRoots(main, main), [main], 'a checkout that is its own root yields one candidate');
   const notGit = tmp('fgos-trust-nogit-');
   assert.deepEqual(trustRoots(notGit, store), [store], 'a directory outside any checkout has only the declared root');
+});
+
+// Hashes codex itself stored for the two hooks fgOS installs (copied from a real account config).
+const DISPATCH_DECIDE = '.fgos/installation/bin/fgos hook dispatch-decide';
+const DECISION_QUESTION = '.fgos/installation/bin/fgos hook decision-question';
+const HOOKS_JSON = JSON.stringify({
+  hooks: {
+    PreToolUse: [
+      { matcher: '.*', hooks: [{ type: 'command', command: DISPATCH_DECIDE }] },
+      { matcher: 'RequestUserInput|ask.*', hooks: [{ type: 'command', command: DECISION_QUESTION }] },
+    ],
+  },
+});
+
+test('codex hooks: the trust hash is the one codex stores for the same hook', () => {
+  assert.equal(
+    codexHookTrustHash('pre_tool_use', '.*', { command: DISPATCH_DECIDE }),
+    'sha256:1fc36c0dc7df159e3dec9de401733c5ad2a9c5d3099fc484f68369c36941389c',
+  );
+  assert.equal(
+    codexHookTrustHash('pre_tool_use', 'RequestUserInput|ask.*', { command: DECISION_QUESTION }),
+    'sha256:c63f37e29ab42cb29938cb131108f93cc2666ba31b6919872627261f9dd5de78',
+  );
+});
+
+test('codex hooks: seeding writes one entry per hook into the private config, once', () => {
+  const project = tmp('fgos-codex-hooks-project-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const real = path.join(tmp('fgos-codex-real-'), 'config.toml');
+  fs.writeFileSync(real, `[projects."${project}"]\ntrust_level = "trusted"\n`);
+  const privateConfig = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(privateConfig, '[projects."/keep/me"]\ntrust_level = "trusted"\n');
+
+  const { keys, skipped } = seedCodexHookTrust(privateConfig, { projectPath: project, repoRoot: project, rootConfigPath: real });
+
+  assert.equal(skipped, 0);
+  assert.deepEqual(keys, [
+    `${project}/.codex/hooks.json:pre_tool_use:0:0`,
+    `${project}/.codex/hooks.json:pre_tool_use:1:0`,
+  ]);
+  const body = fs.readFileSync(privateConfig, 'utf8');
+  assert.ok(body.includes('trusted_hash = "sha256:1fc36c0dc7df159e3dec9de401733c5ad2a9c5d3099fc484f68369c36941389c"'));
+  assert.deepEqual(seedCodexHookTrust(privateConfig, { projectPath: project, repoRoot: project, rootConfigPath: real }).keys, [], 'seeding twice writes nothing');
+
+  assert.equal(fs.readFileSync(real, 'utf8'), `[projects."${project}"]\ntrust_level = "trusted"\n`, 'the real account config is not edited');
+});
+
+test('codex hooks: no hooks file seeds nothing, and an untrusted root derives nothing', () => {
+  const project = tmp('fgos-codex-hooks-none-');
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  assert.deepEqual(seedCodexHookTrust(config, { projectPath: project, repoRoot: project, rootConfigPath: config }), { keys: [], skipped: 0 });
+
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  fs.writeFileSync(config, 'model = "x"\n');
+  assert.throws(
+    () => seedCodexHookTrust(config, { projectPath: project, repoRoot: project, rootConfigPath: config }),
+    (err) => err instanceof TrustStoreError && err.code === 'untrusted-root',
+  );
+});
+
+test('codex hooks: an entry codex wrote itself (indented) is recognised, so no duplicate table is appended', () => {
+  const project = tmp('fgos-codex-hooks-existing-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  const own = `[projects."${project}"]\ntrust_level = "trusted"\n\n    [hooks.state."${project}/.codex/hooks.json:pre_tool_use:0:0"]\n      trusted_hash = "sha256:person"\n`;
+  fs.writeFileSync(config, own);
+
+  const { keys } = seedCodexHookTrust(config, { projectPath: project, repoRoot: project });
+
+  assert.deepEqual(keys, [`${project}/.codex/hooks.json:pre_tool_use:1:0`], 'only the missing hook is added');
+  assert.equal(fs.readFileSync(config, 'utf8').split('pre_tool_use:0:0').length, 2, 'the person\'s entry stays the only one for its key');
+});
+
+test('codex hooks: a path with a quote or backslash is escaped so the config stays valid TOML', () => {
+  const project = tmp('fgos-codex-hooks-esc-') + '/we"ird\\dir';
+  fs.mkdirSync(path.join(project, '.codex'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  const root = tmp('fgos-codex-hooks-root-');
+  fs.writeFileSync(config, `[projects."${root}"]\ntrust_level = "trusted"\n`);
+
+  seedCodexHookTrust(config, { projectPath: project, repoRoot: root });
+
+  assert.match(fs.readFileSync(config, 'utf8'), /\[hooks\.state\."[^\n]*we\\"ird\\\\dir[^\n]*"\]/);
+});
+
+test('codex hooks: a control character in the path is escaped so the header stays one line', () => {
+  const project = tmp('fgos-codex-hooks-ctl-') + '/line\nbreak';
+  fs.mkdirSync(path.join(project, '.codex'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const root = tmp('fgos-codex-hooks-root-');
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(config, `[projects."${root}"]\ntrust_level = "trusted"\n`);
+
+  seedCodexHookTrust(config, { projectPath: project, repoRoot: root });
+
+  const header = fs.readFileSync(config, 'utf8').split('\n').find((line) => line.startsWith('[hooks.state.'));
+  assert.ok(header.includes('line\\nbreak'), 'the newline is written as an escape sequence');
+});
+
+test('codex hooks: a key present in dotted form is not given a second table', () => {
+  const project = tmp('fgos-codex-hooks-dotted-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(config, `[projects."${project}"]\ntrust_level = "trusted"\n\n[hooks.state]\n"${project}/.codex/hooks.json:pre_tool_use:0:0" = { trusted_hash = "sha256:person" }\n`);
+
+  const { keys } = seedCodexHookTrust(config, { projectPath: project, repoRoot: project });
+
+  assert.deepEqual(keys, [`${project}/.codex/hooks.json:pre_tool_use:1:0`]);
+});
+
+test('codex hooks: hook trust goes only to a private home, never into the account config the worker would share', () => {
+  const project = tmp('fgos-codex-hooks-wire-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
+  const realHome = tmp('fgos-codex-real-home-');
+  const realConfig = path.join(realHome, 'config.toml');
+  const realBody = `[projects."${project}"]\ntrust_level = "trusted"\n`;
+  fs.writeFileSync(realConfig, realBody);
+  const trustStore = { kind: 'codex-toml' };
+  const notes = [];
+  const round = { trustWritten: false, note: (patch) => notes.push(patch) };
+
+  seedWorkspaceTrust({ trustStore, round, cwd: project, repoRoot: project, fullEnv: { CODEX_HOME: realHome }, workerEnv: null });
+  assert.equal(fs.readFileSync(realConfig, 'utf8'), realBody, 'no private home: the real config is left as it was');
+  assert.ok(!notes.some((n) => n.hookTrustSeeded), 'nothing is reported as seeded');
+
+  const privateHome = tmp('fgos-codex-private-home-');
+  seedWorkspaceTrust({ trustStore, round, cwd: project, repoRoot: project, fullEnv: { CODEX_HOME: realHome }, workerEnv: { CODEX_HOME: privateHome } });
+  assert.equal(fs.readFileSync(realConfig, 'utf8'), realBody, 'the real config is still untouched');
+  assert.match(fs.readFileSync(path.join(privateHome, 'config.toml'), 'utf8'), /\[hooks\.state\./);
+  assert.ok(notes.some((n) => n.hookTrustSeeded === 2));
 });

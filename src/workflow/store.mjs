@@ -185,6 +185,12 @@ export function projectWorkflowState(events) {
         }
         break;
 
+      case 'unit.started':
+        if (steps[p.stepId]?.units[p.unitId]) {
+          steps[p.stepId].units[p.unitId].unitRunId = p.unitRunId;
+        }
+        break;
+
       case 'unit.complete':
         if (steps[p.stepId] && steps[p.stepId].units[p.unitId]) {
           steps[p.stepId].units[p.unitId].status = 'completed';

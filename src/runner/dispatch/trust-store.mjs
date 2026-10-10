@@ -27,6 +27,8 @@
 // (measured: the probes used /var/tmp). It is the caller's obligation, stated
 // here rather than dressed up as a check that does nothing.
 
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -142,6 +144,44 @@ export function trustedProjectEntry() {
     disabledMcpjsonServers: [],
     history: [],
   };
+}
+
+/**
+ * Roots a workspace's trust may be derived from: the repository root the run
+ * was started for and, for a linked worktree, the main checkout that owns it
+ * (the same repository, and the root codex itself asks about). Never invents
+ * a root: each is only a candidate for the "already trusted" check.
+ */
+export function trustRoots(projectPath, repoRoot) {
+  const roots = [repoRoot];
+  try {
+    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
+  } catch { /* not a checkout: only the declared root is a candidate */ }
+  return [...new Set(roots)];
+}
+
+/**
+ * Per-process approval of the MCP servers a project declares in its own `.mcp.json`, as extra
+ * claude arguments. claude asks a person to approve each such server before it starts, which
+ * stops an unattended worker at a dialog. The approval is derived, never invented: only where the
+ * repo root is already trusted in the account store, only for the servers the file names, and
+ * only for this one process (`--settings`), so no shared file is written. Returns `[]` when there
+ * is nothing to approve or the root is not trusted.
+ */
+export function claudeMcpApprovalArgs({ cwd, repoRoot, storePath }) {
+  let names;
+  try {
+    const declared = JSON.parse(fs.readFileSync(path.join(cwd, '.mcp.json'), 'utf8'))?.mcpServers;
+    names = declared && typeof declared === 'object' ? Object.keys(declared) : [];
+    // A linked worktree is trusted through the main checkout that owns it, as for folder trust.
+    if (names.length === 0 || !trustRoots(path.resolve(cwd), repoRoot).some((root) => readTrust(storePath, root) === true)) return [];
+  } catch {
+    return [];
+  }
+  return ['--settings', JSON.stringify({ enabledMcpjsonServers: names })];
 }
 
 /**
@@ -317,6 +357,118 @@ export function removeCodexTrust(configPath, projectPath) {
     throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
   }
   return true;
+}
+
+// ---------------------------------------------------------------------------
+// codex hook trust: the same policy, one level down.
+//
+// Folder trust does not cover hooks. codex records trust for each hook of a
+// project's `.codex/hooks.json` as `[hooks.state."<abs hooks.json>:<event>:<group>:<handler>"]
+// trusted_hash = "sha256:..."` and asks for review at startup while the stored hash differs from
+// the hook's current one. A confined worker's private CODEX_HOME starts empty, so every round
+// would stop at that review. The hash is sha256 of the key-sorted JSON of
+// `{event_name, matcher?, hooks:[{type, command, timeout, async, statusMessage?}]}` (openai/codex
+// codex-rs/hooks/src/engine/discovery.rs + config/src/fingerprint.rs). A wrong hash only brings
+// the review back; codex never trusts on a mismatch.
+//
+// Same B1 rule as folder trust: seeded only where the project's root is already trusted by a
+// person, and only for the hooks currently in the file -- the decision the person would make by
+// pressing "trust".
+
+const DEFAULT_HOOK_TIMEOUT_SEC = 600;
+
+function sortedJson(value) {
+  if (Array.isArray(value)) return value.map(sortedJson);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortedJson(value[key])]));
+  }
+  return value;
+}
+
+/** The trust hash codex computes for one command hook. */
+export function codexHookTrustHash(eventName, matcher, handler) {
+  const hook = { type: 'command', command: handler.command, timeout: handler.timeout ?? DEFAULT_HOOK_TIMEOUT_SEC, async: handler.async === true };
+  if (typeof handler.statusMessage === 'string') hook.statusMessage = handler.statusMessage;
+  const identity = { event_name: eventName, hooks: [hook] };
+  if (typeof matcher === 'string') identity.matcher = matcher;
+  return `sha256:${createHash('sha256').update(JSON.stringify(sortedJson(identity))).digest('hex')}`;
+}
+
+/** Hook entries of a hooks.json as `{ key, hash }`, plus how many handlers could not be hashed
+ * faithfully (other handler types, fields whose normalisation is not reproduced here). */
+export function codexHookTrustEntries(hooksJsonPath) {
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(hooksJsonPath, 'utf8'));
+  } catch (err) {
+    if (err.code === 'ENOENT') return { entries: [], skipped: 0 };
+    throw new TrustStoreError('unreadable-store', `could not read codex hooks at ${hooksJsonPath}: ${err.message}`, { hooksJsonPath });
+  }
+  const entries = [];
+  let skipped = 0;
+  for (const [event, groups] of Object.entries(parsed?.hooks ?? {})) {
+    const eventName = event.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+    (Array.isArray(groups) ? groups : []).forEach((group, groupIndex) => {
+      (Array.isArray(group?.hooks) ? group.hooks : []).forEach((handler, handlerIndex) => {
+        const hashable = eventName !== 'session_end' && handler?.type === 'command' && typeof handler.command === 'string'
+          && handler.additionalContextLimit === undefined && handler.commandWindows === undefined && handler.command_windows === undefined;
+        if (!hashable) { skipped += 1; return; }
+        entries.push({
+          key: `${hooksJsonPath}:${eventName}:${groupIndex}:${handlerIndex}`,
+          hash: codexHookTrustHash(eventName, group.matcher, handler),
+        });
+      });
+    });
+  }
+  return { entries, skipped };
+}
+
+/** A TOML basic-string key. JSON string escapes (quote, backslash, control characters) are valid
+ * TOML escapes; DEL is the one extra character TOML requires escaped. */
+function codexHookHeader(key) {
+  return `[hooks.state.${JSON.stringify(key).replace(/\x7f/g, '\\u007f')}]`;
+}
+
+/**
+ * Trust the project's codex hooks in `configPath`, which must be a worker's PRIVATE config: it is
+ * created by fgOS and deleted with the home, so nothing here is ever removed again and the
+ * operator's own config is never edited. Idempotent: a key already present (at any indentation)
+ * is left as it is. Returns `{ keys, skipped }`.
+ */
+export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConfigPath } = {}) {
+  if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
+    throw new TrustStoreError('invalid-path', `seedCodexHookTrust: projectPath must be absolute, got "${projectPath}".`);
+  }
+  const { entries, skipped } = codexHookTrustEntries(path.join(projectPath, '.codex', 'hooks.json'));
+  if (entries.length === 0) return { keys: [], skipped };
+  const rootStore = rootConfigPath ?? configPath;
+  if (readCodexTrust(rootStore, repoRoot) !== true) {
+    throw new TrustStoreError(
+      'untrusted-root',
+      `codex hook trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${rootStore}.`,
+      { projectPath, repoRoot, configPath: rootStore },
+    );
+  }
+  let body = '';
+  try {
+    body = fs.readFileSync(configPath, 'utf8');
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+  }
+  // A key already present in any TOML form (standard table, dotted, single-quoted) is left alone:
+  // appending a second table would make codex refuse the whole config.
+  const fresh = entries.filter(({ key }) => !body.includes(codexHookHeader(key)) && !body.includes(key));
+  if (fresh.length === 0) return { keys: [], skipped };
+  const sections = fresh.map(({ key, hash }) => `\n${codexHookHeader(key)}\ntrusted_hash = "${hash}"\n`).join('');
+  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
+  try {
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    writeFileKeepingMode(tmp, configPath, `${body.replace(/\n*$/, '\n')}${sections}`);
+  } catch (err) {
+    try { fs.rmSync(tmp, { force: true }); } catch { /* the temp file is not worth a second failure */ }
+    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
+  }
+  return { keys: fresh.map(({ key }) => key), skipped };
 }
 
 // ---------------------------------------------------------------------------

@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -146,8 +147,9 @@ test('installCodexHook wires .codex/hooks.json and checkCodexHook probes cleanly
 
   const config = JSON.parse(fs.readFileSync(hooksFile, 'utf8'));
   assert.equal(config.hooks.PreToolUse.length, 2);
-  assert.equal(config.hooks.PreToolUse[0].hooks[0].command, '.fgos/installation/bin/fgos hook dispatch-decide');
-  assert.equal(config.hooks.PreToolUse[1].hooks[0].command, '.fgos/installation/bin/fgos hook decision-question');
+  const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
+  assert.equal(config.hooks.PreToolUse[0].hooks[0].command, `'${shim}' hook dispatch-decide`);
+  assert.equal(config.hooks.PreToolUse[1].hooks[0].command, `'${shim}' hook decision-question`);
 
   // Without shim, check fails
   assert.equal(checkCodexHook(repoRoot).passed, false);
@@ -178,14 +180,9 @@ test('installAgyHook wires .agents/hooks.json with --format=agy and checkAgyHook
 
   const config = JSON.parse(fs.readFileSync(hooksFile, 'utf8'));
   assert.equal(config['fgos-dispatch-guard'].enabled, true);
-  assert.equal(
-    config['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command,
-    '.fgos/installation/bin/fgos hook dispatch-decide --format=agy',
-  );
-  assert.equal(
-    config['fgos-decision-guard'].PreToolUse[0].hooks[0].command,
-    '.fgos/installation/bin/fgos hook decision-question --format=agy',
-  );
+  const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
+  assert.equal(config['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command, `'${shim}' hook dispatch-decide --format=agy`);
+  assert.equal(config['fgos-decision-guard'].PreToolUse[0].hooks[0].command, `'${shim}' hook decision-question --format=agy`);
 
   // Without shim, check fails
   assert.equal(checkAgyHook(repoRoot).passed, false);
@@ -194,6 +191,67 @@ test('installAgyHook wires .agents/hooks.json with --format=agy and checkAgyHook
   assert.equal(checkAgyHook(repoRoot).passed, true);
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('codex and agy hooks: an old cwd-relative command is reported and replaced by the absolute one', () => {
+  const repoRoot = mkTempDir('agent-hooks-relative-');
+  mockRunnableShim(repoRoot);
+  const codexFile = path.join(repoRoot, '.codex', 'hooks.json');
+  const agyFile = path.join(repoRoot, '.agents', 'hooks.json');
+  fs.mkdirSync(path.dirname(codexFile), { recursive: true });
+  fs.mkdirSync(path.dirname(agyFile), { recursive: true });
+  fs.writeFileSync(codexFile, JSON.stringify({ hooks: { PreToolUse: [
+    { matcher: '.*', hooks: [{ type: 'command', command: '.fgos/installation/bin/fgos hook dispatch-decide' }] },
+  ] } }));
+  fs.writeFileSync(agyFile, JSON.stringify({ 'fgos-dispatch-guard': { enabled: true, PreToolUse: [
+    { matcher: '.*', hooks: [{ type: 'command', command: '.fgos/installation/bin/fgos hook dispatch-decide --format=agy', timeout: 10 }] },
+  ] } }));
+  assert.equal(checkCodexHook(repoRoot).passed, false);
+  assert.equal(checkAgyHook(repoRoot).passed, false);
+
+  installCodexHook(repoRoot);
+  installAgyHook(repoRoot);
+
+  assert.equal(checkCodexHook(repoRoot).passed, true);
+  assert.equal(checkAgyHook(repoRoot).passed, true);
+  const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
+  const codex = JSON.parse(fs.readFileSync(codexFile, 'utf8'));
+  assert.equal(codex.hooks.PreToolUse.filter((e) => e.hooks.some((h) => h.command.includes('dispatch-decide'))).length, 1, 'replaced, not duplicated');
+  assert.ok(codex.hooks.PreToolUse.every((e) => e.hooks.every((h) => h.command.startsWith(`'${shim}'`))));
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('codex hook command quotes a project path that contains a space and a quote', () => {
+  const base = mkTempDir('agent-hooks-quote-');
+  const repoRoot = path.join(base, "my proj'ect");
+  fs.mkdirSync(repoRoot, { recursive: true });
+  installCodexHook(repoRoot);
+  const command = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse[0].hooks[0].command;
+  const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
+  assert.equal(command, `'${shim.replace(/'/g, "'\\''")}' hook dispatch-decide`);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('codex and agy hook commands run from a directory other than the project, even when the path is awkward or names a hook kind', () => {
+  const base = mkTempDir('agent-hooks-exec-');
+  const repoRoot = path.join(base, "my decision-question 'app");
+  fs.mkdirSync(repoRoot, { recursive: true });
+  mockRunnableShim(repoRoot);
+  installCodexHook(repoRoot);
+  installAgyHook(repoRoot);
+
+  const codex = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse;
+  assert.equal(codex.length, 2, 'both codex hooks are present even though the path contains a kind name');
+  const agy = JSON.parse(fs.readFileSync(path.join(repoRoot, '.agents', 'hooks.json'), 'utf8'));
+  const commands = [
+    ...codex.map((e) => e.hooks[0].command),
+    agy['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command,
+  ];
+  for (const command of commands) {
+    const res = spawnSync('sh', ['-c', command], { cwd: os.tmpdir(), input: '{}', encoding: 'utf8', timeout: 5000 });
+    assert.notEqual(res.status, 127, `${command} was not found from another directory`);
+  }
+  fs.rmSync(base, { recursive: true, force: true });
 });
 
 // ---------------------------------------------------------------------------

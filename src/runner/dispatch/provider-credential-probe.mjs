@@ -71,7 +71,9 @@ export function createCredentialProbe({ spawnFn = spawn, timeoutMs = DEFAULT_CRE
         resolve({ ok: false, detail: `could not start ${plan.command}: ${err.message}` });
         return;
       }
-      const collect = (chunk) => { if (output.length < OUTPUT_LIMIT) output += String(chunk); };
+      // The END of what the call printed is what says whether the login works: pi lists its loaded
+      // skills first (tens of KB) and prints the refresh failure last, so the tail is kept.
+      const collect = (chunk) => { output = (output + String(chunk)).slice(-OUTPUT_LIMIT); };
       child.stdout?.on('data', collect);
       child.stderr?.on('data', collect);
       const timer = setTimeout(() => {

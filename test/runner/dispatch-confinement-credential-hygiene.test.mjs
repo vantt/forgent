@@ -245,3 +245,52 @@ test('an adapter failure that left its pane open keeps the home, tags it with th
   assert.deepEqual(thrown.retainedPrivateHomes, ['/fake/home']);
   assert.match(thrown.message, /Private home kept for the open pane.*\/fake\/home/, 'the failure record names the path');
 });
+
+test('a restarted controller and the reaper both address the herdr session a worker was launched in', async () => {
+  const f = fixture();
+  const savedBin = process.env.FGOS_HERDR_BIN;
+  const savedSession = process.env.HERDR_SESSION;
+  try {
+    // A fake herdr that lists the pane only for the worker's own session and records which session asked.
+    const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fake-herdr-'));
+    const state = path.join(scratch, 'pane-open');
+    const asked = path.join(scratch, 'asked');
+    fs.writeFileSync(state, '1');
+    const bin = path.join(scratch, 'fake-herdr.sh');
+    fs.writeFileSync(bin, `#!/bin/sh
+echo "$HERDR_SESSION" >> '${asked}'
+if [ "$HERDR_SESSION" = "fgos-worker" ] && [ -s '${state}' ]; then
+  echo '{"result":{"panes":[{"pane_id":"p-9"}]}}'
+else
+  echo '{"result":{"panes":[]}}'
+fi
+`, { mode: 0o755 });
+    process.env.FGOS_HERDR_BIN = bin;
+    process.env.HERDR_SESSION = 'operator-cockpit'; // the ambient session is not the worker's
+
+    const plan = planFor(f.tempRoot, 'disp_session');
+    const prepared = await prepareBwrap(
+      plan,
+      requestFor('disp_session', { kind: 'home-files', home: f.accountHome, files: ['plain-auth.json'] }),
+      { id: 'bwrap', type: 'bwrap', config: {} },
+    );
+    const home = plan.resources[0].hostTarget;
+    prepared.retain({ paneId: 'p-9', herdrSession: 'fgos-worker' });
+    assert.equal(readOwnershipMarker(home).herdrSession, 'fgos-worker');
+
+    const deadOwner = () => false;
+    const whilePaneOpen = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner });
+    assert.deepEqual(whilePaneOpen.reaped, [], 'the worker session still has the pane, so its home stays');
+    assert.ok(fs.readFileSync(asked, 'utf8').includes('fgos-worker'), 'the reaper asked the recorded session');
+    assert.ok(!fs.readFileSync(asked, 'utf8').includes('operator-cockpit'), 'and never the ambient one');
+
+    fs.writeFileSync(state, '');
+    const afterClose = reapOrphanedConfinementResources({ tempRoot: f.tempRoot, checkLiveness: deadOwner });
+    assert.equal(afterClose.reaped.length, 1);
+    assert.equal(afterClose.reaped[0].reason, 'pane-closed');
+  } finally {
+    if (savedBin === undefined) delete process.env.FGOS_HERDR_BIN; else process.env.FGOS_HERDR_BIN = savedBin;
+    if (savedSession === undefined) delete process.env.HERDR_SESSION; else process.env.HERDR_SESSION = savedSession;
+    f.cleanup();
+  }
+});

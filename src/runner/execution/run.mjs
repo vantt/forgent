@@ -254,6 +254,9 @@ export async function runUnit(options = {}) {
     };
 
     fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
+    // Told once, as soon as the run exists and before any seat can start, so a caller can record
+    // the id and resume this run if it dies. Not called for a resumed run: its id is already known.
+    options.onUnitRunCreated?.(unitRunId);
   }
 
   const unitDir = path.join(assignmentsDir, unitRunId);

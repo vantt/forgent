@@ -48,7 +48,8 @@ function fakeSpawn({ output = '', exitCode = 0, never = false } = {}) {
     child.stdout = new EventEmitter();
     child.stderr = new EventEmitter();
     child.kill = () => child.emit('close', null);
-    if (!never) setImmediate(() => { child.stdout.emit('data', output); child.emit('close', exitCode); });
+    // A real child delivers its output in many pieces, not one.
+    if (!never) setImmediate(() => { for (let i = 0; i < output.length; i += 4096) child.stdout.emit('data', output.slice(i, i + 4096)); child.emit('close', exitCode); });
     return child;
   };
   return { spawnFn, seen };
@@ -86,4 +87,14 @@ test('a command that cannot even start is a failed call, not an exception', asyn
   const result = await createCredentialProbe({ spawnFn })({ account: { credentialSource: codexSource } });
   assert.equal(result.ok, false);
   assert.match(result.detail, /ENOENT/);
+});
+
+test('a dead login named at the end of a long output is still seen, so the account stays locked', async () => {
+  const noise = 'loaded skill description '.repeat(1500); // well over the retained size
+  const { spawnFn } = fakeSpawn({ output: `${noise}\n{"errorMessage":"OAuth refresh failed for xai: xAI OAuth token refresh failed (HTTP 400): invalid_grant"}` });
+
+  const result = await createCredentialProbe({ spawnFn })({ account: { credentialSource: piSource } });
+
+  assert.equal(result.ok, false);
+  assert.match(result.detail, /still rejected/);
 });

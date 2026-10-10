@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
+import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
 // ~/.claude.json -- the module takes the store path as an argument precisely so a
@@ -286,4 +286,52 @@ test('a 0600 codex config is still 0600 after seed and after remove', () => {
     removeCodexTrust(file, '/tmp/wt-mode');
     assert.equal(modeOf(file), 0o600);
   } finally { process.umask(previous); fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+// claude asks a person to approve each MCP server a project declares; an unattended worker would
+// stop there. The approval is per process and derived from an already-trusted root.
+test('claudeMcpApprovalArgs approves exactly the servers the project declares, only for a trusted root', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mcp-approval-'));
+  try {
+    const project = path.join(dir, 'proj');
+    fs.mkdirSync(project);
+    const store = path.join(dir, 'claude.json');
+    fs.writeFileSync(store, JSON.stringify({ projects: { [project]: { hasTrustDialogAccepted: true } } }));
+    fs.writeFileSync(path.join(project, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {}, other: {} } }));
+
+    const args = claudeMcpApprovalArgs({ cwd: project, repoRoot: project, storePath: store });
+    assert.equal(args[0], '--settings');
+    assert.deepEqual(JSON.parse(args[1]), { enabledMcpjsonServers: ['skillhub', 'other'] });
+
+    assert.deepEqual(claudeMcpApprovalArgs({ cwd: project, repoRoot: path.join(dir, 'other-root'), storePath: store }), [], 'root not trusted: nothing approved');
+    fs.writeFileSync(path.join(project, '.mcp.json'), JSON.stringify({ mcpServers: {} }));
+    assert.deepEqual(claudeMcpApprovalArgs({ cwd: project, repoRoot: project, storePath: store }), [], 'no servers declared');
+    fs.rmSync(path.join(project, '.mcp.json'));
+    assert.deepEqual(claudeMcpApprovalArgs({ cwd: project, repoRoot: project, storePath: store }), [], 'no .mcp.json');
+    assert.deepEqual(claudeMcpApprovalArgs({ cwd: project, repoRoot: project, storePath: path.join(dir, 'missing.json') }), [], 'unreadable store: nothing approved');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('claudeMcpApprovalArgs trusts a linked worktree through the main checkout that owns it', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mcp-worktree-'));
+  try {
+    const main = path.join(dir, 'main');
+    fs.mkdirSync(main);
+    const git = (...a) => execFileSync('git', a, { cwd: main, stdio: 'ignore' });
+    git('init', '-q'); git('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'x');
+    const wt = path.join(dir, 'wt');
+    git('worktree', 'add', '-q', wt);
+    fs.writeFileSync(path.join(wt, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {} } }));
+    const store = path.join(dir, 'claude.json');
+    fs.writeFileSync(store, JSON.stringify({ projects: { [fs.realpathSync(main)]: { hasTrustDialogAccepted: true } } }));
+
+    const args = claudeMcpApprovalArgs({ cwd: wt, repoRoot: wt, storePath: store });
+
+    assert.deepEqual(JSON.parse(args[1]), { enabledMcpjsonServers: ['skillhub'] });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

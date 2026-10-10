@@ -1644,7 +1644,7 @@ test('done findings survive both settlement branches; verified mutating work sti
       const disposition = interpretAssignmentRunResult({ choice: { operation, assignment }, runResult: result, repoRoot: tempDir });
       assert.equal(disposition.stop, true);
       assert.equal(disposition.canAdvanceEdge, false);
-      assert.equal(disposition.reason, 'assignment-implement-item-insufficient-confidence');
+      assert.equal(disposition.reason, 'assignment-implement-item-findings');
     }
   }
 });

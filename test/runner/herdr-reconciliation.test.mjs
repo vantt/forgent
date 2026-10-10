@@ -228,6 +228,48 @@ test('1. Confinement Authority prepares herdr-spawn launch under required bwrap 
   assert.ok(fs.existsSync(path.join(runDir, 'protected', 'prepared-invocation', 'cmd-01.json')));
 });
 
+// A claude worker's project MCP servers are approved per process through its launch args. Those args
+// are part of the published invocation, so a retry must reuse them even if .mcp.json changed since.
+test('1b. a claude worker launch carries the project MCP approval once and a retry keeps the published args', async () => {
+  if (!HAS_WORKING_BWRAP) return;
+  const tmp = mkTempDir();
+  const fgosDir = path.join(tmp, '.fgos');
+  const runDir = path.join(fgosDir, 'runs', 'run-1b');
+  fs.mkdirSync(runDir, { recursive: true });
+  const store = path.join(tmp, 'claude.json');
+  fs.writeFileSync(store, JSON.stringify({ projects: { [tmp]: { hasTrustDialogAccepted: true } } }));
+  fs.writeFileSync(path.join(tmp, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {} } }));
+
+  const launchContext = {
+    contract: 'assignment-herdr-spawn-launch-context.v1',
+    run: { runId: 'run-1b', assignmentId: 'asgn-1b', attempt: 1, dispatchPlanDigest: 'sha256:abcd', evaluatorBaselineDigest: 'sha256:1234' },
+    command: { launchCommandId: 'cmd-1b', controlEpoch: 1, controlTokenDigest: computeSha256Digest('tok-1') },
+  };
+  const build = () => ({
+    ...buildConfinementRequest({
+      backendId: 'bwrap',
+      context: { runDir, cwd: tmp, repoRoot: tmp, fgosDir, workId: 'item-1b', tier: 'standard', model: 'sonnet' },
+      capability: 'code:implement',
+      requirement: { mode: 'required', policyId: 'host-write-denied', policy: BUILTIN_POLICIES['host-write-denied'] },
+      invocation: {
+        command: 'claude', args: ['--model', 'sonnet'], workerCommandSeam: true, adapter: 'herdr-spawn',
+        interactiveMode: { kind: 'claude', trustStore: { kind: 'claude-json', path: store } },
+      },
+    }),
+    assignmentLaunchContext: launchContext,
+  });
+
+  const first = await prepareConfinementForLaunch(build(), { adapterName: 'herdr-spawn' });
+  const args = first.preparedInvocation.workerInvocation.args;
+  assert.equal(args.filter((a) => a === '--settings').length, 1);
+  assert.deepEqual(JSON.parse(args[args.indexOf('--settings') + 1]), { enabledMcpjsonServers: ['skillhub'] });
+
+  fs.writeFileSync(path.join(tmp, '.mcp.json'), JSON.stringify({ mcpServers: { skillhub: {}, extra: {} } }));
+  const retry = await prepareConfinementForLaunch(build(), { adapterName: 'herdr-spawn' });
+  assert.deepEqual(retry.preparedInvocation.workerInvocation.args, args, 'a retry launches with the published args');
+  assert.equal(retry.preparedInvocation.workerInvocation.workerCommandDigest, first.preparedInvocation.workerInvocation.workerCommandDigest);
+});
+
 // 2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false
 test('2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false', async () => {
   if (!HAS_WORKING_BWRAP) return;
@@ -1340,10 +1382,10 @@ test('22. verifyProcessEnvironment catches value overrides and injected addition
 // isHerdrSpawnRunStillWorking's own decision table -- it previously had none
 // beyond indirect integration coverage (flagged in Phase 8a's own report).
 
-function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId }) {
+function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId, herdrSession }) {
   const commandsDir = path.join(runDir, 'controller', 'commands');
   fs.mkdirSync(commandsDir, { recursive: true });
-  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId }));
+  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId, ...(herdrSession ? { herdrSession } : {}) }));
 }
 
 test('isHerdrSpawnRunStillWorking returns false when no controller/commands record exists at all', async () => {
@@ -1424,6 +1466,33 @@ test('isHerdrSpawnRunStillWorking fails closed to "unknown" when both agentGet a
       paneProcessInfo: () => { throw new Error('herdr_call_timeout'); },
     };
     assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrClient: brokenClient }), 'unknown');
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('recovery asks the herdr session the worker was launched in, not the ambient one', async () => {
+  const runDir = mkTempDir('fgos-herdr-session-recovery-');
+  try {
+    // A fake herdr that knows the worker only inside its own session.
+    const bin = path.join(runDir, 'fake-herdr.sh');
+    fs.writeFileSync(bin, `#!/bin/sh
+if [ "$HERDR_SESSION" = "fgos-worker" ]; then
+  echo '{"result":{"agent":{"agent_status":"working","pane_id":"wS:pTest"}}}'
+else
+  echo '{"error":{"code":"pane_not_found"}}'; exit 1
+fi
+`, { mode: 0o755 });
+    const ambient = { ...process.env, HERDR_SESSION: 'operator-cockpit' };
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest', herdrSession: 'fgos-worker' });
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), true, 'found through the recorded session');
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), 'unknown', 'a record without a session keeps asking the ambient one, which does not know the pane');
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest', herdrSession: 'Not A Valid Name!' });
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), 'unknown', 'a session name that cannot be addressed fails closed instead of throwing');
   } finally {
     fs.rmSync(runDir, { recursive: true, force: true });
   }

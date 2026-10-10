@@ -44,7 +44,9 @@ import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-h
 import {
   seedTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   removeTrust, removeCodexTrust, removeAgyTrust,
+  seedCodexHookTrust, trustRoots,
 } from './trust-store.mjs';
+export { trustRoots };
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
@@ -486,6 +488,8 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     model,
     agentName,
     paneId: null,
+    // The herdr session the pane lives in, so a later reaper or recovery asks the right server.
+    herdrSession: null,
     // True only when this round wrote a trust entry, so teardown removes what it wrote and
     // never an entry a person vouched for.
     trustWritten: false,
@@ -494,7 +498,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     },
     fail(errorClass, reason, message, extra = {}) {
       return new DispatchError(errorClass, message, {
-        workId, tier, model, reason, runDir, agentName, paneId: round.paneId, ...extra,
+        workId, tier, model, reason, runDir, agentName, paneId: round.paneId, herdrSession: round.herdrSession, ...extra,
       });
     },
   };
@@ -647,7 +651,7 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
  * already be trusted by some other route, and the dialog it might still hit
  * is reported by name by the very next step anyway.
  */
-function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
+export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
   const projectPath = path.resolve(cwd);
   const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
   const stores = trustStorePaths({ trustStore, fullEnv, workerEnv });
@@ -657,6 +661,8 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerE
       let wrote;
       if (trustStore.kind === 'codex-toml') {
         wrote = seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
+        // Only into a worker's own private home: hook trust is never written to the account's real config.
+        if (stores.target !== stores.root) seedHookTrust({ round, target: stores.target, projectPath, repoRoot: root, rootConfigPath: stores.root });
       } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
         wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
       } else {
@@ -676,22 +682,18 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerE
   round.note({ trustSeedFailed: firstError?.message ?? 'no trust root to derive from' });
 }
 
-/**
- * Roots a workspace's trust may be derived from: the repository root the run
- * was started for and, for a linked worktree, the main checkout that owns it
- * (the same repository, and the root codex itself asks about). Never invents
- * a root: each is only a candidate for the "already trusted" check.
- */
-export function trustRoots(projectPath, repoRoot) {
-  const roots = [repoRoot];
+/** codex hook review is a second dialog after folder trust; seed it from the same trusted root.
+ * Never throws: a failure is noted and the review it would have cleared is reported by name. */
+function seedHookTrust({ round, target, projectPath, repoRoot, rootConfigPath }) {
   try {
-    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
-      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
-  } catch { /* not a checkout: only the declared root is a candidate */ }
-  return [...new Set(roots)];
+    const { keys, skipped } = seedCodexHookTrust(target, { projectPath, repoRoot, rootConfigPath });
+    if (keys.length) round.note({ hookTrustSeeded: keys.length });
+    if (skipped) round.note({ hookTrustSkipped: skipped });
+  } catch (err) {
+    round.note({ hookTrustSeedFailed: err.message });
+  }
 }
+
 
 /**
  * Where the trust decision is read (the account's real store) and where the
@@ -1578,6 +1580,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // a different pane-id namespace) than an unconfined one -- HERDR_SESSION is
   // what `isolatedSessionEnv` sets it to, so it is what distinguishes them.
   const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
+  // Only a session actually named: assuming 'default' would send a later reaper to the wrong socket.
+  round.herdrSession = sessionEnv?.HERDR_SESSION ?? null;
   const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
 
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
@@ -1775,7 +1779,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         patchCommandRecord({
           runDir, launchCommandId: ctx.launchCommandId,
           controlEpoch: ctx.controlEpoch, controlToken: ctx.controlToken,
-          patch: { paneId: round.paneId },
+          patch: { paneId: round.paneId, herdrSession: round.herdrSession },
         });
       } catch {}
     }
