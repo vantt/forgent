@@ -34,6 +34,8 @@ holding hundreds of edits on a long-lived branch.
 - comments that name authority paths;
 - external-facing links where maintained in-repo.
 
+**Evidence payloads** ([policy](evidence-payload-relocation-policy.md) §4-§6): repoint the consumers of `docs/architect/agent-coordination/verification/**` listed in the policy's consumer table (about 190 files: skill sources, how-to links, code comments, the promoted area's README and proof-preservation table), refresh that table for the cutover commit, and build the digest manifest and `scripts/check-evidence-relocation.mjs` (`--before`, `--after`) so Phase 9 step 6 can run.
+
 ## Architecture
 
 Program-level data model and execution boundary: `plan.md` §5 (Execution Boundary) and §6 (Minimum Migration Data Model).

@@ -15,6 +15,8 @@ blocks: []
 Plan status: In-progress (Phase 1 complete; Phase 2 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 3 complete -- independent closure-review verdict APPROVE for `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`, immutable full receipt pinned on the same-tree boundary, tagged `documentation-authority-phase-02-20260926`; Phase 4 complete (closed by the owner 2026-10-06; commits `3b409a373..7c632737b` plus the closing commit); Phase 5 complete (closed 2026-10-07, verdict PASS-WITH-AMENDMENTS); Phases 6-10 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
+Parent: docs/platform/proposals/documentation-system-unification.md (this plan delivers its first steps up to the maintenance system; the full authoring door and agent context engine stay with later plans)
+Sibling plans: plans/261006-1415-fgos-convention-component/ (naming and placement of reports, plans, journals; reserves the placement, classify and overlay hooks Phase 10 reuses); plans/reports/harness-investigation-261006-synthesis.md (H6 is this plan)
 Historical foundation: archive/plans/260825-1841-knowledge-registry/ (moved from plans/ by main commit 22e54f834 on 2026-09-30; see §7.4)
 Execution authority: Phase 1 and Phase 2 completed by direct human request on 2026-09-25; Phase 3 authorized by direct human request on 2026-09-26 (Phase 3 doer assignment, isolated worktree /home/vantt/projects/forgentX-phase00-documentation-authority-unification); 2026-10-06 resume authorized for sync, re-inventory and plan update; Phase 4 authorized by the owner on 2026-10-06 (pre-step first); Phase 5 authorized by the owner on 2026-10-06 and completed on 2026-10-07 (decisions in §7.5b); no authority for Phases 6-10
 Resume state (2026-10-06): branch synced with main at 2fd5cb6a3; inventory regenerated and compared (§7.4); formal blockers completed; Phase 4 completed (2026-10-06); pre-step 0a done (commit `6397a9970`), pre-step 0b done (commit `3809d692c`, report `reports/gate-failures-investigation-261006.md`)
@@ -155,7 +157,7 @@ as a large code migration.
    footprint, baseline checks, and current source digests.
 9. Do not merge any candidate corpus to main before the atomic cutover gate.
    Approved early-harvest controls—switchboard, inventory, ratchet, alias table,
-   and evidence relocation—may merge as separately reviewed changes because they
+   and evidence relocation ([policy](evidence-payload-relocation-policy.md))—may merge as separately reviewed changes because they
    preserve current authority and reduce risk.
 10. Every mutation, including an early-harvest change, is authored and verified
     in a dedicated branch/worktree; the main checkout remains reference/review

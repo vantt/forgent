@@ -32,7 +32,10 @@ reviewable integration change.
 4. promote target authority metadata;
 5. switch every reader and writer;
 6. delete maintained files under `docs/specs/**` and `docs/architect/**` only
-   after non-authority evidence payloads have been relocated and verified;
+   after non-authority evidence payloads have been relocated and verified
+   (per [the evidence relocation policy](evidence-payload-relocation-policy.md):
+   `check-evidence-relocation --before` passes, the legacy copy is deleted,
+   `--after` passes; payload bytes are never edited);
 7. activate approved aliases in the minimal platform resolver, not as duplicate
    files;
 8. regenerate projections and indexes;
