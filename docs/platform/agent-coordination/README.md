@@ -26,6 +26,7 @@ Added in candidate: Current-owner routing and retirement framing
 The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. `coordination` is not a current public CLI verb; the actual machine-readable `--help --json` manifest is the CLI inventory.
 
 CollaborationPattern owns Unit collaboration patterns in `src/runner/execution/patterns/index.mjs`; Unit execution enters through `src/runner/execution/run.mjs`. Workflow execution belongs to `src/workflow/runner.mjs` and its Unit execution-core integration.
+The surviving Assignment/Run dispatch chain is also current: Assignment building, DispatchPlan compilation, governed execution and RunResult normalization are owned by `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`.
 
 Read [the runner spec](../../specs/runner.md) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities.
 
@@ -57,6 +58,10 @@ FlowDefinition, CoordinationProtocol or `fgos coordination` contract is retained
 | Work and result authority boundaries | [Work integration](architecture/work-integration.md), [ADR-001](decisions/ADR-001-work-lifecycle-authority.md), [ADR-003](decisions/ADR-003-assignment-run-runresult-separation.md), [ADR-005](decisions/ADR-005-herdr-visibility-only.md), [ADR-011](decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) |
 | Cognitive advisory quality, not runtime recipes | [Coordinator companion](playbooks/prompts/architecture-advisory-coordinator.md), [role doctrine](playbooks/architecture-advisory-role-doctrine.md), [artifact templates](playbooks/architecture-advisory-artifact-templates.md), [evaluation rubric](playbooks/architecture-advisory-evaluation-rubric.md) |
 | Dated physical evidence | [Verification index](verification/README.md); evidence payload bytes and paths remain unchanged |
+| Legal Workflow operations and current vocabulary | [Operation contract](contracts/workflow-stage-operation.md), [vocabulary index](vocabulary/README.md), [trigger surface](architecture/group-thinking-trigger-surface.md) |
+| Provenance, compatibility and domain harness decisions | [Decision index](decisions/README.md), including current ADR-002, ADR-004, ADR-006 and ADR-007 |
+| Current intended design, not blanket implementation | [Proposal index](proposals/README.md), [foundation vision](vision.md); section status distinguishes proposals from implemented behavior |
+| Owner-retained manual operating material | [Operating harness](playbooks/coordination-operating-harness.md), [master coordinator](playbooks/prompts/master-coordinator.md); these are not the registered architecture-advisory runtime |
 | Classified prior files | [Whole-input history](history/retired-engine/files/README.md#literal-snapshot); historical statuses and links do not establish present implementation |
 
 The registered skill explicitly retains the four cognitive companions and

@@ -2,24 +2,26 @@
 
 ```txt
 Document type: Guide / runbook
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Retain cognitive quality guidance consumed by the registered architecture-advisory skill
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Cognitive companion only; registered Workflow owns execution and safety
-Provenance: Retained from docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Candidate cognitive guidance only; not runtime routing, model selection or execution authority
-Use this when: Applying role posture, artifact reasoning or evaluation criteria
-Do not use this for: Launching historical runtime recipes or treating dated roster examples as live configuration
-Last reviewed: Pending independent whole-area review
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md
-- docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
-- docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
 ## Current Boundary
 
 The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
@@ -65,34 +67,9 @@ Quality judgment lives in [the evaluation rubric](architecture-advisory-evaluati
 
 ## The Shape Of The Panel
 
-```text
-person ──► intake (frozen) ──► lead advisor ──► interpretation
-                                    │
-                                    ▼
-                          context investigator ──► evidence
-                                    │
-                   ┌────────────────┼────────────────┐
-                   ▼                ▼                ▼
-            system shaper   alternative shaper  constraint advocate
-                   │                │                │
-                   └────────────────┼────────────────┘
-                                    ▼
-                          architecture critic  ◄── specialist (on demand)
-                                    │
-                                    ▼
-                              synthesizer ──► Decision Packet
-                                    │
-                                    ▼
-                          independent red-team
-                                    │
-                                    ▼
-                       lead advisor ──► explanation ──► person
-```
+The registered architecture-advisory Workflow is framing -> blind three-seat shaping -> reviewed critique -> reviewed synthesis -> explanation -> human close. Synthesis requires reviewer and red-team checks of the final RAW JSON packet. Evidence: core/workflows/architecture-advisory.yaml:8-84.
 
-The external driver sits outside this graph entirely. It authorizes and
-dispositions; it never occupies a box.
-
----
+The nine role postures below are cognitive lenses and worked examples, not nine mandatory runtime jobs or a driver-owned phase graph. They do not authorize a new roster, conditional specialist step or direct actor launch. Execution, routing and resumption follow core/skills/fgos-architecture-panel/SKILL.md, not an operating recipe in the coordinator companion.
 
 ## 1. Lead Advisor
 

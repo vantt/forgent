@@ -2,30 +2,55 @@
 
 ```txt
 Document type: Decision
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Identify the surviving current owner and preserve superseded sections in exact history
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Current scope below is bound to present code; historical design is not implementation proof
-Provenance: Retained from docs/architect/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Candidate current-owner and boundary guidance only; no authority cutover or duplicate runtime schema
-Use this when: Reading the checked surviving scope or tracing original historical claims
-Do not use this for: Reinstating retired Session, Flow, Protocol or Work-stage contracts
-Last reviewed: Pending independent whole-area review
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- None
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Current-owner evidence and explicit historical section separation
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
-## Current Scope
 
-This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../../specs/runner.md).
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
-Work no longer has a stage; sequencing belongs to Workflow, not a parallel coordination engine. Evidence: `src/state/work.mjs:455-472`, `src/workflow/runner.mjs:419-428`; settled boundary: `docs/specs/runner.md:3072-3081`.
+## Implementation And Design Status
 
-The Workflow runner invokes Unit execution for its executable nodes. Evidence: `src/workflow/runner.mjs:419-428`.
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
 
-## Historical Sections
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Context | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment-runner.mjs:10 'Never mutates Work lifecycle state'; src/state/work.mjs:455-472 |
+| Decision | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:10; test/runner/dispatch-reconciliation-import-graph.test.mjs (no pick/return/claim/appendEvent in dispatch core); AGENTS.md one-door-write verbs |
+| Consequences | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment-runner.mjs:10; src/runner/fanout-batch.mjs / loop.mjs return results to Work driver |
 
-The complete classified input, including all former contracts, schemas, qualifications and implementation statuses, is [preserved verbatim](../history/retired-engine/files/decisions/ADR-001-work-lifecycle-authority.md#literal-snapshot). The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see the runner spec’s historical CoordinationSession section. Retired Session/Flow/Protocol and Work-stage sections are not current contracts. No historical claim is deleted or silently reclassified as implemented.
+## Context
+
+Coordination introduces Assignments, Runs, results, possible sessions, and
+temporary tasks. Letting those objects mutate lifecycle independently would
+create conflicting status, approval, and merge truth.
+
+## Decision
+
+Work and existing Work engine verbs are the sole authority for Work status,
+stage, claim/return, acceptance, approval, durable branch, and merge lifecycle.
+
+Coordination objects may provide evidence or recommendations to a Work driver,
+but cannot perform lifecycle transitions except through authorized Work verbs.
+
+## Consequences
+
+- Session/task status must remain collaboration-local.
+- Agent consensus cannot approve or complete Work.
+- Work-attached dispatch must return results to the driver.
+- Standalone coordination can exist without gaining delivery authority.
+- Lifecycle leakage is a high-severity review finding.
+

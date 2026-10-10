@@ -4,8 +4,8 @@ Date: 2026-10-10
 Executor: codex-session:1@2026-10-08
 Session counter: 1
 Step: first content batch, Agent Coordination; liveness-first section rework
-State: blocked by new routing regressions; not ready for review
-Blocker: unchanged H reports three new unresolved-link tuples caused by author normalization of physical stage-bearing link filenames. Standing A7 requires stop; no baseline/checker change or self-approved continuation.
+State: authoring resumed under A18; not ready for review
+Blocker: none for the authorized three-link repair; unchanged H now reproduces only the 30 exact inherited tuples and zero Agent Coordination/new findings.
 Last green conservation commit: 6df71985bf87b30a7a865e31f22c37ec22a8c8c8 (full/scoped D twice each against both prior registries, zero fatal findings; whole-area-verification.json)
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: d98a5c5e75e4529cd99dd9c8bce95a0032806d95 (imports main 90a4fb27c8e43fca9e73714f1c3f235e832ce38a under A12)
@@ -227,3 +227,9 @@ Restoration authored before the routing stop: all nineteen rejected whole-file m
 Observed stop: `node scripts/check-doc-candidate-status.mjs --json` exits 0 but reports 33 findings: thirty exact inherited tuples plus three NEW Agent Coordination unresolved-link tuples. The Stage/stage prose normalization incorrectly renamed link destinations to workflow-step-operation.md, step-02-workflow-step-operations.md and ADR-002-step-operation-compatibility.md; those are not physical filenames. This is an author-caused regression, not baseline debt. Full evidence and proposed narrow data-only correction are in liveness-rework-routing-stop.json. Stop now under standing A7; do not baseline these findings or publish a ready-for-review request.
 
 The initial read-only liveness scan/classification is committed as 5130cce8c. A basename-boundary refinement of the scan is uncommitted and still needs rerun/output/classification proof; the original broad substring matches are not final liveness adjudication. No new source/retired/classification approvals or content commit are made after the routing stop. Next requires owner authorization for the three-link data-only repair and resumption; then finish exact sentence-level adjudication, current-vs-proposal splits, changed accounting, both-prior D/E and tests, and publish only the limited A17 re-review request.
+
+Authorized continuation: A18 c071b6c66 permits the exact repair of this pass's three unresolved links without a checker/baseline/vocabulary change. Physical stage-bearing filenames are restored. `node scripts/check-doc-candidate-status.mjs --json`: exit 0, 30 findings, 30 exact inherited, zero new and zero Agent Coordination. The extra duplicated Workflow word in the contract title was also an own-pass normalization error and is corrected without renaming its file. Existing stop evidence remains intact.
+
+Refined liveness references are committed as 5d470d7e4: exact basename boundaries exclude suffix/other-area filenames, relative Markdown references are resolved against their source directories, and the 569-input scan is rerun. No new retirement is authorized by an ambiguous lexical match. The committed whole-area report's ok/rework/hold verdicts have been applied to the ten source shards through the unchanged --apply-review command; changed versions will be reopened rather than inheriting those approvals.
+
+Current section rework restores nineteen wrongly moved files, fifteen retained files' live/design sections and the two owner-protected operating prompts. Six mixed files distinguish surviving execution/cognitive/design vocabulary from historical session-engine material; the redesign proposal's dated findings stay as dated context, not fabricated current defects. Remaining proof, changed-row rebinding and the limited independent re-review handoff are in progress; readiness remains UNPROVEN.

@@ -35,6 +35,7 @@ Current execution owners are:
 - CollaborationPattern for Unit runs: `src/runner/execution/patterns/index.mjs`.
 - The Workflow runner: `src/workflow/runner.mjs`.
 - Their current contract: [docs/specs/runner.md](../../specs/runner.md), not the retired CoordinationSession engine.
+- Assignment/Run dispatch: `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`; the current [dispatch contract](contracts/assignment-run-runresult.md) and [control-plane owner](architecture/dispatch-control-plane.md) retain that boundary.
 
 ## Scope
 
@@ -58,6 +59,7 @@ This area does not own:
 |---|---|
 | Unit execution | `src/runner/execution/run.mjs` and `src/runner/execution/patterns/index.mjs` |
 | Workflow execution | `src/workflow/runner.mjs` |
+| Assignment/Run dispatch and normalization | `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs`, `run-result.mjs` |
 | Retired coordination CLI | [Historical snapshot](history/retired-engine/spec.md#literal-snapshot), not a current public door |
 
 ## Core Entities
@@ -70,11 +72,12 @@ Current sequencing and collaboration belong to the [Workflow runner](../../../sr
 
 ## Contracts Owned
 
-The current execution contract is owned by [docs/specs/runner.md](../../specs/runner.md):
+Unit/Workflow execution ownership is described by [docs/specs/runner.md](../../specs/runner.md). The surviving Assignment/Run dispatch contract is retained in this area's current contract and architecture documents; the runner spec does not supersede their complete recovery/control details.
 
 | Contract reading | Owner |
 |---|---|
 | Current execution | [Runner spec](../../specs/runner.md) and its executable owners |
+| Assignment, Run, RunResult and recovery/control boundaries | [Assignment contract](contracts/assignment-run-runresult.md), [dispatch architecture](architecture/dispatch-control-plane.md), [recovery](architecture/runtime-recovery-design.md), [run control](architecture/run-handle.md) |
 | Former coordination engine | [Verbatim historical spec](history/retired-engine/spec.md#literal-snapshot); not current schema authority |
 
 ## Contracts Consumed
@@ -82,7 +85,7 @@ The current execution contract is owned by [docs/specs/runner.md](../../specs/ru
 | Contract area | Owner | Agent Coordination use |
 |---|---|---|
 | Work lifecycle and state | Work-state / runner specs | Optional Work integration; Work remains lifecycle authority. |
-| Host invocation and provider routing | [host-invocation-routing](../host-invocation-routing/README.md) | Dispatch/executor integration consumes host-owned process routing. |
+| Host invocation and provider routing | [host-invocation-routing](../host-invocation-routing/README.md) | Adjacent process-routing authority; this page does not claim that every Node dispatch path consumes that component. |
 | Packaging/distribution | [packaging-distribution](../packaging-distribution/README.md) | Runtime identity, activation, setup/doctor, and release packaging are link-only external authority. |
 | Confinement Authority | [confinement-authority spec](../../specs/confinement-authority.md) | Execution confinement evidence and attestation may be consumed by dispatch paths. |
 

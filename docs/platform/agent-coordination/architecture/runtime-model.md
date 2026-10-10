@@ -2,48 +2,74 @@
 
 ```txt
 Document type: Architecture
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Identify the surviving current owner and preserve superseded sections in exact history
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Current scope below is bound to present code; historical design is not implementation proof
-Provenance: Retained from docs/architect/agent-coordination/architecture/runtime-model.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Candidate current-owner and boundary guidance only; no authority cutover or duplicate runtime schema
-Use this when: Reading the checked surviving scope or tracing original historical claims
-Do not use this for: Reinstating retired Session, Flow, Protocol or Work-stage contracts
-Last reviewed: Pending independent whole-area review
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- docs/platform/agent-coordination/contracts/assignment-run-runresult.md
-- docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md
-- docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Current-owner evidence and explicit historical section separation
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
-## Current Scope
 
-This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../../specs/runner.md).
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/runtime-model.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
-The current execution-core pattern selector supports solo, reviewed and panel Unit patterns. Evidence: `src/runner/execution/patterns/index.mjs:34-46`.
+## Implementation And Design Status
 
-The result normalizer accepts assignmentId, unitRunId and round alongside runId; these are distinct fields, not a restored CoordinationSession. Evidence: `src/runner/dispatch/run-result.mjs:350-355`.
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Execution Chain | Current contract/invariant | src/runner/dispatch/assignment.mjs:283 buildAssignment -> plan.mjs:45 compileDispatchPlan -> assignment-runner.mjs:783 run_<assignment>_<attempt> -> run-result.mjs:350 normalizeRunResult |
+| Invariants | Current contract/invariant | Assignment frozen: assignment.mjs:374-419 Object.freeze; distinct Run per attempt assignment-runner.mjs:783,893,931; confidence from evidence run-result.mjs:29-56 (no self-report trust); mutating done w/o evidence = no-evidence (cited at HEAD run-result.mjs:1276-1280) |
+| Storage | Mixed implementation and proposal; no blanket implementation claim | Canonical Assignment/Run/RunResult records: assignment.mjs, run-result.mjs, runDir layout in assignment-layout.mjs; CoordinationSession/FlowDefinition/CoordinationProtocol paragraph refers to ADR-008/ADR-009 and src/runner/coordination retired in 2180b4e72 |
+
+## Execution Chain
+
+```txt
+declared legal Stage Operation
+  or validated inline execution contract
+  -> Assignment
+    -> dispatch policy resolution
+      -> DispatchPlan
+        -> Run
+          -> worker result / runtime settlement / artifacts
+            -> RunResult
+              -> evidence-aware driver decision
+```
+
+## Invariants
+
+- Assignment is immutable semantic intent, not an execution attempt.
+- Assignment provenance identifies whether its contract came from a declared
+  operation/TaskSpec or validated agent-led planning.
+- The inline path must satisfy foundation authority, budget, mutation, privacy,
+  evidence, and dispatch validation; it is not a compatibility bypass.
+- Each dispatch attempt creates a distinct Run.
+- Retry creates another Run for the same Assignment.
+- Each settled Run produces a normalized RunResult or explicit failure record.
+- Prior Runs and evidence remain available after retry.
+- Result confidence is derived from evidence policy, not worker self-report.
+- Driver consumption of RunResult does not grant direct Work mutation authority.
 
 ## Failure Domains
 
-The runtime distinguishes:
+The concrete failure-family vocabulary is owned by FAILURE_FAMILIES in src/runner/dispatch/run-result.mjs, not the former eight-domain design grouping. Controller/worker/transport/evidence failures must not be collapsed into success or inferred Work completion.
 
-- assignment construction/validation failure;
-- dispatch policy rejection;
-- launch/transport failure;
-- process timeout or non-zero exit;
-- malformed or missing worker result;
-- evidence mismatch or staleness;
-- semantic task failure;
-- persistence/recovery failure.
+## Storage
 
-These outcomes must not collapse into a generic successful process exit.
+Assignment, Run, RunResult, artifacts, and evidence require canonical records
+with IDs and references. Session or Mission storage must reference these records
+rather than create conflicting copies.
 
+The field-level baseline is defined in
+[Assignment, Run, And RunResult Contract](../contracts/assignment-run-runresult.md).
 
-## Historical Sections
-
-The complete classified input, including all former contracts, schemas, qualifications and implementation statuses, is [preserved verbatim](../history/retired-engine/files/architecture/runtime-model.md#literal-snapshot). The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see the runner spec’s historical CoordinationSession section. Retired Session/Flow/Protocol and Work-stage sections are not current contracts. No historical claim is deleted or silently reclassified as implemented.

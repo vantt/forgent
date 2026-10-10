@@ -14,14 +14,20 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-09",
       "rationale": "The prior target unit is no longer a current authority assertion after the whole-file reframe. The complete prior candidate file is retained verbatim as non-authority history after retirement 2180b4e72701bb090288af8fe8021008d9d42079; see docs/specs/runner.md historical section. Prior rationale: Carry the complete legacy response-contract introduction at the corresponding introductory block, retaining the unchanged RunResult status/confidence rule. Added in candidate explicitly marks materialized as an implementation-era enum extension. This added label changes the native target digest, so the former script exact proof is removed and this row requires independent ordinary review; no script or previous reviewer approval is carried forward.",
+      "reviewNote": "unheaded-block unheaded-block-61 (lines 439-440) read in full against the prior reviewed supersede target P:proposals/dag-request-scheduler.md#unheaded-block-60: the carried candidate text differs from the source only in that it adds the labelled enum value \"materialized\" (original four outcomes intact); no source clause or qualifier is missing; the prior candidate unit (digest recomputed equal to the prior reviewed binding) lies byte-for-byte inside the snapshot body. Source and target digests recomputed from git bytes equal the sidecar; disposition supersede, kind contract unchanged; rationale cites 2180b4e72701bb090288af8fe8021008d9d42079 and docs/specs/runner.md. File check: main subject confirmed as the retired engine by the file-level review",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-reopened-exact.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8f6f42ea7ca9a2dbfe594bbbaaea6f832a09edaec4438482e64be68ecb3d013b",
       "targetAncestry": [
         "Historical File: DAG Request Scheduler For Coordination Runs"
-      ]
+      ],
+      "reviewReportCommit": "5d470d7e4718585733b141fe28c0356697b3edd0"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2rework-s2-agent-coordination-reopened-exact.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-reopened-exact.md"
 }

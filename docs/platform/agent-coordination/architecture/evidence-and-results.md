@@ -2,29 +2,34 @@
 
 ```txt
 Document type: Architecture
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Identify the surviving current owner and preserve superseded sections in exact history
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Current scope below is bound to present code; historical design is not implementation proof
-Provenance: Retained from docs/architect/agent-coordination/architecture/evidence-and-results.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Candidate current-owner and boundary guidance only; no authority cutover or duplicate runtime schema
-Use this when: Reading the checked surviving scope or tracing original historical claims
-Do not use this for: Reinstating retired Session, Flow, Protocol or Work-stage contracts
-Last reviewed: Pending independent whole-area review
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- None
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Current-owner evidence and explicit historical section separation
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
-## Current Scope
 
-This candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../../specs/runner.md).
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/evidence-and-results.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
-Worker claims are normalized with evidence; a mutating done claim needs external evidence to become verified. Evidence: `src/runner/dispatch/run-result.mjs:1276-1285`.
+## Implementation And Design Status
 
-Corrupt result records fail closed when read through runOutcome. Evidence: `src/runner/dispatch/run-result.mjs:1305-1325`.
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Evidence Sources | Current contract/invariant | src/runner/dispatch/run-result.mjs:19 CONFIDENCE_LEVELS; src/runner/dispatch/evidence-attribution.mjs:25-76 (pre/post hashes, dirty-before exclusion); run-result.mjs:520-532 policy refusals; assignment-runner.mjs:9 |
+| Aggregation | Mixed implementation and proposal; no blanket implementation claim | git grep -i majority/aggregat in src/runner/execution src/workflow: no evidence-quality aggregation code; panel/findings semantics in runner.md:3055 (findings are outcome, not failed) |
 
 ## Principle
 
@@ -35,22 +40,38 @@ Evidence supports confidence.
 Drivers decide what the evidence permits.
 ```
 
+## Evidence Sources
+
+Depending on the selected TaskSpec or validated inline execution contract,
+evidence may include:
+
+- structured worker result artifact;
+- process settlement and exit metadata;
+- post-run file snapshots and expected-file checks;
+- git delta scoped to the Run;
+- command/test output captured after execution;
+- artifact paths, hashes, timestamps, and provenance;
+- independent reviewer or verifier result.
+
+No one source proves every operation type.
+
 ## Confidence Boundaries
 
-- Worker self-report alone cannot produce externally verified confidence.
-- Exit code zero cannot satisfy missing semantic outputs.
-- Pre-existing dirty files cannot count as changes produced by the Run.
-- Stale or cross-Assignment evidence must be rejected.
-- Read-only analytical output may remain `reported` when the TaskSpec or inline
-  execution contract permits it.
-- Mutating success requires post-run external evidence appropriate to the claim.
-- Missing/malformed required evidence must not false-pass.
+- Worker self-report alone cannot produce externally verified confidence (src/runner/dispatch/run-result.mjs:1276-1285).
+- Exit code zero cannot satisfy missing semantic outputs (src/runner/dispatch/run-result.mjs:1305-1325).
+- Pre-existing dirty files cannot count as changes produced by the Run (src/runner/dispatch/evidence-attribution.mjs:55-70).
+- Stale or cross-Run evidence must be rejected (src/runner/dispatch/run-result.mjs:155,297; evidence-attribution.mjs:69,197).
+- Read-only output may remain `reported`; the runtime gates this by assignment.mutation === read-only, not an unstamped TaskSpec permission (src/runner/dispatch/assignment.mjs:938-940; run-result.mjs:1276-1285).
+- Mutating success requires post-run external evidence appropriate to the claim (src/runner/dispatch/run-result.mjs:1276-1285).
+- Missing/malformed required evidence must not false-pass (src/runner/dispatch/run-result.mjs:1305-1325).
+
+## Aggregation
+
+Task or synthesis aggregation cannot raise evidence quality by majority. Failed,
+missing, unsupported, or excluded branches remain visible in aggregate output.
 
 ## Visibility Boundary
 
 Herdr pane state, terminal text, quietness, and process appearance are useful
 diagnostics only. They cannot replace structured runtime and evidence records.
 
-## Historical Sections
-
-The complete classified input, including all former contracts, schemas, qualifications and implementation statuses, is [preserved verbatim](../history/retired-engine/files/architecture/evidence-and-results.md#literal-snapshot). The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see the runner spec’s historical CoordinationSession section. Retired Session/Flow/Protocol and Work-stage sections are not current contracts. No historical claim is deleted or silently reclassified as implemented.

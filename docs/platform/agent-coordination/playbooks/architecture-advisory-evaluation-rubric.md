@@ -2,22 +2,26 @@
 
 ```txt
 Document type: Guide / runbook
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Retain cognitive quality guidance consumed by the registered architecture-advisory skill
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Cognitive companion only; registered Workflow owns execution and safety
-Provenance: Retained from docs/architect/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Candidate cognitive guidance only; not runtime routing, model selection or execution authority
-Use this when: Applying role posture, artifact reasoning or evaluation criteria
-Do not use this for: Launching historical runtime recipes or treating dated roster examples as live configuration
-Last reviewed: Pending independent whole-area review
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
 ## Current Boundary
 
 The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
@@ -286,64 +290,17 @@ second-order question, or apply the logic to something the panel did not cover?
 
 ---
 
-## 9. A Fresh Coordinator Could Resume From Artifacts Alone
+## 9. A Fresh Session Can Resume Through The Registered Workflow
 
-**What it is really asking.** Does the session exist on disk, or in a
-conversation?
+Evaluate whether evidence and unresolved decisions remain available through Workflow-owned records and the registered skill boundary. Do not score a session.md ledger, hand-run graph or coordinator reading raw run-state as if those were the registered runtime. The actor does not resume the Workflow itself; Workflow resume and human gates are the owning doors. Evidence: core/skills/fgos-architecture-panel/SKILL.md:17-37; core/workflows/architecture-advisory.yaml:78-84.
 
-**Where to look.** `session.md`, the completeness of `runs/` against the roster,
-and — ideally — an actual attempt. This dimension is testable rather than
-inferable, and it should be tested.
+Evidence must preserve pending decisions, attributed findings and reversibility; losing a local terminal is not completion or approval.
 
-**Strong.** `session.md` names the phase and one imperative next action.
-`intake.md` and the newest `human/` turn give ground truth. Every dispatched
-prompt has a matching run record. Every `human/<n>-person.md` has its
-`dialogue/<n>-impact.md` and `dialogue/<n>-response.md` beside it. Someone
-genuinely unfamiliar with the session read these and knew what to do.
+## 10. Independence Is Material, Not A Decorative Model Roster
 
-**Weak.** "Next action: continue the session." Prompts with no results, so a
-successor cannot tell what was interrupted. A human turn with no recorded
-response, so a successor cannot tell whether the person was answered or dropped.
-A phase ledger showing three phases in progress at once. Critical reasoning that
-exists only in narration. Any artifact under a filename neither the coordinator
-prompt's persistent-state tree nor the artifact templates names — an invented
-path is one a successor does not know to look for.
+Evaluate whether the fixed shaping seats offer materially different system, alternative and constraint lenses and whether independent final-packet checks preserve dissent. Actor/model selection is governed by configuration and bind(), not a hand-written roster or manual run record. Evidence: core/workflows/architecture-advisory.yaml:18-64; core/skills/fgos-architecture-panel/SKILL.md:17-24.
 
-**False pass.** Every file exists and is well-formed, but the artifacts do not
-say why the panel is where it is. Completeness is not resumability. The only
-honest way to score this dimension is to try it.
-
----
-
-## 10. Provider/Model Diversity Improved Independence Rather Than Decorating The Roster
-
-**What it is really asking.** Two questions, and both must pass. Did every
-claimed binding actually happen? And did the diversity buy anything?
-
-**Where to look.** `session.md`'s roster against `runs/*.json`; then the
-proposals themselves, read for whether the differently-bound actors actually
-thought differently.
-
-**Strong.** Every roster row has a matching run record with a derived
-provider/model. The shapers are on different families and their proposals differ
-in a way traceable to different priors, not just different wording. The session
-report states plainly what the diversity bought — which advisor saw something its
-counterpart did not.
-
-**Weak.** A roster listing three providers whose outputs are interchangeable.
-`tierMaterial` claimed where the executor derives the same model at every tier.
-
-**Structurally invalid.** A claimed binding with no run record. This is an
-overclaim about provenance and it contaminates the session's other evidence,
-because a panel that overstates its roster may be overstating its isolation too.
-
-**False pass.** Diversity asserted rather than demonstrated. "We used three
-provider families for independence" with no account of what independence
-produced. The honest answer is sometimes "nothing distinguishable this time" —
-that answer scores better here than an unsupported claim, because it is checkable
-and it tells the next session something.
-
----
+Model/provider diversity alone is not proof of cognitive independence; report its demonstrated effect and limits without inventing live routing evidence.
 
 ## 11. Every Shaper Stated Falsification Criteria Before Critics Saw The Proposal
 

@@ -2,24 +2,30 @@
 
 ```txt
 Document type: Guide / runbook
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Retain cognitive quality guidance consumed by the registered architecture-advisory skill
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Cognitive companion only; registered Workflow owns execution and safety
-Provenance: Retained from docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Candidate cognitive guidance only; not runtime routing, model selection or execution authority
-Use this when: Applying role posture, artifact reasoning or evaluation criteria
-Do not use this for: Launching historical runtime recipes or treating dated roster examples as live configuration
-Last reviewed: Pending independent whole-area review
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md
-- docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md
-- docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Registered Output Boundary
+
+These are cognitive artifact shapes and optional manual-harness examples. They do not prescribe a session.md filesystem ledger, manual run records, storage ownership or a nine-phase runtime for the registered architecture-advisory Workflow. Its synthesis template requires a final RAW JSON packet; Workflow owns persistence, gates and resumption. Evidence: core/workflows/architecture-advisory.yaml:43-84 and core/skills/fgos-architecture-panel/SKILL.md:17-37,135-142.
+
 ## Current Boundary
 
 The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
@@ -766,6 +772,8 @@ a bounded reopen into an unbounded one.
 
 ## 14. Session Status Board — `session.md`
 
+**Optional manual-harness example only; not registered Workflow storage or completion instructions.**
+
 **Why this exists.** This is the crash-recovery entry point. A fresh coordinator
 with no chat history reads this file first and must be oriented by it alone.
 
@@ -813,6 +821,8 @@ that says "in progress" for three phases at once.
 ---
 
 ## 15. Prompt Package — `prompts/<role>.md`
+
+**Optional manual-harness example only; not registered Workflow storage or completion instructions.**
 
 **Why this exists.** The prompt is the isolation. In manual mode, "the shapers
 could not see each other" means precisely "these files contained no sibling
@@ -862,6 +872,8 @@ evidence that isolation held.
 ---
 
 ## 16. Run Record — `runs/<ordinal>-<role>.json`
+
+**Optional manual-harness example only; not registered Workflow storage or completion instructions.**
 
 **Why this exists.** Provenance the packet's claims are checked against. The
 red-team opens these files; a roster claim with no matching run record is an
@@ -1058,6 +1070,8 @@ failure of the whole assessment, not a procedural nit.
 ---
 
 ## Assembling A Session Directory
+
+**Optional manual-harness example only; not registered Workflow storage or completion instructions.**
 
 ```text
 <EVIDENCE_DIR>/

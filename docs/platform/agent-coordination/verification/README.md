@@ -2,61 +2,48 @@
 
 ```txt
 Document type: Collection index
-Audience: Human reviewers, maintainers, documentation agents
-Purpose: Preserve source material for Agent Coordination Verification
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
 Design status: Candidate
-Implementation: Not re-verified; source implementation statements remain in the body
-Provenance: Retained from docs/architect/agent-coordination/verification/README.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
-Writer type: Documentation maintainer
-Canonical for: Preserved collection-index material for Agent Coordination Verification; no authority cutover
-Use this when: Comparing this candidate with its pinned legacy source
-Do not use this for: Inferring current implementation or supersession of retained sources
-Last reviewed: UNPROVEN; independent content review pending
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: Pending independent liveness re-review
 Related:
-- docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md
-- docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md
-- docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md
-Supersedes: None; retained source authority is unchanged
-Superseded by: None
-Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+- docs/platform/agent-coordination/README.md
+- docs/specs/runner.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Added in candidate: Liveness evidence and explicit implementation/proposal distinction
 ```
-Document type: Index
-Design status: N/A
-Implementation: Active
-Last reviewed: 2026-08-31
-Canonical for: navigation to conformance evidence
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/verification/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Evidence Sets
 
-Added in candidate: The migration navigation paragraph, evidence-root table and Proof Preservation pointer below predate this batch (`fcfe78cb8`); they are candidate navigation, not newly verified conformance. During migration, target docs link to retained legacy proof roots. The mirrored
-target directories remain navigable copies, but do not replace the dated
-evidence artifacts or their recorded environments.
+These are dated physical evidence collections, not a claim that every tested runtime still exists or that the files have been re-verified. The step-08 CoordinationSession/FlowDefinition collection is historical engine evidence. Team-dispatch, RunResult, recovery, visibility and advisory collections must be read with their individual implementation dates and current owner contracts. All payload bytes are unchanged.
 
-- [Team Dispatch V1 trace](team-dispatch-v1/index.md) records cell-level
-  implementation, review, red-team, and live proof evidence.
+| Collection | Reading location |
+|---|---|
+| architecture-advisory-panel | [architecture-advisory-panel](architecture-advisory-panel/) |
+| code-implementation-track-policy | [code-implementation-track-policy](code-implementation-track-policy/) |
+| code-panel-multicell-facade | [code-panel-multicell-facade](code-panel-multicell-facade/) |
+| confinement-authority-implementation | [confinement-authority-implementation](confinement-authority-implementation/) |
+| coordination-envelope | [coordination-envelope](coordination-envelope/) |
+| dispatch-operability-implementation | [dispatch-operability-implementation](dispatch-operability-implementation/) |
+| executor-policy-dispatch-seams | [executor-policy-dispatch-seams](executor-policy-dispatch-seams/) |
+| group-thinking-plan-loop | [group-thinking-plan-loop](group-thinking-plan-loop/) |
+| runtime-recovery | [runtime-recovery](runtime-recovery/) |
+| rust-host-r1-kernel | [rust-host-r1-kernel](rust-host-r1-kernel/) |
+| step-07-mvp | [step-07-mvp](step-07-mvp/) |
+| step-08-standalone-coordination | [step-08-standalone-coordination](step-08-standalone-coordination/) |
+| step-09-group-thinking-mvp1-mvp2 | [step-09-group-thinking-mvp1-mvp2](step-09-group-thinking-mvp1-mvp2/) |
+| step-09-mvp3-to-mvp5 | [step-09-mvp3-to-mvp5](step-09-mvp3-to-mvp5/) |
+| step-09-mvp6-to-mvp9 | [step-09-mvp6-to-mvp9](step-09-mvp6-to-mvp9/) |
+| team-dispatch-v1 | [team-dispatch-v1](team-dispatch-v1/) |
+| visibility-herdr | [visibility-herdr](visibility-herdr/) |
 
-| Evidence set | Supports | Current proof root |
-|---|---|---|
-| Foundation and standalone coordination | CoordinationSession, FlowDefinition, and Work-isolation boundaries | [Step 08](../../../architect/agent-coordination/verification/step-08-standalone-coordination/index.md) |
-| Runtime recovery | admission fencing, launch reconciliation, fallback, and recovery status split | [Runtime recovery](../../../architect/agent-coordination/verification/runtime-recovery/) |
-| Dispatch operability | worker claim, execution-contract persistence, RunResult v2, inspect, and reconcile boundaries | [Dispatch operability](../../../architect/agent-coordination/verification/dispatch-operability-implementation/) |
-| Executor policy and placement | executor-policy baseline and placement-policy limits | [Executor-policy seams](../../../architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md) |
-| Code implementation track policy | targeted proof per cell and full proof at declared gates | [Track policy](../../../architect/agent-coordination/verification/code-implementation-track-policy/) |
-| Group thinking | protocol, cohort, and advisory-panel evidence, including known quality gaps | [Step 09 evidence](../../../architect/agent-coordination/verification/step-09-mvp6-to-mvp9/index.md) |
-| Visibility / Herdr | visibility-only boundary | [Live proof](../../../architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md) |
-| Team Dispatch V1 | original cell-level implementation, review, red-team, and live proof | [Team Dispatch V1](../../../architect/agent-coordination/verification/team-dispatch-v1/index.md) |
-
-The phase-by-phase move policy and known gaps are in
-[Proof Preservation](../history/documentation-migration/proof-preservation.md).
-
-Verification establishes implementation conformance at a point in time. It does
-not define architecture or change a contract.
-
-Future verification should separate:
-
-- deterministic unit/integration tests;
-- negative and adversarial tests;
-- live provider/executor scenarios;
-- traceability matrix from requirement to code/test/evidence;
-- known unrelated failures;
-- date/commit/configuration of the proof.
+The current runtime owners are dispatch Assignment/Run/RunResult, Unit/CollaborationPattern and Workflow. Their current documents and the historical engine snapshots are linked from the area portal. A transcript, pane state or passing old proof does not establish current implementation authority.
