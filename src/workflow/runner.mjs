@@ -413,14 +413,18 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
           // A unit left `running` with a recorded Unit run id was started by a controller that died:
           // continue that run (settled seats are kept) and reuse the worktree it already has.
-          const resumeUnitRunId = uState?.status === 'running' ? (uState.unitRunId ?? null) : null;
+          // Only when what it needs is still there: after a reboot or a temp-dir cleanup the run's
+          // worktree is gone and resuming would fail for good, where a fresh run can still work.
+          const resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
+          let startedUnitRunId = null;
 
           // If unit has writes, prepare worktree
           let unitWorktree = worktreePath;
           let uBranch = null;
           let ownsWorktree = false;
-          if (resumeUnitRunId && uState.worktreePath) {
-            unitWorktree = uState.worktreePath;
+          if (resumeUnitRunId) {
+            // The seats run in the worktree recorded in the Unit run; never make another one here.
+            unitWorktree = uState.worktreePath ?? worktreePath;
             uBranch = uState.branch ?? null;
           } else if (unitData.writes.length > 0) {
             uBranch = `wf/${workflowRunId}/${u.id}`;
@@ -466,16 +470,19 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               overrides: unitOverridesOf(u),
               workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
               ...(resumeUnitRunId ? { resumeUnitRunId } : {
-                onUnitRunCreated: (unitRunId) => recordEvent({
-                  repoRoot: mainRoot,
-                  workflowRunId,
-                  event: { type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId } },
-                }),
+                onUnitRunCreated: (unitRunId) => {
+                  startedUnitRunId = unitRunId;
+                  recordEvent({
+                    repoRoot: mainRoot,
+                    workflowRunId,
+                    event: { type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId } },
+                  });
+                },
               }),
             });
           } catch (err) {
             unitRunResult = {
-              unitRunId: null,
+              unitRunId: resumeUnitRunId ?? startedUnitRunId,
               outcome: 'execution-failure',
               results: [],
               error: String(err?.message ?? err),
@@ -826,6 +833,19 @@ export function startWorkflowDetached(params = {}) {
  * @param {Function} [params.onLog]
  * @returns {Promise<object>} Projected workflow state
  */
+/** Whether a running unit's recorded Unit run can still be continued: its record is on disk and the
+ * worktrees it ran in still exist. */
+function canResumeUnitRun(mainRoot, uState) {
+  if (!uState.unitRunId) return false;
+  if (uState.worktreePath && !fs.existsSync(uState.worktreePath)) return false;
+  try {
+    const record = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', uState.unitRunId, 'unit.json'), 'utf8'));
+    return typeof record.worktree === 'string' && fs.existsSync(record.worktree);
+  } catch {
+    return false;
+  }
+}
+
 export async function startWorkflow(params = {}) {
   const { workflowRunId, workflow, mainRoot, worktreePath } = prepareWorkflowRun(params);
 

@@ -642,6 +642,29 @@ test('a resumed workflow continues the unit run its dead controller started and 
   );
 });
 
+test('a running unit whose recorded worktree is gone starts a fresh Unit run instead of failing the workflow', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'test/resume-missing-worktree',
+    steps: [{ id: 'only', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write' } }] }],
+  });
+  const first = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp });
+  const id = first.workflowRunId;
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: id });
+  const completed = events.find((e) => e.type === 'unit.complete');
+  const oldRunId = completed.payload.unitRunId;
+  // Died before completing, and the worktree it ran in no longer exists (temp-dir cleanup, reboot).
+  const kept = events.filter((e) => e.seq < completed.seq).map((e) => (
+    e.type === 'unit.scheduled' ? { ...e, payload: { ...e.payload, worktreePath: path.join(tmp, 'gone-worktree'), branch: 'wf/x/u1' } } : e
+  ));
+  fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'events.jsonl'), kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+
+  const resumed = await resumeWorkflow(id, { repoRoot: tmp, cwd: tmp });
+
+  assert.equal(resumed.status, 'completed', 'the workflow carries on rather than failing for good');
+  assert.notEqual(resumed.steps.only.units.u1.unitRunId, oldRunId, 'a fresh Unit run replaced the one that could not be continued');
+});
+
 test('status shows no log tail for a completed run', async () => {
   const tmp = setupTestRepo();
   const state = await startWorkflow({
