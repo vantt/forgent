@@ -1,0 +1,536 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-10",
+  "scope": "The 14 rejected receipt bindings from review-2-truth-classifications.md only; prepared current bindings, still pending independent review.",
+  "currentTextCommit": "f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f",
+  "receipts": [
+    {
+      "claimId": "claim_c184e4b1b804109a870238397b1e5c0d",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "b053393c73b2fe8eecad5f35e7cb87c2e6a31830b02fec1c22fb6aad1ea85013",
+      "shownText": "```txt\ncapability   — abstract behavior promise, bound only by\n               runner.capabilities.<capability>.prefer;\n               executor for[] declarations do not bind this selector\nexecutor-id  — explicit concrete implementation override, naming a\n               runner.executors.<id> entry directly\n```",
+      "shownTextDigest": "b053393c73b2fe8eecad5f35e7cb87c2e6a31830b02fec1c22fb6aad1ea85013",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_2aa3c23733d8b93963a053ffb0fe88e9 at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-10. The specific corrected code boundary is Dispatch Control Plane > Routing Identities; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "routing-identities",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 25,
+            "endLine": 66,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          },
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 255,
+            "endLine": 309,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_2aa3c23733d8b93963a053ffb0fe88e9",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_c70a8a1ffd7d36e49b31d6296cc31356",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "anchor": "unheaded-block-29",
+      "unitDigest": "1caa4692d9e293493a1d62621aaf6d38a4f18bbfb6ca354dcfae2aadaf132710",
+      "shownText": "1. **Request normalizer (design)** — the normalized target/policy/provenance\n   boundary is proposed; current inputs are the compiler options above.\n2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal\n   executor IDs/defaults or capability `prefer`; aliases and executor `for[]`\n   inform capability labels separately in `resolveCapabilityDetailsFromHints`\n   (`resolve.mjs:25-66,255-278`), not this binding resolver.\n3. **Executor registry resolver** — resolves a literal executor-id to its\n   concrete invocation/tool/agent shape (`resolveExecutorConfig`).\n4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported\n   provider/model/rigor/tier derivation and provenance, not a `mergePolicyStack`.\n5. **Governance resolver** — checks egress/provider/executor/content\n   constraints (cross-provider gate, `allowCrossProvider`, `carries`).\n6. **Mechanism resolver** — decides in-process/out-of-process/unavailable\n   and MCP/tool handback (`decideDispatchMechanism`,\n   `decideExecutorDispatchMechanism`).\n7. **DispatchPlan compiler** — `compileDispatchPlan()` joins the legacy\n   dispatch decisions. Unit execution first obtains its binding through\n   `bind()`; assignment-runner revalidates that binding and compiles the\n   governed execution plan. The domain harness owns neither choice.\n8. **Run runtime/adapters** — creates, launches, observes, settles, and\n   retries a Run without choosing semantic operation\n   (`assignment-runner.mjs`, `transport.mjs`, `herdr-round.mjs`).",
+      "shownTextDigest": "1caa4692d9e293493a1d62621aaf6d38a4f18bbfb6ca354dcfae2aadaf132710",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_682a5f07ad5939ff2de7ff33df5c4d0d at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-29. The specific corrected code boundary is Dispatch Control Plane > Component-Internal Ownership; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "component-internal-ownership",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 25,
+            "endLine": 66,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          },
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 255,
+            "endLine": 309,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_682a5f07ad5939ff2de7ff33df5c4d0d",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_7158d119de266633a36b11d20e5691ca",
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "5e9b2ae62fe7b6f3018ff335c99a951584349e79eda9afcfbe82847b011001c2",
+      "shownText": "- Worker self-report alone cannot produce externally verified confidence (src/runner/dispatch/run-result.mjs:1276-1285).\n- Exit code zero cannot satisfy missing semantic outputs: the evidence floor still requires the appropriate worker report or external delta (src/runner/dispatch/run-result.mjs:1250-1285).\n- Pre-existing dirty files cannot count as changes produced by the Run (src/runner/dispatch/evidence-attribution.mjs:55-70).\n- RunResult records with another Run's identity are rejected (src/runner/dispatch/run-result.mjs:153-157,295-299). This is not a worker-claim runId check: agent-result-claim-contract.mjs:52-90 validates claim shape without that identity check. Delta attribution uses the current Run's pre/post state; it is not a general age-based stale-evidence validator.\n- Read-only output may remain `reported`; the runtime gates this by assignment.mutation === read-only, not an unstamped TaskSpec permission (src/runner/dispatch/assignment.mjs:938-940; run-result.mjs:1276-1285).\n- Mutating success requires post-run external evidence appropriate to the claim (src/runner/dispatch/run-result.mjs:1276-1285).\n- Missing required reports/deltas yield `no-evidence` under the evidence floor (src/runner/dispatch/run-result.mjs:1276-1285); corrupt result records fail closed separately (run-result.mjs:1305-1333).",
+      "shownTextDigest": "5e9b2ae62fe7b6f3018ff335c99a951584349e79eda9afcfbe82847b011001c2",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_ed1015c8067fc73022c6207480b7be6c at docs/platform/agent-coordination/architecture/evidence-and-results.md#unheaded-block-9. The specific corrected code boundary is Evidence And Result Architecture > Confidence Boundaries; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "confidence-boundaries",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 149,
+            "endLine": 160,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 290,
+            "endLine": 302,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1250,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 52,
+            "endLine": 90,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_ed1015c8067fc73022c6207480b7be6c",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_091368258f4931d473b31d516b89c947",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "1c0a4a5d251c3061179f8bc7e7edf2dabcd89b552c6c17f5c497c01934647448",
+      "shownText": "The order and behavior in `src/runner/dispatch/liveness.mjs` are ported:\n1. Worker result file beats all runtime readings; it still requires normalization.\n2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:346-357`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.\n3. Death requires consecutive absent readings (default 3); unknown/present reset.\n4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.\n5. Idle/stale evaluation subtracts blind time; working is progress even with\n   zero stdout. Screen reads are requested at the stale boundary, and an early\n   credential probe also runs after fifteen seconds of non-working idle time\n   (`liveness.mjs:267-299`). Thus screen reads are not stale-only.",
+      "shownTextDigest": "1c0a4a5d251c3061179f8bc7e7edf2dabcd89b552c6c17f5c497c01934647448",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_c38d4d6fc5810bbfaa8c4a72237f4ad6 at docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-8. The specific corrected code boundary is Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-production-ladder-semantics",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 341,
+            "endLine": 359,
+            "blobSha": "2a31f0e1bd7eb571f1fbe130fbc8c2a399772074"
+          },
+          {
+            "path": "src/runner/recovery.mjs",
+            "startLine": 105,
+            "endLine": 112,
+            "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_c38d4d6fc5810bbfaa8c4a72237f4ad6",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_1ecdf78c605a84acd3cc9e32cfb55b17",
+      "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "3b351ebe037306b9ffbae3548788db1f0264229081e9ecc843a2527ad842a844",
+      "shownText": "This candidate map reflects the current routes in `core/skills/fgos-panel/SKILL.md:45-59`; it is not yet the skill's linked authority. The skill still links the legacy docs/architect taxonomy at lines 36-39. Repointing that consumer belongs to the authorized link cutover, not this truth pass. The current execution owners below are Workflow/CollaborationPattern owners, not a second sequencer; the former protocol-id mapping is historical.",
+      "shownTextDigest": "3b351ebe037306b9ffbae3548788db1f0264229081e9ecc843a2527ad842a844",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_9f33a05cb18260b107f84fedb23e43e6 at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8. The specific corrected code boundary is Group Thinking Trigger Surface > Surface Taxonomy; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "surface-taxonomy",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/skills/fgos-panel/SKILL.md",
+            "startLine": 36,
+            "endLine": 59,
+            "blobSha": "4cac45e1e900ad4078a5323dc4511771c661c3ad"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_9f33a05cb18260b107f84fedb23e43e6",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_aa0e400354f9f0b2a32e90249880fa78",
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "c8463e48e9ef816b0cfbc19d1f67f93ab9cbc9205cacf2c1342758bf4849c651",
+      "shownText": "`taskSpecForStep` selects the primary normalized `step.operations` entry (or the\nfirst); `skillForStep` reads `step.skill` separately and falls back to a declared\nstatus skill (`src/workflow/steps.mjs:52-63`). Neither projects both values from\nan operation. Compatibility remains a projection, not permission to weaken the\nmandatory declared-operation, transition or evidence constraints. The existing\n`operationsForStep`/`isLegalStepMove` projections preserve declared legality\n(`steps.mjs:44-45,67-85`); they do not restore the retired Work-stage or engine.",
+      "shownTextDigest": "c8463e48e9ef816b0cfbc19d1f67f93ab9cbc9205cacf2c1342758bf4849c651",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_67986b1f7f6936bd5f59616ff9673066 at docs/platform/agent-coordination/architecture/protocol-model.md#unheaded-block-14. The specific corrected code boundary is Coordination Protocol Model > Compatibility; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "compatibility",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 43,
+            "endLine": 85,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_67986b1f7f6936bd5f59616ff9673066",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_0e3108e30bde66b9c650906df3fa1ac4",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-28",
+      "unitDigest": "05b63ae72bb5df95d3b060a075c93ecb1a35b8c31b61cbb72d7a3bfbd4d3d455",
+      "shownText": "| Slice | Scope | Exit evidence; dependency | Status (2026-09-14) |\n|---|---|---|---|\n| S0 | Freeze fixtures for existing ladder, budgets, retry/recheck, context and close behavior | Existing Node suites green; capture known deficiencies without marking them solved. | **Implemented** — P00 |\n| S1 | Versioned Run admission, strict publish fencing and local lock/reclaim | Concurrent admission and every pre-launch crash window; no two winners. Node first. | **Implemented** — P01 (`run-lock.mjs`) |\n| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through the public door; isolated or read-only takeover only. Launch identity uses `runId` plus persisted `launchCommandId` (`fgos-<runId>-<launchCommandId>`); duplicate-name refusal and no resurrection after close require adapter proof. | **Partial** — Herdr launch reconciliation exists in `herdr-reconcile.mjs`; the proposed RunHandle/scope guard, pending-control reconciliation and RecoveryMaterial capture are not implemented as that contract. Writable partial-edit takeover remains deferred (`herdr-reconcile.mjs:356-357`). |\n| S3 | Eligible fallback through compiler and confinement | Same Assignment, bounded attempts, unknown effects park; depends on S1/S2 for takeover. | **Implemented** — P03 (`recovery.mjs`) |\n| S4 | Pure snapshot/planner + show | Can develop beside S1-S3 using recorded facts; no claim of automatic repair. | **Implemented** — P04 (pure evaluators) + P05 (standalone `dispatch recover`) |\n| S5 | Retired coordination-session recovery/continuation | Full dated record remains in the historical snapshot; no current coordination recover door is claimed. | Retired in 2180b4e72 |\n| S6 | Additional runtime/operation adapters and optional checkpoint support | Capability-specific proof before enabling; no promise all adapters ship with S2. | **Not implemented** — out of this track's scope |\n| S7 | Rust writer port | Same fixtures for all supported Node semantics, sole writer and recovery compatibility. | **Not implemented** — separate track (see the `rust-host-r1-kernel` track) |",
+      "shownTextDigest": "05b63ae72bb5df95d3b060a075c93ecb1a35b8c31b61cbb72d7a3bfbd4d3d455",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_1f1b240d7141fa749fe2cc481a832166 at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-28. The specific corrected code boundary is Runtime Recovery And Work Continuity > 9. Implementation Slices And Gates; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "9-implementation-slices-and-gates",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/herdr-reconcile.mjs",
+            "startLine": 351,
+            "endLine": 361,
+            "blobSha": "6ded05f28a310963ed7ceccbf794a50b42780a75"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_1f1b240d7141fa749fe2cc481a832166",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_d04f3528ac32bc6a0a67ecc6153e7879",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "d09a8989b69759b769951f393428fd895fc22f0583d212568e684c0016fbaaa7",
+      "shownText": "1. **Three current provenance kinds, one execution path.** Declared and inline\n   builders stamp `contractPolicyVersion`, `normalizerVersion` and validator\n   provenance (`assignment.mjs:456-459,663-666`). The Unit door separately writes\n   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:334-338`);\n   do not assert every kind has the declared builder's identical shape.\n   - `declared`: Workflow step/operation/TaskSpec validation and normalization.\n   - `inline`: foundation contract validation, the applicable registered domain\n     harness and caller provenance.\n   - `unit-run`: the Unit execution door and its computed binding/admission.\n2. **Normalizer stamps the snapshot.** At build time the normalizer stamps\n   `mutation` (`read-only | mutating`) and `evidence.required`\n   (`reported | verified`) onto the immutable Assignment. Declared operations\n   use operation tables with role/mutation-derived fallbacks for unmapped\n   operations (`assignment-normalizer.mjs:95-124`); inline contracts must declare\n   mutation/evidence explicitly. Missing required inline values fail validation.\n3. **Interpretation reads the Assignment, not the operation id.** Result\n   confidence gating, mutation policy, and post-advance behavior are driven by\n   Assignment fields. Declared `resultKind` and optional `onAdvance` use the\n   normalizer tables, with advisory/work-product fallback from mutation\n   (`assignment-normalizer.mjs:120-143`). These are not arbitrary accepted\n   inline-contract fields.\n4. **Validated inline fields.** `objective`, `contextRefs`, `constraints`,\n   `expectedOutputs`, `mutation`, `evidence`, required `role` and `budget`;\n   optional `capabilities`, `supports`, `contractTemplate` and narrow `policy`.\n   Budget requires positive integer `timeoutMs` and `maxRuns`; optional `tokens`\n   is telemetry, not an enforced limit (`execution-contract.mjs:345-346,371-382`);\n   inline policy accepts only\n   `tier`, not a full PolicyPatch. Caller fields are validated separately\n   (`execution-contract.mjs:180-240,295-340`). Unknown fields are rejected.\n5. **Same execution governance.** Declared, inline and Unit-run requests\n   converge on Assignment execution and Run/RunResult normalization rather than\n   private dispatch or stores that bypass governance.\n6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks described in docs/specs/runner.md:3057. Do not present the dormant stamp path as a current general session-runtime door.",
+      "shownTextDigest": "d09a8989b69759b769951f393428fd895fc22f0583d212568e684c0016fbaaa7",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_f549746262cbe0bc8566ba7d02276a01 at docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#unheaded-block-5. The specific corrected code boundary is ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Decision; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "decision",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 337,
+            "endLine": 384,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_f549746262cbe0bc8566ba7d02276a01",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_91bec036d1df34df7924809fa939ae59",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "0530d671094f0f95ccdfb47f4ccaf57ca23dd14d81dea229521dff2780f55241",
+      "shownText": "The worked examples use the vnflow EOD/intraday evolution question. They do not\ninclude a worked mdview desktop-shell ownership case. Using a concrete case is\nintentional — invented examples drift toward the abstract, and abstraction is\nexactly what this document exists to resist.",
+      "shownTextDigest": "0530d671094f0f95ccdfb47f4ccaf57ca23dd14d81dea229521dff2780f55241",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_dda1473c66642b13b3d87ae99112bbe9 at docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-8. The specific corrected code boundary is Architecture Advisory Role Doctrine > How To Read This; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "how-to-read-this",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_dda1473c66642b13b3d87ae99112bbe9",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_6cd9705f2760c29f75a66f4eecb4046a",
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "unheaded-block-45",
+      "unitDigest": "bd60334f471ae1b0a64ab99250dce208e670359f72a4edee670f4fe1bc0507bb",
+      "shownText": "Legacy `decide --for` resolves a purpose first; `execute --for` is refused.\nExecution uses the resolved executor ID positionally (`dispatch/cli.mjs:1081-1096`).\nThe Node Execution Core uses `bind()`; the Rust host does not directly call this\nJavaScript resolver. Do not equate this proposal with every host representation.",
+      "shownTextDigest": "bd60334f471ae1b0a64ab99250dce208e670359f72a4edee670f4fe1bc0507bb",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_234030992ffddc4c851737f160598406 at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-45. The specific corrected code boundary is Dispatch Control Plane Redesign > 6. DispatchPlan > 6.2 Selector; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "62-selector",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/cli.mjs",
+            "startLine": 1081,
+            "endLine": 1098,
+            "blobSha": "490ccb1893634f830278ebf608f3549f98d31897"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 395,
+            "endLine": 416,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_234030992ffddc4c851737f160598406",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_241d8e8d42387c28dc30179f1bad66cb",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-33",
+      "unitDigest": "4e1c2461b173b04586958e31079f42f54ec11bf937385817b3c4d55eb289ff18",
+      "shownText": "| Status | Required fields |\n|---|---|\n| `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |\n| `blocked` | `summary`; `blocker`; `evidenceRefs` when any evidence exists. |\n| `failed` | `summary`; `error`. |\n| `no-evidence` | Non-empty `summary`; there is no additional reason field in the validator (`agent-result-claim-contract.mjs:9-15,67-85`). |",
+      "shownTextDigest": "4e1c2461b173b04586958e31079f42f54ec11bf937385817b3c4d55eb289ff18",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_69b011aac8a371496f54e1c681286bfd at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-32. The specific corrected code boundary is Team Communication Protocol V1 > 7. Agent Result Schema; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "7-agent-result-schema",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 5,
+            "endLine": 30,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 52,
+            "endLine": 90,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_69b011aac8a371496f54e1c681286bfd",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_cac936814ecd91348f05fc00c22b785d",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-34",
+      "unitDigest": "b82381ad2bd1e6aaf44a30dec3392f6f835858834be3be8b4fe6849e8bf25b0d",
+      "shownText": "`nextRecommendedOperation` is a proposed optional extension, not a current\nvalidated schema field or a field the Work-layer caller presently consumes.",
+      "shownTextDigest": "b82381ad2bd1e6aaf44a30dec3392f6f835858834be3be8b4fe6849e8bf25b0d",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_7f0c45d81af34cef52d8a3c35ed31aaf at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-33. The specific corrected code boundary is Team Communication Protocol V1 > 7. Agent Result Schema; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "7-agent-result-schema",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 5,
+            "endLine": 30,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 52,
+            "endLine": 90,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_7f0c45d81af34cef52d8a3c35ed31aaf",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_0b372cfd0ef95d2afd339badfe67ea0a",
+      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "anchor": "stance",
+      "unitDigest": "880c39ba956eea4e56074fa44cb88a6c771452f58d9bfa0404834d63f40ee470",
+      "shownText": "### Stance\n\nA temporary argumentative viewpoint. Passive panelist stance measurement is implemented: `stanceOptions` elicits an optional choice/confidence claim, and the Unit summary validates it (`src/runner/execution/patterns/role-tasks.mjs:61-70`, `unit-summary.mjs:17-28`); it does not affect pass/fail. A broader cognitive/session-state stance entity or routing identity remains design vocabulary, not a shipped SessionActor model.",
+      "shownTextDigest": "bfd0de71c4c8d55d7859fb955fdf4bdf63e468cf2ca6a8f092ed4a7c8a35a86d",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_0b372cfd0ef95d2afd339badfe67ea0a at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#stance. The specific corrected code boundary is Canonical Agent Coordination Concepts > Cognitive And Proposed Vocabulary > Stance; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "stance",
+        "status": "open",
+        "reason": "Passive panel stance measurement is implemented and checked; only the broader cognitive/session-state stance entity remains unimplemented design vocabulary."
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/patterns/role-tasks.mjs",
+            "startLine": 58,
+            "endLine": 72,
+            "blobSha": "7f7097b6f580c000e5b3f8c358b71b9a5fe8cf14"
+          },
+          {
+            "path": "src/runner/execution/unit-summary.mjs",
+            "startLine": 17,
+            "endLine": 28,
+            "blobSha": "67b0d90161d6a5fac28c9889bce1023a0643c6ff"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_0b372cfd0ef95d2afd339badfe67ea0a",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    },
+    {
+      "claimId": "claim_8448a27d29416253fd0105f943bc9b82",
+      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "anchor": "unheaded-block-26",
+      "unitDigest": "fa955fd843b1e5476c55fa41c58ce988c9a2ed21d12405880b77767052038fdf",
+      "shownText": "A temporary argumentative viewpoint. Passive panelist stance measurement is implemented: `stanceOptions` elicits an optional choice/confidence claim, and the Unit summary validates it (`src/runner/execution/patterns/role-tasks.mjs:61-70`, `unit-summary.mjs:17-28`); it does not affect pass/fail. A broader cognitive/session-state stance entity or routing identity remains design vocabulary, not a shipped SessionActor model.",
+      "shownTextDigest": "fa955fd843b1e5476c55fa41c58ce988c9a2ed21d12405880b77767052038fdf",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Current corrected unit for the independently rejected receipt claim_0326d4bce87b812bde7a5c3c87f096c6 at docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-26. The specific corrected code boundary is Canonical Agent Coordination Concepts > Cognitive And Proposed Vocabulary > Stance; the source identity is traced through previousClaimId, the committed current registry and the pinned shown text. Pending independent targeted review; no earlier approval is carried.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "stance",
+        "status": "open",
+        "reason": "Passive panel stance measurement is implemented and checked; only the broader cognitive/session-state stance entity remains unimplemented design vocabulary."
+      },
+      "currentEvidence": {
+        "commit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/patterns/role-tasks.mjs",
+            "startLine": 58,
+            "endLine": 72,
+            "blobSha": "7f7097b6f580c000e5b3f8c358b71b9a5fe8cf14"
+          },
+          {
+            "path": "src/runner/execution/unit-summary.mjs",
+            "startLine": 17,
+            "endLine": 28,
+            "blobSha": "67b0d90161d6a5fac28c9889bce1023a0643c6ff"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. Bounded surviving design/acceptance obligation, not shipped runtime; its additional mechanism/schema/proof is unimplemented or deferred. Current implemented portions are distinguished in the shown section and cited below.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      },
+      "previousClaimId": "claim_0326d4bce87b812bde7a5c3c87f096c6",
+      "previousReceiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103"
+    }
+  ]
+}

@@ -104,7 +104,7 @@ A19 af6c116f0 accepts carriage and authorizes the separate truth pass. The follo
 - `docs/specs/runner.md:3058` says `executors.*.for` and PolicyPatch `prefer*` were removed, while `src/runner/dispatch/resolve.mjs:33-66`, `src/runner/dispatch/config.mjs:1007-1017` and `src/runner/dispatch/assignment-policy.mjs:334-380` still read or validate them. Distinguish the legacy dispatch path from Execution Core `bind()` in the investigation.
 - `docs/specs/runner.md:1445` says architecture-advisory has not enabled `blind`, while `core/workflows/architecture-advisory.yaml:26` sets `blind: true`.
 
-Independent evidence: `review-2-liveness-conflicts.md:14-15,26,57`, committed in 0b9414d8c. Owner action: send these two conflicts to the separate harness-investigation chat for correction on main. No main/spec edit or external dispatch is authorized in this truth pass. Their resolution remains UNPROVEN.
+Independent evidence: `review-2-liveness-conflicts.md:14-15,26,57`, committed in 0b9414d8c. Resolved on main by `59cd76672`, brought here by the authorized clean merge `a4e132ccd`; no direct runner/main edit is made in this worktree. The former investigation request is closed.
 
 Accepted carriage, historical carriers and evidence-payload bytes remain unchanged. Truth scope is the twenty-nine rejected files listed in `review-2-liveness-files.md`, plus the missing current dispatch-recover description within the existing recovery document. No new move/archive/delete is proposed.
 
@@ -112,7 +112,7 @@ Accepted carriage, historical carriers and evidence-payload bytes remain unchang
 
 The A19 current pass changes only the 29 rejected current documents. No new archive/delete/history move, accepted payload edit or promoted area-portal edit is requested. The carriage acceptance is not revoked or widened. Current content is pinned in 96a13ab21; necessary current-truth rebinding and the exact row lists are in truth-accounting-agent-coordination.json.
 
-The two runner-spec conflicts above remain routed to the owner's separate main harness-investigation chat. No runner.md/main change is made here.
+The two runner-spec conflicts above are resolved on main by `59cd76672` and merged here by `a4e132ccd`; no direct runner.md/main edit is made here. The section above records the prior investigation queue, not an unresolved request.
 
 Eleven original source hold verdicts remain held: eight history vision principles and three Coordination Rings design-vocabulary claims. Three corresponding candidate hold verdicts and eight retired-row hold verdicts also remain held. The exact IDs and original review notes are listed under heldSourceRows, heldCandidateRows and heldRetiredRows in the accounting report. Rewording a current section is not approval of the held owner intent.
 
@@ -121,3 +121,15 @@ Forty-six remaining history-target pending source rows are outside the authorize
 The unchanged scoped strict E remains red: 477 source rows await review/owner closure, 342 identical-unit owner groups remain diagnostic, and 969 reverse units remain open. The new truth receipts cover 511 current units; the other 458 reverse units are outside this truth correction. Existing six-column native-content verdicts and the old pooled author/receipt mismatch are not accepted by silently weakening the mandatory gate. Fresh native-content verdicts must include the unchanged seventh evidence-digest column and correct committed receipt pin. Classification closure outside the current scope remains UNPROVEN.
 
 The truth ledger explicitly marks 66 design/proof sections open. These are declared implementation/proof boundaries, not 66 inferred owner decisions. Live worker/provider/Herdr execution, mutating recovery application and non-Node Participant append/subscribe integration remain UNPROVEN. Strict batch closure is not claimed; the next owner action is the independent truth review, not permission to start another carriage pass or change a gate.
+
+## Targeted truth-fix binding scope
+
+The A20-authorized 21 rejected sections are corrected in `f4bc8027f`; 433 accepted bodies remain byte-identical. Independent ok verdicts are applied only at the committed `947f6169e` report pin. There is no new archive/delete/history move, promoted area-portal edit, checker/gate/baseline/vocabulary or extractor change.
+
+Owner decision required, not ready for review: unchanged D reports 47 target drifts, 50 invalid exact proofs and two unaccounted retired candidate units. Ninety-eight of these 99 findings are outside the named 49-row correction list. Full exact tuples and a narrowly bounded accounting-only proposal are in `truth-fix-binding-stop.json` and `truth-fix-binding-stop.md`. No out-of-scope rebind, demotion, successor disposition or approval has been silently applied.
+
+Recommended decision: permit only the mechanical bindings/class accounting induced by those same 21 sections, retaining approvals only for unchanged shown text and ancestry, returning changed text to pending, and adding exactly the derived changed rows to the same targeted independent check. No extra current content or carriage and no gate/checker/baseline/vocabulary change.
+
+The three current Coordination Rings source holds remain pending with their original owner intent; earlier history/candidate/successor holds are not cleared. The main-side retired confinement recipe `claim_ac8c8092219e244b8a9001337c1d8310` has a pending successor under standing A13, separately routed to the future confinement-spec batch review, not this area's targeted check.
+
+Fourteen corrected current-content receipts are prepared with genuine current native claim identities and shown-text digests, but not activated across the blocked accounting boundary. Final gate closure, targeted pack publication and independent acceptance remain UNPROVEN. Exact next action belongs to the owner: decide this narrow derived accounting scope; only then finish bindings, unchanged proofs and the targeted check request.
