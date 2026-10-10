@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "status": "authored-bindings-pending-proofs-and-independent-review",
+  "status": "ready-for-independent-targeted-review-not-batch-closed",
   "authorizationCommit": "8af99d966",
   "passStartCommit": "98427bec47a55aef64223c19e3f4f4fa293e67a6",
   "priorAuthorSnapshot": "4add5ba7112a1792698e8a41a9c39b3f28eb438a",
@@ -823,6 +823,8 @@
     "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
     "documents": 4377,
     "units": 85718,
+    "retiredUnits": 3247,
+    "identityGaps": 5346,
     "unaccountedNewRetiredSixFiles": []
   },
   "inheritedAdditionalCorrections": {
@@ -9059,5 +9061,18 @@
       "note": "Historical reference IDs are retained as genuine native registry gaps or retired units, not silently lost and not manufactured as current IDs. Old immutable artifacts remain untouched; fresh current IDs are independently rechecked."
     }
   },
-  "mainCheckoutNote": "Owner reports Plan B complete and main staged reversions restored. No further action taken. Future main fast-forward requires prior owner authorization and git merge --ff-only inside the main checkout; never update-ref from another worktree."
+  "mainCheckoutNote": "Owner reports Plan B complete and main staged reversions restored. No further action taken. Future main fast-forward requires prior owner authorization and git merge --ff-only inside the main checkout; never update-ref from another worktree.",
+  "authorCommit": "91a899f1863b2147a0f96db855dd0b2695fddc95",
+  "verification": "plans/260925-documentation-authority-unification/reports/phase-06/carriage-label-binding-verification.json",
+  "reviewScope": {
+    "sourceRows": 48,
+    "retiredRows": 114,
+    "classifications": 42,
+    "contentReceipts": 41,
+    "structuralFrames": 1,
+    "currentSections": 6,
+    "totalItems": 210,
+    "packet": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-2-carriage-labels-current.md",
+    "metadata": "plans/260925-documentation-authority-unification/reports/phase-06/review-pack-2-carriage-labels-current.md.json"
+  }
 }
