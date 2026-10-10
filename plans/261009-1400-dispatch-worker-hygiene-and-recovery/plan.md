@@ -1,7 +1,7 @@
 ---
 title: "Dispatch worker hygiene and crash recovery"
 description: "Make confined read-only workers immune to the target project's own agent hooks/MCP, resume a crashed workflow without re-running settled seats, keep reaper and recovery inside the worker's herdr session, and let the owner quarantine an exhausted account."
-status: in-progress (all phases merged to main 2026-10-10; R1 not yet completed)
+status: done (all phases merged to main 2026-10-10; R1 run 3 passed the fault checks; the workflow parks at its own owner question)
 priority: P1
 effort: 5 sessions
 branch: main
@@ -136,6 +136,9 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 - Per-family probes after the fixes (one seat each, mcp-skill-hub main checkout): codex, xai, claude, gemini all `pass`; target agent-config files and `git status --ignored` unchanged.
 - Run 2 (full advisory workflow, no patches, codex account tetcu72): `framing`, `shaping`, `critique` completed; `synthesis` failed `policy-refusal`. No seat showed hook exit 127, a hook/MCP dialog, or `internal_error`; target status identical before/after. The refusal came from one codex red-team seat whose `agent-result.json` failed claim validation (`invalid-agent-result-claim`, `settlement.mjs:259`). That is an agent output fault outside this phase's file list: a separate item, not patched here. Whether the claim failed on evidence-reference shape or content is not yet diagnosed.
 - Reading: the faults this phase targeted are gone; the run is not yet `completed`, so the phase's named done-check is only partly met. A rerun is cheap evidence once the claim-validation fault is understood or if it does not recur.
+
+- Run 3 (2026-10-10, run by an independent verifier agent, no patches, codex account tetcu72, xai re-logged in): `framing`, `shaping`, `critique`, `synthesis`, `explanation` completed; every seat settled with no failure (reviewer and red-team verdict `findings` is normal output); `close` parked at its designed owner question ("bring in the missing expertise or not"), which the rendered text lists correctly. No seat showed hook exit 127, a hook/MCP dialog or `internal_error`; target agent-config hashes and `git status --ignored` identical before/after; 1733 s, exit 0, run `wf-run-1791628096648-571e602c`. The run-2 `invalid-agent-result-claim` did not recur.
+- Reading: every fault this plan targeted is gone on a full unattended run. The literal wording "ends `completed`" cannot be met by this workflow without an owner answer to its close question; the run reached that gate with all work steps done, which is the intended end state for an unattended run.
 
 ## Status 2026-10-10
 
