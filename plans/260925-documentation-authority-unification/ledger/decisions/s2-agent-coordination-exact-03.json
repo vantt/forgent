@@ -6713,6 +6713,36 @@
         "12. Transport",
         "12.2 Near-Term Herdr Adapter"
       ]
+    },
+    {
+      "claimId": "claim_f6e06362a96e95630a642abfd5407356",
+      "sourceUnitDigest": "20ca5da93c7d84605576a48f85633d64ef4776058c89cbd0a5ed02f16d809798",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "2b85016e03dc5ae4f7344406ffca58011d3e12593121661b1a40e2fef4e11ffc",
+      "targetAncestry": [
+        "Historical File: still-consumed advisory role doctrine; mixed historical dispatch/confinement recipes"
+      ],
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding."
+    },
+    {
+      "claimId": "claim_1c4b6a078b8db6a445492268b7e50187",
+      "sourceUnitDigest": "bca5a6476f7b4cc976fcdc1992f1d8d9ddf7b5f7a75ac7f4a15e8189c89c536e",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "2b85016e03dc5ae4f7344406ffca58011d3e12593121661b1a40e2fef4e11ffc",
+      "targetAncestry": [
+        "Historical File: still-consumed advisory role doctrine; mixed historical dispatch/confinement recipes"
+      ],
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding."
     }
   ],
   "exact": [
@@ -6805,16 +6835,6 @@
           "claimId": "claim_8e13ccc24f4c4a1a1b985b629e0e3fc3",
           "sourceUnitDigest": "1dd0439bd299e5f761977523c1dff7794bf0f4f4aa9c76f0970013aad9a144c3",
           "targetUnitDigest": "1dd0439bd299e5f761977523c1dff7794bf0f4f4aa9c76f0970013aad9a144c3"
-        },
-        {
-          "claimId": "claim_f6e06362a96e95630a642abfd5407356",
-          "sourceUnitDigest": "20ca5da93c7d84605576a48f85633d64ef4776058c89cbd0a5ed02f16d809798",
-          "targetUnitDigest": "20ca5da93c7d84605576a48f85633d64ef4776058c89cbd0a5ed02f16d809798"
-        },
-        {
-          "claimId": "claim_1c4b6a078b8db6a445492268b7e50187",
-          "sourceUnitDigest": "bca5a6476f7b4cc976fcdc1992f1d8d9ddf7b5f7a75ac7f4a15e8189c89c536e",
-          "targetUnitDigest": "bca5a6476f7b4cc976fcdc1992f1d8d9ddf7b5f7a75ac7f4a15e8189c89c536e"
         },
         {
           "claimId": "claim_86d722218391953b41d78c38b2248d9d",

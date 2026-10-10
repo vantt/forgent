@@ -3808,30 +3808,53 @@
       "reviewStatus": "pending",
       "targetUnitDigest": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
       "targetAncestry": []
-    }
-  ],
-  "exact": [
+    },
     {
-      "source": "docs/architect/agent-coordination/verification/README.md",
-      "target": "docs/platform/agent-coordination/verification/README.md",
-      "rows": [
-        {
-          "claimId": "claim_ae3cca79a2d35d3ce1f7cdc0f55c7535",
-          "sourceUnitDigest": "58047058f1e62a8890b518176fcd3755c8ea9a333dd514b365b9be1192eba819",
-          "targetUnitDigest": "58047058f1e62a8890b518176fcd3755c8ea9a333dd514b365b9be1192eba819"
-        },
-        {
-          "claimId": "claim_768ae397efb4f9e23b6f120bed92f78a",
-          "sourceUnitDigest": "d4dc4c8d3260f374cde75c82897b952e414ee4b59740e358e1334e9940282443",
-          "targetUnitDigest": "d4dc4c8d3260f374cde75c82897b952e414ee4b59740e358e1334e9940282443"
-        },
-        {
-          "claimId": "claim_29427a2a05e942cef415e5a9991da2cf",
-          "sourceUnitDigest": "28e71e67e2b6bcd591eb376e42d604301090561868360b02eb24e4279b3b592e",
-          "targetUnitDigest": "28e71e67e2b6bcd591eb376e42d604301090561868360b02eb24e4279b3b592e"
-        }
-      ]
+      "claimId": "claim_ae3cca79a2d35d3ce1f7cdc0f55c7535",
+      "sourceUnitDigest": "58047058f1e62a8890b518176fcd3755c8ea9a333dd514b365b9be1192eba819",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ],
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding."
+    },
+    {
+      "claimId": "claim_768ae397efb4f9e23b6f120bed92f78a",
+      "sourceUnitDigest": "d4dc4c8d3260f374cde75c82897b952e414ee4b59740e358e1334e9940282443",
+      "claimKind": "contract",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ],
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding."
+    },
+    {
+      "claimId": "claim_29427a2a05e942cef415e5a9991da2cf",
+      "sourceUnitDigest": "28e71e67e2b6bcd591eb376e42d604301090561868360b02eb24e4279b3b592e",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ],
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding."
     }
   ],
+  "exact": [],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-exact-06.md"
 }
