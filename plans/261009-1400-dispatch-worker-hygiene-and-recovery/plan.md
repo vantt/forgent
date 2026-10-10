@@ -23,12 +23,14 @@ created: 2026-10-09
 
 | | Added src lines | New files under `src/runner/dispatch` | New durable state | Stop date |
 |---|---|---|---|---|
-| Whole plan | <= 350 | 0 | one workflow event type, two fields on existing records | 2026-10-14 |
+| Whole plan | <= 460 (raised: hygiene approach and two phases added 2026-10-10) | 0 | one workflow event type, two fields on existing records | 2026-10-14 |
 | [P01](phase-01-read-only-worker-agent-config-masks.md) | <= 160 (raised from 60 by the owner 2026-10-09: hook-trust seeding replaced masks as the first fix; 157 measured) | 0 | none | 2026-10-11 |
 | [P02](phase-02-unit-association-before-dispatch.md) | <= 50 | 0 | event `unit.started` in the existing workflow journal | 2026-10-11 |
 | [P03](phase-03-herdr-session-identity-for-reaper-and-recovery.md) | <= 70 | 0 | `herdrSession` on launch-command record and ownership marker | 2026-10-13 |
 | [P04](phase-04-owner-set-quarantine-and-reset-date.md) | <= 60 | 0 | none (reuses quarantine record) | 2026-10-14 |
 | [P05](phase-05-findings-stop-reason.md) | <= 10 | 0 | none | 2026-10-14 |
+| [P06](phase-06-absolute-hook-shim-path.md) | <= 40 | 0 | none | 2026-10-14 |
+| [P07](phase-07-claude-mcp-approval-per-process.md) | <= 70 | 0 | none | 2026-10-14 |
 
 Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row above. Over by > 50% -> stop, descope or re-plan; never merge over budget silently.
 
@@ -41,6 +43,8 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 | 03 | herdr session identity for reaper and recovery | HIGH but rare; makes 02's resume safe for in-flight seats; shares `bwrap.mjs` with 01 -> after 01 | Test T3 | Lead re-runs test + suite | yes (herdr round, reaper) |
 | 04 | Owner-set quarantine and reset date | Auto-quarantine starts working once 01 removes the dialog; this covers the rest | Test T4 | Lead | no (one verb + one parse function) |
 | 05 | Findings stop reason | Cosmetic, zero consumers | Test T5 | Lead | no (reason string; `grep` finds no consumer in src/bin/core) |
+| 06 | Absolute shim path in codex and agy hook commands | Proven cause of agy exit 127 on any dispatch into a project with hooks; independent of 01 | Gemini probe in mcp-skill-hub, first tool call without 127 | Lead | yes (installer, every project) |
+| 07 | Claude worker: approve the target's own MCP servers per process | Claude seat stops at the MCP dialog; blocks R1 | Claude probe, then R1 | Lead | yes (dispatch trust path) |
 
 - **R1**: `fgos workflow start` of the architecture-advisory workflow in `/home/vantt/projects/mcp-skill-hub`, target files untouched (`git -C <target> status` identical before/after, no edit to the claude invocation args), ends `completed`, no seat diagnosis shows hook exit 127, a hooks-trust dialog or an MCP `internal_error`.
 - **T2**: `a resumed workflow continues the unit run its dead controller started and dispatches only the seats that had not settled` (`test/workflow/workflow-runner.test.mjs`).
@@ -55,6 +59,7 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 - 01 and 02: none; parallel allowed (disjoint files).
 - 03 after 01 (`drivers/bwrap.mjs`). 03 does not need 02 to merge, but 02's resume of an in-flight seat is only safe after 03.
 - 04 after 01 for its auto path to matter; code-independent.
+- 06 and 07 are independent of each other (installer vs. dispatch trust path). 07 shares `herdr-round.mjs` with 03: run 07 before 03 or serialize.
 - [Credential rotation plan](../261007-1700-provider-credential-rotation-safety/plan.md): its blocker (advisory capability landing) is gone since M landed. It edits `provider-capacity.mjs` and `drivers/bwrap.mjs` -> run it after 03 and 04, never concurrently. No overlap in scope: it renews logins; this plan never touches what is copied into a private home.
 
 ## Kill criteria
