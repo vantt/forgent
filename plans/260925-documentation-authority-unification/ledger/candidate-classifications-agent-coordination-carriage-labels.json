@@ -1,0 +1,2177 @@
+{
+  "version": 1,
+  "status": "pending-independent-targeted-check",
+  "authorSession": "codex-session:1@2026-10-10",
+  "sourceCommit": "3378386db450cf0b8e366f3b95b093314b03800c",
+  "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+  "receipts": [
+    {
+      "claimId": "claim_1d32168fc40f00b8ff103f6e494ca6f0",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "anchor": "unheaded-block-29",
+      "unitDigest": "27f108554ecf59440195ac0aa398fd624fdc03ba28e7bc518131e02832b36b31",
+      "shownText": "1. **Request normalizer (design)** — the normalized target/policy/provenance\n   boundary is proposed; current inputs are the compiler options above.\n2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal\n   executor IDs/defaults or capability `prefer`; aliases and executor `for[]`\n   inform capability labels separately in `resolveCapabilityDetailsFromHints`\n   (`resolve.mjs:25-66,269-310`), not this binding resolver.\n3. **Executor registry resolver** — resolves a literal executor-id to its\n   concrete invocation/tool/agent shape (`resolveExecutorConfig`).\n4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported\n   provider/model/rigor/tier derivation and provenance, not a `mergePolicyStack`.\n5. **Governance resolver** — checks egress/provider/executor/content\n   constraints (cross-provider gate, `allowCrossProvider`, `carries`).\n6. **Mechanism resolver** — decides in-process/out-of-process/unavailable\n   and MCP/tool handback (`decideDispatchMechanism`,\n   `decideExecutorDispatchMechanism`).\n7. **DispatchPlan compiler** — `compileDispatchPlan()` joins the legacy\n   dispatch decisions. Unit execution first obtains its binding through\n   `bind()`; assignment-runner revalidates that binding and compiles the\n   governed execution plan. The domain harness owns neither choice.\n8. **Run runtime/adapters** — creates, launches, observes, settles, and\n   retries a Run without choosing semantic operation\n   (`assignment-runner.mjs`, `transport.mjs`, `herdr-round.mjs`).",
+      "shownTextDigest": "27f108554ecf59440195ac0aa398fd624fdc03ba28e7bc518131e02832b36b31",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded component-internal-ownership evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_c70a8a1ffd7d36e49b31d6296cc31356",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        },
+        {
+          "claimId": "claim_3917668d815f67336de99ba9a7f2e81a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "component-internal-ownership",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+            "startLine": 434,
+            "endLine": 443,
+            "blobSha": "1028a7279ac95a48f6075d239f36f5cf250ec58f"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 500,
+            "endLine": 528,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1419,
+            "endLine": 1438,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 25,
+            "endLine": 66,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          },
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 269,
+            "endLine": 310,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_f2b49dde03982181f6b70e8673696528",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+      "shownText": "A requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).",
+      "shownTextDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 2-production-ladder-semantics evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_c26b6c8149e0b5bc78dab2b6e1fb6e0a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        },
+        {
+          "claimId": "claim_ad392d3c304da7625a3e2f75aa0753e6",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-production-ladder-semantics",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 341,
+            "endLine": 359,
+            "blobSha": "2a31f0e1bd7eb571f1fbe130fbc8c2a399772074"
+          },
+          {
+            "path": "src/runner/recovery.mjs",
+            "startLine": 105,
+            "endLine": 112,
+            "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 93,
+            "endLine": 109,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 238,
+            "endLine": 246,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_d2ccffd941fae05969fc134130f7237a",
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "dda2de3ff221e2646b7a686c931fe6dfeb234cfd913cd8a7487bf437415f7785",
+      "shownText": "`taskSpecForStep` selects the primary normalized `step.operations` entry (or the\nfirst); `skillForStep` reads `step.skill` separately and falls back to a declared\nstatus skill (`src/workflow/steps.mjs:52-64`). Neither projects both values from\nan operation. Compatibility remains a projection, not permission to weaken the\nmandatory declared-operation, transition or evidence constraints. The existing\n`operationsForStep`/`isLegalStepMove` projections preserve declared legality\n(`steps.mjs:44-45,67-85`); they do not restore the retired Work-stage or engine.",
+      "shownTextDigest": "dda2de3ff221e2646b7a686c931fe6dfeb234cfd913cd8a7487bf437415f7785",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded compatibility evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_aa0e400354f9f0b2a32e90249880fa78",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        },
+        {
+          "claimId": "claim_a0dbbb8526785c8cf1c8bc658d6d38b5",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "compatibility",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/state/domain-registry.mjs",
+            "startLine": 244,
+            "endLine": 258,
+            "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 43,
+            "endLine": 85,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 733,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "9719376eb7ba87c28d95d4dae1fa9da87b9972532fbb3eda1872cccca07a153f",
+      "shownText": "The former session/FlowDefinition profile is historical, not the Workflow operation contract. See the complete historical snapshot linked above.",
+      "shownTextDigest": "9719376eb7ba87c28d95d4dae1fa9da87b9972532fbb3eda1872cccca07a153f",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded standalone-coordination evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        },
+        {
+          "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "standalone-coordination",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/state/domain-registry.mjs",
+            "startLine": 244,
+            "endLine": 258,
+            "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "6-local-concurrency-and-durability",
+      "unitDigest": "b54abb5801b4e539ddd8dc29f1135d06a751a9833cd45a7fd27e72aff7b63cd6",
+      "shownText": "## 6. Local Concurrency And Durability\n\nControl acquisition must not reclaim a live process merely because TTL expired.\nHolder identity is `{hostId, bootId, pid, processStartTime}` of the process doing\ncontrol, not a guessed Rust parent. Unknown liveness is not dead. A dead holder\nmay leave a remotely queued command: successor first reconciles pending control.\n\nImplemented (Phase 02 H1, `src/runner/dispatch/run-lock.mjs`): holder identity\nis `{id, pid, bootId, processStartTime, host}` (`buildRunControlHolder`,\n`host` in place of this section's `hostId`), and `resolveHolderLiveness`\nencodes the reclaim decision above as a table — a live pid, a pid whose\nliveness cannot be disproven (unreadable `/proc/<pid>/stat`), or a pre-H1\nholder record with no `processStartTime` to cross-check all resolve to\n`held`, never `dead`; only a genuinely dead pid, a pid reused by a different\nprocess (`processStartTime` mismatch), or a `bootId` predating the current\nboot resolve to `dead`.\n\nRecommended local implementation for safe reclaim without unlink races:\none per-scope lock directory containing immutable generation records and\ntoken-specific release markers. Contenders publish generation `g+1` only after\n`g` is released or its exact process identity is proven dead. Exactly one wins\nexclusive publication. Never unlink/overwrite an earlier generation during\nacquire/release, so a delayed release cannot delete its successor. A live holder\nnever self-recognizes a second concurrent acquisition as reentrant. Generation\nrecords are retained with the runtime/session artifacts; compaction is offline\nonly after the scope is quiescent.\n\nThe proposed durability profile requires a fully written/fsynced temp file in\nthe same directory, atomic non-overwriting publication and directory fsync.\nIt calls for temp+rename+directory fsync under the owning lock for replacement.\nThose are design requirements; the implementation's best-effort directory\nfsync and other limits are stated below, not silently promoted to guarantees.\nCurrent terminal `result.json` is published by `publishImmutableProof`\n(`settlement.mjs:434`), not the mutable writer. `run.json` updates, the\neffective-execution-contract projection and bookkeeping markers use their\nmutable/marker writers. An unreadable existing result refuses relaunch rather\nthan overwriting evidence. The proof helper fsyncs the file, hard-links it\nwithout overwrite, treats `EEXIST` as an existing proof and rethrows other link\nerrors; directory fsync is best-effort (`proof-helpers.mjs:73-125`).\nA dedicated unsupported-filesystem diagnostic/doctor probe is a design\nrequirement, not an implemented check. No distributed lease, background\nrenewal service or TTL-only takeover is required by this local design.",
+      "shownTextDigest": "097936745e3bd24722d05d5c02697903f13d2e8a95e1e7c7cee804833dfdaf68",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 6-local-concurrency-and-durability evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        },
+        {
+          "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "6-local-concurrency-and-durability",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-lock.mjs",
+            "startLine": 306,
+            "endLine": 412,
+            "blobSha": "d44e2aef594ad322fa5496601501431b6ce216b3"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 895,
+            "endLine": 945,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 420,
+            "endLine": 445,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/proof-helpers.mjs",
+            "startLine": 73,
+            "endLine": 125,
+            "blobSha": "ec8e9f6ab9406cea6eb7ff9ab1edf4fe962862ca"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 999,
+            "endLine": 1022,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "decision",
+      "unitDigest": "5622c06276f32ad74efed999035410c8d752835bbe3f671d5ac3368f4555384c",
+      "shownText": "## Decision\n\n1. **Three current provenance kinds, one execution path.** Declared and inline\n   builders stamp `contractPolicyVersion`, `normalizerVersion` and validator\n   provenance (`assignment.mjs:456-459,663-666`). The Unit door separately writes\n   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:334-338`);\n   do not assert every kind has the declared builder's identical shape.\n   - `declared`: Workflow step/operation/TaskSpec validation and normalization.\n   - `inline`: foundation contract validation, the applicable registered domain\n     harness and caller provenance.\n   - `unit-run`: the Unit execution door and its computed binding/admission.\n2. **Normalizer stamps the snapshot.** At build time the normalizer stamps\n   `mutation` (`read-only | mutating`) and `evidence.required`\n   (`reported | verified`) onto the immutable Assignment. Declared operations\n   use operation tables with role/mutation-derived fallbacks for unmapped\n   operations (`assignment-normalizer.mjs:95-124`); inline contracts must declare\n   mutation/evidence explicitly. Missing required inline values fail validation.\n3. **Interpretation reads the Assignment, not the operation id.** Result\n   confidence gating, mutation policy, and post-advance behavior are driven by\n   Assignment fields. Declared `resultKind` and optional `onAdvance` use the\n   normalizer tables, with advisory/work-product fallback from mutation\n   (`assignment-normalizer.mjs:120-143`). These are not arbitrary accepted\n   inline-contract fields.\n4. **Validated inline fields.** `objective`, `contextRefs`, `constraints`,\n   `expectedOutputs`, `mutation`, `evidence`, required `role` and `budget`;\n   optional `capabilities`, `supports`, `contractTemplate` and narrow `policy`.\n   Budget requires positive integer `timeoutMs` and `maxRuns`; optional `tokens`\n   is telemetry, not an enforced limit (`execution-contract.mjs:345-346,371-382`);\n   inline policy accepts only\n   `tier`, not a full PolicyPatch. Caller fields are validated separately\n   (`execution-contract.mjs:180-240,295-340`). Unknown fields are rejected.\n5. **Same execution governance.** Declared, inline and Unit-run requests\n   converge on Assignment execution and Run/RunResult normalization rather than\n   private dispatch or stores that bypass governance.\n6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks described in docs/specs/runner.md:3058. Do not present the dormant stamp path as a current general session-runtime door.\n\n7. **Retire the standalone read-only heuristic.** Once no declared caller\n   passes `workId: null`, the `missionId || workId === null => read-only`\n   clauses are removed; read-only status comes only from the stamped\n   `mutation` field.",
+      "shownTextDigest": "860625505af248f5e4da75b5c8abbf0ca2d3732123931ab1947a70daa834164a",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded decision evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        },
+        {
+          "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "decision",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 331,
+            "endLine": 340,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 164,
+            "endLine": 188,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 337,
+            "endLine": 384,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "docs/specs/runner.md:3058"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_23d876a3d8a3d6065303317b2200500c",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "unheaded-block-5",
+      "unitDigest": "997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237",
+      "shownText": "1. **Three current provenance kinds, one execution path.** Declared and inline\n   builders stamp `contractPolicyVersion`, `normalizerVersion` and validator\n   provenance (`assignment.mjs:456-459,663-666`). The Unit door separately writes\n   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:334-338`);\n   do not assert every kind has the declared builder's identical shape.\n   - `declared`: Workflow step/operation/TaskSpec validation and normalization.\n   - `inline`: foundation contract validation, the applicable registered domain\n     harness and caller provenance.\n   - `unit-run`: the Unit execution door and its computed binding/admission.\n2. **Normalizer stamps the snapshot.** At build time the normalizer stamps\n   `mutation` (`read-only | mutating`) and `evidence.required`\n   (`reported | verified`) onto the immutable Assignment. Declared operations\n   use operation tables with role/mutation-derived fallbacks for unmapped\n   operations (`assignment-normalizer.mjs:95-124`); inline contracts must declare\n   mutation/evidence explicitly. Missing required inline values fail validation.\n3. **Interpretation reads the Assignment, not the operation id.** Result\n   confidence gating, mutation policy, and post-advance behavior are driven by\n   Assignment fields. Declared `resultKind` and optional `onAdvance` use the\n   normalizer tables, with advisory/work-product fallback from mutation\n   (`assignment-normalizer.mjs:120-143`). These are not arbitrary accepted\n   inline-contract fields.\n4. **Validated inline fields.** `objective`, `contextRefs`, `constraints`,\n   `expectedOutputs`, `mutation`, `evidence`, required `role` and `budget`;\n   optional `capabilities`, `supports`, `contractTemplate` and narrow `policy`.\n   Budget requires positive integer `timeoutMs` and `maxRuns`; optional `tokens`\n   is telemetry, not an enforced limit (`execution-contract.mjs:345-346,371-382`);\n   inline policy accepts only\n   `tier`, not a full PolicyPatch. Caller fields are validated separately\n   (`execution-contract.mjs:180-240,295-340`). Unknown fields are rejected.\n5. **Same execution governance.** Declared, inline and Unit-run requests\n   converge on Assignment execution and Run/RunResult normalization rather than\n   private dispatch or stores that bypass governance.\n6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks described in docs/specs/runner.md:3058. Do not present the dormant stamp path as a current general session-runtime door.",
+      "shownTextDigest": "997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded decision evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_d04f3528ac32bc6a0a67ecc6153e7879",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        },
+        {
+          "claimId": "claim_90f9d9a811588a6b3372cc53001045e1",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "decision",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 331,
+            "endLine": 340,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 164,
+            "endLine": 188,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 337,
+            "endLine": 384,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "docs/specs/runner.md:3058"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4c0c970dae43e8703d7a3cb196d0abff",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-33",
+      "unitDigest": "ceff29b5e89f139a1e246e71440ba41ad5e6b3d46d1297c8cedbdd671ceb3d56",
+      "shownText": "| Status | Required fields |\n|---|---|\n| `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |\n| `blocked` | `summary`; `blocker`. This protocol asks workers to attach `evidenceRefs` when evidence exists; the validator only checks that field when supplied (`agent-result-claim-contract.mjs:70-79`). |\n| `failed` | `summary`; `error`. |\n| `no-evidence` | Non-empty `summary`; there is no additional reason field in the validator (`agent-result-claim-contract.mjs:9-15,67-85`). |",
+      "shownTextDigest": "ceff29b5e89f139a1e246e71440ba41ad5e6b3d46d1297c8cedbdd671ceb3d56",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 7-agent-result-schema evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_241d8e8d42387c28dc30179f1bad66cb",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "7-agent-result-schema",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 5,
+            "endLine": 30,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 52,
+            "endLine": 90,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 70,
+            "endLine": 79,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 747,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_78039339074d6cb799f0cc05212bc1b2",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-51",
+      "unitDigest": "6607ab2663e1528b4881d574a6a1c7c6a25d65603f61d9c7631e01152e89c16a",
+      "shownText": "The current coding Workflow already declares `shape-plan` and reviewer\n`validate-plan`; adopting a future Step 05 is not a prerequisite for that\noperation (`domains/coding/workflows/feature.yaml:64-100`).",
+      "shownTextDigest": "6607ab2663e1528b4881d574a6a1c7c6a25d65603f61d9c7631e01152e89c16a",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 103-planning evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_78039339074d6cb799f0cc05212bc1b2",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        },
+        {
+          "claimId": "claim_94f214f5722011ac862fa96484a2e26a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "A24 inherited stale ordinal/digest corrected to actual complete semantic counterpart; no approval carry"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "103-planning",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_75b676acfa47fb48346fdb41a14eb88b",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-59",
+      "unitDigest": "4b4919e773a62ee697078975dd8b356c3cddb449ce8b52b82098cdd61c141a9c",
+      "shownText": "The harness should be used where it reduces implementation drift, but dogfooding\nit is not a runtime dependency gate for current Unit/Workflow execution.",
+      "shownTextDigest": "4b4919e773a62ee697078975dd8b356c3cddb449ce8b52b82098cdd61c141a9c",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 11-coordination-operating-harness evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_75b676acfa47fb48346fdb41a14eb88b",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        },
+        {
+          "claimId": "claim_1ab27a36fa860ce8e0ed9c1b5911979e",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "A24 inherited stale ordinal/digest corrected to actual complete semantic counterpart; no approval carry"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "11-coordination-operating-harness",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-60",
+      "unitDigest": "d7526645b493fa257553cc2e45338792d83be617562b8e5e8be20e62c9e5bff0",
+      "shownText": "The former session-engine runtime path is historical. Current standalone execution uses Unit/CollaborationPattern, not that protocol profile. The manual operating harness in section 11 remains current by owner decision.",
+      "shownTextDigest": "d7526645b493fa257553cc2e45338792d83be617562b8e5e8be20e62c9e5bff0",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 12-standalone-read-only-coordination evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        },
+        {
+          "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "12-standalone-read-only-coordination",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_ad21fc833125360407f6b23ca8a6d951",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "anchor": "component-internal-ownership",
+      "unitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
+      "shownText": "## Component-Internal Ownership\n\nThe Dispatch And Execution Engine owns exactly these authorities. No other\ncomponent performs any of them; this control plane performs none of the\nComponent-Outer Boundary Note's responsibilities.\n\n1. **Request normalizer (design)** — the normalized target/policy/provenance\n   boundary is proposed; current inputs are the compiler options above.\n2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal\n   executor IDs/defaults or capability `prefer`; aliases and executor `for[]`\n   inform capability labels separately in `resolveCapabilityDetailsFromHints`\n   (`resolve.mjs:25-66,269-310`), not this binding resolver.\n3. **Executor registry resolver** — resolves a literal executor-id to its\n   concrete invocation/tool/agent shape (`resolveExecutorConfig`).\n4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported\n   provider/model/rigor/tier derivation and provenance, not a `mergePolicyStack`.\n5. **Governance resolver** — checks egress/provider/executor/content\n   constraints (cross-provider gate, `allowCrossProvider`, `carries`).\n6. **Mechanism resolver** — decides in-process/out-of-process/unavailable\n   and MCP/tool handback (`decideDispatchMechanism`,\n   `decideExecutorDispatchMechanism`).\n7. **DispatchPlan compiler** — `compileDispatchPlan()` joins the legacy\n   dispatch decisions. Unit execution first obtains its binding through\n   `bind()`; assignment-runner revalidates that binding and compiles the\n   governed execution plan. The domain harness owns neither choice.\n8. **Run runtime/adapters** — creates, launches, observes, settles, and\n   retries a Run without choosing semantic operation\n   (`assignment-runner.mjs`, `transport.mjs`, `herdr-round.mjs`).\n\nForbidden dependencies for all eight:\n\n- no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);\n- no event store append (`appendEvent`): audit dispatch logging is isolated to `src/runner/dispatch-log.mjs` outside dispatch core;\n- no semantic Workflow/domain operation lookup in the strictly decoupled dispatch core. Work-layer lookups belong to `src/runner/work-compat.mjs` and `src/runner/operation-choice.mjs`; caller-derived hints enter the compiler. Historical compatibility re-exports and an `infra` manifest label are not current ownership proof. See boundary tests at `test/runner/dispatch-reconciliation-import-graph.test.mjs:434-443`.\n- no semantic operation choice;\n- no direct protocol/skill/domain executor launch;\n- no RunResult confidence decision (owned by the Run Result Evaluator);\n- no provider/model selection outside the policy resolver (item 4);\n- no second private executor-launch path for a domain or coordinating harness.\n  The retired `cohort-planner.mjs` is not a current exception or authority.",
+      "shownTextDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded component-internal-ownership evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_ad21fc833125360407f6b23ca8a6d951",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "component-internal-ownership",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "test/runner/dispatch-reconciliation-import-graph.test.mjs",
+            "startLine": 434,
+            "endLine": 443,
+            "blobSha": "1028a7279ac95a48f6075d239f36f5cf250ec58f"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 500,
+            "endLine": 528,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1419,
+            "endLine": 1438,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 25,
+            "endLine": 66,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          },
+          {
+            "path": "src/runner/dispatch/resolve.mjs",
+            "startLine": 269,
+            "endLine": 310,
+            "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_4206c1d35ff143014142819046d69771",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "2-production-ladder-semantics",
+      "unitDigest": "21295b47dae8583ef4b70ea406ad45275bdb1902af772589db488dafa179f7c8",
+      "shownText": "## 2. Production Ladder Semantics\n\nThe order and behavior in `src/runner/dispatch/liveness.mjs` are ported:\n1. Worker result file beats all runtime readings; it still requires normalization.\n2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:346-357`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.\n3. Death requires consecutive absent readings (default 3); unknown/present reset.\n4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.\n5. Idle/stale evaluation subtracts blind time; working is progress even with\n   zero stdout. Screen reads are requested at the stale boundary, and an early\n   credential probe also runs after fifteen seconds of non-working idle time\n   (`liveness.mjs:267-299`). Thus screen reads are not stale-only.\n\nA requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).\n\nZero output is a fact orthogonal to outcome. A 35-minute zero-output incident can\nbe timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.\nHandshake timeout with unknown delivery is not proof of launch failure.\nThe ladder supplies the matching screen line, not a parsed retryAfter timestamp.\nAn adapter may parse a known provider reset format, preserving the original line;\notherwise retryAfter is absent. RetryAfter only schedules inspection.",
+      "shownTextDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 2-production-ladder-semantics evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_4206c1d35ff143014142819046d69771",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-production-ladder-semantics",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 341,
+            "endLine": 359,
+            "blobSha": "2a31f0e1bd7eb571f1fbe130fbc8c2a399772074"
+          },
+          {
+            "path": "src/runner/recovery.mjs",
+            "startLine": 105,
+            "endLine": 112,
+            "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 93,
+            "endLine": 109,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 238,
+            "endLine": 246,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "compatibility",
+      "unitDigest": "83aa85a06907fe314ff287f9c63d0d67417933bd0af40a8426180ee499369f64",
+      "shownText": "## Compatibility\n\n`taskSpecForStep` selects the primary normalized `step.operations` entry (or the\nfirst); `skillForStep` reads `step.skill` separately and falls back to a declared\nstatus skill (`src/workflow/steps.mjs:52-64`). Neither projects both values from\nan operation. Compatibility remains a projection, not permission to weaken the\nmandatory declared-operation, transition or evidence constraints. The existing\n`operationsForStep`/`isLegalStepMove` projections preserve declared legality\n(`steps.mjs:44-45,67-85`); they do not restore the retired Work-stage or engine.\n\nThis compatibility path remains mandatory for Work-attached declared workflows.\nAdding an agent-led path must not weaken or reinterpret it. The current Work\ndriver resolves the legal normalized operations, preserves their primary default\nand refuses an undeclared request (`src/runner/operation-choice.mjs:733-761`);\ndeclared Assignment creation independently requires a legal operation and its\nTaskSpec (`src/runner/dispatch/assignment.mjs:328-345`). These are primary\ncompatibility and legality obligations, not a revival of the retired engine.\n\nThe exact normalized contract is defined in\n[Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md).",
+      "shownTextDigest": "a0a50b9e5327a33e11548c30917dac1b43360b9cf2e8932cb762ef7c1829fb8c",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded compatibility evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "compatibility",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/state/domain-registry.mjs",
+            "startLine": 244,
+            "endLine": 258,
+            "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 43,
+            "endLine": 85,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 733,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_56c5cdf17d45ca7bc8a06b045cd7ef6a",
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "f058552f4b52d313e8f86aca9c70ac756a42145757a31ba6b58099f5945534be",
+      "shownText": "This compatibility path remains mandatory for Work-attached declared workflows.\nAdding an agent-led path must not weaken or reinterpret it. The current Work\ndriver resolves the legal normalized operations, preserves their primary default\nand refuses an undeclared request (`src/runner/operation-choice.mjs:733-761`);\ndeclared Assignment creation independently requires a legal operation and its\nTaskSpec (`src/runner/dispatch/assignment.mjs:328-345`). These are primary\ncompatibility and legality obligations, not a revival of the retired engine.",
+      "shownTextDigest": "f058552f4b52d313e8f86aca9c70ac756a42145757a31ba6b58099f5945534be",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded compatibility evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "A24 inherited stale ordinal/digest corrected to actual complete semantic counterpart; no approval carry"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "compatibility",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/state/domain-registry.mjs",
+            "startLine": 244,
+            "endLine": 258,
+            "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 43,
+            "endLine": 85,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 733,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_747e62e56c75416974d865f34776dc1b",
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "unheaded-block-16",
+      "unitDigest": "1336340eee4a4baf5590bfd842f9ba0d8c3bd0c08e501ed16e6742ede9b06088",
+      "shownText": "The exact normalized contract is defined in\n[Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md).",
+      "shownTextDigest": "1336340eee4a4baf5590bfd842f9ba0d8c3bd0c08e501ed16e6742ede9b06088",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded compatibility evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_747e62e56c75416974d865f34776dc1b",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "compatibility",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/state/domain-registry.mjs",
+            "startLine": 244,
+            "endLine": 258,
+            "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 43,
+            "endLine": 85,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 733,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1c28dede124fbc48e2aed31bcb6bb448",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-19",
+      "unitDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
+      "shownText": "The proposed durability profile requires a fully written/fsynced temp file in\nthe same directory, atomic non-overwriting publication and directory fsync.\nIt calls for temp+rename+directory fsync under the owning lock for replacement.\nThose are design requirements; the implementation's best-effort directory\nfsync and other limits are stated below, not silently promoted to guarantees.\nCurrent terminal `result.json` is published by `publishImmutableProof`\n(`settlement.mjs:434`), not the mutable writer. `run.json` updates, the\neffective-execution-contract projection and bookkeeping markers use their\nmutable/marker writers. An unreadable existing result refuses relaunch rather\nthan overwriting evidence. The proof helper fsyncs the file, hard-links it\nwithout overwrite, treats `EEXIST` as an existing proof and rethrows other link\nerrors; directory fsync is best-effort (`proof-helpers.mjs:73-125`).\nA dedicated unsupported-filesystem diagnostic/doctor probe is a design\nrequirement, not an implemented check. No distributed lease, background\nrenewal service or TTL-only takeover is required by this local design.",
+      "shownTextDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 6-local-concurrency-and-durability evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_ba5969519e30f006a6eb0174c94d49b9",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "6-local-concurrency-and-durability",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-lock.mjs",
+            "startLine": 306,
+            "endLine": 412,
+            "blobSha": "d44e2aef594ad322fa5496601501431b6ce216b3"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 895,
+            "endLine": 945,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 420,
+            "endLine": 445,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/proof-helpers.mjs",
+            "startLine": 73,
+            "endLine": 125,
+            "blobSha": "ec8e9f6ab9406cea6eb7ff9ab1edf4fe962862ca"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 999,
+            "endLine": 1022,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_36b0160e2c6b33c6b3b6958486805043",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "7-agent-result-schema",
+      "unitDigest": "b4795ed4e9d009f97e13c46b1802463563b2be105e68f19856392ca56c8d8c4f",
+      "shownText": "## 7. Agent Result Schema\n\n`agent-result.json` is the worker's structured claim. It is not proof by\nitself.\n\nMinimal v2 reviewer claim (reviewer/red-team and recheck contexts require\n`assessment.verdict`; agent-result-claim-contract.mjs:5-30,81-85):\n\n```json\n{\n  \"contract\": { \"id\": \"agent-result-claim\", \"version\": 2 },\n  \"status\": \"done\",\n  \"summary\": \"One concise result sentence.\",\n  \"findings\": [],\n  \"evidenceRefs\": [],\n  \"assessment\": { \"verdict\": \"pass\" }\n}\n```\n\nAllowed status values:\n\n| Status | Meaning |\n|---|---|\n| `done` | The worker believes the assignment objective is complete. |\n| `blocked` | The worker could not complete because a named blocker remains. |\n| `failed` | The worker attempted the assignment and produced an error or invalid output. |\n| `no-evidence` | The worker can report context but cannot support a completion claim. |\n\nRequired fields by status:\n\n| Status | Required fields |\n|---|---|\n| `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |\n| `blocked` | `summary`; `blocker`. This protocol asks workers to attach `evidenceRefs` when evidence exists; the validator only checks that field when supplied (`agent-result-claim-contract.mjs:70-79`). |\n| `failed` | `summary`; `error`. |\n| `no-evidence` | Non-empty `summary`; there is no additional reason field in the validator (`agent-result-claim-contract.mjs:9-15,67-85`). |\n\n`nextRecommendedOperation` is a proposed optional extension, not a current\nvalidated schema field or a field the Work-layer caller presently consumes.\n\nFor this proposed extension, the legality obligation remains:\n\nOptional `nextRecommendedOperation` may name another legal stage operation, but\nit is only a recommendation. The driver must verify legality before acting.\nThe current [driver boundary](../contracts/workflow-stage-operation.md#driver-boundary)\nand undeclared-operation refusals enforce legal selection\n(`src/runner/operation-choice.mjs:747-761`,\n`src/runner/dispatch/assignment.mjs:328-345`); they do not implement a consumer\nfor the proposed field.",
+      "shownTextDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 7-agent-result-schema evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_36b0160e2c6b33c6b3b6958486805043",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "7-agent-result-schema",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 5,
+            "endLine": 30,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 52,
+            "endLine": 90,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 70,
+            "endLine": 79,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 747,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_820ca8318df78e7426ab81c938a0d83a",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-36",
+      "unitDigest": "ced47404abe27dcf3984b8d1b62c02e37787e2654eeb7af864d3272a2b9284e0",
+      "shownText": "Optional `nextRecommendedOperation` may name another legal stage operation, but\nit is only a recommendation. The driver must verify legality before acting.\nThe current [driver boundary](../contracts/workflow-stage-operation.md#driver-boundary)\nand undeclared-operation refusals enforce legal selection\n(`src/runner/operation-choice.mjs:747-761`,\n`src/runner/dispatch/assignment.mjs:328-345`); they do not implement a consumer\nfor the proposed field.",
+      "shownTextDigest": "ced47404abe27dcf3984b8d1b62c02e37787e2654eeb7af864d3272a2b9284e0",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 7-agent-result-schema evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_442970a9228617f16af5de16883fad2d",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "A24 inherited stale ordinal/digest corrected to actual complete semantic counterpart; no approval carry"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "7-agent-result-schema",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 5,
+            "endLine": 30,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 52,
+            "endLine": 90,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "startLine": 70,
+            "endLine": 79,
+            "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+          },
+          {
+            "path": "src/runner/operation-choice.mjs",
+            "startLine": 747,
+            "endLine": 761,
+            "blobSha": "7ccfd74c289cc74fb7f7122ea4a7b545a9101156"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 328,
+            "endLine": 345,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-38",
+      "unitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "shownText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed findings verdict with a report and exit 0 (`run-result.mjs:1261-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "shownTextDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 8-runresult-confidence evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "A24 inherited stale ordinal/digest corrected to actual complete semantic counterpart; no approval carry"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "8-runresult-confidence",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1250,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-39",
+      "unitDigest": "9b769b73c2920816c9da55624eb71f9c6704bb633a32db6a0ba27d71aaef2e6a",
+      "shownText": "The driver must treat `done/no-evidence` as not done. It may retry, ask for a\nproper artifact, or route to a different legal operation.",
+      "shownTextDigest": "9b769b73c2920816c9da55624eb71f9c6704bb633a32db6a0ba27d71aaef2e6a",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 8-runresult-confidence evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "8-runresult-confidence",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1250,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      }
+    },
+    {
+      "claimId": "claim_03e3bf1a24b5712d6df990d5af622dcd",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-40",
+      "unitDigest": "45448dcaa1ce69055f61288526e27178ab68b9657ad3c6ea0471592547570269",
+      "shownText": "Use `handoff` when the interaction is a short role-axis record around work the\ncurrent session already performed or directly observed.",
+      "shownTextDigest": "45448dcaa1ce69055f61288526e27178ab68b9657ad3c6ea0471592547570269",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 9-handoff-versus-assignment evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_03e3bf1a24b5712d6df990d5af622dcd",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "9-handoff-versus-assignment",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/state/store.mjs",
+            "startLine": 1497,
+            "endLine": 1562,
+            "blobSha": "418f3d688929b78bae26607a8eb624737e0ead25"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_97229569942e2e64f1f92b89a23bd513",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-41",
+      "unitDigest": "5e110b497e1da92942a6973ad6b43884d4085ad25ae9ee9a6d23c44d8c63b6bd",
+      "shownText": "Use Assignment when:\n\n- another executor, provider, role, or tool performs the action;\n- the result will be read by a later driver turn;\n- the result needs Run/RunResult evidence;\n- the interaction may fail independently;\n- a read-only consult/review needs an artifact rather than a one-line summary.",
+      "shownTextDigest": "5e110b497e1da92942a6973ad6b43884d4085ad25ae9ee9a6d23c44d8c63b6bd",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 9-handoff-versus-assignment evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_97229569942e2e64f1f92b89a23bd513",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "9-handoff-versus-assignment",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/state/store.mjs",
+            "startLine": 1497,
+            "endLine": 1562,
+            "blobSha": "418f3d688929b78bae26607a8eb624737e0ead25"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1c7027aa91b45aed495eaff739ad27a5",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-42",
+      "unitDigest": "d804ea47af68c0aa6bcdc1058abb3dd934cfe47cfbc766e23bbed4772b98ad1f",
+      "shownText": "`handoff` remains useful for visibility and role-holder truth. It is not enough\nevidence for a Team Dispatch operation once the result influences a lifecycle\ndecision.",
+      "shownTextDigest": "d804ea47af68c0aa6bcdc1058abb3dd934cfe47cfbc766e23bbed4772b98ad1f",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 9-handoff-versus-assignment evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_1c7027aa91b45aed495eaff739ad27a5",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "9-handoff-versus-assignment",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/state/store.mjs",
+            "startLine": 1497,
+            "endLine": 1562,
+            "blobSha": "418f3d688929b78bae26607a8eb624737e0ead25"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_1fa64800fce6ec3602dc783078b1daef",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-43",
+      "unitDigest": "dce623d34c1aae45bf2a55698fd5befa24dafd26b62ff898bf34fee1e683896a",
+      "shownText": "Discovery is machine-alone.",
+      "shownTextDigest": "dce623d34c1aae45bf2a55698fd5befa24dafd26b62ff898bf34fee1e683896a",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 101-discovery evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_1fa64800fce6ec3602dc783078b1daef",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "101-discovery",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_9ccb2418b7aec6f7f91493359b13f7cb",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-44",
+      "unitDigest": "538e8cefb7885ba1fd52c8a4b9dc39cdd9b13edc851f8b83dd1b48a0670fd4c8",
+      "shownText": "Allowed behavior:\n\n- owner reads existing Work context;\n- owner consults researcher helpers for evidence;\n- owner logs consult interactions;\n- owner chooses `clear` or `unclear`;\n- `clear` can route to planning;\n- `unclear` routes to exploring.",
+      "shownTextDigest": "538e8cefb7885ba1fd52c8a4b9dc39cdd9b13edc851f8b83dd1b48a0670fd4c8",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 101-discovery evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_9ccb2418b7aec6f7f91493359b13f7cb",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "101-discovery",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-45",
+      "unitDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "shownText": "Forbidden behavior:\n\n- asking the human directly;\n- parking as `awaiting-human`;\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "shownTextDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 101-discovery evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "101-discovery",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-46",
+      "unitDigest": "8be1c52fac778e783278a3fa17f78a4cf05b675f7111d46bc5930dd19a2bce63",
+      "shownText": "Exploring is the human-adjacent decision-locking stage.",
+      "shownTextDigest": "8be1c52fac778e783278a3fa17f78a4cf05b675f7111d46bc5930dd19a2bce63",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 102-exploring evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "102-exploring",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_223b98d1f2a5e3b6828b08b8e4370931",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-47",
+      "unitDigest": "6c2c64a1d48e2d1dca430f0811e612771eda3379e19731d984b3c5ea8b042013",
+      "shownText": "Allowed behavior:\n\n- advisor interaction for material, grounded, answerable product questions;\n- researcher consult for repo or external facts;\n- lock decisions into CONTEXT.md.",
+      "shownTextDigest": "6c2c64a1d48e2d1dca430f0811e612771eda3379e19731d984b3c5ea8b042013",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 102-exploring evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_223b98d1f2a5e3b6828b08b8e4370931",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "102-exploring",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f842daa15a1440ce53c57b28b577a61d",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-48",
+      "unitDigest": "6e5cc24269ba7cf4ebfdf5bb8062990d284cd999b1d8462e36c55d28713910f2",
+      "shownText": "Exploring may ask a human. It should ask only after machine evidence has been\ngathered and the question is self-contained.",
+      "shownTextDigest": "6e5cc24269ba7cf4ebfdf5bb8062990d284cd999b1d8462e36c55d28713910f2",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 102-exploring evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_f842daa15a1440ce53c57b28b577a61d",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "102-exploring",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_80dd38236997a4794fe26e44e1dcfcad",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-49",
+      "unitDigest": "14807360bce011d160261d7194fbcc2cf445f6a0722f072d50101af54d78d3b9",
+      "shownText": "Planning has two main operation families:",
+      "shownTextDigest": "14807360bce011d160261d7194fbcc2cf445f6a0722f072d50101af54d78d3b9",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 103-planning evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_80dd38236997a4794fe26e44e1dcfcad",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "103-planning",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_19eb3db5e5020a16b00678f6a1912c64",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-50",
+      "unitDigest": "f40aa8cbca5552bcf674388b44a555d1c431f1abab5c218961744a0c77968db0",
+      "shownText": "- `shape-plan` by implementer;\n- `validate-plan` by reviewer.",
+      "shownTextDigest": "f40aa8cbca5552bcf674388b44a555d1c431f1abab5c218961744a0c77968db0",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 103-planning evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_19eb3db5e5020a16b00678f6a1912c64",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "103-planning",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_e47495f1bcf3abc217aa128346ffe56b",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-52",
+      "unitDigest": "999fd62d2ac5bba2d830abbc5aa0e3057ed2a35f727a9ef390bdffe41c60714e",
+      "shownText": "`validate-plan` is a real reviewer-role operation when dispatched through\nAssignment. Prose that says validating is only an implementer function must be\nreconciled before driver adoption.",
+      "shownTextDigest": "999fd62d2ac5bba2d830abbc5aa0e3057ed2a35f727a9ef390bdffe41c60714e",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 103-planning evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_e47495f1bcf3abc217aa128346ffe56b",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "103-planning",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_988e3a8a6c0362f62381f07d896adee4",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-53",
+      "unitDigest": "62f1292eb44e2dd4af3c1ccde7a1a7247ae0febf11739444e8b377e233d40a1b",
+      "shownText": "Executing has the richest team protocol:",
+      "shownTextDigest": "62f1292eb44e2dd4af3c1ccde7a1a7247ae0febf11739444e8b377e233d40a1b",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 104-executing evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_988e3a8a6c0362f62381f07d896adee4",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "104-executing",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_f97e179a706fe5ce55a5ce146e23fb59",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-54",
+      "unitDigest": "3db147178920207776ed26ad024fdfc3cb509d1839901116d0693f322f8f6bca",
+      "shownText": "- implementer owns the main edit path;\n- researcher may answer blast-radius or API/pattern questions;\n- helper may take independent scoped work;\n- reviewer may review returned diffs or candidate fixes;\n- advisor handles product/scope questions that exceed locked decisions.",
+      "shownTextDigest": "3db147178920207776ed26ad024fdfc3cb509d1839901116d0693f322f8f6bca",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 104-executing evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_f97e179a706fe5ce55a5ce146e23fb59",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "104-executing",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_b80a6e9ecbbe65bdc1b568c9635c76fe",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-55",
+      "unitDigest": "3c902b0dddbee64c10302bbe2fa05b431d4ee1236b7c925bf4ba6d10a1859962",
+      "shownText": "The implementer remains responsible for Work lifecycle. Helper/reviewer\nassignments return artifacts and recommendations unless explicitly promoted to\nchild Work.",
+      "shownTextDigest": "3c902b0dddbee64c10302bbe2fa05b431d4ee1236b7c925bf4ba6d10a1859962",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 104-executing evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_b80a6e9ecbbe65bdc1b568c9635c76fe",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "104-executing",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_a3282845dc3dfd02de60631741d5f4fa",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-56",
+      "unitDigest": "99fd2729268c130f3b988b8833fb4ec10dedeb48094339156e687cba619bebb3",
+      "shownText": "Multi-agent implementation benefits from a durable operating harness:",
+      "shownTextDigest": "99fd2729268c130f3b988b8833fb4ec10dedeb48094339156e687cba619bebb3",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 11-coordination-operating-harness evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_a3282845dc3dfd02de60631741d5f4fa",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "11-coordination-operating-harness",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_c5d72d517bde5f2eadf2afee05649af7",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-57",
+      "unitDigest": "3136bedc9eac77f08874328886bc22baa033ea44009227abad3fe36e05878c8f",
+      "shownText": "```txt\ntrace/index.md\ntrace/current-cell.md\ntrace/<cell>.md\nprompt templates\nreview and red-team gates\nlive proof capture\n```",
+      "shownTextDigest": "3136bedc9eac77f08874328886bc22baa033ea44009227abad3fe36e05878c8f",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 11-coordination-operating-harness evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_c5d72d517bde5f2eadf2afee05649af7",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "11-coordination-operating-harness",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_5906c3d46cacca0ac1ad8aae963a8304",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-58",
+      "unitDigest": "68cb00b63900ec23e263a0a39ed605cf5e1f2a3a841467c8632d7f06e99f4264",
+      "shownText": "This harness is documented in\n[coordination-operating-harness.md](../playbooks/coordination-operating-harness.md). It is\nsupporting engineering practice, not Step 07 runtime infrastructure and not a\nlifecycle system. Its job is to keep coordinator, doer, reviewer, and red-team\nsessions aligned while preserving token budget and proof traceability.",
+      "shownTextDigest": "68cb00b63900ec23e263a0a39ed605cf5e1f2a3a841467c8632d7f06e99f4264",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 11-coordination-operating-harness evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_5906c3d46cacca0ac1ad8aae963a8304",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "11-coordination-operating-harness",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_d0a734e0e2ffe167a8576cd898e4279d",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-61",
+      "unitDigest": "734cc0979352c1a8d01a9e6c05a6fd4d544665459d9c6bdc8a3e71b9622321d5",
+      "shownText": "The protocol is ready for driver adoption when:",
+      "shownTextDigest": "734cc0979352c1a8d01a9e6c05a6fd4d544665459d9c6bdc8a3e71b9622321d5",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 13-acceptance-criteria-for-v1-protocol evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_d0a734e0e2ffe167a8576cd898e4279d",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "13-acceptance-criteria-for-v1-protocol",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_8de909df847b8689807abcfe156b704a",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-62",
+      "unitDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "shownText": "- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only operations can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "shownTextDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This genuine current native unit replaces the listed stale/changed/ordinal receipt references. Its complete shown text and current implementation/design/retirement boundaries require independent targeted verification against the recorded 13-acceptance-criteria-for-v1-protocol evidence; no previous classification approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_8de909df847b8689807abcfe156b704a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "unique identical shown text/native digest; immutable receipt ordinal/provenance refresh, pending independent check"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "13-acceptance-criteria-for-v1-protocol",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "3378386db450cf0b8e366f3b95b093314b03800c",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 40,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": [
+          "domains/coding/workflows/feature.yaml:12-140",
+          "domains/coding/registry.yaml:3-64"
+        ]
+      }
+    },
+    {
+      "claimId": "claim_978add6195798b64b599b1a2050ca2b2",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-35",
+      "unitDigest": "6c1793d59cb3c61a400cb26b3109fbe4e57b594df0002ec9a159a372536b97a6",
+      "shownText": "For this proposed extension, the legality obligation remains:",
+      "shownTextDigest": "6c1793d59cb3c61a400cb26b3109fbe4e57b594df0002ec9a159a372536b97a6",
+      "class": "structural-frame",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This newly introduced primitive only frames the proposed legality obligation below; it makes no additional current-runtime claim. Its actual text/digest and frame class require independent review.",
+      "previousReferences": [],
+      "truthSection": null
+    }
+  ]
+}
