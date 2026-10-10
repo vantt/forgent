@@ -1,0 +1,345 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-carriage-label-classifications",
+  "authorSession": "codex-session:1@2026-10-10",
+  "sources": [],
+  "claims": [],
+  "candidateClassifications": [
+    {
+      "claimId": "claim_1d32168fc40f00b8ff103f6e494ca6f0",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_f2b49dde03982181f6b70e8673696528",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_d2ccffd941fae05969fc134130f7237a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_23d876a3d8a3d6065303317b2200500c",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_4c0c970dae43e8703d7a3cb196d0abff",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_78039339074d6cb799f0cc05212bc1b2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_75b676acfa47fb48346fdb41a14eb88b",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_ad21fc833125360407f6b23ca8a6d951",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_4206c1d35ff143014142819046d69771",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_56c5cdf17d45ca7bc8a06b045cd7ef6a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_747e62e56c75416974d865f34776dc1b",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_1c28dede124fbc48e2aed31bcb6bb448",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_36b0160e2c6b33c6b3b6958486805043",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_820ca8318df78e7426ab81c938a0d83a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_03e3bf1a24b5712d6df990d5af622dcd",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_97229569942e2e64f1f92b89a23bd513",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_1c7027aa91b45aed495eaff739ad27a5",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_1fa64800fce6ec3602dc783078b1daef",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_9ccb2418b7aec6f7f91493359b13f7cb",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_223b98d1f2a5e3b6828b08b8e4370931",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_f842daa15a1440ce53c57b28b577a61d",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_80dd38236997a4794fe26e44e1dcfcad",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_19eb3db5e5020a16b00678f6a1912c64",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_e47495f1bcf3abc217aa128346ffe56b",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_988e3a8a6c0362f62381f07d896adee4",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_f97e179a706fe5ce55a5ce146e23fb59",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_b80a6e9ecbbe65bdc1b568c9635c76fe",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_a3282845dc3dfd02de60631741d5f4fa",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_c5d72d517bde5f2eadf2afee05649af7",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_5906c3d46cacca0ac1ad8aae963a8304",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_d0a734e0e2ffe167a8576cd898e4279d",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_8de909df847b8689807abcfe156b704a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    },
+    {
+      "claimId": "claim_978add6195798b64b599b1a2050ca2b2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
+      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+    }
+  ]
+}

@@ -5101,24 +5101,10 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_ad21fc833125360407f6b23ca8a6d951",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_d5fb8a32d49d21d440463a7cc92e30b7",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_3917668d815f67336de99ba9a7f2e81a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_cf80c418afb850eadd73fbe96439b46a",
@@ -5349,24 +5335,10 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_4206c1d35ff143014142819046d69771",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_9eae02f8528c14c092397a6b6f02a81d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ad392d3c304da7625a3e2f75aa0753e6",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_791aabf022f5a8f6060cf0ee1f8910ae",
@@ -5861,45 +5833,10 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_a0dbbb8526785c8cf1c8bc658d6d38b5",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_747e62e56c75416974d865f34776dc1b",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_f603b719a09969d2697b2ed65e4734e6",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_f36123e05778ce23bb364fe19b5b06f5",
@@ -6478,13 +6415,6 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_28ce337d93e47437f91c999c0662e163",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
@@ -6501,13 +6431,6 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ba5969519e30f006a6eb0174c94d49b9",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_4ffa60f4e184d451338ac102a22456f5",
@@ -7576,20 +7499,6 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_90f9d9a811588a6b3372cc53001045e1",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_d0d40206f5353b61687bbabd74139dba",
@@ -12800,13 +12709,6 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_36b0160e2c6b33c6b3b6958486805043",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_6ff7c980e8e9ab8b9879210555f84d64",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
@@ -12843,13 +12745,6 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_442970a9228617f16af5de16883fad2d",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
@@ -12862,45 +12757,10 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_a6b1bbf40d4681004a4725364f7544f2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_03e3bf1a24b5712d6df990d5af622dcd",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_97229569942e2e64f1f92b89a23bd513",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_1c7027aa91b45aed495eaff739ad27a5",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_19144a66f7f280075c2a2b3531eadb4d",
@@ -12915,52 +12775,10 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_1fa64800fce6ec3602dc783078b1daef",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_9ccb2418b7aec6f7f91493359b13f7cb",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_cc1143308f7b159157e4004197432ee4",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_223b98d1f2a5e3b6828b08b8e4370931",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_f842daa15a1440ce53c57b28b577a61d",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_66bd364b825814ad85174f21a5b9029d",
@@ -12969,59 +12787,10 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_80dd38236997a4794fe26e44e1dcfcad",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_19eb3db5e5020a16b00678f6a1912c64",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_94f214f5722011ac862fa96484a2e26a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_e47495f1bcf3abc217aa128346ffe56b",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_5bf2ce7149c7a82f296a86d122a69adf",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_988e3a8a6c0362f62381f07d896adee4",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_f97e179a706fe5ce55a5ce146e23fb59",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_b80a6e9ecbbe65bdc1b568c9635c76fe",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_528ad7a971e30ea32fee1a7bed6dad48",
@@ -13030,65 +12799,16 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_a3282845dc3dfd02de60631741d5f4fa",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_c5d72d517bde5f2eadf2afee05649af7",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_5906c3d46cacca0ac1ad8aae963a8304",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_1ab27a36fa860ce8e0ed9c1b5911979e",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_21215ecd31cdeff263a3cdff74b478ed",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d0a734e0e2ffe167a8576cd898e4279d",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_8de909df847b8689807abcfe156b704a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_8b867d968a2f7af6d73eb4c4e2e7233f",

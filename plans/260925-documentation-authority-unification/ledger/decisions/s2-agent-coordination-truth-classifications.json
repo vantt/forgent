@@ -200,15 +200,6 @@
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
     },
     {
-      "claimId": "claim_c70a8a1ffd7d36e49b31d6296cc31356",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth-fix.json",
-      "receiptCommit": "007edbbe75e19a35eb79c90ec626ca352d1d0b76",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried.",
-      "previousClaimId": "claim_682a5f07ad5939ff2de7ff33df5c4d0d"
-    },
-    {
       "claimId": "claim_768ec152838b0cad32dd12fe283c78c2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
@@ -473,14 +464,6 @@
       "reviewedAt": "2026-10-10",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-classifications.md",
       "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
-    },
-    {
-      "claimId": "claim_c26b6c8149e0b5bc78dab2b6e1fb6e0a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_904bdea6ebebf5fd9c056383d87bafa4",
@@ -916,15 +899,6 @@
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
     },
     {
-      "claimId": "claim_aa0e400354f9f0b2a32e90249880fa78",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth-fix.json",
-      "receiptCommit": "007edbbe75e19a35eb79c90ec626ca352d1d0b76",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried.",
-      "previousClaimId": "claim_67986b1f7f6936bd5f59616ff9673066"
-    },
-    {
       "claimId": "claim_f603b719a09969d2697b2ed65e4734e6",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
@@ -935,14 +909,6 @@
       "reviewedAt": "2026-10-10",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_72cf88dd4cf65226b1ba243f19a44e88",
@@ -1231,14 +1197,6 @@
       "reviewedAt": "2026-10-10",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_e5e162344f3f8216607df45757a6a5ab",
@@ -2152,23 +2110,6 @@
       "reviewedAt": "2026-10-10",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_d04f3528ac32bc6a0a67ecc6153e7879",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth-fix.json",
-      "receiptCommit": "007edbbe75e19a35eb79c90ec626ca352d1d0b76",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried.",
-      "previousClaimId": "claim_f549746262cbe0bc8566ba7d02276a01"
     },
     {
       "claimId": "claim_d0d40206f5353b61687bbabd74139dba",
@@ -4789,15 +4730,6 @@
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
     },
     {
-      "claimId": "claim_241d8e8d42387c28dc30179f1bad66cb",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth-fix.json",
-      "receiptCommit": "007edbbe75e19a35eb79c90ec626ca352d1d0b76",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried.",
-      "previousClaimId": "claim_69b011aac8a371496f54e1c681286bfd"
-    },
-    {
       "claimId": "claim_cac936814ecd91348f05fc00c22b785d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth-fix.json",
       "receiptCommit": "007edbbe75e19a35eb79c90ec626ca352d1d0b76",
@@ -4811,22 +4743,6 @@
       "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
-      "claimId": "claim_78039339074d6cb799f0cc05212bc1b2",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
-      "claimId": "claim_75b676acfa47fb48346fdb41a14eb88b",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
-    },
-    {
       "claimId": "claim_21215ecd31cdeff263a3cdff74b478ed",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
@@ -4837,14 +4753,6 @@
       "reviewedAt": "2026-10-10",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
-      "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "The authorized precision/obligation correction changes the shown unit or its ordinal anchor; the prior immutable receipt/report does not approve this current counterpart. A fresh native receipt and independent targeted check are required; no approval is carried."
     },
     {
       "claimId": "claim_9786ce02129b75faa01d4b022dca1fe2",

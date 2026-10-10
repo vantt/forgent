@@ -6323,20 +6323,15 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "8-runresult-confidence",
       "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "legacy:proposals/team-communication-protocol-v1.md#8-runresult-confidence -> proposals/team-communication-protocol-v1.md#8-runresult-confidence (move, byte-identical): heading unit; section 8 text true against run-result.mjs:1250-1285 incl. blocked reported without report and failed findings verdict reported",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
-      "reviewMode": "ordinary",
+      "rationale": "Supersede the complete older RunResult Confidence section with its whole current counterpart. All five confidence classes, the separate status/confidence boundary and the done/no-evidence driver obligation are addressed; reported includes the current blocked/read-only/findings branches and failed has the actual finding-verdict exception (run-result.mjs:1250-1285). Those changed claim-bearing statements make the inherited move label false under A23; A24 permits correcting it. No approval carries; independent review checks the complete source/current sections.",
+      "reviewNote": "A24 inherited same-batch changed-claim move label corrected; pending independent whole-unit verification.",
       "targetUnitDigest": "df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ],
-      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
+      ]
     },
     {
       "claimId": "claim_afb1772a0dd83cd513d09e9dadf17e49",

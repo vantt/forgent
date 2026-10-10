@@ -1371,20 +1371,15 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
       "targetAnchor": "domain-augmentation",
       "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/architecture/protocol-model.md#domain-augmentation is retained in docs/platform/agent-coordination/architecture/protocol-model.md#domain-augmentation. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "legacy:architecture/protocol-model.md#domain-augmentation -> architecture/protocol-model.md#domain-augmentation (move, byte-identical): heading unit Domain Augmentation preserved; section body true (no declared protocols; CoordinationProtocol retired per assignment-runner.mjs:445)",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
-      "reviewMode": "ordinary",
+      "rationale": "Supersede the complete older Domain Augmentation section with its whole current counterpart: the extension list replaces declared protocols with Workflow definitions/operations and domain harnesses while preserving the full extension responsibilities and two-unlike-consumers common-seam condition. These claim-bearing words make the inherited move label false under A23; A24 permits this same-batch label correction. The current and source whole sections are shown for independent verification, with no approval carry.",
+      "reviewNote": "A24 inherited same-batch changed-claim move label corrected; pending independent whole-unit verification.",
       "targetUnitDigest": "719057129311d43f8d206c76a7d74e0e5ba1410de21d3b527729f45561e80ef1",
       "targetAncestry": [
         "Coordination Protocol Model"
-      ],
-      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
+      ]
     },
     {
       "claimId": "claim_b651958d419c963a53013dc032c0a56c",
