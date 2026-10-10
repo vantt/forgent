@@ -54,11 +54,10 @@ Each role below carries seven things:
   produce when under-specified, and several are recognizably the kind of thing
   a capable model writes when it is trying to be helpful.
 
-The worked examples use the two real cases this track advises on: the
-mdview (`../../../../plans/260905-architecture-advisory-panel/plan.md`; Added in candidate: historical path absent at the batch pin) desktop-shell
-ownership question (clear case) and the vnflow EOD/intraday evolution question
-(unclear case). Using real cases is intentional — invented examples drift toward
-the abstract, and abstraction is exactly what this document exists to resist.
+The worked examples use the vnflow EOD/intraday evolution question. They do not
+include a worked mdview desktop-shell ownership case. Using a concrete case is
+intentional — invented examples drift toward the abstract, and abstraction is
+exactly what this document exists to resist.
 
 The [coordinator companion](prompts/architecture-advisory-coordinator.md) is a
 cognitive reference, not an operating-rules owner. The registered skill and

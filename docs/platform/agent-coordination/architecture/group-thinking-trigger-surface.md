@@ -69,7 +69,7 @@ This is a dated pre-introduction UX audit, not a list of currently installed ski
 
 ## Surface Taxonomy
 
-This is the canonical surface preset map consumed by `core/skills/fgos-panel/SKILL.md:36-59`, not a second runtime sequencer. The skill's current routes implement the named Workflow/CollaborationPattern owners below; the former protocol-id mapping is historical.
+This candidate map reflects the current routes in `core/skills/fgos-panel/SKILL.md:45-59`; it is not yet the skill's linked authority. The skill still links the legacy docs/architect taxonomy at lines 36-39. Repointing that consumer belongs to the authorized link cutover, not this truth pass. The current execution owners below are Workflow/CollaborationPattern owners, not a second sequencer; the former protocol-id mapping is historical.
 
 | Requested use case | Selected surface | Current execution owner |
 |---|---|---|

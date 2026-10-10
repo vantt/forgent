@@ -60,7 +60,7 @@ No one source proves every operation type.
 - Worker self-report alone cannot produce externally verified confidence (src/runner/dispatch/run-result.mjs:1276-1285).
 - Exit code zero cannot satisfy missing semantic outputs: the evidence floor still requires the appropriate worker report or external delta (src/runner/dispatch/run-result.mjs:1250-1285).
 - Pre-existing dirty files cannot count as changes produced by the Run (src/runner/dispatch/evidence-attribution.mjs:55-70).
-- Structured claims with another Run's identity are rejected (src/runner/dispatch/run-result.mjs:155,297). Delta attribution uses the current Run's pre/post state; this is not a general age-based stale-evidence validator.
+- RunResult records with another Run's identity are rejected (src/runner/dispatch/run-result.mjs:153-157,295-299). This is not a worker-claim runId check: agent-result-claim-contract.mjs:52-90 validates claim shape without that identity check. Delta attribution uses the current Run's pre/post state; it is not a general age-based stale-evidence validator.
 - Read-only output may remain `reported`; the runtime gates this by assignment.mutation === read-only, not an unstamped TaskSpec permission (src/runner/dispatch/assignment.mjs:938-940; run-result.mjs:1276-1285).
 - Mutating success requires post-run external evidence appropriate to the claim (src/runner/dispatch/run-result.mjs:1276-1285).
 - Missing required reports/deltas yield `no-evidence` under the evidence floor (src/runner/dispatch/run-result.mjs:1276-1285); corrupt result records fail closed separately (run-result.mjs:1305-1333).

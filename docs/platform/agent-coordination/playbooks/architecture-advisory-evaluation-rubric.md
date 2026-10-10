@@ -397,8 +397,8 @@ for the declared human close, approval of advice, or permission to implement.
   articulate, is a success.
 - **Whether the panel agreed with itself.** Preserved disagreement is a feature.
 - **Volume of alternatives.** Three real candidates beat six with three escorts.
-- **Protocol conformance.** A conformance pass is not on this rubric at all, and
-  that is intentional. If a future productized panel conforms perfectly to its
-  protocol and scores worse here than this manual playbook did on the same case,
-  the productization regressed — the rubric is the thing it has to beat, and the
-  protocol is not a substitute for it.
+- **Protocol conformance.** This manual quality rubric is not a runtime
+  conformance gate. The architecture-advisory Workflow and skill already ship
+  (`core/workflows/architecture-advisory.yaml`, `core/skills/fgos-architecture-panel/SKILL.md`).
+  Compare advice quality on the same case without treating this rubric as a
+  required score the registered runtime must pass; conformance alone is not quality.

@@ -707,19 +707,19 @@ interpretation into the person's voice, and a reopen with unbounded scope
 Optional manual response trace. Registered gates/continuation remain with
 Workflow; no companion-directory crash-recovery guarantee is asserted.
 
-**Why this exists.** This is the fourth and last layer of the Dialogue Turn
-Protocol, and the one most likely to go unwritten — because a clarification
-answered in conversation feels finished. It is not: a successor coordinator
-reading `human/3-person.md` with no `dialogue/3-response.md` beside it cannot
-tell whether the person was answered or dropped, and that is exactly the state
-crash recovery is supposed to make impossible.
+**Why this exists.** An optional manual response trace can help a successor
+understand whether a person was answered and which artifact supports the reply.
+It is not the retired Dialogue Turn Protocol's fourth runtime layer, and the
+registered Workflow does not guarantee crash recovery of these companion files.
+The registered graph remains framing, shaping, critique, synthesis, explanation
+and the human close gate (`core/workflows/architecture-advisory.yaml:8-84`).
 
 It is also the layer where authority leaks. The response is produced under the
 driver's authorization, and naming that authorization here is what makes it
 checkable later that the panel did what it was permitted to do and not more.
 
-Every turn gets one, including the small ones. A one-paragraph response with a
-citation is complete; a missing file is not.
+When the owner chooses this manual convention, even a short cited response is
+useful. A missing companion file is not a current Workflow completion failure.
 
 ```text
 # Dialogue Response <n>
@@ -762,8 +762,8 @@ both are findings for a red-team. A response that quietly exceeds its
 authorization: authorized to answer a clarification, it also revises the
 recommendation. A response that answers the impact assessment's reading rather
 than the person's actual words — the tell is that it never quotes or cites
-`human/<n>-person.md`. And the worst one, because it is invisible: no file at
-all, for a turn the coordinator answered in conversation and considered handled.
+`human/<n>-person.md`. Under the chosen manual convention, an undocumented reply
+loses traceability; this rubric concern is not a registered runtime acceptance gate.
 
 ---
 

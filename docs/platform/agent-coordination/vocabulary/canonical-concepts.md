@@ -171,7 +171,7 @@ A behavioral viewpoint supplied to a Unit template or advisory seat, not a persi
 
 ### Stance
 
-A temporary argumentative viewpoint. This is cognitive vocabulary, not an implemented session-state entity or a new routing identity.
+A temporary argumentative viewpoint. Passive panelist stance measurement is implemented: `stanceOptions` elicits an optional choice/confidence claim, and the Unit summary validates it (`src/runner/execution/patterns/role-tasks.mjs:61-70`, `unit-summary.mjs:17-28`); it does not affect pass/fail. A broader cognitive/session-state stance entity or routing identity remains design vocabulary, not a shipped SessionActor model.
 
 ### TaskCandidate
 

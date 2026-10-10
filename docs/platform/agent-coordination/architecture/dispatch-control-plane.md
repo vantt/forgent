@@ -78,9 +78,9 @@ The dispatch core recognizes exactly two target identities. No other name
 resolves a Run target.
 
 ```txt
-capability   — abstract behavior promise, resolved through
-               runner.capabilities.<capability> (prefer/rigor), then
-               runner.executors.<id>.for[]
+capability   — abstract behavior promise, bound only by
+               runner.capabilities.<capability>.prefer;
+               executor for[] declarations do not bind this selector
 executor-id  — explicit concrete implementation override, naming a
                runner.executors.<id> entry directly
 ```
@@ -267,8 +267,10 @@ Component-Outer Boundary Note's responsibilities.
 
 1. **Request normalizer (design)** — the normalized target/policy/provenance
    boundary is proposed; current inputs are the compiler options above.
-2. **Capability binding resolver** — resolves capability aliases, `prefer`,
-   and executor `for[]` declarations (`resolveExecutorAndOverrides`).
+2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal
+   executor IDs/defaults or capability `prefer`; aliases and executor `for[]`
+   inform capability labels separately in `resolveCapabilityDetailsFromHints`
+   (`resolve.mjs:25-66,255-278`), not this binding resolver.
 3. **Executor registry resolver** — resolves a literal executor-id to its
    concrete invocation/tool/agent shape (`resolveExecutorConfig`).
 4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported

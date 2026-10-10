@@ -194,10 +194,10 @@ Allowed selector types:
 
 Do not add `nativeTask` as a selector. Native/in-process is an output mechanism, not an input category.
 
-Both legacy `decide --for` and `execute --for` use capability-aware compiled
-resolution. The earlier `for`-scan/prefer split is not a current defect.
-The primary Rust-host request door uses bind(); do not equate a legacy plan's
-shape with every host request/transport representation.
+Legacy `decide --for` resolves a purpose first; `execute --for` is refused.
+Execution uses the resolved executor ID positionally (`dispatch/cli.mjs:1081-1096`).
+The Node Execution Core uses `bind()`; the Rust host does not directly call this
+JavaScript resolver. Do not equate this proposal with every host representation.
 
 ### 6.3 Mechanism
 
@@ -286,9 +286,9 @@ Different fields resolve differently:
 
 | Field family | Rule |
 |---|---|
-| Constraints | union, then fail closed if unsatisfied |
+| Constraints | operation constraints override the assignment-skills base (`assignment-policy.mjs:459-462`), not a union |
 | Provider / executor preference | highest-specificity wins |
-| Fallback executors | preserve ordered list from the most specific layer, with broader fallbacks appended if useful |
+| Fallback executors | only the most specific declared list is recorded; reserved-not-executed here, with no broader append (`assignment-policy.mjs:380-388`) |
 | Tier / rigor | strongest required tier wins |
 | Model name | resolve from provider/model policy after effective provider and tier are known |
 | Literal model name | assignment or human/CLI override only |
@@ -297,9 +297,9 @@ Different fields resolve differently:
 Example:
 
 ```txt
-role reviewer requires minTier=standard
+operation reviewer requires rigor=standard
 operation validate-plan prefers persona=code-reviewer
-work risk=high raises minTier=critical
+work.rigor=critical raises the effective rigor
 assignment prefers executor=claude
 governance checks effective egress
 ```
@@ -317,8 +317,8 @@ names are dated examples. Current checked project configuration declares
 named invocation `agy-herdr-mucdong`. Effective global/project merge and
 binding, not this table, decide a live request.
 
-Use these as defaults for the first team-dispatch proof, not permanent hard
-bindings.
+The table records dated proof recommendations only. It supplies neither current
+defaults nor live bindings; use effective configuration and binding for execution.
 
 | Stage | Operation | Preferred execution | Rationale |
 |---|---|---|---|

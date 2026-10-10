@@ -91,10 +91,11 @@ below specify persisted/exchanged boundaries; in-process APIs can use native typ
 | Worker cannot continue | Reconcile effects and writers, then eligible replacement Run | Same Assignment and unit objective. |
 | Cell accepted, next cell begins | Consuming track/domain transition; outside dispatch recovery | Track acceptance history, if the consuming harness records it. |
 
-Result scanning wins before any new execution, including after budget exhaustion
-or cancellation. Read/collect is not admission. Cancellation bars retry and
-automatic continuation of the cancelled intent, but does not discard late results.
-An explicit new user intent is a new request, not an escape through continuation.
+Proposed cancellation/budget rule: result collection would remain available after
+budget exhaustion or cancellation, without admitting another execution; a new
+intent would require a new request. This is not implemented cancellation precedence:
+current Herdr/cli reconciliation returns `cancel-unsupported` before scanning
+results (`herdr-reconcile.mjs:351-355`, `reconcile-cli-spawn.mjs:38-47`).
 
 ## 5. Arbitrary Interruption Is Not A Checkpoint
 
@@ -148,20 +149,21 @@ never self-recognizes a second concurrent acquisition as reentrant. Generation
 records are retained with the runtime/session artifacts; compaction is offline
 only after the scope is quiescent.
 
-Publication uses a fully written/fsynced temp file in the same directory,
-followed by atomic non-overwriting publication (local filesystem hard-link on
-the initial Linux adapter), then directory fsync. State replacement uses
-temp+rename+directory fsync under the owning lock. This retains exclusive-create
-semantics while avoiding empty-lock and conditional-unlink races seen in P12.
-Implemented (Phase 02 H3) for the mutable Run/Assignment artifacts named in
-the contract doc (`result.json`, `run.json`, the effective-execution-contract
-projection, and the per-attempt dispatch-bookkeeping marker) via
-`publishMutableProjection`/`publishMarkerOnce`; a resume that finds an
-existing `result.json` which fails to parse refuses rather than relaunching
-over unreadable evidence. Unsupported filesystem guarantees refuse mutation
-with a named diagnostic;
-doctor must probe them before this writer profile is enabled. No distributed
-lease, background renew service or TTL-only takeover is required by default.
+The proposed durability profile requires a fully written/fsynced temp file in
+the same directory, atomic non-overwriting publication and directory fsync.
+It calls for temp+rename+directory fsync under the owning lock for replacement.
+Those are design requirements; the implementation's best-effort directory
+fsync and other limits are stated below, not silently promoted to guarantees.
+Current terminal `result.json` is published by `publishImmutableProof`
+(`settlement.mjs:434`), not the mutable writer. `run.json`, the
+effective-execution-contract projection and bookkeeping markers use their
+mutable/marker writers. An unreadable existing result refuses relaunch rather
+than overwriting evidence. The proof helper fsyncs the file, hard-links it
+without overwrite, treats `EEXIST` as an existing proof and rethrows other link
+errors; directory fsync is best-effort (`proof-helpers.mjs:73-125`).
+A dedicated unsupported-filesystem diagnostic/doctor probe is a design
+requirement, not an implemented check. No distributed lease, background
+renewal service or TTL-only takeover is required by this local design.
 
 ## 7. Agent-Facing Contract
 
@@ -222,7 +224,7 @@ new config defaults. Project-over-global precedence remains unchanged.
 |---|---|---|---|
 | S0 | Freeze fixtures for existing ladder, budgets, retry/recheck, context and close behavior | Existing Node suites green; capture known deficiencies without marking them solved. | **Implemented** — P00 |
 | S1 | Versioned Run admission, strict publish fencing and local lock/reclaim | Concurrent admission and every pre-launch crash window; no two winners. Node first. | **Implemented** — P01 (`run-lock.mjs`) |
-| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through the public door; isolated or read-only takeover only. The launch identity uses both `runId` and a random persisted `launchCommandId` (`fgos-<runId>-<launchCommandId>`), not `runId` alone. Duplicate-name refusal and no resurrection after close require adapter proof. Writable partial-edit takeover parks until workspace-grant and evaluator owners exist; depends on S1. | Implemented adapter scope; see `assignment-runner.mjs:2118` and `confinement/authority.mjs:1595`. Writable inherited-edit acceptance remains deferred. |
+| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through the public door; isolated or read-only takeover only. Launch identity uses `runId` plus persisted `launchCommandId` (`fgos-<runId>-<launchCommandId>`); duplicate-name refusal and no resurrection after close require adapter proof. | **Partial** — Herdr launch reconciliation exists in `herdr-reconcile.mjs`; the proposed RunHandle/scope guard, pending-control reconciliation and RecoveryMaterial capture are not implemented as that contract. Writable partial-edit takeover remains deferred (`herdr-reconcile.mjs:356-357`). |
 | S3 | Eligible fallback through compiler and confinement | Same Assignment, bounded attempts, unknown effects park; depends on S1/S2 for takeover. | **Implemented** — P03 (`recovery.mjs`) |
 | S4 | Pure snapshot/planner + show | Can develop beside S1-S3 using recorded facts; no claim of automatic repair. | **Implemented** — P04 (pure evaluators) + P05 (standalone `dispatch recover`) |
 | S5 | Retired coordination-session recovery/continuation | Full dated record remains in the historical snapshot; no current coordination recover door is claimed. | Retired in 2180b4e72 |

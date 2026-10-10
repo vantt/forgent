@@ -173,15 +173,17 @@ secrets.
 `agent-result.json` is the worker's structured claim. It is not proof by
 itself.
 
-Minimal schema:
+Minimal v2 reviewer claim (reviewer/red-team and recheck contexts require
+`assessment.verdict`; agent-result-claim-contract.mjs:5-30,81-85):
 
 ```json
 {
+  "contract": { "id": "agent-result-claim", "version": 2 },
   "status": "done",
   "summary": "One concise result sentence.",
   "findings": [],
   "evidenceRefs": [],
-  "nextRecommendedOperation": null
+  "assessment": { "verdict": "pass" }
 }
 ```
 
@@ -201,10 +203,10 @@ Required fields by status:
 | `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |
 | `blocked` | `summary`; `blocker`; `evidenceRefs` when any evidence exists. |
 | `failed` | `summary`; `error`. |
-| `no-evidence` | `summary`; reason why evidence is absent. |
+| `no-evidence` | Non-empty `summary`; there is no additional reason field in the validator (`agent-result-claim-contract.mjs:9-15,67-85`). |
 
-Optional `nextRecommendedOperation` may name a legal step operation; it is
-only a recommendation and the Work-layer caller must verify legality.
+`nextRecommendedOperation` is a proposed optional extension, not a current
+validated schema field or a field the Work-layer caller presently consumes.
 
 ## 8. RunResult Confidence
 
@@ -215,10 +217,10 @@ Confidence ladder:
 | Confidence | Meaning | Allowed use |
 |---|---|---|
 | `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |
-| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |
+| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed findings verdict with a report and exit 0 (`run-result.mjs:1261-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |
 | `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |
 | `no-evidence` | Process settled without proof. | Must not advance Work. |
-| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |
+| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |
 
 The driver must treat `done/no-evidence` as not done. It may retry, ask for a
 proper artifact, or route to a different legal operation.

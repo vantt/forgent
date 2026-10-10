@@ -260,8 +260,10 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
 - `ProviderOutcome` is a host-invocation wrapper, not Run truth.
 - `agent-result.json` becomes `agent-result-claim.v2`, a worker claim consumed
   by the normalizer, never independent proof.
-- New v2 results classify execution, assessment, confidence, failure, policy,
-  delivery, and provenance separately.
+- Current normalization defaults to RunResult v3 and also supports v4
+  (`run-result.mjs:350-351,557-563`); v2 is the historical interpretation
+  recorded by this design addendum, not the current default. Execution,
+  assessment, confidence, failure, policy, delivery and provenance stay separate.
 - Historical v1 results are interpreted deterministically as `legacy-derived`
   and are not rewritten on read.
 - A v2 result whose compatibility `status`/`confidence` disagrees with its

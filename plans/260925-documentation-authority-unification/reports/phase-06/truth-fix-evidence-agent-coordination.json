@@ -1,0 +1,733 @@
+{
+  "version": 1,
+  "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+  "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+  "scope": "Only the 21 rejected section corrections; unchanged clauses retain their independently reviewed context.",
+  "sections": [
+    {
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "anchor": "routing-identities",
+      "shownTextDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "startLine": 25,
+          "endLine": 66,
+          "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+        },
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "startLine": 255,
+          "endLine": 309,
+          "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "anchor": "component-internal-ownership",
+      "shownTextDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "startLine": 25,
+          "endLine": 66,
+          "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+        },
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "startLine": 255,
+          "endLine": 309,
+          "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "anchor": "confidence-boundaries",
+      "shownTextDigest": "6cff376c1fa1fc8451e0d19f7d115af7ae2c09e93391779725325ece8c5f8b5d",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 149,
+          "endLine": 160,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 290,
+          "endLine": 302,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1250,
+          "endLine": 1285,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+        },
+        {
+          "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+          "startLine": 52,
+          "endLine": 90,
+          "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "2-production-ladder-semantics",
+      "shownTextDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/herdr-round.mjs",
+          "startLine": 341,
+          "endLine": 359,
+          "blobSha": "2a31f0e1bd7eb571f1fbe130fbc8c2a399772074"
+        },
+        {
+          "path": "src/runner/recovery.mjs",
+          "startLine": 105,
+          "endLine": 112,
+          "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "4-recovery-choice",
+      "shownTextDigest": "e7ae12b12502e13a7f0c85957cde6f74db8ad080528b788bb0d2296869c5f805",
+      "status": "open",
+      "reason": "Cancellation/budget precedence is proposed, not implemented: cancel is explicitly unsupported before reconciliation scans results.",
+      "citations": [
+        {
+          "path": "src/runner/dispatch/herdr-reconcile.mjs",
+          "startLine": 351,
+          "endLine": 357,
+          "blobSha": "6ded05f28a310963ed7ceccbf794a50b42780a75"
+        },
+        {
+          "path": "src/runner/dispatch/reconcile-cli-spawn.mjs",
+          "startLine": 38,
+          "endLine": 47,
+          "blobSha": "fc1e16dd73336c031db43a5c06ba9656994ed4ac"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "6-local-concurrency-and-durability",
+      "shownTextDigest": "0dbc105ed07e7650ce5578efc360ef95ff64fb445697018ffdc0674e76aa4bb2",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/settlement.mjs",
+          "startLine": 420,
+          "endLine": 445,
+          "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+        },
+        {
+          "path": "src/runner/dispatch/proof-helpers.mjs",
+          "startLine": 73,
+          "endLine": 125,
+          "blobSha": "ec8e9f6ab9406cea6eb7ff9ab1edf4fe962862ca"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "9-implementation-slices-and-gates",
+      "shownTextDigest": "a97b6824a78bccd5d981579af8ec52780b4a25716ac104b144c71080e1b94403",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/herdr-reconcile.mjs",
+          "startLine": 351,
+          "endLine": 361,
+          "blobSha": "6ded05f28a310963ed7ceccbf794a50b42780a75"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "dispatch-operability-addendum",
+      "shownTextDigest": "f31f0d25e068b35187511d62dcc6962dd779b16ad87832803ae3da867a30e362",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 350,
+          "endLine": 385,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 546,
+          "endLine": 566,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "decision",
+      "shownTextDigest": "73de1c83930c66622cb0c813e1d5eac7d247ef016bf64850ad155b01ab2414f3",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 337,
+          "endLine": 384,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "62-selector",
+      "shownTextDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/cli.mjs",
+          "startLine": 1081,
+          "endLine": 1098,
+          "blobSha": "490ccb1893634f830278ebf608f3549f98d31897"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 395,
+          "endLine": 416,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "72-policy-resolution-before-dispatchplan",
+      "shownTextDigest": "fa0931df22b0c3241d4b8629f862c9299f7157357028c85aef26bc1fb227f6d3",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/assignment-policy.mjs",
+          "startLine": 220,
+          "endLine": 243,
+          "blobSha": "700225473f8dcb08861af498f8273cb73b526993"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-policy.mjs",
+          "startLine": 380,
+          "endLine": 388,
+          "blobSha": "700225473f8dcb08861af498f8273cb73b526993"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-policy.mjs",
+          "startLine": 457,
+          "endLine": 466,
+          "blobSha": "700225473f8dcb08861af498f8273cb73b526993"
+        },
+        {
+          "path": "src/runner/rigor.mjs",
+          "startLine": 4,
+          "endLine": 21,
+          "blobSha": "379ec204684cbba514af5c4101383b4e70124ec7"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "anchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
+      "shownTextDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
+      "status": "open",
+      "reason": "Dated proof recommendations remain historical; no live defaults or bindings are supplied by the table.",
+      "citations": [
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "startLine": 255,
+          "endLine": 309,
+          "blobSha": "2049c05b94a245826c0b630ab22305369cab4301"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "anchor": "surface-taxonomy",
+      "shownTextDigest": "2f690c59d8ac5122e508a0bdc48506848eb48e12d90c356cbc9e8f14b607bab2",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "core/skills/fgos-panel/SKILL.md",
+          "startLine": 36,
+          "endLine": 59,
+          "blobSha": "4cac45e1e900ad4078a5323dc4511771c661c3ad"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "compatibility",
+      "shownTextDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/workflow/steps.mjs",
+          "startLine": 43,
+          "endLine": 85,
+          "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "anchor": "domain-augmentation",
+      "shownTextDigest": "cc89a329f26ff91efa2d1a150592feab41c24260d32fcc3f4e1aa4f5d989e39f",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/workflow/steps.mjs",
+          "startLine": 43,
+          "endLine": 85,
+          "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+        },
+        {
+          "path": "src/state/domain-registry.mjs",
+          "startLine": 244,
+          "endLine": 258,
+          "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112"
+        },
+        {
+          "path": "domains/coding/workflows/feature.yaml",
+          "startLine": 12,
+          "endLine": 140,
+          "blobSha": "73be44ee13235ee800d60010ab8f9b1261d2b22a"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "7-agent-result-schema",
+      "shownTextDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+          "startLine": 5,
+          "endLine": 30,
+          "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+        },
+        {
+          "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+          "startLine": 52,
+          "endLine": 90,
+          "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "8-runresult-confidence",
+      "shownTextDigest": "7aa709fd3f5866327701b3f8c010b77cc7f3db49e7fa7fbbfb7e8db8baf1782e",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1250,
+          "endLine": 1285,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "anchor": "stance",
+      "shownTextDigest": "bfd0de71c4c8d55d7859fb955fdf4bdf63e468cf2ca6a8f092ed4a7c8a35a86d",
+      "status": "open",
+      "reason": "Passive panel stance measurement is implemented and checked; only the broader cognitive/session-state stance entity remains unimplemented design vocabulary.",
+      "citations": [
+        {
+          "path": "src/runner/execution/patterns/role-tasks.mjs",
+          "startLine": 58,
+          "endLine": 72,
+          "blobSha": "7f7097b6f580c000e5b3f8c358b71b9a5fe8cf14"
+        },
+        {
+          "path": "src/runner/execution/unit-summary.mjs",
+          "startLine": 17,
+          "endLine": 28,
+          "blobSha": "67b0d90161d6a5fac28c9889bce1023a0643c6ff"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "12-dialogue-response-dialogue-responsemd",
+      "shownTextDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "anchor": "what-this-rubric-deliberately-does-not-measure",
+      "shownTextDigest": "3357fa8a8a6f2670aed4737be57a566d0d12724e54456719f0abe00f62a786ac",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "anchor": "how-to-read-this",
+      "shownTextDigest": "c144e4d23f2510628dc27d36ae9f01413092f329c18136aaf02279f61b7a0bb2",
+      "status": "verified",
+      "reason": null,
+      "citations": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+        }
+      ],
+      "reviewStatus": "pending-independent-review"
+    }
+  ],
+  "excerpts": [
+    {
+      "citation": "src/runner/dispatch/resolve.mjs:25-66",
+      "path": "src/runner/dispatch/resolve.mjs",
+      "startLine": 25,
+      "endLine": 66,
+      "blobSha": "2049c05b94a245826c0b630ab22305369cab4301",
+      "sha256": "bf9b694795e933daa04bc1ba45864c21f9e9f948afd0a3e0eb6a6e1d164472d6",
+      "text": "export function resolveCapabilityDetailsFromHints({\n  cfg,\n  executorId,\n  resolvedExecutor,\n  purpose,\n  hints,\n} = {}) {\n  const { candidates = [], preferred = null, fallbackLabel = null } = hints ?? {};\n  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};\n\n  function resolveAlias(name) {\n    if (!name || typeof name !== 'string') return name;\n    if (capabilities[name]) return name;\n    for (const [capName, capEntry] of Object.entries(capabilities)) {\n      if (Array.isArray(capEntry?.aliases) && capEntry.aliases.includes(name)) {\n        return capName;\n      }\n    }\n    return name;\n  }\n\n  const explicitPurpose = purpose && typeof purpose === 'string' && purpose.trim()\n    ? resolveAlias(purpose.trim())\n    : null;\n\n  const candidateSet = new Set(candidates);\n\n  // Executor declared capabilities (`for: [...]`)\n  if (Array.isArray(resolvedExecutor?.for)) {\n    for (const f of resolvedExecutor.for) {\n      if (typeof f === 'string' && f.trim()) {\n        candidateSet.add(f.trim());\n      }\n    }\n  }\n\n  // Capabilities in config that `prefer` this executor\n  if (executorId || resolvedExecutor) {\n    for (const [capName, capEntry] of Object.entries(capabilities)) {\n      if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {\n        candidateSet.add(capName);\n      }"
+    },
+    {
+      "citation": "src/runner/dispatch/resolve.mjs:255-309",
+      "path": "src/runner/dispatch/resolve.mjs",
+      "startLine": 255,
+      "endLine": 309,
+      "blobSha": "2049c05b94a245826c0b630ab22305369cab4301",
+      "sha256": "f3c207bebaca68294278eb92db655a43a6912a6344a5cfb4ac006bf6539c30e0",
+      "text": " * that, `cfg.capabilities[executorIdOrPurpose].prefer` names a real\n * registered executor directly — no requirement that the executor also\n * self-declare a matching `for` entry (D5, `docs/history/capability-\n * capacity-remodel/CONTEXT.md`, supersedes D2's own symmetry requirement:\n * the reverse check forced a second config edit per wiring decision\n * without a proportional safety benefit — a careless `prefer` edit could\n * add a careless `for` entry just as easily). `prefer` naming an executor\n * id that does not exist at all still throws loud (`RunnerConfigError`),\n * matching every other shape-validation gate in this file. (3) nothing\n * found — `{executorId: null, configured: false}`, a legitimate,\n * expected state, never thrown. An executor's own `for` never binds a\n * purpose here: only `capabilities.<name>.prefer` does.\n *\n */\nexport function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {\n  const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};\n  if (executors[executorIdOrPurpose]) {\n    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], configured: true, bindingSource: 'executor-id' };\n  }\n  if (!executorIdOrPurpose && cfg?.executor) {\n    return { executorId: cfg.executor.command ?? 'executor', executor: cfg.executor, configured: true, bindingSource: 'default' };\n  }\n  if (cfg?.executor && (executorIdOrPurpose === 'executor' || executorIdOrPurpose === cfg.executor.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.id)) {\n    return { executorId: executorIdOrPurpose, executor: cfg.executor, configured: true, bindingSource: 'default' };\n  }\n  const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;\n  const preferred = capabilityEntry?.prefer;\n  if (preferred !== undefined) {\n    // executor-id-consolidation Step 2.2: `prefer` may now be a single\n    // string (legacy, unchanged) or an ORDERED candidate array (cascade,\n    // account-rotator-style — try candidates[0], fall to the next only\n    // when it is not usable). `normalizePreferCandidates` always returns\n    // an array; the single-string case becomes its own 1-element array,\n    // so `candidates[0]` is exactly the pre-existing `preferred` value for\n    // every config that has not adopted the array shape — zero behavior\n    // change for every currently-configured capability.\n    const candidates = normalizePreferCandidates(preferred, `capabilities.${executorIdOrPurpose}.prefer`);\n    const primary = candidates[0];\n    const executor = executors[primary.executor];\n    if (!executor) {\n      throw new RunnerConfigError(\n        `runner config capabilities.${executorIdOrPurpose}.prefer names \"${primary.executor}\" but no such executor is registered.`,\n      );\n    }\n    return {\n      executorId: primary.executor,\n      executor,\n      configured: true,\n      bindingSource: 'capability.prefer',\n      invocationId: primary.invocation,\n      candidates,\n    };\n  }\n  return { executorId: null, executor: undefined, configured: false, bindingSource: null };\n}"
+    },
+    {
+      "citation": "src/runner/dispatch/run-result.mjs:149-160",
+      "path": "src/runner/dispatch/run-result.mjs",
+      "startLine": 149,
+      "endLine": 160,
+      "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+      "sha256": "cc2b480fc461694518fa748f81b2c76a40cbf1f18ee1e2e2516f18b1b4f3e57e",
+      "text": "  } else if (result.contract.id !== RUN_RESULT_CONTRACT_V2.id || result.contract.version !== 2) {\n    reasons.push(`contract must be {id: \"${RUN_RESULT_CONTRACT_V2.id}\", version: 2}`);\n  }\n\n  if (typeof result.runId !== 'string' || !result.runId.trim()) {\n    reasons.push('runId must be a non-empty string');\n  } else if (expectedRunId && result.runId !== expectedRunId) {\n    reasons.push(`runId \"${result.runId}\" does not match expectedRunId \"${expectedRunId}\"`);\n  }\n\n  const c = result.classification;\n  if (!c || typeof c !== 'object' || Array.isArray(c)) {"
+    },
+    {
+      "citation": "src/runner/dispatch/run-result.mjs:290-302",
+      "path": "src/runner/dispatch/run-result.mjs",
+      "startLine": 290,
+      "endLine": 302,
+      "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+      "sha256": "c65697de11f7319162e68ea59b9c8a14a793e604a7d93e47b07de546797cf4b6",
+      "text": "    reasons.push('contract field is required');\n  } else if (result.contract.id !== RUN_RESULT_CONTRACT.id || result.contract.version !== 3) {\n    reasons.push(`contract must be {id: \"${RUN_RESULT_CONTRACT.id}\", version: 3}`);\n  }\n\n  if (typeof result.runId !== 'string' || !result.runId.trim()) {\n    reasons.push('runId must be a non-empty string');\n  } else if (expectedRunId && result.runId !== expectedRunId) {\n    reasons.push(`runId \"${result.runId}\" does not match expectedRunId \"${expectedRunId}\"`);\n  }\n\n  const c = result.classification;\n  if (!c || typeof c !== 'object' || Array.isArray(c)) {"
+    },
+    {
+      "citation": "src/runner/dispatch/run-result.mjs:1250-1285",
+      "path": "src/runner/dispatch/run-result.mjs",
+      "startLine": 1250,
+      "endLine": 1285,
+      "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+      "sha256": "e5e7b9fbacac7173cae1db4f3b254440dda0b61ff1fd28cffe52a58a3eab44a0",
+      "text": "  if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {\n    return { status: 'failed', confidence: 'failed' };\n  }\n  if (claimInvalid) {\n    return { status: 'failed', confidence: 'failed' };\n  }\n  const companionReportArtifacts = workerArtifacts.filter(\n    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\\\]outbox[/\\\\]result-\\d+\\.json$/.test(p),\n  );\n  const hasWorkerReport = companionReportArtifacts.length > 0;\n\n  if (agentClaim?.status === 'failed') {\n    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';\n    if (isFindingVerdict && hasWorkerReport && exitCode === 0 && !isTimeout) {\n      return { status: 'failed', confidence: 'reported' };\n    }\n    return { status: 'failed', confidence: 'failed' };\n  }\n\n  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;\n  if (isReadOnlyOperation && hasExternalEvidence) {\n    return { status: 'failed', confidence: 'failed' };\n  }\n  if (agentClaim?.status === 'blocked') {\n    return { status: 'blocked', confidence: 'reported' };\n  }\n  if (agentClaim && agentClaim.status === 'done') {\n    if (isReadOnlyOperation) {\n      return hasWorkerReport ? { status: 'done', confidence: 'reported' } : { status: 'no-evidence', confidence: 'no-evidence' };\n    }\n    return hasExternalEvidence ? { status: 'done', confidence: 'verified' } : { status: 'no-evidence', confidence: 'no-evidence' };\n  }\n  if (!isReadOnlyOperation && hasExternalEvidence) {\n    return { status: 'done', confidence: 'inferred' };\n  }\n  return { status: 'no-evidence', confidence: 'no-evidence' };"
+    },
+    {
+      "citation": "src/runner/dispatch/agent-result-claim-contract.mjs:52-90",
+      "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+      "startLine": 52,
+      "endLine": 90,
+      "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095",
+      "sha256": "5eb5c5525bc3d75205d629685c345915bae7f89ccecf030ad7d3e07aa7c08b00",
+      "text": "export function validateAgentResultClaimContract(value, context = {}) {\n  if (value === null || typeof value !== 'object' || Array.isArray(value)) {\n    return { valid: false, reason: 'agent-result.json must be a JSON object' };\n  }\n  const legacy = value.contract === undefined;\n  if (!legacy) {\n    if (value.contract === null || typeof value.contract !== 'object' || Array.isArray(value.contract)\n      || value.contract.id !== AGENT_RESULT_CLAIM_CONTRACT.id || value.contract.version !== AGENT_RESULT_CLAIM_CONTRACT.version) {\n      return { valid: false, reason: `agent-result.json contract must be {id:\"${AGENT_RESULT_CLAIM_CONTRACT.id}\",version:${AGENT_RESULT_CLAIM_CONTRACT.version}}` };\n    }\n  }\n  const summaryRule = CLAIM_FIELD_RULES.find((field) => field.path === 'summary');\n  const blockerRule = CLAIM_FIELD_RULES.find((field) => field.path === 'blocker');\n  const errorRule = CLAIM_FIELD_RULES.find((field) => field.path === 'error');\n  const evidenceRefsRule = CLAIM_FIELD_RULES.find((field) => field.path === 'evidenceRefs');\n  if (!ALLOWED_AGENT_CLAIM_STATUSES.includes(value.status)) {\n    return { valid: false, reason: `agent-result.json status must be one of [${ALLOWED_AGENT_CLAIM_STATUSES.join(', ')}]; got: ${JSON.stringify(value.status)}` };\n  }\n  if (!nonEmptyString(value.summary)) return { valid: false, reason: `agent-result.json requires non-empty summary (${summaryRule.description})` };\n  if (value.status === blockerRule.requiredWhen && !nonEmptyString(value.blocker)) return { valid: false, reason: `agent-result.json with status \"blocked\" requires blocker: ${blockerRule.description}` };\n  const validError = legacy\n    ? nonEmptyString(value.error)\n    : (nonEmptyString(value.error) || (value.error !== null && typeof value.error === 'object' && !Array.isArray(value.error)));\n  if (value.status === errorRule.requiredWhen && !validError) {\n    return { valid: false, reason: `agent-result.json with status \"failed\" requires error: ${errorRule.description}` };\n  }\n  if (value.evidenceRefs !== undefined && (!Array.isArray(value.evidenceRefs) || value.evidenceRefs.some((ref) => !nonEmptyString(ref)))) {\n    return { valid: false, reason: `agent-result.json evidenceRefs must be ${evidenceRefsRule.description}` };\n  }\n  if (!legacy && isAssessmentRequired(context)) {\n    if (value.assessment === null || typeof value.assessment !== 'object' || Array.isArray(value.assessment)\n      || !ASSESSMENT_VERDICTS.includes(value.assessment.verdict)) {\n      return { valid: false, reason: `agent-result.json for this assessment role requires assessment.verdict one of [${ASSESSMENT_VERDICTS.join(', ')}]` };\n    }\n  }\n  // Keep the validator's historical success shape byte-compatible. The\n  // missing-contract branch above is an interpretation rule only: callers\n  // receive accepted input, never an upgraded v2 proof marker.\n  return { valid: true };"
+    },
+    {
+      "citation": "src/runner/dispatch/herdr-round.mjs:341-359",
+      "path": "src/runner/dispatch/herdr-round.mjs",
+      "startLine": 341,
+      "endLine": 359,
+      "blobSha": "2a31f0e1bd7eb571f1fbe130fbc8c2a399772074",
+      "sha256": "fcf68e268844e4680f66cb745565474ba85adab1155f7682b2f4e22e0114debf",
+      "text": "/**\n * The ladder's outcome is the precise answer; `errorClass` stays the coarse\n * vocabulary `recovery.mjs` matches on, so the recovery matrix keeps working\n * unchanged. A caller that wants the real reason reads `outcome`.\n *\n * A known seam, stated rather than hidden: `blocked` and `paused-limit` both\n * map to `worker-timeout`, so the matrix will retry them like any other\n * timeout even though neither is worth retrying immediately. Fixing that\n * means giving the matrix its own entries, which belongs with Run truth, not\n * with the adapter.\n */\nconst ERROR_CLASS_FOR_OUTCOME = Object.freeze({\n  died: 'worker-spawn-fail',\n  blocked: 'worker-timeout',\n  'timed-out-idle': 'worker-timeout',\n  'timed-out-ceiling': 'worker-timeout',\n  'paused-limit': 'worker-timeout',\n  'provider-limit': 'worker-timeout',\n});"
+    },
+    {
+      "citation": "src/runner/recovery.mjs:105-112",
+      "path": "src/runner/recovery.mjs",
+      "startLine": 105,
+      "endLine": 112,
+      "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f",
+      "sha256": "49c671b2e1d38b87c673f0b53eb6b8b188078e929e879c1b89c9fb85b2b2e16a",
+      "text": "export const RECOVERY = Object.freeze({\n  'worker-spawn-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'worker-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'verify-miss': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'verify-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'worktree-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),\n  'corrupt-log': Object.freeze({ action: 'halt' }),\n  'reject-returned': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),"
+    },
+    {
+      "citation": "src/runner/dispatch/herdr-reconcile.mjs:351-357",
+      "path": "src/runner/dispatch/herdr-reconcile.mjs",
+      "startLine": 351,
+      "endLine": 357,
+      "blobSha": "6ded05f28a310963ed7ceccbf794a50b42780a75",
+      "sha256": "efe18a7fce63712b2b8d85203e840bb4a72d71049a7aafc357e1145209f43c4a",
+      "text": "export async function reconcileHerdrSpawnRun(runDir, opts = {}) {\n  // 1. Check action: unsupported operations\n  if (opts.action === 'cancel' || opts.operation === 'cancel') {\n    return { status: 'parked', reason: 'cancel-unsupported' };\n  }\n  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {\n    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };"
+    },
+    {
+      "citation": "src/runner/dispatch/reconcile-cli-spawn.mjs:38-47",
+      "path": "src/runner/dispatch/reconcile-cli-spawn.mjs",
+      "startLine": 38,
+      "endLine": 47,
+      "blobSha": "fc1e16dd73336c031db43a5c06ba9656994ed4ac",
+      "sha256": "15ce4c42ecb8d5fa659623eaecbdef28b96653fa4f069ca736caf38fc941bb79",
+      "text": "export async function reconcileCliSpawnRun(runDir, opts = {}) {\n  // Check action: unsupported operations\n  if (opts.action === 'cancel' || opts.operation === 'cancel') {\n    return { status: 'parked', reason: 'cancel-unsupported' };\n  }\n  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {\n    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };\n  }\n\n  const resultJsonPath = path.join(runDir, 'result.json');"
+    },
+    {
+      "citation": "src/runner/dispatch/settlement.mjs:420-445",
+      "path": "src/runner/dispatch/settlement.mjs",
+      "startLine": 420,
+      "endLine": 445,
+      "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22",
+      "sha256": "16262eca7438f7741dd6f3f83f4b96cd4c79179da07cef159b759a8e066654f0",
+      "text": "  if (!alreadySettledByUs) {\n    const settlement = settleRunControl(runDir, { controlEpoch, controlToken });\n    if (settlement.status !== 'settled') {\n      publishMutableProjection(supersededJsonPath, runResult);\n      throw new RunnerConfigError(\n        `executeAssignment: control token for Run \"${runId}\" (epoch ${controlEpoch}) is no longer current (settlement status: \"${settlement.status}\") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,\n        { code: 'run-control-superseded', phase: 'post-admission' },\n      );\n    }\n    if (typeof _afterControlSettlement === 'function') {\n      _afterControlSettlement({ runDir, runId, controlEpoch, controlToken });\n    }\n  }\n\n  const published = publishImmutableProof(resultJsonPath, runResult);\n  if (!published) {\n    if (alreadySettledByUs) {\n      // Our own prior attempt already reached the authoritative publish\n      // (possibly a concurrent duplicate call, or a retry that raced its own\n      // still-running earlier attempt) -- rehydrate rather than treat as\n      // superseded.\n      try {\n        const existing = interpretRunResult(resultJsonPath, { expectedRunId: runId });\n        if (existing && !existing.corrupt && !existing.contractCorrupt && !existing.resultCorrupt\n          && existing.classification?.provenance !== 'contract-corrupt') {\n          return Object.freeze(existing);"
+    },
+    {
+      "citation": "src/runner/dispatch/proof-helpers.mjs:73-125",
+      "path": "src/runner/dispatch/proof-helpers.mjs",
+      "startLine": 73,
+      "endLine": 125,
+      "blobSha": "ec8e9f6ab9406cea6eb7ff9ab1edf4fe962862ca",
+      "sha256": "31d75321f375f5a513a4a314483951e97c24305cbb79871a06a6239849044e76",
+      "text": "function fsyncDirBestEffort(dir) {\n  let fd;\n  try {\n    fd = fs.openSync(dir, 'r');\n    fs.fsyncSync(fd);\n  } catch {\n  } finally {\n    if (fd !== undefined) {\n      try { fs.closeSync(fd); } catch {}\n    }\n  }\n}\n\nexport function publishImmutableProof(targetPath, record) {\n  const dir = path.dirname(targetPath);\n  fs.mkdirSync(dir, { recursive: true });\n  const content = typeof record === 'string' ? record : `${JSON.stringify(record, null, 2)}\\n`;\n  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);\n  const fd = fs.openSync(tmpPath, 'w');\n  try {\n    fs.writeSync(fd, content);\n    fs.fsyncSync(fd);\n  } finally {\n    fs.closeSync(fd);\n  }\n  try {\n    fs.linkSync(tmpPath, targetPath);\n  } catch (err) {\n    try { fs.unlinkSync(tmpPath); } catch {}\n    if (err.code === 'EEXIST') {\n      return false;\n    }\n    throw err;\n  }\n  try { fs.unlinkSync(tmpPath); } catch {}\n  fsyncDirBestEffort(dir);\n  return true;\n}\n\nexport function publishMutableProjection(targetPath, record) {\n  const dir = path.dirname(targetPath);\n  fs.mkdirSync(dir, { recursive: true });\n  const content = typeof record === 'string' ? record : `${JSON.stringify(record, null, 2)}\\n`;\n  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);\n  const fd = fs.openSync(tmpPath, 'w');\n  try {\n    fs.writeSync(fd, content);\n    fs.fsyncSync(fd);\n  } finally {\n    fs.closeSync(fd);\n  }\n  fs.renameSync(tmpPath, targetPath);\n  fsyncDirBestEffort(dir);"
+    },
+    {
+      "citation": "src/runner/dispatch/herdr-reconcile.mjs:351-361",
+      "path": "src/runner/dispatch/herdr-reconcile.mjs",
+      "startLine": 351,
+      "endLine": 361,
+      "blobSha": "6ded05f28a310963ed7ceccbf794a50b42780a75",
+      "sha256": "1a29ce3d416d167f5280d551b1f31841c7db78d5315ec532063ae3f546e1a0bf",
+      "text": "export async function reconcileHerdrSpawnRun(runDir, opts = {}) {\n  // 1. Check action: unsupported operations\n  if (opts.action === 'cancel' || opts.operation === 'cancel') {\n    return { status: 'parked', reason: 'cancel-unsupported' };\n  }\n  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {\n    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };\n  }\n  if (opts.resourceClosed === true) {\n    return { status: 'parked', reason: 'closed-resource' };\n  }"
+    },
+    {
+      "citation": "src/runner/dispatch/run-result.mjs:350-385",
+      "path": "src/runner/dispatch/run-result.mjs",
+      "startLine": 350,
+      "endLine": 385,
+      "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+      "sha256": "1ceecfac6cf42d9e573c3e29e8eee21f286f4071e7b7abcbab53a469064e6184",
+      "text": "export function normalizeRunResult({\n  contractVersion = 3,\n  runId,\n  assignmentId = null,\n  unitRunId = null,\n  round = null,\n  workId,\n  controlEpoch,\n  controlToken,\n  executorId = null,\n  adapter = 'cli-spawn',\n  confinement = null,\n  role = null,\n  executorRedirected,\n  policy: dispatchPolicy,\n  settledAt,\n  durationMs = null,\n  planContentHash,\n  claimSha256,\n  settleReports = [],\n  runtime = {},\n  agentClaim = null,\n  claimInvalid = false,\n  evidence = {},\n  operation,\n  isReadOnlyOperation = false,\n  deliveryMode = 'fresh',\n  sourceRunId = null,\n  policyOverride = null,\n  failureOverride = null,\n  confidenceLevel = null,\n  assessmentOverride = null,\n  execStatusOverride = null,\n  runnerNote = null,\n  usage = null,\n} = {}) {"
+    },
+    {
+      "citation": "src/runner/dispatch/run-result.mjs:546-566",
+      "path": "src/runner/dispatch/run-result.mjs",
+      "startLine": 546,
+      "endLine": 566,
+      "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+      "sha256": "0f250113c4c41727066d1c2d4bcaf824c81a12017a9f68b0a2f3f889e24bff7a",
+      "text": "  const classification = {\n    execution: {\n      status: execStatus,\n      exitCode,\n    },\n    assessment,\n    confidence: {\n      level: confLvl,\n      basis,\n    },\n    failure,\n    policy,\n    delivery,\n    provenance: isV2 ? 'native-v2' : (contractVersion === 4 ? 'native-v4' : 'native-v3'),\n  };\n  const contract = isV2\n    ? { ...RUN_RESULT_CONTRACT_V2 }\n    : (contractVersion === 4 ? { ...RUN_RESULT_CONTRACT_V4 } : { ...RUN_RESULT_CONTRACT_V3 });\n\n  if (!isV2) {\n    classification.outcome = deriveOutcome(classification);"
+    },
+    {
+      "citation": "src/runner/dispatch/execution-contract.mjs:337-384",
+      "path": "src/runner/dispatch/execution-contract.mjs",
+      "startLine": 337,
+      "endLine": 384,
+      "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+      "sha256": "7cb22fe3922153c4c676f3245dffc25c6c40118f205f1e41a5325d50b863380a",
+      "text": "  if (!isPlainObject(contract.evidence)) {\n    fail('contract.evidence must be an object with a \"required\" field');\n  }\n  assertOnlyAcceptedFields(contract.evidence, ACCEPTED_EVIDENCE_FIELDS, 'contract.evidence');\n  if (!EVIDENCE_REQUIRED_VALUES.has(contract.evidence.required)) {\n    fail('contract.evidence.required must be \"reported\" or \"verified\"');\n  }\n\n  if (!isNonEmptyString(contract.role)) {\n    fail('contract.role must be a non-empty string (role hint)');\n  }\n  if (contract.supports !== undefined && !isNonEmptyString(contract.supports)) {\n    fail('contract.supports must be a non-empty string when provided (an operation id it claims to support -- legality against the Work\\'s declared Stage is checked by the domain harness seam, ADR-007 §3, not here)');\n  }\n  if (contract.contractTemplate !== undefined && !isNonEmptyString(contract.contractTemplate)) {\n    fail('contract.contractTemplate must be a non-empty string when provided');\n  }\n  if (contract.capabilities !== undefined && !isStringArray(contract.capabilities)) {\n    fail('contract.capabilities must be an array of strings when provided (capability hints)');\n  }\n\n  // `contract.policy` is optional and current contracts carry exactly\n  // `tier`. Retired persisted keys are normalized before this validator at\n  // the assignment load boundary, never accepted on a new contract.\n  if (contract.policy !== undefined) {\n    if (!isPlainObject(contract.policy)) {\n      fail('contract.policy must be an object when provided');\n    }\n    assertOnlyAcceptedFields(contract.policy, ACCEPTED_POLICY_FIELDS, 'contract.policy');\n    if (!MODEL_POLICY_TIERS.includes(contract.policy.tier)) {\n      fail(`contract.policy.tier must be one of ${MODEL_POLICY_TIERS.join(', ')}`);\n    }\n  }\n\n  if (!isPlainObject(contract.budget)) {\n    fail('contract.budget must be an object');\n  }\n  assertOnlyAcceptedFields(contract.budget, ACCEPTED_BUDGET_FIELDS, 'contract.budget');\n  if (!Number.isInteger(contract.budget.timeoutMs) || contract.budget.timeoutMs <= 0) {\n    fail('contract.budget.timeoutMs must be a positive integer (milliseconds) -- the only enforced time budget');\n  }\n  if (!Number.isInteger(contract.budget.maxRuns) || contract.budget.maxRuns <= 0) {\n    fail('contract.budget.maxRuns must be a positive integer -- the only enforced run-count budget');\n  }\n  if (contract.budget.tokens !== undefined && (typeof contract.budget.tokens !== 'number' || !Number.isFinite(contract.budget.tokens) || contract.budget.tokens < 0)) {\n    fail('contract.budget.tokens must be a non-negative finite number when provided (telemetry only, never enforced as a limit)');\n  }\n"
+    },
+    {
+      "citation": "src/runner/dispatch/cli.mjs:1081-1098",
+      "path": "src/runner/dispatch/cli.mjs",
+      "startLine": 1081,
+      "endLine": 1098,
+      "blobSha": "490ccb1893634f830278ebf608f3549f98d31897",
+      "sha256": "084621e32898ed4fa4960c938fc01d102017d92b5a2f4e874e25ceb7830b8a26",
+      "text": "      // Dispatch-path unification: `execute --for <purpose>` is retired.\n      // It was the \"purpose door\" -- resolving a purpose straight to a\n      // spawn with zero provider-capacity lease and zero fallback (unlike\n      // every other real dispatch door here) -- and had zero live callers\n      // (docs/knowledge/how-to-wire-a-skill-to-an-executor-by-purpose-not-\n      // by-name/... 's own \"Status: pattern proven, no live consumer\n      // today\"). The correct, real pattern (already how every live caller\n      // works) is two-phase: `decide --for <purpose>` resolves the\n      // purpose to a real executorId first, then `execute <that id>`\n      // dispatches it positionally -- `decide --for` is unaffected by\n      // this, only `execute --for` is refused.\n      if (flagValue('--for')) {\n        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId>`)';\n        if (returnResult) throw new StoreError('validation', msg);\n        process.stderr.write(`${msg}\\n`);\n        process.exitCode = 1;\n        break;\n      }"
+    },
+    {
+      "citation": "src/runner/execution/run.mjs:395-416",
+      "path": "src/runner/execution/run.mjs",
+      "startLine": 395,
+      "endLine": 416,
+      "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+      "sha256": "e564978a622880cb44ff9e2ebe743921488fcabac2d145e437c57c19f7c6963d",
+      "text": "      unit: rUnit || unit,\n      role,\n      readOnly,\n      independentOf: resolveIndependence(independentOf),\n      overrides: unitRecord.overrides || [],\n      ...(unit.blind ? { blind: true } : {}),\n    };\n    const bindCtx = { runnerConfig, session };\n\n    const key = `${role}/${round}`;\n    const recorded = unitRecord.bindings[key] ?? [];\n    let attemptNo = recorded.length > 0 ? recorded.length - 1 : 0;\n    let bound = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(ask, bindCtx);\n\n    if (bound.refused) {\n      return {\n        outcome: 'policy-refusal',\n        role,\n        round,\n        refused: bound.refused,\n      };\n    }"
+    },
+    {
+      "citation": "src/runner/dispatch/assignment-policy.mjs:220-243",
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "startLine": 220,
+      "endLine": 243,
+      "blobSha": "700225473f8dcb08861af498f8273cb73b526993",
+      "sha256": "49bebe488c4a7a954feb843067caba610a5535a204fa0d96d26fb51ee03e8464",
+      "text": "  const strength = (t) => TIER_STRENGTH[t] ?? 0;\n  const rigorToTier = runnerConfig?.rigorToTier ?? runnerConfig?.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;\n  const rigorStrength = (r) => RIGOR_RANK[r] ?? 0;\n\n  // 1. Rigor Resolution (demand side, monotonic: highest explicit\n  // requirement wins; the implicit standard is only a final fallback).\n  if (opPolicy.rigor !== undefined && !RIGOR_VALUES.includes(opPolicy.rigor)) {\n    throw new RunnerConfigError(`invalid operation rigor \"${opPolicy.rigor}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n  }\n  let effectiveRigor = opPolicy.rigor ?? 'standard';\n  let rigorSource = opPolicy.rigor !== undefined ? { scope: 'opPolicy', id: opId } : { scope: 'default' };\n  // The implicit standard is a fallback, not a floor. The first explicit\n  // source may therefore select low; only later explicit sources are\n  // monotonic raise-only.\n  if (work) {\n    if (work.rigor !== undefined) {\n      if (!RIGOR_VALUES.includes(work.rigor)) {\n        throw new RunnerConfigError(`invalid work rigor \"${work.rigor}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n      }\n      if (rigorSource.scope === 'default' || rigorStrength(work.rigor) > rigorStrength(effectiveRigor)) {\n        effectiveRigor = rigorSource.scope === 'default' ? work.rigor : resolveStrongerRigor(effectiveRigor, work.rigor);\n        rigorSource = { scope: 'work', id: work.id };\n      }\n    } else if (work.risk === 'heavy') {"
+    },
+    {
+      "citation": "src/runner/dispatch/assignment-policy.mjs:380-388",
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "startLine": 380,
+      "endLine": 388,
+      "blobSha": "700225473f8dcb08861af498f8273cb73b526993",
+      "sha256": "357ab2a12dc2c9cac6e3354b2bcaafdc3926a717e635044a24e978a2411d6480",
+      "text": "  const declaredFallbacks = cliOverride.fallbackExecutors ?? opPolicy.fallbackExecutors ?? [];\n  // `fallbackExecutors` is reserved-not-executed (Phase 00 R10): only\n  // `executorList[0]` (primaryExecutor) is ever actually dispatched --\n  // entries beyond it are recorded for future automatic-failover, never\n  // validated for registration and never spawned by this resolver.\n  const executorList = [\n    primaryExecutor,\n    ...declaredFallbacks.filter((e) => e !== primaryExecutor),\n  ];"
+    },
+    {
+      "citation": "src/runner/dispatch/assignment-policy.mjs:457-466",
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "startLine": 457,
+      "endLine": 466,
+      "blobSha": "700225473f8dcb08861af498f8273cb73b526993",
+      "sha256": "51ff0932ff862c810991852d1f50e73a5313cc8fbfdb0854821dd391e3cebed8",
+      "text": "  // 6. Constraints Accumulation\n  const skills = Array.isArray(assignment.skills) ? assignment.skills : [];\n  const constraints = {\n    requiresSkills: Object.freeze([...skills]),\n    ...(opPolicy.constraints || {}),\n  };\n  const constraintsSource = { scope: 'assignment', id: assignment.assignmentId };\n\n  // 7. Governance check (Phase 00 R6/F2: `resolvedProvider` and\n  // `primaryExecutor` are checked as two DISTINCT fields, never merged into"
+    },
+    {
+      "citation": "src/runner/rigor.mjs:4-21",
+      "path": "src/runner/rigor.mjs",
+      "startLine": 4,
+      "endLine": 21,
+      "blobSha": "379ec204684cbba514af5c4101383b4e70124ec7",
+      "sha256": "ab6e048ed9043bb86ba2ab5f95523a5e0cdd716174654e9c967102a471625610",
+      "text": "export const RIGOR_VALUES = Object.freeze(['low', 'standard', 'high', 'critical']);\n\nexport const RIGOR_RANK = Object.freeze({\n  low: 1,\n  standard: 2,\n  high: 3,\n  critical: 4,\n});\n\nexport function resolveStrongerRigor(a, b) {\n  for (const value of [a, b]) {\n    if (value !== undefined && value !== null && !RIGOR_VALUES.includes(value)) {\n      throw new RangeError(`invalid rigor \"${value}\". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);\n    }\n  }\n  if (a === undefined || a === null) return b;\n  if (b === undefined || b === null) return a;\n  return RIGOR_RANK[b] > RIGOR_RANK[a] ? b : a;"
+    },
+    {
+      "citation": "core/skills/fgos-panel/SKILL.md:36-59",
+      "path": "core/skills/fgos-panel/SKILL.md",
+      "startLine": 36,
+      "endLine": 59,
+      "blobSha": "4cac45e1e900ad4078a5323dc4511771c661c3ad",
+      "sha256": "acb68eef43db9c234fad5fe958874549c26093c0050b9c8573a85788bf738af1",
+      "text": "Read the canonical\n[`Group Thinking Trigger Surface`](../../../docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md)\nbefore routing. Its Surface Taxonomy is the only preset map. Do not recreate or\nextend that map in this skill.\n\n## Route\n\n1. Extract the subject, any proposal/artifact, supplied options, and material\n   scope or risk constraints from the request and current context.\n2. Select exactly one preset from the canonical Surface Taxonomy:\n   - `architecture-panel` or architectural `coding-design-panel` -> Workflow\n     `architecture-advisory` (follow [`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)\n     or run `fgos workflow start architecture-advisory`).\n   - `independent-feedback` / `reflection-review` -> Workflow `delphi`\n     (`fgos workflow start delphi`).\n   - `option-comparison` / `strategy-options` -> Workflow `nominal-group`\n     (`fgos workflow start nominal-group`).\n   - `group-cognition` / complex dialectical sense-making -> Workflow\n     `group-cognition` (`fgos workflow start group-cognition`).\n   - `proposal-review` / `business-review` -> preset `rfc` (pattern `reviewed`,\n     1 critique round with red-team).\n   - `consult` -> preset `consult` (pattern `solo`, role `advisor`).\n   - `research-fan-out` -> preset `research-fan-out` (pattern `panel`, 3 members).\n   - `code-change-panel` -> follow `fgos-run`."
+    },
+    {
+      "citation": "src/workflow/steps.mjs:43-85",
+      "path": "src/workflow/steps.mjs",
+      "startLine": 43,
+      "endLine": 85,
+      "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15",
+      "sha256": "772971828d33bd5c9ce1b8d49795b7677786224a0d8b6e9caa89bb57bbbee67e",
+      "text": "/** Whether a Work item may move from `from` to `to` in this workflow. */\nexport function isLegalStepMove(wf, from, to) {\n  return (wf?.transitions ?? EMPTY).some((t) => t.from === from && t.to === to);\n}\n\n/**\n * The skill a session should load for a step, or for a Work status handled by\n * a skill instead of a step (e.g. retrospective). null when none is declared.\n */\nexport function skillForStep(wf, stepOrStatus) {\n  return stepById(wf, stepOrStatus)?.skill ?? wf?.statusSkills?.[stepOrStatus]?.skill ?? null;\n}\n\n/** The primary operation's task spec for a step, or the status skill's task spec. */\nexport function taskSpecForStep(wf, stepOrStatus) {\n  const step = stepById(wf, stepOrStatus);\n  if (step) {\n    const primary = step.operations.find((o) => o.primary) ?? step.operations[0];\n    return primary?.taskSpec ?? null;\n  }\n  return wf?.statusSkills?.[stepOrStatus]?.taskSpec ?? null;\n}\n\n/**\n * Operations legal at a step. A step that declares none but has a skill offers\n * one synthesized primary operation; otherwise [].\n */\nexport function operationsForStep(wf, stepId, { defaultRole = 'implementer' } = {}) {\n  const step = stepById(wf, stepId);\n  if (!step) return EMPTY;\n  if (step.operations.length > 0) return step.operations;\n  if (step.skill) {\n    return Object.freeze([\n      Object.freeze({\n        id: step.id,\n        primary: true,\n        taskSpec: step.id,\n        role: defaultRole,\n        skills: Object.freeze([step.skill]),\n      }),\n    ]);\n  }\n  return EMPTY;"
+    },
+    {
+      "citation": "src/state/domain-registry.mjs:244-258",
+      "path": "src/state/domain-registry.mjs",
+      "startLine": 244,
+      "endLine": 258,
+      "blobSha": "79871e4e1c675b5a371707d719dbc2318f71f112",
+      "sha256": "bf282badb29d79ab4804e28e2bf57262b6ed370d2d24cb9c79062e6953b8a096",
+      "text": "/** `{ skill, taskSpec }` for a step or status; either may be null. */\nexport function bundleForStep(domain, stepOrStatus, kind) {\n  const wf = resolveWorkflow(domain, kind);\n  return {\n    skill: workflowSkillForStep(wf, stepOrStatus),\n    taskSpec: workflowTaskSpecForStep(wf, stepOrStatus),\n  };\n}\n\n/** Operations legal at a step for a Work item of `kind`. Never throws; [] when none. */\nexport function operationsForStep(domain, step, kind) {\n  if (!step) return Object.freeze([]);\n  return workflowOperationsForStep(resolveWorkflow(domain, kind), step, {\n    defaultRole: domain?.roleGraph?.defaultRole || 'implementer',\n  });"
+    },
+    {
+      "citation": "domains/coding/workflows/feature.yaml:12-140",
+      "path": "domains/coding/workflows/feature.yaml",
+      "startLine": 12,
+      "endLine": 140,
+      "blobSha": "73be44ee13235ee800d60010ab8f9b1261d2b22a",
+      "sha256": "398a8288352608ee6fd08a1388c46c982886f7d85c1c5aae6bca6364acdc5d3f",
+      "text": "  - id: discovery\n    title: Discovery\n    phase: discover\n    skill: fgos-coding-discovering\n    operations:\n      - id: judge-ambiguity\n        primary: true\n        taskSpec: judge-ambiguity\n        role: implementer\n        skills: [fgos-coding-discovering]\n      - id: resolve-question\n        taskSpec: resolve-question\n        role: researcher\n        reason: consult\n        skills: [fgos-researching]\n    units:\n      - id: judge-ambiguity\n        template:\n          capability: coding:discover\n          pattern: solo\n          taskSpec: judge-ambiguity\n  - id: exploring\n    title: Exploring\n    phase: discover\n    skill: fgos-coding-exploring\n    dependsOn: [discovery]\n    operations:\n      - id: lock-decisions\n        primary: true\n        taskSpec: lock-decisions\n        role: implementer\n        skills: [fgos-coding-exploring]\n      - id: answer-question\n        taskSpec: answer-question\n        role: advisor\n        reason: advise\n        dispatch: human-only\n        skills: [fgos-coding-exploring]\n      - id: resolve-question\n        taskSpec: resolve-question\n        role: researcher\n        reason: consult\n        skills: [fgos-researching]\n    units:\n      - id: lock-decisions\n        template:\n          capability: coding:explore\n          pattern: solo\n          taskSpec: lock-decisions\n    gate:\n      kind: human\n      question: Lock decisions for this item?\n  - id: planning\n    title: Planning\n    phase: plan\n    skill: fgos-coding-planning\n    dependsOn: [exploring]\n    operations:\n      - id: shape-plan\n        primary: true\n        taskSpec: shape-plan\n        role: implementer\n        skills: [fgos-coding-planning]\n      - id: validate-plan\n        taskSpec: validate-plan\n        role: reviewer\n        reason: review\n        skills: [fgos-coding-validating]\n        policy:\n          rigor: standard\n      - id: scout-blast-radius\n        taskSpec: scout-blast-radius\n        role: researcher\n        reason: consult\n        skills: [fgos-researching]\n      - id: resolve-question\n        taskSpec: resolve-question\n        role: researcher\n        reason: consult\n        skills: [fgos-researching]\n    units:\n      - id: shape-plan\n        template:\n          capability: coding:plan\n          pattern: solo\n          taskSpec: shape-plan\n      - id: validate-plan\n        template:\n          capability: coding:validate\n          pattern: reviewed\n          taskSpec: validate-plan\n  - id: executing\n    title: Executing\n    phase: execute\n    skill: fgos-coding-implement\n    dependsOn: [planning]\n    operations:\n      - id: implement-item\n        primary: true\n        taskSpec: implement-item\n        role: implementer\n        skills: [fgos-coding-implement]\n      - id: review-item\n        taskSpec: review-item\n        role: reviewer\n        reason: review\n        skills: [fgos-coding-validating]\n      - id: fix-verify-red\n        taskSpec: fix-verify-red\n        role: implementer\n        skills: [fgos-coding-implement]\n      - id: scoped-subtask\n        taskSpec: scoped-subtask\n        role: helper\n        reason: assist\n        skills: [fgos-coding-implement]\n      - id: scout-blast-radius\n        taskSpec: scout-blast-radius\n        role: researcher\n        reason: consult\n        skills: [fgos-researching]\n      - id: resolve-question\n        taskSpec: resolve-question\n        role: researcher\n        reason: consult\n        skills: [fgos-researching]\n    units:\n      - id: implement-item\n        template:"
+    },
+    {
+      "citation": "src/runner/dispatch/agent-result-claim-contract.mjs:5-30",
+      "path": "src/runner/dispatch/agent-result-claim-contract.mjs",
+      "startLine": 5,
+      "endLine": 30,
+      "blobSha": "20c9d63d1e0795bb4860ef1298037cc467d92095",
+      "sha256": "dd025860292e9e8e03c27aaa9d0ac1d4d4dd7f3092a38185172f410d77ec80a0",
+      "text": "export const AGENT_RESULT_CLAIM_CONTRACT = Object.freeze({ id: 'agent-result-claim', version: 2 });\nexport const ALLOWED_AGENT_CLAIM_STATUSES = Object.freeze(['done', 'blocked', 'failed', 'no-evidence']);\nexport const ASSESSMENT_VERDICTS = Object.freeze(['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);\n\nexport const CLAIM_FIELD_RULES = Object.freeze([\n  Object.freeze({ path: 'status', description: `exactly one of: ${ALLOWED_AGENT_CLAIM_STATUSES.join(' | ')}`, required: true }),\n  Object.freeze({ path: 'summary', description: 'a required non-empty string', required: true }),\n  Object.freeze({ path: 'blocker', description: 'a non-empty string when status is \"blocked\"', requiredWhen: 'blocked' }),\n  Object.freeze({ path: 'error', description: 'a non-empty string or object when status is \"failed\"', requiredWhen: 'failed' }),\n  Object.freeze({ path: 'evidenceRefs', description: 'an array of non-empty strings if provided' }),\n]);\n\nfunction nonEmptyString(value) {\n  return typeof value === 'string' && value.trim() !== '';\n}\n\nexport function isAssessmentRequired(context = {}) {\n  const role = context.role ?? context.assignment?.role;\n  const operation = context.operation ?? context.assignment?.operation;\n  return role === 'reviewer' || role === 'red-team' || (typeof operation === 'string' && operation.includes('recheck'));\n}\n\nexport function assessmentRequirement(context = {}) {\n  return isAssessmentRequired(context)\n    ? Object.freeze({ required: true, path: 'assessment.verdict', allowed: ASSESSMENT_VERDICTS })\n    : Object.freeze({ required: false, path: 'assessment.verdict', allowed: ASSESSMENT_VERDICTS });"
+    },
+    {
+      "citation": "src/runner/execution/patterns/role-tasks.mjs:58-72",
+      "path": "src/runner/execution/patterns/role-tasks.mjs",
+      "startLine": 58,
+      "endLine": 72,
+      "blobSha": "7f7097b6f580c000e5b3f8c358b71b9a5fe8cf14",
+      "sha256": "a720c0c40d688ac2edd574af9005e0e34d1efafacb37f720dcda710f322f565a",
+      "text": "export function roleUnit(unit, { role, kind = role, params = {}, findings = [] } = {}) {\n  const task = params?.roleTasks?.[role] ?? params?.roleTasks?.[kind] ?? DEFAULT_ROLE_TASKS[kind];\n  const hasFindings = Array.isArray(findings) && findings.length > 0;\n  const stanceOptions = unit.stanceOptions ?? [];\n  const hasStance = kind === 'panelist' && stanceOptions.length > 0;\n  if (typeof task !== 'string' && !hasFindings && !hasStance) return unit;\n\n  let objective = typeof task === 'string' ? wrap(task, unit.objective) : unit.objective;\n  if (hasFindings) {\n    objective += `\\n\\nThe previous round's checks reported these findings. Fix them and change nothing else:\\n${findings.map((f) => `- ${f}`).join('\\n')}`;\n  }\n  if (hasStance) {\n    objective += `\\n\\nPassive stance measurement for this question. Declared choices: ${JSON.stringify(stanceOptions)}; \\\"other\\\" is also allowed.\\nEnd your report by stating your stance and include \\\"stance\\\": {\\\"choice\\\": <one declared choice or \\\"other\\\">, \\\"confidence\\\": <number from 0 to 1>} in your agent-result.json claim. This optional measurement never changes whether your work passes.`;\n  }\n  return { ...unit, objective };"
+    },
+    {
+      "citation": "src/runner/execution/unit-summary.mjs:17-28",
+      "path": "src/runner/execution/unit-summary.mjs",
+      "startLine": 17,
+      "endLine": 28,
+      "blobSha": "67b0d90161d6a5fac28c9889bce1023a0643c6ff",
+      "sha256": "8047af93dae64ae8a8d82d5116dc69eeed187a6a00bb41c6ebc93eaf0fe83f28",
+      "text": "export function extractStance(agentClaim, options = []) {\n  if (agentClaim?.stance === undefined) return { status: 'missing' };\n  const stance = agentClaim.stance;\n  if (!stance || typeof stance !== 'object' || Array.isArray(stance)) return { status: 'invalid', reason: 'stance-not-object' };\n  if (typeof stance.choice !== 'string' || (!options.includes(stance.choice) && stance.choice !== 'other')) {\n    return { status: 'invalid', reason: 'choice-not-declared' };\n  }\n  if (stance.confidence !== undefined && stance.confidence !== null\n    && (typeof stance.confidence !== 'number' || !Number.isFinite(stance.confidence) || stance.confidence < 0 || stance.confidence > 1)) {\n    return { status: 'invalid', reason: 'confidence-out-of-range' };\n  }\n  return { status: 'valid', choice: stance.choice, confidence: stance.confidence ?? null };"
+    },
+    {
+      "citation": "core/workflows/architecture-advisory.yaml:8-84",
+      "path": "core/workflows/architecture-advisory.yaml",
+      "startLine": 8,
+      "endLine": 84,
+      "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+      "sha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e",
+      "text": "steps:\n  - id: framing\n    title: Intake and Framing\n    units:\n      - id: frame-context\n        template:\n          capability: architecture:frame\n          pattern: solo\n          persona: advisor\n          objective: Frame problem context and investigate architectural constraints\n  - id: shaping\n    title: Diverge Proposals\n    dependsOn: [framing]\n    units:\n      - id: shape-proposals\n        template:\n          capability: architecture:shape\n          pattern: panel\n          blind: true\n          params:\n            roleTasks:\n              panelist-1: 'SYSTEM LENS: Propose a coherent primary architecture grounded in the framed repository evidence, ownership, and boundaries. {objective}'\n              panelist-2: 'ALTERNATIVE LENS: Develop a genuinely different architecture, including a smaller or no-build option when credible; never provide a designated loser. {objective}'\n              panelist-3: 'CONSTRAINT LENS: Test security, production operations, migration, cost, and reversibility; propose a constraint-led design rather than merely endorsing another seat. {objective}'\n          objective: Diverge into system, alternative, and constraint-focused proposals across 3 panelists\n  - id: critique\n    title: Critique & Stress-Test\n    dependsOn: [shaping]\n    units:\n      - id: critique-proposals\n        template:\n          capability: architecture:critique\n          pattern: reviewed\n          acceptOutcomes: [pass, findings]\n          objective: Critique proposals, identify risks, and stress-test constraints; preserve attributed findings and dissent without claiming approval.\n  - id: synthesis\n    title: Converge & Synthesize\n    dependsOn: [critique]\n    units:\n      - id: synthesize-recommendation\n        template:\n          capability: architecture:synthesize\n          pattern: reviewed\n          rigor: high\n          acceptOutcomes: [pass, findings]\n          params:\n            minCheckers: [reviewer, red-team]\n            roleTasks:\n              reviewer: 'Read the producer final RAW JSON packet listed in Context refs for this round. Review that packet, not git changes or earlier proposals. Check required missing expertise array, evidence, verdict, dispositions, and preserved dissent. Do not rewrite the packet or change files; report concrete findings or explicitly none. {objective}'\n              red-team: 'Read the producer final RAW JSON packet listed in Context refs for this round. Attack that packet, not git changes or earlier proposals: framing, authority, unsupported claims, residual risks, missing expertise, and dissent laundering. Do not rewrite it or change files; report concrete failures with evidence or explicitly none. {objective}'\n          objective: >-\n            Produce the final recommendation packet as a RAW JSON object, without Markdown fences.\n            Require \"missing expertise\" as an array of nonempty expertise names, or [] when none.\n            Include the verdict, evidence, alternatives, attributed findings, dispositions, unresolved\n            dissent, named defaults, residual risks, and reversal triggers; never invent consensus or approval.\n            Reviewers and red-team must challenge THIS final packet, not merely the earlier proposals:\n            check evidence, framing, authority, dissent preservation, and the required missing-expertise array.\n  - id: explanation\n    title: Explain for Ownership\n    dependsOn: [synthesis]\n    units:\n      - id: explain-recommendation\n        template:\n          capability: architecture:explain\n          pattern: solo\n          persona: advisor\n          objective: >-\n            Explain the settled final packet for ownership with evidence and one reversible next action.\n            Preserve its verdict, \"missing expertise\" array, attributed findings and unresolved dissent;\n            do not replace the recommendation, invent approval, or silently clear review findings.\n  - id: close\n    title: Owner Expertise Decision\n    dependsOn: [explanation]\n    gate:\n      kind: human\n      mode: input\n      question: 'The final packet names missing expertise: {{report:synthesis/synthesize-recommendation:missing expertise}}. Bring in that expertise or not? Answer once for the whole list; [] means none is requested. Completion is not approval of the advice or permission to implement.'"
+    },
+    {
+      "citation": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+      "path": "core/skills/fgos-architecture-panel/SKILL.md",
+      "startLine": 17,
+      "endLine": 37,
+      "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+      "sha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c",
+      "text": "## Execution boundary\n\nStart only the two registered definitions. Do not author inline definitions,\nselect executors/models, impersonate independent seats, or choose a continuation\nstep. Config and `bind()` own routing; Workflow owns execution and human gates.\nThis skill starts workflows and reads settled reports. Use the public CLI to show\nthe declared owner gate and submit only the owner's explicit answer. Do not read\nor write raw run-state files, poll in a loop, resume runs, or choose gate transitions.\n\nPreserve the person's words verbatim in `--request`. Use the actual target as\ncaller cwd or explicitly set `--worktree`; `--dir` is the state/config root, not\nworker cwd. With the read-only safety prerequisite satisfied:\n\n```sh\nfgos workflow start architecture-advisory --request \"<verbatim CASE>\" --dir <repoRoot> --worktree <targetRoot>\n```\n\nThe start result identifies a run, not completed advice. Read the complete settled\nreports supplied by the workflow/operator; never infer success from launch metadata,\nchat memory, an absent report, or a one-line summary. Missing evidence stays a gap.\nDo not open workflow event logs, unit state files, or a parallel status store."
+    }
+  ]
+}

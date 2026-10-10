@@ -54,9 +54,11 @@ evidence, capability, budget, and provenance semantics.
    (`assignment-normalizer.mjs:120-143`). These are not arbitrary accepted
    inline-contract fields.
 4. **Validated inline fields.** `objective`, `contextRefs`, `constraints`,
-   `expectedOutputs`, `mutation`, `evidence`, optional `role`, `capabilities`,
-   `budget`, `supports`, `contractTemplate`, and narrowly accepted `policy`.
-   Budget accepts `timeoutMs`, `maxRuns`, `tokens`; inline policy accepts only
+   `expectedOutputs`, `mutation`, `evidence`, required `role` and `budget`;
+   optional `capabilities`, `supports`, `contractTemplate` and narrow `policy`.
+   Budget requires positive integer `timeoutMs` and `maxRuns`; optional `tokens`
+   is telemetry, not an enforced limit (`execution-contract.mjs:345-346,371-382`);
+   inline policy accepts only
    `tier`, not a full PolicyPatch. Caller fields are validated separately
    (`execution-contract.mjs:180-240,295-340`). Unknown fields are rejected.
 5. **Same execution governance.** Declared, inline and Unit-run requests

@@ -102,11 +102,13 @@ No layer may absorb all responsibilities:
 
 ## Compatibility
 
-TaskSpec/skill compatibility projections are derived from normalized
-`step.operations`, including selection of a primary operation. `step.taskSpec`
-and `stage.operations` are not the current raw fields. The domain step
-projection APIs preserve consumers without restoring the retired Work-stage
-or coordination engine.
+`taskSpecForStep` selects the primary normalized `step.operations` entry (or the
+first); `skillForStep` reads `step.skill` separately and falls back to a declared
+status skill (`src/workflow/steps.mjs:52-63`). Neither projects both values from
+an operation. Compatibility remains a projection, not permission to weaken the
+mandatory declared-operation, transition or evidence constraints. The existing
+`operationsForStep`/`isLegalStepMove` projections preserve declared legality
+(`steps.mjs:44-45,67-85`); they do not restore the retired Work-stage or engine.
 
 The exact normalized contract is defined in
 [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md).
@@ -118,7 +120,8 @@ The former session/FlowDefinition profile is historical, not the Workflow operat
 ## Domain Augmentation
 
 Domains and organizations may add knowledge, doctrine, Skills, declared
-protocols, planning validators, resource/isolation analysis, evidence policy,
-roles, souls, and quality criteria. The foundation introduces a shared extension
-seam only after at least two unlike consumers prove the common responsibility.
+Workflow definitions/operations and domain harnesses, planning validators,
+resource/isolation analysis, evidence policy, roles, souls and quality criteria.
+The foundation introduces a shared extension seam only after at least two unlike
+consumers prove the common responsibility.
 

@@ -1,0 +1,1736 @@
+{
+  "version": 1,
+  "status": "sync-and-committed-review-application",
+  "authorization": "owner message following review 947f6169e; recorded in owner-answers.md A20",
+  "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+  "reviewer": "reviewer:claude-session:4df9e88c@2026-10-10",
+  "authorSession": "codex-session:1@2026-10-10",
+  "startCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+  "syncCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+  "mainCommit": "b2927802231f539ea2b7490cb8a449a9e2204e37",
+  "scope": {
+    "sections": [
+      {
+        "section": "architecture/dispatch-control-plane.md#routing-identities",
+        "lines": "75-110",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Lines 81-83 route capability resolution through runner.executors.<id>.for[] but resolveExecutorAndOverrides (resolve.mjs:255-266) states an executor's own for never binds a purpose and only capabilities.<name>.prefer does; for[] is read only by resolveCapabilityDetailsFromHints (resolve.mjs:53) to infer a capability label; the same defect also sits in the code block at lines 81-83. The rest (purpose terminology, resolveExecutorIdForPurpose not exported, selector.type purpose at plan.mjs:91) is true."
+      },
+      {
+        "section": "architecture/dispatch-control-plane.md#component-internal-ownership",
+        "lines": "262-300",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Item 2 (line 270-271) says resolveExecutorAndOverrides resolves capability aliases and executor for[] declarations, but that function binds only executor-id, default executor and capabilities.<name>.prefer (resolve.mjs:269-310); alias handling and for[] live in resolveCapabilityDetailsFromHints (resolve.mjs:25-66). Forbidden-dependency list is true (test import-graph forbids appendEvent/settleClaim/pickWork/returnWork in src/runner/dispatch; cohort-planner has no source hits)."
+      },
+      {
+        "section": "architecture/evidence-and-results.md#confidence-boundaries",
+        "lines": "58-67",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "line 63 says structured claims carrying another Run identity are rejected, but run-result.mjs:155 and 297 reject a RunResult record whose runId differs from expectedRunId; the worker claim validator has no runId check at all"
+      },
+      {
+        "section": "architecture/executor-health-and-fallback.md#2-production-ladder-semantics",
+        "lines": "68-92",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Line 72 states as a ported invariant that blocked means do not retry, but herdr-round.mjs:344-357 maps blocked to worker-timeout and RECOVERY in recovery.mjs retries that class (the code comment calls it a known seam), so current callers do retry blocked rounds. The ladder order, death threshold 3, 15s credential probe (liveness.mjs:267-299) and provider-limit emission are otherwise correct; qualify line 72 as the ladder verdict only."
+      },
+      {
+        "section": "architecture/runtime-recovery-design.md#4-recovery-choice",
+        "lines": "85-98",
+        "authorStatus": "open",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Lines 94-97 state cancellation-bars-retry and budget-exhaustion precedence as behavior, yet cancel is explicitly parked as cancel-unsupported (herdr-reconcile.mjs:344, reconcile-cli-spawn.mjs:40, detached-run-supervisor.mjs:981-985) and recovery.mjs/recovery-planner.mjs have no budget or cancellation path; the status row calls this section current standalone Run recovery."
+      },
+      {
+        "section": "architecture/runtime-recovery-design.md#6-local-concurrency-and-durability",
+        "lines": "124-165",
+        "authorStatus": "verified",
+        "change": "unchanged",
+        "verdict": "rework",
+        "finding": "Lines 156-165: result.json is published via publishImmutableProof (settlement.mjs:434), not publishMutableProjection, and the sentence that unsupported filesystem guarantees refuse mutation with a named diagnostic has no code (run-lock.mjs publish only rethrows non-EEXIST link errors) nor any doctor probe (no match in src/setup). H1 holder identity (buildRunControlHolder run-lock.mjs:51, resolveHolderLiveness decision table in process-identity.mjs:70-90) is described correctly."
+      },
+      {
+        "section": "architecture/runtime-recovery-design.md#9-implementation-slices-and-gates",
+        "lines": "219-231",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "S2 row (line 225) is marked Implemented adapter scope while its scope lists handle guard, pending-control reconciliation and material capture; git grep finds zero hits for RunHandle or RecoveryMaterial and no pending-control code, only herdr launch reconciliation (herdr-reconcile.mjs) exists. S0/S1/S3/S4/S5 rows are consistent (run-lock.mjs, recovery.mjs, recover.mjs, commit 2180b4e72 exists)."
+      },
+      {
+        "section": "contracts/assignment-run-runresult.md#dispatch-operability-addendum",
+        "lines": "249-279",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "mostly true (agent-result-claim v2 at agent-result-claim-contract.mjs:5, legacy-derived and contract-corrupt provenance, reconciliation negations match fgos dispatch --help, test and archive record exist) BUT line 263 says new results are v2 while normalizeRunResult defaults contractVersion to 3 and v4 is also written (run-result.mjs:13-16,350,562)"
+      },
+      {
+        "section": "decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#decision",
+        "lines": "33-71",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "item 4 lists role and budget as optional inline fields, but execution-contract.mjs:345 requires a non-empty contract.role and lines 371-380 require contract.budget with positive timeoutMs and maxRuns"
+      },
+      {
+        "section": "proposals/dispatch-control-plane-redesign.md#62-selector",
+        "lines": "183-201",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Lines 197-198 say both decide --for and execute --for use capability-aware resolution, but cli.mjs:1081-1093 refuses execute --for outright (message: execute --for is no longer supported); lines 199-200 say the primary Rust-host request door uses bind(), yet bind() is only called from execution/run.mjs:404, assignment-runner.mjs and setup, with no Rust caller. Selector list itself (plan.mjs:80-93) is correct."
+      },
+      {
+        "section": "proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan",
+        "lines": "252-309",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Example at lines 300 and 302 uses minTier, a retired field that assignment-policy.mjs now rejects with a removed error and registrations.mjs:657-658 reports as a dead key (rigor replaced it); table row 289 says constraints are unioned but assignment-policy.mjs:459-462 spreads opPolicy.constraints over the base (override); row 291 says broader fallbacks are appended but assignment-policy.mjs:380-388 keeps only the most specific fallbackExecutors and marks them reserved-not-executed. Line 307 (no execution wrapper) is correct."
+      },
+      {
+        "section": "proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow",
+        "lines": "310-337",
+        "authorStatus": "open",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Label paragraph is accurate (.fgos/config.json declares exactly the ten listed executors; fgos-coding-implement prefers gemini with invocation agy-herdr-mucdong; pi and agy-cli are not registered), but lines 313-314 still instruct readers to use the table as defaults for the first proof, contradicting the preceding statement that these are historical and not current config defaults."
+      },
+      {
+        "section": "architecture/group-thinking-trigger-surface.md#surface-taxonomy",
+        "lines": "70-84",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "table rows match SKILL.md:45-59 and presets.mjs (rfc reviewed with red-team, consult solo advisor, research-fan-out panel of 3) BUT the claim that SKILL.md:36-59 consumes this map is wrong: SKILL.md:37 links ../../../docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md, a legacy copy whose taxonomy still lists core.coordination-protocol ids"
+      },
+      {
+        "section": "architecture/protocol-model.md#compatibility",
+        "lines": "103-113",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "BUT line 105 says TaskSpec/skill projections derive from normalized step.operations: taskSpecForStep does use the primary operation (src/workflow/steps.mjs:57-62) while skillForStep reads step.skill directly (steps.mjs:50-52), so a step with operations and no step.skill yields null"
+      },
+      {
+        "section": "architecture/protocol-model.md#domain-augmentation",
+        "lines": "118-125",
+        "authorStatus": "verified",
+        "change": "unchanged",
+        "verdict": "rework",
+        "finding": "line 121 lists declared protocols as something domains may add, which conflicts with line 28 and the retired CoordinationProtocol (no declared-protocol mechanism in src; only Workflows and a domain harness exist under domains/coding/harness)"
+      },
+      {
+        "section": "proposals/team-communication-protocol-v1.md#7-agent-result-schema",
+        "lines": "171-208",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "section 7 minimal schema and field table are partly not true now: no-evidence requires only a non-empty summary in agent-result-claim-contract.mjs CLAIM_FIELD_RULES (no reason field), and nextRecommendedOperation appears nowhere in src, packages, apps, bin, core or domains"
+      },
+      {
+        "section": "proposals/team-communication-protocol-v1.md#8-runresult-confidence",
+        "lines": "209-225",
+        "authorStatus": "verified",
+        "change": "unchanged",
+        "verdict": "rework",
+        "finding": "ladder oversimplifies run-result.mjs:1260-1274: a blocked claim yields confidence reported with no worker report, and a failed claim with findings verdict plus report yields reported, contradicting the reported and failed rows"
+      },
+      {
+        "section": "vocabulary/canonical-concepts.md#stance",
+        "lines": "172-175",
+        "authorStatus": "open",
+        "change": "unchanged",
+        "verdict": "rework",
+        "finding": "Stale: the text says Stance is only cognitive vocabulary and the open reason says unimplemented, but a passive stance measurement now ships: role-tasks.mjs:61-70 asks panelists for stance choice/confidence, unit-summary.mjs:17 extractStance validates it, run.mjs:140 and :220 carry stanceOptions (also docs/specs/runner.md and observe.md). The section should say that panel-seat stance measurement is implemented and only a session-state or routing identity is not."
+      },
+      {
+        "section": "playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd",
+        "lines": "705-769",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Heading line says optional manual trace, but the body (lines 710-722) still says this is the fourth and last layer of the Dialogue Turn Protocol, that crash recovery is supposed to make an unanswered turn impossible, and that a missing response file is not complete; that retired-engine protocol and crash-recovery obligation read as current while the text also disclaims any such guarantee."
+      },
+      {
+        "section": "playbooks/architecture-advisory-evaluation-rubric.md#what-this-rubric-deliberately-does-not-measure",
+        "lines": "391-405",
+        "authorStatus": "verified",
+        "change": "unchanged",
+        "verdict": "rework",
+        "finding": "Line 400-404 says If a future productized panel conforms to its protocol, but the productized panel already exists: core/workflows/architecture-advisory.yaml and core/skills/fgos-architecture-panel/SKILL.md are registered and shipped, so a shipped capability is presented as future and the claim that this manual playbook is the thing to beat is stale."
+      },
+      {
+        "section": "playbooks/architecture-advisory-role-doctrine.md#how-to-read-this",
+        "lines": "31-68",
+        "authorStatus": "verified",
+        "change": "changed",
+        "verdict": "rework",
+        "finding": "Line 57-61 says the worked examples use two real cases including the mdview desktop-shell question, but the document contains no mdview example at all (git grep mdview hits only line 58, an inline plan path whose file is absent) and every example is the vnflow case; line 58 also leaks the raw metadata phrase Added in candidate into body prose. Links at 63-67 resolve and the cognitive-reference framing matches core/skills/fgos-architecture-panel/SKILL.md:135-142."
+      }
+    ],
+    "nonOkRows": [
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_ebe7d2366429303cb74938b60f5cf2fb",
+        "verdict": "rework",
+        "note": "LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds.",
+        "sourceUnitDigest": "abd895bacd7a5e70bd5915ba5a6dfb5843929fc64919d3b0290513a273641029",
+        "targetUnitDigest": "936384760192ad0bb548e44624257be5730af75c5f99dac34092936a2c7e15a6"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_901dae1b8039d130359712125f4d69f9",
+        "verdict": "rework",
+        "note": "LEG:architecture/executor-health-and-fallback.md#2-production-ladder-semantics -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (supersede): Section 2 line 72 asserts blocked means do not retry, but herdr-round.mjs:344-357 routes blocked to worker-timeout which the matrix retries; the rest of section 2 (15s probe liveness.mjs:267-299, provider-limit, keep-always) is accurate.",
+        "sourceUnitDigest": "dbaf1434220173d1544ccc02f9daa13ca9f87453ace7ad899ef0b8167d758b97",
+        "targetUnitDigest": "13a34e347ffeaf306e0481a1779cf9ac7a1e951838181f264f4711bf3a011fbf"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_37887f05ca0822cd7c415eaadda42c55",
+        "verdict": "rework",
+        "note": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-32 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit unheaded-block-32 -> 7-agent-result-schema (171-171): target table at lines 199-204 says no-evidence requires a reason, but validateAgentResultClaimContract requires only status and summary for no-evidence (agent-result-claim-contract.mjs CLAIM_FIELD_RULES)",
+        "sourceUnitDigest": "fd36ed4ee645f1e8a36bd3a20ac076a9c70d7bc1c89c2b3488edcb551816a21b",
+        "targetUnitDigest": "cc384c0ca5ea5d6c462ac8e0d293f6c86fe85edec2ddc57c190b848233b6eb7d"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_3d5dc31cf6cf90ba661de6bb1fafb486",
+        "verdict": "rework",
+        "note": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-33 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit unheaded-block-33 -> 7-agent-result-schema (171-171): nextRecommendedOperation is described as an accepted optional field but is not read or validated anywhere in src, so the sentence presents an unimplemented field without a proposed label",
+        "sourceUnitDigest": "546c59ef10ff886d2fd256b488c6193c117c59d5e82632dbb8c14b30cd072efc",
+        "targetUnitDigest": "cc384c0ca5ea5d6c462ac8e0d293f6c86fe85edec2ddc57c190b848233b6eb7d"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_f5567f4d0486c29fd719218e8a37d4ad",
+        "verdict": "rework",
+        "note": "LEG:architecture/dispatch-control-plane.md#unheaded-block-8 -> architecture/dispatch-control-plane.md#routing-identities (supersede): Old identity block listing prefer/overrides then executors.<id>.for[]: overrides now correctly replaced by rigor, but the target still lists for[] as a resolution step (lines 81-83), false per resolve.mjs:255-266.",
+        "sourceUnitDigest": "58d62d1e2fb7ced0af3003179e67762eda8bb0b99d37ed17185eb92dafb80d52",
+        "targetUnitDigest": "936384760192ad0bb548e44624257be5730af75c5f99dac34092936a2c7e15a6"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_d277029b4e3a80bc6eb3c33a7990b182",
+        "verdict": "rework",
+        "note": "LEG:architecture/dispatch-control-plane.md#unheaded-block-29 -> architecture/dispatch-control-plane.md#component-internal-ownership (supersede): Authority list: item 2 claims resolveExecutorAndOverrides resolves aliases and executor for[] (lines 270-271), false per resolve.mjs:269-310; normalizer correctly relabelled design.",
+        "sourceUnitDigest": "95a2b7c5b5d00e917f2c042d1d49d3829b707933cfea28a3d65f1887744d1c08",
+        "targetUnitDigest": "e751c9d2cb4766bcab9a724d8cda92e802320d8f62e152f84c5c80c90e20b647"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_f35f68bb3feae40702d02c97d02cea0b",
+        "verdict": "rework",
+        "note": "LEG:architecture/executor-health-and-fallback.md#unheaded-block-7 -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (supersede): The five-step ladder list keeps step 2 blocked-beats-timeout do not retry, which is contradicted since herdr-round.mjs:344-357 maps blocked to retryable worker-timeout; steps 1,3,4,5 match evaluateLadder.",
+        "sourceUnitDigest": "3cf3dc60ee31fd5df6ab2864b92ed1f3bdc96982df814f65c4afb545b4458957",
+        "targetUnitDigest": "13a34e347ffeaf306e0481a1779cf9ac7a1e951838181f264f4711bf3a011fbf"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_9e039b5f6acdd3eb0fa002d35c2a3f54",
+        "verdict": "rework",
+        "note": "LEG:architecture/protocol-model.md#unheaded-block-15 -> architecture/protocol-model.md#compatibility (supersede): old rule that the compatibility path stays mandatory for Work-attached workflows, target lines 103-103: the target sentence on skill projection is wrong because skillForStep reads step.skill not step.operations (src/workflow/steps.mjs:50-52), and the mandatory/non-weakening obligation is not restated",
+        "sourceUnitDigest": "4173ec263ab82dbec1cc0138083b9a13debc8821030f94a08e26c81680068e0c",
+        "targetUnitDigest": "1b89b19b51b485611faa935b1738c3ca47a6d964b6a85e14a840af354aa21186"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_66366a2de3e810733eaaf6905e57628b",
+        "verdict": "rework",
+        "note": "LEG:contracts/assignment-run-runresult.md#unheaded-block-34 -> contracts/assignment-run-runresult.md#unheaded-block-38 (move): bullet list for the addendum (target lines 256-268): the bullet at line 263 says new results are v2, but normalizeRunResult defaults contractVersion=3 and also writes v4 (run-result.mjs:350,562-563); the RunObservation (runtime-inspection.mjs:230), claim v2 and legacy-derived bullets are true",
+        "sourceUnitDigest": "98815955352ea016dd5a0d03b1302502496a4fec5202fe95e2f7b126e1cc007f",
+        "targetUnitDigest": "98815955352ea016dd5a0d03b1302502496a4fec5202fe95e2f7b126e1cc007f"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_d6d08257977c9db1a12719246f739678",
+        "verdict": "rework",
+        "note": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-43 -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): Replacement text at lines 197-198 says execute --for uses capability-aware compiled resolution, but cli.mjs:1081-1093 rejects execute --for (\"no longer supported\"); also line 199-200 attributes bind() to a Rust-host door while bind() is called from execution/run.mjs:404 and assignment-runner.mjs.",
+        "sourceUnitDigest": "7f4a913cd40a582883a10dce9a4fcab6023b655dd4ab28fc88a4ae43d0c0f717",
+        "targetUnitDigest": "62838e353ba0cccdcf65a813f6037ce5124b3e64134bfcc80efb2eaedb05ff5b"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_f42a735dabf1e5292e44aec3a483fd4d",
+        "verdict": "rework",
+        "note": "LEG:proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan -> proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan (supersede): Section 7.2 still has the retired minTier in its example (lines 300, 302; assignment-policy.mjs rejects minTier as removed), a constraints-union rule that code does not implement (assignment-policy.mjs:459-462 override spread) and a fallback-append rule contradicted by assignment-policy.mjs:380-388 (reserved-not-executed).",
+        "sourceUnitDigest": "487d6dc9830b4078de9fcf7e7f1ce51780128d71b448e9e6da14721302c36222",
+        "targetUnitDigest": "3c4b3f4f7f95c486eef5e068da5b2273a45e6976e84bbafea9a0bd06da63418e"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_4977752b5d7eef0cea02a91c090a39ae",
+        "verdict": "rework",
+        "note": "LEG:proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (supersede): Section 7.3 target pairs a correct historical/current-config label with line 313-314 directing readers to use the table as defaults, which contradicts the label and points at pi and agy-cli executors that are not registered in .fgos/config.json.",
+        "sourceUnitDigest": "62560b47d9fa2b2476a7fa7e720d96e46041d6fe047e76c8bb14ca498a5f9487",
+        "targetUnitDigest": "748d10ac43feb647b76517d9c6017e43b85c0ec559cb07aaea1a09e4184455b5"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_432d7c4b1684e3d11aade76846dc2193",
+        "verdict": "rework",
+        "note": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-66 -> proposals/dispatch-control-plane-redesign.md#unheaded-block-67 (move): Line 313-314 (use these as defaults for the first team-dispatch proof) conflicts with the sentence above it that calls the recommendations historical and not current config defaults; executors pi and agy-cli are not in runner.executors.",
+        "sourceUnitDigest": "74d1a79c159657dabd64e7bc2d04c0737ede2b74bbf3c1a4dcea0053f6b8b3c6",
+        "targetUnitDigest": "74d1a79c159657dabd64e7bc2d04c0737ede2b74bbf3c1a4dcea0053f6b8b3c6"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_9d058e29fa247f69fb897aab37ce1724",
+        "verdict": "rework",
+        "note": "LEG:playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd -> playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd (supersede): Target 12-dialogue-response-dialogue-responsemd (line 705) still carries the retired fourth-layer Dialogue Turn Protocol and crash-recovery obligation as if live while the same section says optional manual; old claim is neither retired cleanly nor kept as a live obligation.",
+        "sourceUnitDigest": "872a5764bbcf39ed147afbb87f57b44eb6c2f14e58f7e4a11610a242c319baee",
+        "targetUnitDigest": "9b5e64c0abf4fe1da9a7d2281d4f86b626987f1120df35dcff1918cb8a1f5a58"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_6ce1d10cc50a8bd04bd82b4b65486125",
+        "verdict": "rework",
+        "note": "LEG:proposals/team-communication-protocol-v1.md#7-agent-result-schema -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit 7-agent-result-schema -> 7-agent-result-schema (171-171): whole section 7 target contains the unlabeled nextRecommendedOperation field and the false no-evidence reason requirement, and omits the v2 contract id and the assessment.verdict rule for reviewer roles",
+        "sourceUnitDigest": "b62841ac251963f3384c9cb2db74e6c3df5579d39869c29fe4a96fa25b5dd47a",
+        "targetUnitDigest": "cc384c0ca5ea5d6c462ac8e0d293f6c86fe85edec2ddc57c190b848233b6eb7d"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_d6db58a3090422d42154f240f54c9f5a",
+        "verdict": "hold",
+        "note": "LEG:vocabulary/concept-relationships.md#coordination-rings -> vocabulary/concept-relationships.md#coordination-rings (supersede): Held owner decision on ring naming: the target text at coordination-rings is true now (no Orchestrator/Launcher/Router entity exists in src and the text calls them a responsibility model). Decision stays held.",
+        "sourceUnitDigest": "631c2b459e76ccb130e41afdc78c2fc296b342d641450632df8e33baeac22459",
+        "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+        "verdict": "hold",
+        "note": "LEG:vocabulary/concept-relationships.md#unheaded-block-13 -> vocabulary/concept-relationships.md#coordination-rings (supersede): Held owner decision on ring naming: the target text at coordination-rings is true now (no Orchestrator/Launcher/Router entity exists in src and the text calls them a responsibility model). Decision stays held.",
+        "sourceUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
+        "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823"
+      },
+      {
+        "report": "review-2-truth-files.md",
+        "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+        "verdict": "hold",
+        "note": "LEG:vocabulary/concept-relationships.md#unheaded-block-14 -> vocabulary/concept-relationships.md#coordination-rings (supersede): Held owner decision on ring naming: the target text at coordination-rings is true now (no Orchestrator/Launcher/Router entity exists in src and the text calls them a responsibility model). Decision stays held.",
+        "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+        "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
+        "verdict": "rework",
+        "note": "[new successor] architecture/protocol-model.md#unheaded-block-15 -> architecture/protocol-model.md#compatibility (supersede): retired-unit successor now at compatibility (lines 103-103): that anchor still carries the inaccurate statement that skill compatibility projection derives from step.operations while skillForStep reads step.skill (src/workflow/steps.mjs:50-52)",
+        "sourceUnitDigest": "4173ec263ab82dbec1cc0138083b9a13debc8821030f94a08e26c81680068e0c",
+        "targetUnitDigest": "1b89b19b51b485611faa935b1738c3ca47a6d964b6a85e14a840af354aa21186"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_1f29a0c78fd1c3b7572bd0327faeea7f",
+        "verdict": "rework",
+        "note": "[new successor] proposals/dispatch-control-plane-redesign.md#unheaded-block-42 -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): Successor unheaded-block-42 to 62-selector (183-183): section 6.2 lines 197-200 claim execute --for is capability-aware (cli.mjs:1081-1093 refuses it) and attribute bind() to a Rust-host door (bind is Node run.mjs:404).",
+        "sourceUnitDigest": "4bd5619af16c5af92c73c6d5a88ff22c8b1dfdde3298ba450703e150d2b83d7f",
+        "targetUnitDigest": "62838e353ba0cccdcf65a813f6037ce5124b3e64134bfcc80efb2eaedb05ff5b"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_df2c20fabb1be2139694a4220887c87f",
+        "verdict": "rework",
+        "note": "[new successor] proposals/dispatch-control-plane-redesign.md#unheaded-block-44 -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): Successor unheaded-block-44 to 62-selector (183-183): section 6.2 lines 197-200 claim execute --for is capability-aware (cli.mjs:1081-1093 refuses it) and attribute bind() to a Rust-host door (bind is Node run.mjs:404).",
+        "sourceUnitDigest": "7f4a913cd40a582883a10dce9a4fcab6023b655dd4ab28fc88a4ae43d0c0f717",
+        "targetUnitDigest": "62838e353ba0cccdcf65a813f6037ce5124b3e64134bfcc80efb2eaedb05ff5b"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_d1ce767a2e3239b22d2e9fc6649dd9a5",
+        "verdict": "rework",
+        "note": "[changed older binding] architecture/dispatch-control-plane.md#unheaded-block-8 -> architecture/dispatch-control-plane.md#routing-identities (move): Old routing-identities block unheaded-block-8 moves to anchor routing-identities, whose code block at lines 81-83 keeps executors.<id>.for[] as a resolution step contradicted by resolve.mjs:255-266.",
+        "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+        "targetUnitDigest": "936384760192ad0bb548e44624257be5730af75c5f99dac34092936a2c7e15a6"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_2ff575998d2ae90d5ecc1a2d414d078d",
+        "verdict": "rework",
+        "note": "[changed older binding] architecture/executor-health-and-fallback.md#2-production-ladder-semantics -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (move): Moved to section 2 anchor whose line 72 do not retry on blocked is contradicted by herdr-round.mjs:344-357; other ladder content is true.",
+        "sourceUnitDigest": "dbaf1434220173d1544ccc02f9daa13ca9f87453ace7ad899ef0b8167d758b97",
+        "targetUnitDigest": "13a34e347ffeaf306e0481a1779cf9ac7a1e951838181f264f4711bf3a011fbf"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_d283a70392cc071ee19d103f77228841",
+        "verdict": "rework",
+        "note": "[changed older binding] architecture/executor-health-and-fallback.md#unheaded-block-6 -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (move): Ladder items moved to section 2 anchor, which keeps the blocked do not retry claim contradicted by herdr-round.mjs:344-357.",
+        "sourceUnitDigest": "3cf3dc60ee31fd5df6ab2864b92ed1f3bdc96982df814f65c4afb545b4458957",
+        "targetUnitDigest": "13a34e347ffeaf306e0481a1779cf9ac7a1e951838181f264f4711bf3a011fbf"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_0a52ec5fcc2abb5870b350b23451da43",
+        "verdict": "rework",
+        "note": "[changed older binding] architecture/protocol-model.md#unheaded-block-14 -> architecture/protocol-model.md#compatibility (move): retired-unit successor now at compatibility (lines 103-103): that anchor still carries the inaccurate statement that skill compatibility projection derives from step.operations while skillForStep reads step.skill (src/workflow/steps.mjs:50-52)",
+        "sourceUnitDigest": "4173ec263ab82dbec1cc0138083b9a13debc8821030f94a08e26c81680068e0c",
+        "targetUnitDigest": "1b89b19b51b485611faa935b1738c3ca47a6d964b6a85e14a840af354aa21186"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_e415506235b575bc5eb32b225a758f5b",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#62-selector -> proposals/dispatch-control-plane-redesign.md#62-selector (move): Successor 62-selector to 62-selector (183-183): section 6.2 lines 197-200 claim execute --for is capability-aware (cli.mjs:1081-1093 refuses it) and attribute bind() to a Rust-host door (bind is Node run.mjs:404).",
+        "sourceUnitDigest": "29ff28ddd20131ed5005890937b9ad9fa2928b73bd2ff3d818e09f2515f6cda1",
+        "targetUnitDigest": "62838e353ba0cccdcf65a813f6037ce5124b3e64134bfcc80efb2eaedb05ff5b"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_d245d70ae94106a208d95b6bfa6b6152",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan -> proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan (move): Successor 72-policy-resolution-before-dispatchplan to 72-policy-resolution-before-dispatchplan (252-252): section 7.2 uses retired minTier (lines 300, 302), unioned constraints (assignment-policy.mjs:459-462 overrides) and appended fallbacks (assignment-policy.mjs:380-388 reserved-not-executed).",
+        "sourceUnitDigest": "487d6dc9830b4078de9fcf7e7f1ce51780128d71b448e9e6da14721302c36222",
+        "targetUnitDigest": "3c4b3f4f7f95c486eef5e068da5b2273a45e6976e84bbafea9a0bd06da63418e"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_f0b558c805f1b274d2df72fb6083acfb",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (move): Successor 73-recommended-v1-provider-policy-for-coding-feature-flow to 73-recommended-v1-provider-policy-for-coding-feature-flow (310-310): section 7.3 lines 313-314 tell readers to use the historical table as defaults, contradicting its own historical label (pi and agy-cli are not registered executors).",
+        "sourceUnitDigest": "62560b47d9fa2b2476a7fa7e720d96e46041d6fe047e76c8bb14ca498a5f9487",
+        "targetUnitDigest": "748d10ac43feb647b76517d9c6017e43b85c0ec559cb07aaea1a09e4184455b5"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_e95c422ac5e33683c4e657f55a540496",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-40 -> proposals/dispatch-control-plane-redesign.md#62-selector (move): Successor unheaded-block-40 to 62-selector (183-183): section 6.2 lines 197-200 claim execute --for is capability-aware (cli.mjs:1081-1093 refuses it) and attribute bind() to a Rust-host door (bind is Node run.mjs:404).",
+        "sourceUnitDigest": "4bd5619af16c5af92c73c6d5a88ff22c8b1dfdde3298ba450703e150d2b83d7f",
+        "targetUnitDigest": "62838e353ba0cccdcf65a813f6037ce5124b3e64134bfcc80efb2eaedb05ff5b"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_ab8a87d8a586e83cc0df72070e1c438f",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-42 -> proposals/dispatch-control-plane-redesign.md#62-selector (move): Successor unheaded-block-42 to 62-selector (183-183): section 6.2 lines 197-200 claim execute --for is capability-aware (cli.mjs:1081-1093 refuses it) and attribute bind() to a Rust-host door (bind is Node run.mjs:404).",
+        "sourceUnitDigest": "7f4a913cd40a582883a10dce9a4fcab6023b655dd4ab28fc88a4ae43d0c0f717",
+        "targetUnitDigest": "62838e353ba0cccdcf65a813f6037ce5124b3e64134bfcc80efb2eaedb05ff5b"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_29768201e6d5a5c215e3a7e4a25873c3",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-64 -> proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan (move): Successor unheaded-block-64 to 72-policy-resolution-before-dispatchplan (252-252): section 7.2 uses retired minTier (lines 300, 302), unioned constraints (assignment-policy.mjs:459-462 overrides) and appended fallbacks (assignment-policy.mjs:380-388 reserved-not-executed).",
+        "sourceUnitDigest": "9ef8c86adc6b48a1b019c1597695d4ec0f546ae79f52d4f819025bac1bcd464c",
+        "targetUnitDigest": "3c4b3f4f7f95c486eef5e068da5b2273a45e6976e84bbafea9a0bd06da63418e"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_3bffcfe4496d0fec611c2d4cdfbf9149",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-66 -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (move): Successor unheaded-block-66 to 73-recommended-v1-provider-policy-for-coding-feature-flow (310-310): section 7.3 lines 313-314 tell readers to use the historical table as defaults, contradicting its own historical label (pi and agy-cli are not registered executors).",
+        "sourceUnitDigest": "2412915baaeaf954feeedcf5626584850738338e31925686869b456a495cf773",
+        "targetUnitDigest": "748d10ac43feb647b76517d9c6017e43b85c0ec559cb07aaea1a09e4184455b5"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_f07d01d9479baf2c23835b14f4038768",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/dispatch-control-plane-redesign.md#unheaded-block-67 -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (move): Successor unheaded-block-67 to 73-recommended-v1-provider-policy-for-coding-feature-flow (310-310): section 7.3 lines 313-314 tell readers to use the historical table as defaults, contradicting its own historical label (pi and agy-cli are not registered executors).",
+        "sourceUnitDigest": "5bf2f51a1882af2dbf452174845056de8d783ab64fa05f66a1511bd59eedb8d2",
+        "targetUnitDigest": "748d10ac43feb647b76517d9c6017e43b85c0ec559cb07aaea1a09e4184455b5"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_15cac2a9bbfbbffc9af1c2dc16b5415a",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/team-communication-protocol-v1.md#7-agent-result-schema -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (move): identity 7-agent-result-schema moved to 7-agent-result-schema: target anchor carries defective text: section 7 minimal schema and field table are partly not true now: no-evidence requires only a non-empty summary in agent-result-claim-contract.mjs CLAIM_FIELD_RULES (no reason field), and nextRecommendedOperation appears nowhere in src, packages, apps, bin, core or domains",
+        "sourceUnitDigest": "b62841ac251963f3384c9cb2db74e6c3df5579d39869c29fe4a96fa25b5dd47a",
+        "targetUnitDigest": "cc384c0ca5ea5d6c462ac8e0d293f6c86fe85edec2ddc57c190b848233b6eb7d"
+      },
+      {
+        "report": "review-2-truth-retired-unit.md",
+        "claimId": "claim_742532532aa9e696db78cb285b8b2178",
+        "verdict": "rework",
+        "note": "[changed older binding] proposals/team-communication-protocol-v1.md#unheaded-block-32 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (move): identity unheaded-block-32 moved to 7-agent-result-schema: target anchor carries defective text: section 7 minimal schema and field table are partly not true now: no-evidence requires only a non-empty summary in agent-result-claim-contract.mjs CLAIM_FIELD_RULES (no reason field), and nextRecommendedOperation appears nowhere in src, packages, apps, bin, core or domains",
+        "sourceUnitDigest": "546c59ef10ff886d2fd256b488c6193c117c59d5e82632dbb8c14b30cd072efc",
+        "targetUnitDigest": "cc384c0ca5ea5d6c462ac8e0d293f6c86fe85edec2ddc57c190b848233b6eb7d"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_2aa3c23733d8b93963a053ffb0fe88e9",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "cb70c5ea6aa4b0222605a7f844a026119f2d9b8a1ea8729b8685a8ba40f5aff7",
+        "shownTextDigest": "cb70c5ea6aa4b0222605a7f844a026119f2d9b8a1ea8729b8685a8ba40f5aff7",
+        "note": "architecture/dispatch-control-plane.md#unheaded-block-10: unheaded-block-10 lines 80-86: Lines 81-83 route capability resolution through runner.executors.<id>.for[] but resolveExecutorAndOverrides (resolve.mjs:255-266) states an executor's own for never binds a purpose and only capabilities.<name>.prefer does; for[] is read only by resolveCapabilityDetailsFromHints (resolve.mjs:53) to infer a capability label.",
+        "evidenceDigest": "7a9d28ae51f79eed0b4699ba5a3a5041298b128a63d71a300575795626552943"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_682a5f07ad5939ff2de7ff33df5c4d0d",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "98ffff070253b6cfa0afa529a0285dbc80a4f73d5345dd45ecdfff64a3c78438",
+        "shownTextDigest": "98ffff070253b6cfa0afa529a0285dbc80a4f73d5345dd45ecdfff64a3c78438",
+        "note": "architecture/dispatch-control-plane.md#unheaded-block-29: unheaded-block-29 lines 268-287: Item 2 (line 270-271) says resolveExecutorAndOverrides resolves capability aliases and executor for[] declarations, but that function binds only executor-id, default executor and capabilities.<name>.prefer (resolve.mjs:269-310); alias handling and for[] live in resolveCapabilityDetailsFromHints (resolve.mjs:25-66).",
+        "evidenceDigest": "de25c13bf77200e59777b74dbe6b99c40c4a108591ca7de478c593e1fbb58b2b"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_ed1015c8067fc73022c6207480b7be6c",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "7fac0911191e61aa1de7f9035cf1e6d3f46ea18b19c000ba11235d0e80143958",
+        "shownTextDigest": "7fac0911191e61aa1de7f9035cf1e6d3f46ea18b19c000ba11235d0e80143958",
+        "note": "architecture/evidence-and-results.md#unheaded-block-9: receipt unheaded-block-9 (60-66): line 63 says structured claims carrying another Run identity are rejected, but run-result.mjs:155 and 297 reject a RunResult record whose runId differs from expectedRunId; the worker claim validator has no runId check at all",
+        "evidenceDigest": "a5989b4755305b71943244aa9c97f91409c4163c52c2f23c95139053503a28d7"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_c38d4d6fc5810bbfaa8c4a72237f4ad6",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "e1c71871064c05c1c8472389d8d03834c5f740bfe7fb64b34ccd36fea4155ff8",
+        "shownTextDigest": "e1c71871064c05c1c8472389d8d03834c5f740bfe7fb64b34ccd36fea4155ff8",
+        "note": "architecture/executor-health-and-fallback.md#unheaded-block-8: Ladder list lines 70-78: steps 1,3,4,5 match evaluateLadder (death threshold 3, ceiling after death, 15s credential probe at liveness.mjs:267-299) but step 2 do not retry for blocked contradicts herdr-round.mjs:344-357 where blocked maps to retryable worker-timeout.",
+        "evidenceDigest": "4a2993ab9305a00ee37fa7c57fbcba8b70e21c78954f668310f826bf9b87cbd4"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_9f33a05cb18260b107f84fedb23e43e6",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "daef2cb7424495812522edf72920c8dbcff6a7b72cc78c8f16e49e3d53765a86",
+        "shownTextDigest": "daef2cb7424495812522edf72920c8dbcff6a7b72cc78c8f16e49e3d53765a86",
+        "note": "architecture/group-thinking-trigger-surface.md#unheaded-block-8: unit unheaded-block-8 (line 72-72): says the map is consumed by core/skills/fgos-panel/SKILL.md:36-59 but that skill links the legacy docs/architect copy at SKILL.md:37, whose taxonomy still names core.coordination-protocol ids",
+        "evidenceDigest": "18023b8fcb1191c25ceeac54168d02d8b0e3fc403bc0927104d35d3a823699f2"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_67986b1f7f6936bd5f59616ff9673066",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "928772047c60c58593bc7fd56839a1ab742a0ab93503d7c4e7031f71602c5f2e",
+        "shownTextDigest": "928772047c60c58593bc7fd56839a1ab742a0ab93503d7c4e7031f71602c5f2e",
+        "note": "architecture/protocol-model.md#unheaded-block-14: unit unheaded-block-14 (lines 105-109): skill projection claim is wrong, skillForStep reads step.skill directly (src/workflow/steps.mjs:50-52) rather than normalized operations; taskSpecForStep is correct (:57-62)",
+        "evidenceDigest": "adbe60a620a0d5adb46cc6f46d8d0d204ac1c724019dcbe0bc2991f3ffb7239b"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_1f1b240d7141fa749fe2cc481a832166",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "e64fc342e262c8f477a4e806866bbe2625b2319fe431ac67019b7ea406437e90",
+        "shownTextDigest": "e64fc342e262c8f477a4e806866bbe2625b2319fe431ac67019b7ea406437e90",
+        "note": "architecture/runtime-recovery-design.md#unheaded-block-28: unheaded-block-28 lines 221-230: S2 row (line 225) is marked Implemented adapter scope while its scope lists handle guard, pending-control reconciliation and material capture; git grep finds zero hits for RunHandle or RecoveryMaterial and no pending-control code, only herdr launch reconciliation (herdr-reconcile.mjs) exists.",
+        "evidenceDigest": "a148caf341b17e79ffe26a83f9325c3a9d75774fcaba38e843929d792987cefe"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_f549746262cbe0bc8566ba7d02276a01",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "33d134be3c1fb4f84ec56603def1b351f3442816de8bc9ce835668cdd68808d3",
+        "shownTextDigest": "33d134be3c1fb4f84ec56603def1b351f3442816de8bc9ce835668cdd68808d3",
+        "note": "decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#unheaded-block-5: receipt unheaded-block-5 (35-65): item 4 lists role and budget as optional inline fields, but execution-contract.mjs:345 requires a non-empty contract.role and lines 371-380 require contract.budget with positive timeoutMs and maxRuns",
+        "evidenceDigest": "b82e7c4fdea6f4cbc4ce281c45db9f3a11fc2690cce45c226794d3a8796d8256"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_dda1473c66642b13b3d87ae99112bbe9",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "3f7c7be0a149c757b23f19e757c324f81594d2f02936ef8d57dce2d5bdcf48c1",
+        "shownTextDigest": "3f7c7be0a149c757b23f19e757c324f81594d2f02936ef8d57dce2d5bdcf48c1",
+        "note": "playbooks/architecture-advisory-role-doctrine.md#unheaded-block-8: Lines 57-61 claim worked examples use both the mdview and vnflow real cases, but the document has no mdview example (git grep mdview matches only line 58) and line 58 leaks raw metadata (Added in candidate) into prose; the plan path is absent, as admitted.",
+        "evidenceDigest": "f08e4c4512b09ba82a417b8ee9b132ac50249199da13fb1857caf85093251b61"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_234030992ffddc4c851737f160598406",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "96a438bc7f45cc776b604b5b67d80d9b04de7523ab6f106e4fc0a4e9cc345663",
+        "shownTextDigest": "96a438bc7f45cc776b604b5b67d80d9b04de7523ab6f106e4fc0a4e9cc345663",
+        "note": "proposals/dispatch-control-plane-redesign.md#unheaded-block-45: Lines 197-200: execute --for is claimed capability-aware but cli.mjs:1081-1093 refuses it; bind() attributed to a Rust-host door although it is a Node module called from execution/run.mjs:404.",
+        "evidenceDigest": "ea005e61a0becbab815bdaabf3474816d556d2b223eee7a32d25d96163ff0b54"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_69b011aac8a371496f54e1c681286bfd",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "eb3336c5f0bc349a94bf04af7437d8fd2eefcf6e62208fe4a904b90187900a96",
+        "shownTextDigest": "eb3336c5f0bc349a94bf04af7437d8fd2eefcf6e62208fe4a904b90187900a96",
+        "note": "proposals/team-communication-protocol-v1.md#unheaded-block-32: receipt unheaded-block-32 (199-204): section 7 minimal schema and field table are partly not true now: no-evidence requires only a non-empty summary in agent-result-claim-contract.mjs CLAIM_FIELD_RULES (no reason field), and nextRecommendedOperation appears nowhere in src, packages, apps, bin, core or domains",
+        "evidenceDigest": "94cb2d55a366dee7ae16285379c010e7df2ec9735ddc8e25cb51de0c983273f6"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_7f0c45d81af34cef52d8a3c35ed31aaf",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "97f4963c76cfe9265bb371a713c5eefcaec1e818a7e05cd37a9bc9e6c4ae1b13",
+        "shownTextDigest": "97f4963c76cfe9265bb371a713c5eefcaec1e818a7e05cd37a9bc9e6c4ae1b13",
+        "note": "proposals/team-communication-protocol-v1.md#unheaded-block-33: receipt unheaded-block-33 (206-207): section 7 minimal schema and field table are partly not true now: no-evidence requires only a non-empty summary in agent-result-claim-contract.mjs CLAIM_FIELD_RULES (no reason field), and nextRecommendedOperation appears nowhere in src, packages, apps, bin, core or domains",
+        "evidenceDigest": "94cb2d55a366dee7ae16285379c010e7df2ec9735ddc8e25cb51de0c983273f6"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_0b372cfd0ef95d2afd339badfe67ea0a",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "eec564a0981f8339be90e3ae7ff0cc2e8ce7c3ed33d2e8b4c72642c1daf8bb71",
+        "shownTextDigest": "7423490212b96760756a9c03649e719f78b4efbd4f15f73c5207cb7a47dd7b3f",
+        "note": "vocabulary/canonical-concepts.md#stance: Unit stance lines 172-172: Stale: the text says Stance is only cognitive vocabulary and the open reason says unimplemented, but a passive stance measurement now ships: role-tasks.mjs:61-70 asks panelists for stance choice/confidence, unit-summary.mjs:17 extractStance validates it, run.mjs:140 and :220 carry stanceOptions (als",
+        "evidenceDigest": "c272679b2b61cab73ca1e149789bd86ba2b0ef33e7a24f22ea62100e859fc2c0"
+      },
+      {
+        "report": "review-2-truth-classifications.md",
+        "claimId": "claim_0326d4bce87b812bde7a5c3c87f096c6",
+        "class": "candidate-native-content",
+        "verdict": "rework",
+        "unitDigest": "1547cbcc2ac57e4850a0b10a7b02ca557a14ab7ed6390890dd8d02ca8a051a2e",
+        "shownTextDigest": "1547cbcc2ac57e4850a0b10a7b02ca557a14ab7ed6390890dd8d02ca8a051a2e",
+        "note": "vocabulary/canonical-concepts.md#unheaded-block-26: Unit unheaded-block-26 lines 174-174: Stale: the text says Stance is only cognitive vocabulary and the open reason says unimplemented, but a passive stance measurement now ships: role-tasks.mjs:61-70 asks panelists for stance choice/confidence, unit-summary.mjs:17 extractStance validates it, run.mjs:140 and :220 carry stanceOptions (als",
+        "evidenceDigest": "c272679b2b61cab73ca1e149789bd86ba2b0ef33e7a24f22ea62100e859fc2c0"
+      }
+    ],
+    "carriage": "accepted and unchanged",
+    "toolGateBaselineVocabulary": "unchanged"
+  },
+  "legacySyncAccounting": [
+    {
+      "path": "docs/specs/runner.md",
+      "commits": [
+        "a528345592348c1ca4162dbed2e0753880c73fb9 feat(council): add per-seat reasoning postures",
+        "59cd766725c18df6e109e74878d744ca2605eecf docs(runner): align executor routing and advisory blind settings with the code",
+        "454d7a8df2bdf74b4fc29fa9785d776d659139b7 fix(workflow): record the Unit run id when it is created and resume that run after a controller death",
+        "89304dbae16a26b14ef1acce5363947ac32cec91 feat(dispatch): let the owner quarantine an exhausted provider account until a given time",
+        "ce880fbedde86152ca169b66fe7e58cd966e67dc fix(workflow): read the producer expertise field from a sibling packet file and either key spelling"
+      ],
+      "previousExpectedDigest": "7117cd188b4fe6994dc9940235985d960c702a48192dc1ec6e0f38d62b337f50",
+      "expectedDigest": "e8d602a5566aaa328007585aeec3a6845f3f3d8c23cde32aaec852b4f3b9b640",
+      "contentReview": "owed"
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "commits": [
+        "10c38b71c67dd8c1ef76951fb98324676dfa39c6 fix(dispatch): ask the herdr session a worker was launched in when recovering and reaping",
+        "a48548ca26839eff0c0f0087297c204f5ec46bd1 docs: describe per-process MCP approval for confined claude workers in the confinement spec",
+        "56c66b41e44ef7fa9b7740b3c1c5acf41e98b5ca fix(dispatch): escape control characters in hook trust keys and leave existing keys in any TOML form",
+        "a8b3ab38083904ba5249246a8191befbf1f0e4be docs: record codex hook trust seeding in the confinement spec and changelog"
+      ],
+      "previousExpectedDigest": "4ed5306dacc55cd475a032afdc2c8d0c0b00978be6d2b1f5c7fb10b0d7a545fe",
+      "expectedDigest": "1e783c81396a340096d46ee7887b837ef630f9e0aa7b2ca2ed8eebbb766cb84a",
+      "contentReview": "owed"
+    }
+  ],
+  "reportCounts": {
+    "review-2-truth-files.md": {
+      "total": 431,
+      "ok": 413,
+      "rework": 15,
+      "hold": 3
+    },
+    "review-2-truth-retired-unit.md": {
+      "total": 335,
+      "ok": 318,
+      "rework": 17,
+      "hold": 0
+    },
+    "review-2-truth-classifications.md": {
+      "total": 511,
+      "ok": 497,
+      "rework": 14,
+      "hold": 0
+    }
+  },
+  "refresh": {
+    "command": [
+      "node",
+      "scripts/generate-doc-inventory.mjs",
+      "--refresh",
+      "--commit",
+      "HEAD",
+      "--identity-registry",
+      "/tmp/phase06/review-identity-registry.json",
+      "--json-out",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--md-out",
+      "/tmp/phase06/review-doc-inventory.md"
+    ],
+    "exit": 0,
+    "output": "generate-doc-inventory: carried identity registry forward from 96a13ab21670e1f5d9748c02cd615ea5598b53f5 to a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2 (4377 documents, 85714 units); commit ../../../../tmp/phase06/review-identity-registry.json\ngenerate-doc-inventory: wrote ../../../../tmp/phase06/review-doc-inventory.json and ../../../../tmp/phase06/review-doc-inventory.md\n"
+  },
+  "retiredProjection": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import {loadShardedJsonArtifact,writeShardedJsonArtifact,sha256Buffer} from \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/doc-inventory-artifact.mjs\";const p=\"/tmp/phase06/review-identity-registry.json\";const r=loadShardedJsonArtifact(p);const rows=JSON.parse(fs.readFileSync(\"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json\",'utf8')).rows;const by=new Map(rows.map(row=>[row.claimId,row]));let projected=0;for(const item of r.retiredUnits){const row=by.get(item.claimId);if(row){Object.assign(item,row);projected++;}}fs.writeFileSync(p,JSON.stringify(r,null,2)+String.fromCharCode(10));const ip=\"/tmp/phase06/review-doc-inventory.json\";const inventory=loadShardedJsonArtifact(ip);const bytes=fs.readFileSync(p);inventory.identityRegistry.bytes=bytes.length;inventory.identityRegistry.sha256=sha256Buffer(bytes);writeShardedJsonArtifact(ip,inventory);console.log(JSON.stringify({projected,totalRetired:r.retiredUnits.length,unaccountedOwned:r.retiredUnits.filter(u=>[\"docs/platform/agent-coordination/architecture/system-context.md\",\"docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md\",\"docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md\",\"docs/platform/agent-coordination/history/documentation-migration/proposal-status.md\",\"docs/platform/agent-coordination/intent-preservation-ledger.md\",\"docs/platform/agent-coordination/proposals/semantic-cli-surface.md\",\"docs/platform/agent-coordination/spec.md\",\"docs/platform/agent-coordination/subcomponents/README.md\",\"docs/platform/agent-coordination/verification/implementation-alignment.md\",\"docs/platform/agent-coordination/README.md\"].includes(u.sourcePath)&&!u.disposition).length,registrySha256:inventory.identityRegistry.sha256,registryBytes:bytes.length}));\n"
+    ],
+    "exit": 0,
+    "output": "{\"projected\":3177,\"totalRetired\":3245,\"unaccountedOwned\":0,\"registrySha256\":\"b367bc61ec4d6cf154c207b467124805eafdfa033f84f3032d080a906fb9afd4\",\"registryBytes\":70457024}\n"
+  },
+  "syncFullD": {
+    "command": [
+      "node",
+      "scripts/check-doc-inventory-gates.mjs",
+      "--inventory",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--identity-registry",
+      "/tmp/phase06/review-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--previous-registry",
+      "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+      "--json"
+    ],
+    "exit": 1,
+    "fatalFindings": [
+      {
+        "type": "retired-row-disposition-missing",
+        "path": "docs/specs/confinement-authority.md",
+        "message": "docs/specs/confinement-authority.md: retired claim claim_ac8c8092219e244b8a9001337c1d8310 (unheaded-block-139) has no vocabulary disposition, so its removal is not recorded"
+      }
+    ],
+    "conservationOpen": [
+      {
+        "type": "files-unknown-blocking",
+        "message": "inventory files whose file-level disposition is unknown-blocking",
+        "count": 1168,
+        "examples": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "docs/architect/architecture-intent.md",
+          "docs/architect/component-boundary/component-boundary-advisory.md",
+          "docs/architect/component-boundary/README.md"
+        ]
+      },
+      {
+        "type": "claims-unknown-blocking",
+        "message": "claim rows whose disposition is unknown-blocking",
+        "count": 22227,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 23032,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "claims-without-own-rationale",
+        "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+        "count": 22227,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "identical-units-multiple-owners",
+        "message": "identical source units whose rows name different target owners",
+        "count": 343,
+        "examples": [
+          "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+          "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+          "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 597,
+        "examples": [
+          "AGENTS.md#unheaded-block-12",
+          "AGENTS.md#unheaded-block-13",
+          "AGENTS.md#unheaded-block-20",
+          "AGENTS.md#unheaded-block-4",
+          "AGENTS.md#unheaded-block-4"
+        ]
+      },
+      {
+        "type": "dropped-claims-unreviewed",
+        "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+        "count": 17,
+        "examples": [
+          "dropped-001",
+          "dropped-002",
+          "dropped-003",
+          "dropped-004",
+          "dropped-005"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 2235,
+        "examples": [
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+        ]
+      }
+    ]
+  },
+  "mainSideRetiredSuccessors": [
+    {
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "unitDigest": "6c423bb840992daf8f370543fa7a56c7b16c932385268752cc4b81acf0a46fed",
+      "identityFingerprint": "6c423bb840992daf8f370543fa7a56c7b16c932385268752cc4b81acf0a46fed",
+      "claimId": "claim_ac8c8092219e244b8a9001337c1d8310",
+      "sourceAnchor": "unheaded-block-139",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "45c002409eb1ea7d8170b033d5a590edc01ab8284b9cf787474a310e05c24823",
+      "claimKind": "specification",
+      "status": "removed-pending-disposition",
+      "priorStatus": "current",
+      "retiredAtCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "retiredReason": "no counterpart in current source",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-140",
+      "targetUnitDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
+      "shownTargetDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
+      "sourceCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "shownSourceText": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập.",
+      "shownSourceDigest": "45c002409eb1ea7d8170b033d5a590edc01ab8284b9cf787474a310e05c24823",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "mainCommit": "a8b3ab38083904ba5249246a8191befbf1f0e4be",
+      "rationale": "Standing A13 main-side source-identity accounting: main a8b3ab38083904ba5249246a8191befbf1f0e4be and a48548ca26839eff0c0f0087297c204f5ec46bd1 revise the private-home trust and process-local approval explanation. The former three-item recipe at unheaded-block-139 is superseded by the current three-item recipe at unheaded-block-140, retaining resourceBindings and credential inventory/provisioning while correcting the trust detail. This is a pending identity successor for the owning confinement-spec batch, not another Agent Coordination truth fix or approval; no legacy text is edited.",
+      "owningBatch": "specs-confinement-authority",
+      "nextIndependentReview": "the next review of the owning specs batch (not closed); excluded from the 21-section/49-row Agent Coordination targeted check"
+    }
+  ],
+  "mainRetirementProjection": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import {loadShardedJsonArtifact,writeShardedJsonArtifact,sha256Buffer} from \"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/doc-inventory-artifact.mjs\";const p=\"/tmp/phase06/review-identity-registry.json\";const r=loadShardedJsonArtifact(p);const rows=JSON.parse(fs.readFileSync(\"/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json\",'utf8')).rows;const by=new Map(rows.map(row=>[row.claimId,row]));let projected=0;for(const item of r.retiredUnits){const row=by.get(item.claimId);if(row){Object.assign(item,row);projected++;}}fs.writeFileSync(p,JSON.stringify(r,null,2)+String.fromCharCode(10));const ip=\"/tmp/phase06/review-doc-inventory.json\";const inventory=loadShardedJsonArtifact(ip);const bytes=fs.readFileSync(p);inventory.identityRegistry.bytes=bytes.length;inventory.identityRegistry.sha256=sha256Buffer(bytes);writeShardedJsonArtifact(ip,inventory);console.log(JSON.stringify({projected,totalRetired:r.retiredUnits.length,unaccountedOwned:r.retiredUnits.filter(u=>[\"docs/platform/agent-coordination/architecture/system-context.md\",\"docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md\",\"docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md\",\"docs/platform/agent-coordination/history/documentation-migration/proposal-status.md\",\"docs/platform/agent-coordination/intent-preservation-ledger.md\",\"docs/platform/agent-coordination/proposals/semantic-cli-surface.md\",\"docs/platform/agent-coordination/spec.md\",\"docs/platform/agent-coordination/subcomponents/README.md\",\"docs/platform/agent-coordination/verification/implementation-alignment.md\",\"docs/platform/agent-coordination/README.md\"].includes(u.sourcePath)&&!u.disposition).length,registrySha256:inventory.identityRegistry.sha256,registryBytes:bytes.length}));\n"
+    ],
+    "exit": 0,
+    "output": "{\"projected\":3178,\"totalRetired\":3245,\"unaccountedOwned\":0,\"registrySha256\":\"c5d0a28aa22aa048afe9b19d4f4a048ff6c5fee476f8cb93dc4dd15d43a1d9e4\",\"registryBytes\":70459375}\n"
+  },
+  "prerequisiteGates": [
+    {
+      "name": "fullD",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/review-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1168,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22227,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 23032,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22227,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 343,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+            "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 597,
+          "examples": [
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 17,
+          "examples": [
+            "dropped-001",
+            "dropped-002",
+            "dropped-003",
+            "dropped-004",
+            "dropped-005"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2235,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fullD",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/review-doc-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/review-identity-registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1168,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22227,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 23032,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22227,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 343,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+            "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 597,
+          "examples": [
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 17,
+          "examples": [
+            "dropped-001",
+            "dropped-002",
+            "dropped-003",
+            "dropped-004",
+            "dropped-005"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2235,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "F/H",
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "output": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n"
+    },
+    {
+      "name": "F/H",
+      "command": [
+        "node",
+        "scripts/check-doc-constitution.mjs",
+        "--no-ledger",
+        "--check-placement"
+      ],
+      "exit": 0,
+      "output": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 504 files, 503 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n"
+    },
+    {
+      "name": "F/H",
+      "command": [
+        "node",
+        "scripts/check-doc-candidate-status.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "output": "{\n  \"counts\": {\n    \"files\": 504,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 111,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 389\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 114,\n    \"findings\": 30,\n    \"byType\": {\n      \"missing-promotion-fields\": 2,\n      \"unresolved-link\": 23,\n      \"unresolved-related\": 5\n    }\n  },\n  \"findings\": [\n    {\n      \"type\": \"missing-promotion-fields\",\n      \"path\": \"docs/platform/host-invocation-routing/README.md\",\n      \"message\": \"missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/README.md\",\n      \"message\": \"link target does not exist: ../../../plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/README.md\",\n      \"message\": \"link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/architecture/host-use-cases.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/architecture/host-use-cases.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-related\",\n      \"path\": \"docs/platform/host-invocation-routing/architecture/host-use-cases.md\",\n      \"message\": \"Related path does not exist: plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260929-1501-metrics-friction-rust-native/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/intent-preservation-ledger.md\",\n      \"message\": \"link target does not exist: ../../packaging-distribution/reports/track-closeout.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/intent-preservation-ledger.md\",\n      \"message\": \"link target does not exist: ../../packaging-distribution/verification/install-and-release-proof.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/intent-preservation-ledger.md\",\n      \"message\": \"link target does not exist: ../../packaging-distribution/reports/track-closeout.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/intent-preservation-ledger.md\",\n      \"message\": \"link target does not exist: ../../packaging-distribution/verification/implementation-alignment.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/intent-preservation-ledger.md\",\n      \"message\": \"link target does not exist: ../../packaging-distribution/reports/track-closeout.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/intent-preservation-ledger.md\",\n      \"message\": \"link target does not exist: ../../packaging-distribution/verification/install-and-release-proof.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md\",\n      \"message\": \"link target does not exist: ../../../plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-related\",\n      \"path\": \"docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md\",\n      \"message\": \"Related path does not exist: plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md\",\n      \"message\": \"link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-related\",\n      \"path\": \"docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md\",\n      \"message\": \"Related path does not exist: plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/roadmap.md\",\n      \"message\": \"link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/roadmap.md\",\n      \"message\": \"link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/roadmap.md\",\n      \"message\": \"link target does not exist: ../../../plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/roadmap.md\",\n      \"message\": \"link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/implementation-alignment.md\",\n      \"message\": \"link target does not exist: ../../../../packages/host-runtime/rust/src/providers/external_process/supervisor.rs\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/r2-external-process-proof.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/r2-external-process-proof.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-related\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/r2-external-process-proof.md\",\n      \"message\": \"Related path does not exist: plans/260915-host-invocation-r2-external-process/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-related\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md\",\n      \"message\": \"Related path does not exist: plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"unresolved-link\",\n      \"path\": \"docs/platform/host-invocation-routing/verification/source-preservation-audit.md\",\n      \"message\": \"link target does not exist: ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md\"\n    },\n    {\n      \"type\": \"missing-promotion-fields\",\n      \"path\": \"docs/platform/packaging-distribution/README.md\",\n      \"message\": \"missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by\"\n    }\n  ]\n}\n"
+    }
+  ],
+  "prerequisitePreservation": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set(isolate.exactExemptions),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:isolate.exactExemptions.length,result:'pass'}));"
+    ],
+    "exit": 0,
+    "output": {
+      "historicalWitnesses": 74,
+      "historyTreeUnchanged": true,
+      "payloadTreeOutside29Unchanged": true,
+      "inheritedPhysicalPayloads": 867,
+      "changedAreaPaths": 29,
+      "frozenFiles": 5,
+      "firstParentNonMergeCommits": 173,
+      "allowlistViolations": 0,
+      "exactCommitPathExceptions": 5,
+      "result": "pass"
+    }
+  },
+  "isolationCI": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as git} from 'node:child_process';const p=\"plans/260925-documentation-authority-unification\",f=p+'/transitional-switchboard.json',before=JSON.parse(git('git',['show','a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2:'+f],{encoding:'utf8'})),after=JSON.parse(fs.readFileSync(f,'utf8'));assert.deepEqual(after.areas.map(a=>[a.area,a.authorityStatus]),before.areas.map(a=>[a.area,a.authorityStatus]));const paths=['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md'],set=new Set;for(const file of paths){const text=fs.readFileSync(file,'utf8');for(const m of text.matchAll(/docs\\/platform\\/[^ )`|>\"]*/g))set.add(m[0]);}const baseline=fs.readFileSync(p+'/reports/phase-06/reader-links-baseline.txt','utf8').trim().split('\\n').filter(Boolean).sort();assert.deepEqual([...set].sort(),baseline);console.log(JSON.stringify({authorityChanges:[],readerLinkChanges:[],result:'pass'}));"
+    ],
+    "exit": 0,
+    "output": {
+      "authorityChanges": [],
+      "readerLinkChanges": [],
+      "result": "pass"
+    }
+  },
+  "sourceReviewApplication": {
+    "command": [
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--apply-review",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "--inventory",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--repo-root",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+      "--verdicts",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
+      "--reviewer",
+      "reviewer:claude-session:4df9e88c@2026-10-10"
+    ],
+    "exit": 0,
+    "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+    "approved": 413,
+    "pending": 18,
+    "outputSha256": "1b8c7fd2025045155e3db42781e66a1a28cafbc225a66c35612f14e7b4321302"
+  },
+  "retiredReviewApplication": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import {applyReviewVerdicts,parseReviewVerdicts} from './scripts/propose-doc-decisions.mjs';import {buildConservationUnitLookup} from './scripts/check-doc-inventory-gates.mjs';const p=\"plans/260925-documentation-authority-unification\",reportPath=p+'/reports/phase-06/review-2-truth-retired-unit.md',reviewer=\"reviewer:claude-session:4df9e88c@2026-10-10\",all=JSON.parse(fs.readFileSync(p+'/ledger/retired-unit-decisions.json','utf8')).rows,verdicts=parseReviewVerdicts(fs.readFileSync(reportPath,'utf8'),reviewer),ids=new Set(verdicts.map(v=>v.claimId)),rows=all.filter(r=>ids.has(r.claimId));if(rows.length!==335||rows.some(r=>r.reviewStatus!=='pending'))throw new Error('retired genuine pending view mismatch');const context={repoRoot:process.cwd(),inventory:{commit:\"a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2\",claimLedger:rows.map(r=>({claimId:r.claimId,sourcePath:r.sourcePath,sourceAnchor:r.sourceAnchor,sourceUnitDigest:r.sourceUnitDigest}))},unitsOf:buildConservationUnitLookup(process.cwd(),\"a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2\")};const shard={version:1,shard:'retired-agent-coordination-current-truth-view',authorSession:'codex-session:1@2026-10-10',sources:[...new Set(rows.map(r=>r.sourcePath))],claims:rows},applied=applyReviewVerdicts(context,shard,{verdicts,reviewer,reportPath,ordinaryReview:true,reviewedAt:'2026-10-10'});fs.writeFileSync('/tmp/phase06/truth-applied-retired-view.json',JSON.stringify(applied,null,2));console.log(JSON.stringify({rows:applied.claims.length,ok:applied.claims.filter(r=>r.reviewStatus==='reviewed').length,pending:applied.claims.filter(r=>r.reviewStatus!=='reviewed').length}));"
+    ],
+    "exit": 0,
+    "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+    "method": "Native applyReviewVerdicts over exactly the 335 genuine current retired-row source descriptors and current native target units; no generated inventory rows or report filtering.",
+    "counts": {
+      "rows": 335,
+      "ok": 318,
+      "pending": 17
+    }
+  },
+  "classificationReviewApplication": {
+    "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+    "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+    "ok": 497,
+    "pending": 14,
+    "fullUnitShownTextEvidenceDigestsMatched": 511,
+    "priorUnchangedFramesPreserved": 29
+  },
+  "appliedVerdictGate": {
+    "command": [
+      "node",
+      "scripts/check-doc-inventory-gates.mjs",
+      "--inventory",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--identity-registry",
+      "/tmp/phase06/review-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--previous-registry",
+      "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+      "--json"
+    ],
+    "exit": 0,
+    "fatalFindings": [],
+    "conservationOpen": [
+      {
+        "type": "files-unknown-blocking",
+        "message": "inventory files whose file-level disposition is unknown-blocking",
+        "count": 1168,
+        "examples": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "docs/architect/architecture-intent.md",
+          "docs/architect/component-boundary/component-boundary-advisory.md",
+          "docs/architect/component-boundary/README.md"
+        ]
+      },
+      {
+        "type": "claims-unknown-blocking",
+        "message": "claim rows whose disposition is unknown-blocking",
+        "count": 22227,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 22619,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "claims-without-own-rationale",
+        "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+        "count": 22227,
+        "examples": [
+          "AGENTS.md#forgent",
+          "AGENTS.md#unheaded-block-1",
+          "AGENTS.md#unheaded-block-2",
+          "AGENTS.md#unheaded-block-3",
+          "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+        ]
+      },
+      {
+        "type": "identical-units-multiple-owners",
+        "message": "identical source units whose rows name different target owners",
+        "count": 343,
+        "examples": [
+          "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+          "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+          "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "1f83d2721e63: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 597,
+        "examples": [
+          "AGENTS.md#unheaded-block-12",
+          "AGENTS.md#unheaded-block-13",
+          "AGENTS.md#unheaded-block-20",
+          "AGENTS.md#unheaded-block-4",
+          "AGENTS.md#unheaded-block-4"
+        ]
+      },
+      {
+        "type": "dropped-claims-unreviewed",
+        "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+        "count": 17,
+        "examples": [
+          "dropped-001",
+          "dropped-002",
+          "dropped-003",
+          "dropped-004",
+          "dropped-005"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 1946,
+        "examples": [
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-10",
+          "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-29",
+          "docs/platform/agent-coordination/architecture/evidence-and-results.md#unheaded-block-9",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-8",
+          "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8"
+        ]
+      }
+    ]
+  },
+  "tests": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/backfill-status-category.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-citation-drift.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-codes.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-decision-supersession.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-candidate-status.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-conservation.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-constitution.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-doc-retirement.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/check-locked-decisions-heading-drift.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/dispatch-decide-hook.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-alias-resolver.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-candidate-conservation.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-corpus-decisions.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-conservation.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-exact.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-mirrors.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-decision-review.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-restoration-proofs.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-authorship.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-review-format.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/fgos-shell-integration.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/full-suite-queue.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-doc-inventory.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/generate-shipped-path-inventory.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/herdr-cockpit-notify.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/install-git-hooks.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/is-main-module.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-classifier.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/knowledge-migration.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/list-doc-anchors.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/migrate-actor-to-role.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/next-doc-id.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/prepare-release.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/probe-storytelling-material.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/project-agents.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-test-canary.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/run-tests.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-ownership-lint.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-plan-out.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-proof-inventory.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-compare.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-coverage-map.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-mutate.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote-report.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select-promote.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-select.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/test-timing.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/verify-phase-02.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-test-marker.test.mjs",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/write-wrapper-script.test.mjs"
+    ],
+    "exit": 0,
+    "counts": {
+      "tests": 912,
+      "suites": 0,
+      "pass": 912,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "artifact": "scratch-only /tmp/phase06/truth-fix-tool-tests.log"
+  },
+  "targetedSectionProof": {
+    "changedSections": 21,
+    "changedFiles": 14,
+    "unchangedAcceptedSections": 433,
+    "evidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+    "evidenceExcerpts": 31,
+    "noCarriageChanges": true
+  },
+  "reworkedRowBindings": [
+    {
+      "claimId": "claim_ebe7d2366429303cb74938b60f5cf2fb",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "routing-identities",
+      "targetUnitDigest": "9346bcff67d284b8b32d0fbdc8b35e9da446a76e5f244fc7e6c89d68c958d671",
+      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
+      "section": "routing-identities"
+    },
+    {
+      "claimId": "claim_901dae1b8039d130359712125f4d69f9",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "shownTargetDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "section": "2-production-ladder-semantics"
+    },
+    {
+      "claimId": "claim_37887f05ca0822cd7c415eaadda42c55",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "7-agent-result-schema",
+      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "section": "7-agent-result-schema"
+    },
+    {
+      "claimId": "claim_3d5dc31cf6cf90ba661de6bb1fafb486",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "7-agent-result-schema",
+      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "section": "7-agent-result-schema"
+    },
+    {
+      "claimId": "claim_f5567f4d0486c29fd719218e8a37d4ad",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "routing-identities",
+      "targetUnitDigest": "9346bcff67d284b8b32d0fbdc8b35e9da446a76e5f244fc7e6c89d68c958d671",
+      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
+      "section": "routing-identities"
+    },
+    {
+      "claimId": "claim_d277029b4e3a80bc6eb3c33a7990b182",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "component-internal-ownership",
+      "targetUnitDigest": "02739069a8533c9f6637cfef2b916395b08a060474d20e1d122651788c250b96",
+      "shownTargetDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734",
+      "section": "component-internal-ownership"
+    },
+    {
+      "claimId": "claim_f35f68bb3feae40702d02c97d02cea0b",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "shownTargetDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "section": "2-production-ladder-semantics"
+    },
+    {
+      "claimId": "claim_9e039b5f6acdd3eb0fa002d35c2a3f54",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "targetAnchor": "compatibility",
+      "targetUnitDigest": "7a6f9fa240fe911d210c903743ef5ea8a41beddd2ad5bd0898c2fc524a4ea4ba",
+      "shownTargetDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
+      "section": "compatibility"
+    },
+    {
+      "claimId": "claim_66366a2de3e810733eaaf6905e57628b",
+      "report": "review-2-truth-files.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "23d3360350d9203713ffa49ccd90c47fae6eff15620a38f2a36e3b9b40a6b48e",
+      "shownTargetDigest": "23d3360350d9203713ffa49ccd90c47fae6eff15620a38f2a36e3b9b40a6b48e",
+      "section": "dispatch-operability-addendum"
+    },
+    {
+      "claimId": "claim_d6d08257977c9db1a12719246f739678",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "62-selector",
+      "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "section": "62-selector"
+    },
+    {
+      "claimId": "claim_f42a735dabf1e5292e44aec3a483fd4d",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "72-policy-resolution-before-dispatchplan",
+      "targetUnitDigest": "1b8bad3a28b92a56bcefee746276e3cabf955f0361653f49b152dd5b720d5dd0",
+      "shownTargetDigest": "fa0931df22b0c3241d4b8629f862c9299f7157357028c85aef26bc1fb227f6d3",
+      "section": "72-policy-resolution-before-dispatchplan"
+    },
+    {
+      "claimId": "claim_4977752b5d7eef0cea02a91c090a39ae",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
+      "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
+      "shownTargetDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
+      "section": "73-recommended-v1-provider-policy-for-coding-feature-flow"
+    },
+    {
+      "claimId": "claim_432d7c4b1684e3d11aade76846dc2193",
+      "report": "review-2-truth-files.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "unheaded-block-67",
+      "targetUnitDigest": "40bd432c24f73273a929aa993f623685addfa0720d7b0568ee06f005bc403ea6",
+      "shownTargetDigest": "40bd432c24f73273a929aa993f623685addfa0720d7b0568ee06f005bc403ea6",
+      "section": "73-recommended-v1-provider-policy-for-coding-feature-flow"
+    },
+    {
+      "claimId": "claim_9d058e29fa247f69fb897aab37ce1724",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "targetAnchor": "12-dialogue-response-dialogue-responsemd",
+      "targetUnitDigest": "13d5476dee5a0e24b4fad8dd926f3d676fa2c6c2ea16c14a9e60067a6831221a",
+      "shownTargetDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
+      "section": "12-dialogue-response-dialogue-responsemd"
+    },
+    {
+      "claimId": "claim_6ce1d10cc50a8bd04bd82b4b65486125",
+      "report": "review-2-truth-files.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "7-agent-result-schema",
+      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "section": "7-agent-result-schema"
+    },
+    {
+      "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "targetAnchor": "compatibility",
+      "targetUnitDigest": "7a6f9fa240fe911d210c903743ef5ea8a41beddd2ad5bd0898c2fc524a4ea4ba",
+      "shownTargetDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
+      "section": "compatibility"
+    },
+    {
+      "claimId": "claim_1f29a0c78fd1c3b7572bd0327faeea7f",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "62-selector",
+      "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "section": "62-selector"
+    },
+    {
+      "claimId": "claim_df2c20fabb1be2139694a4220887c87f",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "62-selector",
+      "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "section": "62-selector"
+    },
+    {
+      "claimId": "claim_d1ce767a2e3239b22d2e9fc6649dd9a5",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "routing-identities",
+      "targetUnitDigest": "9346bcff67d284b8b32d0fbdc8b35e9da446a76e5f244fc7e6c89d68c958d671",
+      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
+      "section": "routing-identities"
+    },
+    {
+      "claimId": "claim_2ff575998d2ae90d5ecc1a2d414d078d",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "shownTargetDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "section": "2-production-ladder-semantics"
+    },
+    {
+      "claimId": "claim_d283a70392cc071ee19d103f77228841",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "shownTargetDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "section": "2-production-ladder-semantics"
+    },
+    {
+      "claimId": "claim_0a52ec5fcc2abb5870b350b23451da43",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "targetAnchor": "compatibility",
+      "targetUnitDigest": "7a6f9fa240fe911d210c903743ef5ea8a41beddd2ad5bd0898c2fc524a4ea4ba",
+      "shownTargetDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
+      "section": "compatibility"
+    },
+    {
+      "claimId": "claim_e415506235b575bc5eb32b225a758f5b",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "62-selector",
+      "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "section": "62-selector"
+    },
+    {
+      "claimId": "claim_d245d70ae94106a208d95b6bfa6b6152",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "72-policy-resolution-before-dispatchplan",
+      "targetUnitDigest": "1b8bad3a28b92a56bcefee746276e3cabf955f0361653f49b152dd5b720d5dd0",
+      "shownTargetDigest": "fa0931df22b0c3241d4b8629f862c9299f7157357028c85aef26bc1fb227f6d3",
+      "section": "72-policy-resolution-before-dispatchplan"
+    },
+    {
+      "claimId": "claim_f0b558c805f1b274d2df72fb6083acfb",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
+      "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
+      "shownTargetDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
+      "section": "73-recommended-v1-provider-policy-for-coding-feature-flow"
+    },
+    {
+      "claimId": "claim_e95c422ac5e33683c4e657f55a540496",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "62-selector",
+      "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "section": "62-selector"
+    },
+    {
+      "claimId": "claim_ab8a87d8a586e83cc0df72070e1c438f",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "62-selector",
+      "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "section": "62-selector"
+    },
+    {
+      "claimId": "claim_29768201e6d5a5c215e3a7e4a25873c3",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "72-policy-resolution-before-dispatchplan",
+      "targetUnitDigest": "1b8bad3a28b92a56bcefee746276e3cabf955f0361653f49b152dd5b720d5dd0",
+      "shownTargetDigest": "fa0931df22b0c3241d4b8629f862c9299f7157357028c85aef26bc1fb227f6d3",
+      "section": "72-policy-resolution-before-dispatchplan"
+    },
+    {
+      "claimId": "claim_3bffcfe4496d0fec611c2d4cdfbf9149",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
+      "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
+      "shownTargetDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
+      "section": "73-recommended-v1-provider-policy-for-coding-feature-flow"
+    },
+    {
+      "claimId": "claim_f07d01d9479baf2c23835b14f4038768",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
+      "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
+      "shownTargetDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
+      "section": "73-recommended-v1-provider-policy-for-coding-feature-flow"
+    },
+    {
+      "claimId": "claim_15cac2a9bbfbbffc9af1c2dc16b5415a",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "7-agent-result-schema",
+      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "section": "7-agent-result-schema"
+    },
+    {
+      "claimId": "claim_742532532aa9e696db78cb285b8b2178",
+      "report": "review-2-truth-retired-unit.md",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "7-agent-result-schema",
+      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "section": "7-agent-result-schema"
+    }
+  ],
+  "holds": [
+    {
+      "claimId": "claim_d6db58a3090422d42154f240f54c9f5a",
+      "verdict": "hold",
+      "ownerIntent": "unchanged",
+      "reviewStatus": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null
+    },
+    {
+      "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+      "verdict": "hold",
+      "ownerIntent": "unchanged",
+      "reviewStatus": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null
+    },
+    {
+      "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+      "verdict": "hold",
+      "ownerIntent": "unchanged",
+      "reviewStatus": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  ]
+}

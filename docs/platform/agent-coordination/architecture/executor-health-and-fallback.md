@@ -69,7 +69,7 @@ Success/config/launch outcomes do not require fabricated ladder values.
 
 The order and behavior in `src/runner/dispatch/liveness.mjs` are ported:
 1. Worker result file beats all runtime readings; it still requires normalization.
-2. Blocked beats timeout: answer the existing question, do not retry.
+2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:346-357`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.
 3. Death requires consecutive absent readings (default 3); unknown/present reset.
 4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.
 5. Idle/stale evaluation subtracts blind time; working is progress even with
