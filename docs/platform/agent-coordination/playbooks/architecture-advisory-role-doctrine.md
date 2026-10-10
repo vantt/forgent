@@ -60,16 +60,26 @@ ownership question (clear case) and the vnflow EOD/intraday evolution question
 (unclear case). Using real cases is intentional — invented examples drift toward
 the abstract, and abstraction is exactly what this document exists to resist.
 
-Coordinator-side operating rules live in
-[the coordinator prompt](prompts/architecture-advisory-coordinator.md). Artifact
-shapes live in [the artifact templates](architecture-advisory-artifact-templates.md).
-Quality judgment lives in [the evaluation rubric](architecture-advisory-evaluation-rubric.md).
+The [coordinator companion](prompts/architecture-advisory-coordinator.md) is a
+cognitive reference, not an operating-rules owner. The registered skill and
+Workflow own execution, routing and gates. Optional manual artifact shapes are
+in [templates](architecture-advisory-artifact-templates.md); quality judgment is
+in [the rubric](architecture-advisory-evaluation-rubric.md).
 
 ## The Shape Of The Panel
 
 The registered architecture-advisory Workflow is framing -> blind three-seat shaping -> reviewed critique -> reviewed synthesis -> explanation -> human close. Synthesis requires reviewer and red-team checks of the final RAW JSON packet. Evidence: core/workflows/architecture-advisory.yaml:8-84.
 
 The nine role postures below are cognitive lenses and worked examples, not nine mandatory runtime jobs or a driver-owned phase graph. They do not authorize a new roster, conditional specialist step or direct actor launch. Execution, routing and resumption follow core/skills/fgos-architecture-panel/SKILL.md, not an operating recipe in the coordinator companion.
+
+Registered output mapping: Lead/Investigator framing guidance belongs in the
+framing report; the system, alternative and constraint lenses belong to the
+three shaping reports; critic findings belong to reviewed critique; synthesis
+and dispositions belong to the final RAW JSON packet; explanation belongs to
+its report; the close gate records the owner's missing-expertise answer.
+Named Markdown files below are optional manual example artifacts, not required
+registered outputs. Hypothetical examples are reasoning demonstrations, not
+observed reports from a present Workflow run.
 
 ## 1. Lead Advisor
 
@@ -128,7 +138,7 @@ get to smuggle them in through the explanation.
   reading. Find the one where they are responding sensibly to something you
   cannot see yet — then go look for that thing.
 - **Never resolve ambiguity by choosing.** If the question could mean two
-  things, hold both open into Phase 3 and let evidence collapse it. Choosing
+  things, hold both open through investigation and let evidence collapse it. Choosing
   early is how a panel spends a week answering the wrong question fluently.
 - **When explaining, lead with the consequence, not the architecture.** People
   own decisions through consequences. "You will be able to change the intraday
@@ -155,11 +165,12 @@ get to smuggle them in through the explanation.
 
 ### Handoff Shape
 
-Produces `interpretation.md` in Phase 2 and `explanation.md` in Phase 8; drafts
-`decision-request.md` in Phase 4 for the driver to authorize, and
-`dialogue/<n>-impact.md` for each turn in Phase 9.
-Everything it writes is labelled as *its* reading. It never writes into
-`intake.md` or into `human/`. It never authorizes; it never dispositions.
+In registered execution, framing records the advisor's interpretation and
+explanation records the settled packet's consequences. Optional manual
+`interpretation.md`, `explanation.md` and dialogue notes are not extra Workflow
+steps or required paths. The registered human close is the missing-expertise
+decision; no separate driver-authorized `decision-request.md` gate is implied.
+Keep advisor interpretation distinct from the person's actual words.
 
 ### Good Example
 
@@ -191,7 +202,7 @@ Everything it writes is labelled as *its* reading. It never writes into
 >
 > What I deliberately did not resolve: "difficult" could mean slow to change,
 > risky to change, or unpleasant to change. These have different causes and
-> different fixes. Phase 3 should distinguish them by looking at what actually
+> different fixes. Repository investigation should distinguish them by what actually
 > changes in the history and what breaks when it does.
 
 This is good because every inference is separately calibrated, the largest
@@ -214,7 +225,7 @@ when this role is under-specified. It converts a symptom ("difficult") into a
 diagnosis ("duplication") with no evidence. It invents requirements the person
 never stated. It uses generic architecture vocabulary in place of the person's
 own. It carries no uncertainty at all, so nothing downstream knows what to
-verify. And it recommends — in Phase 2, before anyone has looked at the code —
+verify. And it recommends before repository investigation has established the cause,
 which pre-commits the whole panel to a solution class and makes the shapers'
 independence worthless.
 
@@ -284,10 +295,10 @@ determine it" — that is a real finding, not a failure.
 
 ### Handoff Shape
 
-Produces `scout-report.md`: observations with paths, the hypothesis it tried to
-refute and what happened, magnitudes and trends, what could not be determined
-and what would determine it. Read by every shaper, the critic, and the
-synthesizer. Contains no recommendation and no architecture.
+Investigation contributes observations with paths, attempted refutations,
+magnitudes/trends and explicit gaps to the registered framing report.
+An optional manual `scout-report.md` can carry the same reasoning; no separate
+scout step or mandatory file is created by this cognitive lens.
 
 ### Good Example
 
@@ -329,7 +340,7 @@ synthesizer. Contains no recommendation and no architecture.
 This is good because it leads with disconfirmation, replaces an adjective with a
 countable observation, reframes the axis on evidence rather than assertion,
 separates "could not determine" from "not present", flags a genuine user-only
-gap for Phase 4 instead of guessing at it, and never once says what should be
+gap for the owner rather than guessing at it, and never once says what should be
 built.
 
 ### Bad Example
@@ -391,7 +402,7 @@ Aiming to be different is a way of being worse.
 - **State falsification criteria before you see any critique.** "This proposal
   is wrong if the intraday path has a sub-second budget, or if the team cannot
   absorb a two-week migration." Writing these first is what makes the later
-  debate honest — and it is checkable, because the timestamp is recorded.
+  debate honest. Timestamped pre-critique criteria are useful evidence when actually captured; the registered shaping template does not mandate that field.
 - **Size the intervention to the evidence.** If the scout found the pain at one
   890-line module, a whole-system re-architecture is not the direct response, it
   is an escalation. The direct response is the smallest change that addresses the
@@ -418,10 +429,10 @@ Aiming to be different is a way of being worse.
 
 ### Handoff Shape
 
-Produces `proposals/system-shaper.md`: the frame it worked from, the proposal,
-the load-bearing constraint, what it makes harder, the first reversible step,
-which claims rest on scout evidence versus assumption, and its falsification
-criteria — written before any critique is visible. It sees no sibling proposal.
+The registered system-lens shaping report carries an evidence-grounded proposal,
+constraints, costs and a reversible first step. Pre-critique falsification
+criteria are optional quality guidance, not a required template field.
+`proposals/system-shaper.md` is an optional manual artifact name.
 
 ### Good Example
 
@@ -567,11 +578,11 @@ the cost of being wrong. It must be able to state which priors it is applying.
 
 ### Handoff Shape
 
-Produces `proposals/alternative-shaper.md`: the priors it applied and why, the
-candidate, an explicitly considered no-build or smaller path with concrete
-consequences, any alternative it tried and honestly abandoned with the reason,
-and its own falsification criteria written before critique. Isolated from the
-system shaper.
+The registered alternative-lens shaping report offers a genuine alternative,
+including smaller/no-build options when credible. Priors and falsification
+criteria are quality guidance; `proposals/alternative-shaper.md` is an optional
+manual filename, not the registered output contract. Blind shaping follows the
+Workflow/pattern input boundary, not a promise inferred from this prose.
 
 ### Good Example
 
@@ -705,8 +716,9 @@ should use that license precisely rather than broadly.
 
 ### Handoff Shape
 
-Produces `proposals/constraint-advocate.md` in Phase 5 (as a candidate shaped by
-operational priors) and constraint findings against every candidate in Phase 6.
+The registered constraint-lens shaping report offers a constraint-led design;
+reviewed critique later carries findings. Optional manual
+`proposals/constraint-advocate.md` is not a separate Phase 5/6 execution graph.
 Each finding names the proposal, the concern, its magnitude, whether it is
 reversible, and the cheapest mitigation. Ranked, not listed flat.
 
@@ -884,10 +896,10 @@ evidence, and the finished proposals — not a shaper's working notes.
 
 ### Handoff Shape
 
-Produces `critiques/architecture-critic.md`: attacks grouped by target proposal,
-each with the specific claim attacked, why it may be false, what evidence would
-settle it, and whether it changes the decision if it lands. Includes attacks that
-failed. Read by the shapers (who may concede or revise) and by the synthesizer.
+Registered reviewed critique carries attributed attacks against actual proposals,
+with evidence and resolution conditions. `critiques/architecture-critic.md` is
+an optional manual export name. The Workflow does not automatically send
+critique back through a new shaping revision graph.
 
 ### Good Example
 
@@ -1005,9 +1017,9 @@ that hides a live objection is worse than useless because it looks trustworthy.
   your mind" is far more useful than an overall confidence score.
 - **Promote a live unresolved objection into the packet body.** Not a footnote.
   If it could change the person's decision, it belongs where they will read it.
-- **Never introduce a new argument.** If synthesis reveals a gap, say so and let
-  the coordinator reopen. A synthesizer that quietly invents the winning argument
-  has replaced the panel with itself, and nothing downstream can detect it.
+- **Never invent the missing argument.** Name a material synthesis gap.
+  Only a separately authorized `architecture-advisory-reopen` run revisits the
+  packet; the synthesizer does not control continuation or automatically reopen.
 - **Preserve the names.** "The constraint advocate objects that..." lets the
   person weigh the source. Anonymous dissent is unweighable.
 - **State what the recommendation costs.** Choosing is choosing against
@@ -1027,10 +1039,11 @@ that hides a live objection is worse than useless because it looks trustworthy.
 
 ### Handoff Shape
 
-Produces `synthesis.md` — the Decision Packet. Recommendation, what it rests on,
-per-claim confidence, what it costs, surviving dissent with attribution and
-resolution conditions, unchecked falsification criteria, missing/failed actors,
-source revisions, and the open observation that would most change the answer.
+The registered synthesis producer emits the final RAW JSON packet, including
+verdict, evidence, alternatives, attributed findings, dispositions, dissent,
+defaults, residual risks, reversal triggers and the required `"missing expertise"`
+array. Per-claim confidence is useful optional guidance, not a required packet
+field. `synthesis.md` is only an optional manual display/export name.
 
 ### Good Example
 
@@ -1167,11 +1180,10 @@ the ledger, and whether authority was respected.
   supposedly preceded.
 - Isolation breaches. A proposal that references a sibling proposal is proof the
   isolation failed or was never real.
-- Authority violations. A driver disposition that decided a technical question
-  without an advisor's evidence. An artifact presenting the driver's
-  authorization as the person's decision. Any human turn nobody can source.
-- Fabricated or over-claimed provenance. A roster entry whose run result does
-  not match.
+- Authority violations: a packet claims human approval or clears findings about
+  its own conduct without independent evidence.
+- Fabricated provenance: claimed seat attribution or reports do not match the
+  settled Unit results. A proposed roster is not proof that seats ran.
 - Comfortable conclusions. Where does the packet agree with what the person
   seemed to want? That is where to dig hardest.
 - Confidence that outruns evidence, especially "high confidence" attached to a
@@ -1179,9 +1191,9 @@ the ledger, and whether authority was respected.
 
 ### Judgment Heuristics
 
-- **Check the artifacts, not the narration.** Open the files. A summary saying
-  three shapers ran independently is not evidence; three prompt files with
-  distinct ordinals and no sibling content is.
+- **Check actual settled reports, not narration.** Compare the packet and its
+  cited evidence with real Unit role reports and available isolation evidence.
+  Three optional prompt files alone do not prove enforced independent execution.
 - **Re-derive one conclusion end to end.** Pick the recommendation and trace it
   back to a specific observation. If the chain breaks, that is the finding.
 - **Attack the process when the architecture holds.** A correct recommendation
@@ -1208,12 +1220,17 @@ the ledger, and whether authority was respected.
 
 ### Handoff Shape
 
-Produces `redteam.md`: named attacks with what was checked, what was found, the
-artifact cited, severity, and a verdict of `APPROVE` / `REVISE` /
-`INSUFFICIENT-EVIDENCE`. Never fixes anything. Does not see the reviewer's
-first-pass output before producing its own.
+The registered synthesis `red-team` checker challenges the producer's actual
+final RAW JSON packet and returns concrete findings/evidence or explicitly none.
+`redteam.md` and `APPROVE`/`REVISE`/`INSUFFICIENT-EVIDENCE` are optional manual
+display conventions, not runtime verdict enums or human approval. Read actual
+input/isolation evidence; do not infer checker blindness from this companion.
 
 ### Good Example
+
+Hypothetical manual-harness trace, not an observed registered run. Its
+prompts/runs/dispositions paths and `REVISE` label are optional examples;
+they do not prove current confinement or packet-checker inputs.
 
 > **Red-team — vnflow session (verdict: REVISE)**
 >
@@ -1307,9 +1324,9 @@ A narrow expert on loan. The specialist is dispatched for a specific question �
 "what is the actual failure mode of this Postgres isolation level under their
 access pattern?" — and its authority extends exactly that far and no further.
 
-It is bound only after driver authorization, because an unbounded specialist is
-just another advisor with an impressive title and it will expand to opine on the
-architecture.
+A specialist is not automatically bound by the current graph. Its missing
+expertise is named in the packet; the owner may separately authorize a bounded
+consultation. This cognitive role does not add a conditional Workflow step.
 
 ### What To Notice
 
@@ -1344,10 +1361,10 @@ architecture.
 
 ### Handoff Shape
 
-Produces `proposals/specialist-<topic>.md`: the exact question as authorized, the
-answer, its confidence and source, whether it changes the panel's options, and an
-explicit statement of where its expertise stops. Read by the synthesizer and, if
-material, by the critic.
+A separately authorized specialist consultation returns the bounded question,
+answer, evidence, uncertainty and expertise limit. A manual
+`proposals/specialist-<topic>.md` is optional; the registered graph adds neither
+that file nor an automatic specialist/reopen step.
 
 ### Good Example
 
@@ -1408,15 +1425,16 @@ cannot attribute, cannot bound, and cannot easily discount.
 
 ## Driver-Disposition Doctrine
 
-The external driver — the coordinator — dispositions findings, objections, and
-open points. Disposition is an authority act, not an advisory one. The driver
-decides what happens to a finding; it does not decide whether the finding is
-technically correct unless an advisor has shown it.
+In current registered execution, the synthesis packet carries the six
+disposition kinds; its reviewer/red-team checks challenge that actual packet
+(`core/skills/fgos-architecture-panel/SKILL.md:124-128`). The producing advisor
+must cite evidence and retain dissent; it cannot confer human implementation
+approval or self-clear conduct/isolation violations.
 
-Every disposition is appended to `dispositions.md` with the finding id, the
-disposition, a rationale, and an evidence reference. Dispositions are never
-edited; a changed mind is a new appended disposition that supersedes and cites
-the old one.
+The driver/append-only `dispositions.md` ledger below is an optional manual
+trace convention, not an implemented registered control plane or a required
+output path. Its examples illustrate evidence and authority discipline; the
+Workflow, not the companion prompt, owns gates and continuation.
 
 ### The Six Dispositions
 
@@ -1434,10 +1452,9 @@ carries both the mitigation and the residual risk. Requires stating the residual
 plainly. A `mitigated` that claims the risk is now zero is an `accepted` in
 disguise or a lie.
 
-**`deferred`** — valid, but outside this decision's scope. Requires naming where
-it belongs and what triggers revisiting. Deferral is the one disposition the
-driver may make entirely on its own authority, because scope is an authority
-question, not a technical one.
+**`deferred`** — valid, but outside this decision's scope. Name the scope owner
+and revisit trigger. The packet records deferral without erasing the finding;
+it does not grant a nonexistent external driver independent runtime authority.
 
 **`unresolved`** — valid, unsettled, and it goes to the person as visible
 dissent. This is a legitimate and often correct outcome. Panels degrade by
@@ -1449,28 +1466,24 @@ forbidden.
 Requires citing the observation, by path or by run result, made by an advisor who
 looked. Not "our reasoning shows this is wrong".
 
-### When The Driver Must Not Disposition Alone
+### Evidence And Conduct Boundaries
 
-The driver must obtain another advisor's evidence before dispositioning whenever
-the disposition turns on a claim about PROJECT_ROOT or about the panel's own
-artifacts. Concretely:
+Current packet dispositions require actual evidence when they turn on claims
+about PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):
 
-- **`invalidated-by-evidence` always requires an advisor's observation.** The
-  driver asserting a fact about the code it has not been shown is opining inside
-  an authority role, which is the exact failure the role separation exists to
-  prevent — and it is invisible in the final packet unless a red-team catches it.
-- **`answered` requires a citation to an existing artifact.** If the driver
-  cannot point at the file and section, it has not been answered.
-- **`mitigated` requires the mitigation to be authored by an advisor.** The
-  driver may authorize a mitigation; it may not design one. Designing one is
-  advisory work performed by the authority that will later judge it.
-- **A disposition of a finding about the driver's own conduct** — an authority
-  violation, an isolation breach, a fabricated turn — must not be self-
-  dispositioned as `answered` or `invalidated-by-evidence`. Escalate it to the
-  person or to an independent role. Self-clearing is never legitimate here.
+- **Invalidation:** cite a real observation, not the producer's unsupported
+  explanation for why dissent would be inconvenient.
+- **Answer:** cite the artifact that answers the concern.
+- **Mitigation:** identify the concrete mitigation and remaining risk; do not
+  invent advisor evidence or imply a mitigation was run merely because it is
+  written down.
+- **Conduct/isolation:** do not self-clear a breach as answered or invalidated.
+  Preserve it for an independent authority or the owner.
 
-The driver may always disposition alone on scope (`deferred`), and on accepting a
-finding (`accepted`) — accepting costs nothing that needs guarding.
+Accepted and deferred findings retain their consequence, scope and trigger.
+Neither disposition automatically approves implementation or replaces the
+declared Workflow human gate. Manual-driver examples below illustrate these
+invariants, not a current runtime actor.
 
 ### Worked Dispositions
 
@@ -1516,6 +1529,14 @@ idempotency key step zero) or `unresolved` (hand the person the risk). This one
 converts a HIGH irreversible finding into packet decoration.
 
 ---
+
+## Diversity As A Hedge
+
+Diversity is a hedge, not a vote count. Report real attribution and what the
+different views contributed; never manufacture disagreement or a provider roster.
+The current skill states this doctrine at
+`core/skills/fgos-architecture-panel/SKILL.md:119-122`. Config/binding and actual
+confinement evidence, not rhetorical diversity, determine safe execution.
 
 ## Historical Operational Roster
 

@@ -96,3 +96,14 @@ A18 c071b6c66 resolves the three-link authoring stop. The exact repair reproduce
 - Holds: không thêm unknown-blocking hold hoặc quyết định cần anh chọn trước review. Các row/receipt thay đổi đều pending, không tự reviewed.
 - Promoted edits: portal/spec và các owner trước đó bị cắt nhầm được phục hồi; log trước sửa nằm trong promoted-edits.md. Không đổi legacy root, AGENTS, main, switchboard/area status hoặc vocabulary.
 - Bước chính xác tiếp theo: reviewer commit verdict report cho các pack/retired rows/classification receipts/member sets đã đổi. Sau đó em chỉ áp dụng verdict khớp đúng phiên bản; chưa đóng batch hoặc sang batch tiếp theo lúc này.
+
+## Truth-pass runner conflicts
+
+A19 af6c116f0 accepts carriage and authorizes the separate truth pass. The following conflicts are routed to the main harness investigation; neither is resolved by editing this area's candidate text.
+
+- `docs/specs/runner.md:3058` says `executors.*.for` and PolicyPatch `prefer*` were removed, while `src/runner/dispatch/resolve.mjs:33-66`, `src/runner/dispatch/config.mjs:1007-1017` and `src/runner/dispatch/assignment-policy.mjs:334-380` still read or validate them. Distinguish the legacy dispatch path from Execution Core `bind()` in the investigation.
+- `docs/specs/runner.md:1445` says architecture-advisory has not enabled `blind`, while `core/workflows/architecture-advisory.yaml:26` sets `blind: true`.
+
+Independent evidence: `review-2-liveness-conflicts.md:14-15,26,57`, committed in 0b9414d8c. Owner action: send these two conflicts to the separate harness-investigation chat for correction on main. No main/spec edit or external dispatch is authorized in this truth pass. Their resolution remains UNPROVEN.
+
+Accepted carriage, historical carriers and evidence-payload bytes remain unchanged. Truth scope is the twenty-nine rejected files listed in `review-2-liveness-files.md`, plus the missing current dispatch-recover description within the existing recovery document. No new move/archive/delete is proposed.

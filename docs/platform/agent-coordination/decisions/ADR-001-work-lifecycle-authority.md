@@ -29,28 +29,31 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Section | Status | Evidence / limit |
 |---|---|---|
 | Context | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment-runner.mjs:10 'Never mutates Work lifecycle state'; src/state/work.mjs:455-472 |
-| Decision | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:10; test/runner/dispatch-reconciliation-import-graph.test.mjs (no pick/return/claim/appendEvent in dispatch core); AGENTS.md one-door-write verbs |
+| Decision | Current lifecycle invariant | assignment-runner.mjs:10 states the boundary; Work field validation is src/state/work.mjs:455-467. Import-graph tests enforce specific lifecycle boundaries, not a blanket ban on every word `claim`. |
 | Consequences | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment-runner.mjs:10; src/runner/fanout-batch.mjs / loop.mjs return results to Work driver |
 
 ## Context
 
-Coordination introduces Assignments, Runs, results, possible sessions, and
-temporary tasks. Letting those objects mutate lifecycle independently would
-create conflicting status, approval, and merge truth.
+Execution introduces Assignments, Runs, results, Unit runs and Workflow runs.
+Letting execution records independently approve or merge Work would create
+conflicting delivery authority. Retired sessions/tasks are historical context,
+not current lifecycle actors.
 
 ## Decision
 
-Work and existing Work engine verbs are the sole authority for Work status,
-stage, claim/return, acceptance, approval, durable branch, and merge lifecycle.
+Work and its existing verbs own status, claim/return, acceptance, approval and
+branch/merge lifecycle. Work records Workflow position as `workflowStep`;
+`stage` is rejected (`src/state/work.mjs:455-467`).
 
-Coordination objects may provide evidence or recommendations to a Work driver,
-but cannot perform lifecycle transitions except through authorized Work verbs.
+Execution returns evidence and recommendations to its consuming driver.
+Lifecycle changes still go through authorized Work verbs, never consensus or
+a second execution-state lifecycle.
 
 ## Consequences
 
-- Session/task status must remain collaboration-local.
+- Unit/Workflow execution state does not duplicate Work approval/status authority.
 - Agent consensus cannot approve or complete Work.
-- Work-attached dispatch must return results to the driver.
-- Standalone coordination can exist without gaining delivery authority.
+- Work-attached execution returns results to the driver.
+- Execution without Work does not acquire delivery authority.
 - Lifecycle leakage is a high-severity review finding.
 

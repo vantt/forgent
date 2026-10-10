@@ -27,19 +27,18 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 Team Dispatch V1 needs a communication protocol, but it must stay smaller than
 a mailbox, daemon, or second lifecycle system.
 
-This proposal describes a Work-attached coding-domain protocol and one early
-standalone prototype. It is not the universal entry model for Agent
-Coordination. Per the [Agent Coordination Foundation Vision](../vision.md), an
-agent-led session may coordinate through validated dynamic execution contracts
-without a predeclared Workflow/Stage graph.
+This proposal retains communication doctrine for Work-attached coding activity.
+The early standalone prototype was retired; current standalone execution uses
+Unit/CollaborationPattern or Workflow. A predeclared Workflow is not required
+for every bounded Unit request, but validated contracts and governance remain.
 
 The protocol defines how roles communicate while `Work` remains the lifecycle
 authority:
 
 ```txt
 Work position
-  -> current workflow stage
-    -> legal stage operations
+  -> recorded workflowStep
+    -> legal step operations
       -> selected Assignment
         -> one Run
           -> one RunResult
@@ -54,9 +53,9 @@ say-so as proof.
 
 ```txt
 Work is lifecycle authority.
-Mission is a lightweight team envelope.
-Stage is workflow position.
-Stage Operation is one legal task-shaped action inside a stage.
+Mission is reserved/deferred vocabulary, not a current team-envelope runtime.
+workflowStep records Work's position.
+Step operations are declared semantic actions, not a second Stage Protocol engine.
 Assignment is a semantic request.
 Run is a runtime attempt.
 RunResult is normalized result plus evidence.
@@ -85,8 +84,8 @@ The coding domain starts with the roles already declared in the role graph:
 Role is not executor. A reviewer can run on Codex, Claude, agy, pi, or a future
 executor if policy and governance allow it.
 
-Role is not stage owner. A stage owner may dispatch an Assignment to another
-role while the Work item stays at the same stage.
+Role is not Workflow step owner. A step owner may dispatch an Assignment to
+another role while Work remains at the same `workflowStep`.
 
 ## 4. Communication Modes
 
@@ -94,28 +93,29 @@ The role graph's `mode` field has protocol meaning:
 
 | Mode | Meaning | Lifecycle effect | Required evidence |
 |---|---|---|---|
-| `sync` | Caller waits for a bounded finding or work product, then continues in the same stage. | Work usually stays claimed by the caller; holder may be logged but returns immediately. | Structured result artifact for read-only calls; git/artifact delta for mutating helper work. |
-| `async` | Caller cannot continue without another actor or human-adjacent answer. | Work may park, or holder may move until a future reclaim. | A recorded question, answer, review verdict, or blocker with context refs. |
+| `sync` | Bounded contribution; caller continues at the same Workflow step. | `work.call-summary` records the call; holder is untouched. | The role-call record alone is not RunResult proof; executed Assignments require their normal evidence. |
+| `async` | Role handoff governed by the current role graph. | `work.handoff` records holder change and checkpoint; it does not itself invent a status transition. | Actual handoff/answer context plus any independently required execution evidence. |
 
-`sync` does not mean invisible. It still needs a recorded handoff or Assignment
-RunResult when the result matters to later decisions.
+`src/state/store.mjs:1497-1562` chooses the event from the matched edge's mode,
+not a caller override. Sync call summaries do not consume the async callstack.
 
 `async` does not mean a new Work item. It becomes Work only when the request
 needs independent lifecycle, approval, merge, or backlog visibility.
 
 ## 5. Workflow Step Operation Selection
 
-The current Workflow helper is `operationsForStep(wf, stepId, { defaultRole })`
-(`src/workflow/steps.mjs:70-85`). The old domain/stage/kind signature is historical.
-The selection rules below remain a communication/driver design proposal, not proof
-that every communication mode is implemented.
+`src/workflow/steps.mjs:70-85` provides
+`operationsForStep(wf, stepId, { defaultRole })`; the domain wrapper
+`src/state/domain-registry.mjs:254-257` also accepts
+`operationsForStep(domain, step, kind)`. Both are current APIs; do not call the
+domain wrapper historical merely because the Workflow helper has another signature.
 
 Selection rules:
 
-1. Prefer the primary operation when the stage's normal owner work remains the
-   next required action.
+1. Prefer the primary operation when the current step's owner work is still
+   the next required action.
 2. Choose a secondary operation when a bounded role contribution would unblock
-   the stage without creating lifecycle-bearing child work.
+   the step without creating lifecycle-bearing child work.
 3. Create child Work only when the contribution needs its own claim, branch,
    verify, approval, merge, or backlog visibility.
 4. Route discovery unresolved ambiguity to `exploring`; discovery must not ask
@@ -156,8 +156,9 @@ Context refs:
 Expected outputs:
 - <output>
 Result artifact:
-- Write JSON to <runDir>/agent-result.json
-- Optionally write Markdown to <runDir>/agent-report.md
+- Write structured JSON to the effective claim path supplied in the prompt.
+- Read-only: also write the required companion agent-report.md beside the claim.
+- Mutating: a human-readable report is optional; required external evidence remains.
 ```
 
 The prompt must say that the worker should not call Work lifecycle verbs unless
@@ -197,13 +198,13 @@ Required fields by status:
 
 | Status | Required fields |
 |---|---|
-| `done` | `summary`; at least one `evidenceRefs` entry or a companion `agent-report.md` for read-only work; external git/artifact evidence for mutating work. |
+| `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |
 | `blocked` | `summary`; `blocker`; `evidenceRefs` when any evidence exists. |
 | `failed` | `summary`; `error`. |
 | `no-evidence` | `summary`; reason why evidence is absent. |
 
-Optional `nextRecommendedOperation` may name another legal stage operation, but
-it is only a recommendation. The driver must verify legality before acting.
+Optional `nextRecommendedOperation` may name a legal step operation; it is
+only a recommendation and the Work-layer caller must verify legality.
 
 ## 8. RunResult Confidence
 
@@ -239,7 +240,7 @@ Use Assignment when:
 evidence for a Team Dispatch operation once the result influences a lifecycle
 decision.
 
-## 10. Coding-Domain Stage Protocols
+## 10. Coding-Domain Workflow Step Operations
 
 ### 10.1 Discovery
 
@@ -281,8 +282,9 @@ Planning has two main operation families:
 - `shape-plan` by implementer;
 - `validate-plan` by reviewer.
 
-The stage owner may write the plan directly, but validation should move toward
-a reviewer Assignment once Step 05 adopts operation choice.
+The current coding Workflow already declares `shape-plan` and reviewer
+`validate-plan`; adopting a future Step 05 is not a prerequisite for that
+operation (`domains/coding/workflows/feature.yaml:64-100`).
 
 `validate-plan` is a real reviewer-role operation when dispatched through
 Assignment. Prose that says validating is only an implementer function must be
@@ -322,7 +324,7 @@ lifecycle system. Its job is to keep coordinator, doer, reviewer, and red-team
 sessions aligned while preserving token budget and proof traceability.
 
 The harness should be used where it reduces implementation drift, but dogfooding
-it is not a runtime dependency gate for standalone coordination.
+it is not a runtime dependency gate for current Unit/Workflow execution.
 
 ## 12. Standalone Read-Only Coordination
 

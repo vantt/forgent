@@ -26,6 +26,21 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 These are cognitive artifact shapes and optional manual-harness examples. They do not prescribe a session.md filesystem ledger, manual run records, storage ownership or a nine-phase runtime for the registered architecture-advisory Workflow. Its synthesis template requires a final RAW JSON packet; Workflow owns persistence, gates and resumption. Evidence: core/workflows/architecture-advisory.yaml:43-84 and core/skills/fgos-architecture-panel/SKILL.md:17-37,135-142.
 
+| Optional manual artifact | Current registered counterpart |
+|---|---|
+| intake, interpretation, scout report | Verbatim request and framing report |
+| proposals/system, alternative, constraint | Three blind shaping reports |
+| critique / constraint findings | Reviewed critique reports and findings |
+| synthesis / dispositions | Final synthesis RAW JSON packet |
+| explanation | Explanation report preserving the packet |
+| human turn | Actual owner close-gate answer; no fabricated user input |
+| decision request / specialist / dialogue impact | No automatic graph step; material revisit requires separately authorized reopen |
+| session board / prompts / runs / rubric | Optional manual trace/evaluation; not Workflow storage or completion authority |
+
+All numbered templates below are manual shapes, not phase IDs in the registered
+graph. Their local checklists are cognitive guidance, not new mandatory runtime
+fields, gates, provider rosters or a requirement to write the named files.
+
 ## Current Boundary
 
 The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
@@ -50,12 +65,12 @@ carries nothing.
 
 Three rules apply to every artifact here:
 
-1. **Every artifact carries its own provenance header.** Role, executor,
-   provider, model, tier, source revision, timestamp. An unattributed artifact is
-   unusable as evidence and cannot be red-teamed.
-2. **Artifacts are append-only.** A revision is a new section, not an edit. The
-   superseded text stays readable, because "the panel changed its mind and here
-   is why" is one of the most valuable things a session can demonstrate.
+1. **Attribute manual evidence.** Record the actual role, source revision and
+   observed run reference; do not fill executor/provider/model claims from a
+   requested roster. Registered reports retain their own runtime provenance.
+2. **Preserve revision trace.** Append-only manual exports can retain changed
+   reasoning, but this does not define Workflow's storage or mandate a second
+   ledger beside its registered run records.
 3. **A section you cannot fill honestly gets "not determined" plus what would
    determine it.** Never a plausible-sounding placeholder. The gap is the
    information.
@@ -66,7 +81,7 @@ The role doctrine supplies cognitive expectations. Executable operating rules be
 
 ## Standard Provenance Header
 
-Every artifact starts with this. It is short on purpose; it is checked constantly.
+Optional manual provenance header; registered reports do not require this literal header or the example prompts/runs directory layout.
 
 ```text
 Role: <role name>
@@ -77,13 +92,16 @@ Revision: v<n>  (supersedes v<n-1>, which stays below)
 Written: <timestamp>
 ```
 
-`Reads` matters more than it looks. It is the isolation claim in machine-checkable
-form: a shaper whose `Reads` lists a sibling proposal was not isolated, and a
-critic whose `Reads` omits one proposal did not attack the full set.
+`Reads` is an explicit input claim to check against actual input/confinement
+evidence. A hand-written list alone does not prove machine-enforced isolation.
+Check that critique actually received the proposals it claims to examine.
 
 ---
 
 ## 1. Intake Record — `intake.md`
+
+Registered counterpart: preserve the verbatim request and use the framing
+report. This optional intake file adds no roster-selection or recovery door.
 
 **Why this exists.** It is the only artifact that predates the panel's opinion. It
 is what every later interpretation is checked against, and it is the first thing a
@@ -134,6 +152,9 @@ now inherits a diagnosis nobody made and nobody can trace.
 ---
 
 ## 2. Interpretation — `interpretation.md`
+
+Registered counterpart: the framing report. This optional filename is not a
+separate interpretation step or mandatory runtime artifact.
 
 **Why this exists.** To make the lead advisor's reading a separate, attributable,
 challengeable object rather than an invisible assumption. This is the artifact
@@ -186,6 +207,9 @@ choice rather than by evidence, silently.
 
 ## 3. Scout Report — `scout-report.md`
 
+Registered counterpart: repository investigation in the framing report. There
+is no separately scheduled scout step in the registered advisory graph.
+
 **Why this exists.** To separate what is observed from what is believed, and to
 force disconfirmation to happen before divergence rather than during critique.
 
@@ -216,7 +240,7 @@ force disconfirmation to happen before divergence rather than during critique.
 
 ## Could Not Determine
 <each item: what it is, what I tried, and what would determine it. Flag anything
-that no amount of repository reading can answer — that is a Phase 4 candidate>
+that no amount of repository reading can answer — retain it as a user-exclusive gap>
 ```
 
 **Bad fill.** Adjectives with no counts ("tightly coupled", "limited coverage"),
@@ -227,6 +251,10 @@ contaminates every shaper who reads it.
 ---
 
 ## 4. Decision Request — `decision-request.md`
+
+Optional manual missing-input discipline, not a registered pre-recommendation
+human gate. The current close gate asks one missing-expertise question; carry
+safe defaults for nonblocking gaps and do not invent an intermediate gate.
 
 **Why this exists.** This is the one artifact the person is asked to act on
 before the recommendation exists, so it is the one place premature or ceremonial
@@ -283,6 +311,10 @@ Are Not Asking* section is empty, the filter probably was not applied.
 
 ## 5. Candidate Architecture Proposal — `proposals/<role>.md`
 
+Registered counterpart: blind system/alternative/constraint shaping reports.
+Falsification criteria are quality guidance, not required fields in the current
+shaping template; a claimed timestamp must be backed by an actual observation.
+
 **Why this exists.** To make a proposal into a hypothesis instead of a pitch. The
 falsification section is the load-bearing part of this template and it must be
 written before any critique is visible — its timestamp is checkable evidence that
@@ -333,7 +365,7 @@ different"). And for the alternative shaper specifically: any proposal written
 *relative to* another proposal ("as an alternative to X") — that phrasing is
 proof the isolation failed or was imagined.
 
-### No-Build Path — mandatory sub-shape
+### No-Build Path — cognitive quality sub-shape
 
 The no-build path is a candidate, not a placeholder. It gets the same treatment:
 
@@ -353,6 +385,9 @@ the option most likely to be correct.
 ---
 
 ## 6. Critique / Attack Record — `critiques/<role>.md`
+
+Registered counterpart: reviewed critique. Findings remain attributed; this
+manual record does not automatically reopen shaping or authorize a new run.
 
 **Why this exists.** To turn criticism into something settleable. Every attack
 carries the observation that would resolve it, so the panel can distinguish "we
@@ -396,7 +431,10 @@ was easy.
 
 ---
 
-## 7. Constraint Findings — `proposals/constraint-advocate.md` (Phase 6 section)
+## 7. Constraint Findings — optional manual constraint/critique shape
+
+Registered counterparts: constraint-lens shaping and reviewed critique reports,
+not a separate numbered runtime phase or mandatory file.
 
 **Why this exists.** To force ranking and reversibility judgment, which is the
 entire value of this role. A flat risk list is indistinguishable from noise.
@@ -425,6 +463,11 @@ judgment nobody else in the panel is making.
 ---
 
 ## 8. Decision Packet — `synthesis.md`
+
+Registered counterpart: the final RAW JSON synthesis packet. This Markdown
+shape is an optional manual reading aid, not a substitute for the required
+packet fields. Per-claim confidence is optional; `"missing expertise"` is a
+required array in the registered packet.
 
 **Why this exists.** This is what the person receives. It has to be decisive
 enough to be useful and honest enough to be trustworthy, and those pull against
@@ -496,13 +539,13 @@ Missing provenance.
 
 ## 9. Human-Facing Explanation — `explanation.md`
 
-**Why this exists.** This is Phase 8's output and the only artifact written to be
-read by the person rather than by the panel. It is a separate file from
-`synthesis.md` deliberately: the packet is the panel's record, complete with
-provenance and unchecked criteria, and the explanation is the handover. Merging
-them produces a document that is too internal to hand over and too edited to
-audit. The explanation's job is ownership — the person has to be able to defend
-this decision to a colleague who was not here, using their own words.
+**Why this exists.** Explanation is a distinct registered report preserving
+the final packet's verdict, expertise list and dissent. The optional manual
+`explanation.md` below is a human-facing reading aid, not a required separate
+filesystem export or the output of a retired Phase 8 graph.
+The explanation supports ownership: the person should be able to defend the
+recommendation's consequences and evidence to a colleague, without changing
+the packet's verdict or laundering its unresolved dissent.
 
 ```text
 # Explanation — <case slug>
@@ -569,6 +612,9 @@ owning a decision and a person complying with one.
 
 ## 10. Dialogue Turn — `human/<n>-person.md`
 
+Registered counterpart: the actual human close answer. This optional transcript
+file cannot replace the public Workflow answer or fabricate approval.
+
 **Why this exists.** The person's words are evidence with the highest authority
 in the session. They are stored alone, unedited, so that no later artifact can be
 mistaken for them.
@@ -598,6 +644,9 @@ even if the guess was correct.
 ---
 
 ## 11. Dialogue Impact Assessment — `dialogue/<n>-impact.md`
+
+Optional manual interpretation of a turn; not a conditional graph node.
+Material revisit uses the separately authorized registered reopen Workflow.
 
 **Why this exists.** A dialogue turn is not self-interpreting. This artifact is
 where the lead advisor says what it thinks the turn means, what it changes, and
@@ -632,7 +681,7 @@ comment from spuriously reopening the whole session>
 
 ## What Reopens, If Anything
 
-Phase: <none | 3 | 5 | 6 | 7>
+Affected registered report: <framing | shaping | critique | synthesis | explanation; no automatic jump>
 Scope of the reopen: <bounded, specific, predeclared>
 Why nothing smaller would do: <a reopen is expensive; justify it>
 
@@ -654,6 +703,9 @@ interpretation into the person's voice, and a reopen with unbounded scope
 ---
 
 ## 12. Dialogue Response — `dialogue/<n>-response.md`
+
+Optional manual response trace. Registered gates/continuation remain with
+Workflow; no companion-directory crash-recovery guarantee is asserted.
 
 **Why this exists.** This is the fourth and last layer of the Dialogue Turn
 Protocol, and the one most likely to go unwritten — because a clarification
@@ -716,6 +768,10 @@ all, for a turn the coordinator answered in conversation and considered handled.
 ---
 
 ## 13. Disposition Entry — `dispositions.md` (append-only)
+
+Registered counterpart: disposition content in the final RAW JSON packet,
+challenged by its reviewer/red-team. This manual append-only ledger is optional
+and grants no independent driver authorization or human decision authority.
 
 **Why this exists.** Disposition is an authority act. Recording it with its
 evidence is what makes the authority auditable, and what lets a red-team catch a
@@ -838,7 +894,7 @@ Immutable: yes — if this prompt was wrong, dispatch a new ordinal
 ## Your Role
 
 <point at the role doctrine by path; do not paste it>
-Read: docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md,
+Read: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md,
 section <role>
 
 ## The Case
@@ -902,23 +958,22 @@ overclaim.
 
 ## 17. Red-Team Report — `redteam.md`
 
-**Why this exists.** The role doctrine requires the independent red-team to
-produce this file, so it needs a shape nobody has to invent. Its structure is
-adversarial on purpose: the unit is an *attack*, not a *section*, because a
-red-team organized by topic drifts into being a second, softer critique. An
-attack names what was checked, what was found in the artifact, and what that
-means — and attacks that failed are reported at the same weight as attacks that
-landed, because "I tried to break this and could not" is the report's only source
-of positive evidence.
+**Why this exists.** This optional manual attack-record shape supports cognitive
+red-team quality. The registered red-team checker reads the actual final RAW
+JSON packet and emits concrete findings/evidence or explicitly none; it does
+not require a file named `redteam.md` or a manual `APPROVE` enum.
+An attack names what was actually checked, the observed result and its
+consequence. Failed attacks are reported too, so a reader distinguishes tested
+claims from untested ones; no check may be fabricated from a filled template.
 
-The red-team attacks the packet and the panel, not the proposals. It writes
-before seeing `review.md`, and the reviewer writes before seeing this file.
+The current target is the final producer packet. Check actual checker inputs
+before claiming independence; manual file ordering alone does not prove it.
 
 ```text
 # Red-Team — <case slug> (verdict: <APPROVE | REVISE | INSUFFICIENT-EVIDENCE>)
 
-<provenance header — must be a different provider family from the synthesizer;
-Reads: the full evidence directory, including prompts/ and runs/>
+<actual observed provenance, not a mandated provider-family roster;
+Reads: the actual packet and supplied evidence references>
 
 ## Attack <letter> — <what I tried to falsify>: <PASSED | FAILED | PARTIAL>
 
@@ -961,16 +1016,15 @@ provenance, and the driver's authority went unchecked.
 
 ## 18. Reviewer Assessment — `review.md`
 
-**Why this exists.** The reviewer is a separate actor from the red-team with a
-separate job, so it gets a separate file. The red-team assumes the session is
-wrong and hunts for the mechanism. The reviewer asks whether the session did what
-it set out to do — whether each phase's obligations were actually met, whether
-the artifacts a fresh coordinator would need exist and are usable, whether the
-rubric's dimensions are answerable from what is on disk.
+**Why this exists.** The registered reviewer and red-team challenge the producer's
+final synthesis packet through the reviewed pattern. This optional manual
+assessment broadens process/evidence questions without adding a separate
+post-explanation reviewer step, file or completion gate.
 
-The two run independently and neither reads the other before writing. Merging
-them into one file destroys that independence and, in practice, produces one
-document in the voice of whichever ran first.
+A manual directory recovery exercise may be useful when that manual harness
+is actually used. It is not the registered Workflow's completion criterion.
+Independence must come from the executed seat/input/confinement evidence,
+not from having two filenames or asserting neither read the other.
 
 ```text
 # Review — <case slug> (verdict: <PASS | REVISE | INSUFFICIENT-EVIDENCE>)
@@ -1026,6 +1080,9 @@ same severity as a missing artifact.
 ---
 
 ## 19. Rubric Assessment — `rubric.md`
+
+Optional manual evaluation, not a registered graph step, schema or completion
+gate. Actual owner feedback must remain attributable; do not manufacture it.
 
 **Why this exists.** The person's own judgment of the session is evidence, and it
 must be captured before any evaluator can anchor them. The file's ordering
@@ -1098,14 +1155,12 @@ failure of the whole assessment, not a procedural nit.
   runs/<ordinal>-<role>.json
 ```
 
-These names are the same ones the
-[coordinator prompt](prompts/architecture-advisory-coordinator.md)'s PERSISTENT
-STATE tree fixes, and they are fixed for one reason: a coordinator resuming with
-no chat history must never have to guess where the previous one put something. If
-a session needs an artifact neither document names, that is a gap in the playbook
-— record it in `session.md` rather than coining a filename a successor will not
-know to look for.
+This is an optional manual trace layout, not the coordinator companion's fixed
+PERSISTENT STATE tree: that companion is cognitive-only. Registered status,
+storage, human gates and continuation belong to Workflow.
 
-A session is finished when a coordinator who has never seen the conversation can
-read `session.md`, then `intake.md`, then the newest `human/` turn, and know
-exactly what to do next. That is the test — not whether every file exists.
+For a manual harness, a fresh reader being able to reconstruct the next action
+is useful continuity evidence. For registered execution, completion follows the
+declared Workflow and its close gate; neither directory completeness nor a
+manual recovery exercise substitutes for it. Completion is not approval of the
+advice or permission to implement.

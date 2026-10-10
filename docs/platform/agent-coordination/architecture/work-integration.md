@@ -28,11 +28,11 @@ The implementation column below bounds the retained text. Proposed typed interfa
 
 | Section | Status | Evidence / limit |
 |---|---|---|
-| Core Invariant | Mixed implementation and proposal; no blanket implementation claim | docs/specs/runner.md:3072-3081 (0049: Work has no stage, A4 import ban); git grep 'from .*state/' in src/runner/dispatch src/runner/execution -> no hits; src/state/work.mjs:455-457 |
-| Coordination May | Mixed implementation and proposal; no blanket implementation claim | src/workflow/runner.mjs:419-428 (runUnit returns result to Workflow runner, which drives Work); src/runner/dispatch/run-result.mjs:350-385 |
-| Coordination May Not | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch and src/runner/execution import nothing from src/state (A4, runner.md 0049 item 3); src/state/work.mjs:455 stage retired |
-| Child Work | Mixed implementation and proposal; no blanket implementation claim | docs/specs/runner.md:1224 and :2378 (child work = work.parent edge) |
-| Work Driver Handoff To Dispatch | Unimplemented design proposal | git grep DispatchRequest/PolicyPatch in src packages apps core -> no hits (docs only); src/runner/dispatch/assignment-runner.mjs:62,2286 resolveExecutorConfig is used inside dispatch only |
+| Core Invariant | Current lifecycle boundary | Work records `workflowStep`; `stage` is rejected by src/state/work.mjs:455-467. The Workflow runner drives Work around execution; dispatch/execution do not own its lifecycle. |
+| Execution May | Current handoff and result boundary | src/workflow/runner.mjs:419-428 invokes execution and consumes its result; src/runner/dispatch/run-result.mjs:350-385 owns result normalization. |
+| Execution May Not | Current authority boundary | Execution does not replace Work lifecycle/approval/merge verbs; work.stage is not a valid current field (src/state/work.mjs:455-467). |
+| Child Work | Delivery-lifecycle decision, not automatic dispatch side effect | Child Work uses the Work parent edge; an execution attempt alone does not create a backlog item. |
+| Work Driver Handoff To Dispatch | Current policy implementation; proposed typed request name distinguished | PolicyPatch is used by src/runner/dispatch/assignment-policy.mjs:172-181 and execution-contract.mjs:229-235. `DispatchRequest` is a design name, not a shipped normalizer/type. Executor configuration resolution belongs inside dispatch. |
 | Isolation | Mixed implementation and proposal; no blanket implementation claim | src/workflow/runner.mjs:385-391 (createWorkflowWorktree per Unit), :173-176 (cleanup keeps failed worktrees); assignment-runner.mjs:497 worktree mismatch refusal |
 
 ## Core Invariant
@@ -44,26 +44,27 @@ Execution returns evidence and recommendations to the Work driver.
 
 Work attachment is optional per the
 [Agent Coordination Foundation Vision](../vision.md). These boundaries apply
-whenever a session references Work; standalone coordination uses the same
-dispatch/runtime/evidence core without gaining a delivery lifecycle.
+when a Unit or Workflow execution references Work. Supporting execution without
+a Work item does not acquire a separate delivery lifecycle.
 
 ## Execution May
 
-- read Work requirements, decisions, artifacts, stage, and allowed repository
-  scope;
-- execute a legal Work Stage Operation through Assignment;
+- read Work requirements, decisions, artifacts, `workflowStep`, and allowed
+  repository scope;
+- execute a Workflow step operation through the applicable Assignment/Unit door;
 - return RunResults, evidence, review findings, or synthesis;
 - inform the driver's choice of an existing Work verb;
-- reference child Work and session-local supporting activity.
+- reference child Work and supporting execution without inventing session-local
+  lifecycle entities.
 
 ## Execution May Not
 
-- directly move Work stage or status;
+- directly replace Work `workflowStep` or status outside its owning verbs;
 - infer acceptance or approval from agent consensus;
 - claim/return Work outside existing lifecycle verbs;
 - merge a branch outside Work merge policy;
-- mark Work complete because a Run or session completed;
-- duplicate Work stage/status/approval/merge state in another runtime.
+- mark Work complete merely because a Run or Unit completed;
+- duplicate Work step/status/approval/merge state in another runtime.
 
 ## Child Work
 
@@ -71,6 +72,18 @@ Child Work is appropriate when a unit needs independently durable backlog,
 claim, acceptance, approval, dependency, branch, merge, or resume behavior.
 
 ## Work Driver Handoff To Dispatch
+
+The Work driver supplies the task target/capability, policy inputs and provenance
+to the governed execution door. It does not call `resolveExecutorConfig` to
+bypass dispatch planning, governance or confinement. Dispatch resolves execution
+configuration; the Work driver retains the subsequent lifecycle decision.
+
+The current policy resolver accepts caller `policyInputs` (with its existing
+`cliOverride` alias) and records effective-policy provenance. This is distinct
+from the proposed `DispatchRequest` schema: a design request name must not be
+treated as an exported normalizer or an additional Work write door.
+
+See the [area portal](../README.md) and [runner spec](../../../specs/runner.md).
 
 ## Isolation
 

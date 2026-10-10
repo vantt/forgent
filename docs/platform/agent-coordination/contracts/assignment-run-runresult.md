@@ -53,15 +53,17 @@ Assignment is an immutable semantic request. It should identify:
 - result/artifact destination contract;
 - creation timestamp and caller provenance.
 
-Assignment construction has two accepted provenance classes:
+Current construction has three provenance kinds:
 
-1. a declared Stage Operation and TaskSpec;
-2. an agent-proposed inline execution contract validated by foundation policy
-   and any selected domain harness.
+1. declared Workflow step operation/TaskSpec;
+2. validated inline contract and applicable registered domain harness;
+3. Unit-run execution and its computed binding.
 
 [ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
-accepts how both classes converge: every Assignment carries
-`provenance.kind = declared | inline` in the original decision, with policy/normalizer versions and the validator chain. The normalizer stamps `mutation` and `evidence.required` onto the immutable snapshot. Current Unit-run provenance is also accepted by the dispatch path. Evidence: src/runner/dispatch/assignment-normalizer.mjs:2-20; assignment-runner.mjs:431,560,574. The former read-only first-slice restriction is historical, not a current blanket inline restriction.
+distinguishes their shapes. Declared/inline builders stamp policy/normalizer
+versions; Unit-run provenance is written by `execution/run.mjs:334-338`.
+Mutation/evidence normalization is current implementation, not an assumption
+that the retired session stamp-producing door still exists.
 
 Assignment does not contain attempt status as lifecycle truth. Retry does not
 rewrite the Assignment.
@@ -87,7 +89,7 @@ is allowed to exist". Every runtime-layer concern (RunHandle, continuation
 planning, executor fallback) reads and references Run; none of them admits an
 attempt on its own.
 
-Phases, in order:
+Proposed phase vocabulary, not a claim that the writer persists every transition:
 
 | Phase | Meaning | Must hold before entering |
 |---|---|---|
@@ -97,7 +99,25 @@ Phases, in order:
 | `delivered` | The work prompt/input reached the worker. | Bound. Delivery is a tri-state fact: `not-sent`, `sent`, `unknown`. A request sent without acknowledgment is `unknown`, never "launch failed". |
 | `settled` | A normalized RunResult or an explicit failure record exists. | Any earlier phase; crash windows settle as explicit failure with the phase reached. |
 
+The current writer initializes `phase: admitted` and `delivery: not-sent`
+(`assignment-runner.mjs:1562-1582`). Runtime inspection derives additional
+observations; recognizing `bound`/`delivered` does not prove those proposed
+phase transitions are durably written. Herdr launch reconciliation uses both
+Run identity and its persisted launch-command identity.
+
 Admission rules:
+
+- Admission uses immutable generation records and deterministic attempt identity
+  (`assignment-runner.mjs:697-714,895-910`).
+- When a `retryId` is supplied, the same destination/payload tuple reuses its
+  admission; a changed tuple or invalid predecessor refuses
+  (`assignment-runner.mjs:724-730,914-924`). This stricter tuple behavior is opt-in,
+  not the behavior of every legacy attempt caller.
+- A prior un-settled Run with live/unknown control holder refuses another
+  admission unless the caller explicitly requests `forceNewAttempt`; settled
+  result refusal is separately opt-in (`assignment-runner.mjs:926-940,1554-1561`).
+- Admission observations are not semantic acceptance. Corrupt settlement must
+  not be overwritten by a fresh launch.
 
 Three guarantees, kept distinct:
 
@@ -109,10 +129,10 @@ Three guarantees, kept distinct:
   disproven, or a PID reused after a host reboot is never mistaken for a dead
   holder's slot. Observers hold no lock. A controller that lost the lock may
   not deliver input, terminate, or write Run/RunHandle state.
-- **Result fencing** — a superseded Run loses the right to publish the
-  Assignment's authoritative result (`result-linked` after `run-retried`).
-  Its late result is still stored and validated: it may prove an effect
-  already happened.
+- **Result fencing (stronger proposal)** — authoritative result-link exclusion
+  for superseded Runs requires its own implemented eligibility owner. The old
+  session `result-linked`/`run-retried` event order is historical, not a current
+  standalone event API or proven guarantee.
 - **Effect protection** — deduplication or isolation at the place the effect
   occurs. Owned by the operation contract and its adapter. Run promises no
   exactly-once external effect; a stopped worker does not mean its effects
@@ -131,7 +151,7 @@ would make their guarantees verifiable. See
 [Runtime Recovery Design](../architecture/runtime-recovery-design.md) for scope,
 local publication/locking, compatibility and proof.
 
-**Run record.** New writer format `assignment-run.v2` adds:
+**Proposed stronger Run record.** The implemented `assignment-run.v2` subset is described above; the full field set below is not today's writer schema:
 
 | Field | Semantics |
 |---|---|
@@ -229,7 +249,7 @@ RunResult is the normalized outcome for one Run. It should identify:
 ### Dispatch Operability Addendum
 
 The dispatch-operability design track
-(`plans/260914-dispatch-operability-evidence-attribution/`) now supplies RunResult
+(`archive/plans/260914-dispatch-operability-evidence-attribution/`) records RunResult
 v2 interpretation and read-only Dispatch runtime inspection while preserving
 `result.json` as the one terminal RunResult location:
 
@@ -247,8 +267,9 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
 - A v2 result whose compatibility `status`/`confidence` disagrees with its
   classification is `contract-corrupt` and fails closed.
 
-The accepted design authority is
-`plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`.
+The archived design record is
+`archive/plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`;
+it is historical design evidence, not a second live authority overriding code.
 The implementation proof for this slice is
 `test/runner/dispatch-operability-production-door.test.mjs`, which exercises
 the production Assignment door, public inspect CLI, historical/replayed result
@@ -281,8 +302,9 @@ adapter/confinement evidence with declared positive coverage can produce
 
 ## Work Boundary
 
-Assignment, Run, and RunResult may reference Work and inform its driver. None is
-authorized to move Work status/stage, accept, approve, claim, return, or merge.
+Assignment, Run and RunResult may reference Work and inform its driver. None
+independently owns Work status/workflowStep, acceptance, approval, claim/return
+or merge; lifecycle actions go through the authorized Work verbs.
 
 ## Required Negative Tests
 

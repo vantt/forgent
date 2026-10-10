@@ -26,7 +26,16 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ### Participant
 
+Platform event-log participant: any process that speaks the event-log format
+and append/read/subscribe contract, including a non-Node implementation
+(`docs/specs/platform-foundations.md:210-219`). Do not redefine this platform
+term as a CoordinationSession actor or a terminal pane.
+
 ### Job
+
+Reserved for a future durable scheduler/queue abstraction. No current Job
+record or Job-based dispatch selector is implied; Assignment and Run retain
+their distinct identities. See [ADR-004](../decisions/ADR-004-reserve-job.md).
 
 ### Mission
 
@@ -36,9 +45,10 @@ Reserved vocabulary, not a current execution identity or a reason to create a se
 
 ### Cell
 
-May be used informally in implementation planning or the operating harness, but
-is not currently a canonical runtime entity. Use AdhocTask for the proposed
-session-local runtime concept and child Work for durable lifecycle units.
+An informal planning/manual-harness unit, not a current universal runtime
+entity. Use Unit/Workflow execution for immediate execution and child Work
+when an independently durable delivery lifecycle is required. The retired
+AdhocTask/session-local proposal is not a current API.
 
 ### Exec Packet
 
@@ -62,6 +72,12 @@ Avoid without qualification. Distinguish process settlement, worker claim,
 task satisfaction, Work completion, and visible terminal state.
 
 ## Forbidden Equivalences
+
+- Participant is not a CoordinationSession actor.
+- Job is not Work, Assignment, Run or a capability selector.
+- Cell is not an implicit persisted task or Work record.
+- Worker claim is not normalized RunResult or verified completion.
+- Process exit or pane quietness is not Work acceptance/approval.
 
 ## Historical Vocabulary
 

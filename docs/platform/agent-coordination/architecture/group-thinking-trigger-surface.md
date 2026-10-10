@@ -28,14 +28,14 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 together. A person describes the outcome they want, such as review, compare,
 debate, red-team, or independent opinions. They do not select a protocol.
 
-`fgos-panel` owns this surface routing. It selects one use-case preset and then
-hands an explicit registered protocol id to `fgos-group-thinking`, which remains
-the thin pack gate. No CLI verb, protocol, capability, or execution path is
-added by this surface.
+`fgos-panel` owns intent-first selection and routes to a named Workflow or a
+CollaborationPattern preset. For discussion Workflows it may start the Workflow
+directly or delegate to `fgos-group-thinking` after selecting the name. The latter
+is not a current protocol-pack gate. This surface adds no private execution path.
 
 ## Baseline UX Audit
 
-This table records the surface before `fgos-panel` was introduced.
+This is a dated pre-introduction UX audit, not a list of currently installed skills or commands. In particular `fgos-code-panel` and the protocol-pack gate below are historical; today's explicit implementation route is `fgos-run`.
 
 | Current trigger | User mental model | Required knowledge | Problem | Proposed surface |
 |---|---|---|---|---|
@@ -49,7 +49,7 @@ This table records the surface before `fgos-panel` was introduced.
 | Historical coordination run/show | Retired session-engine UX | Preserved in the historical snapshot | Not a current execution door | Use current Workflow/Unit owners |
 | "Get independent opinions" | Fresh views before commitment | Nothing beyond the question | Previously had no reliable skill trigger and could collapse to one-agent advice | `independent-feedback` or `option-comparison`, based on whether options exist |
 | "Red-team this decision" | Attack assumptions and failure modes | Nothing beyond the decision/proposal | Could misroute to code implementation red-team | `architecture-panel` for architecture; otherwise `proposal-review` |
-| "Coding decision panel" | Advisory design choice | Nothing beyond the choice | Could misroute to mutating `fgos-code-panel` | Non-mutating `architecture-panel` or `option-comparison`; use `fgos-code-panel` only when implementation is explicitly requested |
+| "Coding decision panel" | Advisory design choice | Nothing beyond the choice | Historical misroute to mutating `fgos-code-panel` | Current advisory route is `architecture-panel`/`option-comparison`; explicit implementation uses `fgos-run`, not the removed code-panel skill |
 | "Business panel" | Multi-perspective business decision | Nothing beyond the business question | Existing named skills look coding-specific | Generic `option-comparison`, `proposal-review`, or `independent-feedback` preset |
 
 ## Vocabulary Evaluation
@@ -69,7 +69,7 @@ This table records the surface before `fgos-panel` was introduced.
 
 ## Surface Taxonomy
 
-This current preset map follows the live consumer in core/skills/fgos-panel/SKILL.md:43-59. The former protocol-id mapping is historical, not a second runtime authority.
+This is the canonical surface preset map consumed by `core/skills/fgos-panel/SKILL.md:36-59`, not a second runtime sequencer. The skill's current routes implement the named Workflow/CollaborationPattern owners below; the former protocol-id mapping is historical.
 
 | Requested use case | Selected surface | Current execution owner |
 |---|---|---|
@@ -86,13 +86,13 @@ This current preset map follows the live consumer in core/skills/fgos-panel/SKIL
 
 | User phrase | Expected route |
 |---|---|
-| "run a panel on whether we should split this service" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |
+| "run a panel on whether we should split this service" | `architecture-panel` -> `fgos-architecture-panel` -> `architecture-advisory` Workflow |
 | "compare these 3 implementation options" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |
-| "red-team this architecture decision" | `architecture-panel`; red-team remains a declared phase inside that protocol |
+| "red-team this architecture decision" | `architecture-panel`; reviewer/red-team checks belong to the registered advisory synthesis unit |
 | "get independent opinions before I commit" | `independent-feedback`; ask only for the subject if it is absent |
 | "review this proposal with group thinking" | `proposal-review`; use the proposal text or artifact already in scope |
 | "business panel: should we change pricing?" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |
-| "coding panel: should this be a plugin or core feature?" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |
+| "coding panel: should this be a plugin or core feature?" | `coding-design-panel` -> `architecture-panel`; never the mutating `code-change-panel` route because no implementation was requested |
 
 ## Clarification Rules
 
@@ -129,6 +129,10 @@ Extract the subject, accessible artifact/options and material scope, select the 
 
 Do not invent actors, grants, transitions, quorum, close rules, routing pins or an alternate session engine in task prose. Status and human answers use the registered Workflow doors. Evidence: core/skills/fgos-panel/SKILL.md:65-108.
 
+A purpose/use-case preset is not another dispatch ontology or routing identity.
+Selection fills the existing advisory/coding capability and task contract; it
+must not manufacture a capability merely because an alias is used in conversation.
+
 ## Entry Point Choice
 
 Use fgos-panel for intent-first preset selection, fgos-group-thinking for named discussion Workflow use, and fgos-architecture-panel for architecture-advisory. Only explicit code implementation/change requests route to fgos-run. Workflow status, answer and resume use the Workflow run id; the retired coordination run/show doors are not current. Evidence: core/skills/fgos-panel/SKILL.md:45-75.
@@ -137,21 +141,21 @@ Use fgos-panel for intent-first preset selection, fgos-group-thinking for named 
 
 ### A. Keep only `fgos-group-thinking`
 
-Smallest file change, but preserves the central failure: its pack gate correctly
-requires an explicit id from its caller. Teaching protocol ids in examples would
-make the person learn core vocabulary rather than fixing the surface.
+Historically this left protocol-pack selection exposed to the person. The
+current named-Workflow skill can execute an already selected method, but it does
+not replace intent-first surface selection.
 
 ### B. Add `fgos-panel`
 
-Selected. It gives natural requests one memorable entrypoint, keeps all mapping
-in this canonical table, and delegates unchanged execution to the pack gate and
-registered protocol. Existing specialist skills remain available.
+Selected. Natural requests use one surface and the canonical table, while named
+Workflow/CollaborationPattern owners retain execution semantics. Selection is
+not permission to implement an advisory request.
 
 ### C. Rename or deprecate the existing skills
 
-Rejected for now. `fgos-group-thinking` is an accurate internal gate name,
-`fgos-architecture-panel` is already a strong specialist surface, and
-`fgos-code-panel` has a distinct mutating contract. Renaming creates migration
-cost without improving the new happy path. Their descriptions instead state the
-boundary and preserve backward compatibility.
+The earlier keep-all-skills decision was dated migration reasoning.
+`fgos-code-panel` is no longer a current installed implementation facade;
+explicit code-change requests route to `fgos-run`. `fgos-architecture-panel`
+retains the specialized advisory route and `fgos-group-thinking` handles named
+discussion Workflows.
 

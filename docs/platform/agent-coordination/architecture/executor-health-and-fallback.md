@@ -41,7 +41,7 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Stage | Owner | Output |
 |---|---|---|
 | Worker result interpretation | Existing normalizer/evaluator | Per-Run result; not an executor-health judgment. |
-| Liveness classification | Existing signal ladder | Nonterminal or settled/blocked/died/ceiling/paused-limit/idle outcome. |
+| Liveness classification | Existing signal ladder | Nonterminal or settled/blocked/died/timed-out-ceiling/provider-limit/timed-out-idle; `paused-limit` is a compatibility pane-fate alias, not evaluateLadder's emitted limit outcome. |
 | Effect and workspace retry eligibility | Operation recovery adapter plus runtime facts | Eligible/reconcile/forbidden verdict. |
 | Retry/park/halt and bounds | Existing recovery matrix, extended with an explicit runtime projection | Coarse decision and cap reasons. |
 | Candidate ordering | Pure fallback resolver | Ordered selection/rejections. |
@@ -72,13 +72,16 @@ The order and behavior in `src/runner/dispatch/liveness.mjs` are ported:
 2. Blocked beats timeout: answer the existing question, do not retry.
 3. Death requires consecutive absent readings (default 3); unknown/present reset.
 4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.
-5. Only stale evaluation reads screen; working itself is progress even with zero
-   stdout, and blind intervals are subtracted from idle duration.
+5. Idle/stale evaluation subtracts blind time; working is progress even with
+   zero stdout. Screen reads are requested at the stale boundary, and an early
+   credential probe also runs after fifteen seconds of non-working idle time
+   (`liveness.mjs:267-299`). Thus screen reads are not stale-only.
 
-A screen request is a second stage of the same sample, not another death reading.
-Keep all failure panes by default. Paused-limit survives automated closeAlways;
-operator destructive intent is separate and guarded. Never infer Run completion
-from agent_status or pane idleness.
+A requested screen is the second stage of the sample, not another death read.
+`evaluateLadder` emits `provider-limit` for credential/quota screen matches.
+Its pane fate is `keep-always`; `paused-limit` remains a recognized alias.
+Operator destructive intent is separate and guarded. Pane idleness does not
+prove Run completion.
 
 Zero output is a fact orthogonal to outcome. A 35-minute zero-output incident can
 be timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.
@@ -109,46 +112,35 @@ for its current Work-runner callers and `resolveStaleDoing` semantics.
 `verify-miss`, `verify-timeout`, `worktree-fail`, `reject-returned`,
 `stale-doing` and `state-conflict` keep their Work-runner meaning. Do not route
 them into executor fallback simply because some coarse entries say retry.
-For timed-out-ceiling, original session/Run bounds remain binding; an expired
-session cannot dispatch a fallback. An eligible retry under still-valid session
-authority gets its own bounded Run; it does not extend the old Run ceiling.
+For timed-out-ceiling, the Run's applicable admission/budget bounds remain
+binding. Retry does not extend the failed Run's ceiling; a replacement needs
+its own eligible admission. No current session graph grants fallback authority.
 
 ## 4. One Attempt History, Explicit Caps
 
-Canonical count A = number of committed admissions for the Assignment, including
-admitted attempts that failed before launch. It never resets on restart, changed
-executor, changed error class or a new observer. Repeating an admissionKey does
-not increment A. Pure refusal before admission consumes no attempt.
+Current durable Run admission and attempt accounting are implemented in
+`src/runner/dispatch/assignment-runner.mjs:672-783`. Retry attempts retain the
+Assignment and previous evidence; observer restarts are not a fresh semantic
+request. Exact admission caps must come from that implementation/effective
+contract, not a retired session retry declaration.
 
-For executor e, E(e) counts those same admissions selecting e.
-Retry count R = max(0, A - 1). Session retry declarations may reserve the next
-attempt before it is admitted; a pending declaration is resumed, not counted as
-a completed extra Run. Reservation checks include any outstanding declaration.
+The older Work-runner recovery matrix separately uses
+`DEFAULT_MAX_RETRIES = 2` (`src/runner/recovery.mjs:91`).
+Its claim-attempt counter is not interchangeable with every Assignment
+admission counter.
 
-Default policy is a derived view of effective DispatchRequest/PolicyPatch:
-- candidates = unique `[selected primary, ...fallbackExecutors]`, preserving order;
-- maxAttemptsPerExecutor = 1;
-- maxAttemptsPerAssignment = 2 (the existing recovery default's total-attempt
-  threshold for a retryable runtime failure);
-- no automatic retry-same; no fallback if explicitly pinned no-fallback;
-- no observation store, cooldown or scoring;
-- retry backoff remains the caller's existing bounded scheduling policy; no new
-  configurable exponential-backoff subsystem in the default.
+The proposed `maxAttemptsPerAssignment`/`maxAttemptsPerExecutor` policy and
+unique primary-plus-fallback candidate list are not accepted current config
+fields or a shipped universal default. `fallbackExecutors` is recorded but
+reserved-not-executed by the Assignment policy resolver
+(`assignment-policy.mjs:380-388`). Current Execution Core quota fallback uses
+its own binding/replacement path; this proposal must not claim the old session
+`maxRetries` mechanism still schedules it.
 
-A candidate can be admitted only if A < maxAttemptsPerAssignment and
-E(candidate) < maxAttemptsPerExecutor. With maxAttempts=2, initial Run 1 fails,
-Run 2 may use the next candidate; no third admission. The Session's existing
-maxRetries counts retry declarations after the initial attempt: its allowance is
-`1 + maxRetries` total attempts, not a number directly passed to the old
-per-class claim resolver. The stricter effective cap always wins. Other session
-assignment/concurrency/wall-time bounds remain independent predicates.
-
-The runtime projection consumes the SAME recovery table's action/default limit,
-using Assignment admission history as its counter input; it does not reset on
-class changes. Existing claim-scoped callers of resolveAction keep their current
-counter semantics. Name both scopes in APIs/tests so one integer is not silently
-reinterpreted. Future policy can permit retry-same with the same history and caps,
-but that is not today's default E-b proof.
+Future unified caps would count admitted attempts, including pre-launch
+failure, preserve counts across executors and reject exhaustion before another
+admission. This is a design requirement, not proof that the proposed two-attempt,
+one-attempt-per-executor schema is implemented.
 
 ## 5. EffectGuaranteePort
 
@@ -158,14 +150,15 @@ recoveryMaterialRef, destinationExecutorFacts, now})` returns a typed verdict:
 - reconcile with required fact refs/reason;
 - forbidden with reason.
 
-The operation contract declares repeat mode explicitly: before-delivery-only,
-read-only, idempotent, dedup-keyed or never. The first protocol profile declares
-`repeatMode: read-only` in its review/red-team YAML operation contracts. The
-read-only effect boundary is derived from the selected executor's DispatchPlan
-(`providerModel` and executor facts): provider endpoints may be allowed, while
-unlisted external sinks are denied. Operations declare only sinks whose repeated
-write is part of their contract; a sink that can change outcome needs its own
-dedup identity. The runtime never infers this from `Assignment.mutation`.
+An operation's repeat mode must be explicit; it is not inferred from
+`Assignment.mutation`. Supported current policy values are checked by
+`assignment-policy.mjs:439-453`, and recovery assessment refuses to infer mode
+(`src/runner/dispatch/recovery.mjs:201-206`). No current review/red-team YAML
+profile is claimed here to declare `repeatMode: read-only`.
+
+The following effect-sink, deduplication and guarantee model belongs to the
+proposed EffectGuaranteePort, not a shipped generic effect ledger. Operations
+would need their own effect identity and adapter proof before enabling it.
 Missing/unknown mode cannot authorize automatic
 retry after possible delivery. The adapter verifies facts appropriate to that
 mode, rather than demanding every idempotent operation have a dedup service.

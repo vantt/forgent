@@ -64,7 +64,7 @@ This area does not own:
 
 ## Core Entities
 
-The current data and execution owners are [Unit](../../../src/runner/execution/unit.mjs), [CollaborationPattern](../../../src/runner/execution/patterns/index.mjs) and the [Workflow runner](../../../src/workflow/runner.mjs). Retired CoordinationSession and FlowDefinition claims remain verbatim in [history](history/retired-engine/spec.md#literal-snapshot), not this current-state map.
+Current entities include [Unit](../../../src/runner/execution/unit.mjs), [CollaborationPattern](../../../src/runner/execution/patterns/index.mjs), Workflow definitions/runs, Assignment, Run, RunResult and the compiled DispatchPlan. Unit/Workflow execution uses the pattern/Workflow runners; Assignment construction, plan compilation, attempt admission and result normalization retain their dispatch-module owners listed above. This is not an exclusive three-entity list. CoordinationSession and FlowDefinition remain verbatim [history](history/retired-engine/spec.md#literal-snapshot), not current runtime prerequisites.
 
 ## Operations And Flows
 
@@ -91,7 +91,7 @@ Unit/Workflow execution ownership is described by [docs/specs/runner.md](../../s
 
 ## Implementation Status
 
-The coordination CLI/engine was removed in `2180b4e72701bb090288af8fe8021008d9d42079`. Current implementation is inspected through `src/runner/execution/` and `src/workflow/`; the dated implementation/status table is [preserved verbatim](history/retired-engine/spec.md#literal-snapshot).
+The coordination CLI/engine was removed in `2180b4e72701bb090288af8fe8021008d9d42079`. Current execution is inspected through `src/runner/execution/`, `src/workflow/` and the surviving `src/runner/dispatch/` owners. Dormant session-ownership checks still exist in dispatch recovery; their presence does not restore the retired CLI/engine. The dated implementation/status table is [preserved verbatim](history/retired-engine/spec.md#literal-snapshot).
 
 The former claim-by-claim evidence table is [retained history](history/retired-engine/verification/implementation-alignment.md#literal-snapshot), not proof of current implementation.
 

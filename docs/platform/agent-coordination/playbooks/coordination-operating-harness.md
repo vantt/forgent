@@ -24,31 +24,25 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ## Runtime And Lifecycle Notice
 
-This harness is an engineering bootstrap/manual fallback. Agent-coordination
-runtime does not load it, and production behavior must not depend on it.
+This owner-retained harness describes manual engineering coordination.
+It is not a runtime sequencer or a prerequisite for restoring the retired
+CoordinationSession engine. Use current Unit/Workflow execution and governed
+dispatch when running requests; manual roles cannot bypass their authority.
 
-While runtime self-coordination is incomplete, humans may use this harness to
-coordinate independent agent sessions and write evidence under
-`verification/<track>/`. Once equivalent behavior is implemented through
-runtime protocol configuration, Skills, TaskSpecs, Assignment, Run, and
-RunResult, normal operation must use those runtime assets instead.
+New selected manual tracks write evidence under the current platform
+`verification/<track>/` owner, not the frozen `docs/architect/` tree. The
+conventions below apply only when a track actually adopts this manual harness.
+They neither define Workflow storage nor prove a rollout was executed.
 
-At that point this document may remain as a recovery/debug runbook, move to a
-repository-wide engineering playbook, or be archived. Removing it must not alter
-feature behavior.
-
-This playbook is independent of runtime Step numbering. The current Step 07
-architecture discussion is captured in
-[Step 07 - CoordinationSession, AdhocTask, And Planning Boundary](../history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot).
+The [earlier Step 07 discussion](../history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
+is preserved history, not a current architecture milestone.
 
 ## 1. Goal
 
-Step 06 proves Work-attached Team Dispatch can run on real Work items. Step 08
-will test mission-lite brainstorming/debate without Work lifecycle.
-
-This operating practice sits between design and implementation because the team
-needs a compact, durable harness before it can safely run a non-Work
-coordination experiment.
+The original Work-attached/mission-lite experiment motivation is historical;
+mission-lite and the coordination engine were retired. The current goal is a
+compact, auditable manual engineering loop whose roles produce real evidence
+without replacing Unit/Workflow execution or Work lifecycle.
 
 The target:
 
@@ -99,7 +93,7 @@ trace/<cell>.md         = compact proof record for one cell
 - Do not introduce scheduler, daemon, mailbox, or mission lifecycle.
 - Do not replace Work lifecycle.
 - Do not change Assignment/RunResult semantics.
-- Do not implement Step 08 mission-lite yet.
+- Do not revive the retired mission-lite/CoordinationSession runtime.
 - Do not turn trace files into long transcripts.
 - Do not require every agent to read every architecture doc.
 
@@ -128,7 +122,7 @@ coordination cost and context drift.
 Create:
 
 ```txt
-docs/architect/agent-coordination/verification/<track>/
+docs/platform/agent-coordination/verification/<track>/
   index.md
   current-cell.md
   harness-cell-01-trace-harness.md
@@ -276,8 +270,8 @@ Every coordinator prompt must start by reading `trace/index.md` and
 
 Rules:
 
-- If `trace/index.md` exists, do not restart Step 1-6 audit unless it says
-  `stale`, `blocked`, or explicitly requests re-audit.
+- If `trace/index.md` exists, do not restart the selected track's audit unless
+  it says `stale`, `blocked`, or explicitly requests re-audit.
 - If `trace/current-cell.md` exists, treat it as the active cell contract.
 - Do not overwrite `current-cell.md` unless the current action is coordinator
   prepare or close.
@@ -333,6 +327,10 @@ Forbidden token patterns:
 - reading historical reports unless the current cell names one as must-read.
 
 ## 12. Harness Rollout Cells
+
+Status: dated, unexecuted rollout proposal. H.1 through H.Final below are
+manual-harness adoption criteria, not current completed cells or registered
+Workflow steps. No execution/proof is inferred from their presence here.
 
 ### 12.1 Cell H.1 - Trace Harness Skeleton
 
@@ -420,7 +418,7 @@ Implementation:
 1. Define a proof artifact path convention, such as:
 
    ```txt
-   docs/architect/agent-coordination/verification/<track>/proofs/<cell-id>/
+   docs/platform/agent-coordination/verification/<track>/proofs/<cell-id>/
    ```
 
 2. Define required live proof fields:
@@ -460,8 +458,9 @@ Acceptance:
 
 ## 13. Tests And Checks
 
-If a script is added, test it. If no script is added, run manual checks and
-record them in trace.
+Use the repository's current test/check doors for actual scripts and record the
+exact observed result. The hypothetical trace script below is not shipped or a
+mandatory dependency; manual text checks do not prove execution behavior.
 
 Suggested minimal test if implemented:
 
@@ -472,14 +471,13 @@ node --test test/architect/coordination-trace.test.mjs
 Suggested manual checks:
 
 ```bash
-test -s docs/architect/agent-coordination/verification/team-dispatch-v1/index.md
-test -s docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md
-rg -n "Status:|Next action:|Must Read|Do Not Touch|Acceptance" docs/architect/agent-coordination/verification/team-dispatch-v1/current-cell.md
+test -s docs/platform/agent-coordination/verification/<selected-track>/index.md
+test -s docs/platform/agent-coordination/verification/<selected-track>/current-cell.md
 ```
 
 ## 14. Acceptance Criteria
 
-The harness rollout is done when:
+For a separately authorized adoption of the unexecuted rollout, completion would require:
 
 - trace index exists and can resume safely;
 - current-cell contract exists and stays compact;
@@ -491,6 +489,7 @@ The harness rollout is done when:
 
 ## 15. Rollback
 
-Rollback is simple: remove trace harness docs/templates. Do not remove runtime
-implementation or numbered architecture plans. The harness improves
-coordination discipline; it is not runtime infrastructure.
+Any future rollback must first check actual consumers and authority.
+This proposal does not authorize deleting owner-retained current prompts,
+evidence or runtime implementation. The manual harness is not a second
+runtime infrastructure component.

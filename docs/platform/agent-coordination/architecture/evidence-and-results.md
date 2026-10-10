@@ -29,7 +29,7 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Section | Status | Evidence / limit |
 |---|---|---|
 | Evidence Sources | Current contract/invariant | src/runner/dispatch/run-result.mjs:19 CONFIDENCE_LEVELS; src/runner/dispatch/evidence-attribution.mjs:25-76 (pre/post hashes, dirty-before exclusion); run-result.mjs:520-532 policy refusals; assignment-runner.mjs:9 |
-| Aggregation | Mixed implementation and proposal; no blanket implementation claim | git grep -i majority/aggregat in src/runner/execution src/workflow: no evidence-quality aggregation code; panel/findings semantics in runner.md:3055 (findings are outcome, not failed) |
+| Aggregation | Normative evidence-quality boundary, not a shipped majority-scoring module | Run outcome interpretation is in run-result.mjs:1305-1377; synthesis must retain unsupported branches rather than treating consensus as external evidence. |
 
 ## Principle
 
@@ -58,12 +58,12 @@ No one source proves every operation type.
 ## Confidence Boundaries
 
 - Worker self-report alone cannot produce externally verified confidence (src/runner/dispatch/run-result.mjs:1276-1285).
-- Exit code zero cannot satisfy missing semantic outputs (src/runner/dispatch/run-result.mjs:1305-1325).
+- Exit code zero cannot satisfy missing semantic outputs: the evidence floor still requires the appropriate worker report or external delta (src/runner/dispatch/run-result.mjs:1250-1285).
 - Pre-existing dirty files cannot count as changes produced by the Run (src/runner/dispatch/evidence-attribution.mjs:55-70).
-- Stale or cross-Run evidence must be rejected (src/runner/dispatch/run-result.mjs:155,297; evidence-attribution.mjs:69,197).
+- Structured claims with another Run's identity are rejected (src/runner/dispatch/run-result.mjs:155,297). Delta attribution uses the current Run's pre/post state; this is not a general age-based stale-evidence validator.
 - Read-only output may remain `reported`; the runtime gates this by assignment.mutation === read-only, not an unstamped TaskSpec permission (src/runner/dispatch/assignment.mjs:938-940; run-result.mjs:1276-1285).
 - Mutating success requires post-run external evidence appropriate to the claim (src/runner/dispatch/run-result.mjs:1276-1285).
-- Missing/malformed required evidence must not false-pass (src/runner/dispatch/run-result.mjs:1305-1325).
+- Missing required reports/deltas yield `no-evidence` under the evidence floor (src/runner/dispatch/run-result.mjs:1276-1285); corrupt result records fail closed separately (run-result.mjs:1305-1333).
 
 ## Aggregation
 
@@ -74,4 +74,7 @@ missing, unsupported, or excluded branches remain visible in aggregate output.
 
 Herdr pane state, terminal text, quietness, and process appearance are useful
 diagnostics only. They cannot replace structured runtime and evidence records.
+
+Read the [area portal](../README.md) and [runner spec](../../../specs/runner.md)
+for the consuming execution and delivery boundaries.
 

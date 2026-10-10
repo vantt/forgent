@@ -39,6 +39,13 @@ panel's own bounds, which forbid tallying and weighted scoring — a panel that
 refuses to reduce advisor disagreement to a count cannot coherently reduce its
 own quality to one.
 
+This is an optional cognitive evaluation method, not a registered Workflow
+schema, mandatory post-close step or completion/approval gate. Manual filenames,
+phase numbers and driver vocabulary below are examples. Current report mapping
+is framing; three blind shaping reports; reviewed critique; final RAW JSON
+synthesis packet with dispositions; explanation; owner missing-expertise close.
+No separate Decision Request, rubric.md or directory-recovery step is scheduled.
+
 Each dimension gets one of four verdicts:
 
 - **demonstrated** — the artifacts show it happened, with a citation.
@@ -55,7 +62,7 @@ failure the rubric is testing for.
 
 ## Who Evaluates, And In What Order
 
-Order is part of the method, not administration:
+For a separately chosen manual evaluation, the following order avoids anchoring; it is not the registered Workflow order:
 
 1. **The person's own assessment comes first**, before any evaluator, Reviewer,
    or Red-Team output exists or is shown to them. What they found useful,
@@ -64,11 +71,13 @@ Order is part of the method, not administration:
 2. **The evaluator runs second**, and **the evaluator is never the session
    driver.** A driver assessing its own session is self-assessment with an
    evaluation label on it.
-3. **Reviewer and Red-Team run last**, independently of each other, after Parts
-   1 and 2 exist.
+3. **Manual evaluator/reviewer feedback follows the person's assessment.**
+   Registered critique and final-packet reviewer/red-team checks instead run
+   where the actual Workflow declares them, before explanation and human close.
 
-Recorded in `rubric.md` per the
-[artifact templates](architecture-advisory-artifact-templates.md).
+An optional `rubric.md` export can follow the
+[manual templates](architecture-advisory-artifact-templates.md); it does not
+replace real Unit reports or add a human gate.
 
 ## A Note On What Failure Looks Like
 
@@ -86,18 +95,17 @@ Read those closely. They are where sessions actually fail.
 **What it is really asking.** Did the panel end up working on a better-formed
 problem than the one it was handed? Not a rephrased one — a better-formed one.
 
-**Where to look.** `intake.md` verbatim section against `interpretation.md` and
-`scout-report.md`'s "what this means for the framing"; then against the frame the
-shapers were actually dispatched on.
+**Where to look.** The original verbatim request against the registered framing
+report and the actual context passed into blind shaping. Optional manual
+intake/interpretation/scout exports are additional evidence, not required files.
 
 **Strong.** The axis of the question moved for a stated reason. "One pipeline or
 two" became "an unowned shared contract" because the investigator counted the
 commit coupling and found duplication was low. The person can see why the
 question changed and would agree it is now the right question.
 
-**Weak.** The frame at Phase 5 is the input sentence with architecture vocabulary
-substituted in. Or the frame changed with no cited observation behind the change,
-which is not reframing — it is the panel preferring its own question.
+**Weak.** The shaping frame merely replaces the input sentence with architecture
+vocabulary, or changes it without evidence. That is preference, not reframing.
 
 **False pass.** Elaborate restatement. A page of framing that adds structure,
 headings, and terminology to the original wording without adding a single fact.
@@ -110,14 +118,14 @@ that made the frame move. If there isn't one, this is a false pass.
 
 **What it is really asking.** Was the person's attention treated as expensive?
 
-**Where to look.** `decision-request.md` (or its recorded absence), the scouting
-that preceded it, and the count of separate times a person was contacted.
+**Where to look.** The request, framing report, recorded user-exclusive gaps
+and the actual human close answer. Optional manual Decision Requests are not
+additional registered gates.
 
-**Strong.** Either no question was asked and the reasoning for that is recorded,
-or exactly one Decision Request went out in which every question names the options
-its answer eliminates, states where the panel looked and failed to find it, and
-gives a default the person could accept by not replying. The *What We Are Not
-Asking* section is populated.
+**Strong.** Repository-answerable gaps were investigated; nonblocking
+user-exclusive gaps remain named defaults. Necessary unsafe-to-infer owner
+obligations were made explicit. The registered close asks its declared batched
+missing-expertise question; it does not silently become a mid-graph survey.
 
 **Weak.** Multiple contacts. A question answerable from the repository. A "why it
 matters" that says "to better understand your requirements". No default, so the
@@ -130,9 +138,9 @@ it entirely. Check each question against the recommendation: if the panel would
 recommend the same thing under every plausible answer, the question was
 decoration.
 
-**Also strong, and often missed.** Asking nothing at all. A session that
-investigated its way to a recommendation without contacting the person scores
-highest here, not lowest.
+**Also strong.** Investigating without unnecessary contacts. The required
+registered close answer still occurs; avoiding ceremonial questions does not
+authorize skipping the missing-expertise gate, even when its array is empty.
 
 ---
 
@@ -141,8 +149,8 @@ highest here, not lowest.
 **What it is really asking.** Did the person get a real option space, or a
 front-runner with escorts?
 
-**Where to look.** Every file in `proposals/`, read side by side; the no-build
-sub-shape; anything the alternative shaper abandoned and why.
+**Where to look.** The three registered shaping reports, side by side, including
+credible smaller/no-build alternatives. Manual proposals/ filenames are optional.
 
 **Strong.** The candidates differ in solution *class*, not in mechanics — build
 versus buy versus delete versus duplicate versus do nothing. Each is one a
@@ -169,8 +177,8 @@ X") was not independently produced, whatever the roster claims.
 **What it is really asking.** Did anyone go looking for the panel being wrong,
 early, when it was still cheap?
 
-**Where to look.** `scout-report.md`'s stated hypothesis and its
-evidence-against section; whether anything downstream changed because of it.
+**Where to look.** The framing report's tested hypotheses, disconfirming
+observations and their downstream effect; no separate scout-report.md is required.
 
 **Strong.** The investigator wrote the hypothesis down before looking, found
 something that undercut it, and the frame or the candidate set changed as a
@@ -192,9 +200,9 @@ and it has to be something the panel would rather not have found.
 where every advisor's final position equals its first is not deliberating; it is
 publishing in parallel.
 
-**Where to look.** Proposal revisions (v2 sections, since artifacts are
-append-only), `critiques/` concessions, the "attacks that failed" section, and
-whether any falsification criterion was actually triggered.
+**Where to look.** Actual reviewed critique and synthesis evidence, including
+conceded attacks and any changed claim. There is no automatic re-shaping loop
+or mandatory append-only v2 proposal file in the registered linear graph.
 
 **Strong.** At least one advisor visibly revised, with the reason and the
 triggering evidence recorded, and the superseded position still readable. A
@@ -216,12 +224,12 @@ test is whether a claim, a recommendation, or a criterion actually differs.
 **What it is really asking.** Did the tidy final document preserve the untidy
 truth?
 
-**Where to look.** Positions live at the end of `critiques/` and `proposals/`,
-traced into `synthesis.md`; then `dispositions.md` for how each was handled.
+**Where to look.** Shaping and critique positions traced into the final RAW JSON
+packet, including its attributed dissent and dispositions.
 
 **Strong.** An unrefuted disagreement appears in the packet body — not a footnote
 — attributed by role, with what would settle it, and an explicit statement that
-it was not refuted. `unresolved` appears in `dispositions.md` where it should.
+it was not refuted. The packet carries the corresponding unresolved disposition; a manual `dispositions.md` export is optional.
 
 **Weak.** "The panel is aligned" over a live disagreement. Dissent demoted to
 "minor considerations". Anonymous dissent the person cannot weigh.
@@ -240,7 +248,7 @@ the disposition doctrine precisely because it passes casual inspection.
 sure it was? These are both required, and they trade against each other, which is
 why they are one dimension.
 
-**Where to look.** `synthesis.md`'s recommendation and per-claim confidence.
+**Where to look.** The final RAW JSON packet's recommendation and evidence. Per-claim confidence is optional quality guidance, not a required registered field.
 
 **Strong.** One recommendation. Confidence stated per claim, so the diagnosis,
 the cost estimate, and the prediction about people carry different weights. What
@@ -270,9 +278,9 @@ untested authorship.
 **What it is really asking.** Can they now defend this choice to someone else,
 without the panel in the room?
 
-**Where to look.** `explanation.md` (the Phase 8 output), and Part 1 of
-`rubric.md` — the person's own words are the primary evidence for this dimension
-and outrank the evaluator's reading of it.
+**Where to look.** The registered explanation report against the settled packet,
+plus actual owner feedback when available. Optional rubric.md is not required,
+and the expertise close answer is not necessarily evidence of understanding.
 
 **Strong.** The explanation uses their vocabulary and altitude, leads with
 consequences rather than architecture, names the first reversible step, names the
@@ -304,12 +312,16 @@ Model/provider diversity alone is not proof of cognitive independence; report it
 
 ## 11. Every Shaper Stated Falsification Criteria Before Critics Saw The Proposal
 
-**What it is really asking.** Did the shapers arrive at the debate as hypotheses
-or as advocates? This is the structural precondition for dimensions 4, 5, and 7 —
-if it fails, honest debate was not available to the session.
+Optional quality dimension: the current shaping template does not require a
+falsification-criteria field or a pre-critique timestamp. Assess only actual
+recorded criteria; absence is not automatically Workflow failure.
 
-**Where to look.** The falsification section of each `proposals/` file, and the
-run-record timestamps of the proposals against the critique.
+**What it is really asking.** Did proposals expose observable conditions that
+would refute them? This improves criticism but does not create a new runtime
+precondition, field or gate.
+
+**Where to look.** Actual shaping reports and cited observations. A manual
+timestamp claim must be evidenced, not inferred from a template filename.
 
 **Strong.** Criteria present in the v1 proposal body, not appended. Every
 proposal's run completed before the critic's run started. Criteria name
@@ -330,10 +342,15 @@ criterion. Test each one by asking what specific observation would trigger it.
 
 ## 12. The Person's Assessment Came First, And The Evaluator Was Not The Driver
 
+Optional manual assessment discipline. The registered Workflow has no required
+rubric.md/evaluator step; missing that optional exercise does not invalidate
+registered completion. If an assessment is performed, preserve real authorship
+and acquisition order, and do not invent the person's words.
+
 **What it is really asking.** Is the evidence about the session's usefulness
 uncontaminated?
 
-**Where to look.** `rubric.md` Part 1 and Part 2: authorship, and the timestamps.
+**Where to look.** Actual feedback and independent evaluator records, when collected; manual rubric.md parts are one optional format.
 
 **Strong.** Part 1 is in the person's own words, timestamped before Part 2
 exists, with a recorded account of how they were kept from seeing evaluator
@@ -355,6 +372,9 @@ not a procedural nit; it is the difference between evidence and self-report.
 ## Overall Session Verdict
 
 After the twelve dimensions, one verdict:
+
+These are manual quality verdicts only, not runtime outcome enums, a substitute
+for the declared human close, approval of advice, or permission to implement.
 
 - **APPROVE** — the session advised well. No dimension is *not demonstrated*
   where it materially mattered, no structural invalidity, and the person's own

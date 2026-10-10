@@ -24,15 +24,17 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ## Context
 
-Existing workflow consumers understand `step.skill` and `step.taskSpec`.
-Team Dispatch needs multiple legal operations per Workflow step without breaking that
-path.
+Current consumers obtain skills and TaskSpecs through Workflow projection APIs.
+The step's `skill` remains supported, while TaskSpec selection comes from the
+primary operation (`src/workflow/steps.mjs:52-63`), not `step.taskSpec`.
 
 ## Decision
 
-Stages may define multiple Workflow step Operations. `step.skill` and
-`step.taskSpec` remain the primary operation compatibility projection.
-Normalization and `operationsForStep()` provide the canonical operation list.
+Workflow steps may define multiple operations. `operationsForStep()` returns
+the normalized operations or synthesizes a primary operation for a skill-only
+step (`src/workflow/steps.mjs:70-85`). `taskSpecForStep()` and the domain
+`bundleForStep()` preserve primary-operation consumers. This compatibility
+does not revive Work stages or a Stage Protocol runtime.
 
 ## Consequences
 

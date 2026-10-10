@@ -26,39 +26,39 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ### Work
 
-A durable, human-manageable delivery item. Work is the sole authority for its
-status, workflow stage, claim/return ownership, acceptance, approval, durable
-branch, and merge lifecycle.
-
-Work may reference coordination sessions and their evidence. Session, Task,
-Assignment, Run, RunResult, Mission, or Herdr state cannot mutate Work lifecycle
-except by invoking authorized Work engine verbs.
+A durable, human-manageable delivery item. Work owns its status, claim/return,
+acceptance, approval and branch/merge lifecycle through the existing Work verbs.
+Its recorded Workflow position is `workflowStep`, not the retired `stage`
+field (`src/state/work.mjs:455-467`). Execution evidence may inform a Work
+decision; a Run, Unit or Workflow completion does not itself confer approval.
 
 ## Protocol Definition Layer
 
 ### Workflow
 
-A graph describing the legal lifecycle stages and transitions for a Work type.
-Workflow is definition/configuration, not a runtime attempt.
+A definition of dependent steps, operations, gates and execution templates.
+The definition is not a concrete attempt; Workflow runs are separate runtime
+records. The Workflow runner sequences these steps rather than a coordination
+protocol or a second Stage Protocol engine.
 
 ### Stage
 
-A named node in a Workflow. A Stage identifies the current Work lifecycle
-position and exposes a Stage Protocol and legal Stage Operations.
+Legacy name for a Workflow step in earlier documents. Current Work records
+`workflowStep`; the definition and operation APIs use steps. No current
+`work.stage` field or separate Stage runtime is implied.
 
 ### Stage Protocol
 
-The coordination doctrine active in one Stage: owner role, legal operations,
-handoff expectations, gates, and evidence expectations.
+Historical name for the old stage-level coordination doctrine. Current
+operations, handoffs and gates belong to the Workflow definition and its
+domain doctrine; there is no additional shipped Stage Protocol layer.
 
 ### Stage Operation
 
-A legal semantic action available in a Stage. An operation references TaskSpec,
-Skill(s), Role, and policy hints. It is a choice in protocol definition, not an
-Assignment or Run.
-
-The current compatibility path keeps `step.skill` and `step.taskSpec` as the
-primary operation projection.
+Compatibility term for a Workflow step operation. Current normalized operations
+carry `id`, `taskSpec`, optional `role`, `skills`, `policy` and dispatch metadata
+(`src/workflow/definition.mjs:81-109`). TaskSpec projections are derived from
+operations; `step.taskSpec` is not the current primary-operation field.
 
 ### TaskSpec
 
@@ -66,9 +66,10 @@ A reusable machine-readable execution contract defining required inputs,
 expected outputs, gates, mutation/evidence expectations, and completion
 criteria for an operation.
 
-A registered TaskSpec is optional for agent-led coordination. Every executable
-request still requires equivalent validated semantic fields in its Assignment
-contract. The exact inline representation remains under design.
+A registered TaskSpec is optional when the request supplies a validated inline
+contract. Inline field validation and normalization are implemented in
+`src/runner/dispatch/execution-contract.mjs:180-200,295-340`; the representation
+is not merely an unresolved design. Both paths retain execution governance.
 
 ### Skill
 
@@ -90,21 +91,22 @@ An immutable semantic request to perform one operation for a caller/context. It
 contains objective, inputs, constraints, expected outputs, role, operation, and
 policy context. It does not own retries or lifecycle progress.
 
-An Assignment may originate from a declared Stage Operation/TaskSpec or from an
-agent-proposed inline execution contract that passes foundation and selected
-domain validation. Both paths use the same dispatch and runtime governance.
+An Assignment may originate from a Workflow operation/TaskSpec, a validated
+inline contract, or the current Unit-run door. These are provenance kinds,
+not three private dispatch engines.
 
 ## Dispatch And Execution Layer
 
 ### Capability
 
-An abstract behavior promise, resolved through `runner.capabilities.<capability>`
-(`prefer`/`overrides`) to a registered Executor's `for[]` declaration. Together
-with Executor-id, Capability is one of exactly two target identities the
-Dispatch And Execution Engine resolves against — see the
-[Dispatch Control Plane](../architecture/dispatch-control-plane.md)'s Routing
-Identities section. `purpose` and the `--for` CLI flag are compatibility
-terminology for Capability, not a separate concept.
+An abstract behavior promise. The legacy dispatch capability catalog supports
+`prefer` and `rigor`, with executor `for[]` declarations; capability `overrides`
+is rejected (`src/runner/dispatch/config.mjs:1007-1017,1223-1235`).
+Capability and executor-id are the conceptual target identities described in
+[Dispatch Control Plane](../architecture/dispatch-control-plane.md).
+`purpose` and `--for` are its compatibility terminology. Execution Core Unit
+requests instead bind through `src/runner/execution/bind.mjs`; catalog details
+must not be inferred to be identical across those two entry paths.
 
 ### DispatchPlan
 
@@ -155,6 +157,11 @@ Interactive execution visibility over panes/processes. Herdr may show activity,
 but pane text, quietness, or process appearance is not truth or evidence.
 
 ### Job
+
+Reserved vocabulary for a possible future scheduler, not a third dispatch
+target or an already implemented queue entity. A Run is one concrete attempt;
+it is not a Job. See the retained
+[dispatch-job reservation](../decisions/ADR-004-reserve-job.md).
 
 ## Cognitive And Proposed Vocabulary
 

@@ -24,7 +24,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ## Evidence Sets
 
-These are dated physical evidence collections, not a claim that every tested runtime still exists or that the files have been re-verified. The step-08 CoordinationSession/FlowDefinition collection is historical engine evidence. Team-dispatch, RunResult, recovery, visibility and advisory collections must be read with their individual implementation dates and current owner contracts. All payload bytes are unchanged.
+These are dated physical evidence collections, not proof that every tested runtime still exists or that the files were re-verified. Step 08 CoordinationSession/FlowDefinition and all three Step 09 session-protocol collections are historical engine evidence. Other collections also require their individual dates, commits and current owners: old code-panel/plan-loop proof is not proof that removed facades still ship. All payload bytes remain unchanged.
 
 | Collection | Reading location |
 |---|---|
@@ -47,3 +47,15 @@ These are dated physical evidence collections, not a claim that every tested run
 | visibility-herdr | [visibility-herdr](visibility-herdr/) |
 
 The current runtime owners are dispatch Assignment/Run/RunResult, Unit/CollaborationPattern and Workflow. Their current documents and the historical engine snapshots are linked from the area portal. A transcript, pane state or passing old proof does not establish current implementation authority.
+
+## Verification Boundary
+
+Verification establishes conformance at a point in time; it does not define
+architecture or change a contract. New proof should separately identify:
+
+- deterministic unit/integration scenarios;
+- negative and adversarial scenarios;
+- actual live provider/executor scenarios;
+- requirement-to-code/test/evidence traceability;
+- unrelated/pre-existing failures;
+- the exact proof date, commit and configuration.

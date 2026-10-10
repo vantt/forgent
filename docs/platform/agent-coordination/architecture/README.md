@@ -28,27 +28,24 @@ This directory has been promoted from
 `docs/architect/agent-coordination/architecture/` during the platform
 documentation migration.
 
-Accepted architecture documents keep their authority. Runtime-recovery-family
-documents that are marked as proposals or partial designs remain
-proposal/partial even though they now live beside accepted architecture.
-Current implemented claims must still line up with
-[Implementation Alignment](../history/retired-engine/files/verification/implementation-alignment.md#literal-snapshot) and
-the proof roots linked from
-[Proof Preservation](../history/documentation-migration/proof-preservation.md).
+Current contracts and explicitly proposed designs are distinguished by their
+own section status and implementation evidence, not by placement alone.
+[Implementation Alignment](../history/retired-engine/files/verification/implementation-alignment.md#literal-snapshot)
+is a historical preservation/retirement pointer, not a current alignment
+ledger. The [proof-preservation record](../history/documentation-migration/proof-preservation.md)
+retains old proof roots without certifying today's runtime.
 
 ## Documents
 
 Read the [Agent Coordination Foundation Vision](../vision.md) before this
 directory. Architecture refines that direction into accepted system boundaries.
 
-1. [System Context](../history/retired-engine/files/architecture/system-context.md#literal-snapshot) defines system purpose and major
-   authority boundaries.
+1. [System Context](../history/retired-engine/files/architecture/system-context.md#literal-snapshot)
+   preserves the retired engine's earlier system context.
 2. [Coordination Foundation Baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot)
-   summarizes the accepted Step 00-08 shape promoted out of roadmap/proposal
-   history.
-3. [Protocol Model](protocol-model.md) defines declared and agent-led planning
-   sources plus the hard/soft coordination model around Workflow, Stage,
-   Operation, TaskSpec, Skill, and Role.
+   preserves the earlier Step 00-08 baseline; it is not current runtime authority.
+3. [Protocol Model](protocol-model.md) describes planning sources and the
+   current Workflow-step/operation, TaskSpec, Skill and Role boundaries.
 4. [Runtime Model](runtime-model.md) defines Assignment, dispatch, Run,
    RunResult, and evidence flow.
 5. [Work Integration](work-integration.md) defines how coordination may attach
@@ -64,8 +61,7 @@ directory. Architecture refines that direction into accepted system boundaries.
    execution/attachment/observation facts, pending-command reconciliation and
    adapter-owned incarnation. In-cell takeover needs no worker checkpoint.
 10. [Coordination Continuation And Recovery](../history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot)
-    proposes evaluator-backed snapshots, a pure typed planner, idempotent apply
-    and protocol-declared parent/child transfer through existing engine doors.
+    is the retired session continuation proposal, not an existing engine door.
 11. [Executor Fallback Activation And Health](executor-health-and-fallback.md)
     proposes activating the reserved `fallbackExecutors` on signal-ladder
     outcomes through the existing compiler; health observation store is the
@@ -96,8 +92,8 @@ Shared by documents 9–11; each applies them without restating them.
   not worker stopped.
 - Domain semantics and application ports first; wire/persistence schemas
   only at boundaries that are stored or exchanged. Existing semantic
-  contracts (`liveness.mjs` ladder, `recovery.mjs` matrix, `run-retried`
-  supersession, exclusive-create lock) are ported, not re-derived.
+  contracts are reused where implemented (`liveness.mjs`, `recovery.mjs`,
+  `run-lock.mjs`); an event named `run-retried` is not a current public contract.
 - Node/Rust coexistence: the runtime that spawned owns the state it wrote;
   the other reads; a reader that does not understand a `contract` version
   refuses explicitly.
@@ -109,14 +105,16 @@ Shared by documents 9–11; each applies them without restating them.
 - Cell/session correlation belongs to the consuming track; neither replacing a
   worker nor opening a child session constitutes cell acceptance.
 
-CoordinationSession's identity/persistence boundary and the shared
-FlowDefinition graph/operation/policy IR are accepted per
+The earlier CoordinationSession/FlowDefinition decisions
 [ADR-008](../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot)
 and [ADR-009](../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot)
-(schemas in [contracts/](../history/retired-engine/files/contracts/README.md#literal-snapshot)). The promoted Step 00-08
-baseline is summarized in
-[Coordination Foundation Baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot).
-Unaccepted extensions, including AdhocTask, AgentMessage, runtime topology
-deviation, and broader group-cognitive protocol expansion, remain proposals or
-architecture-wide intent until separately accepted.
+remain historical decisions about the engine retired in 2180b4e72, not accepted
+current session/IR contracts. Their
+[baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot)
+is retained for provenance.
+
+For current natural-language advisory selection, read
+[Group Thinking Trigger Surface](group-thinking-trigger-surface.md). It maps
+intents to current named Workflow/CollaborationPattern execution; it does not
+restore the retired protocol engine or promote proposed AgentMessage topology.
 

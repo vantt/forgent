@@ -8,7 +8,7 @@ Design status: Candidate
 Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
 Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
 Writer type: Human + agent coauthor
-Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Canonical for: Nothing; current dispatch architecture is ../architecture/dispatch-control-plane.md
 Use this when: Reading the surviving contract, its implementation limits or current proposals
 Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
 Last reviewed: Pending independent liveness re-review
@@ -22,7 +22,7 @@ Added in candidate: Liveness evidence and explicit implementation/proposal disti
 
 Complete pre-rework input: [historical snapshot](../history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
-Reading boundary: sections 1 and 4 record the original 2026-08-26 problem/finding context; their wording is not a claim that those defects still exist. Sections 2–16 retain the engine-independent design proposal. Section 17 records subsequent implementation and removal events. Current dispatch behaviour must be read in src/runner/execution/bind.mjs and the dispatch config/resolve/transport/result modules, not inferred from the dated failure examples below. No section is retired merely because a proposed schema is not yet implemented.
+Reading boundary: sections 1 and 4 record dated 2026-08-26 findings, not present defects. Sections 8–9, 11 and 13 retain explicitly unimplemented design targets; current implementations and limits are stated locally elsewhere. Section 14 records the dated narrow candidate, including a removed sentinel adapter, and section 17 records its historical task sets. Neither is current execution proof. Read src/runner/execution/bind.mjs and current dispatch modules for live behavior; no proposed schema or historical count becomes a current contract.
 
 ## 1. Problem Statement
 
@@ -144,7 +144,7 @@ Therefore mailbox and AgentMessage are still design targets, not prerequisites f
 - `work` - lifecycle-bearing fgOS unit with state, events, claim/return, and merge semantics.
 - `child work` - a normal work item related to a parent; not a separate dispatch category.
 - `capability` - an abstract behavior promise such as `fgos-coding-implement`.
-- `executor` - the concrete implementation of a capability, such as `agy`, `codex`, `gitnexus`, or `herdr`.
+- `executor` - a concrete configured implementation, for example `claude`, `gemini`, `gitnexus` or `herdr`; names are configuration-local, not fixed runtime capabilities.
 - `ad-hoc task` / `exec packet` - an ephemeral runtime-composed unit outside the work ledger.
 
 The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target. Note that the runner spec's (`docs/specs/runner.md`) historical `capacity` concept maps to `capability` for abstract behavior promises and to `executor` for concrete execution units per ADR 0034.
@@ -169,41 +169,16 @@ It is not a new decision beside the Native-First Dispatch Doctrine. Its `mechani
 
 ### 6.1 Shape
 
-```json
-{
-  "selector": {
-    "type": "work",
-    "value": "tsk-123"
-  },
-  "target": {
-    "capability": "fgos-coding-implement",
-    "executorId": "agy",
-    "kind": "agent"
-  },
-  "mechanism": "out-of-process",
-  "handback": null,
-  "governance": {
-    "carries": ["repo-content"],
-    "egress": {
-      "allowed": true,
-      "declaredProvider": "agy",
-      "command": "agy",
-      "effectiveTarget": "agy"
-    }
-  },
-  "execution": {
-    "invocationVia": "cli",
-    "adapter": "cli-spawn",
-    "model": "gemini-...",
-    "tier": "lightweight"
-  },
-  "reasonCodes": [
-    "capability-prefer",
-    "cli-spawn-shaped-executor",
-    "native-first-rule-cross-provider"
-  ]
-}
-```
+Current compiled fields (`src/runner/dispatch/plan.mjs:444-461`) are
+`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,
+`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,
+`bindingSource`, `tier`, `model`, `providerModel`, `provenance`, and `policy`.
+Governance uses its actual provider/egress shape; there is no top-level
+`target`, `handback` or `execution` wrapper and no `egress.allowed` flag.
+
+Values and reason codes depend on the resolved request/configuration. Inspect
+the actual returned plan rather than treating an illustrative schema or an
+old executor selection as a observed result.
 
 ### 6.2 Selector
 
@@ -214,14 +189,15 @@ Allowed selector types:
 - `work` - dispatch decision for a lifecycle work item.
 - `purpose` - dispatch decision for a named capability/purpose.
 - `executor` - dispatch decision for a concrete executor id.
+- `assignment` - dispatch decision for an actual Assignment or its id.
 - `adHocAgent` - dispatch decision for a runtime-composed agent assignment.
 
 Do not add `nativeTask` as a selector. Native/in-process is an output mechanism, not an input category.
 
-Current implementation note: `execute --for` already resolves through the
-capability-aware path that honors `capabilities.<name>.prefer`.
-`decide --for` still uses the older `for` scan. Item 0 below exists to
-remove that split.
+Both legacy `decide --for` and `execute --for` use capability-aware compiled
+resolution. The earlier `for`-scan/prefer split is not a current defect.
+The primary Rust-host request door uses bind(); do not equate a legacy plan's
+shape with every host request/transport representation.
 
 ### 6.3 Mechanism
 
@@ -231,29 +207,10 @@ Allowed mechanisms:
 - `in-process` - use the current live agent/session facility.
 - `out-of-process` - execute through an external executor/adapter.
 
-For in-process dispatch, `handback` carries the concrete native surface:
-
-```json
-{
-  "mechanism": "in-process",
-  "handback": {
-    "type": "native-task",
-    "agentType": "fgos-coding-implement"
-  }
-}
-```
-
-or:
-
-```json
-{
-  "mechanism": "in-process",
-  "handback": {
-    "type": "mcp-tool",
-    "tool": "mcp__gitnexus__impact"
-  }
-}
-```
+For in-process plans, native capability fields are top-level `agentType` or
+`mcpTool` when supplied (`plan.mjs:453-454`), not a `handback` object.
+The caller must actually possess the returned live facility; the decision
+does not invoke that facility itself.
 
 ## 7. Governance And Egress
 
@@ -347,10 +304,18 @@ assignment prefers executor=claude
 governance checks effective egress
 ```
 
-The resulting `DispatchPlan.execution` carries the concrete model and adapter.
+The current compiled plan exposes policy-derived `tier`, `model`, `providerModel`, `provenance` and `policy` alongside the resolved `invocation`; there is no `DispatchPlan.execution` wrapper.
 The workflow does not need to hardcode a provider to prove team coordination.
 
 ### 7.3 Recommended V1 Provider Policy For Coding Feature Flow
+
+Historical recommendations for the first proof, not current config defaults or
+globally required execution order. The table's `pi`, `agy-cli` and old model
+names are dated examples. Current checked project configuration declares
+`claude`, `glm`, `gitnexus`, `herdr`, `openai`, `gemini`, `xai`, `deepseek`,
+`claude-herdr`, `glm-herdr`; coding implementation prefers `gemini` with the
+named invocation `agy-herdr-mucdong`. Effective global/project merge and
+binding, not this table, decide a live request.
 
 Use these as defaults for the first team-dispatch proof, not permanent hard
 bindings.
@@ -361,14 +326,14 @@ bindings.
 | planning | `resolve-question` | `pi` / OpenAI-Codex `gpt-5.5` | independent consult benefits from provider diversity; `pi` has a verified JSON cli-spawn path |
 | planning | `scout-blast-radius` | `gitnexus`, then `pi` if synthesis is needed | graph/tool evidence should precede model judgment |
 | planning | `validate-plan` | `claude` / `sonnet`, raise to `opus` for critical work | review/proving should be evidence-first and may need stronger rigor |
-| executing | `implement-item` | `agy-cli` / Gemini `gemini-3.6-flash-medium` | current repo config already pins `fgos-coding-implement` to the stable headless agy path |
+| executing | `implement-item` | dated `agy-cli` / Gemini example | original proof recommendation; not the current project executor id or headless-path claim |
 | executing | `review-item` | `claude` / `sonnet`, raise to `opus` for critical work | separate reviewer from implementation provider where possible |
 | executing | `fix-verify-red` | `claude` for diagnosis, `agy-cli` for bounded edits | root-cause work and mechanical fix work have different execution needs |
 | executing | `scoped-subtask` | `agy-cli` or `pi` | bounded helper work should use a cheaper/fast executor when evidence gates are clear |
 
-Do not use `agy-herdr`, `codex-herdr`, or other interactive Herdr paths as the
-authority for the first team proof. They can be tried later as visibility
-adapters after cli-spawn assignment execution and evidence handling are stable.
+The original cli-spawn-first proof restriction is historical. Current transport
+selection follows configuration/bind and the authorized proof track; Herdr
+visibility does not become semantic completion evidence.
 
 ## 8. DispatchAssignment
 
@@ -435,13 +400,11 @@ The current `<scope>#p<n>` id remains valid for old prompt contracts. In the bre
 - `run_*` - one execution run;
 - `trace_*` - distributed trace.
 
-Implementation note:
-
-```txt
-Only `tsk-*` work ids exist today as durable lifecycle ids.
-`asgn_*`, `msg_*`, `run_*`, and `trace_*` are design-target namespaces until
-the assignment, message, runtime, and observability layers add real writers.
-```
+Current implementation note: Work retains lifecycle ids. Assignment and Run
+already have actual durable writers: `assignment.mjs:124-144` creates
+`asgn_*`, and `assignment-runner.mjs:783` creates `run_*`.
+The proposed DispatchAssignment envelope and `msg_*`/`trace_*` namespaces here
+are not thereby implemented; they remain separate design targets.
 
 ## 9. AgentMessage
 
@@ -568,9 +531,9 @@ Do not add confidence telemetry as a write-only field. A migration must include 
 
 Until that reader exists, keep the current fallback behavior and avoid pretending the telemetry migration has started.
 
-Current post-merge status: Assignment RunResult storage now has first-class
-`confidence` labels, but Step 04 must harden the evidence contract before the
-coding driver treats those labels as lifecycle proof.
+Current Assignment RunResult confidence/evidence hardening exists. A label
+alone still is not lifecycle authority: validate the run's actual evidence
+through attribution, result contracts and settlement.
 
 For Team Dispatch V1, the concrete post-merge rule is:
 
@@ -579,9 +542,10 @@ No driver may advance Work from an Assignment result unless the RunResult
 confidence was computed from evidence produced during that run.
 ```
 
-This is why Step 04 hardens dirty-before/after snapshots, structured
-`agent-result.json` validation, and read-only report artifacts before Step 05
-lets the coding driver choose secondary operations.
+Dirty-before/after attribution, structured result validation and required
+read-only report artifacts are implemented checks, not a future Step 04/05
+dependency. Current owners include `evidence-attribution.mjs`,
+`agent-result-claim-contract.mjs`, `run-result.mjs` and `settlement.mjs`.
 
 ## 11. Artifact Store
 
@@ -655,9 +619,9 @@ Those facts come from runner state, structured agent events, artifact refs, and 
 Herdr's Rust implementation (`herdr-dashboard/src/`) names several of its own
 types with "orchestrator" in Rust-identifier casing: the `PaneOrchestrator`
 trait (`ports.rs`) governing pane open/reuse/focus, and the
-`OrchestratorSettings`/`HerdrOrchestratorToggles` structs (`settings.rs`,
-`main.rs`) governing the `herdrOrchestrator` auto-launch config section
-(auto-discover/auto-merge/auto-retro/auto-cleanup pane launching). These
+`OrchestratorSettings` (`packages/herdr-fgos-common/rust/src/settings.rs`) and
+`HerdrOrchestratorToggles` (`herdr-dashboard/src/main.rs`) govern the
+`herdrOrchestrator` configuration namespace. These
 are Rust port terms describing Herdr's own pane-lifecycle and toggle
 mechanics — a different vocabulary from this document's own "orchestrator"
 glossary entry above (§5.1: the T0 composition layer that manages N units of work and stays attached). Do not
@@ -668,39 +632,24 @@ being described.
 
 ### 12.2 Near-Term Herdr Adapter
 
-The near-term implementation should use:
+Current `herdr-spawn` keeps CLI-shaped invocation but requires configured
+`interactiveMode`; non-interactive dispatch is rejected
+(`transport.mjs:913-921`). It starts a fresh interactive agent pane through
+`herdr agent start`; the prompt is delivered through a disk artifact rather
+than typed as a multiline shell command.
 
-```txt
-invocation.via = "cli"
-executor.adapter = "herdr-spawn"
-```
+Completion is a worker-written `outbox/result-<round>.json`, not pane status,
+stdout sentinels, `[DONE]` or a screenshot. A failed dispatch's pane stays open
+by default and its error identifies the pane; a separately configured sweep
+may close failed-round panes, not provider-limit pauses
+(`transport.mjs:748-814`).
 
-This lets the resolver keep its current CLI-shaped contract while the transport layer launches the worker in Herdr instead of a hidden child process.
+The old non-interactive temporary-script/sentinel/echo-strip/timeout-kill
+recipe is removed and must not be used as current instructions. Result files
+still require their own contract/evidence validation; terminal visibility
+does not decide Work lifecycle.
 
-The later design target may add a true `protocol:"herdr"` or mailbox transport, but that should wait until a real AgentMessage consumer exists.
-
-Implemented adapter contract for the reviewed narrow slice:
-
-- `herdr-spawn` is selected only by the executor adapter field.
-- The adapter always creates a fresh Herdr pane for the dispatched worker; it does not reuse an existing pane.
-- The worker command is run through a temporary script so prompt text and shell metacharacters are not reinterpreted as a pane command.
-- The temporary script removes itself at startup so a crash does not leave the full prompt behind on disk.
-- The adapter injects a runner-owned completion sentinel after the real worker command exits.
-- Herdr observation waits for that runner-owned sentinel, not for `[DONE]` or `[BLOCKED]`.
-- The captured Herdr transcript is normalized by stripping echoed script-invocation lines before downstream result parsing.
-- Missing `result.read.text`, missing sentinel evidence, or observer failure is a transport failure, not a worker success.
-- Timeout belongs to the adapter: on timeout it closes the pane, kills the observer process group, releases local pipes, and rejects immediately without waiting for Herdr or descendant processes to close.
-- Resolved executor environment is passed into the pane, but secret values are not included in adapter error messages.
-
-The important protocol split:
-
-```txt
-runner-owned sentinel = proves the pane command exited and transcript is complete
-[DONE]/[BLOCKED]      = optional legacy semantic signal emitted by the worker
-git head delta        = fallback inference when no semantic signal appears
-```
-
-This keeps Herdr compatible with the current prompt/stdout protocol while avoiding the false conclusion that a terminal token is a full AgentMessage.
+AgentMessage/mailbox transport remains an unimplemented design target.
 
 ## 13. Full Design Target
 
@@ -738,7 +687,7 @@ State layer:
 
 ## 14. Narrow Implementation Status
 
-This is the current implementation slice. It intentionally does not implement the full design target.
+Dated status of the original narrow candidate, not the current adapter contract or a fresh verification run. Its sentinel/observer behavior was later removed; current behavior is section 12.2. Counts and branch findings below are historical claims, not truth-pass test evidence.
 
 Reviewed candidate branch:
 
@@ -858,18 +807,17 @@ Current dispatch files:
 - `src/runner/dispatch/transport.mjs`
 - `src/runner/dispatch/prepare.mjs`
 - `src/runner/dispatch/cli.mjs`
-- `src/runner/dispatch/result-ladder.mjs` — confidence-ladder result normalization, extracted from `cli.mjs` by `tsk-2tr` (§17.2/§17.3), consumed by `src/report/dispatch-confidence.mjs`.
+- `src/runner/dispatch/result-ladder.mjs` — legacy result-signal normalization; the removed dispatch-confidence report is not a current consumer.
 - `src/runner/dispatch.mjs`
 
-Result-confidence reader (§10/§15 entry criterion pulled forward by `tsk-1g6`, §17.2/§17.3):
-
-- `src/report/dispatch-confidence.mjs`
-- wired into `bin/fgos.mjs` and `src/cli/command-registry.mjs`
+The former `src/report/dispatch-confidence.mjs` reader and its CLI command
+were removed. Do not use them as implementation pointers or proof that the
+deferred telemetry reader is current.
 
 Current prompt/protocol references:
 
-- `plugins/fgOS/skills/_shared/executor-dispatch-fallback.md`
-- `plugins/fgOS/skills/_shared/coding-worker-contract.md`
+- `core/skills/_shared/executor-dispatch-fallback.md`
+- `core/skills/_shared/coding-worker-contract.md`
 - `src/runner/prompt-templates/worker-prompt-skill-pointer.txt`
 
 Current focused tests for the narrow slice:
@@ -958,11 +906,10 @@ tasks are noted as such rather than listing their own plan doc again.
 | `tsk-2rr` | `src/runner/dispatch/transport.mjs`, `test/runner/herdr-spawn-adapter.test.mjs` |
 | `tsk-by0` | `src/runner/dispatch/transport.mjs` (shrunk), `test/runner/herdr-spawn-adapter.test.mjs` (shrunk), `CHANGELOG.md`, `docs/architecture-manifest.json` (entries removed); deleted `src/runner/dispatch/live-renderers/claude-stream-json.mjs` and `pi-agent-session.mjs` (the two live-renderer files `tsk-5jl` had added) |
 
-Net effect on §16's file list: `src/runner/dispatch/result-ladder.mjs` and
-`src/report/dispatch-confidence.mjs` are new files this window added and
-belong in §16's pointer list; `src/runner/dispatch/live-renderers/` was
-added by `tsk-5jl` and removed again by `tsk-by0` — it no longer exists on
-`main` and should not be added to §16.
+The preceding task table records files added/removed in its dated window,
+not today's existence. `result-ladder.mjs` remains current; the former
+dispatch-confidence reader and live-renderer files are removed and are not
+current pointers. Use section 16's current list.
 
 ## 18. Broader Orchestration Vocabulary
 

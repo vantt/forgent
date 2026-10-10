@@ -24,9 +24,9 @@ Complete pre-rework input: [historical snapshot](../../history/retired-engine/fi
 
 ## Runtime Boundary
 
-This is an engineering bootstrap and manual fallback prompt. It is not loaded by
-agent-coordination runtime. Production coordination prose belongs in runtime
-Skills, TaskSpecs, and workflow/protocol configuration.
+This owner-retained prompt is a manual engineering convention, not a runtime
+sequencer. Current automated execution uses Unit/CollaborationPattern and
+Workflow; runtime definitions and governed dispatch retain their authority.
 
 ## Usage
 
@@ -83,17 +83,17 @@ ADR, stop at a gate; do not pick one silently.
 
 RUNTIME BOUNDARY AND THE SYSTEM UNDER TEST
 
-This prompt coordinates engineering work only. It is not product runtime prose.
-Runtime Skills/TaskSpecs/config live under core/, domains/, and src/. Nothing in
-docs/architect/agent-coordination/playbooks/ is a production dependency.
+This prompt coordinates manual engineering work; it does not own product
+runtime sequencing, storage or gates. Runtime definitions live under core/,
+domains/ and src/. Advisory playbooks may be cognitive references of Skills;
+there is no blanket prohibition on live references into this directory.
 
-When the repository under change is fgOS itself, fgOS is the system under
-test, not the coordination tool. Coordinate with this prompt alone:
-- do NOT use fgOS skills (/fgOS:*), fgos-runner loops, `fgos pick/cook/submit`,
-  Work items, claims, or worktree verbs to coordinate this engineering work —
-  the code being changed must not be the code running the change;
-- invoke the `fgos` CLI only as a test subject inside tests and live proofs
-  that a phase explicitly requires, and record those invocations as evidence.
+For a self-hosted change, obey the active plan's isolation and execution
+restrictions. Do not use a mutating system-under-test door for coordination
+when the plan forbids it. Repository-required read-only dispatch binding
+still applies before delegation; the manual prompt never authorizes bypassing
+decide/execute, configuration or governance. CLI proofs must use the intended
+working-tree/installed payload and record which code actually ran.
 
 What may be edited is decided only by each phase file's Files section and the
 plan's Out Of Scope list — nothing here forbids changing fgOS itself.
@@ -129,45 +129,34 @@ the master's ability to launch subagents. Therefore:
 
 MECHANISM AND DRIVER PRIORITY
 
-Prove the simplest, most observable path first and finish it before touching
-the next. Two axes, each strictly ordered:
+Manual proof ordering is selected by the approved track, not a global runtime
+preference. A track may start with an interactive/cli-spawn proof to isolate
+behavior, but cannot override a phase's explicit order or the current bind()
+mechanism. Herdr is the configured/default transport when available in the
+session, not a generally deferred second-class path.
 
-1. Who drives the work:
-   a. an interactive agent session (a person-visible session or its subagent,
-      `in-process`, live task access) — FIRST;
-   b. a headless runner loop (fgos-runner, loop.mjs sweeps, `--watch`) — only
-      after (a) is complete and proven.
-2. How a dispatched worker executes:
-   a. `cli-spawn` (headless CLI process such as `claude -p`) — FIRST;
-   b. `herdr-spawn` panes and any other adapter (rpc/app-server) — only after
-      (a) is complete and proven. Herdr stays visibility, never evidence.
+Before delegation, ask the repository dispatch decide door with actual live
+task access. For in-process use the live returned capability; for
+out-of-process use dispatch execute; unavailable work stays inline.
+Do not invoke a resolved adapter command manually or claim an rpc/app-server
+adapter exists without current implementation evidence.
 
-Rules:
-- Every live proof in the plan is executed from an interactive session with
-  `cli-spawn` workers until both are closed with recorded evidence.
-- No cell may add, require, or "also test" the headless-driver or herdr paths
-  while the interactive + cli-spawn proofs are still open. If a phase file
-  seems to require them earlier, stop at a gate and report the conflict.
-- Code that both paths share (build, normalize, dispatch policy, result
-  ladder) is changed once; unit tests may cover the shared logic, but the
-  live proof obligation belongs to the interactive + cli-spawn path first.
-- Headless-driver and herdr work, when it comes, gets its own later phases
-  and its own proofs; do not fold it into the closing of earlier phases.
+Each requested driver/transport path needs its own observed proof. Shared
+normalization/policy/result code may be tested once; visibility alone never
+substitutes for semantic execution evidence.
 
 EXECUTION ENVIRONMENT
 
-Assume an agent session with a subagent/Agent tool. Independence is provided
-by launching Doer, Reviewer, and Red-Team as separate subagent executions with
-fresh context and only their role packet. Default model tier: use a lower-cost
-tier (sonnet-class) for Doer, Reviewer, Red-Team, and Researcher; reserve the
-master's own reasoning for audit, cell selection, disposition, and close. Raise
-a role's tier only when a cell's Bug Taxonomy marks it hard.
+Independent roles need distinct actual executions with fresh role-scoped input.
+Select mechanism/executor/model through current configuration and binding,
+not a fixed sonnet-class roster. If the approved track forbids delegation,
+work inline and stop at its committed independent-review boundary.
 
 PERSISTENT STATE
 
 Use:
 
-<REPO_ROOT>/docs/architect/agent-coordination/verification/<TRACK>/
+<REPO_ROOT>/docs/platform/agent-coordination/verification/<TRACK>/
   index.md
   current-cell.md
   <cell-id>.md
@@ -290,9 +279,10 @@ BRANCH AND COMMIT POLICY
 - Trace/proof files are committed together with their cell.
 - Record BASE_REF and BRANCH in index.md when the track is created; later
   invocations read them from there, never re-derive them.
-- If the repository's pre-commit hook refuses with a "lock held" message, wait
-  30 seconds and retry once (the lock is per-commit with a short TTL); if it
-  still refuses, treat it as a stop gate and report the holder identity.
+- If a commit is refused, preserve the actual hook diagnostic and follow the
+  repository's documented recovery door; do not infer a holder, TTL or safe
+  retry from a literal "lock held" message the current hook does not emit.
+  Linked-worktree scope and fail-closed ambiguity still apply.
 
 ROLE SET
 
@@ -362,7 +352,7 @@ Run this loop until every phase in plan.md is done or a stop gate is reached:
 A. PREFLIGHT AND RESUME
 1. Resolve REPO_ROOT, PLAN_DIR, TRACK directory, BRANCH.
 2. Read git status and note unrelated/user changes. Check out BRANCH.
-3. Read plan.md and documentation-governance.md.
+3. Read plan.md, its phase contract, the current area spec and applicable governance; do not treat a frozen/history documentation-governance.md as current authority.
 4. Read index.md/current-cell.md when present.
 5. If a cell is active, resume from its persisted Next action.
 6. If no track exists, run TEST BASELINE, then AUDIT.
@@ -456,8 +446,8 @@ G. RED-TEAM (INDEPENDENT)
    - exit-zero/self-report false success;
    - illegal operation/role/executor/provider/model/policy bypass;
    - Work lifecycle mutation outside Work verbs;
-   - inline/agent-led request driving a Stage transition or replacing a
-     declared Stage Operation;
+   - inline/agent-led requests changing Work workflowStep/status outside Work
+     authority or replacing a declared operation;
    - retry duplication or prior-evidence loss;
    - partial write/crash/resume/idempotency failure;
    - dirty-before output attribution;
@@ -466,7 +456,7 @@ G. RED-TEAM (INDEPENDENT)
    - shared-checkout mutation collision/branch target error;
    - unsupported consensus/hidden failed branch;
    - discovery asking a human instead of routing to exploring;
-   - primary step.skill/taskSpec compatibility regression.
+   - primary Workflow step.skill/taskSpec compatibility regression.
 3. Red-Team updates only Red-Team section/proof artifacts.
 4. If findings exist, route accepted findings to Fixer and rerun relevant
    attack/review. Otherwise set Next action close. If Reviewer and Red-Team ran
@@ -554,24 +544,21 @@ evidence support it.
 
 ## What The User Pastes
 
-A normal invocation can be as small as:
+A track-specific invocation can use the current platform prompt and accepted
+current contracts. Supply the actual worktree, branch, plan and test command;
+do not reuse the retired Step 07 plan or a switch that disables checks.
 
 ```text
-Read and follow docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md
-(the "Master Prompt" block) as the Master Implementation Coordinator.
+Read and follow docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md
+(the "Master Prompt" block) within the approved track's execution restrictions.
 
-REPO_ROOT: /home/vantt/projects/forgentX
-PLAN_DIR: plans/260831-1637-step07-inline-assignment-mvp/
-TRACK: step-07-mvp
-SCOPE_DOCS:
-- docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md
-- docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md
-- docs/architect/agent-coordination/contracts/assignment-run-runresult.md
-- docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md (section 19 only)
-BRANCH: step-07-mvp
-Test command: FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'
-Do not use fgOS skills, fgos-runner, Work items, or claims to coordinate; fgOS is the system under test.
-Run until the plan is complete or a stop gate is reached.
+REPO_ROOT: <actual authorized worktree>
+PLAN_DIR: <current approved plan>
+TRACK: <selected manual track>
+SCOPE_DOCS: <current accepted contracts and required specs>
+BRANCH: <authorized branch>
+Test command: <the approved exact command; no check-disabling switch>
+Run until the contract is complete or its independent review/stop gate is reached.
 ```
 
 On later invocations, the same input resumes from `index.md` and
@@ -579,10 +566,10 @@ On later invocations, the same input resumes from `index.md` and
 
 ## Retirement
 
-When the runtime can natively execute this coordination protocol with validated
-Skills, TaskSpecs, configuration, Assignment, Run, and RunResult, this prompt is
-retained only as manual recovery/engineering fallback or archived.
-
-For a Work-independent track, `.agents/skills/fgos-code-change/SKILL.md`
-(plan mode, `references/plan-mode.md`) is the intended native path this
-prompt retires into.
+The prompt stays current as an owner-retained manual engineering convention;
+the retired coordination engine is not its future execution target.
+The current free-form/plan execution skill is `fgos-run`
+(`core/skills/fgos-run/SKILL.md`), through registered Workflow execution.
+There is no `.agents/skills/fgos-code-change` native path.
+Any retirement requires an authorized consumer/liveness check, not an
+assumption that a nonexistent skill or engine will replace this prompt.

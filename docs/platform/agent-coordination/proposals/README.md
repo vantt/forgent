@@ -22,7 +22,7 @@ Added in candidate: Liveness evidence and explicit implementation/proposal disti
 
 Complete pre-rework input: [historical snapshot](../history/retired-engine/files/proposals/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
-All proposals remain subordinate to the surviving Agent Coordination foundation boundaries in [Vision](../vision.md). A current design frontier does not implicitly reopen an accepted boundary. Before narrowing it, reconcile the original intent in the [preservation ledger](../intent-preservation-ledger.md). This restores the live introduction; the historical snapshot retains its original wording.
+Proposals remain subordinate to the surviving boundaries in [Vision](../vision.md). A current design frontier does not implicitly reopen an accepted boundary. The original [intent-preservation ledger](../history/retired-engine/files/intent-preservation-ledger.md#literal-snapshot) is dated preservation evidence, not current authority or an additional mandatory approval gate.
 
 ## Migration Status
 
@@ -42,35 +42,33 @@ promote its design: the status of every frontier source remains governed by
 
 ## Promoted History
 
-These proposals are no longer the active design frontier. Their accepted parts
-have been promoted into architecture, contracts, and ADRs; their unresolved
-parts remain explicitly deferred.
+These snapshots record the retired coordination engine and its earlier design
+frontier. Links into history preserve discussion and provenance; they do not
+declare those contracts canonical or the engine delivered in the current release.
 
 1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](../history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
-   is historical discussion. CoordinationSession, runtime boundaries, and
-   Work authority decisions were promoted; AdhocTask and generalized inline
-   execution-contract schema remain unaccepted/deferred.
+   records the old session/planning discussion. Current inline validation is
+   implemented in `src/runner/dispatch/execution-contract.mjs`; it is not waiting
+   for acceptance of that retired proposal.
 2. [Step 08: Standalone Coordination And Optional Protocols](../history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
-   is historical discussion for the delivered standalone coordination surface.
-   Read [Coordination Foundation Baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot),
-   [CoordinationSession](../history/retired-engine/files/contracts/coordination-session.md#literal-snapshot), and
-   [FlowDefinition](../history/retired-engine/files/contracts/flow-definition.md#literal-snapshot) for canonical design.
+   records the former coordination door and optional-protocol design, retired
+   in 2180b4e72. Its [foundation baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot),
+   [CoordinationSession](../history/retired-engine/files/contracts/coordination-session.md#literal-snapshot)
+   and [FlowDefinition](../history/retired-engine/files/contracts/flow-definition.md#literal-snapshot)
+   links are historical evidence, not current runtime contracts.
 
 ## Related Architect-Level Intentions
 
-- [Architecture Intent](../../../architect/architecture-intent.md) preserves the wider
-  design intent behind deferred architecture capabilities. Its first active
-  thread covers group-thinking/problem-solving capability and sits at
-  `docs/architect/` because the concern spans Agent Coordination, Work Driver,
-  Dispatch/Run, Run Result Evaluation, and the Coding Domain adoption track.
+- [Architecture Intent](../../../architect/architecture-intent.md) records wider,
+  cross-component design intent; frozen legacy placement is not proof of current
+  implementation.
 - [Step 09: Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md)
-  discusses the standalone, no-Work group-thinking substrate expansion. The
-  first useful proof fixture is a Master Coordination style loop with external
-  driver authority, bounded optional rounds, recheck, and disposition.
+  records the earlier substrate proposal. Current named execution is defined by
+  Workflow and CollaborationPattern owners, not the retired coordination door.
 - [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../../architect/proposals/step-10-coding-domain-adoption.md)
-  discusses bringing the existing coding domain onto the Step 08 foundation:
-  duplicate-mechanism inventory, seams, the foundation capabilities coding
-  still needs, and a candidate step sequence gated on ADR-010 §5's proof.
+  records the earlier coding-adoption plan. Current coding operations and
+  Workflow definitions must be checked in `domains/coding/`, not inferred from
+  the old Step 08/ADR-010 proof sequence.
 - [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md)
   is the parallel architect-level authority/layout draft for cross-component
   placement and forbidden dependencies.

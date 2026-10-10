@@ -24,19 +24,19 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 
 ## Planning Sources
 
-Per the [Agent Coordination Foundation Vision](../vision.md), a predeclared
-Workflow or Coordination Protocol is optional. Coordination may obtain planning
-and constraints from one or more composable sources:
+Planning need not begin with a predeclared Workflow. Current execution accepts
+Unit requests and Workflow execution; the retired CoordinationProtocol is not
+another current declared-planning source.
 
 ```txt
 Agent-led
-  objective -> coordinator reasoning -> dynamic semantic task/Assignment
+  objective -> bounded Unit or validated inline Assignment
 
 Declared
-  Workflow / Coordination Protocol -> legal graph and operations
+  Workflow -> dependent steps and operations -> Unit execution
 
 Domain-assisted
-  agent or declared plan -> domain enrichment / validation / resource policy
+  either source -> registered domain TaskSpecs, skills and validation
 ```
 
 All sources lower executable intent into the same governed
@@ -47,36 +47,36 @@ create a private execution path.
 
 ```txt
 Workflow
-  -> Stage graph
-    -> Stage Protocol
-      -> Stage Operation
-        -> TaskSpec
-        -> Skill(s)
-        -> Role
-        -> policy hints
+  -> step graph
+    -> step operations
+      -> TaskSpec
+      -> Skill(s)
+      -> Role
+      -> policy hints
 ```
 
-The same hard-and-soft shape may be used by a standalone Coordination Protocol
-when repeatability, auditability, or reusable doctrine justifies a predeclared
-graph. A session is not required to select this model.
+Current Workflow definitions normalize operations directly
+(`src/workflow/definition.mjs:81-109`). No separately shipped Stage Protocol,
+CoordinationProtocol or FlowDefinition engine sits between steps and operations.
 
 ## Responsibility Split
 
 | Element | Responsibility |
 |---|---|
-| Workflow/graph | Legal stage transitions and structural boundaries. |
-| Stage Protocol | Coordination doctrine active in one stage. |
-| Stage Operation | Legal semantic action selectable by the driver. |
+| Workflow/graph | Step dependencies, gates and sequencing boundaries. |
+| Step | A declared node in the Workflow graph. |
+| Step operation | Semantic action declared by the definition. |
 | TaskSpec | Machine-readable inputs, outputs, gates, mutation, and evidence contract. |
 | Skill | Adaptive judgment and procedural guidance. |
 | Role | Semantic responsibility and capability expectation. |
 | Policy hints | Inputs to governed provider/model/tier/mechanism resolution. |
 
-For agent-led planning, the coordinator supplies adaptive planning and proposes
-a dynamic execution contract. Foundation policy and any selected domain harness
-validate its objective, bounds, mutation, evidence, capability, privacy, and
-budget fields before Assignment construction. The exact inline contract schema
-remains an open contract-design question.
+Agent-led callers supply a bounded Unit or validated inline contract. Current
+inline fields and normalization are implemented by
+`src/runner/dispatch/execution-contract.mjs:180-200,295-340`, rather than left
+as an open schema question. Domain-specific validators must be checked against
+their registered implementation; this extension model does not imply research
+and marketing harnesses already ship.
 
 ## Hard And Soft Coordination
 
@@ -102,12 +102,11 @@ No layer may absorb all responsibilities:
 
 ## Compatibility
 
-`step.skill` and `step.taskSpec` remain the primary-operation compatibility
-path. Multiple `stage.operations` extend the stage without regressing consumers
-that only understand the primary operation.
-
-This compatibility path remains mandatory for Work-attached declared workflows.
-Adding an agent-led path must not weaken or reinterpret it.
+TaskSpec/skill compatibility projections are derived from normalized
+`step.operations`, including selection of a primary operation. `step.taskSpec`
+and `stage.operations` are not the current raw fields. The domain step
+projection APIs preserve consumers without restoring the retired Work-stage
+or coordination engine.
 
 The exact normalized contract is defined in
 [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md).

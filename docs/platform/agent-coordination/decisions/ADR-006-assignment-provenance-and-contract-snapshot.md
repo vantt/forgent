@@ -32,33 +32,37 @@ evidence, capability, budget, and provenance semantics.
 
 ## Decision
 
-1. **Two provenance classes, one Assignment.** Every Assignment carries
-   `provenance.kind = declared | inline`, plus `contractPolicyVersion`,
-   `normalizerVersion`, and the validator chain that produced it.
-   - `declared`: existing domain/workflow/stage/operation/TaskSpec legality
-     validation, unchanged (ADR-002 preserved).
-   - `inline`: an agent-proposed contract validated by the foundation validator
-     and any selected domain harness (ADR-007), plus caller provenance
-     (writer identity, optional parent Assignment reference).
+1. **Three current provenance kinds, one execution path.** Declared and inline
+   builders stamp `contractPolicyVersion`, `normalizerVersion` and validator
+   provenance (`assignment.mjs:456-459,663-666`). The Unit door separately writes
+   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:334-338`);
+   do not assert every kind has the declared builder's identical shape.
+   - `declared`: Workflow step/operation/TaskSpec validation and normalization.
+   - `inline`: foundation contract validation, the applicable registered domain
+     harness and caller provenance.
+   - `unit-run`: the Unit execution door and its computed binding/admission.
 2. **Normalizer stamps the snapshot.** At build time the normalizer stamps
    `mutation` (`read-only | mutating`) and `evidence.required`
    (`reported | verified`) onto the immutable Assignment. Declared operations
-   are stamped from the existing operation/role mapping; inline contracts must
-   declare them explicitly. A missing value is a build failure, never a default.
+   use operation tables with role/mutation-derived fallbacks for unmapped
+   operations (`assignment-normalizer.mjs:95-124`); inline contracts must declare
+   mutation/evidence explicitly. Missing required inline values fail validation.
 3. **Interpretation reads the Assignment, not the operation id.** Result
    confidence gating, mutation policy, and post-advance behavior are driven by
-   Assignment fields. Operation-specific behavior is declared on the operation
-   table or inline contract as `resultKind` (for example `gate-verdict`,
-   `advisory`, `work-product`) and an optional `onAdvance` action, replacing
-   `if (operation === ...)` branches.
-4. **Minimum inline contract.** objective; bounded context references;
-   constraints/authority; expected outputs; `mutation`; `evidence.required`;
-   role and capability hints; budget (`timeoutMs`, `maxRuns`; token counts are
-   telemetry only); caller provenance. Unknown fields are rejected.
-5. **Same stores and governance.** Both classes use `.fgos/assignments/`,
-   `executeAssignment()`, `compileDispatchPlan`, and the same Run/RunResult
-   normalization. Neither class may bypass dispatch governance.
-6. **Historical first-slice restriction.** The former session-isolation prerequisite is preserved in the full historical snapshot. Current normalized mutation/evidence validation is implemented by assignment-normalizer.mjs and assignment.mjs; the old first-slice restriction must not be asserted as the current general inline contract (docs/specs/runner.md:3057).
+   Assignment fields. Declared `resultKind` and optional `onAdvance` use the
+   normalizer tables, with advisory/work-product fallback from mutation
+   (`assignment-normalizer.mjs:120-143`). These are not arbitrary accepted
+   inline-contract fields.
+4. **Validated inline fields.** `objective`, `contextRefs`, `constraints`,
+   `expectedOutputs`, `mutation`, `evidence`, optional `role`, `capabilities`,
+   `budget`, `supports`, `contractTemplate`, and narrowly accepted `policy`.
+   Budget accepts `timeoutMs`, `maxRuns`, `tokens`; inline policy accepts only
+   `tier`, not a full PolicyPatch. Caller fields are validated separately
+   (`execution-contract.mjs:180-240,295-340`). Unknown fields are rejected.
+5. **Same execution governance.** Declared, inline and Unit-run requests
+   converge on Assignment execution and Run/RunResult normalization rather than
+   private dispatch or stores that bypass governance.
+6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks described in docs/specs/runner.md:3057. Do not present the dormant stamp path as a current general session-runtime door.
 
 7. **Retire the standalone read-only heuristic.** Once no declared caller
    passes `workId: null`, the `missionId || workId === null => read-only`
@@ -67,13 +71,14 @@ evidence, capability, budget, and provenance semantics.
 
 ## Consequences
 
-- Standalone coordination no longer fabricates a coding Stage; the Vision's
-  two-consumer proof becomes testable.
+- Standalone Unit execution does not fabricate a coding Work stage.
+- A registered domain harness is not proof that every proposed domain ships.
 - Declared operations gain an explicit, inspectable mutation/evidence snapshot
   without parsing TaskSpec Markdown.
 - Result interpretation becomes contract-driven and testable per field.
-- A mutating inline path, session references, and dynamic task graphs remain
-  future decisions and must not be implied by this ADR.
+- Session references and dynamic session task graphs are historical/deferred
+  vocabulary; Unit-run mutation is current and must not be called universally
+  deferred just because the generic inline stamp gate remains.
 
 ## Rejected Alternatives
 
