@@ -213,7 +213,12 @@ export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBi
   const resolvedHerdrBin = (herdrBin && herdrBin.trim()) || (env ?? process.env).FGOS_HERDR_BIN?.trim() || 'herdr';
   // The pane lives in the session it was launched in, which is not necessarily the one this process's
   // own environment names; a record written without a session keeps asking the ambient one.
-  const clientEnv = command.herdrSession ? envForSession(env ?? process.env, command.herdrSession) : env;
+  let clientEnv = env;
+  try {
+    if (command.herdrSession) clientEnv = envForSession(env ?? process.env, command.herdrSession);
+  } catch {
+    return 'unknown'; // a session name that cannot be addressed: undecidable, fail closed
+  }
   const client = herdrClient ?? createHerdrClient({ herdrBin: resolvedHerdrBin, cwd, env: clientEnv });
 
   try {

@@ -1489,7 +1489,10 @@ fi
     assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), true, 'found through the recorded session');
 
     writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
-    assert.notEqual(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), true, 'a record without a session keeps asking the ambient one');
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), 'unknown', 'a record without a session keeps asking the ambient one, which does not know the pane');
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest', herdrSession: 'Not A Valid Name!' });
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), 'unknown', 'a session name that cannot be addressed fails closed instead of throwing');
   } finally {
     fs.rmSync(runDir, { recursive: true, force: true });
   }

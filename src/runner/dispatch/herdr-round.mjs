@@ -1580,7 +1580,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // a different pane-id namespace) than an unconfined one -- HERDR_SESSION is
   // what `isolatedSessionEnv` sets it to, so it is what distinguishes them.
   const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
-  round.herdrSession = sessionKey;
+  // Only a session actually named: assuming 'default' would send a later reaper to the wrong socket.
+  round.herdrSession = sessionEnv?.HERDR_SESSION ?? null;
   const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
 
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);

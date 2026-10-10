@@ -1649,6 +1649,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       herdrName,
       agentSession: existingCmd?.agentSession || null,
       paneId: existingCmd?.paneId || null,
+      herdrSession: existingCmd?.herdrSession || null,
       resourceIncarnation: existingCmd?.resourceIncarnation || null,
       outcome: existingCmd?.outcome || null,
     };
