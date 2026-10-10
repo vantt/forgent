@@ -1,0 +1,130 @@
+---
+name: fgos-advise
+user-invocable: false
+description: >-
+  Entry for natural-language advisory and panel requests: a multi-agent panel,
+  independent opinions, option comparison, proposal review, debate, idea
+  generation and ranking, or decision red-team, in any domain. Picks the
+  registered discussion Workflow (`council-lite`, `delphi`, `nominal-group`,
+  `group-cognition`, `business-discussion`, `architecture-advisory`) or
+  collaboration pattern preset (`rfc`, `consult`, `research-fan-out`) from the
+  person's purpose and the role they need, without asking for a protocol id.
+  Does not implement code; use fgos-run only when the person explicitly
+  requests a code change plus review/red-team. This is not the interview-driven
+  `ak:advise` / advisor agent from another kit: it runs a multi-agent
+  discussion through fgOS workflows.
+---
+
+# fgos-advise
+
+The natural-language entrypoint for advisory discussions. It chooses the route;
+[`fgos-group-thinking`](../fgos-group-thinking/SKILL.md) executes a route that
+was already chosen. The person states the question and what they will do with
+the answer; this skill infers the request kind, looks it up in
+[`references/request-kinds-and-routes.md`](references/request-kinds-and-routes.md)
+(the only kind-to-route map), and launches the named Workflow
+(`core/workflows/*.yaml`) or CollaborationPattern preset
+(`src/runner/execution/patterns/presets.mjs`).
+
+It is not the interview-driven `ak:advise` / advisor agent of another kit. That
+one interviews a person and returns one agent's advice; this one runs a
+multi-agent discussion and returns its synthesized result.
+
+This skill builds on the shared **Generic Driver Discipline**:
+[`../_shared/coordination-driver.md`](../_shared/coordination-driver.md). The
+Facade Hook Values table below fills its 9 hook slots, but governs **only**
+Route step 6's own generic path (observe and dispatch a run across turns). It
+does not govern the delegated architecture route, which keeps the hook table of
+[`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md), nor the
+`fgos-run` route.
+
+## Route
+
+1. **Read the signals; never ask for them.** Infer from the request and context:
+   thinking need, use of the answer, candidate answers (none / 2-4 discrete /
+   many), artifact present or not, domain (in-repo software architecture or
+   other), attendance (unknown counts as unattended), authority (advice or
+   implement). Definitions are in the reference.
+2. **Pick the request kind** (A-G plus the two overlays) and take its route from
+   the reference table. Pick the narrower, gate-free route when two fit. Check
+   the row's "Do NOT use when" before launching.
+3. **Ask only when one of these four holds**, batching them in one message:
+   the subject is absent; a review (kind B) has no readable artifact; kind A was
+   named but the options are neither supplied nor discoverable (if options can
+   be generated, use kind C instead of asking); the only ambiguity is advice
+   versus an actual change. Never ask for pattern, seats, lenses, rounds,
+   blind, gate, attendance, provider, model, executor, or tier.
+4. **State one line before launching** (informs, does not ask): "You need
+   [use]; I chose [route] because [reason]; configuration [seats/lenses/rounds/gate]."
+5. **Fill only these launch inputs:** the request verbatim (`--request`), the
+   artifacts or evidence the person named (`--context-ref`), `--stance-options`
+   only when their words contain 2-4 mutually exclusive answers (verbatim, never
+   paraphrased or invented; panel-bearing workflows only, see "Stance options"
+   in `fgos-group-thinking`), and `--worktree` / `--dir` as in
+   `fgos-architecture-panel`. Seats, lenses, rounds, blind and gates come only
+   from the chosen Workflow or preset, never from this skill.
+6. **Launch and report.**
+   - Architecture overlay: follow `fgos-architecture-panel` (do not pass stance
+     options there).
+   - Implementation requested: follow `fgos-run`; no discussion starts. A
+     coding decision, design review, or "plugin versus core" question is
+     advisory and must not take this route.
+   - Workflows: `fgos workflow start <workflowId> --request "<verbatim>" ...`
+     via `fgos-group-thinking`. `start`, `answer` and `resume` return at once
+     (the run continues detached); poll `fgos workflow status <workflowRunId>`
+     until it completes or parks at a gate. At a human gate (such as
+     `voting-ranking` in `nominal-group`), submit the person's answer with
+     `fgos workflow answer <workflowRunId> --step <stepId> --answer <text>`;
+     when the person is unattended, say the run parked there.
+   - Presets (`rfc`, `consult`, `research-fan-out`): `fgos run --pattern
+     <preset> --unit <file>` per `fgos-group-thinking` section 4. `fgos run`
+     takes no `--request`/`--context-ref`: put the request and the artifact path
+     in the unit's `objective`.
+7. **Return** the synthesized advice, positions, or rankings with the run
+   reference. When the person asked "which one?" and the route is
+   `council-lite`, say that its verdict is split-first (positions, agreement or
+   split, what would change it, one next step) and does not always name one
+   winner.
+
+## Configuration rules
+
+- Seats, per-seat lenses (posture files `core/agents/council-*.yaml`,
+  architecture lenses), rounds, `blind`, and human gates are data in the chosen
+  YAML or preset. "The person wants a gate" is a constraint on which route to
+  pick, not a switch to flip.
+- Domain flavour (customer, finance, ops) goes into the request text only,
+  never into seat configuration. No new persona files.
+- Never set provider, model, executor, tier, `invocation`, `prefer`, or a
+  persona override.
+- **Unmet knob** (for example 5 seats, a custom lens, 3 rounds): run the closest
+  registered route; state the unmet knob in the pre-launch line and in the
+  result; never fake it in the request text ("act as 5 people"), never write an
+  inline workflow, never simulate a gate or a round. If the unmet knob defeats
+  the outcome, report that and offer the closest real alternative.
+
+## Facade Hook Values (Route Step 6's Generic Path Only)
+
+| Hook Slot | Value |
+|---|---|
+| `unit of iteration` | One dispatched Workflow run or one preset collaboration pattern run for the route chosen in step 2. |
+| `open inputs` | (a) result kind: advisory, never work-product. (b) exactly one primary canonical capability, resolved from the selected route or task capability in `runner.capabilities` (e.g. `advise`), never a keyword-matched guess. (c) the subject, artifact, supplied options, and material scope/risk constraint (step 1). |
+| `evidence verification` | Read the advisory artifact and run state back through `fgos workflow status <workflowRunId>` or unit execution results; report only artifacts the real run produced. |
+| `disposition criteria` | None owned by this skill. The selected Workflow's steps, dependencies and unit patterns govern every finding. |
+| `adaptation bounds` | None owned by this skill. Bounded by the Workflow definition or preset `maxRounds`. |
+| `human-escalation triggers` | The four questions in step 3 only. |
+| `close criteria` | The Workflow's completion status (`completed` with outcome `pass` or `findings`), or every human gate answered. |
+| `after-close action` | Return the advisory artifact and run id. Never turn an advisory panel into an implementation executor. |
+| `continuity artifact` | `fgos workflow status <workflowRunId>`, unmodified. |
+
+## Boundaries
+
+- This is selection and request filling, not an execution engine. Workflow and
+  CollaborationPattern definitions remain authoritative.
+- Never invent workflow semantics, actors, transitions, visibility, grants,
+  reopen, aggregation, quorum, or close rules in task prose.
+- Never pin a provider, model, executor, or tier. Dispatch resolves the existing
+  `advise` or coding capability through the Dispatch Control Plane.
+- Never claim that a ranking workflow selected a winner or that mediated
+  feedback guarantees anonymity or consensus; report only artifacts the real
+  run produced.
+- Do not recreate the kind-to-route table here; it lives only in the reference.

@@ -428,11 +428,11 @@ test('fgos-code-change canonical source has non-vacuous repo-root path reference
 test('active source and projected skill files do not path-link fgos-code-panel after domain move', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
   const skillPaths = [
-    path.join(repoRoot, 'core', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, 'core', 'skills', 'fgos-advise', 'SKILL.md'),
     path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
-    path.join(repoRoot, '.agents', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, '.agents', 'skills', 'fgos-advise', 'SKILL.md'),
     path.join(repoRoot, '.agents', 'skills', 'fgos-plan-loop', 'SKILL.md'),
-    path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-advise', 'SKILL.md'),
     path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-plan-loop', 'SKILL.md'),
   ];
   const markdownLinkPattern = /\[[^\]]+\]\(([^)]+)\)/g;

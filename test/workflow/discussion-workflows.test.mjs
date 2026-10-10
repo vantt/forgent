@@ -361,11 +361,14 @@ test('CLI: fgos workflow start and status for discussion workflows', () => {
   assert.ok(answerNominal.includes('completed'), 'workflow answer should resume and complete');
 });
 
-test('skills: fgos-panel and fgos-group-thinking route to named discussion workflows', () => {
-  const panelSkill = fs.readFileSync(path.resolve('core/skills/fgos-panel/SKILL.md'), 'utf8');
-  assert.ok(panelSkill.includes('delphi'), 'fgos-panel must reference delphi');
-  assert.ok(panelSkill.includes('nominal-group'), 'fgos-panel must reference nominal-group');
-  assert.ok(panelSkill.includes('group-cognition'), 'fgos-panel must reference group-cognition');
+test('skills: fgos-advise and fgos-group-thinking route to named discussion workflows', () => {
+  const panelSkill = fs.readFileSync(path.resolve('core/skills/fgos-advise/SKILL.md'), 'utf8');
+  for (const id of ['delphi', 'nominal-group', 'group-cognition', 'council-lite', 'business-discussion']) {
+    assert.ok(panelSkill.includes(id), `fgos-advise must reference ${id}`);
+  }
+  assert.ok(panelSkill.includes('references/request-kinds-and-routes.md'), 'fgos-advise must link its route reference');
+  assert.ok(fs.existsSync(path.resolve('core/skills/fgos-advise/references/request-kinds-and-routes.md')), 'route reference must exist');
+  assert.ok(!fs.existsSync(path.resolve('core/skills/fgos-panel')), 'the retired fgos-panel skill must not return');
   assert.ok(!panelSkill.includes('core.coordination-protocol.deliberation-delphi-chain'), 'must not route to old protocol id');
   assert.ok(!panelSkill.includes('core.coordination-protocol.deliberation-nominal-group-chain'), 'must not route to old protocol id');
 
@@ -373,6 +376,8 @@ test('skills: fgos-panel and fgos-group-thinking route to named discussion workf
   assert.ok(groupThinkingSkill.includes('delphi'), 'fgos-group-thinking must reference delphi');
   assert.ok(groupThinkingSkill.includes('nominal-group'), 'fgos-group-thinking must reference nominal-group');
   assert.ok(groupThinkingSkill.includes('group-cognition'), 'fgos-group-thinking must reference group-cognition');
+  assert.ok(groupThinkingSkill.includes('council-lite'), 'fgos-group-thinking must reference council-lite');
+  assert.ok(groupThinkingSkill.includes('business-discussion'), 'fgos-group-thinking must reference business-discussion');
   assert.ok(groupThinkingSkill.includes('fgos workflow start'), 'must reference fgos workflow start');
 });
 

@@ -2,15 +2,16 @@
 
 Start with the outcome in ordinary language. For example: "review this proposal
 with a panel", "compare these three options", "red-team this decision", or
-"get independent opinions before I commit". `fgos-panel` selects the matching
-use-case preset; it never asks you for a protocol id.
+"get independent opinions before I commit". `fgos-advise` picks the matching
+route from your purpose and the role you need; it never asks you for a protocol id.
 
 The lower-level `fgos-group-thinking` skill executes named discussion Workflows
-(`delphi`, `nominal-group`, `group-cognition`, `architecture-advisory`) and
+(`council-lite`, `delphi`, `nominal-group`, `group-cognition`, `business-discussion`, `architecture-advisory`) and
 CollaborationPattern presets (`rfc`, `consult`, `research-fan-out`). Its caller
 names the discussion shape, but that caller is the surface skill or an operator,
-not the end user. The canonical preset map and the core/surface boundary live in
-[`fgos-panel`](../../core/skills/fgos-panel/SKILL.md).
+not the end user. The canonical request-kind to route map ships with the skill, in
+[`fgos-advise`](../../core/skills/fgos-advise/SKILL.md) and its
+[`request-kinds-and-routes.md`](../../core/skills/fgos-advise/references/request-kinds-and-routes.md).
 
 This guide is deliberately example-driven. Workflow definitions live in
 `core/workflows/*.yaml`, and single-unit presets live in

@@ -17,19 +17,19 @@ Related: [Protocol Model](protocol-model.md),
 together. A person describes the outcome they want, such as review, compare,
 debate, red-team, or independent opinions. They do not select a protocol.
 
-`fgos-panel` owns this surface routing. It selects one use-case preset and then
-hands an explicit registered protocol id to `fgos-group-thinking`, which remains
-the thin pack gate. No CLI verb, protocol, capability, or execution path is
+`fgos-advise` (formerly `fgos-panel`) owns this surface routing. It picks one
+request kind and route and then hands the registered Workflow or preset id to
+`fgos-group-thinking`, which remains the execution door. No CLI verb, protocol, capability, or execution path is
 added by this surface.
 
 ## Baseline UX Audit
 
-This table records the surface before `fgos-panel` was introduced.
+This table records the surface before `fgos-panel` (now `fgos-advise`) was introduced.
 
 | Current trigger | User mental model | Required knowledge | Problem | Proposed surface |
 |---|---|---|---|---|
-| `fgos-group-thinking` | "Ask several agents" | Exact pack member id and request shape | Internal selection gate leaked protocol identity to the person and its description missed natural requests | `fgos-panel` selects a preset; `fgos-group-thinking` remains the internal pack gate |
-| `fgos-architecture-panel` | Architecture advisory board | Only the architecture question | Good entrypoint, but intentionally limited to software architecture | Keep it; route architecture intents here from `fgos-panel` |
+| `fgos-group-thinking` | "Ask several agents" | Exact pack member id and request shape | Internal selection gate leaked protocol identity to the person and its description missed natural requests | `fgos-advise` selects a preset; `fgos-group-thinking` remains the internal pack gate |
+| `fgos-architecture-panel` | Architecture advisory board | Only the architecture question | Good entrypoint, but intentionally limited to software architecture | Keep it; route architecture intents here from `fgos-advise` |
 | `fgos-code-panel` | Usually "several agents discuss code" | Must know it actually implements, reviews, and red-teams a change | Name can capture advisory coding-decision requests even though it is a mutating implementation workflow | Keep for explicit implementation; route advisory coding decisions to `fgos-architecture-panel` or a non-mutating preset |
 | Raw protocol id | Runtime implementation identity | Registry id/version | Precise for machines, hostile to recall and discovery | Hide behind preset selection |
 | RFC-Review-Lite | Structured proposal critique | RFC vocabulary and protocol behavior | "RFC" sounds coding-specific although the protocol can review any concrete proposal | Surface name `proposal-review` |
@@ -45,7 +45,7 @@ This table records the surface before `fgos-panel` was introduced.
 
 | Term | Recall | Ambiguity | Cross-domain fit | Scale across protocols | Decision |
 |---|---|---|---|---|---|
-| `panel` | High | Low: clearly several viewpoints | Strong | Strong | Canonical noun and skill name |
+| `panel` | High | Low: clearly several viewpoints | Strong | Strong | Canonical noun; the skill is now `fgos-advise` |
 | `review` | High | Medium: may mean single reviewer | Strong | Strong | Intent verb; selects proposal review when group thinking is explicit |
 | `compare` | High | Low when options are supplied | Strong | Strong | Intent verb for option comparison |
 | `red-team` | High | Medium: attack only, not always synthesis | Strong | Strong | Intent verb, never a separate protocol identity |
@@ -58,40 +58,14 @@ This table records the surface before `fgos-panel` was introduced.
 
 ## Surface Taxonomy
 
-This is the one canonical preset map. It describes selection only. The linked
-FlowDefinition remains authoritative for actors, legal operations, visibility,
-authorization, bounds, completion, and contribution types.
-
-| Surface intent | Use-case preset | Core protocol id | Roster/policy default | Dispatch capability | Expected artifact |
-|---|---|---|---|---|---|
-| Software architecture decision with competing alternatives | `architecture-panel` | `core.coordination-protocol.architecture-advisory-panel-v1` | Protocol roles plus the architecture skill's governed roster selection | `advise` | Recommendation, alternatives, constraints, dissent, red-team findings, replay id |
-| Explicit, low-materiality architecture request that names the standard/no-red-team preset directly (never a default or implicit fallback from `architecture-panel`) | `architecture-panel-standard` | `core.coordination-protocol.architecture-advisory-panel-standard-v1` | Same protocol roles minus `red-team`; no skill currently routes here (Unit I26 scope excluded adding this routing to `fgos-architecture-panel`/`fgos-panel`) | `advise` (direct `fgos coordination pack run`/`coordination run` door only) | Recommendation, alternatives, constraints, dissent, replay id -- no red-team findings |
-| Concrete proposal review or general decision red-team | `proposal-review` | `core.coordination-protocol.group-thinking-rfc-review-lite` | Proposer, two isolated objectors, coordinator; configured dispatch policy | `advise` | Proposal, independent objections, response/disposition, replay id |
-| Compare supplied options or generate and rank strategy choices | `option-comparison` | `core.coordination-protocol.group-thinking-nominal-group-lite` | Facilitator and three isolated participants; configured dispatch policy | `advise` | Independent proposals, clarification, private ranks, replay id; no automatic winner |
-| Independent opinions followed by mediated reconsideration | `independent-feedback` | `core.coordination-protocol.group-thinking-delphi-feedback-lite` | Facilitator and two isolated panelists; configured dispatch policy | `advise` | Round-one views, mediated aggregate, round-two revisions, replay id |
-| Business pricing, policy, or process proposal review | `business-review` | `core.coordination-protocol.group-thinking-rfc-review-lite` | Same protocol-declared roster; business context only changes request content | `advise` | Proposal critique and response/disposition, replay id |
-| Business or product options comparison / strategy brainstorm | `strategy-options` | `core.coordination-protocol.group-thinking-nominal-group-lite` | Same protocol-declared roster; domain-neutral execution policy | `advise` | Options, clarification, ranks, replay id |
-| Incident or postmortem reflection needing independent first takes and a second round | `reflection-review` | `core.coordination-protocol.group-thinking-delphi-feedback-lite` | Same protocol-declared roster; evidence references supplied in the request | `advise` | Independent analyses, mediated aggregate, revised conclusions, replay id |
-| Advisory coding design decision | `coding-design-panel` | `core.coordination-protocol.architecture-advisory-panel-v1` when architectural; otherwise the relevant review/compare preset above | Advisory only; no doer/fixer and no mutating Assignment | `advise` | Design recommendation or comparison, dissent, replay id |
-| Implement one code change and independently review/red-team it | `code-change-panel` | `core.coordination-protocol.standalone-master-coordination-loop` | `fgos-code-change` roster and mutation gates | `code:implement`, then `code:review` at the workflow boundary | Committed candidate, findings/dispositions, test evidence, replay id |
-| General group-thinking request without a discernible review/compare/feedback shape | unresolved | none until clarified | none | none | One concise clarification question |
-
-The `code-change-panel` row is a compatibility route to `fgos-code-change`, not
-a generic `fgos-panel` advisory preset. A phrase containing "coding panel" does
-not authorize implementation. Mutation requires an explicit implement/change/
-fix request and still follows decide-before-execute.
-
-## Happy Path Routing
-
-| User phrase | Expected route |
-|---|---|
-| "run a panel on whether we should split this service" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |
-| "compare these 3 implementation options" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |
-| "red-team this architecture decision" | `architecture-panel`; red-team remains a declared phase inside that protocol |
-| "get independent opinions before I commit" | `independent-feedback`; ask only for the subject if it is absent |
-| "review this proposal with group thinking" | `proposal-review`; use the proposal text or artifact already in scope |
-| "business panel: should we change pricing?" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |
-| "coding panel: should this be a plugin or core feature?" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |
+The kind-to-route map no longer lives in this document. It ships with the
+skill that applies it:
+[`request-kinds-and-routes.md`](../../../../core/skills/fgos-advise/references/request-kinds-and-routes.md)
+(owner: [`fgos-advise`](../../../../core/skills/fgos-advise/SKILL.md), the
+renamed `fgos-panel`). The protocol-id table that stood here named retired
+`-lite` protocols; routes now name registered Workflows and presets directly.
+Boundaries below still hold: the surface selects and fills request data, and
+never defines actors, transitions, visibility, or close rules.
 
 ## Clarification Rules
 
@@ -154,8 +128,8 @@ implementation.
 
 | Need | Use |
 |---|---|
-| Natural-language group review, comparison, red-team, or independent views | `fgos-panel` |
-| Deep software-architecture recommendation and dialogue | `fgos-architecture-panel` (also selected by `fgos-panel`) |
+| Natural-language group review, comparison, red-team, or independent views | `fgos-advise` |
+| Deep software-architecture recommendation and dialogue | `fgos-architecture-panel` (also selected by `fgos-advise`) |
 | Actual single code change plus independent review and red-team | `fgos-code-panel` |
 | A known protocol id and low-level request/session operation | `fgos-group-thinking` or `fgos coordination run` |
 | Replay/status for any of the above | `fgos coordination show <coordinationId> --json` |
@@ -168,7 +142,7 @@ Smallest file change, but preserves the central failure: its pack gate correctly
 requires an explicit id from its caller. Teaching protocol ids in examples would
 make the person learn core vocabulary rather than fixing the surface.
 
-### B. Add `fgos-panel`
+### B. Add `fgos-advise`
 
 Selected. It gives natural requests one memorable entrypoint, keeps all mapping
 in this canonical table, and delegates unchanged execution to the pack gate and

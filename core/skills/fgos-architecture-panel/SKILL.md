@@ -10,7 +10,7 @@ description: >-
 # Architecture Advisory Panel
 
 Use this surface for architecture advice, including ambiguous raw intent.
-Business/product/policy questions belong to [fgos-panel](../fgos-panel/SKILL.md).
+Business/product/policy questions belong to [fgos-advise](../fgos-advise/SKILL.md).
 Implementation belongs to `fgos-run` only after an explicit implementation request;
 permission, politeness, and Workflow completion are not implementation instructions.
 
