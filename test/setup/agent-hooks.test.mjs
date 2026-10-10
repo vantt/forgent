@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -228,6 +229,28 @@ test('codex hook command quotes a project path that contains a space and a quote
   const command = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse[0].hooks[0].command;
   const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
   assert.equal(command, `'${shim.replace(/'/g, "'\\''")}' hook dispatch-decide`);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('codex and agy hook commands run from a directory other than the project, even when the path is awkward or names a hook kind', () => {
+  const base = mkTempDir('agent-hooks-exec-');
+  const repoRoot = path.join(base, "my decision-question 'app");
+  fs.mkdirSync(repoRoot, { recursive: true });
+  mockRunnableShim(repoRoot);
+  installCodexHook(repoRoot);
+  installAgyHook(repoRoot);
+
+  const codex = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse;
+  assert.equal(codex.length, 2, 'both codex hooks are present even though the path contains a kind name');
+  const agy = JSON.parse(fs.readFileSync(path.join(repoRoot, '.agents', 'hooks.json'), 'utf8'));
+  const commands = [
+    ...codex.map((e) => e.hooks[0].command),
+    agy['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command,
+  ];
+  for (const command of commands) {
+    const res = spawnSync('sh', ['-c', command], { cwd: os.tmpdir(), input: '{}', encoding: 'utf8', timeout: 5000 });
+    assert.notEqual(res.status, 127, `${command} was not found from another directory`);
+  }
   fs.rmSync(base, { recursive: true, force: true });
 });
 

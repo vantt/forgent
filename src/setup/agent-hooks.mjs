@@ -12,7 +12,7 @@
 // 5. Runnable Probe: doctor checks verify both configuration presence AND that the shim is runnable
 //    with benign input via non-shell spawnSync with finite timeout.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -44,8 +44,16 @@ export function getProjectShimPath(repoRoot) {
 /** The shim as a shell command: an absolute, single-quoted path, so it runs whatever directory the
  * agent starts the hook in (agy runs it outside the project; codex uses the session directory). */
 function shimCommand(repoRoot, args) {
-  const shim = getProjectShimPath(path.resolve(repoRoot)).replace(/'/g, `'\\''`);
+  let root = path.resolve(repoRoot);
+  try { root = realpathSync(root); } catch { /* not created yet: the resolved path is what there is */ }
+  const shim = getProjectShimPath(root).replace(/'/g, `'\\''`);
   return `'${shim}' ${args}`;
+}
+
+/** Whether a hook command is the given fgOS hook kind, judged by the arguments after the shim path
+ * (the project path itself may contain a kind's name). Assumes a POSIX shell runs the command. */
+function commandIsKind(command, kind) {
+  return typeof command === 'string' && new RegExp(`\\bhook ${kind}( --format=agy)?\\s*$`).test(command);
 }
 
 export function isShimRunnable(repoRoot) {
@@ -230,7 +238,7 @@ export function installCodexHook(repoRoot) {
   let changed = false;
   for (const hookSpec of codexHooks(repoRoot)) {
     const idx = preToolUse.findIndex(
-      (e) => Array.isArray(e?.hooks) && e.hooks.some((h) => h?.command?.includes(hookSpec.kind)),
+      (e) => Array.isArray(e?.hooks) && e.hooks.some((h) => commandIsKind(h?.command, hookSpec.kind)),
     );
     if (idx >= 0) {
       if (
