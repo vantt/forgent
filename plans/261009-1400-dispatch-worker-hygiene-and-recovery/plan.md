@@ -129,3 +129,10 @@ Pre-merge check per phase: `git diff --stat main...<branch> -- src` vs. row abov
 4. Keep `inconclusive`/`blocked`/`not-applicable` -> `pass` in settlement for now? **Answered yes (defer)**; changing it alters every panel's outcome with `acceptOutcomes: [pass, findings]`. Trigger: a non-answer seat counted as a vote in a real run.
 5. R1 (~26 min, real quota) run by Lead after P01 merge, as P01's only done-check? **Answered yes**; codex account `tetcu72`.
 6. Run the credential-rotation plan after P03+P04? **Answered yes.**
+
+## R1 results (2026-10-10)
+
+- Run 1 (before the hygiene fixes): failed in `framing`; claude seat stopped at the MCP approval dialog.
+- Per-family probes after the fixes (one seat each, mcp-skill-hub main checkout): codex, xai, claude, gemini all `pass`; target agent-config files and `git status --ignored` unchanged.
+- Run 2 (full advisory workflow, no patches, codex account tetcu72): `framing`, `shaping`, `critique` completed; `synthesis` failed `policy-refusal`. No seat showed hook exit 127, a hook/MCP dialog, or `internal_error`; target status identical before/after. The refusal came from one codex red-team seat whose `agent-result.json` failed claim validation (`invalid-agent-result-claim`, `settlement.mjs:259`). That is an agent output fault outside this phase's file list: a separate item, not patched here. Whether the claim failed on evidence-reference shape or content is not yet diagnosed.
+- Reading: the faults this phase targeted are gone; the run is not yet `completed`, so the phase's named done-check is only partly met. A rerun is cheap evidence once the claim-validation fault is understood or if it does not recur.
