@@ -51,12 +51,12 @@ Command: `.fgos/installation/bin/fgos metrics discussions --since 2026-10-01` (d
 - Consequence: the acceptance row "stance + agreement for every run" cannot be compared before/after until a template declares `stanceOptions`. Phase 04 must either add that declaration in the re-run or fall back to the blind A/B score alone (pre-slice reference: council 8, fgOS 5). Decide in phase 04; do not count this as a metric that moved.
 - Re-run the same command with `--since` set to the day persona changes merge to get the after-set.
 
-Stayed open after close-out: decision clarity of the split-first synthesizer (1/2 on Q1 and Q2; n=1, revisit after more runs) and stance measurement (never exercised).
+Stayed open after close-out: decision clarity of the split-first synthesizer (1/2 on Q1 and Q2) is an accepted trade-off, reopen trigger in the [re-measure report](reports/phase-04-remeasure-report.md); stance measurement was exercised on two questions (all 6 seats reported a valid stance, agreement 0.67 on each, no genuine split; n=2).
 
 ## Acceptance criteria
 
 - Blind A/B rerun on the same question set scores the fgOS output at least 7/10 on the council rubric, or the report states which rubric rows still lag and why.
-- Observe `metrics discussions` over the new runs shows stance + agreement for every run (no `unitsUndetermined` caused by the new schema). Not met for the 2026-10-10 runs: stance options are question-local (`params.stanceOptions`) and none was passed, so every run is `unmeasured`; see [re-measure report](reports/phase-04-remeasure-report.md).
+- Observe `metrics discussions` over the new runs shows stance + agreement for every run (no `unitsUndetermined` caused by the new schema). Exercised on Q1 and Q2 only (n=2); the 3 re-measure runs themselves stayed unmeasured: stance options are question-local (`params.stanceOptions`) and none was passed for them; see [re-measure report](reports/phase-04-remeasure-report.md).
 - Full `npm test` green; doctor/setup untouched unless a phase adds a prerequisite.
 - CHANGELOG `[Unreleased]` line; `docs/specs/` area notes updated where the output contract changes; no new engine, store, registry or runtime seam.
 - Component-boundary: expected "No component-boundary change"; state it explicitly in the verification note.

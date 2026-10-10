@@ -36,11 +36,26 @@ Mean: council-lite 9.0, plain panel 7.7. Q1 against the old reference: 5 (fgOS 1
 
 n = 1 per question and per row; one judge; adjacent scores (8 vs 9, 9 vs 9) are within noise. Real council was run only on Q1 (stored from 10-04, not rerun, no baseline on Q2/Q3). Length differs a lot (real council longest); the judge saw word counts removed but length is visible. Q1 names repo files the judge could check but was not required to. Style tells remain ("voice", "genuine split").
 
+## Stance runs (2026-10-10, after the re-measure)
+
+Two `council-lite` runs with `--stance-options` passed (sequential, same invocation shape as the re-measure; Observe read via `metrics discussions --since 2026-10-10`). Q3 was not run (no natural discrete options).
+
+| Question | Stance options | Run id | stancesValid / Missing | Agreement | Genuine split | Measurement |
+|---|---|---|---|---|---|---|
+| Q1 dissent gate | no gate / opt-in gate / always-on gate | `unit-run-1791647462998-6befb5f0` | 3 / 0 | 0.6666666666666666 | false | measured |
+| Q2 queue triage | manual / automate / shadow trial | `unit-run-1791647544846-e8e87757` | 3 / 0 | 0.6666666666666666 | false | measured |
+
+Stances counted: Q1 no gate 2, opt-in gate 1; Q2 manual 1, shadow trial 2 (stancesInvalid 0 on both, so no seat answered outside the options). Seat reports still open with Restatement and then Position. Observe printed `unitsUndetermined 0` for the period.
+
+This shows that under `council-lite` seats do report a usable stance when options are supplied, and Observe turns it into agreement. It does not show more than that: n = 2, the options were chosen by us (Q1 from the positions the 10-04 real-council run converged on), and the three re-measure runs themselves stayed unmeasured.
+
 ## Decision
 
 Stop here. The score moved, so personas + restate were worth shipping; no row lags badly enough to justify cross-exam, tally or an outcome ledger. The one lagging row is decision clarity in the split-first synthesizer (1 of 2 on Q1, Q2); that is prose in the synthesizer instruction, not a runtime seam, and one run per question does not justify rewriting it. Stance options are question-local: they are supplied per run as `params.stanceOptions` (or a template `stanceOptions`; `src/workflow/definition.mjs`, `src/workflow/runner.mjs`, `src/runner/execution/patterns/role-tasks.mjs`), and no run in this re-measure passed them, so Observe shows `unmeasured`. A fixed list inside `council-lite` would not fit arbitrary questions, so none is declared. When agreement should be measured, pass `params.stanceOptions` with the question. The acceptance row "stance + agreement for every run" stays unmet for the 2026-10-10 runs; do not claim an Observe result for them.
 
+Decision clarity (1 of 2 on Q1 and Q2) is a deliberate trade-off between phase 01's rule that no consensus is invented and a split is reported as a split, and the judge's reward for committing to a decision. It is left unchanged at n = 1. Reopen when the dip repeats on at least 2 new questions: then try one sentence in the synthesizer ("if forced to choose now: X under rule Y, not a consensus") and re-measure on the same questions.
+
 ## Unresolved
 
 - Whether the decision-clarity dip repeats on more questions.
-- Stance measurement was not exercised: no run passed `params.stanceOptions`, so whether seats report a usable stance and agreement under `council-lite` is untested.
+- Stance measurement is now exercised on Q1 and Q2 only (n = 2, options chosen by us); the three re-measure runs stayed unmeasured.

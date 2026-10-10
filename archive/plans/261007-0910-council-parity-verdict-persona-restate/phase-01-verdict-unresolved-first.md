@@ -30,7 +30,7 @@ The synthesizer's final report gets a fixed shape: what is still unknown, each l
 
 ## Success Criteria
 - [x] Real run's final report has unknowns first and one next step (second-run synthesizer in [lens-personas-evidence](reports/lens-personas-evidence.md); Q1-Q3 runs in [re-measure report](reports/phase-04-remeasure-report.md)). Shipped in `f95f9f0f9`.
-- [ ] `metrics discussions` reports the run with no new undetermined units. Not shown: no report records the `unitsUndetermined` count; the re-measured runs are all `unmeasured` (no `stanceOptions`).
+- [x] `metrics discussions` reports the run with no new undetermined units (unitsUndetermined 0 on the 2026-10-10 read, `--since 2026-10-10`; see the stance runs in the [re-measure report](reports/phase-04-remeasure-report.md)).
 - [ ] No duplicate copies of the schema across workflows. Contradicted: `f95f9f0f9` added the same verdict order to four workflow definitions on purpose (the order must travel with the workflow; a persona file is read from the project being run).
 
 ## Risk Assessment
