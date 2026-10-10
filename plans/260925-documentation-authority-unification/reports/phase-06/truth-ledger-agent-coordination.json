@@ -5545,9 +5545,11 @@
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
-      "verificationType": "current-code-and-consumer-check",
+      "verificationType": "platform-definition-and-current-jsonl-consumer-check",
       "evidence": [
-        "docs/specs/platform-foundations.md:208-224"
+        "docs/specs/platform-foundations.md:208-224",
+        "src/state/events.mjs:75-120",
+        "src/state/events.mjs:482-490"
       ],
       "reviewStatus": "pending-independent-review",
       "changed": true,
@@ -10091,6 +10093,24 @@
       "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
       "excerptSha256": "a1d168bccf5bea10c04c2519b3c23d6f9779f041b4807d14f0ebceffa44c695d",
       "excerpt": "  let compiledPlan = compileDispatchPlan(cfg, {\n    assignment: effectiveAssignment.assignmentId,\n    assignmentItem: effectiveAssignment,\n    workItem: opts.work,\n    hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,\n    cliOverride: opts.cliOverride,\n    options: opts.options,\n  });\n\n  if (compiledPlan.mechanism === 'unavailable' || compiledPlan.mechanism === null) {\n    const reason = compiledPlan.blockedReason ?? compiledPlan.reasonCodes?.join(', ') ?? 'governance-blocked or unavailable mechanism';\n    throw new RunnerConfigError(`dispatch decide blocked operation \"${effectiveAssignment.operation}\": ${reason}`);\n  }\n\n  let effectivePolicy = compiledPlan.policy;\n\n  // One confinement path: an Assignment bound by bind() carries its posture, and\n  // that posture alone picks the requirement handed to the Confinement Authority.\n  // Without a binding (direct callers) the plan's own confinement applies as before.\n  const postureBinding = effectiveAssignment.binding || effectiveAssignment.provenance?.binding;"
+    },
+    "src/state/events.mjs:75-120": {
+      "path": "src/state/events.mjs",
+      "startLine": 75,
+      "endLine": 120,
+      "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+      "blobSha": "250dd206f208ee206a134afdc03b87f6b09aa3c7",
+      "excerptSha256": "f892331ad5f774a0be046736a106e4d0c4bd7dd47e58daf74cdfacd612a29844",
+      "excerpt": "// Shared core (tsk-49e): splits `raw` into JSON Lines and parses each one,\n// throwing the same EventLogError('corrupt-log') shape readEvents always\n// has. Used by readEvents (whole-file) and readEventsFromByte (partial,\n// incremental-snapshot read) below — one parsing implementation, never two.\nexport function parseEventLines(raw, logPath) {\n  if (raw === '') return [];\n\n  const lines = raw.split('\\n');\n  // A well-formed log always ends with a trailing newline, which split()\n  // turns into one final empty string — drop that artifact only. Any other\n  // empty/partial line is a real corruption and must surface below.\n  if (lines[lines.length - 1] === '') lines.pop();\n\n  const events = [];\n  for (let i = 0; i < lines.length; i++) {\n    let parsed;\n    try {\n      parsed = JSON.parse(lines[i]);\n    } catch (err) {\n      throw new EventLogError(\n        'corrupt-log',\n        `Corrupt or truncated event log line ${i + 1} of ${lines.length} in ${logPath}: ${err.message}`,\n      );\n    }\n    events.push(parsed);\n  }\n  return events;\n}\n\n/**\n * Read every event from the append-only log at `logPath`, in append order.\n *\n * Returns `[]` when the log does not exist yet (uninitialized log — not an\n * error). Throws `EventLogError('corrupt-log')` the moment any line fails to\n * parse as JSON — a corrupt or truncated line (e.g. a crash mid-append) is\n * never silently skipped or auto-repaired.\n */\nexport function readEvents(logPath) {\n  let raw;\n  try {\n    raw = fs.readFileSync(logPath, 'utf8');\n  } catch (err) {\n    if (err.code === 'ENOENT') return [];\n    throw err;\n  }\n  return parseEventLines(raw, logPath);"
+    },
+    "src/state/events.mjs:482-490": {
+      "path": "src/state/events.mjs",
+      "startLine": 482,
+      "endLine": 490,
+      "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+      "blobSha": "250dd206f208ee206a134afdc03b87f6b09aa3c7",
+      "excerptSha256": "fcbe379a79337bb38a97b4a1768ab6271380daf1a2eab5ba0dd3fe4635fff0d3",
+      "excerpt": "  const src = String(resolveWriterIdentity(fgosDir).id);\n  const unhashed = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION, src };\n  // h: 16-hex SHA-256 of the unhashed line content (TA-D1) — the event's\n  // content-addressed identity, order-independent, deterministic.\n  const h = crypto.createHash('sha256').update(JSON.stringify(unhashed)).digest('hex').slice(0, 16);\n  const event = { ...unhashed, h };\n\n  fs.mkdirSync(path.dirname(logPath), { recursive: true });\n  fs.appendFileSync(logPath, `${JSON.stringify(event)}\\n`, 'utf8');"
     }
   },
   "commands": [
@@ -10153,7 +10173,8 @@
   "limits": [
     "No live worker/provider/Herdr dispatch or mutating recovery apply was executed; those live results remain UNPROVEN.",
     "Historical/proposed scenarios are not green proofs; open reasons are explicit.",
-    "No checker, gate, baseline, vocabulary, history carrier, payload, legacy root, AGENTS or main change."
+    "No checker, gate, baseline, vocabulary, history carrier, payload, legacy root, AGENTS or main change.",
+    "Participant is the existing platform log-format/protocol definition, not a claim that this pass executed a non-Node writer or subscription integration. The current JSONL codec/read consumer is cited; live non-Node append/subscribe remains UNPROVEN."
   ],
   "authorCausedRoutingCorrection": {
     "authorization": "A18 standing own-current-pass restoration rule",

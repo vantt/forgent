@@ -107,3 +107,17 @@ A19 af6c116f0 accepts carriage and authorizes the separate truth pass. The follo
 Independent evidence: `review-2-liveness-conflicts.md:14-15,26,57`, committed in 0b9414d8c. Owner action: send these two conflicts to the separate harness-investigation chat for correction on main. No main/spec edit or external dispatch is authorized in this truth pass. Their resolution remains UNPROVEN.
 
 Accepted carriage, historical carriers and evidence-payload bytes remain unchanged. Truth scope is the twenty-nine rejected files listed in `review-2-liveness-files.md`, plus the missing current dispatch-recover description within the existing recovery document. No new move/archive/delete is proposed.
+
+## Current-truth review queue
+
+The A19 current pass changes only the 29 rejected current documents. No new archive/delete/history move, accepted payload edit or promoted area-portal edit is requested. The carriage acceptance is not revoked or widened. Current content is pinned in 96a13ab21; necessary current-truth rebinding and the exact row lists are in truth-accounting-agent-coordination.json.
+
+The two runner-spec conflicts above remain routed to the owner's separate main harness-investigation chat. No runner.md/main change is made here.
+
+Eleven original source hold verdicts remain held: eight history vision principles and three Coordination Rings design-vocabulary claims. Three corresponding candidate hold verdicts and eight retired-row hold verdicts also remain held. The exact IDs and original review notes are listed under heldSourceRows, heldClassificationRows and heldRetiredRows in the accounting report. Rewording a current section is not approval of the held owner intent.
+
+Forty-six remaining history-target pending source rows are outside the authorized truth correction and stay in their existing shards; their exact paths/IDs are listed under outsideTruthPendingSourceRows. The 431 current-target pending rows are regrouped without content/digest/disposition changes into the new truth-only judgment shard so one ordinary committed report can be applied to exactly this truth scope.
+
+The unchanged scoped strict E remains red: 477 source rows await review/owner closure, 342 identical-unit owner groups remain diagnostic, and 969 reverse units remain open. The new truth receipts cover 511 current units; the other 458 reverse units are outside this truth correction. Existing six-column native-content verdicts and the old pooled author/receipt mismatch are not accepted by silently weakening the mandatory gate. Fresh native-content verdicts must include the unchanged seventh evidence-digest column and correct committed receipt pin. Classification closure outside the current scope remains UNPROVEN.
+
+The truth ledger explicitly marks 66 design/proof sections open. These are declared implementation/proof boundaries, not 66 inferred owner decisions. Live worker/provider/Herdr execution, mutating recovery application and non-Node Participant append/subscribe integration remain UNPROVEN. Strict batch closure is not claimed; the next owner action is the independent truth review, not permission to start another carriage pass or change a gate.

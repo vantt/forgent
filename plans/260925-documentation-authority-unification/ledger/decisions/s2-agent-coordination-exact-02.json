@@ -279,12 +279,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-5",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-3 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-5: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e75651b37d276ea3ad60df661f1a75abdfe4b6a858396c5df38b40740035b887",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Context"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_e058ee730b7253c519dc8f38dd892f00",
@@ -295,12 +301,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-6",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-4 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-6: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5dc425d1f0bad971e829261eb29409bf3848cc58867814796e2ab428a3287363",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Context"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_82e3f1824c9fb3f0f4c4c292ec067ef8",
@@ -311,12 +323,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-7",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-5 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-7: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8726d0e02b20ac2beb203a002f2c7f99d3c6745fa01a188d7b5c91daceac34ec",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Context"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_276d64851e2136e50539e46180122ceb",
@@ -327,12 +345,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-8",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-6 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-8: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7b239f28d2bfe5f5d4ae21bb7345fc38fbdca034836bd0049ff5af965ad71930",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Context"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_020a1e424ee511993f0797d7ead1dfdc",
@@ -343,12 +367,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-7 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-9: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "afdd3d1f20e74db0d8cbb32edd6793c277862dd5d413f615350b1a80dd84127a",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Decision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_006a0abb9d507402215439fb23fdca5d",
@@ -359,12 +389,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-10",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-8 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-10: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0df8ef05fe5ffd0192a1ff7a258d9fe2c62fe5f09fbe96db97b21c3e3382b925",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Decision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_7804fb0af6accd3b19f0e927d5c64300",
@@ -375,11 +411,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-9 -> PLAT:history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#literal-snapshot: The two superseded Decision paragraphs (receipt and visibility) are retired to history and replaced by corrected, code-evidenced current text at current.txt:74-79.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "05491a4d1abf1dfbd8d33e73027bb48caeb4f284bd7f6ef09e0c5c1124729950",
       "targetAncestry": [
         "Historical File: surviving transport-versus-receipt boundary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_1fe2f9d8bcd07ea0d9cac3dd064f63cf",
@@ -390,11 +432,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-10 -> PLAT:history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#literal-snapshot: The two superseded Decision paragraphs (receipt and visibility) are retired to history and replaced by corrected, code-evidenced current text at current.txt:74-79.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "05491a4d1abf1dfbd8d33e73027bb48caeb4f284bd7f6ef09e0c5c1124729950",
       "targetAncestry": [
         "Historical File: surviving transport-versus-receipt boundary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_1374dd72d941a06cc894364357e6e9be",
@@ -405,12 +453,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-13",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-11 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-13: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ae92a69c02fd45641328aeba3d4ae2c41f72b2b2d6eb2585d5822399db5e484c",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Consequences"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_f9be8311c31aa61219e25fe732c7a373",
@@ -421,12 +475,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-14",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-12 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-14: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c89408caeabe8db8e23ef2e3e21858c6088f6d2f3c758d20a77063437e560ff5",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Open, and stated rather than hidden"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_ab3ec78b6c0504016f5d6061946c2490",
@@ -437,60 +497,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "targetAnchor": "unheaded-block-15",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-13 -> PLAT:decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#unheaded-block-15: Remaining rows are digest-identical live Context, Decision-paragraph, Consequences and Open text in sections judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "86f57f83225410f2d71e4493aa7563265c167cb74eaa4fb6cef09db6cdf3c778",
       "targetAncestry": [
         "ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt",
         "Open, and stated rather than hidden"
-      ]
-    },
-    {
-      "claimId": "claim_f7be1d8a794e7f9c867378b67fbc3158",
-      "sourceUnitDigest": "4220e3a9675537c9fe609c9cfbf7324d589f26b484441c45a0ebf1ec2d0fa4dc",
-      "claimKind": "decision",
-      "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-3 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-4. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
-      "targetAnchor": "unheaded-block-4",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "4220e3a9675537c9fe609c9cfbf7324d589f26b484441c45a0ebf1ec2d0fa4dc",
-      "targetAncestry": [
-        "Agent Coordination Architecture Decisions",
-        "Accepted Decisions"
-      ]
-    },
-    {
-      "claimId": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
-      "sourceUnitDigest": "0a311d99026944161e5c278e27c04c9751122d186dd7718cac1293e704bd2104",
-      "claimKind": "decision",
-      "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-4 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-5. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
-      "targetAnchor": "unheaded-block-5",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "21acf7661a71b9ec029ec6b1ec397b838869dc77513c4fd865d05c6c85fa9b56",
-      "targetAncestry": [
-        "Agent Coordination Architecture Decisions",
-        "Accepted Decisions"
-      ]
-    },
-    {
-      "claimId": "claim_a8914714b51091a9f0a487f739172da2",
-      "sourceUnitDigest": "5ba4d36d43461dcc3047edaf13a0aa0685b4352f9e177191e29dd1bd980a66bf",
-      "claimKind": "decision",
-      "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-5 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-6. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
-      "targetAnchor": "unheaded-block-6",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "targetUnitDigest": "636a563c6077dbd3f7c921c88b79cc72e434704a2bbf618e7333618ec296d11c",
-      "targetAncestry": [
-        "Agent Coordination Architecture Decisions",
-        "Accepted Decisions"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
@@ -499,14 +517,20 @@
       "disposition": "move",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-6 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-7. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
       "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
-      "targetAnchor": "unheaded-block-7",
+      "targetAnchor": "unheaded-block-9",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:decisions/README.md#unheaded-block-6 -> PLAT:decisions/README.md#unheaded-block-7: Vision sentence, Migration Status text (judged separately by receipts) and closing rule are digest-identical carried text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
       "targetAncestry": [
         "Agent Coordination Architecture Decisions",
         "Accepted Decisions"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_4a2d082437d31677a4344a224ac8e5a3",
@@ -979,11 +1003,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#unheaded-block-8 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot: Remaining rows carry units into current sections judged ok (header, 3, no-build, 8, 19) with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_04f1628604d93c06b98725adcba6ff25",
@@ -994,11 +1024,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#16-run-record-runs-json -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot: Remaining rows carry units into current sections judged ok (header, 3, no-build, 8, 19) with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_d191b4b9f457b50a8936302973698733",
@@ -1009,11 +1045,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#unheaded-block-68 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot: Remaining rows carry units into current sections judged ok (header, 3, no-build, 8, 19) with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_06f3dda173fae1c8b12b31f4d0fd2486",
@@ -1064,13 +1106,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#14-session-status-board-sessionmd -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot: Remaining rows carry units into current sections judged ok (header, 3, no-build, 8, 19) with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_c827157d0a3976cec972a4330c4ecf6d",
@@ -1079,13 +1127,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#15-prompt-package-promptsmd -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-artifact-templates.md#literal-snapshot: Remaining rows carry units into current sections judged ok (header, 3, no-build, 8, 19) with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a06f717c92a219caf90715adb4bbebe269aebb971af81fcfbb98a616324d54f",
       "targetAncestry": [
         "Historical File: still-consumed cognitive artifact aids, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_4454ffcff8f7b0f7b18b1449ae01b26e",
@@ -1094,13 +1148,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#9-a-fresh-coordinator-could-resume-from-artifacts-alone -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_22272aa8f74eb216c144ddfb7e152ea9",
@@ -1109,13 +1169,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-54 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_14e6ea3df43f9cdc7d1d0012fce7d72b",
@@ -1124,13 +1190,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-55 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_db4ded5f11b6629bbbd11529d25dcee3",
@@ -1139,13 +1211,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-56 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_d211d214d0b391c4059b874baa1f881e",
@@ -1154,13 +1232,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-57 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_29835ebab097bc7526dd5c6b38846903",
@@ -1169,13 +1253,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-58 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_377357b936192368c724fd58952ba91a",
@@ -1184,13 +1274,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#10-providermodel-diversity-improved-independence-rather-than-decorating-the-roster -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_444dec3006b483519062790eaacd32eb",
@@ -1199,13 +1295,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-59 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_d730647e7bb69bbf8f545640d35aa184",
@@ -1214,13 +1316,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-60 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_ceee14a069e00b70bd582628abcd083f",
@@ -1229,13 +1337,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-61 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_4754daed02bb99d87cb60a257fa979cd",
@@ -1244,13 +1358,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-62 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_95857727a0d2bd6dd05515f82e85aa89",
@@ -1259,13 +1379,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-63 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_2af3ee680336bc17c1c0df36b0cee2b6",
@@ -1274,13 +1400,19 @@
       "disposition": "move",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "literal-snapshot",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "reviewed",
+      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries.",
+      "reviewNote": "LEG:playbooks/architecture-advisory-evaluation-rubric.md#unheaded-block-64 -> PLAT:history/retired-engine/files/playbooks/architecture-advisory-evaluation-rubric.md#literal-snapshot: Remaining rows carry what-this-rubric-is, who-evaluates, failure-note and overall-verdict into current sections judged ok, with equal digests.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bee4fc4b314dd1fa6f00a28e9ca9afafb41351e8a524994705e116ceb936d89",
       "targetAncestry": [
         "Historical File: still-consumed cognitive evaluation criteria, not runtime recipes"
       ],
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The old script-exact proof no longer matches the corrected current unit. The complete dated source text remains verbatim in its own historical input carrier; this row preserves that exact original version without falsely approving its operational recipe as the present registered Workflow. Current surviving guidance remains at docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md and is separately checked against current code. This is an authorized unit-level correction, not whole-file retirement. No script or human approval carries."
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     }
   ],
   "exact": [
@@ -2733,24 +2865,9 @@
           "targetUnitDigest": "26409dcb1fb8afa85b2b66c4fe750eac7c65cb7d104dd7dd4e533ab859433af2"
         },
         {
-          "claimId": "claim_70a805be575183f1a48f3d5933770896",
-          "sourceUnitDigest": "ce5513244017cd08e740fb27ef0ea4ca16a2bea1d16b19ee2ecada96b3de1de5",
-          "targetUnitDigest": "ce5513244017cd08e740fb27ef0ea4ca16a2bea1d16b19ee2ecada96b3de1de5"
-        },
-        {
-          "claimId": "claim_e03e71322f4966158501e6da370897a6",
-          "sourceUnitDigest": "abea55eb3d1c7ac987a2aa55e01cef98a02e9452751622328ae302240e9eefed",
-          "targetUnitDigest": "abea55eb3d1c7ac987a2aa55e01cef98a02e9452751622328ae302240e9eefed"
-        },
-        {
           "claimId": "claim_3ec36be7002bcc96e8fd42e8cab51e37",
           "sourceUnitDigest": "b62353f2d3f3955c53d82b0efcdd7a118e85600a73daaba91273698e31e5733d",
           "targetUnitDigest": "b62353f2d3f3955c53d82b0efcdd7a118e85600a73daaba91273698e31e5733d"
-        },
-        {
-          "claimId": "claim_454a911b873012ac0ff8f6c43613cd48",
-          "sourceUnitDigest": "de8b4415e6deef449cd314ab318fe42b9565d7cdcae5f70f8dabfbc317893175",
-          "targetUnitDigest": "de8b4415e6deef449cd314ab318fe42b9565d7cdcae5f70f8dabfbc317893175"
         },
         {
           "claimId": "claim_5593594d6e0f8b79c5bceb23b2ca4aa1",
@@ -2766,11 +2883,6 @@
           "claimId": "claim_d0aea214060c6b749a417ed5379655f0",
           "sourceUnitDigest": "00bea35b17d3268ea34cfb5de417926b81d9edfe871613ad68fd114cf6bcd4da",
           "targetUnitDigest": "00bea35b17d3268ea34cfb5de417926b81d9edfe871613ad68fd114cf6bcd4da"
-        },
-        {
-          "claimId": "claim_0987383b5e8998185c4d4b4d9d7808a8",
-          "sourceUnitDigest": "00e9536c0f0159524a48ebb31f058bdc6425a66f6630370475e7ce29cbf89589",
-          "targetUnitDigest": "00e9536c0f0159524a48ebb31f058bdc6425a66f6630370475e7ce29cbf89589"
         },
         {
           "claimId": "claim_8d466c7adecbdef3a4bf5fa5382b4789",
@@ -2793,19 +2905,9 @@
           "targetUnitDigest": "ceedd7b89ecf4f93b2d1740c99e0b15f457dee804c22dd289076554c4abeec11"
         },
         {
-          "claimId": "claim_4265ae53d6f60a543e5c6ddb87ca352e",
-          "sourceUnitDigest": "5ca2f4b26c7b636a1547f830a3148804d78cca301e22327e2e4a44da6989b9c7",
-          "targetUnitDigest": "5ca2f4b26c7b636a1547f830a3148804d78cca301e22327e2e4a44da6989b9c7"
-        },
-        {
           "claimId": "claim_221bddfce6e1936b897bb21fa1ac4827",
           "sourceUnitDigest": "375cc7046070d26a930d96ad8e3a64d966d837ee26e56ba42511f21e55b4a380",
           "targetUnitDigest": "375cc7046070d26a930d96ad8e3a64d966d837ee26e56ba42511f21e55b4a380"
-        },
-        {
-          "claimId": "claim_55bbde5a56b1d6fcc53425178f192da8",
-          "sourceUnitDigest": "50a3de873103f5f57af70b7567da89289954f3eb99173ed94d4b11c72b213ac4",
-          "targetUnitDigest": "50a3de873103f5f57af70b7567da89289954f3eb99173ed94d4b11c72b213ac4"
         },
         {
           "claimId": "claim_8c9643184173b55782981810fafe003c",
@@ -2823,11 +2925,6 @@
           "targetUnitDigest": "865c0e6dee3085380bf5afb529160fbc8c6eb0c2afafd4f6e445e89f80450228"
         },
         {
-          "claimId": "claim_612e75ec16f9d47ebf5e09f11c3def33",
-          "sourceUnitDigest": "85bcebc2380d90a0737cc89c78b5cb9490d4f67bc2e7ffec2f1affe66b50762b",
-          "targetUnitDigest": "85bcebc2380d90a0737cc89c78b5cb9490d4f67bc2e7ffec2f1affe66b50762b"
-        },
-        {
           "claimId": "claim_b9279e8c12d4b55fcf6255382e27e160",
           "sourceUnitDigest": "a726763a223496b5cba708be5a23ac1ceb8379d8d59361ca7851d9687daad759",
           "targetUnitDigest": "a726763a223496b5cba708be5a23ac1ceb8379d8d59361ca7851d9687daad759"
@@ -2841,26 +2938,6 @@
           "claimId": "claim_86616efd585aa45a5147eebed1982c75",
           "sourceUnitDigest": "e2cf6ca0a65c613503c27ec2597ae0fd9d48e65dfafad44375967f2446df339b",
           "targetUnitDigest": "e2cf6ca0a65c613503c27ec2597ae0fd9d48e65dfafad44375967f2446df339b"
-        },
-        {
-          "claimId": "claim_2d6fead0c43c66d71a75a792b8fc0af4",
-          "sourceUnitDigest": "b966ae0e1460ab7ae4b8c0590e3b6f72c9d10abbe84e63a27bd29d3ad8a58915",
-          "targetUnitDigest": "b966ae0e1460ab7ae4b8c0590e3b6f72c9d10abbe84e63a27bd29d3ad8a58915"
-        },
-        {
-          "claimId": "claim_9053d212a1d094dda69ed7e3124ec459",
-          "sourceUnitDigest": "cf5054b7363a581dc1a02be6704071f9b33faf034df6581f1847a85ca97278ac",
-          "targetUnitDigest": "cf5054b7363a581dc1a02be6704071f9b33faf034df6581f1847a85ca97278ac"
-        },
-        {
-          "claimId": "claim_c87985222ef9cfb3a5a64ad3f375abb6",
-          "sourceUnitDigest": "6c50b9c6966a57813be2ef06dbd737388419a2ea121303eb325a14056f124235",
-          "targetUnitDigest": "6c50b9c6966a57813be2ef06dbd737388419a2ea121303eb325a14056f124235"
-        },
-        {
-          "claimId": "claim_831692f7033d44f577e462fa8051fed7",
-          "sourceUnitDigest": "13625138e4c6c57b40bcba402d2e22c74f7d3ccf4b8c1644fc92ef392d86b247",
-          "targetUnitDigest": "13625138e4c6c57b40bcba402d2e22c74f7d3ccf4b8c1644fc92ef392d86b247"
         },
         {
           "claimId": "claim_67705b0839ce1e8f81402a807329b715",
@@ -2878,26 +2955,6 @@
           "targetUnitDigest": "fd2266b61741533615f209ff7e80828120f7e760bb207dad9c064779df737fba"
         },
         {
-          "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
-          "sourceUnitDigest": "925fd21f6972ad4060e318d3d32bfc3feae3fa6aebd95910d5a6ff90837c5885",
-          "targetUnitDigest": "925fd21f6972ad4060e318d3d32bfc3feae3fa6aebd95910d5a6ff90837c5885"
-        },
-        {
-          "claimId": "claim_b6dde833e1e94658019aecb31294a7e6",
-          "sourceUnitDigest": "ffbb19884c262cabef857adbd445184a0fe365f9ef7d7020eeea6e38ad4155a7",
-          "targetUnitDigest": "ffbb19884c262cabef857adbd445184a0fe365f9ef7d7020eeea6e38ad4155a7"
-        },
-        {
-          "claimId": "claim_921fe2f798d3d1cbd95e02e7b597e1e2",
-          "sourceUnitDigest": "a7fe12ec970bb4a89b8f5f0880b71f449f3a71a88d8426b3126f65aafd902f79",
-          "targetUnitDigest": "a7fe12ec970bb4a89b8f5f0880b71f449f3a71a88d8426b3126f65aafd902f79"
-        },
-        {
-          "claimId": "claim_df876a1ab74395eaaadda955b740528c",
-          "sourceUnitDigest": "08567f67d3f8d2cd74df5b45987ca4015ad06e4843a451f41fadbc64c826c277",
-          "targetUnitDigest": "08567f67d3f8d2cd74df5b45987ca4015ad06e4843a451f41fadbc64c826c277"
-        },
-        {
           "claimId": "claim_9cb82efecd63bf43d4cc79365a0769e6",
           "sourceUnitDigest": "0a4d627a2ca4b9955639c4fed88ea157549be550b395711ac93ba46c9482d150",
           "targetUnitDigest": "0a4d627a2ca4b9955639c4fed88ea157549be550b395711ac93ba46c9482d150"
@@ -2913,16 +2970,6 @@
           "targetUnitDigest": "dcecb671ee01314a3812765becae24a9712e5deda4c8d73391110f3b59af149a"
         },
         {
-          "claimId": "claim_b5dadbe63df8883537ee032ea33eaa10",
-          "sourceUnitDigest": "84f27b2046703271db8b86d80b5f7958c3eb0f1b5364d7e0255bda4afdc4bb50",
-          "targetUnitDigest": "84f27b2046703271db8b86d80b5f7958c3eb0f1b5364d7e0255bda4afdc4bb50"
-        },
-        {
-          "claimId": "claim_f5ac0ef50ab3563ebd907f6fce7bee1b",
-          "sourceUnitDigest": "bece9edc81e0ddcf82cad96d9340ac7e6cfe39fd9e52c195a3b2790da8fc3e75",
-          "targetUnitDigest": "bece9edc81e0ddcf82cad96d9340ac7e6cfe39fd9e52c195a3b2790da8fc3e75"
-        },
-        {
           "claimId": "claim_0f76be95c618f89919425acfe0a62567",
           "sourceUnitDigest": "a7c30b0e7a18fb085c2750de82462a7cb9fcdd724a38375f8fc1a652ccf42c65",
           "targetUnitDigest": "a7c30b0e7a18fb085c2750de82462a7cb9fcdd724a38375f8fc1a652ccf42c65"
@@ -2931,11 +2978,6 @@
           "claimId": "claim_379a294519bcc7969840648b13317cda",
           "sourceUnitDigest": "91a5b1368f4bcd927a816ea03a612c8aba777dee011fec64190a2a89634889a9",
           "targetUnitDigest": "91a5b1368f4bcd927a816ea03a612c8aba777dee011fec64190a2a89634889a9"
-        },
-        {
-          "claimId": "claim_ecd377c432c0daf638b3b71d85e36650",
-          "sourceUnitDigest": "023fcc80d67dda7852ba55d1197e732cab78626b009351f459f223e0016577b7",
-          "targetUnitDigest": "023fcc80d67dda7852ba55d1197e732cab78626b009351f459f223e0016577b7"
         },
         {
           "claimId": "claim_da35589f0a916d99cc156017d550c959",
@@ -2958,29 +3000,14 @@
           "targetUnitDigest": "5fee3ff50ada4dc933767ecf4a5c32d375f9f1c72684040ba4f3c3ed7ee94cb1"
         },
         {
-          "claimId": "claim_47e1bbce62798fe3ce5e32311ef045be",
-          "sourceUnitDigest": "1581b33108650bddbf5c05b6b9e0e7884c8f0320a4cfedd89b34cd2e64b55111",
-          "targetUnitDigest": "1581b33108650bddbf5c05b6b9e0e7884c8f0320a4cfedd89b34cd2e64b55111"
-        },
-        {
           "claimId": "claim_9b15d1f4f0a0c0f81e13737d922a24cd",
           "sourceUnitDigest": "9424d2598e1f2f8722b534e94908d0f153a0a6a1c7e6c3e6ef7fb54a79bbac27",
           "targetUnitDigest": "9424d2598e1f2f8722b534e94908d0f153a0a6a1c7e6c3e6ef7fb54a79bbac27"
         },
         {
-          "claimId": "claim_48f849918416a2e7a0253da7188ed3a6",
-          "sourceUnitDigest": "419bb47b988e8b7e0d505ada59d1f8c0c6afc71be503b9c7d157f3e1065e0208",
-          "targetUnitDigest": "419bb47b988e8b7e0d505ada59d1f8c0c6afc71be503b9c7d157f3e1065e0208"
-        },
-        {
           "claimId": "claim_9b2102341f42def82a0665cc7d92273f",
           "sourceUnitDigest": "a9fe4cfeca9d0f76025b68b50112e091b9eafd10cf9454006bbcf21c9e92f01b",
           "targetUnitDigest": "a9fe4cfeca9d0f76025b68b50112e091b9eafd10cf9454006bbcf21c9e92f01b"
-        },
-        {
-          "claimId": "claim_9d058e29fa247f69fb897aab37ce1724",
-          "sourceUnitDigest": "872a5764bbcf39ed147afbb87f57b44eb6c2f14e58f7e4a11610a242c319baee",
-          "targetUnitDigest": "872a5764bbcf39ed147afbb87f57b44eb6c2f14e58f7e4a11610a242c319baee"
         },
         {
           "claimId": "claim_fb0f85ad508f7f857ba4c0963879790a",
@@ -3006,11 +3033,6 @@
           "claimId": "claim_8c81cb12fcc0ff0408e9b5bb594cb1dc",
           "sourceUnitDigest": "5c25ba934123a77f41c1e242b1ef0746ca48edd4794f118dc40112830846a769",
           "targetUnitDigest": "5c25ba934123a77f41c1e242b1ef0746ca48edd4794f118dc40112830846a769"
-        },
-        {
-          "claimId": "claim_41aa6b7f094734eff7a5de2686eac257",
-          "sourceUnitDigest": "7d2cf18f87c65020f2a57881adc4a5bd7bc6230514e421e697ad9c5bda982c66",
-          "targetUnitDigest": "7d2cf18f87c65020f2a57881adc4a5bd7bc6230514e421e697ad9c5bda982c66"
         },
         {
           "claimId": "claim_6834ba270c7686be53bd71d742cf2e9e",
@@ -3068,11 +3090,6 @@
           "targetUnitDigest": "f4c6b194bf092d02119c655f241d2801789ceb2d4ee3198860dcbe606ce52b6a"
         },
         {
-          "claimId": "claim_8e489ff736ba50a186eef488fdf45c56",
-          "sourceUnitDigest": "e75202696078dfc604ef6c64f30066affe79f9e1304dc90b6532b974e34931cd",
-          "targetUnitDigest": "e75202696078dfc604ef6c64f30066affe79f9e1304dc90b6532b974e34931cd"
-        },
-        {
           "claimId": "claim_dc2e50633fdcd7fccfba02775a4e8c99",
           "sourceUnitDigest": "2348f7c013149a1d8565c408ec91323f17bfd8abc25c2ca5d7ffad8c45c5652c",
           "targetUnitDigest": "2348f7c013149a1d8565c408ec91323f17bfd8abc25c2ca5d7ffad8c45c5652c"
@@ -3088,39 +3105,9 @@
           "targetUnitDigest": "050b9392348c8179618fe65e4eae0dab87070d0ede5b70ef47f53528d58828b5"
         },
         {
-          "claimId": "claim_4a45bed5a7cfbab3868aa12d43769450",
-          "sourceUnitDigest": "b305a18ce11506b14cae5728a1ad5768fec6cd7f6f539130a2324d03a5cb41ea",
-          "targetUnitDigest": "b305a18ce11506b14cae5728a1ad5768fec6cd7f6f539130a2324d03a5cb41ea"
-        },
-        {
-          "claimId": "claim_a3371035f36760e80daff24f1b12ae48",
-          "sourceUnitDigest": "b67455829142f78e8b9d4eba9897a599eb23e6ea213b7a84c9864d61640854eb",
-          "targetUnitDigest": "b67455829142f78e8b9d4eba9897a599eb23e6ea213b7a84c9864d61640854eb"
-        },
-        {
-          "claimId": "claim_b4a122fdf0fb7791b7747ab63d107da5",
-          "sourceUnitDigest": "a2260d42e998d826a205adaa9b8bb9755af5c4383971c64dc394b18c265afe47",
-          "targetUnitDigest": "a2260d42e998d826a205adaa9b8bb9755af5c4383971c64dc394b18c265afe47"
-        },
-        {
           "claimId": "claim_a83ca367947815d7e7c623ec7688c222",
           "sourceUnitDigest": "d2ab30d734580dd8850d55185524fd4e27cd446e9442ffddda44bbd05f512f27",
           "targetUnitDigest": "d2ab30d734580dd8850d55185524fd4e27cd446e9442ffddda44bbd05f512f27"
-        },
-        {
-          "claimId": "claim_4f05e3d2d0842433065ee5cc5917f5cc",
-          "sourceUnitDigest": "d0bd09c37a8c36505c893141dd61a815a0a0575775356d5f5febd8223c9eb4e3",
-          "targetUnitDigest": "d0bd09c37a8c36505c893141dd61a815a0a0575775356d5f5febd8223c9eb4e3"
-        },
-        {
-          "claimId": "claim_1449692311c75f2f513b0e3838de257d",
-          "sourceUnitDigest": "5a24149f1b973fea20707d1688326f74835f942e028379402ab00eac5943a75f",
-          "targetUnitDigest": "5a24149f1b973fea20707d1688326f74835f942e028379402ab00eac5943a75f"
-        },
-        {
-          "claimId": "claim_8b66907461f2c1a815924ea9aebf4b09",
-          "sourceUnitDigest": "845fdc216ee998d3833dc123bd929e5d9f08bd6bc033feecb6c662a3e727171c",
-          "targetUnitDigest": "845fdc216ee998d3833dc123bd929e5d9f08bd6bc033feecb6c662a3e727171c"
         },
         {
           "claimId": "claim_36e38c4eca885ae9d49279aeb4fb91bd",
@@ -3151,16 +3138,6 @@
           "claimId": "claim_8d656329fbe4436977972cad5ff829e2",
           "sourceUnitDigest": "e675f2967c591e10a3cf7eac813dbbe04e012b7d98bb1602c3552d03311d6366",
           "targetUnitDigest": "e675f2967c591e10a3cf7eac813dbbe04e012b7d98bb1602c3552d03311d6366"
-        },
-        {
-          "claimId": "claim_f0bc9fabb69b3fff3a2279ca16dc1386",
-          "sourceUnitDigest": "e5310c9ec7de3e79c3a4de9cebff5f6a84397b31bea4128bd4652cc2dff0c7fb",
-          "targetUnitDigest": "e5310c9ec7de3e79c3a4de9cebff5f6a84397b31bea4128bd4652cc2dff0c7fb"
-        },
-        {
-          "claimId": "claim_09c41493bee64d87f99ac0d362a6e455",
-          "sourceUnitDigest": "122a8b7bb41ac3ff21e0b824d5984d91e5948ef40e6fe4117792e556be3690e0",
-          "targetUnitDigest": "122a8b7bb41ac3ff21e0b824d5984d91e5948ef40e6fe4117792e556be3690e0"
         }
       ]
     },
@@ -3194,29 +3171,9 @@
           "targetUnitDigest": "3eac354180161e93116cab276538b23e5ac4747f71e0e19d458fd232b5c8b8ea"
         },
         {
-          "claimId": "claim_cc28adc3c809386b5bad63a0f782f83a",
-          "sourceUnitDigest": "857af4b7926cd7fd731e760b5bfd54834e311b3fcb0b665f9ddebf20eb982f44",
-          "targetUnitDigest": "857af4b7926cd7fd731e760b5bfd54834e311b3fcb0b665f9ddebf20eb982f44"
-        },
-        {
-          "claimId": "claim_5ed2477f55abe3aa4f66bb7b75fe815d",
-          "sourceUnitDigest": "5d0ebf3c1cfe27924cf6a4ce7cba9f0f4d48d9fec066619c5aa9aa38915e527a",
-          "targetUnitDigest": "5d0ebf3c1cfe27924cf6a4ce7cba9f0f4d48d9fec066619c5aa9aa38915e527a"
-        },
-        {
-          "claimId": "claim_c96224f7925e5b4f85066faa056c820b",
-          "sourceUnitDigest": "427018d03eb9b22bbd55b37e8fc407e6e1b1ff1d43dd4975875b833a6b680eec",
-          "targetUnitDigest": "427018d03eb9b22bbd55b37e8fc407e6e1b1ff1d43dd4975875b833a6b680eec"
-        },
-        {
           "claimId": "claim_8be0c987b2b5938bde70a1bfb729697b",
           "sourceUnitDigest": "d29a3053c450be1d3cd67f4eff5e94d7877faaa20f6c763a0c422eed58066dd7",
           "targetUnitDigest": "d29a3053c450be1d3cd67f4eff5e94d7877faaa20f6c763a0c422eed58066dd7"
-        },
-        {
-          "claimId": "claim_c49e4a8faa16e9002e787fa0c10ad462",
-          "sourceUnitDigest": "eca5c27dfabcbb290fbe00fafd719c804a424b5fb0e2934bd8b8238132c02121",
-          "targetUnitDigest": "eca5c27dfabcbb290fbe00fafd719c804a424b5fb0e2934bd8b8238132c02121"
         },
         {
           "claimId": "claim_66efdc615e979445ad3f85c897f53c81",
@@ -3224,19 +3181,9 @@
           "targetUnitDigest": "efba5d8e32c6963a5fbc706cd1da06a62f8584d1065b7c66fd197e8532a78d28"
         },
         {
-          "claimId": "claim_7485ea80c31d4586b12a923c2eaa4577",
-          "sourceUnitDigest": "bf825cd6c9a2e109b10babd7c1a65195bf0b4b784bdc2126a5a3924d5f1a76b3",
-          "targetUnitDigest": "bf825cd6c9a2e109b10babd7c1a65195bf0b4b784bdc2126a5a3924d5f1a76b3"
-        },
-        {
           "claimId": "claim_66b8226725e683f52e41d5c597a30eda",
           "sourceUnitDigest": "67a25faacd34b9260f94b774b41ee0c5cc18ee4a0770de8f8d61f7e59f910251",
           "targetUnitDigest": "67a25faacd34b9260f94b774b41ee0c5cc18ee4a0770de8f8d61f7e59f910251"
-        },
-        {
-          "claimId": "claim_f621f927fe3f6d1d01d6e9fcee3cf5f3",
-          "sourceUnitDigest": "954ea4b9bbe6d905b536e6025c7fde874e8bae464070082f3e18efd63342d03b",
-          "targetUnitDigest": "954ea4b9bbe6d905b536e6025c7fde874e8bae464070082f3e18efd63342d03b"
         },
         {
           "claimId": "claim_ea25ab4f530bd1f4c75ebd6035c25722",
@@ -3244,24 +3191,9 @@
           "targetUnitDigest": "826d7570500c469821700ca917b5aba7a650bb0e0cfbfffa58bae97ffac0577e"
         },
         {
-          "claimId": "claim_819d2a4ffb74095ae3cd496eaa1cc798",
-          "sourceUnitDigest": "1d1bd660cf5f5c219972fa9e8e11a77ec277c126e89f9e24bf052620bcac1418",
-          "targetUnitDigest": "1d1bd660cf5f5c219972fa9e8e11a77ec277c126e89f9e24bf052620bcac1418"
-        },
-        {
           "claimId": "claim_704be6b4082d38aaab90bd64bd564377",
           "sourceUnitDigest": "203e814e1a449702381019df5b263956413ffbb8bd1fbbe6815c5ceaef4f31bc",
           "targetUnitDigest": "203e814e1a449702381019df5b263956413ffbb8bd1fbbe6815c5ceaef4f31bc"
-        },
-        {
-          "claimId": "claim_92efcd5ebc7e6be578c08f559b57215a",
-          "sourceUnitDigest": "92776d4dba344f92c28f188d29e5392c0abadbeaa286b02e01d665e311d0c826",
-          "targetUnitDigest": "92776d4dba344f92c28f188d29e5392c0abadbeaa286b02e01d665e311d0c826"
-        },
-        {
-          "claimId": "claim_aa3b64c48d320e48335959ea7cb89aea",
-          "sourceUnitDigest": "2808fac8c5f5bffff551834efc0b7ab9444602c8057e4f6356f6c55f50fd418b",
-          "targetUnitDigest": "2808fac8c5f5bffff551834efc0b7ab9444602c8057e4f6356f6c55f50fd418b"
         },
         {
           "claimId": "claim_0249a02773059932f5a259a140fa4e27",
@@ -3274,24 +3206,9 @@
           "targetUnitDigest": "bb9a8643a971fdff1a62f41075cd8c248c4887f35fec8ec688209dcfe1836999"
         },
         {
-          "claimId": "claim_31ffb6dabab19ec588e55d3d31d53867",
-          "sourceUnitDigest": "0d3897f41589932d8e36b6bc3617380161d5cc021398d734bf4f3fa7f636892e",
-          "targetUnitDigest": "0d3897f41589932d8e36b6bc3617380161d5cc021398d734bf4f3fa7f636892e"
-        },
-        {
-          "claimId": "claim_54f3970929bf8d30f7ece7704902268b",
-          "sourceUnitDigest": "9a79f86d6c604b3f10071758d736d67a0a94614c881b55d800842090899649ec",
-          "targetUnitDigest": "9a79f86d6c604b3f10071758d736d67a0a94614c881b55d800842090899649ec"
-        },
-        {
           "claimId": "claim_e28475efc6bae6a85c417aa7dc0b7de9",
           "sourceUnitDigest": "4a86fbaa45efff0e7be4dc2cd6faf614ad96677a3cc9048422d5c086fb961645",
           "targetUnitDigest": "4a86fbaa45efff0e7be4dc2cd6faf614ad96677a3cc9048422d5c086fb961645"
-        },
-        {
-          "claimId": "claim_c5d593322274924a9603971c41251493",
-          "sourceUnitDigest": "5b87ca320d5bfef0ededc2f8e2b86f85a39e47642ba9d506b3d83839022b753c",
-          "targetUnitDigest": "5b87ca320d5bfef0ededc2f8e2b86f85a39e47642ba9d506b3d83839022b753c"
         },
         {
           "claimId": "claim_2e6406d2e7c7cbb0ac0e31a1ef22ddf7",
@@ -3309,19 +3226,9 @@
           "targetUnitDigest": "d4a5145521b1462436a0a8f5fabb213f64be4f88eae0f6a6dd526a275ea68e23"
         },
         {
-          "claimId": "claim_87016db109d01f1738fc665fd25a7ed4",
-          "sourceUnitDigest": "fee3377714d02d7141b276efa137b05709b83a7fc9d7ebfabcc48a40c4f1a070",
-          "targetUnitDigest": "fee3377714d02d7141b276efa137b05709b83a7fc9d7ebfabcc48a40c4f1a070"
-        },
-        {
           "claimId": "claim_6268e576ecc66d8ca659d3ab43d3c246",
           "sourceUnitDigest": "7d4a52655e1c5310b65739093eee118bfbf0e1257461eee16659b1936b90b4de",
           "targetUnitDigest": "7d4a52655e1c5310b65739093eee118bfbf0e1257461eee16659b1936b90b4de"
-        },
-        {
-          "claimId": "claim_f2ecbd975d976c653ce70137afdfe843",
-          "sourceUnitDigest": "89b88f093b50a1377c5522bc33c8e3eeb3df975508db5ad77fb4b0b81405eb26",
-          "targetUnitDigest": "89b88f093b50a1377c5522bc33c8e3eeb3df975508db5ad77fb4b0b81405eb26"
         },
         {
           "claimId": "claim_2a888651a79e955c536b3ede362aaf01",
@@ -3339,19 +3246,9 @@
           "targetUnitDigest": "13ede0d65b5098cdbd36dafdb6b798bf44aaf153968107ae1f7e9ac8e99c07b3"
         },
         {
-          "claimId": "claim_3e117ae0c024845234aa1a5896ecddac",
-          "sourceUnitDigest": "0152f065ea37370fe85447fa979b9c66e7cc17f602e4687dfdaea11e5c8d872e",
-          "targetUnitDigest": "0152f065ea37370fe85447fa979b9c66e7cc17f602e4687dfdaea11e5c8d872e"
-        },
-        {
           "claimId": "claim_bc9125989f9d7de4625c7d8f45e3135b",
           "sourceUnitDigest": "0b5e73d854840613a14e31710b485b606dcec1542d2c9bee6b93cc7d53ffdfa1",
           "targetUnitDigest": "0b5e73d854840613a14e31710b485b606dcec1542d2c9bee6b93cc7d53ffdfa1"
-        },
-        {
-          "claimId": "claim_e976332dd4fb73def367d062991b016e",
-          "sourceUnitDigest": "c332c9768ed6cb7d4196e8f316f9c632d5f338344a8168afd8407c89bc0ea88e",
-          "targetUnitDigest": "c332c9768ed6cb7d4196e8f316f9c632d5f338344a8168afd8407c89bc0ea88e"
         },
         {
           "claimId": "claim_ac1f844239a51859c77c0270265120b6",
@@ -3374,16 +3271,6 @@
           "targetUnitDigest": "e06d2d723c4142f6339b9b8ff6a769b3e740680a0a17511388e1f7a8e5ceace1"
         },
         {
-          "claimId": "claim_9c60847e6afc58eaac38ab36beda8889",
-          "sourceUnitDigest": "3e5e142b83b71fded7d616e3275f7d83214568ffbe6db84344a947af7396fb35",
-          "targetUnitDigest": "3e5e142b83b71fded7d616e3275f7d83214568ffbe6db84344a947af7396fb35"
-        },
-        {
-          "claimId": "claim_3d97c79e3477c56e002f75f27a964f3a",
-          "sourceUnitDigest": "1da5dbf71df3630ae3c2e804d97177c27136b04f98172137611050b7dc04737f",
-          "targetUnitDigest": "1da5dbf71df3630ae3c2e804d97177c27136b04f98172137611050b7dc04737f"
-        },
-        {
           "claimId": "claim_b92b91d896acc8e12cab661f32b82ec1",
           "sourceUnitDigest": "9f9a9bbe51e48671554de64fc8923d9aa482ab6fef7234c67e90d4aba31a24ac",
           "targetUnitDigest": "9f9a9bbe51e48671554de64fc8923d9aa482ab6fef7234c67e90d4aba31a24ac"
@@ -3394,19 +3281,9 @@
           "targetUnitDigest": "68676eb74d56ca6399f90f5300eb65f0df18d0be5d5ed0a81d7fc7adee7df0cd"
         },
         {
-          "claimId": "claim_a7cb506a2c73561b1a4dde1e62fe273c",
-          "sourceUnitDigest": "65f83569620ad9de444a1d8e615a00fd02fd5c263b83b12c8e45b4fce6ce0e5a",
-          "targetUnitDigest": "65f83569620ad9de444a1d8e615a00fd02fd5c263b83b12c8e45b4fce6ce0e5a"
-        },
-        {
           "claimId": "claim_b565eca9e1cf36dac6b27e59ae090435",
           "sourceUnitDigest": "e4728d452e64916bdcaf5905a2288a6c3ce9a215e94b7e21760127b861ecddc8",
           "targetUnitDigest": "e4728d452e64916bdcaf5905a2288a6c3ce9a215e94b7e21760127b861ecddc8"
-        },
-        {
-          "claimId": "claim_fb6f32b5b22654b9f92dfccd337713a4",
-          "sourceUnitDigest": "648523d99139a9192bdd96ff1be645a0a97a86053aa795bad3fea93ac3be3b69",
-          "targetUnitDigest": "648523d99139a9192bdd96ff1be645a0a97a86053aa795bad3fea93ac3be3b69"
         },
         {
           "claimId": "claim_76aa81473d09688fc99edeb78b4200a2",
@@ -3429,19 +3306,9 @@
           "targetUnitDigest": "7ae844aa8784765b85bc7107ea2831a2db4f70e73a1541cadea070fcff36b930"
         },
         {
-          "claimId": "claim_601a132ae1d97b6b21ba9ad345960cf2",
-          "sourceUnitDigest": "ff553a6771cc14cd01ba55c796a53cfc99a90764553275714e0bfba803db9d66",
-          "targetUnitDigest": "ff553a6771cc14cd01ba55c796a53cfc99a90764553275714e0bfba803db9d66"
-        },
-        {
           "claimId": "claim_83408164d5b5b2b16d029d5d23a401fc",
           "sourceUnitDigest": "94227e29d68ef7d1e08b1429ce6bf5333755de9644864c446283d2ffedd3e6f4",
           "targetUnitDigest": "94227e29d68ef7d1e08b1429ce6bf5333755de9644864c446283d2ffedd3e6f4"
-        },
-        {
-          "claimId": "claim_937e450eee820c23e23b237410fad831",
-          "sourceUnitDigest": "edb5a67562b7c8d22756d2be6c7bd31a6c64fb3058dba2393b398f974ba31b0f",
-          "targetUnitDigest": "edb5a67562b7c8d22756d2be6c7bd31a6c64fb3058dba2393b398f974ba31b0f"
         },
         {
           "claimId": "claim_b36c9a2774a560c9770ea76cac370981",
@@ -3457,24 +3324,9 @@
           "claimId": "claim_ee1436df8e38efc584bc20fd458e0ed9",
           "sourceUnitDigest": "330034de11cfdf5763a7c14b598504341abd5858ea1934d571e432d670a0b0d5",
           "targetUnitDigest": "330034de11cfdf5763a7c14b598504341abd5858ea1934d571e432d670a0b0d5"
-        },
-        {
-          "claimId": "claim_ec223028877db481d1f1dd0ba3419632",
-          "sourceUnitDigest": "50b5d472771cb70d18300f45222c8c31031deba0bb10385588a56252510579eb",
-          "targetUnitDigest": "50b5d472771cb70d18300f45222c8c31031deba0bb10385588a56252510579eb"
-        },
-        {
-          "claimId": "claim_7a382f6a6153c5b68cdb7fd557598623",
-          "sourceUnitDigest": "4a6916511542a6e023da4a7d391f67ab71b017aa7943e4dee380e8805664517e",
-          "targetUnitDigest": "4a6916511542a6e023da4a7d391f67ab71b017aa7943e4dee380e8805664517e"
-        },
-        {
-          "claimId": "claim_6ed7f2c285615b6ef028736452657e35",
-          "sourceUnitDigest": "826253ddea0cac6b985e44787301209800938c33d737b2fb9862fa5436d208af",
-          "targetUnitDigest": "826253ddea0cac6b985e44787301209800938c33d737b2fb9862fa5436d208af"
         }
       ]
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-exact-02.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md"
 }

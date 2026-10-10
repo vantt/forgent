@@ -2905,13 +2905,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/verification/README.md#agent-coordination-verification is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/verification/README.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:verification/README.md#agent-coordination-verification -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Legacy migration note, metadata, title, Evidence Sets heading and the Team Dispatch V1 bullet are carried in history or by the current table row team-dispatch-v1/.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
       "targetAncestry": [
         "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_757256782a9fcd89eb7db89c2deedee6",
@@ -2937,13 +2943,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/verification/README.md#unheaded-block-2 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/verification/README.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/verification/README.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:verification/README.md#unheaded-block-2 -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Legacy migration note, metadata, title, Evidence Sets heading and the Team Dispatch V1 bullet are carried in history or by the current table row team-dispatch-v1/.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
       "targetAncestry": [
         "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_9ca45c1cbc5df4468eae3eb46d27e672",
@@ -2952,13 +2964,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/verification/README.md#evidence-sets is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/verification/README.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:verification/README.md#evidence-sets -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Legacy migration note, metadata, title, Evidence Sets heading and the Team Dispatch V1 bullet are carried in history or by the current table row team-dispatch-v1/.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
       "targetAncestry": [
         "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_a41fa095e3c0bb83b1c7e5b55ebbe110",
@@ -2970,10 +2988,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/verification/README.md#unheaded-block-5 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/verification/README.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/verification/README.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
-      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
-      "targetAncestry": [
-        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
-      ]
+      "reviewNote": "LEG:verification/README.md#unheaded-block-5 -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index."
     },
     {
       "claimId": "claim_80b2ae85ad0727c18030b4739c02bb7b",
@@ -2982,13 +2997,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vision.md#agent-coordination-foundation-vision is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vision.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vision.md#agent-coordination-foundation-vision -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-subject sections and the old header are carried verbatim in the history snapshot.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_98389d1b7407ffc77a4cfe9a1e79d89e",
@@ -2997,43 +3018,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vision.md#unheaded-block-1 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vision.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vision.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vision.md#unheaded-block-1 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-subject sections and the old header are carried verbatim in the history snapshot.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
-    },
-    {
-      "claimId": "claim_04f1e3992587473eafb0bc73fa04117a",
-      "sourceUnitDigest": "1da66236c45f5d154e21a818ffae89321dc6d36d0ad5cb0daa301674e8bcdeea",
-      "targetOwner": "docs/platform/agent-coordination/vision.md",
-      "targetAnchor": "authority-and-reading-rule",
-      "claimKind": "vision",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#authority-and-reading-rule is retained in docs/platform/agent-coordination/vision.md#authority-and-reading-rule. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "d071729264d4d9a6b8d11d71370d3f94a9453bfeb040309ab1553b3cdcb41f5e",
-      "targetAncestry": [
-        "Agent Coordination Foundation Vision"
-      ]
-    },
-    {
-      "claimId": "claim_52a9700c3921ea5126aa0ab1d6ca3e4b",
-      "sourceUnitDigest": "4b9ac6ad0e69cd12ac68fde5808c66e62b625d97d578258f58770202f19170b5",
-      "targetOwner": "docs/platform/agent-coordination/vision.md",
-      "targetAnchor": "vision",
-      "claimKind": "vision",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#vision is retained in docs/platform/agent-coordination/vision.md#vision. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "4b9ac6ad0e69cd12ac68fde5808c66e62b625d97d578258f58770202f19170b5",
-      "targetAncestry": [
-        "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_bd8a05c3bda253eafa843ee48a78d1ff",
@@ -3042,13 +3039,19 @@
       "targetAnchor": "problems-this-vision-resolves",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#problems-this-vision-resolves is retained in docs/platform/agent-coordination/vision.md#problems-this-vision-resolves. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#problems-this-vision-resolves -> PLAT:vision.md#problems-this-vision-resolves: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e5267b72a0f29e9631b6e398d3451a5869f87e95793db6f79a40994002223523",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_c21536dec23954ed3fc478f666ec43d5",
@@ -3057,31 +3060,43 @@
       "targetAnchor": "6-the-two-unsafe-extremes",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#6-the-two-unsafe-extremes is retained in docs/platform/agent-coordination/vision.md#6-the-two-unsafe-extremes. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#6-the-two-unsafe-extremes -> PLAT:vision.md#6-the-two-unsafe-extremes: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "53554791b479c742ef58049beaa0cb898b2174dd6d73166e4a7beaf955bfd245",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_832d730918fd7ec72730438c02b0a1ea",
       "sourceUnitDigest": "2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae",
       "targetOwner": "docs/platform/agent-coordination/vision.md",
-      "targetAnchor": "unheaded-block-23",
+      "targetAnchor": "unheaded-block-22",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#unheaded-block-22 is retained in docs/platform/agent-coordination/vision.md#unheaded-block-23. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#unheaded-block-22 -> PLAT:vision.md#unheaded-block-23: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "6. The Two Unsafe Extremes"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_1e802ee97f49f39adf169e746fc90440",
@@ -3090,13 +3105,19 @@
       "targetAnchor": "accepted-vision-decisions",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#accepted-vision-decisions is retained in docs/platform/agent-coordination/vision.md#accepted-vision-decisions. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#accepted-vision-decisions -> PLAT:vision.md#accepted-vision-decisions: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "24fa1aa6236fbd6f222fdffaf7643be06ccf4f518797cf52c291610c0494eff0",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_3e63b14f9703f11715ef1cc4d4bf7a8c",
@@ -3108,10 +3129,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vision.md#unheaded-block-41 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vision.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vision.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
-      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
-      "targetAncestry": [
-        "Historical File: Agent Coordination Foundation Vision"
-      ]
+      "reviewNote": "LEG:vision.md#unheaded-block-41 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision."
     },
     {
       "claimId": "claim_2c531f09f9410d21fc5d8767b601b9b0",
@@ -3120,13 +3138,19 @@
       "targetAnchor": "foundation-responsibilities",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#foundation-responsibilities is retained in docs/platform/agent-coordination/vision.md#foundation-responsibilities. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#foundation-responsibilities -> PLAT:vision.md#foundation-responsibilities: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8894387ad35fab05ad8d2f03cb0170f273820a3a5450321bc1ce81b451f3c609",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_252424201835ab948c571d4fe8064c6a",
@@ -3138,10 +3162,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vision.md#rejected-interpretations is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vision.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
-      "targetAncestry": [
-        "Historical File: Agent Coordination Foundation Vision"
-      ]
+      "reviewNote": "LEG:vision.md#rejected-interpretations -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell."
     },
     {
       "claimId": "claim_f4c5bd9dd0a8f97df4596c47519e4f9c",
@@ -3150,13 +3171,19 @@
       "targetAnchor": "consequences-for-downstream-design",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#consequences-for-downstream-design is retained in docs/platform/agent-coordination/vision.md#consequences-for-downstream-design. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#consequences-for-downstream-design -> PLAT:vision.md#consequences-for-downstream-design: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "220050cf052d9ae3b76681f983db34f0bcc3cc802dca80b3d264d8f4b60df911",
       "targetAncestry": [
         "Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_88097d7b3426d6caf4b176315181f9bb",
@@ -3165,14 +3192,20 @@
       "targetAnchor": "protocol-model",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#protocol-model is retained in docs/platform/agent-coordination/vision.md#protocol-model. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#protocol-model -> PLAT:vision.md#protocol-model: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a9bed025ca2fa9c69f0ad5967631753b0ddad2807296d475285a54af5dcd5c8a",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_0287aee81df05441ee9ee652579bb3cb",
@@ -3181,14 +3214,20 @@
       "targetAnchor": "assignment",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#assignment is retained in docs/platform/agent-coordination/vision.md#assignment. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#assignment -> PLAT:vision.md#assignment: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f936753f7c9ef017fdbfb100c8646229676b238232c3a4229ea47aec1942bdad",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_c72435516fe8e83a93bddaa79cc3f734",
@@ -3197,13 +3236,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vision.md#coordinationsession-and-adhoctask is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vision.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vision.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vision.md#coordinationsession-and-adhoctask -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-subject sections and the old header are carried verbatim in the history snapshot.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_57d596caec3fcfa2de3dc34439dba74b",
@@ -3212,13 +3257,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vision.md#standalone-protocols is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vision.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vision.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vision.md#standalone-protocols -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-subject sections and the old header are carried verbatim in the history snapshot.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_816824c44b0382cf327e7f8c7052eb2e",
@@ -3227,14 +3278,20 @@
       "targetAnchor": "planning-materialization",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#planning-materialization is retained in docs/platform/agent-coordination/vision.md#planning-materialization. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#planning-materialization -> PLAT:vision.md#planning-materialization: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a10b03651c24fe6fb9849bc663245c36be6c84e3765ea77c484b7df300c75d73",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_2a35cd91ef4489b8cba34a05e2905cbf",
@@ -3243,45 +3300,20 @@
       "targetAnchor": "extension-design",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#extension-design is retained in docs/platform/agent-coordination/vision.md#extension-design. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vision.md#extension-design -> PLAT:vision.md#extension-design: Unit carried verbatim (digest equal) into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "96bdd272db28763995fe852aae99517606d5f4daa00debffe3eb252bc7683b90",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design"
-      ]
-    },
-    {
-      "claimId": "claim_b15db24ee1738cb12ed454378aab1638",
-      "sourceUnitDigest": "0703183ea6f8d1a19cf45de96ba51b2e7f4e4b86867b3335522c9e9138e5d99f",
-      "targetOwner": "docs/platform/agent-coordination/vision.md",
-      "targetAnchor": "reading-down-from-the-vision",
-      "claimKind": "navigation",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#reading-down-from-the-vision is retained in docs/platform/agent-coordination/vision.md#reading-down-from-the-vision. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "930d01d6538d5496f1155844ee2b17948b7fd022264133aa34bc39e391f1d129",
-      "targetAncestry": [
-        "Agent Coordination Foundation Vision"
-      ]
-    },
-    {
-      "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
-      "sourceUnitDigest": "ea4efb1bd39165a8a159e48b5e5d03a7da8ba4b017f66b0fcfec46fe96db6242",
-      "targetOwner": "docs/platform/agent-coordination/vision.md",
-      "targetAnchor": "unheaded-block-53",
-      "claimKind": "navigation",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#unheaded-block-65 is retained in docs/platform/agent-coordination/vision.md#unheaded-block-53. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "ac08c87e27c06d7ff3630a13dd970cf4aa8160d97b5d38e9f6ddf697260f745e",
-      "targetAncestry": [
-        "Agent Coordination Foundation Vision",
-        "Reading Down From The Vision"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_5b9f287ae5552fa2a46c7d39dd3cdc4e",
@@ -3290,13 +3322,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#canonical-agent-coordination-concepts is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#canonical-agent-coordination-concepts -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_74a252c064d9dd4907baf44a10db3ed0",
@@ -3322,13 +3360,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-2 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-2 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_9bda1293aeaa81db1d6ab09d48463e98",
@@ -3337,13 +3381,19 @@
       "targetAnchor": "lifecycle-and-objective-layer",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#lifecycle-and-objective-layer is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#lifecycle-and-objective-layer. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#lifecycle-and-objective-layer -> PLAT:vocabulary/canonical-concepts.md#lifecycle-and-objective-layer: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cf451a14677f9cf10ccc8b8d84515baaf578865eeee2badb225fdc783072fccd",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_ff59b66e53865556bfb4a2d1f431b034",
@@ -3352,13 +3402,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#work is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#work -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_01fa231780f6ed68c60ee98c7ab1c68f",
@@ -3367,13 +3423,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#mission is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#mission -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_1b666cb12b7bf8bc4ff64c2b22d7975b",
@@ -3382,13 +3444,19 @@
       "targetAnchor": "protocol-definition-layer",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#protocol-definition-layer is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#protocol-definition-layer. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#protocol-definition-layer -> PLAT:vocabulary/canonical-concepts.md#protocol-definition-layer: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e88f12f22d4a38ce47a17586771cdd5a1298bad2279203ab68aa1b9e7c2d4558",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_df02e70e8bdc67f53001732bf7c2c486",
@@ -3397,61 +3465,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#flowdefinition is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#flowdefinition -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
-    },
-    {
-      "claimId": "claim_1a086e1e0b5c4c84e324859dc9a435ae",
-      "sourceUnitDigest": "2f2c10c8a981967b250918ab6301f21568c47b41b890b258ac5a177b1313ef3a",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "targetAnchor": "workflow",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#workflow is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#workflow. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "2f2c10c8a981967b250918ab6301f21568c47b41b890b258ac5a177b1313ef3a",
-      "targetAncestry": [
-        "Canonical Agent Coordination Concepts",
-        "Protocol Definition Layer"
-      ]
-    },
-    {
-      "claimId": "claim_6e8b246637c5b547b9f4d10e7765b001",
-      "sourceUnitDigest": "2217d0a50a8e658013b79588d97e13677c81462aadc711b6ee7ac072c40f2e12",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "targetAnchor": "stage",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#stage is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#stage. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "2217d0a50a8e658013b79588d97e13677c81462aadc711b6ee7ac072c40f2e12",
-      "targetAncestry": [
-        "Canonical Agent Coordination Concepts",
-        "Protocol Definition Layer"
-      ]
-    },
-    {
-      "claimId": "claim_496366554c5c5934c855ad244c7415fa",
-      "sourceUnitDigest": "ce95c29d1ba3ec079a742e3140bcf2a498a74e0f4f54f90d95d05bd91927e218",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "targetAnchor": "stage-protocol",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#stage-protocol is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#stage-protocol. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "ce95c29d1ba3ec079a742e3140bcf2a498a74e0f4f54f90d95d05bd91927e218",
-      "targetAncestry": [
-        "Canonical Agent Coordination Concepts",
-        "Protocol Definition Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_5fe5c594e5a101c7d92f638ca0c518f2",
@@ -3460,13 +3486,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#stage-operation is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#stage-operation -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_19d00346b56822255f0ee1a5c7182541",
@@ -3475,29 +3507,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#coordination-protocol is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#coordination-protocol -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
-    },
-    {
-      "claimId": "claim_4a8e7b1658ef678f829cc7bf2a6c0054",
-      "sourceUnitDigest": "9b158d63875ae06680f4298a7ec194097661c75366b550ddbacfa7d5fdc9e796",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "targetAnchor": "taskspec",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#taskspec is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#taskspec. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "9b158d63875ae06680f4298a7ec194097661c75366b550ddbacfa7d5fdc9e796",
-      "targetAncestry": [
-        "Canonical Agent Coordination Concepts",
-        "Protocol Definition Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_f70c1c8f75195a89d178207684d0bd60",
@@ -3506,14 +3528,20 @@
       "targetAnchor": "skill",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#skill is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#skill. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#skill -> PLAT:vocabulary/canonical-concepts.md#skill: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f8beeee962c6d998cb7fa48fb314f1c2e2e345bc86f59ba343d2c690b6646bfc",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Protocol Definition Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_c8647f8839a8f108f6ff656a23f4be47",
@@ -3522,13 +3550,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#role is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#role -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_8042ce7d86f2716fa54dc1609c8ad618",
@@ -3537,13 +3571,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#phase is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#phase -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_dd49ba82b09713ec73e3046ded135f74",
@@ -3552,13 +3592,19 @@
       "targetAnchor": "coordination-runtime-layer",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#coordination-runtime-layer is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#coordination-runtime-layer. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#coordination-runtime-layer -> PLAT:vocabulary/canonical-concepts.md#coordination-runtime-layer: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d4e3362f17ad9eafd50ae8971267309d3471bcfc6a9fe1791d43f05d645392e4",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_10f948eb376cb93e9cf858e6687d2521",
@@ -3567,13 +3613,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#coordinationsession is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#coordinationsession -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_ebac8203cac1b09a9d2e322ad3744c25",
@@ -3582,13 +3634,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#sessionactor is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#sessionactor -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_b61549616b7fe1291e297d238a8da881",
@@ -3597,13 +3655,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-31 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-31 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_86cea26d70eeedb2232613ff3c7318bb",
@@ -3612,13 +3676,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#persona is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#persona -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_8bc6d21b086692bec2c4df79735485f7",
@@ -3627,13 +3697,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-33 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-33 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_52e25a4a76b34dc00352b955bb348dd5",
@@ -3642,13 +3718,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#stance is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#stance -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_297a73ffb38e5102ad222cc3af90a6ce",
@@ -3657,13 +3739,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#taskcandidate is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#taskcandidate -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_755d6207bc4bd062e2e0c6ee5eaaa4b7",
@@ -3672,13 +3760,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-38 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-38 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_0bac3816b297b8d3aa7442a43209cf5d",
@@ -3687,13 +3781,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#adhoctask is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#adhoctask -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_65a8dd74217cbf85a119e8589b0fd969",
@@ -3702,29 +3802,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-41 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-41 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
-    },
-    {
-      "claimId": "claim_120276736d1c72d4d1186921ba21b07f",
-      "sourceUnitDigest": "57541bd5f767e95bb38d77a95878bdb4c20b3dee991c0aa5b1d5e01424458699",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "targetAnchor": "assignment",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#assignment is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#assignment. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "57541bd5f767e95bb38d77a95878bdb4c20b3dee991c0aa5b1d5e01424458699",
-      "targetAncestry": [
-        "Canonical Agent Coordination Concepts",
-        "Coordination Runtime Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_14382cd773641d09c975643d869158f4",
@@ -3733,13 +3823,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#agentmessage is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#agentmessage -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_0d03f642bd23f811c3a4aa8bea2b7e90",
@@ -3748,13 +3844,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#synthesis is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#synthesis -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_fe3db0ed8f413106140d9fd111de31dd",
@@ -3763,13 +3865,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-47 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/canonical-concepts.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-47 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_a7a7b7c82d087d3f6c63059b9b90cf88",
@@ -3778,29 +3886,19 @@
       "targetAnchor": "dispatch-and-execution-layer",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#dispatch-and-execution-layer is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#dispatch-and-execution-layer. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#dispatch-and-execution-layer -> PLAT:vocabulary/canonical-concepts.md#dispatch-and-execution-layer: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7c24003f5ca01e4bc79c4735ea2a51e9295f4614a6855787652d8a3249f1e384",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts"
-      ]
-    },
-    {
-      "claimId": "claim_0e71b6f54a90e90950e3e5b444aabcdd",
-      "sourceUnitDigest": "d891086bcfb0c4e9727ad7bfd0e35907335ecf63307bb91fcc6aa48e31fdb4ea",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "targetAnchor": "capability",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#capability is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#capability. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "d891086bcfb0c4e9727ad7bfd0e35907335ecf63307bb91fcc6aa48e31fdb4ea",
-      "targetAncestry": [
-        "Canonical Agent Coordination Concepts",
-        "Dispatch And Execution Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_219d84f15c2dcdc84ceb765bce9c264d",
@@ -3809,14 +3907,20 @@
       "targetAnchor": "dispatchplan",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#dispatchplan is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#dispatchplan. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#dispatchplan -> PLAT:vocabulary/canonical-concepts.md#dispatchplan: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "37f4796c74b83f1aa74cace382518f93e6515e8e5406dbe11149407f51ff324d",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_13117c38fe8febeccf87d84b0efa72af",
@@ -3825,14 +3929,20 @@
       "targetAnchor": "dispatcher",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#dispatcher is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#dispatcher. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#dispatcher -> PLAT:vocabulary/canonical-concepts.md#dispatcher: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bafe6f44dc74d5e6037e3d21ba529679c3c21a328727b8ee073f390131a8886",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_e498a97221f308e42c7c15cc4ee2aaea",
@@ -3841,14 +3951,20 @@
       "targetAnchor": "executor",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#executor is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#executor. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#executor -> PLAT:vocabulary/canonical-concepts.md#executor: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "737df12efb6ddb64aaa33ed261b71ab2fa705764b2361e1865eb03d196328349",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_675d47cb520c69dd255232c8dde18f58",
@@ -3857,14 +3973,20 @@
       "targetAnchor": "run",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#run is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#run. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#run -> PLAT:vocabulary/canonical-concepts.md#run: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7d92515e4a14aba8c3f40fdd51080a8fe3d9f6b10334c010c39a49203a494a3a",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_c0835d769ae38e59a4594b210973a632",
@@ -3873,14 +3995,20 @@
       "targetAnchor": "runresult",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#runresult is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#runresult. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#runresult -> PLAT:vocabulary/canonical-concepts.md#runresult: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c47adff16a79e98f931f47222915e0341911b6b89f52e9078d1e0b09c62c4b1b",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_b8b002e25b2dc58a576af5bcc598a380",
@@ -3889,13 +4017,19 @@
       "targetAnchor": "evidence-and-visibility-layer",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#evidence-and-visibility-layer is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#evidence-and-visibility-layer. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#evidence-and-visibility-layer -> PLAT:vocabulary/canonical-concepts.md#evidence-and-visibility-layer: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6a271c5eb68fc9174927b6f80de7df2c9ccb5820c0ba4ae49d3576c6318979d6",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_7382adf9550b673255a5870741120d7d",
@@ -3904,14 +4038,20 @@
       "targetAnchor": "evidence",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#evidence is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#evidence. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#evidence -> PLAT:vocabulary/canonical-concepts.md#evidence: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f4c17500793cc42a6254774a2b5e719e55b79ed231c069f27883f3f983c38920",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Evidence And Visibility Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_0933f628c1695da663d86205af0d7e82",
@@ -3920,14 +4060,20 @@
       "targetAnchor": "artifact",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#artifact is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#artifact. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#artifact -> PLAT:vocabulary/canonical-concepts.md#artifact: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7f11cbd912373089696d0d0f36228105a97fa7aac0fc98a262dc08240ecd7074",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Evidence And Visibility Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_bb516d02bfe2d9fd1fd8d030fcbabebb",
@@ -3936,14 +4082,20 @@
       "targetAnchor": "herdr",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#herdr is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#herdr. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#herdr -> PLAT:vocabulary/canonical-concepts.md#herdr: Engine-term rows go to the verbatim history snapshot; live entries carried into current sections that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4d8c9a2f3d9b4c8a25555326d5ce638bd31843403604005df002f91567836045",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Evidence And Visibility Layer"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_9950b45abbe07bf669b4603700a12d25",
@@ -3955,10 +4107,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#job is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
-      "targetAncestry": [
-        "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#job -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Job reserved-term definition and text go to history while the concept is live."
     },
     {
       "claimId": "claim_9832d0298e9320dc2ec4d4497b411db6",
@@ -3967,13 +4116,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#agent-coordination-concept-relationships is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#agent-coordination-concept-relationships -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Session layer map, profiles, ownership table and header go to the history snapshot with live replacements carried in the current text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_b53fe4cde49f120bda8fe93cc01cea84",
@@ -3999,13 +4154,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-2 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/concept-relationships.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#unheaded-block-2 -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Session layer map, profiles, ownership table and header go to the history snapshot with live replacements carried in the current text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_0ec50da09f379b79d8bf763660c21fb6",
@@ -4014,13 +4175,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#layer-map is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#layer-map -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Session layer map, profiles, ownership table and header go to the history snapshot with live replacements carried in the current text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_825643f78fef3641b308e35c37ec83a1",
@@ -4029,13 +4196,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#runtime-profiles is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#runtime-profiles -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Session layer map, profiles, ownership table and header go to the history snapshot with live replacements carried in the current text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_5f0ea240f41c6a482d5785fee410158c",
@@ -4044,13 +4217,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#ownership-rules is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#ownership-rules -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Session layer map, profiles, ownership table and header go to the history snapshot with live replacements carried in the current text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_ef46af833dcb1f76ff7ca72844c4aa74",
@@ -4062,55 +4241,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#creation-rules is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
-      "targetAncestry": [
-        "Historical File: Agent Coordination Concept Relationships"
-      ]
-    },
-    {
-      "claimId": "claim_25f2595b08c2e429eeda0894307c264d",
-      "sourceUnitDigest": "02a43b917009cd308eed9e9b307cda4772605aa6e0bc7dd420d0f41aa777f44b",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
-      "targetAnchor": "critical-non-equivalences",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/concept-relationships.md#critical-non-equivalences is retained in docs/platform/agent-coordination/vocabulary/concept-relationships.md#critical-non-equivalences. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "02a43b917009cd308eed9e9b307cda4772605aa6e0bc7dd420d0f41aa777f44b",
-      "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ]
-    },
-    {
-      "claimId": "claim_40376c0fb55e01717dc664e2630865c5",
-      "sourceUnitDigest": "032c3655805e2015fd2a69035a601f66c3d17ef5f24dbcb320bcdb8238be391d",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
-      "targetAnchor": "lifecycle-and-isolation",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation is retained in docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "032c3655805e2015fd2a69035a601f66c3d17ef5f24dbcb320bcdb8238be391d",
-      "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ]
-    },
-    {
-      "claimId": "claim_d6db58a3090422d42154f240f54c9f5a",
-      "sourceUnitDigest": "631c2b459e76ccb130e41afdc78c2fc296b342d641450632df8e33baeac22459",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
-      "targetAnchor": "coordination-rings",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings is retained in docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "631c2b459e76ccb130e41afdc78c2fc296b342d641450632df8e33baeac22459",
-      "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ]
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#creation-rules -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading."
     },
     {
       "claimId": "claim_c9d4728b2c921461f0d3ffa2022f5368",
@@ -4119,13 +4250,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#deprecated-and-reserved-coordination-terms is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#deprecated-and-reserved-coordination-terms -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Mission proposal text and header are retired-engine/metadata and carried verbatim in history.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
       "targetAncestry": [
         "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_6e942f5479cfebf05e32039d927580a1",
@@ -4151,13 +4288,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#unheaded-block-2 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-2 -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Mission proposal text and header are retired-engine/metadata and carried verbatim in history.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
       "targetAncestry": [
         "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_404762a446a5b649adab2504df16c2e3",
@@ -4166,13 +4309,19 @@
       "targetAnchor": "reserved",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#reserved is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#reserved. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#reserved -> PLAT:vocabulary/deprecated-and-reserved.md#reserved: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "da82f66d740e75d8b4c2e32b41de7df1569028e4a684e996cbc17928480dab11",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_93545a04eef4e8bb80b1db130614c870",
@@ -4184,10 +4333,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#participant is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
-      "targetAncestry": [
-        "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#participant -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings."
     },
     {
       "claimId": "claim_726792257e15bca8a1724a65842fb9af",
@@ -4199,10 +4345,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#job is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
-      "targetAncestry": [
-        "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#job -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings."
     },
     {
       "claimId": "claim_ced41289f087b866d0a34602c3009c65",
@@ -4211,13 +4354,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#mission is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#mission -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Mission proposal text and header are retired-engine/metadata and carried verbatim in history.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
       "targetAncestry": [
         "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_d630cd336fbe5a75e399d9507ae36308",
@@ -4226,29 +4375,19 @@
       "targetAnchor": "discouraged-or-ambiguous",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#discouraged-or-ambiguous is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#discouraged-or-ambiguous. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#discouraged-or-ambiguous -> PLAT:vocabulary/deprecated-and-reserved.md#discouraged-or-ambiguous: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bfa377eef96eb5febf8a1e0ce65ea39fbe9823d75512d4dc48883dc47970cb9b",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms"
-      ]
-    },
-    {
-      "claimId": "claim_cbedb41c7a00cb4db2b9e3840a028b36",
-      "sourceUnitDigest": "af83616dc8a1fed3764228890c55647b1472b0d556c1997505e6deb9fbb7ba3d",
-      "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
-      "targetAnchor": "cell",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#cell is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#cell. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "targetUnitDigest": "af83616dc8a1fed3764228890c55647b1472b0d556c1997505e6deb9fbb7ba3d",
-      "targetAncestry": [
-        "Deprecated And Reserved Coordination Terms",
-        "Discouraged Or Ambiguous"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_89c630c8a025b33134494cb41869c05f",
@@ -4257,14 +4396,20 @@
       "targetAnchor": "exec-packet",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#exec-packet is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#exec-packet. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#exec-packet -> PLAT:vocabulary/deprecated-and-reserved.md#exec-packet: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4ec242dec66bf9cc02850c4ddab2ecbd70b20362daef34ca9e427d3f5e94e199",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_5c4a16c9e542ccc72bd92ff6a0075f7b",
@@ -4273,14 +4418,20 @@
       "targetAnchor": "worker",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#worker is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#worker. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#worker -> PLAT:vocabulary/deprecated-and-reserved.md#worker: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "430561adbf53522d54e219e350222f77506f9bc61cf79b621a70021a90d73b3d",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_6603997b3304439ab21d3da9e3ae0820",
@@ -4289,14 +4440,20 @@
       "targetAnchor": "agent-result",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#agent-result is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#agent-result. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#agent-result -> PLAT:vocabulary/deprecated-and-reserved.md#agent-result: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e22ef328223ab319a674dc38ddd6c18b44e4c8c53b753cfb4c96e83708dc479c",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_92a9c79cccf54645d699adaf14b7e685",
@@ -4305,14 +4462,20 @@
       "targetAnchor": "completion-signal",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#completion-signal is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#completion-signal. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#completion-signal -> PLAT:vocabulary/deprecated-and-reserved.md#completion-signal: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2a75e50a6c0ff8a365e9f82f1f6ab4b49a3db6d5f12e3d8a058f26cd3979b177",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_cf37dde46ef351853e49583cd5304c7c",
@@ -4324,10 +4487,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#forbidden-equivalences is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
-      "targetAncestry": [
-        "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#forbidden-equivalences -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings."
     },
     {
       "claimId": "claim_5fbe0e914039d88235adf86cbf69914a",
@@ -4336,13 +4496,19 @@
       "targetAnchor": "historical-vocabulary",
       "claimKind": "historical-context",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary is retained in docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#historical-vocabulary. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#historical-vocabulary -> PLAT:vocabulary/deprecated-and-reserved.md#historical-vocabulary: Carried verbatim into current Discouraged-or-Ambiguous entries and the history pointer that verified ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6867d901c91997275541d6e914d9419ade1248df922dcccd745795c68c70369e",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_b65b3d060510d5506a3ecc697c4ef9c4",
@@ -4351,13 +4517,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/README.md#agent-coordination-vocabulary is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/README.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "LEG:vocabulary/README.md#agent-coordination-vocabulary -> PLAT:history/retired-engine/files/vocabulary/README.md#literal-snapshot: Legacy title/metadata line carried verbatim in history.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5364b8752a88fe65561b63fb9711b47f3fbfec890eec927480641a4bf3b51fd7",
       "targetAncestry": [
         "Historical File: Agent Coordination Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_a850f03482da7eadfd5c62f146d07a57",
@@ -4383,13 +4555,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vocabulary/README.md#unheaded-block-2 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vocabulary/README.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vocabulary/README.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
+      "reviewNote": "LEG:vocabulary/README.md#unheaded-block-2 -> PLAT:history/retired-engine/files/vocabulary/README.md#literal-snapshot: Unit carried verbatim into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5364b8752a88fe65561b63fb9711b47f3fbfec890eec927480641a4bf3b51fd7",
       "targetAncestry": [
         "Historical File: Agent Coordination Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_e899d21c07c93a34f3ff4463ff4bc991",
@@ -4398,13 +4576,19 @@
       "targetAnchor": "purpose",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/README.md#purpose is retained in docs/platform/agent-coordination/vocabulary/README.md#purpose. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/README.md#purpose -> PLAT:vocabulary/README.md#purpose: Unit carried verbatim into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5d41a077dd9ecb5ea6c736c1c9ec9d55497ca2e0cf5791208b5b8bcc25ff311b",
       "targetAncestry": [
         "Agent Coordination Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_e0cb3ca20dd8cb6c2c460ae46876208b",
@@ -4413,13 +4597,19 @@
       "targetAnchor": "documents",
       "claimKind": "navigation",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/README.md#documents is retained in docs/platform/agent-coordination/vocabulary/README.md#documents. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/README.md#documents -> PLAT:vocabulary/README.md#documents: Unit carried verbatim into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7b91f70cc752d0d3a1558f8bec0c7d75a0b0add7dfd1cfceb92c958693cde5a8",
       "targetAncestry": [
         "Agent Coordination Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_47ec8cc13fc2a6b4b8ce374cd38e6037",
@@ -4428,13 +4618,19 @@
       "targetAnchor": "entry-contract",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/README.md#entry-contract is retained in docs/platform/agent-coordination/vocabulary/README.md#entry-contract. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/README.md#entry-contract -> PLAT:vocabulary/README.md#entry-contract: Unit carried verbatim into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3e29758be17e545cf3c0fd21fa991f9d6be3d003b3e271dc7c24d19c1c79d175",
       "targetAncestry": [
         "Agent Coordination Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_a8364ee8380e18547ceea9e58962e799",
@@ -4443,14 +4639,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/README.md#unheaded-block-8 is retained in docs/platform/agent-coordination/vocabulary/README.md#unheaded-block-8. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/README.md#unheaded-block-8 -> PLAT:vocabulary/README.md#unheaded-block-8: Unit carried verbatim into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f31fac90009b5c43aa6ba1e23554d981b721de1de358331715901e435a508d35",
       "targetAncestry": [
         "Agent Coordination Vocabulary",
         "Entry Contract"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_755ad6b1f543ff615fc3d39052392b44",
@@ -4459,13 +4661,19 @@
       "targetAnchor": "change-control",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/README.md#change-control is retained in docs/platform/agent-coordination/vocabulary/README.md#change-control. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "LEG:vocabulary/README.md#change-control -> PLAT:vocabulary/README.md#change-control: Unit carried verbatim into a current section judged ok.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0b853f7355cc9c7181a046501d6b3c00e0ce0496a498eb3d959e60b87c9abe0e",
       "targetAncestry": [
         "Agent Coordination Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
       "claimId": "claim_3e24819e15c8383445261a9fdfe10ba9",
@@ -8458,5 +8666,5 @@
       "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2whole-s2-agent-coordination-judgment-03.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md"
 }
