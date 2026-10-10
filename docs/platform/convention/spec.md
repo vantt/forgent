@@ -205,7 +205,7 @@ Every call uses a 5-second process timeout so a stuck host cannot hang a commit 
 
 | Result | Hook | Doctor |
 |---|---|---|
-| success with violations | print each warning; continue | `passed: true` with counts and up to three examples |
+| success with violations | print each warning; continue | pre-cutoff only: `passed: true`; any post-cutoff violation: `passed: false`; include counts and up to three examples |
 | `host-unavailable` | print one warning; skip | `passed: true` with pass-skip reason |
 | `host-version-mismatch` | print one warning; skip | `passed: true` with pass-skip reason |
 | `host-exec-error`, including provider exit 1 | print one warning with the category; skip | `passed: true` with pass-skip reason and category |
@@ -250,9 +250,10 @@ Golden data must include every kind × supported operation success, every stable
 
 `convention-conformance` is a registered doctor check and is listed in the Packaging-Distribution check registry and legacy distribution spec. It calls the thin client against the caller's working-tree top level.
 
-- Existing or warning-posture violations: `passed: true` with counts and at most three examples.
+- Pre-cutoff violations: `passed: true` with counts and at most three examples.
+- Any violation introduced after its rule's per-rule cutoff: `passed: false`, including for initial `warn` rules.
 - Missing/old host: `passed: true` with a pass-skip reason; never a guessed local implementation.
-- A future block-posture violation introduced after its cutoff may return `passed: false`; no initial kind has block posture.
+- The pre-commit hook is independent of doctor failure posture: it prints warnings and never blocks.
 - Phase 05 applies packaged internal rules only in the fgOS source repository. Overlay-aware project behavior is deferred with Q13 because Plan B does not load overlays.
 
 The release containing the native verb must be staged and activated before plain `fgos` can enforce it. Merging source alone does not refresh an activated release.
