@@ -112,6 +112,11 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     assert.ok(fs.existsSync(installedPkgDir), `installed package dir not found at ${installedPkgDir}`);
     assert.equal(fs.existsSync(path.join(installedPkgDir, '.fgos')), false, '.fgos/ must not ship in the installed package');
     assert.equal(fs.existsSync(path.join(installedPkgDir, 'test')), false, 'test/ must not ship');
+    assert.equal(
+      fs.existsSync(path.join(installedPkgDir, 'packages', 'convention', 'contracts', 'convention.rules.v1.json')),
+      true,
+      'installed doctor Convention rule data must ship',
+    );
 
     // (4) invoke the installed binary's `init` verb from a SEPARATE fresh
     // external tmp cwd (not the repo, not the install prefix, not the pack
