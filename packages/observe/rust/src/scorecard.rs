@@ -8,6 +8,7 @@ use crate::contract::Observation;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
+use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CaseSection {
@@ -143,27 +144,7 @@ pub struct Scorecard {
     pub warnings: Vec<String>,
 }
 fn parse_iso_secs(s: &str) -> Option<i64> {
-    // s is e.g. "2026-09-01T10:00:00.000Z" or "2026-09-01T10:00:00Z"
-    if s.len() < 19 {
-        return None;
-    }
-    let y: i64 = s.get(0..4)?.parse().ok()?;
-    let m: i64 = s.get(5..7)?.parse().ok()?;
-    let d: i64 = s.get(8..10)?.parse().ok()?;
-    let hour: i64 = s.get(11..13)?.parse().ok()?;
-    let min: i64 = s.get(14..16)?.parse().ok()?;
-    let sec: i64 = s.get(17..19)?.parse().ok()?;
-
-    // Howard Hinnant's inverse algorithm
-    let y_adj = if m <= 2 { y - 1 } else { y };
-    let m_adj = if m <= 2 { m + 9 } else { m - 3 };
-    let era = (if y_adj >= 0 { y_adj } else { y_adj - 399 }) / 400;
-    let yoe = (y_adj - era * 400) as u32;
-    let doy = (153 * m_adj + 2) / 5 + d - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy as u32;
-    let days = era * 146097 + doe as i64 - 719468;
-
-    Some(days * 86400 + hour * 3600 + min * 60 + sec)
+    parse_iso_prefix_secs(s)
 }
 
 fn now_unix_secs() -> i64 {

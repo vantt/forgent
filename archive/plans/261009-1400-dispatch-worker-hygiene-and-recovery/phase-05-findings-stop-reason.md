@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Findings stop reason"
-status: pending
+status: done
 budget: "<= 10 added src lines; 0 new files; no state"
 stop: 2026-10-14
 ---

@@ -3,6 +3,7 @@
 use crate::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
 use serde::Deserialize;
 use serde_json::Value;
+use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 
 #[derive(Deserialize)]
 struct FastLine<'a> {
@@ -58,25 +59,7 @@ impl Default for ClaudeTranscriptsSource {
 }
 
 fn parse_iso_secs(s: &str) -> Option<i64> {
-    if s.len() < 19 {
-        return None;
-    }
-    let y: i64 = s.get(0..4)?.parse().ok()?;
-    let m: i64 = s.get(5..7)?.parse().ok()?;
-    let d: i64 = s.get(8..10)?.parse().ok()?;
-    let hour: i64 = s.get(11..13)?.parse().ok()?;
-    let min: i64 = s.get(14..16)?.parse().ok()?;
-    let sec: i64 = s.get(17..19)?.parse().ok()?;
-
-    let y_adj = if m <= 2 { y - 1 } else { y };
-    let m_adj = if m <= 2 { m + 9 } else { m - 3 };
-    let era = (if y_adj >= 0 { y_adj } else { y_adj - 399 }) / 400;
-    let yoe = (y_adj - era * 400) as u32;
-    let doy = (153 * m_adj + 2) / 5 + d - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy as u32;
-    let days = era * 146097 + doe as i64 - 719468;
-
-    Some(days * 86400 + hour * 3600 + min * 60 + sec)
+    parse_iso_prefix_secs(s)
 }
 /// Helper to get valid project and worktree paths from git.
 fn get_valid_cwds(root: &Path) -> Vec<PathBuf> {

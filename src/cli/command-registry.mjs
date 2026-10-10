@@ -87,6 +87,22 @@ export const COMMAND_REGISTRY = [
     nativeOnly: true,
   },
   {
+    name: 'convention',
+    invoke: 'fgos convention <subcommand>',
+    description: 'Generate and check repository artifact names and paths through the native Convention component.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: [
+      'fgos convention name --kind report --type audit --slug x',
+      'fgos convention check --all',
+    ],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    nativeOnly: true,
+  },
+  {
     name: 'init',
     invoke: 'fgos init',
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',

@@ -105,6 +105,10 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'bin', 'fgos-runner.mjs')), 'bin/fgos-runner.mjs must exist in legacy-node');
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'package.json')), 'package.json must exist in legacy-node');
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'src', 'setup', 'registrations.mjs')), 'src/ must be staged intact in legacy-node');
+    assert.ok(
+      fs.existsSync(path.join(legacyNodeDir, 'packages', 'convention', 'contracts', 'convention.rules.v1.json')),
+      'Convention rule data required by installed doctor must be staged in legacy-node',
+    );
 
     // 6. Verify manifest.json and its required §5 fields
     const manifestPath = path.join(tempOut, 'manifest.json');
@@ -130,6 +134,25 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     const paths = manifest.files.map((f) => f.path);
     const sortedPaths = [...paths].sort();
     assert.deepEqual(paths, sortedPaths, 'files[] paths must be lexicographically sorted');
+
+    const conventionRulesPath = 'libexec/legacy-node/packages/convention/contracts/convention.rules.v1.json';
+    assert.ok(paths.includes(conventionRulesPath), 'manifest files[] must cover installed doctor rule data');
+
+    const doctorEnv = { ...process.env };
+    delete doctorEnv.CLAUDE_CODE_SESSION_ID;
+    delete doctorEnv.FGOS_HOST_BIN;
+    const doctor = spawnSync(fgosBin, ['doctor', '--dir', REPO_ROOT], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      env: doctorEnv,
+    });
+    assert.equal(doctor.status, 0, `staged fgos doctor failed: ${doctor.stderr}`);
+    const doctorEnvelope = JSON.parse(doctor.stdout);
+    const conventionCheck = doctorEnvelope.data.checks.find((entry) => entry.id === 'convention-conformance');
+    assert.ok(conventionCheck, 'staged fgos doctor must list convention-conformance');
+    assert.equal(conventionCheck.passed, true);
+    assert.match(conventionCheck.message, /convention violations: \d+ pre-cutoff, 0 post-cutoff/);
+    assert.doesNotMatch(conventionCheck.message, /skipped|ENOENT/);
 
     for (const file of manifest.files) {
       assert.ok(!file.path.startsWith('/'), `Path must not be absolute: ${file.path}`);

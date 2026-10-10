@@ -38,6 +38,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("convention.query"),
+        owning_component_id: Cow::Borrowed("convention"),
+        request_contract: ContractRef::from_static("convention.query.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("convention.query.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("convention.read"),
+        allowed_host_kinds: &["cli", "remote"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("test.fixture.echo"),
         owning_component_id: Cow::Borrowed("test"),
         request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
@@ -78,13 +89,14 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        assert_eq!(CATALOG.len(), 5);
+        assert_eq!(CATALOG.len(), 6);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
         assert!(ids.contains(&"test.fixture.echo"));
         assert!(ids.contains(&"observe.metrics"));
         assert!(ids.contains(&"observe.friction"));
+        assert!(ids.contains(&"convention.query"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

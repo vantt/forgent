@@ -168,6 +168,7 @@
     "src/util/session-identity.mjs": "kernel",
     "src/util/unique-tmp-tag.mjs": "kernel",
     "src/util/host-bin.mjs": "infra",
+    "src/convention/convention-client.mjs": "infra",
     "src/observe/friction-client.mjs": "infra",
     "src/intake/classify.mjs": "use-case",
     "src/setup/ansi.mjs": "domain",

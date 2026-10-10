@@ -29,9 +29,9 @@ Promote a small set of council-style lenses (assumption-destroyer, ship/maintain
 4. Keep the roster small; justify any persona beyond three with a real question that needs it.
 
 ## Success Criteria
-- [ ] Real run: each seat's brief shows a distinct lens and each report follows its method.
-- [ ] A seat's lens measurably changes its position or reasoning versus the same seat without it (one comparison, recorded).
-- [ ] No runtime code change; if one was needed, plan stopped and re-shaped.
+- [x] Real run (second run, [evidence](reports/lens-personas-evidence.md)): each seat's brief shows a distinct lens and each report follows its method.
+- [ ] A seat's lens measurably changes its position or reasoning versus the same seat without it (one comparison, recorded). Left open: the comparison is recorded, but [evidence](reports/lens-personas-evidence.md) says the effect on stance is not established and the re-measure report shows no gain on Q2.
+- [x] No runtime code change (evidence report: "No runtime or renderer change"); if one was needed, plan stopped and re-shaped.
 
 ## Risk Assessment
 Distinct lenses on the same provider reintroduce correlated priors (the council's own weakness); `bind()` keeps providers distinct. A persona that nudges toward a conclusion defeats the purpose: review wording for steering.

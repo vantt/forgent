@@ -40,8 +40,8 @@ function fixture(t, { marker = true } = {}) {
   }
   fs.chmodSync(path.join(host, '.githooks/pre-commit'), 0o755);
   git(['config', 'core.hooksPath', path.join(host, '.githooks')]);
-  const commit = (cwd = repo) => spawnSync('git', ['commit', '-q', '-m', 'guard scenario'], {
-    cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000,
+  const commit = (cwd = repo, extraEnv = {}) => spawnSync('git', ['commit', '-q', '-m', 'guard scenario'], {
+    cwd, env: { ...env, ...extraEnv }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000,
   });
   return { temp, repo, host, git, put, commit };
 }
@@ -167,4 +167,85 @@ test('unrelated hook edits may accompany an already allowlisted root addition', 
   f.git(['add', '.githooks/pre-commit', 'README.md']);
   passed(f.commit());
   assert.equal(f.git(['show', 'HEAD:README.md']), '# Legitimate addition');
+});
+
+test('Convention hook warns without blocking and forwards only direct added or renamed Markdown paths', (t) => {
+  const f = fixture(t);
+  f.git(['config', '--unset', 'core.hooksPath']);
+  f.put('plans/reports/old.md', '# old report\n');
+  f.git(['add', 'plans/reports/old.md']);
+  f.git(['commit', '-qm', 'seed report']);
+  f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
+
+  f.git(['mv', 'plans/reports/old.md', 'plans/reports/-đổi-tên.md']);
+  f.put('plans/journals/tạp chí.md', '# journal\n');
+  f.put('plans/example/reports/nested-bad.md', '# nested\n');
+  f.put('plans/reports/not-markdown.txt', 'not Markdown\n');
+  f.git(['add', 'plans/reports/-đổi-tên.md', 'plans/journals/tạp chí.md', 'plans/example/reports/nested-bad.md', 'plans/reports/not-markdown.txt']);
+
+  const argsLog = path.join(f.temp, 'host-args.json');
+  const host = path.join(f.temp, 'fake-host.mjs');
+  fs.writeFileSync(host, `#!/usr/bin/env node
+import fs from 'node:fs';
+fs.writeFileSync(process.env.ARGS_LOG, JSON.stringify(process.argv.slice(2)));
+const separator = process.argv.indexOf('--');
+const paths = separator === -1 ? [] : process.argv.slice(separator + 1);
+const violations = paths.map((path) => ({ path, code: 'pattern-mismatch', message: 'bad fixture name' }));
+process.stdout.write(JSON.stringify({ contract: 'fgos.v1', data: { checked: paths.length, violations } }));
+`, { mode: 0o755 });
+
+  const result = f.commit(f.repo, { FGOS_HOST_BIN: host, ARGS_LOG: argsLog });
+  passed(result);
+  assert.match(result.stderr, /warning: convention plans\/reports\/-đổi-tên\.md: pattern-mismatch/);
+  assert.match(result.stderr, /warning: convention plans\/journals\/tạp chí\.md: pattern-mismatch/);
+  const args = JSON.parse(fs.readFileSync(argsLog, 'utf8'));
+  assert.deepEqual(args.slice(args.indexOf('--') + 1), [
+    'plans/journals/tạp chí.md',
+    'plans/reports/-đổi-tên.md',
+  ]);
+  assert.equal(args.includes('plans/example/reports/nested-bad.md'), false);
+  assert.equal(args.includes('plans/reports/not-markdown.txt'), false);
+});
+
+test('Convention hook ignores modifications to pre-existing scoped files', (t) => {
+  const f = fixture(t);
+  f.git(['config', '--unset', 'core.hooksPath']);
+  f.put('plans/reports/old-bad.md', '# old report\n');
+  f.git(['add', 'plans/reports/old-bad.md']);
+  f.git(['commit', '-qm', 'seed old report']);
+  f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
+  f.put('plans/reports/old-bad.md', '# modified\\n');
+  f.git(['add', 'plans/reports/old-bad.md']);
+
+  const host = path.join(f.temp, 'must-not-run');
+  fs.writeFileSync(host, '#!/bin/sh\\nexit 99\\n', { mode: 0o755 });
+  const result = f.commit(f.repo, { FGOS_HOST_BIN: host });
+  passed(result);
+  assert.doesNotMatch(result.stderr, /convention/);
+});
+
+test('Convention hook pass-skips a missing client in a copied hook fixture', (t) => {
+  const f = fixture(t);
+  f.put('plans/reports/bad.md', '# bad report\n');
+  f.git(['add', 'plans/reports/bad.md']);
+  const result = f.commit();
+  passed(result);
+  assert.match(result.stderr, /warning: convention check skipped \(client-load-error\)/);
+});
+
+test('Convention hook pass-skips an old host with one warning', (t) => {
+  const f = fixture(t);
+  f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
+  f.put('plans/reports/bad.md', '# bad report\n');
+  f.git(['add', 'plans/reports/bad.md']);
+  const host = path.join(f.temp, 'old-host');
+  fs.writeFileSync(
+    host,
+    "#!/bin/sh\necho 'fgos: unknown verb \"convention\". Usage: fgos <command> [args...]' >&2\nexit 4\n",
+    { mode: 0o755 },
+  );
+  const result = f.commit(f.repo, { FGOS_HOST_BIN: host });
+  passed(result);
+  assert.match(result.stderr, /warning: convention check skipped \(host-version-mismatch\)/);
+  assert.equal(result.stderr.match(/host-version-mismatch/g)?.length, 1);
 });

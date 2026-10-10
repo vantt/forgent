@@ -64,7 +64,8 @@ extend that map in this skill.
    this route.
 5. For discussion workflows (`delphi`, `nominal-group`, `group-cognition`),
    start the workflow via `fgos workflow start <workflowId>` (or delegate to
-   [`fgos-group-thinking`](../fgos-group-thinking/SKILL.md)).
+   [`fgos-group-thinking`](../fgos-group-thinking/SKILL.md)). When the question has 2-4
+   discrete candidate answers, pass `--stance-options` as described in its "Stance options" section.
    `start`, `answer` and `resume` return at once (the run continues detached); inspect progress and findings via
    `fgos workflow status <workflowRunId>`, polling until the run completes or parks at a gate.
    If a workflow parks at a human gate (such as `voting-ranking` in `nominal-group`),

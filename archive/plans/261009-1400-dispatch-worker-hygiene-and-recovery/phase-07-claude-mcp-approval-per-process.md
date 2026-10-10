@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Claude worker: approve the target's own MCP servers per process"
-status: pending
+status: done
 budget: "<= 70 added src lines; 0 new files under src/runner/dispatch; no durable state"
 stop: 2026-10-14
 ---

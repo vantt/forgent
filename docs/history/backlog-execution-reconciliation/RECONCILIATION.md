@@ -435,6 +435,31 @@ Two hardenings the row did not ask for, both of which matter for its
   catches a prior `merge -s ours` that recorded the parent while discarding
   the changes, and fails the merge instead of declaring it done.
 
+### p-c3a41d07 — verdict: open
+
+Bind the confinement ownership marker to its herdr pane at pane creation.
+
+The marker still gets `paneId` only when a failed round retains the resource
+(`src/runner/dispatch/confinement/cleanup.mjs:72-81`,
+`src/runner/dispatch/confinement/authority.mjs:1172`). The session-aware pane
+check landed; the early bind was left out under the descope rule of the
+dispatch worker hygiene plan, phase 03.
+
+### p-c7e90b52 — verdict: open
+
+OMP and Pi extension hook commands still use the session cwd.
+
+Only the codex and agy hook commands were moved to the absolute shim path
+(commit `c7b2d42be`); the OMP and Pi extension hooks were not touched.
+
+### p-cf1280a6 — verdict: open
+
+`Continue anyway?` dialog of a codex council seat in a worktree without project hooks.
+
+Seen once, not reproduced. A failed round that closes its pane now keeps the
+last 40 screen lines (`src/runner/dispatch/herdr-round.mjs`, `screenTail`,
+commit `0eb9dfe64`), so a recurrence leaves evidence to act on.
+
 ## What this leaves for a person
 
 1. Nine rows (7 `resolved`, 2 `stale`) present finished or moot work as

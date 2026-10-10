@@ -18,10 +18,10 @@
 //
 // Installed via `git config core.hooksPath .githooks` (wiring is cell -6's
 // job, out of scope here). Lives at <repoRoot>/.githooks/pre-commit and
-// imports its two dependencies with paths relative to ITS OWN location,
-// mirroring the production install layout -- the e2e test copies this file
-// alongside copies of those same two dependency files into a disposable
-// temp repo, preserving the same relative nesting.
+// imports its always-required dependencies with paths relative to ITS OWN
+// location, mirroring the production install layout. Convention checking
+// dynamically imports its client only when a scoped staged path exists; a
+// copied hook without that optional client warns and continues.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -392,7 +392,46 @@ function staleWorktreeIndexRefusal(committingToplevel) {
   return `commit refused: "${branch}" has moved to ${branchTip} since this worktree was last synced (${lastSynced}) -- likely an external force-move (e.g. approve's merge landing a sibling child). This worktree's files/index are stale and a commit right now would silently carry the OLD content of every other tracked file, reverting them. Run "fgos resync-worktree" in this worktree to repair it, then retry the commit.`;
 }
 
-function main() {
+async function warnOnConventionViolations(committingToplevel) {
+  if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return;
+
+  let staged;
+  try {
+    staged = execFileSync(
+      'git',
+      ['diff', '--cached', '--name-only', '-z', '--diff-filter=ACR'],
+      { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+  } catch (error) {
+    process.stderr.write(`warning: convention check skipped (staged-path-read-error): ${error.message}\n`);
+    return;
+  }
+  const paths = staged
+    .split('\0')
+    .filter((candidate) => /^plans\/(?:reports|journals)\/[^/]+\.md$/u.test(candidate));
+  if (paths.length === 0) return;
+
+  let conventionCheck;
+  try {
+    ({ conventionCheck } = await import('../src/convention/convention-client.mjs'));
+  } catch (error) {
+    process.stderr.write(`warning: convention check skipped (client-load-error): ${error.message}\n`);
+    return;
+  }
+
+  try {
+    const result = conventionCheck(paths, { dir: committingToplevel });
+    for (const violation of result.violations ?? []) {
+      process.stderr.write(`warning: convention ${violation.path}: ${violation.code} ${violation.message}\n`);
+    }
+  } catch (error) {
+    const category = error?.code ?? 'host-exec-error';
+    const detail = error?.timedOut ? 'host timed out' : (error?.message ?? 'unknown error');
+    process.stderr.write(`warning: convention check skipped (${category}): ${detail}\n`);
+  }
+}
+
+async function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const committingToplevel = execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).trim();
 
@@ -419,6 +458,8 @@ function main() {
     refuse(rootRefusal);
     return;
   }
+
+  await warnOnConventionViolations(committingToplevel);
 
   if (!hookRunsAtHome(repoRoot, committingToplevel)) {
     // A different, unrelated checkout (sharing this repo's core.hooksPath)
@@ -462,4 +503,4 @@ function main() {
   process.exit(0);
 }
 
-main();
+await main();

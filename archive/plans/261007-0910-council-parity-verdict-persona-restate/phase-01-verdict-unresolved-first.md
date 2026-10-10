@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Verdict schema: unresolved first"
-status: pending
+status: done
 priority: P1
 effort: "0.5d"
 dependencies: []
@@ -29,9 +29,9 @@ The synthesizer's final report gets a fixed shape: what is still unknown, each l
 4. Add or adjust a consumer test only for behavior with a real boundary (e.g. unit-summary still extracts stance from the new shape). No source-text or wording tests.
 
 ## Success Criteria
-- [ ] Real run's final report has unknowns first and one next step.
-- [ ] `metrics discussions` reports the run with no new undetermined units.
-- [ ] No duplicate copies of the schema across workflows.
+- [x] Real run's final report has unknowns first and one next step (second-run synthesizer in [lens-personas-evidence](reports/lens-personas-evidence.md); Q1-Q3 runs in [re-measure report](reports/phase-04-remeasure-report.md)). Shipped in `f95f9f0f9`.
+- [x] `metrics discussions` reports the run with no new undetermined units (unitsUndetermined 0 on the 2026-10-10 read, `--since 2026-10-10`; see the stance runs in the [re-measure report](reports/phase-04-remeasure-report.md)).
+- [ ] No duplicate copies of the schema across workflows. Contradicted: `f95f9f0f9` added the same verdict order to four workflow definitions on purpose (the order must travel with the workflow; a persona file is read from the project being run).
 
 ## Risk Assessment
 Schema text can bloat output and push a model past its limit: keep it to five short items. If a model ignores the order, record it as evidence in Phase 04 rather than adding a gate.

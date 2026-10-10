@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "herdr session identity for reaper and recovery"
-status: pending
+status: done
 budget: "<= 70 added src lines; 0 new files; field herdrSession on launch-command record and ownership marker"
 stop: 2026-10-13
 ---

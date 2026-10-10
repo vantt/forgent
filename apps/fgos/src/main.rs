@@ -49,13 +49,23 @@ pub fn command_routes() -> &'static HashMap<String, CommandRouteDescriptor> {
     })
 }
 
-/// Static provider table for the composition root: echo fixture and fgos-distribution provider.
+/// Static provider table for the composition root.
 static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     ECHO_PROVIDER_DESCRIPTOR,
     fgos_distribution::DISTRIBUTION_BUILD_SHOW_DESCRIPTOR,
     fgos_work_state::WORK_GATE_BYPASS_SHOW_DESCRIPTOR,
     fgos_observe::OBSERVE_METRICS_DESCRIPTOR,
     fgos_observe::OBSERVE_FRICTION_DESCRIPTOR,
+    fgos_convention::CONVENTION_DESCRIPTOR,
+];
+
+static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
+    ("metrics", fgos_observe::metrics_cli::AVAILABLE_SUBCOMMANDS),
+    (
+        "friction",
+        fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS,
+    ),
+    ("convention", fgos_convention::AVAILABLE_SUBCOMMANDS),
 ];
 
 fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
@@ -82,7 +92,6 @@ fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
 }
 
 fn main() {
-
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
 
@@ -137,6 +146,7 @@ fn main() {
             wiring::friction_sources::build_legacy_friction_sources(),
         ),
     ));
+    service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
     let tracker = service.tracker();
 
     match route.route_kind.as_str() {
@@ -156,11 +166,14 @@ fn main() {
                 .unwrap_or("distribution.build.show");
 
             if route.subcommands == Some(true) {
-                let (available, name) = if selector == "metrics" {
-                    (fgos_observe::metrics_cli::AVAILABLE_SUBCOMMANDS, "metrics")
-                } else {
-                    (fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS, "friction")
-                };
+                let (name, available) = NATIVE_SUBCOMMANDS
+                    .iter()
+                    .find(|(name, _)| *name == selector)
+                    .copied()
+                    .unwrap_or_else(|| {
+                        eprintln!("fgos: error: missing subcommand table for \"{selector}\"");
+                        std::process::exit(1);
+                    });
                 let has_help = cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h");
                 let sub_opt = if cli_args.len() > 1 {
                     let s = cli_args[1].to_string_lossy();
@@ -212,7 +225,9 @@ fn main() {
                     let mut handle = std::io::stdin().take(max_bytes as u64 + 1);
                     handle.read_to_end(&mut buf).unwrap_or_default();
                     if buf.len() > max_bytes {
-                        eprintln!("fgos: error: stdin payload exceeds 1 MiB limit [stdin-overflow]");
+                        eprintln!(
+                            "fgos: error: stdin payload exceeds 1 MiB limit [stdin-overflow]"
+                        );
                         std::process::exit(4);
                     }
                     if !buf.is_empty() {
