@@ -4,6 +4,8 @@
 import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
+import os from "node:os";
+import { claudeMcpApprovalArgs } from "../trust-store.mjs";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
 import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
@@ -1374,7 +1376,19 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   // Prepared Worker Invocation
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;
   const workerCommand = sourceInvocation.command;
-  const workerArgs = sourceInvocation.args || [];
+  const claudeTrust = sourceInvocation.interactiveMode?.trustStore;
+  const workerArgs = [
+    ...(sourceInvocation.args || []),
+    // The target project's own MCP servers are approved for this worker only, so the claude
+    // dialog that asks a person cannot stop an unattended seat.
+    ...(claudeTrust?.kind === 'claude-json'
+      ? claudeMcpApprovalArgs({
+        cwd: request.context.cwd,
+        repoRoot: request.context.repoRoot ?? request.context.cwd,
+        storePath: claudeTrust.path ?? path.join(os.homedir(), '.claude.json'),
+      })
+      : []),
+  ];
   const workerCwd = request.context.cwd;
   const depth = currentDispatchDepth();
   const writerId = resolveWriterIdentity(request.context.fgosDir).id;

@@ -146,6 +146,26 @@ export function trustedProjectEntry() {
 }
 
 /**
+ * Per-process approval of the MCP servers a project declares in its own `.mcp.json`, as extra
+ * claude arguments. claude asks a person to approve each such server before it starts, which
+ * stops an unattended worker at a dialog. The approval is derived, never invented: only where the
+ * repo root is already trusted in the account store, only for the servers the file names, and
+ * only for this one process (`--settings`), so no shared file is written. Returns `[]` when there
+ * is nothing to approve or the root is not trusted.
+ */
+export function claudeMcpApprovalArgs({ cwd, repoRoot, storePath }) {
+  let names;
+  try {
+    const declared = JSON.parse(fs.readFileSync(path.join(cwd, '.mcp.json'), 'utf8'))?.mcpServers;
+    names = declared && typeof declared === 'object' ? Object.keys(declared) : [];
+    if (names.length === 0 || readTrust(storePath, repoRoot) !== true) return [];
+  } catch {
+    return [];
+  }
+  return ['--settings', JSON.stringify({ enabledMcpjsonServers: names })];
+}
+
+/**
  * Record trust for `projectPath`, derived from an already-trusted `repoRoot`.
  *
  * Refuses, without writing anything, when:
