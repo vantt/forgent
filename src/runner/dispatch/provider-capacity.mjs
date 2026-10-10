@@ -927,9 +927,26 @@ export function parseQuotaResetWindowMs(text) {
   return total > 0 ? total : null;
 }
 
+/**
+ * The reset moment codex prints as a local clock time: "... or try again at 6:02 PM." Returns the
+ * next such time after `now` in epoch milliseconds, or null when the text names none.
+ */
+export function parseQuotaResetClockTime(text, now) {
+  const match = /try again at\s+(\d{1,2}):(\d{2})\s*([ap]m)/i.exec(typeof text === 'string' ? text : '');
+  if (!match) return null;
+  let hour = Number(match[1]) % 12;
+  if (match[3].toLowerCase() === 'pm') hour += 12;
+  const reset = new Date(now);
+  reset.setHours(hour, Number(match[2]), 0, 0);
+  if (reset.getTime() <= now) reset.setDate(reset.getDate() + 1);
+  return reset.getTime();
+}
+
 function quotaQuarantineUntil(text, now) {
   const windowMs = parseQuotaResetWindowMs(text);
-  return new Date(now + (windowMs === null ? DEFAULT_QUOTA_QUARANTINE_TTL_MS : windowMs)).toISOString();
+  if (windowMs !== null) return new Date(now + windowMs).toISOString();
+  const clock = parseQuotaResetClockTime(text, now);
+  return new Date(clock ?? now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString();
 }
 
 // C2b: the auth-fault regex used to scan the ENTIRE stderr text for the

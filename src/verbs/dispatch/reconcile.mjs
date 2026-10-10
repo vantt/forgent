@@ -1,6 +1,6 @@
 import { planReconciliation, applyReconciliation } from '../../runner/dispatch/reconciliation-planner.mjs';
 import { loadGlobalConfig } from '../../config/global-config.mjs';
-import { clearProviderAccountQuarantine, ProviderCapacityConfigError } from '../../runner/dispatch/provider-capacity.mjs';
+import { clearProviderAccountQuarantine, quarantineProviderAccount, providerAccountInventory, ProviderCapacityConfigError } from '../../runner/dispatch/provider-capacity.mjs';
 export class DispatchReconcileError extends Error {
   constructor(message, { category = 'validation' } = {}) {
     super(message);
@@ -62,8 +62,35 @@ export function reconcileProviderCapacityClearUseCase(ctx, payload = {}) {
     throw err;
   }
 }
+export function reconcileProviderCapacityQuarantineUseCase(ctx, payload = {}) {
+  const { provider, account, reason } = payload;
+  const refuse = (reasonCode, detail) => ({ contract: 'provider-capacity.quarantine.v1', status: 'refused', provider, accountId: account, reasonCode, detail });
+  if (!provider || typeof provider !== 'string') throw new DispatchReconcileError('provider-capacity quarantine requires --provider');
+  if (!account || typeof account !== 'string') throw new DispatchReconcileError('provider-capacity quarantine requires --account');
+  if (!reason || typeof reason !== 'string') throw new DispatchReconcileError('provider-capacity quarantine requires --reason');
+  const until = new Date(payload.until);
+  if (!payload.until || Number.isNaN(until.getTime())) throw new DispatchReconcileError('provider-capacity quarantine requires --until as an ISO date-time');
+  if (until.getTime() <= Date.now()) return refuse('until-in-past', `--until ${payload.until} is not in the future`);
+  const runnerConfig = loadGlobalConfig(payload.globalConfigPath);
+  if (!providerAccountInventory(runnerConfig)[provider]?.accounts?.[account]) {
+    return refuse('unknown-account', `unknown provider/account ${provider}/${account}`);
+  }
+  const quarantine = quarantineProviderAccount({
+    provider,
+    accountId: account,
+    reasonCode: 'quota-limit',
+    quarantineKind: 'temporary',
+    until: until.toISOString(),
+    runtimeDir: payload.runtimeDir,
+    detail: { kind: 'owner', reason, caller: ctx?.actor || 'fgos dispatch reconcile provider-capacity quarantine' },
+  });
+  return { contract: 'provider-capacity.quarantine.v1', status: 'quarantined', provider, accountId: account, quarantine };
+}
 export function invokeDispatchReconcileOperation(request) {
   if (request?.operationId !== 'dispatch.runtime.reconcile' || request?.effect !== 'write') throw new DispatchReconcileError('unsupported Dispatch reconciliation operation');
+  if (request.payload?.providerCapacity?.action === 'quarantine') {
+    return reconcileProviderCapacityQuarantineUseCase(request.ctx, request.payload.providerCapacity);
+  }
   if (request.payload?.providerCapacity?.action === 'clear-quarantine') {
     return reconcileProviderCapacityClearUseCase(request.ctx, request.payload.providerCapacity);
   }

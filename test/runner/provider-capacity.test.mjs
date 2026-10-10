@@ -11,6 +11,7 @@ import {
   clearProviderAccountQuarantine,
   classifyProviderCapacityFault,
   parseQuotaResetWindowMs,
+  parseQuotaResetClockTime,
   inspectProviderCapacity,
   ProviderCapacityLockError,
   providerCapacityStatePaths,
@@ -20,6 +21,7 @@ import {
   stableHash,
   validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
 import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
 
 const PROVIDER_CAPACITY_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/dispatch/provider-capacity.mjs');
@@ -728,4 +730,43 @@ test('a round that ended on a dead credential quarantines the account as an auth
   assert.equal(fault.reasonCode, 'auth-token');
   assert.equal(fault.quarantineKind, 'manual-clear');
   assert.equal(fault.until, undefined);
+});
+
+test('an owner-set quarantine keeps the account out of selection until its end time', () => {
+  const dir = mkTempDir();
+  const globalConfigPath = path.join(dir, 'config.json');
+  fs.writeFileSync(globalConfigPath, JSON.stringify({ runner: runnerConfig() }));
+  const until = new Date(Date.now() + 3600_000).toISOString();
+
+  const refusedPast = reconcileProviderCapacityQuarantineUseCase({}, {
+    provider: 'openai-codex', account: 'a', reason: 'quota', until: new Date(Date.now() - 1000).toISOString(), globalConfigPath, runtimeDir: dir,
+  });
+  assert.equal(refusedPast.reasonCode, 'until-in-past');
+  const refusedUnknown = reconcileProviderCapacityQuarantineUseCase({}, {
+    provider: 'openai-codex', account: 'nope', reason: 'quota', until, globalConfigPath, runtimeDir: dir,
+  });
+  assert.equal(refusedUnknown.reasonCode, 'unknown-account');
+
+  const result = reconcileProviderCapacityQuarantineUseCase({}, {
+    provider: 'openai-codex', account: 'a', reason: 'quota exhausted', until, globalConfigPath, runtimeDir: dir,
+  });
+  assert.equal(result.status, 'quarantined');
+  assert.equal(result.quarantine.detail.kind, 'owner');
+
+  const inventory = validateProviderAccountInventory(runnerConfig());
+  const state = inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir: dir });
+  const rank = (now) => rankProviderAccounts({ provider: 'openai-codex', inventory, state: { providers: state.providers, assignments: {} }, seed: 's', now });
+  assert.ok(!rank(Date.now()).includes('a'), 'out of selection before the end time');
+  assert.ok(rank(Date.parse(until) + 1000).includes('a'), 'selectable again after the end time');
+});
+
+test('the clock time codex prints ("try again at 6:02 PM") becomes the next such local time', () => {
+  const now = new Date(2026, 9, 9, 17, 0, 0).getTime();
+  const reset = new Date(parseQuotaResetClockTime("You've hit your usage limit. Visit settings or try again at 6:02 PM.", now));
+  assert.deepEqual([reset.getFullYear(), reset.getMonth(), reset.getDate(), reset.getHours(), reset.getMinutes()], [2026, 9, 9, 18, 2]);
+  const nextDay = new Date(parseQuotaResetClockTime('try again at 9:30 AM', now));
+  assert.equal(nextDay.getDate(), 10, 'a time already past today means tomorrow');
+  assert.equal(parseQuotaResetClockTime('no reset named here', now), null);
+  const classified = classifyProviderCapacityFault({ provider: 'openai', stderr: "You've hit your usage limit. try again at 6:02 PM.", now });
+  assert.equal(new Date(classified.until).getHours(), 18);
 });

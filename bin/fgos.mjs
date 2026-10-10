@@ -2529,6 +2529,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (sub === 'reconcile') {
         const reconcileCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
+        if (positional[1] === 'provider-capacity' && positional[2] === 'quarantine') {
+          return invokeDispatchReconcileOperation({
+            operationId: 'dispatch.runtime.reconcile', effect: 'write',
+            ctx: reconcileCtx,
+            payload: { providerCapacity: { action: 'quarantine', provider: flags.provider, account: flags.account, reason: flags.reason, until: flags.until } },
+          });
+        }
         if (positional[1] === 'provider-capacity' && positional[2] === 'clear-quarantine') {
           return invokeDispatchReconcileOperation({
             operationId: 'dispatch.runtime.reconcile', effect: 'write',
