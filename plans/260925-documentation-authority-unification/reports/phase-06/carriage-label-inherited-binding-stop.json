@@ -19216,5 +19216,33 @@
     "Independent acceptance and strict batch closure",
     "Live worker/provider/Herdr and mutating execution"
   ],
-  "requestedOwnerDecision": "Authorize exactly these two inherited retired binding/carriage corrections under the unchanged A23 whole-unit vocabulary and A22 real-digest/ancestry proof; include them and only genuine consequences in the targeted check. No further current prose, carriage move, gate/checker/baseline/vocabulary change."
+  "requestedOwnerDecision": "Authorize exactly these two inherited retired binding/carriage corrections under the unchanged A23 whole-unit vocabulary and A22 real-digest/ancestry proof; include them and only genuine consequences in the targeted check. No further current prose, carriage move, gate/checker/baseline/vocabulary change.",
+  "authorSnapshotCommit": "4add5ba7112a1792698e8a41a9c39b3f28eb438a",
+  "preservationAtAuthoredSnapshot": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set([...isolate.exactExemptions,...[\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/plan.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"]]),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:exceptions.size,leadCommit:\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",leadPaths:[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],result:'pass'}));"
+    ],
+    "exit": 0,
+    "counts": {
+      "historicalWitnesses": 74,
+      "historyTreeUnchanged": true,
+      "payloadTreeOutside29Unchanged": true,
+      "inheritedPhysicalPayloads": 867,
+      "changedAreaPaths": 29,
+      "frozenFiles": 5,
+      "firstParentNonMergeCommits": 183,
+      "allowlistViolations": 0,
+      "exactCommitPathExceptions": 8,
+      "leadCommit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+      "leadPaths": [
+        "plans/260925-documentation-authority-unification/plan.md",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+      ],
+      "result": "pass"
+    }
+  }
 }
