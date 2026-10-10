@@ -307831,6 +307831,94 @@
         "scope": "Current runtime statements use the pinned code extracts; surviving manual/cognitive obligations and engine-independent proposals are retained as guidance/design, not claims of full runtime implementation.",
         "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-current-state-evidence.json"
       }
+    },
+    {
+      "claimId": "claim_97165e7ab70b9ac88bae637ebe9cda4b",
+      "path": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "24b6f0590f13af79957ddc6d08552e7004044bf2d9cde287b4c33cecea28c066",
+      "shownText": "| Phase | Plan title | Status | Landed target docs | Remaining work |\n|---|---|---|---|---|\n| Phase 0 | Protect the current authority graph | complete | [source-inventory.md](source-inventory.md), [claim-preservation.md](claim-preservation.md), [proof-preservation.md](proof-preservation.md), [proposal-status.md](proposal-status.md) | Keep ledgers updated when later phases promote or redirect source rows. |\n| Phase 1 | Create target portal and preserve vision/ledger pair | complete | [../../README.md](../../README.md), [../../vision.md](../retired-engine/files/vision.md#literal-snapshot), [../../intent-preservation-ledger.md](../retired-engine/files/intent-preservation-ledger.md#literal-snapshot), [../../subcomponents/README.md](../retired-engine/files/subcomponents/README.md#literal-snapshot), [../README.md](../README.md) | Legacy detailed docs remain current until later phases drain them. |\n| Phase 2 | Promote spec without shrinking the vision | complete | [../../spec.md](../../spec.md), [../../verification/implementation-alignment.md](../retired-engine/files/verification/implementation-alignment.md#literal-snapshot) | Keep status conservative; update alignment when code/proof scans refine partial/implemented claims. |\n| Phase 3 | Move accepted architecture | complete | [architecture index](../retired-engine/files/architecture/README.md#literal-snapshot) plus 13 target architecture documents; target-local and cross-area links were normalized. | Legacy sources remain retained until Phase 7 redirect review; keep runtime-recovery-family proposal/partial labels explicit. |\n| Phase 4 | Move contracts and ADRs | complete | [contract index](../retired-engine/files/contracts/README.md#literal-snapshot), four target contracts, [decision index](../retired-engine/files/decisions/README.md#literal-snapshot), and ADR-001 through ADR-011. | Legacy sources remain retained until Phase 7 redirect review; future semantic changes need decision/compatibility evidence. |\n| Phase 5 | Preserve verification trees | complete | [verification README](../../verification/README.md) indexes retained legacy proof roots; mirrored target trees remain navigable evidence copies. | Keep the proof-preservation ledger current when a target doc adds an implementation claim. |\n| Phase 6 | Preserve playbooks, proposals, roadmap, and history | complete | [playbooks](../retired-engine/files/playbooks/README.md#literal-snapshot), [proposals](../retired-engine/files/proposals/README.md#literal-snapshot), [roadmap](../retired-engine/files/roadmap/README.md#literal-snapshot), and [history](../README.md) now state their target-path and non-normative status. | Keep proposal-status and source-inventory ledgers current as frontier material changes. |\n| Phase 7 | Redirect legacy paths | complete | All 63 legacy narrative/index documents with target counterparts carry standard target-path migration notes; legacy proof artifacts remain unchanged, link-only evidence through the target verification index. | Keep target/legacy pairs synchronized if a retained legacy source changes; preserve proof artifacts as evidence. |",
+      "shownTextDigest": "24b6f0590f13af79957ddc6d08552e7004044bf2d9cde287b4c33cecea28c066",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This substantive migration-status/diagram payload is not structural framing. The historical context remains explicit and does not reinstate the engine or the removed Work.stage field. Check its full shown text and the current surviving Workflow/manual-harness boundary against the pinned evidence; no approval is carried from the rejected class.",
+      "currentEvidence": {
+        "commit": "eefe3c4e73012ad439010196d6690d546ca87c8e",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 48,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 135,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "src/state/work.mjs",
+            "startLine": 455,
+            "endLine": 472,
+            "blobSha": "154507cc747a6e83f3abc215c83f560cb02f459a"
+          }
+        ],
+        "commands": [],
+        "scope": "Substantive historical process/design payload, not claimed current session-engine implementation; current consumers still cite the legacy cognitive companions, and Workflow step operation projections are the actual replacement.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-current-state-evidence.json"
+      }
+    },
+    {
+      "claimId": "claim_bda347a573675e6ca19bb64833ebad25",
+      "path": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+      "anchor": "unheaded-block-141",
+      "unitDigest": "834e49d47ce2c61f7d2d0136623829f5d8234daa7eac1bface6f311b3558745c",
+      "shownText": "![Stage, Stage Operation, TaskSpec, and Skill relationship](../retired-engine/files/vocabulary/stage-operation-taskspec-skill-relationship.svg)",
+      "shownTextDigest": "834e49d47ce2c61f7d2d0136623829f5d8234daa7eac1bface6f311b3558745c",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "This substantive migration-status/diagram payload is not structural framing. The historical context remains explicit and does not reinstate the engine or the removed Work.stage field. Check its full shown text and the current surviving Workflow/manual-harness boundary against the pinned evidence; no approval is carried from the rejected class.",
+      "currentEvidence": {
+        "commit": "eefe3c4e73012ad439010196d6690d546ca87c8e",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/workflow/steps.mjs",
+            "startLine": 48,
+            "endLine": 86,
+            "blobSha": "90c81d9d050c8494ba92c3b64c92a0b83a50ba15"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 135,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "src/state/work.mjs",
+            "startLine": 455,
+            "endLine": 472,
+            "blobSha": "154507cc747a6e83f3abc215c83f560cb02f459a"
+          }
+        ],
+        "commands": [],
+        "scope": "Substantive historical process/design payload, not claimed current session-engine implementation; current consumers still cite the legacy cognitive companions, and Workflow step operation projections are the actual replacement.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/liveness-current-state-evidence.json"
+      }
     }
   ]
 }
