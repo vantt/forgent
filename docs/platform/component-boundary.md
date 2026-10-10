@@ -72,6 +72,7 @@ This table is a compact navigation surface, not a full replacement for the advis
 | Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |
 | Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |
 | Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |
+| Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Proposed; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |
 ## 5. How To Change
 
 1. Read this anchor and the current detailed component-boundary source.
