@@ -10,7 +10,7 @@
     "7880fbc74b07c3667ebaa61f2b0561b5d80471b5",
     "plans/260925-documentation-authority-unification/reports/phase-06/liveness-classification-input.json"
   ],
-  "method": "Live-reference protection first. Return reworked and owner-protected files; restore live/mixed/proposal sections. Existing already-reviewed literal snapshots remain historical audit carriers, not newly moved authority. No new whole-file or section retirement is authorized by lexical matches alone. Mixed section edits require sentence-specific adjudication; live-proposal is current intended design, not implementation.",
+  "method": "Live-reference protection first. Return reworked and owner-protected files; restore live/mixed/proposal sections. Existing already-reviewed literal snapshots remain historical audit carriers, not newly moved authority. No new whole-file or section retirement is authorized by lexical matches alone. Mixed section edits require sentence-specific adjudication; live-proposal is current intended design, not implementation. The remaining prior review-accepted historical locations are not new moves in this pass. A legacy ratchet-baseline reference protects the unchanged legacy source but is not an implementation/consumer of the candidate text. Generic live identifiers are not permission to retire a section: the surviving Assignment/Run, Workflow operation, cognitive and engine-independent design subjects are returned/current. Only session-engine-specific wording is historical; immutable complete original carriers remain audit evidence.",
   "files": [
     {
       "path": "docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md",
@@ -156,7 +156,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md",
@@ -276,7 +278,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
@@ -551,7 +555,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
@@ -645,7 +651,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
@@ -770,7 +778,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
@@ -1009,7 +1019,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
@@ -1129,7 +1141,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/protocol-model.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/README.md",
@@ -1277,7 +1291,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
@@ -1397,7 +1413,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
@@ -1478,7 +1496,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
@@ -1670,7 +1690,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/system-context.md",
@@ -1777,7 +1799,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
@@ -1910,7 +1934,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
@@ -2027,7 +2053,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -2195,7 +2223,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
@@ -2574,7 +2604,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/flow-definition.md",
@@ -2823,7 +2855,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/README.md",
@@ -2963,7 +2997,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
@@ -3070,7 +3106,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
@@ -3138,7 +3176,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
@@ -3206,7 +3246,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
@@ -3274,7 +3316,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
@@ -3347,7 +3391,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
@@ -3415,7 +3461,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
@@ -3791,7 +3839,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
@@ -3982,7 +4032,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md",
@@ -4078,7 +4130,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
@@ -4186,7 +4240,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
@@ -4272,7 +4328,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
@@ -4358,7 +4416,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/README.md",
@@ -4493,7 +4553,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/decisions/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/intent-preservation-ledger.md",
@@ -4756,7 +4818,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/intent-preservation-ledger.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
@@ -5102,7 +5166,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
@@ -5357,7 +5423,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
@@ -6579,7 +6647,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
@@ -6894,7 +6964,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md",
@@ -7040,7 +7112,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
@@ -7183,7 +7257,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
@@ -7291,7 +7367,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md",
@@ -7401,7 +7479,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/README.md",
@@ -7575,7 +7655,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/playbooks/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
@@ -8129,7 +8211,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
@@ -8859,7 +8943,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/README.md",
@@ -9033,7 +9119,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/proposals/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -9121,7 +9209,9 @@
           "action": "adjudicate-with-subject-evidence; do not move merely because unimplemented"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/proposals/semantic-cli-surface.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
@@ -9917,7 +10007,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
@@ -11017,7 +11109,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -11267,7 +11361,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/README.md",
@@ -11420,7 +11516,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/README.md",
@@ -11555,7 +11653,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/README.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/README.md",
@@ -11690,7 +11790,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/README.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
@@ -12748,7 +12850,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
@@ -13119,7 +13223,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
@@ -13340,7 +13446,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
@@ -13602,7 +13710,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
@@ -13843,7 +13953,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
@@ -14132,7 +14244,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-05-coding-driver-operation-choice.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
@@ -14344,7 +14458,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-06-work-attached-team-adoption.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/spec.md",
@@ -14554,7 +14670,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/spec.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/subcomponents/README.md",
@@ -14671,7 +14789,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/subcomponents/README.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/verification/implementation-alignment.md",
@@ -14707,7 +14827,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/history/retired-engine/files/verification/implementation-alignment.md",
+      "finalDisposition": "unchanged previously reviewed historical location; no new move"
     },
     {
       "path": "docs/platform/agent-coordination/verification/README.md",
@@ -14829,7 +14951,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/verification/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/vision.md",
@@ -15300,7 +15424,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/vision.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
@@ -15797,7 +15923,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
@@ -15917,7 +16045,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
@@ -16102,7 +16232,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/README.md",
@@ -16263,7 +16395,9 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/vocabulary/README.md",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
@@ -16292,8 +16426,95 @@
           "action": "protect-current; verify wording or label unimplemented proposal"
         }
       ],
-      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract."
+      "sectionAdjudication": "Live/mixed and engine-independent proposal sections remain current. Existing session-only text is a historical carrier, not a runnable engine: CLI registry has no coordination verb; src/runner/coordination, src/verbs/coordination and src/runner/definitions are absent; present mentions are historical specs, stale comments or legacy-record refusal/inspection branches. No citation to a generic Assignment/Run term authorizes retirement of its live surrounding contract.",
+      "finalLocation": "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+      "finalDisposition": "current surviving material; old version remains historical evidence"
     }
   ],
-  "scanCommit": "c071b6c66c3e66b088bda65081803007fff76cd3"
+  "scanCommit": "c071b6c66c3e66b088bda65081803007fff76cd3",
+  "finalContentCommit": "eefe3c4e73012ad439010196d6690d546ca87c8e",
+  "currentFiles": [
+    "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+    "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "docs/platform/agent-coordination/architecture/README.md",
+    "docs/platform/agent-coordination/architecture/run-handle.md",
+    "docs/platform/agent-coordination/architecture/runtime-model.md",
+    "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+    "docs/platform/agent-coordination/architecture/work-integration.md",
+    "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+    "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+    "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+    "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+    "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
+    "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+    "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+    "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+    "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+    "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+    "docs/platform/agent-coordination/decisions/README.md",
+    "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+    "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+    "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+    "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+    "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
+    "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+    "docs/platform/agent-coordination/playbooks/README.md",
+    "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+    "docs/platform/agent-coordination/proposals/README.md",
+    "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+    "docs/platform/agent-coordination/README.md",
+    "docs/platform/agent-coordination/spec.md",
+    "docs/platform/agent-coordination/verification/README.md",
+    "docs/platform/agent-coordination/vision.md",
+    "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+    "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+    "docs/platform/agent-coordination/vocabulary/README.md",
+    "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg"
+  ],
+  "changedFiles": [
+    "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "docs/platform/agent-coordination/architecture/README.md",
+    "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
+    "docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md",
+    "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
+    "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+    "docs/platform/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+    "docs/platform/agent-coordination/decisions/README.md",
+    "docs/platform/agent-coordination/playbooks/README.md",
+    "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+    "docs/platform/agent-coordination/proposals/README.md",
+    "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+    "docs/platform/agent-coordination/vision.md",
+    "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+    "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+    "docs/platform/agent-coordination/vocabulary/README.md",
+    "docs/platform/agent-coordination/vocabulary/stage-operation-taskspec-skill-relationship.svg",
+    "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
+    "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+    "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+    "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "docs/platform/agent-coordination/architecture/run-handle.md",
+    "docs/platform/agent-coordination/architecture/runtime-model.md",
+    "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+    "docs/platform/agent-coordination/architecture/work-integration.md",
+    "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+    "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+    "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+    "docs/platform/agent-coordination/verification/README.md",
+    "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+    "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+    "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+    "docs/platform/agent-coordination/README.md",
+    "docs/platform/agent-coordination/spec.md"
+  ],
+  "noNewWholeFileMoves": true
 }

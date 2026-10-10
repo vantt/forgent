@@ -85,3 +85,14 @@ A17 3d8ee0d11 authorizes the rejected-classification rework after f9575e2a6. Ini
 - Archive/delete/conflicts/holds: no new legacy archive/delete, real-conflict decision or unknown-blocking hold; prior lists remain recorded. Existing history carriers/payloads are unchanged. Promoted portal edit is logged under A17 and remains uncommitted.
 
 Exact next step after authorization: repair only the three links, rerun/refine the committed liveness scan and section classification, complete current/proposal sentence adjudication and changed-row accounting, prove unchanged gates/tests, publish the limited A17 re-review request, stop ready for review.
+
+## Limited liveness re-review handoff
+
+A18 c071b6c66 resolves the three-link authoring stop. The exact repair reproduces H's thirty inherited tuples with zero new/Agent Coordination findings. The earlier stop entry is historical evidence, not a current blocker.
+
+- Anh: mở session reviewer khác với review-request-2-liveness-rework.md và commit các ordinary report giới hạn vào bản thay đổi này. Không yêu cầu anh duyệt lại tooling hoặc phê duyệt một thay đổi gate.
+- Archive/delete: không thêm archive/delete legacy; không thêm whole-file move. Mười chín file được trả về current, hai operating prompt giữ current, các phần live/design của mười lăm file được phục hồi. Danh sách 38 path và 74 carrier không đổi có trong liveness-rework-verification.json.
+- Real conflicts: không phát hiện mâu thuẫn current mới đã được xác nhận trong pass này. Các nhóm semantic diagnostic cũ vẫn là danh sách điều tra, không đồng nghĩa 174 mâu thuẫn thật. Việc giải quyết toàn bộ diagnostic là UNPROVEN; reviewer kiểm tra 71 member set đã đổi trong liveness-identical-unit-groups.json, không dùng receipt cũ cho set mới.
+- Holds: không thêm unknown-blocking hold hoặc quyết định cần anh chọn trước review. Các row/receipt thay đổi đều pending, không tự reviewed.
+- Promoted edits: portal/spec và các owner trước đó bị cắt nhầm được phục hồi; log trước sửa nằm trong promoted-edits.md. Không đổi legacy root, AGENTS, main, switchboard/area status hoặc vocabulary.
+- Bước chính xác tiếp theo: reviewer commit verdict report cho các pack/retired rows/classification receipts/member sets đã đổi. Sau đó em chỉ áp dụng verdict khớp đúng phiên bản; chưa đóng batch hoặc sang batch tiếp theo lúc này.
