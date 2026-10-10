@@ -114,7 +114,7 @@ The A19 current pass changes only the 29 rejected current documents. No new arch
 
 The two runner-spec conflicts above remain routed to the owner's separate main harness-investigation chat. No runner.md/main change is made here.
 
-Eleven original source hold verdicts remain held: eight history vision principles and three Coordination Rings design-vocabulary claims. Three corresponding candidate hold verdicts and eight retired-row hold verdicts also remain held. The exact IDs and original review notes are listed under heldSourceRows, heldClassificationRows and heldRetiredRows in the accounting report. Rewording a current section is not approval of the held owner intent.
+Eleven original source hold verdicts remain held: eight history vision principles and three Coordination Rings design-vocabulary claims. Three corresponding candidate hold verdicts and eight retired-row hold verdicts also remain held. The exact IDs and original review notes are listed under heldSourceRows, heldCandidateRows and heldRetiredRows in the accounting report. Rewording a current section is not approval of the held owner intent.
 
 Forty-six remaining history-target pending source rows are outside the authorized truth correction and stay in their existing shards; their exact paths/IDs are listed under outsideTruthPendingSourceRows. The 431 current-target pending rows are regrouped without content/digest/disposition changes into the new truth-only judgment shard so one ordinary committed report can be applied to exactly this truth scope.
 
