@@ -270,7 +270,7 @@ Component-Outer Boundary Note's responsibilities.
 2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal
    executor IDs/defaults or capability `prefer`; aliases and executor `for[]`
    inform capability labels separately in `resolveCapabilityDetailsFromHints`
-   (`resolve.mjs:25-66,255-278`), not this binding resolver.
+   (`resolve.mjs:25-66,269-310`), not this binding resolver.
 3. **Executor registry resolver** — resolves a literal executor-id to its
    concrete invocation/tool/agent shape (`resolveExecutorConfig`).
 4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported

@@ -284,18 +284,21 @@
         "src/runner/dispatch/resolve.mjs:25-66",
         "src/runner/dispatch/resolve.mjs:255-309"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "f8d71c8397b809bb08d46a8c26d20cb577c3444160b12758b7624273c85f83cc",
       "priorReviewSection": "Dispatch Control Plane > Routing Identities",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "5e598b7090a943fc7b95a76a0b7f3c67f8e52a82e009a0a2f40a8f959b578bfb",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
@@ -442,31 +445,32 @@
       "section": "Dispatch Control Plane > Component-Internal Ownership",
       "anchor": "component-internal-ownership",
       "startLine": 262,
-      "endLine": 302,
-      "shownTextDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734",
+      "endLine": 301,
+      "shownTextDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833",
       "status": "verified",
       "classification": "normative-obligation",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "authorized-precision-and-restored-obligation-correction-pending-independent-check",
       "evidence": [
         "test/runner/dispatch-reconciliation-import-graph.test.mjs:434-443",
         "src/runner/dispatch/assignment-runner.mjs:500-528",
         "src/runner/dispatch/assignment-runner.mjs:1419-1438",
         "src/runner/dispatch/resolve.mjs:25-66",
-        "src/runner/dispatch/resolve.mjs:255-309"
+        "src/runner/dispatch/resolve.mjs:269-310"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "25ba341466fa9e25e0781e9f1345b4e3747e0426fb22f425328366595691a9c7",
       "priorReviewSection": "Dispatch Control Plane > Component-Internal Ownership",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "988f26e393e2e268b09a42bce3ecfaa4404687c961df916c468ec08f0f9ed6d7",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+      "beforeCarriageLabelFollowupShownTextDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
@@ -707,18 +711,21 @@
         "src/runner/dispatch/run-result.mjs:1250-1285",
         "src/runner/dispatch/agent-result-claim-contract.mjs:52-90"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "520cc6b37c68a52c8154d49aa87bf973a81603a02b57443514d4bd3eeb6e1310",
       "priorReviewSection": "Evidence And Result Architecture > Confidence Boundaries",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "b52bdc6fbe9ba6e6231db4e064e13263cab47a581b9f69d666d69c861287cc4e",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
@@ -1087,29 +1094,32 @@
       "section": "Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics",
       "anchor": "2-production-ladder-semantics",
       "startLine": 68,
-      "endLine": 92,
-      "shownTextDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "endLine": 94,
+      "shownTextDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "authorized-precision-and-restored-obligation-correction-pending-independent-check",
       "evidence": [
         "src/runner/dispatch/liveness.mjs:211-302",
         "src/runner/dispatch/herdr-round.mjs:341-359",
-        "src/runner/recovery.mjs:105-112"
+        "src/runner/recovery.mjs:105-112",
+        "src/runner/dispatch/liveness.mjs:93-109",
+        "src/runner/dispatch/liveness.mjs:238-246"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "870fa30fefb1f699690eeec5b3ba9973bd32fedfd1eff755b1f26adc9b92692d",
       "priorReviewSection": "Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "50b5b0b87b09a60e2f5b4e8f04bc6487800595bff29955b6e8ea4f9890a85b12",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+      "beforeCarriageLabelFollowupShownTextDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
@@ -1408,18 +1418,21 @@
         "src/runner/dispatch/herdr-reconcile.mjs:351-357",
         "src/runner/dispatch/reconcile-cli-spawn.mjs:38-47"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "9f3875531f12f049ffe0512fc11288eeb07eedc29d95ff307d8bfa65f1c0af9c",
       "priorReviewSection": "Runtime Recovery And Work Continuity > 4. Recovery Choice",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "072eb3df3b590ab7ad6e31d7ce97c47924ac16eab5b16e7616b64ca5b518a816",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
@@ -1454,30 +1467,32 @@
       "section": "Runtime Recovery And Work Continuity > 6. Local Concurrency And Durability",
       "anchor": "6-local-concurrency-and-durability",
       "startLine": 125,
-      "endLine": 167,
-      "shownTextDigest": "0dbc105ed07e7650ce5578efc360ef95ff64fb445697018ffdc0674e76aa4bb2",
+      "endLine": 166,
+      "shownTextDigest": "097936745e3bd24722d05d5c02697903f13d2e8a95e1e7c7cee804833dfdaf68",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "authorized-precision-and-restored-obligation-correction-pending-independent-check",
       "evidence": [
         "src/runner/dispatch/run-lock.mjs:306-412",
         "src/runner/dispatch/assignment-runner.mjs:895-945",
         "src/runner/dispatch/settlement.mjs:420-445",
-        "src/runner/dispatch/proof-helpers.mjs:73-125"
+        "src/runner/dispatch/proof-helpers.mjs:73-125",
+        "src/runner/dispatch/assignment-runner.mjs:999-1022"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "pending",
       "changed": false,
       "beforeShownTextDigest": "6e392e74988bbfe7d294f5e52354ea67d0ff54ce610a429c2cef63cfd760a687",
       "priorReviewSection": "Runtime Recovery And Work Continuity > 6. Local Concurrency And Durability",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "6e392e74988bbfe7d294f5e52354ea67d0ff54ce610a429c2cef63cfd760a687",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+      "beforeCarriageLabelFollowupShownTextDigest": "0dbc105ed07e7650ce5578efc360ef95ff64fb445697018ffdc0674e76aa4bb2"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
@@ -1553,18 +1568,21 @@
         "src/runner/dispatch/recovery-planner.mjs:243-316",
         "src/runner/dispatch/herdr-reconcile.mjs:351-361"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "229baa03dd1e27215e9409672a5f7b7bf819d0cd8e588b0a8ceb75d165a11f93",
       "priorReviewSection": null,
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "bbcce590fd914864cf1221d303ca2d91537b99f096facf3524fac7160268367f",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
@@ -1836,18 +1854,21 @@
         "src/runner/dispatch/run-result.mjs:350-385",
         "src/runner/dispatch/run-result.mjs:546-566"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "88c1e2e361f772140234715c33efd4c652ad46e1f52d68531e2f105bb6e0febe",
       "priorReviewSection": "Assignment, Run, And RunResult Contract > RunResult > Dispatch Operability Addendum",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "55107075554ec17405026aa531f49ce76fc38050bd4ac06a4899301038269118",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -2278,31 +2299,33 @@
       "section": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Decision",
       "anchor": "decision",
       "startLine": 33,
-      "endLine": 73,
-      "shownTextDigest": "73de1c83930c66622cb0c813e1d5eac7d247ef016bf64850ad155b01ab2414f3",
+      "endLine": 72,
+      "shownTextDigest": "860625505af248f5e4da75b5c8abbf0ca2d3732123931ab1947a70daa834164a",
       "status": "verified",
       "classification": "normative-obligation",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "authorized-precision-and-restored-obligation-correction-pending-independent-check",
       "evidence": [
         "src/runner/execution/run.mjs:331-340",
         "src/runner/dispatch/assignment-normalizer.mjs:95-144",
         "src/runner/dispatch/execution-contract.mjs:180-240",
         "src/runner/dispatch/assignment-normalizer.mjs:164-188",
-        "src/runner/dispatch/execution-contract.mjs:337-384"
+        "src/runner/dispatch/execution-contract.mjs:337-384",
+        "docs/specs/runner.md:3058"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "b5041b026fa8ecb712fa0264026690ce6c99e52517cb8d9e1e264291a6a6685a",
       "priorReviewSection": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Decision",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "b2ae4b3442d2ef6e9cea4e516f1491f0fdd7d187b70118897ddeb4af1865d5e7",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+      "beforeCarriageLabelFollowupShownTextDigest": "73de1c83930c66622cb0c813e1d5eac7d247ef016bf64850ad155b01ab2414f3"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
@@ -3057,18 +3080,21 @@
         "src/runner/dispatch/cli.mjs:1081-1098",
         "src/runner/execution/run.mjs:395-416"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "80b21f08495c23ab630f543454b41a6f7256e2841b01d6401b3e237368f1eb68",
       "priorReviewSection": "Dispatch Control Plane Redesign > 6. DispatchPlan > 6.2 Selector",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "833b3d78b4b2d6613d5de489c7af6c9c1da053f010743599b129ce1047f0cfd8",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
@@ -3173,18 +3199,21 @@
         "src/runner/dispatch/assignment-policy.mjs:457-466",
         "src/runner/rigor.mjs:4-21"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "1452c1a4d07dcdef3dee5adf0a4e824f29aa08c03440f6b9ba4c23def2d01d20",
       "priorReviewSection": "Dispatch Control Plane Redesign > 7. Governance And Egress > 7.2 Policy Resolution Before DispatchPlan",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "d822a355456dc8e0965ebc2d69edfef81e559c5d874cfa4dbea072afedf68138",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
@@ -3203,18 +3232,21 @@
         "src/runner/dispatch/plan.mjs:444-461",
         "src/runner/dispatch/resolve.mjs:255-309"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "cd9de33daa61bb3db13511d578b67cac710e59aa73e6ae7bc0ded6d020e03221",
       "priorReviewSection": "Dispatch Control Plane Redesign > 7. Governance And Egress > 7.3 Recommended V1 Provider Policy For Coding Feature Flow",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "99ffd7126bd6185626c72bd62db14310da7731f47d3dd0648bec2411ff6816c7",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
@@ -4009,18 +4041,21 @@
         "core/workflows/architecture-advisory.yaml:8-84",
         "core/skills/fgos-panel/SKILL.md:36-59"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "16d2facd0f553ef7f88ebf2175d4fda345cfdb0aa8af542e8726504a7e1c2edc",
       "priorReviewSection": "Group Thinking Trigger Surface > Surface Taxonomy",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "b47c465f31a5cdd51e88c1ead2971389b2f46bd4dfb94ef7296e33138e9ffc7d",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
@@ -4480,31 +4515,34 @@
       "section": "Coordination Protocol Model > Compatibility",
       "anchor": "compatibility",
       "startLine": 103,
-      "endLine": 115,
-      "shownTextDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
+      "endLine": 122,
+      "shownTextDigest": "a0a50b9e5327a33e11548c30917dac1b43360b9cf2e8932cb762ef7c1829fb8c",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "authorized-precision-and-restored-obligation-correction-pending-independent-check",
       "evidence": [
         "src/workflow/steps.mjs:40-86",
         "src/state/domain-registry.mjs:244-258",
         "domains/coding/workflows/feature.yaml:12-140",
         "src/runner/dispatch/execution-contract.mjs:180-240",
-        "src/workflow/steps.mjs:43-85"
+        "src/workflow/steps.mjs:43-85",
+        "src/runner/operation-choice.mjs:733-761",
+        "src/runner/dispatch/assignment.mjs:328-345"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "fb816315c338c1743053a8726b41a58f17f0b480e7d3b762050613cbd033252e",
       "priorReviewSection": "Coordination Protocol Model > Compatibility",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "cfc246f0a3b1c86e4a58ddb2a76655ddd5f20d8c6d973bbcbd41effbea7139c3",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+      "beforeCarriageLabelFollowupShownTextDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
@@ -4553,18 +4591,21 @@
         "src/runner/dispatch/execution-contract.mjs:180-240",
         "src/workflow/steps.mjs:43-85"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "c6fff086570a2edc7fd6137a50356c42730ef881c0951e362a6a15c491407a75",
       "priorReviewSection": "Coordination Protocol Model > Domain Augmentation",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "c6fff086570a2edc7fd6137a50356c42730ef881c0951e362a6a15c491407a75",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/README.md",
@@ -5054,29 +5095,33 @@
       "section": "Team Communication Protocol V1 > 7. Agent Result Schema",
       "anchor": "7-agent-result-schema",
       "startLine": 171,
-      "endLine": 210,
-      "shownTextDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "endLine": 219,
+      "shownTextDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "authorized-precision-and-restored-obligation-correction-pending-independent-check",
       "evidence": [
         "src/runner/dispatch/run-result.mjs:1245-1330",
         "src/runner/dispatch/agent-result-claim-contract.mjs:5-30",
-        "src/runner/dispatch/agent-result-claim-contract.mjs:52-90"
+        "src/runner/dispatch/agent-result-claim-contract.mjs:52-90",
+        "src/runner/dispatch/agent-result-claim-contract.mjs:70-79",
+        "src/runner/operation-choice.mjs:747-761",
+        "src/runner/dispatch/assignment.mjs:328-345"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "2f53bb9660924f94b45a8be4d630ec157d9f1396de174f8be57841a0bc95e458",
       "priorReviewSection": "Team Communication Protocol V1 > 7. Agent Result Schema",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "3d4d430de86be88e3b46f2bf4c66ce2a4c19ab40b2ac64910825d8c7330a4c3c",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+      "beforeCarriageLabelFollowupShownTextDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -5093,18 +5138,21 @@
         "src/runner/dispatch/run-result.mjs:1245-1330",
         "src/runner/dispatch/run-result.mjs:1250-1285"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "af738b83403692261f546f3655326fd51f066065e7549ce91cb480454f58822f",
       "priorReviewSection": "Team Communication Protocol V1 > 8. RunResult Confidence",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "af738b83403692261f546f3655326fd51f066065e7549ce91cb480454f58822f",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -6998,18 +7046,21 @@
         "src/runner/execution/patterns/role-tasks.mjs:58-72",
         "src/runner/execution/unit-summary.mjs:17-28"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "7423490212b96760756a9c03649e719f78b4efbd4f15f73c5207cb7a47dd7b3f",
       "priorReviewSection": "Canonical Agent Coordination Concepts > Cognitive And Proposed Vocabulary > Stance",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "7423490212b96760756a9c03649e719f78b4efbd4f15f73c5207cb7a47dd7b3f",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
@@ -8609,18 +8660,21 @@
         "core/skills/fgos-architecture-panel/SKILL.md:17-37",
         "core/skills/fgos-architecture-panel/SKILL.md:113-142"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "f9e3d07556b143ab42cbedea07b1ada240d546ad888c465162ba40c0804dc332",
       "priorReviewSection": null,
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "4500479ddca92e0850fb3b01d8cb29c69967fe9078278ab7d26263e17229a4a0",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
@@ -9391,18 +9445,21 @@
         "core/skills/fgos-architecture-panel/SKILL.md:17-37",
         "core/skills/fgos-architecture-panel/SKILL.md:113-142"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "48fb7d02ec2b23dec676fe4887804186c36e9b4fa3abde6d98cab7e752c04de9",
       "priorReviewSection": "Architecture Advisory Evaluation Rubric > What This Rubric Deliberately Does Not Measure",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "48fb7d02ec2b23dec676fe4887804186c36e9b4fa3abde6d98cab7e752c04de9",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
@@ -9476,18 +9533,21 @@
         "core/skills/fgos-architecture-panel/SKILL.md:17-37",
         "core/skills/fgos-architecture-panel/SKILL.md:113-142"
       ],
-      "reviewStatus": "pending-independent-review",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "b3e6ddd504b5c5c9ec7ca2d13926299ff3363cf5fcc1b8049f0a1e8c89b812f7",
       "priorReviewSection": "Architecture Advisory Role Doctrine > How To Read This",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md",
-        "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
-        "verdict": "rework"
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
+        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "de12886d4fe6cee81678c080e24eebc96133c9409572beefb674e725b7af5ade",
       "targetedChanged": true,
-      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2"
+      "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",

@@ -201,12 +201,22 @@ Required fields by status:
 | Status | Required fields |
 |---|---|
 | `done` | `summary`; read-only acceptance requires a companion worker report artifact, not just `evidenceRefs`; mutating acceptance requires appropriate external delta evidence. See run-result.mjs:1276-1285 and assignment.mjs:881-898. |
-| `blocked` | `summary`; `blocker`; `evidenceRefs` when any evidence exists. |
+| `blocked` | `summary`; `blocker`. This protocol asks workers to attach `evidenceRefs` when evidence exists; the validator only checks that field when supplied (`agent-result-claim-contract.mjs:70-79`). |
 | `failed` | `summary`; `error`. |
 | `no-evidence` | Non-empty `summary`; there is no additional reason field in the validator (`agent-result-claim-contract.mjs:9-15,67-85`). |
 
 `nextRecommendedOperation` is a proposed optional extension, not a current
 validated schema field or a field the Work-layer caller presently consumes.
+
+For this proposed extension, the legality obligation remains:
+
+Optional `nextRecommendedOperation` may name another legal stage operation, but
+it is only a recommendation. The driver must verify legality before acting.
+The current [driver boundary](../contracts/workflow-stage-operation.md#driver-boundary)
+and undeclared-operation refusals enforce legal selection
+(`src/runner/operation-choice.mjs:747-761`,
+`src/runner/dispatch/assignment.mjs:328-345`); they do not implement a consumer
+for the proposed field.
 
 ## 8. RunResult Confidence
 

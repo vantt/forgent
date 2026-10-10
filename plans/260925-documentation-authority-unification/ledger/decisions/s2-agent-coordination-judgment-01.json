@@ -1372,14 +1372,19 @@
       "targetAnchor": "domain-augmentation",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/architecture/protocol-model.md#domain-augmentation is retained in docs/platform/agent-coordination/architecture/protocol-model.md#domain-augmentation. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewNote": "legacy:architecture/protocol-model.md#domain-augmentation -> architecture/protocol-model.md#domain-augmentation (move, byte-identical): heading unit Domain Augmentation preserved; section body true (no declared protocols; CoordinationProtocol retired per assignment-runner.mjs:445)",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "719057129311d43f8d206c76a7d74e0e5ba1410de21d3b527729f45561e80ef1",
       "targetAncestry": [
         "Coordination Protocol Model"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_b651958d419c963a53013dc032c0a56c",
@@ -1983,13 +1988,14 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The complete primitive conservation unit at docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-23 is retained in docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-19. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
-      "targetUnitDigest": "621e3bfd5db6dea42e09af2b1a7b600c3c57f4168daebd1e5b7f117d305b102c",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
+      "targetUnitDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "6. Local Concurrency And Durability"
-      ]
+      ],
+      "shownTargetDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11"
     },
     {
       "claimId": "claim_ec0a4abadcdee949f582694b3f34ae5e",

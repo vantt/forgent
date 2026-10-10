@@ -80,8 +80,11 @@ The order and behavior in `src/runner/dispatch/liveness.mjs` are ported:
 A requested screen is the second stage of the sample, not another death read.
 `evaluateLadder` emits `provider-limit` for credential/quota screen matches.
 Its pane fate is `keep-always`; `paused-limit` remains a recognized alias.
-Operator destructive intent is separate and guarded. Pane idleness does not
-prove Run completion.
+Keep all failure panes by default; both limit outcomes survive automated
+`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate
+and guarded. Never infer Run completion from `agent_status` or pane idleness;
+the ladder settles on the result file, which still requires normalization
+(`liveness.mjs:238-246`).
 
 Zero output is a fact orthogonal to outcome. A 35-minute zero-output incident can
 be timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.

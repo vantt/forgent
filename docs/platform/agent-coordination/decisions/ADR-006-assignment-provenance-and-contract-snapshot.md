@@ -64,7 +64,7 @@ evidence, capability, budget, and provenance semantics.
 5. **Same execution governance.** Declared, inline and Unit-run requests
    converge on Assignment execution and Run/RunResult normalization rather than
    private dispatch or stores that bypass governance.
-6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks described in docs/specs/runner.md:3057. Do not present the dormant stamp path as a current general session-runtime door.
+6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks described in docs/specs/runner.md:3058. Do not present the dormant stamp path as a current general session-runtime door.
 
 7. **Retire the standalone read-only heuristic.** Once no declared caller
    passes `workId: null`, the `missionId || workId === null => read-only`

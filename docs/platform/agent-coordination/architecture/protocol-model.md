@@ -104,11 +104,19 @@ No layer may absorb all responsibilities:
 
 `taskSpecForStep` selects the primary normalized `step.operations` entry (or the
 first); `skillForStep` reads `step.skill` separately and falls back to a declared
-status skill (`src/workflow/steps.mjs:52-63`). Neither projects both values from
+status skill (`src/workflow/steps.mjs:52-64`). Neither projects both values from
 an operation. Compatibility remains a projection, not permission to weaken the
 mandatory declared-operation, transition or evidence constraints. The existing
 `operationsForStep`/`isLegalStepMove` projections preserve declared legality
 (`steps.mjs:44-45,67-85`); they do not restore the retired Work-stage or engine.
+
+This compatibility path remains mandatory for Work-attached declared workflows.
+Adding an agent-led path must not weaken or reinterpret it. The current Work
+driver resolves the legal normalized operations, preserves their primary default
+and refuses an undeclared request (`src/runner/operation-choice.mjs:733-761`);
+declared Assignment creation independently requires a legal operation and its
+TaskSpec (`src/runner/dispatch/assignment.mjs:328-345`). These are primary
+compatibility and legality obligations, not a revival of the retired engine.
 
 The exact normalized contract is defined in
 [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md).

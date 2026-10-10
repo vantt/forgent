@@ -103,10 +103,10 @@
       "targetAnchor": "routing-identities",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds. The corrected current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities now states the code-checked boundary in Routing Identities; evidence: src/runner/dispatch/resolve.mjs:25-66; src/runner/dispatch/resolve.mjs:255-309. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds.",
+      "reviewNote": "legacy:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): supersede heading; target Routing Identities text true against resolve.mjs:269-310 and prefer-only binding; for[] defect fixed",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -114,12 +114,17 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
+      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9346bcff67d284b8b32d0fbdc8b35e9da446a76e5f244fc7e6c89d68c958d671",
       "targetAncestry": [
         "Dispatch Control Plane"
       ],
-      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_0fc7c6e612423aa78420e2b5ad63f1bf",
@@ -195,12 +200,13 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-internal-ownership supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-internal-ownership before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
-      "targetUnitDigest": "02739069a8533c9f6637cfef2b916395b08a060474d20e1d122651788c250b96",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
+      "targetUnitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "shownTargetDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833"
     },
     {
       "claimId": "claim_8ed451a179a884fe1b475149f75e2b26",
@@ -253,8 +259,8 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/executor-health-and-fallback.md#2-production-ladder-semantics -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (supersede): Section 2 line 72 asserts blocked means do not retry, but herdr-round.mjs:344-357 routes blocked to worker-timeout which the matrix retries; the rest of section 2 (15s probe liveness.mjs:267-299, provider-limit, keep-always) is accurate. The corrected current successor at docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#2-production-ladder-semantics now states the code-checked boundary in 2. Production Ladder Semantics; evidence: src/runner/dispatch/herdr-round.mjs:341-359; src/runner/recovery.mjs:105-112. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
-      "reviewNote": "LEG:architecture/executor-health-and-fallback.md#2-production-ladder-semantics -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (supersede): Section 2 line 72 asserts blocked means do not retry, but herdr-round.mjs:344-357 routes blocked to worker-timeout which the matrix retries; the rest of section 2 (15s probe liveness.mjs:267-299, provider-limit, keep-always) is accurate.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
         "targetAnchor": "2-production-ladder-semantics",
@@ -262,12 +268,12 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "21295b47dae8583ef4b70ea406ad45275bdb1902af772589db488dafa179f7c8",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility"
-      ],
-      "shownTargetDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_5a75f48c0b4d226df6e8ae2dad84c43f",
@@ -530,15 +536,20 @@
       "targetAnchor": "dispatch-operability-addendum",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewNote": "legacy:contracts/assignment-run-runresult.md#dispatch-operability-addendum -> contracts/assignment-run-runresult.md#dispatch-operability-addendum (supersede): addendum heading superseded by corrected text; v3 default and v4 support verified (run-result.mjs:350,559-563)",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_e761c7c9e0eb2c158978cd99751f5fb5",
@@ -1701,12 +1712,12 @@
       "sourceUnitDigest": "fd36ed4ee645f1e8a36bd3a20ac076a9c70d7bc1c89c2b3488edcb551816a21b",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:proposals/team-communication-protocol-v1.md#unheaded-block-32 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit unheaded-block-32 -> 7-agent-result-schema (171-171): target table at lines 199-204 says no-evidence requires a reason, but validateAgentResultClaimContract requires only status and summary for no-evidence (agent-result-claim-contract.mjs CLAIM_FIELD_RULES) The corrected current successor at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#7-agent-result-schema now states the code-checked boundary in 7. Agent Result Schema; evidence: src/runner/dispatch/agent-result-claim-contract.mjs:5-30; src/runner/dispatch/agent-result-claim-contract.mjs:52-90. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "7-agent-result-schema",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-32 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit unheaded-block-32 -> 7-agent-result-schema (171-171): target table at lines 199-204 says no-evidence requires a reason, but validateAgentResultClaimContract requires only status and summary for no-evidence (agent-result-claim-contract.mjs CLAIM_FIELD_RULES)",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
         "targetAnchor": "7-agent-result-schema",
@@ -1714,24 +1725,24 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "b4795ed4e9d009f97e13c46b1802463563b2be105e68f19856392ca56c8d8c4f",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ],
-      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_3d5dc31cf6cf90ba661de6bb1fafb486",
       "sourceUnitDigest": "546c59ef10ff886d2fd256b488c6193c117c59d5e82632dbb8c14b30cd072efc",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:proposals/team-communication-protocol-v1.md#unheaded-block-33 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit unheaded-block-33 -> 7-agent-result-schema (171-171): nextRecommendedOperation is described as an accepted optional field but is not read or validated anywhere in src, so the sentence presents an unimplemented field without a proposed label The corrected current successor at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#7-agent-result-schema now states the code-checked boundary in 7. Agent Result Schema; evidence: src/runner/dispatch/agent-result-claim-contract.mjs:5-30; src/runner/dispatch/agent-result-claim-contract.mjs:52-90. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "7-agent-result-schema",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-33 -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit unheaded-block-33 -> 7-agent-result-schema (171-171): nextRecommendedOperation is described as an accepted optional field but is not read or validated anywhere in src, so the sentence presents an unimplemented field without a proposed label",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
         "targetAnchor": "7-agent-result-schema",
@@ -1739,12 +1750,12 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "b4795ed4e9d009f97e13c46b1802463563b2be105e68f19856392ca56c8d8c4f",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ],
-      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_57f26b5acbd6bb500ca353f84f486488",
@@ -1753,7 +1764,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-41; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-42",
+      "targetAnchor": "unheaded-block-44",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-41 -> proposals/team-communication-protocol-v1.md#unheaded-block-41 (move): unit unheaded-block-41 -> unheaded-block-41 (249-256): current target text discovery is machine-alone: feature.yaml discovery declares judge-ambiguity and resolve-question only, and the human gate sits on exploring; the old claim is preserved or correctly retired",
@@ -1776,7 +1787,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-42; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-43",
+      "targetAnchor": "unheaded-block-45",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-42 -> proposals/team-communication-protocol-v1.md#unheaded-block-42 (move): unit unheaded-block-42 -> unheaded-block-42 (258-263): current target text discovery is machine-alone: feature.yaml discovery declares judge-ambiguity and resolve-question only, and the human gate sits on exploring; the old claim is preserved or correctly retired",
@@ -1799,7 +1810,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-43; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-44",
+      "targetAnchor": "unheaded-block-46",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-43 -> proposals/team-communication-protocol-v1.md#unheaded-block-43 (move): unit unheaded-block-43 -> unheaded-block-43 (267-267): current target text feature.yaml exploring carries the human gate plus lock-decisions, answer-question (dispatch human-only) and resolve-question, matching the text; the old claim is preserved or correctly retired",
@@ -1822,7 +1833,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-44; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-45",
+      "targetAnchor": "unheaded-block-47",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-44 -> proposals/team-communication-protocol-v1.md#unheaded-block-44 (move): unit unheaded-block-44 -> unheaded-block-44 (269-273): current target text feature.yaml exploring carries the human gate plus lock-decisions, answer-question (dispatch human-only) and resolve-question, matching the text; the old claim is preserved or correctly retired",
@@ -1845,7 +1856,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-45; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-46",
+      "targetAnchor": "unheaded-block-48",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-45 -> proposals/team-communication-protocol-v1.md#unheaded-block-45 (move): unit unheaded-block-45 -> unheaded-block-45 (275-276): current target text feature.yaml exploring carries the human gate plus lock-decisions, answer-question (dispatch human-only) and resolve-question, matching the text; the old claim is preserved or correctly retired",
@@ -1868,7 +1879,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-46; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-47",
+      "targetAnchor": "unheaded-block-49",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-46 -> proposals/team-communication-protocol-v1.md#unheaded-block-46 (move): unit unheaded-block-46 -> unheaded-block-46 (280-280): current target text feature.yaml:64-100 declares shape-plan (implementer) and validate-plan (reviewer, fgos-coding-validating), so the claim that no future adoption is needed is true; the old claim is preserved or correctly retired",
@@ -1891,7 +1902,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-47; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-48",
+      "targetAnchor": "unheaded-block-50",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-47 -> proposals/team-communication-protocol-v1.md#unheaded-block-47 (move): unit unheaded-block-47 -> unheaded-block-47 (282-283): current target text feature.yaml:64-100 declares shape-plan (implementer) and validate-plan (reviewer, fgos-coding-validating), so the claim that no future adoption is needed is true; the old claim is preserved or correctly retired",
@@ -1936,7 +1947,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-49; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-50",
+      "targetAnchor": "unheaded-block-52",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-49 -> proposals/team-communication-protocol-v1.md#unheaded-block-49 (move): unit unheaded-block-49 -> unheaded-block-49 (289-291): current target text feature.yaml:64-100 declares shape-plan (implementer) and validate-plan (reviewer, fgos-coding-validating), so the claim that no future adoption is needed is true; the old claim is preserved or correctly retired",
@@ -1959,7 +1970,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-50; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-51",
+      "targetAnchor": "unheaded-block-53",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-50 -> proposals/team-communication-protocol-v1.md#unheaded-block-50 (move): unit unheaded-block-50 -> unheaded-block-50 (295-295): current target text feature.yaml executing declares implement-item, review-item, fix-verify-red, scoped-subtask, scout-blast-radius and resolve-question with the roles named in the text; the old claim is preserved or correctly retired",
@@ -1982,7 +1993,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-51; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-52",
+      "targetAnchor": "unheaded-block-54",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-51 -> proposals/team-communication-protocol-v1.md#unheaded-block-51 (move): unit unheaded-block-51 -> unheaded-block-51 (297-301): current target text feature.yaml executing declares implement-item, review-item, fix-verify-red, scoped-subtask, scout-blast-radius and resolve-question with the roles named in the text; the old claim is preserved or correctly retired",
@@ -2005,7 +2016,7 @@
       "disposition": "move",
       "rationale": "The frozen primitive is still byte-identical at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-52; only its owning heading ancestry was corrected in 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The move/carriage decision is unchanged. Heading/context changes invalidate the prior approval even when the primitive text digest is equal. The current section and its specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json are pending independent truth review.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-53",
+      "targetAnchor": "unheaded-block-55",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
       "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-52 -> proposals/team-communication-protocol-v1.md#unheaded-block-52 (move): unit unheaded-block-52 -> unheaded-block-52 (303-305): current target text feature.yaml executing declares implement-item, review-item, fix-verify-red, scoped-subtask, scout-blast-radius and resolve-question with the roles named in the text; the old claim is preserved or correctly retired",
@@ -2072,8 +2083,8 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#unheaded-block-8 -> architecture/dispatch-control-plane.md#routing-identities (supersede): Old identity block listing prefer/overrides then executors.<id>.for[]: overrides now correctly replaced by rigor, but the target still lists for[] as a resolution step (lines 81-83), false per resolve.mjs:255-266.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:architecture/dispatch-control-plane.md#unheaded-block-8 -> architecture/dispatch-control-plane.md#routing-identities (supersede): supersede old identity block (prefer/overrides then for[]); target now states prefer-only per resolve.mjs:269-310 and names for[] as non-binding",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -2081,12 +2092,17 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
+      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9346bcff67d284b8b32d0fbdc8b35e9da446a76e5f244fc7e6c89d68c958d671",
       "targetAncestry": [
         "Dispatch Control Plane"
       ],
-      "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
@@ -2097,12 +2113,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:architecture/dispatch-control-plane.md#unheaded-block-9 -> architecture/dispatch-control-plane.md#routing-identities (supersede): supersede old purpose paragraph; target drops nonexistent resolveExecutorIdForPurpose (git grep none) and keeps plan.mjs:91 selector label; true",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9346bcff67d284b8b32d0fbdc8b35e9da446a76e5f244fc7e6c89d68c958d671",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_ad2493c325d75127139698ed4a34592b",
@@ -2351,12 +2372,12 @@
       "sourceUnitDigest": "95a2b7c5b5d00e917f2c042d1d49d3829b707933cfea28a3d65f1887744d1c08",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/dispatch-control-plane.md#unheaded-block-29 -> architecture/dispatch-control-plane.md#component-internal-ownership (supersede): Authority list: item 2 claims resolveExecutorAndOverrides resolves aliases and executor for[] (lines 270-271), false per resolve.mjs:269-310; normalizer correctly relabelled design. The corrected current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-internal-ownership now states the code-checked boundary in Component-Internal Ownership; evidence: src/runner/dispatch/resolve.mjs:25-66; src/runner/dispatch/resolve.mjs:255-309. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#unheaded-block-29 -> architecture/dispatch-control-plane.md#component-internal-ownership (supersede): Authority list: item 2 claims resolveExecutorAndOverrides resolves aliases and executor for[] (lines 270-271), false per resolve.mjs:269-310; normalizer correctly relabelled design.",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "component-internal-ownership",
@@ -2364,28 +2385,29 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "02739069a8533c9f6637cfef2b916395b08a060474d20e1d122651788c250b96",
+      "shownTargetDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ],
-      "shownTargetDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_194da7d0a9b40e6ba93d40df2b58eaec",
       "sourceUnitDigest": "e9b40512995229674223f2e51e2cf80e9bc9f95814714f443178d73d8bcece52",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-internal-ownership supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-31 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "component-internal-ownership",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
-      "targetUnitDigest": "02739069a8533c9f6637cfef2b916395b08a060474d20e1d122651788c250b96",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
+      "targetUnitDigest": "2733a56fe75fb75ffd77892a1cbc0937340927f3c7727df7cc59446f24be91ce",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "shownTargetDigest": "0c74651edd5b7e919916e16bb79bbe5536883eb24333911502d943c37f14d833"
     },
     {
       "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
@@ -2413,12 +2435,12 @@
       "sourceUnitDigest": "3cf3dc60ee31fd5df6ab2864b92ed1f3bdc96982df814f65c4afb545b4458957",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/executor-health-and-fallback.md#unheaded-block-7 -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (supersede): The five-step ladder list keeps step 2 blocked-beats-timeout do not retry, which is contradicted since herdr-round.mjs:344-357 maps blocked to retryable worker-timeout; steps 1,3,4,5 match evaluateLadder. The corrected current successor at docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#2-production-ladder-semantics now states the code-checked boundary in 2. Production Ladder Semantics; evidence: src/runner/dispatch/herdr-round.mjs:341-359; src/runner/recovery.mjs:105-112. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "targetAnchor": "2-production-ladder-semantics",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/executor-health-and-fallback.md#unheaded-block-7 -> architecture/executor-health-and-fallback.md#2-production-ladder-semantics (supersede): The five-step ladder list keeps step 2 blocked-beats-timeout do not retry, which is contradicted since herdr-round.mjs:344-357 maps blocked to retryable worker-timeout; steps 1,3,4,5 match evaluateLadder.",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
         "targetAnchor": "2-production-ladder-semantics",
@@ -2426,28 +2448,29 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "21295b47dae8583ef4b70ea406ad45275bdb1902af772589db488dafa179f7c8",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility"
-      ],
-      "shownTargetDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_06019161f3eadb87a1a6fe714da0d8e6",
       "sourceUnitDigest": "16a6a7ab095e99754b130605651b5c88ba99d377a3a22f140b254077ba6733fb",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#2-production-ladder-semantics supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-9 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "targetAnchor": "2-production-ladder-semantics",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
-      "targetUnitDigest": "18a8113ca28a3e4eb1d70e5a4599b354a57fa5bdf38e1addce71c5a4ad8c3713",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
+      "targetUnitDigest": "21295b47dae8583ef4b70ea406ad45275bdb1902af772589db488dafa179f7c8",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility"
-      ]
+      ],
+      "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc"
     },
     {
       "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
@@ -2899,12 +2922,12 @@
       "sourceUnitDigest": "4173ec263ab82dbec1cc0138083b9a13debc8821030f94a08e26c81680068e0c",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/protocol-model.md#unheaded-block-15 -> architecture/protocol-model.md#compatibility (supersede): old rule that the compatibility path stays mandatory for Work-attached workflows, target lines 103-103: the target sentence on skill projection is wrong because skillForStep reads step.skill not step.operations (src/workflow/steps.mjs:50-52), and the mandatory/non-weakening obligation is not restated The corrected current successor at docs/platform/agent-coordination/architecture/protocol-model.md#compatibility now states the code-checked boundary in Compatibility; evidence: src/workflow/steps.mjs:43-85. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
       "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
       "targetAnchor": "compatibility",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/protocol-model.md#unheaded-block-15 -> architecture/protocol-model.md#compatibility (supersede): old rule that the compatibility path stays mandatory for Work-attached workflows, target lines 103-103: the target sentence on skill projection is wrong because skillForStep reads step.skill not step.operations (src/workflow/steps.mjs:50-52), and the mandatory/non-weakening obligation is not restated",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
         "targetAnchor": "compatibility",
@@ -2912,12 +2935,12 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "7a6f9fa240fe911d210c903743ef5ea8a41beddd2ad5bd0898c2fc524a4ea4ba",
+      "shownTargetDigest": "a0a50b9e5327a33e11548c30917dac1b43360b9cf2e8932cb762ef7c1829fb8c",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "83aa85a06907fe314ff287f9c63d0d67417933bd0af40a8426180ee499369f64",
       "targetAncestry": [
         "Coordination Protocol Model"
-      ],
-      "shownTargetDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_0e9e0ab53bbc4bdfb7b06b60033e2cc0",
@@ -3267,25 +3290,30 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "dispatch-operability-addendum",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:contracts/assignment-run-runresult.md#unheaded-block-33 -> contracts/assignment-run-runresult.md#dispatch-operability-addendum (supersede): source says design track now supplies v2; target restates as record of design with archive path (exists) and correct current v3/v4 note",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_66366a2de3e810733eaaf6905e57628b",
       "sourceUnitDigest": "98815955352ea016dd5a0d03b1302502496a4fec5202fe95e2f7b126e1cc007f",
       "claimKind": "contract",
-      "disposition": "move",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:contracts/assignment-run-runresult.md#unheaded-block-34 -> contracts/assignment-run-runresult.md#unheaded-block-38 (move): bullet list for the addendum (target lines 256-268): the bullet at line 263 says new results are v2, but normalizeRunResult defaults contractVersion=3 and also writes v4 (run-result.mjs:350,562-563); the RunObservation (runtime-inspection.mjs:230), claim v2 and legacy-derived bullets are true The corrected current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-38 now states the code-checked boundary in Dispatch Operability Addendum; evidence: src/runner/dispatch/run-result.mjs:350-385; src/runner/dispatch/run-result.mjs:546-566. The disposition move and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "disposition": "supersede",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: Current v3 default/v4 support replaces the historical v2-default wording while preserving all result, observation, wrapper, classification, legacy and corruption boundaries. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-38",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-34 -> contracts/assignment-run-runresult.md#unheaded-block-38 (move): bullet list for the addendum (target lines 256-268): the bullet at line 263 says new results are v2, but normalizeRunResult defaults contractVersion=3 and also writes v4 (run-result.mjs:350,562-563); the RunObservation (runtime-inspection.mjs:230), claim v2 and legacy-derived bullets are true",
+      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
         "targetAnchor": "unheaded-block-38",
@@ -3311,13 +3339,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "dispatch-operability-addendum",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:contracts/assignment-run-runresult.md#unheaded-block-35 -> contracts/assignment-run-runresult.md#dispatch-operability-addendum (supersede): accepted-design-authority sentence superseded by archived historical record wording; test path and archive contract file exist; target true",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_c43d8d2e272e534e1af9a432840b598d",
@@ -4682,13 +4715,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "62-selector",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#unheaded-block-41 -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): supersede ok: shown 6.2 true (cli.mjs:1081-1096 execute --for refused, bind in Node run.mjs only, no Rust caller); old selector list superseded by list incl assignment (plan.mjs:80-93)",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_8b4d9c48d10903dad95562eadb59f44f",
@@ -4722,8 +4760,8 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "62-selector",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-43 -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): Replacement text at lines 197-198 says execute --for uses capability-aware compiled resolution, but cli.mjs:1081-1093 rejects execute --for (\"no longer supported\"); also line 199-200 attributes bind() to a Rust-host door while bind() is called from execution/run.mjs:404 and assignment-runner.mjs.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#unheaded-block-43 -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): supersede ok: names replaced claim execute --for capability-aware; cli.mjs:1081-1096 refuses it; Rust host not a bind caller",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
         "targetAnchor": "62-selector",
@@ -4731,13 +4769,18 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
+      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
       ],
-      "shownTargetDigest": "5438778e2e47a3b8b1ae4508b5d31eb532f2250e72471fc8bb045249ba64304d",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_7788ed260777142b9452d61228e1d1be",
@@ -4814,8 +4857,8 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "72-policy-resolution-before-dispatchplan",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan -> proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan (supersede): Section 7.2 still has the retired minTier in its example (lines 300, 302; assignment-policy.mjs rejects minTier as removed), a constraints-union rule that code does not implement (assignment-policy.mjs:459-462 override spread) and a fallback-append rule contradicted by assignment-policy.mjs:380-388 (reserved-not-executed).",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan -> proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan (supersede): supersede ok: minTier removed, constraints override (assignment-policy.mjs:459-462), fallbacks reserved-not-executed (:380-388), rigor strongest-wins verified",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
         "targetAnchor": "72-policy-resolution-before-dispatchplan",
@@ -4823,13 +4866,18 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
+      "shownTargetDigest": "fa0931df22b0c3241d4b8629f862c9299f7157357028c85aef26bc1fb227f6d3",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1b8bad3a28b92a56bcefee746276e3cabf955f0361653f49b152dd5b720d5dd0",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
       ],
-      "shownTargetDigest": "fa0931df22b0c3241d4b8629f862c9299f7157357028c85aef26bc1fb227f6d3",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_23a302d963323aa22a6a9e8ff35aad4e",
@@ -4840,13 +4888,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "72-policy-resolution-before-dispatchplan",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#unheaded-block-65 -> proposals/dispatch-control-plane-redesign.md#72-policy-resolution-before-dispatchplan (supersede): supersede ok: DispatchPlan.execution replaced by true statement that plan exposes tier/model/providerModel/provenance/policy/invocation (plan.mjs:444-461)",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1b8bad3a28b92a56bcefee746276e3cabf955f0361653f49b152dd5b720d5dd0",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_4977752b5d7eef0cea02a91c090a39ae",
@@ -4857,8 +4910,8 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (supersede): Section 7.3 target pairs a correct historical/current-config label with line 313-314 directing readers to use the table as defaults, which contradicts the label and points at pi and agy-cli executors that are not registered in .fgos/config.json.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (supersede): supersede ok: 7.3 labelled historical, no defaults claim; config executor list matches .fgos/config.json runner.executors",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
         "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
@@ -4866,25 +4919,30 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
+      "shownTargetDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
       ],
-      "shownTargetDigest": "c3b100684b202fdb32e4617eea7f7189e363712124574625c545c8076eb50f88",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_432d7c4b1684e3d11aade76846dc2193",
       "sourceUnitDigest": "74d1a79c159657dabd64e7bc2d04c0737ede2b74bbf3c1a4dcea0053f6b8b3c6",
       "claimKind": "architecture",
-      "disposition": "move",
-      "rationale": "The committed reviewer rejected this specific binding: LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-66 -> proposals/dispatch-control-plane-redesign.md#unheaded-block-67 (move): Line 313-314 (use these as defaults for the first team-dispatch proof) conflicts with the sentence above it that calls the recommendations historical and not current config defaults; executors pi and agy-cli are not in runner.executors. The corrected current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-67 now states the code-checked boundary in 7.3 Recommended V1 Provider Policy For Coding Feature Flow; evidence: src/runner/dispatch/resolve.mjs:255-309. The disposition move and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
+      "disposition": "supersede",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: Dated first-proof recommendations replace live defaults; the proof table remains historical, and effective configuration/binding owns current execution. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-67",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-66 -> proposals/dispatch-control-plane-redesign.md#unheaded-block-67 (move): Line 313-314 (use these as defaults for the first team-dispatch proof) conflicts with the sentence above it that calls the recommendations historical and not current config defaults; executors pi and agy-cli are not in runner.executors.",
+      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
         "targetAnchor": "unheaded-block-67",
@@ -4910,13 +4968,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#unheaded-block-67 -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (supersede): supersede ok: table kept as dated examples; implement-item row relabelled dated agy-cli example, no longer claims current repo config pins agy-cli",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_74bb68261a023f96104ac9591bdddd6f",
@@ -4927,13 +4990,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "73-recommended-v1-provider-policy-for-coding-feature-flow",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#unheaded-block-68 -> proposals/dispatch-control-plane-redesign.md#73-recommended-v1-provider-policy-for-coding-feature-flow (supersede): supersede ok: first-proof Herdr prohibition replaced by historical label plus current selection follows config/bind; no false current claim",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cdcee4bf1cc904e4d7fc101b37de8008fbe974562c3bcc2ab782690fef29913b",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_a3cd1ed21b3ed3f2a66f8a33071fd226",
@@ -5379,14 +5447,19 @@
       "targetAnchor": "how-to-read-this",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The earlier script-proven exact target at docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-9 changed during the current-truth correction in 96a13ab21670e1f5d9748c02cd615ea5598b53f5; digest identity no longer proves this row. It is now an explicitly authored, pending supersede to the corrected current successor at docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#how-to-read-this. The frozen source unit and accepted historical carriage are unchanged. The source/current difference and section-specific code evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require independent truth review; no script approval or former review carries over.",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewNote": "legacy:playbooks/architecture-advisory-role-doctrine.md#unheaded-block-7 -> playbooks/architecture-advisory-role-doctrine.md#how-to-read-this (supersede): Supersede fits: old pointer-to-coordinator-owns-operating-rules replaced by target saying coordinator is cognitive reference and registered skill+Workflow own execution (SKILL.md Execution boundary L17-24); links resolve; no false sentence",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7b957f55b62e80e577630262778b632d31829818985415c80fad356358c0ba58",
       "targetAncestry": [
         "Architecture Advisory Role Doctrine"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_b77e786ca1c28b37204b3c2d3af32147",
@@ -6435,10 +6508,10 @@
       "targetAnchor": "12-dialogue-response-dialogue-responsemd",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The committed reviewer rejected this specific binding: LEG:playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd -> playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd (supersede): Target 12-dialogue-response-dialogue-responsemd (line 705) still carries the retired fourth-layer Dialogue Turn Protocol and crash-recovery obligation as if live while the same section says optional manual; old claim is neither retired cleanly nor kept as a live obligation. The corrected current successor at docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd now states the code-checked boundary in 12. Dialogue Response — `dialogue/<n>-response.md`; evidence: core/workflows/architecture-advisory.yaml:8-84. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review.",
-      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd -> playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd (supersede): Target 12-dialogue-response-dialogue-responsemd (line 705) still carries the retired fourth-layer Dialogue Turn Protocol and crash-recovery obligation as if live while the same section says optional manual; old claim is neither retired cleanly nor kept as a live obligation.",
+      "reviewNote": "legacy:playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd -> playbooks/architecture-advisory-artifact-templates.md#12-dialogue-response-dialogue-responsemd (supersede): Heading supersede fits; target section text true (yaml L8-84 graph and human close gate; no dialogue crash-recovery in code) and labels manual trace honestly; retired fourth layer named",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
         "targetAnchor": "12-dialogue-response-dialogue-responsemd",
@@ -6446,12 +6519,17 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
+      "shownTargetDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "13d5476dee5a0e24b4fad8dd926f3d676fa2c6c2ea16c14a9e60067a6831221a",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates"
       ],
-      "shownTargetDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_41aa6b7f094734eff7a5de2686eac257",
@@ -7924,15 +8002,20 @@
       "targetAnchor": "62-selector",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#62-selector supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#62-selector before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "Stored digest has no target match; independent re-review required.",
+      "reviewNote": "legacy:proposals/dispatch-control-plane-redesign.md#62-selector -> proposals/dispatch-control-plane-redesign.md#62-selector (supersede): supersede ok: heading unit rebinds to corrected 6.2, all sentences verified",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f74896a55ec95145a488a4d4f78d23c0498357b944441ca192f35ecb38247d3a",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
     },
     {
       "claimId": "claim_04267215d393d248ae4d55f9c500d755",
@@ -8308,8 +8391,8 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The source section's whole worker-claim contract is carried in the corrected 7-agent-result-schema successor: the v2 contract identity and assessment-role verdict requirement are explicit, no-evidence requires a non-empty summary, and nextRecommendedOperation survives with an explicit proposed-extension boundary rather than a current-reader claim. Evidence: src/runner/dispatch/agent-result-claim-contract.mjs:5-30,52-90. The source claim ID/digest and accepted historical carriage remain intact. The disposition supersede is unchanged; this current-text binding is pending independent targeted review with its renewed full shown-target digest. The original review finding is recorded separately in reviewNote, not asserted as the current disposition rationale.",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#7-agent-result-schema -> proposals/team-communication-protocol-v1.md#7-agent-result-schema (supersede): unit 7-agent-result-schema -> 7-agent-result-schema (171-171): whole section 7 target contains the unlabeled nextRecommendedOperation field and the false no-evidence reason requirement, and omits the v2 contract id and the assessment.verdict rule for reviewer roles",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
         "targetAnchor": "7-agent-result-schema",
@@ -8317,12 +8400,12 @@
         "shownTargetDigest": null,
         "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
       },
-      "targetUnitDigest": "8c063fe72e95edc2dc765531eb12e520d28afac9f0fee9dc309f221b3e95b15f",
+      "shownTargetDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "b4795ed4e9d009f97e13c46b1802463563b2be105e68f19856392ca56c8d8c4f",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ],
-      "shownTargetDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
-      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json"
+      ]
     },
     {
       "claimId": "claim_0261291ac389be7c598690a1c40ef56a",
@@ -8371,7 +8454,7 @@
       "claimId": "claim_f7388f36e2422375b8acf615e169e8c3",
       "sourceUnitDigest": "dce623d34c1aae45bf2a55698fd5befa24dafd26b62ff898bf34fee1e683896a",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "targetAnchor": "unheaded-block-41",
+      "targetAnchor": "unheaded-block-43",
       "claimKind": "architecture",
       "disposition": "move",
       "reviewStatus": "reviewed",
@@ -8745,7 +8828,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The current successor at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings supersedes the stale current-state claim shown at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "LEG:vocabulary/concept-relationships.md#coordination-rings -> vocabulary/concept-relationships.md#coordination-rings (supersede): Held owner decision on ring naming: the target text at coordination-rings is true now (no Orchestrator/Launcher/Router entity exists in src and the text calls them a responsibility model). Decision stays held."
+      "reviewNote": "legacy:vocabulary/concept-relationships.md#coordination-rings -> vocabulary/concept-relationships.md#coordination-rings (supersede): text honestly bounded as responsibility model, no Orchestrator/Launcher entity in src (git grep), owners named exist Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph."
     },
     {
       "claimId": "claim_cbedb41c7a00cb4db2b9e3840a028b36",
@@ -9299,7 +9382,7 @@
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/concept-relationships.md#unheaded-block-13 -> vocabulary/concept-relationships.md#coordination-rings (supersede): Held owner decision on ring naming: the target text at coordination-rings is true now (no Orchestrator/Launcher/Router entity exists in src and the text calls them a responsibility model). Decision stays held."
+      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-13 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true and labelled future-open, no ring entities asserted as implemented Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph."
     },
     {
       "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
@@ -9311,7 +9394,7 @@
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/concept-relationships.md#unheaded-block-14 -> vocabulary/concept-relationships.md#coordination-rings (supersede): Held owner decision on ring naming: the target text at coordination-rings is true now (no Orchestrator/Launcher/Router entity exists in src and the text calls them a responsibility model). Decision stays held."
+      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-14 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true, responsibility-boundary meaning preserved and future typed rings stated as open Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph."
     },
     {
       "claimId": "claim_371515038b57bcd114632a79a36a922e",

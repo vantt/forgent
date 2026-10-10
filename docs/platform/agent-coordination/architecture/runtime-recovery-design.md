@@ -155,7 +155,7 @@ It calls for temp+rename+directory fsync under the owning lock for replacement.
 Those are design requirements; the implementation's best-effort directory
 fsync and other limits are stated below, not silently promoted to guarantees.
 Current terminal `result.json` is published by `publishImmutableProof`
-(`settlement.mjs:434`), not the mutable writer. `run.json`, the
+(`settlement.mjs:434`), not the mutable writer. `run.json` updates, the
 effective-execution-contract projection and bookkeeping markers use their
 mutable/marker writers. An unreadable existing result refuses relaunch rather
 than overwriting evidence. The proof helper fsyncs the file, hard-links it
