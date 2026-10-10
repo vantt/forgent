@@ -1,0 +1,1126 @@
+{
+  "version": 1,
+  "status": "blocked-before-verdict-application",
+  "authorization": "ae3a742e13e5e84c13a651dd115747e6a50851ac",
+  "reviewCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+  "syncCommit": "727a9bd0183cd870611ccc22f2ee44303b6f0493",
+  "accountingCommit": "da294ffb5a07765a2733f16c0d63516b2e0274a5",
+  "stage": "A25 ordered step 2",
+  "reason": "Both committed ordinary source-decision reports put the note in column five; the unchanged parser and committed-report gate require it in column three. Applying their verdicts requires an independently committed report formatting correction, not a checker change.",
+  "actualApprovalsApplied": 0,
+  "physicalDecisionFilesWritten": 0,
+  "reproduction": {
+    "command": [
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--apply-review",
+      "/tmp/phase06/closure-source-approval-reproduction.json",
+      "--verdicts",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "--reviewer",
+      "reviewer:claude-session:4df9e88c@2026-10-11",
+      "--inventory",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--repo-root",
+      "."
+    ],
+    "exit": 1,
+    "stderr": "propose-doc-decisions: shown source digest changed for claim_fb0f85ad508f7f857ba4c0963879790a",
+    "scratchInputClaims": 48
+  },
+  "unchangedGateAudit": {
+    "command": [
+      "node",
+      "/tmp/phase06/closure-report-format-audit.mjs"
+    ],
+    "exit": 0,
+    "head": "da294ffb5a07765a2733f16c0d63516b2e0274a5",
+    "reportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+    "expectedColumns": [
+      "Claim",
+      "Verdict",
+      "Note",
+      "Source digest",
+      "Target digest"
+    ],
+    "reports": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+        "actualHeader": "| Claim | Verdict | Source digest | Target digest | Note |",
+        "total": 48,
+        "ok": 46,
+        "accepted": 0,
+        "rejected": 46,
+        "findingTypes": [
+          "decision-review-report-missing"
+        ],
+        "results": [
+          {
+            "claimId": "claim_fb0f85ad508f7f857ba4c0963879790a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_234cfe4ee6319f76a699a920567daac2",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_8c81cb12fcc0ff0408e9b5bb594cb1dc",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a3c5dcace145e25b55eeb9dca7a8221e",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_1838df5e7c81c1fa79b336008e3b94bd",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_50cc0ff73dabd1642950365f358125c2",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_1c155ab462849e3ec4136ee9fa08a218",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_34284834ad2dd8f5a0fc5a924b8196a5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b602d530010f3b2f66ef5485bbff5bcb",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_c37da632abaadd051eff58492f71c8c7",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_c52e0d7342545a9365e507c17a99e946",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f4f513bfd7ca5fd9708005243a624f95",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b165c6ca3702ce5335599867e447ae55",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_8b6511ceef7788eaaecfbe1c17de0ccf",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_033a7b790516e8618c276525412173f8",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_312c758a5236381993df5c20d5827ec8",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_9431e63ec3fc3f89927e22abc8f14a91",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_c0ec44efc62ae8bbbf2c114f387739f5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_11d149c1655503f91604b77b40e6a381",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5eef231348dcdc9566a29285fce97d59",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_7c56791bc2955ef63687b7134d2cd053",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_901dae1b8039d130359712125f4d69f9",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_37887f05ca0822cd7c415eaadda42c55",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_3d5dc31cf6cf90ba661de6bb1fafb486",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_57f26b5acbd6bb500ca353f84f486488",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_78524c36c6f57c543377be47620d748c",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_242208b542d4bb24c84796f43f775d4a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_88cf23510b37d2048b1a578efc2ebb10",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_abb60eb206ce120877cc9c06f826ab57",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a6f71d465ebccd696428b94ff6f664af",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_6b4789439adfb6eb3b05c85b7ed8f7e0",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_8b79ab2d01c7ce85912eb9f0a25bf3ea",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_e16b56644d520a0fe0a4cd6b40c2459a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a86887b78fbc23319db13f3bf4816dd8",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_fad0d749adc5ef611ee344c16b7c661e",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d277029b4e3a80bc6eb3c33a7990b182",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_194da7d0a9b40e6ba93d40df2b58eaec",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f35f68bb3feae40702d02c97d02cea0b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_06019161f3eadb87a1a6fe714da0d8e6",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_9e039b5f6acdd3eb0fa002d35c2a3f54",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_66366a2de3e810733eaaf6905e57628b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_432d7c4b1684e3d11aade76846dc2193",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_6ce1d10cc50a8bd04bd82b4b65486125",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f7388f36e2422375b8acf615e169e8c3",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_1053b6e0b639f5a2970343078b6e04fe",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2ef5d353dab2d57f38906df73e709125",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-retired.md",
+        "actualHeader": "| Claim | Verdict | Source digest | Target digest | Note |",
+        "total": 114,
+        "ok": 114,
+        "accepted": 0,
+        "rejected": 114,
+        "findingTypes": [
+          "decision-review-report-missing"
+        ],
+        "results": [
+          {
+            "claimId": "claim_00e1cb91d634a22b72c2256909cd407d",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_956d10da281258c396a6a9459ef8071c",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_c146eb9ca2936c2b94a0ebbf081089c3",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_55a9444e77866c7803537f5684e5da13",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_cc694e436718853f93d26210b711851b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_576d8164dbbe914a84da4587e377cd47",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_9ef44cee11ca6f130d5a28fa4cc49394",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_bbf72392c1062ed1b443cd93b177cc61",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f9536edbf15fb8cd770895db4e3db776",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2de3ff94e2a72a014c15799b9ae43f2b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_9ef3c80fdfe0d056a4520028d43ed96c",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_0083b06d7d1bba8445d501c6b650fee0",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_342a3db7d55d432f8e005476d2d84a83",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2e3d3130591aa534a5bb9ccab93cde3b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_aca867e065269cdc1b7bff0124e41415",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_7e18dccb4fe896af8b83a2b5de4c266f",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_6f5b02ddd1f0ecb1dcb7053bbabca278",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d1ce767a2e3239b22d2e9fc6649dd9a5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_ab4146aee9d8e1ab49e57748fbaa4c68",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2ff575998d2ae90d5ecc1a2d414d078d",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5f1ed90b8f9d90a9154d031de27371f6",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f6a2a4af7834e2209c2aa0d79096a0f5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a8e8f9d7c1d2f985d88ee5d6e30bc292",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_389748ac69ec4431898b33b9d3cbaa7a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_64841e2814f9e18b59ad1c570b1d7939",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5979cfd8120d760254dde6ce536f748b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_e762a052559d38e47e84dd142cc1e084",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5f806e1511b3cc49b3c6b94c4ebb9f26",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_14196364b2969e5f8e346f512e113fbb",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b4a5ab776d481422d642def3422f56b0",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d283a70392cc071ee19d103f77228841",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_bf85c9cf436ce088c700c256f10da53f",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d3412d82559b826bec94f23111405667",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b62a54a1663d8ec3f97483c7c3696602",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_1d24205383b4179b3af1af8f9e4d4d64",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_4b0b5417404fba3e323fecec285d9197",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_0a52ec5fcc2abb5870b350b23451da43",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_4b3088ee72a27223da73fe4c6a014636",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a5d7cd08266654056f95caaca04e2e7b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_6b1c9b954404efb60283d3586e0ab652",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d28cfc459ff698cdc0cba03e41465318",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_71d5d262a16519dd81c76e97d793f062",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5acd6c3b2aaf7f55b6a7fea7713295dd",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_ad1c305fe8b9ab3274ebe83e92cd0510",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_cfaa373787b1c74aea1a67094101edd2",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_13ba760cbd7bfff5dc1cf25ecf5cee25",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_65b380d92e76cf66bcbff80eba5b918e",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_c4de8768ad9142c80e9ded5358a1704a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_114999eb22b4a2af22df9fe3f8b9cb2b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5aeca43617b977fa79fdb9fd60a20e2c",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_4eeffbb74710aa62461cc1903dbbfa69",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_4a4e9b6ec382f6e6bf2872bd125816c9",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a5635111215eb0e0862917d1658db254",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_966a448be6530851e8b1fd7b72d75d4e",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b29336161c4c0f8135cbc1e646ce2b16",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_e415506235b575bc5eb32b225a758f5b",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d245d70ae94106a208d95b6bfa6b6152",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f0b558c805f1b274d2df72fb6083acfb",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_ab8a87d8a586e83cc0df72070e1c438f",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_29768201e6d5a5c215e3a7e4a25873c3",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_3bffcfe4496d0fec611c2d4cdfbf9149",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f07d01d9479baf2c23835b14f4038768",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d3a92a158a268eb159e378a2da19b98f",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_7f793c412e8771ef3ad910df37d99001",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_77a56ab8d154627187035bdf07a5b15a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_23ed879031c62dae36299ec71ca605fd",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_0db106f41cd28c543735740b7b37e012",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_90afe255012eb59e488ba8a1ccf06ecf",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_ed40360e4032897654f2d67aad57111d",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_7156a782087fad156dafcf4ddd462abf",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_15cac2a9bbfbbffc9af1c2dc16b5415a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_78f79863a6eafd66861e3199b4a554f0",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2957b3b08f36bc10d20de1db3c9fd753",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a42ca40e2aab443cf11e13ff5d270ac5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_ad26893bab59a122a491834bd033c772",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_caf321abd5b296259f9b3a76411c1123",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_118e0ddaa1e41b6b91ed214f60184d71",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_5216f2e514a9fc25e63e226774cddf86",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_58e446ab5b192ee42614c7494b719819",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b5d805fde6d9cb5e47a21f6da03883ba",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_614bf32047335842400474fda96f5eed",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_20d4ca5d44e210c040dc15545e72b9ad",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2bb820a8ff1c1a570b53e7c159213ba2",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_742532532aa9e696db78cb285b8b2178",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_a277b4049236bc5574145bac059711c1",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_63156a6026de7a0ff7fbad44aa1b4281",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_84b7cd3e67c87c553e30f60243f2aaa9",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_91283c9936f0e12201b89acc09109179",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_3b5dc416320d1a6d45c254067dcb819d",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_cc49bf43e6fe30f0fb858e49ddd7ae81",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_377b337b7f62374e0380bde37a235300",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_78aa83e3a51cd866a2ac2bede23cbeb9",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_9a9308ce7c8e42934677d8cb5eabe705",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f34be39fff111922b3bcfdececd9cbf5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_0d2ea8d781366940476e413ce92981e3",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_7db5dc11f77d14fd3727322fc55d3f93",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_c57b759ed7febdde453483cdaa751b47",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d9b5b1e4e476d7f6ef0b7d48d006e733",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b9aa2904f915f73edd84bc53b688efb6",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_01076329b1d1de03c55e36f8f6083888",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_706f2bd1b37418db859990fb08c94d7c",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_9fd07336436513827c0662dd5a28ad34",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_b1ac27062ecb3e38aa015468ddde00f3",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_f5547cd37d69dfb14b002eefc64466ab",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_6f97739eb139794268dacb8d60dde14e",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_fa6023902614373a29e9bd46d7ffdee5",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_fac890b2535c30ea85082981768e751f",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_7ed1b25376986d3b14af32de5a42bade",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2b93e5dd494194b949188f9b77ceae8a",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_2898e0b9ca684155967180fa0230b8ae",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_d64648495877bd05b5ef3ba2f5c799cc",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_3817494a9443f5b9be5b1b3aa22613ad",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_69b011aac8a371496f54e1c681286bfd",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          },
+          {
+            "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
+            "findings": [
+              "decision-review-report-missing"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "checkA": {
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set([...isolate.exactExemptions,...[\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/plan.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"]]),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:exceptions.size,leadCommit:\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",leadPaths:[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],result:'pass'}));"
+    ],
+    "exit": 0,
+    "result": {
+      "historicalWitnesses": 74,
+      "historyTreeUnchanged": true,
+      "payloadTreeOutside29Unchanged": true,
+      "inheritedPhysicalPayloads": 867,
+      "changedAreaPaths": 29,
+      "frozenFiles": 5,
+      "firstParentNonMergeCommits": 192,
+      "allowlistViolations": 0,
+      "exactCommitPathExceptions": 8,
+      "leadCommit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+      "leadPaths": [
+        "plans/260925-documentation-authority-unification/plan.md",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md"
+      ],
+      "result": "pass"
+    }
+  },
+  "ratchet": {
+    "command": [
+      "node",
+      "scripts/check-legacy-docs-ratchet.mjs"
+    ],
+    "exit": 0,
+    "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+    "stderr": ""
+  },
+  "refresh": {
+    "command": [
+      "node",
+      "scripts/generate-doc-inventory.mjs",
+      "--refresh",
+      "--commit",
+      "HEAD",
+      "--identity-registry",
+      "/tmp/phase06/review-identity-registry.json",
+      "--json-out",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--md-out",
+      "/tmp/phase06/review-doc-inventory.md"
+    ],
+    "exit": 0,
+    "commit": "da294ffb5a07765a2733f16c0d63516b2e0274a5",
+    "documents": 4378,
+    "units": 85830
+  },
+  "requiredIndependentRepair": {
+    "paths": [
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-retired.md"
+    ],
+    "replaceHeaderWith": "| Claim | Verdict | Note | Source digest | Target digest |",
+    "preserve": [
+      "all 162 claim IDs",
+      "all 160 ok and two rework verdicts",
+      "every note verbatim",
+      "every source and target digest verbatim",
+      "Reviewer and Author session headers",
+      "ordinary review mode"
+    ],
+    "doNotAppendDuplicateVerdictRows": true,
+    "commitByDifferentAuthorSession": true
+  },
+  "unchanged": [
+    "gate",
+    "checker",
+    "baseline",
+    "vocabulary",
+    "extractor",
+    "independent report contents",
+    "decision rows",
+    "candidate content",
+    "history and evidence payloads"
+  ],
+  "notRun": [
+    "four rework fixes",
+    "reverse closure authoring",
+    "remaining pending source preparation",
+    "post-application D/E proofs",
+    "closure review publication"
+  ],
+  "next": "After the independent formatting repair is committed, pull it, rerun native apply, then continue the remaining A25 steps in order."
+}
