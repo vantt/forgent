@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "authorization": "ae3a742e13e5e84c13a651dd115747e6a50851ac",
+  "reviewCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+  "mergeCommit": "727a9bd0183cd870611ccc22f2ee44303b6f0493",
+  "mainCommit": "a9abe55f25e3dcc8733734ecb16a69211ffe58c1",
+  "previousHead": "ae3a742e13e5e84c13a651dd115747e6a50851ac",
+  "planBMerge": "1819b9548",
+  "planBDocPaths": [
+    "docs/architecture-manifest.json",
+    "docs/platform/README.md",
+    "docs/platform/component-boundary.md",
+    "docs/platform/convention/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/specs/distribution.md",
+    "docs/specs/system-overview.md"
+  ],
+  "accounted": [
+    {
+      "path": "docs/architecture-manifest.json",
+      "before": null,
+      "after": {
+        "path": "docs/architecture-manifest.json",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "57f522e7bd7a46f900381611e3c36386b269f0048a54463f34dc20d66f131428",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/README.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/README.md",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "2aed12ac464558e409827031c72de90fadf67cc8e13dec8b16c11e25e5e3aec1",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/component-boundary.md",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "259dc64a98021ab4e559e86673b797e6a8d91e7af0b38aeda8faa2348b941a09",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/convention/spec.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/convention/spec.md",
+        "kind": "allowed-new-file",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "ce58ee5ab16696335be7cbe7b5be46449eca2799b4eb5266aa0b13a4276424a6",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "fe8372caa7b5cd7c88e2a38e2da59c22bf6e098425e44e5ee4716c7c9e21c9e9",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "before": {
+        "path": "docs/specs/distribution.md",
+        "kind": "allowed-edit",
+        "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 26 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | chore: pools for the discussion capabilities, more proven blind pairs, retire the coordination sessions check | docs(spec): keep the blind pool check row to registered check ids only (+23 more) Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard",
+        "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06; prior sync exceptions retained; sync 2026-10-08 at 5d6467093217a6869b31afb28866732400767267 imports main c2aa9e374a8cee57c676809dab4849273ed71855 under the standing sync policy (plan.md §7.5b); content-review-owed, per-file review pending before cutover; owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "064ba25062c95cbd7e05b250a27de942461f67bbb626787c60a86945c8c54982",
+        "reviewedAt": "2026-10-06",
+        "revisitTrigger": "Phase 08 cutover"
+      },
+      "after": {
+        "path": "docs/specs/distribution.md",
+        "kind": "allowed-edit",
+        "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 26 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | chore: pools for the discussion capabilities, more proven blind pairs, retire the coordination sessions check | docs(spec): keep the blind pool check row to registered check ids only (+23 more) Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06; prior sync exceptions retained; sync 2026-10-08 at 5d6467093217a6869b31afb28866732400767267 imports main c2aa9e374a8cee57c676809dab4849273ed71855 under the standing sync policy (plan.md §7.5b); content-review-owed, per-file review pending before cutover; owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed; Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "6f247f298f83374625ea6f24d6e50405b47f773e974a1b75018270ae80076e8f",
+        "reviewedAt": "2026-10-06",
+        "revisitTrigger": "Phase 08 cutover"
+      }
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "before": {
+        "path": "docs/specs/system-overview.md",
+        "kind": "allowed-edit",
+        "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): feat(observe): complete metrics namespace and delete legacy check (phase F7)",
+        "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "9a184058044f3a252bdea7406598c8ad4a191ea96ecd66b146ffa092fd73e480",
+        "reviewedAt": "2026-10-06",
+        "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+      },
+      "after": {
+        "path": "docs/specs/system-overview.md",
+        "kind": "allowed-edit",
+        "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): feat(observe): complete metrics namespace and delete legacy check (phase F7) Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "214c64c60cc3b3d2dfaeb6550b2ebbe6c38a4c759104086d238e96223895c7a8",
+        "reviewedAt": "2026-10-06",
+        "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+      }
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "kind": "allowed-edit",
+        "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 54 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+51 more) Re-accounted 2026-10-06: carried in by sync of main at 36dc5f083 (Phase 4 sync): docs(observe): record the third acceptance round and close the plan | fix(observe): a panel needs more than half of its voters before agreement is measured Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard Re-accounted after committed truth review 947f6169e826564b6e00bafb8a0535ec2ff6f0ea: merge a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2 of main b2927802231f539ea2b7490cb8a449a9e2204e37 carries a528345592348c1ca4162dbed2e0753880c73fb9 feat(council): add per-seat reasoning postures | 59cd766725c18df6e109e74878d744ca2605eecf docs(runner): align executor routing and advisory blind settings with the code | 454d7a8df2bdf74b4fc29fa9785d776d659139b7 fix(workflow): record the Unit run id when it is created and resume that run after a controller death | 89304dbae16a26b14ef1acce5363947ac32cec91 feat(dispatch): let the owner quarantine an exhausted provider account until a given time | ce880fbedde86152ca169b66fe7e58cd966e67dc fix(workflow): read the producer expertise field from a sibling packet file and either key spelling. Content review owed at atomic cutover; no direct legacy edit by this executor.",
+        "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Phase 4 sync under the standing sync policy (plan.md §7.5b), per-file content review pending; sync 2026-10-07 under the standing sync policy (plan.md §7.5b), per-file content review pending; owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed; owner authorizes targeted truth-fix main sync after review 947f6169e826564b6e00bafb8a0535ec2ff6f0ea and the standing main-side legacy accounting rule (plan section 7.5b); content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "e8d602a5566aaa328007585aeec3a6845f3f3d8c23cde32aaec852b4f3b9b640",
+        "reviewedAt": "2026-10-06",
+        "revisitTrigger": "Phase 08 cutover"
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "kind": "allowed-edit",
+        "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 54 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+51 more) Re-accounted 2026-10-06: carried in by sync of main at 36dc5f083 (Phase 4 sync): docs(observe): record the third acceptance round and close the plan | fix(observe): a panel needs more than half of its voters before agreement is measured Re-accounted 2026-10-07: carried in by sync of main at 7e36897c0: f053de033 feat(hygiene): unify skill renders, dev runtime and root guard Re-accounted after committed truth review 947f6169e826564b6e00bafb8a0535ec2ff6f0ea: merge a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2 of main b2927802231f539ea2b7490cb8a449a9e2204e37 carries a528345592348c1ca4162dbed2e0753880c73fb9 feat(council): add per-seat reasoning postures | 59cd766725c18df6e109e74878d744ca2605eecf docs(runner): align executor routing and advisory blind settings with the code | 454d7a8df2bdf74b4fc29fa9785d776d659139b7 fix(workflow): record the Unit run id when it is created and resume that run after a controller death | 89304dbae16a26b14ef1acce5363947ac32cec91 feat(dispatch): let the owner quarantine an exhausted provider account until a given time | ce880fbedde86152ca169b66fe7e58cd966e67dc fix(workflow): read the producer expertise field from a sibling packet file and either key spelling. Content review owed at atomic cutover; no direct legacy edit by this executor. Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Phase 4 sync under the standing sync policy (plan.md §7.5b), per-file content review pending; sync 2026-10-07 under the standing sync policy (plan.md §7.5b), per-file content review pending; owner amendment A12 at fb79d9eb2 authorizes main sync 90a4fb27c8e43fca9e73714f1c3f235e832ce38a via d98a5c5e75e4529cd99dd9c8bce95a0032806d95 on 2026-10-09; content review owed; owner authorizes targeted truth-fix main sync after review 947f6169e826564b6e00bafb8a0535ec2ff6f0ea and the standing main-side legacy accounting rule (plan section 7.5b); content review owed; Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "504fb464725f70493817738f5684ee5469384e540adc83bd234fa9cf32b2450a",
+        "reviewedAt": "2026-10-06",
+        "revisitTrigger": "Phase 08 cutover"
+      }
+    }
+  ],
+  "changedPaths": [
+    ".agents/skills/fgos-group-thinking/SKILL.md",
+    ".agents/skills/fgos-panel/SKILL.md",
+    ".githooks/pre-commit",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "Cargo.lock",
+    "Cargo.toml",
+    "apps/fgos/Cargo.toml",
+    "apps/fgos/src/cli_presenter.rs",
+    "apps/fgos/src/cli_projector.rs",
+    "apps/fgos/src/main.rs",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/phase-01-verdict-unresolved-first.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/phase-02-lens-personas.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/phase-03-per-seat-restate.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/phase-04-remeasure.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/plan.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/reports/lens-personas-evidence.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/reports/phase-04-blind-inputs.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/reports/phase-04-measurement-inputs.md",
+    "archive/plans/261007-0910-council-parity-verdict-persona-restate/reports/phase-04-remeasure-report.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-01-read-only-worker-agent-config-masks.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-02-unit-association-before-dispatch.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-03-herdr-session-identity-for-reaper-and-recovery.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-04-owner-set-quarantine-and-reset-date.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-05-findings-stop-reason.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-06-absolute-hook-shim-path.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/phase-07-claude-mcp-approval-per-process.md",
+    "archive/plans/261009-1400-dispatch-worker-hygiene-and-recovery/plan.md",
+    "core/skills/fgos-group-thinking/SKILL.md",
+    "core/skills/fgos-panel/SKILL.md",
+    "docs/architecture-manifest.json",
+    "docs/backlog.md",
+    "docs/history/backlog-execution-reconciliation/RECONCILIATION.md",
+    "docs/platform/README.md",
+    "docs/platform/component-boundary.md",
+    "docs/platform/convention/spec.md",
+    "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+    "docs/specs/distribution.md",
+    "docs/specs/runner.md",
+    "docs/specs/system-overview.md",
+    "package.json",
+    "packages/convention/contracts/convention.golden.v1.json",
+    "packages/convention/contracts/convention.query.v1.json",
+    "packages/convention/contracts/convention.rules.v1.json",
+    "packages/convention/rust/Cargo.toml",
+    "packages/convention/rust/src/lib.rs",
+    "packages/convention/rust/src/operations.rs",
+    "packages/convention/rust/src/provider.rs",
+    "packages/convention/rust/src/rules.rs",
+    "packages/convention/rust/tests/golden.rs",
+    "packages/distribution/rust/src/init.rs",
+    "packages/host-runtime/contracts/command-route-annotations.json",
+    "packages/host-runtime/contracts/command-routes.json",
+    "packages/host-runtime/rust/src/catalog.rs",
+    "packages/host-runtime/rust/src/civil_time.rs",
+    "packages/host-runtime/rust/src/lib.rs",
+    "packages/observe/rust/src/metrics_cli/snapshot.rs",
+    "packages/observe/rust/src/scorecard.rs",
+    "packages/observe/rust/src/sources/claude_transcripts.rs",
+    "packages/observe/rust/src/store_lock.rs",
+    "packages/observe/rust/src/time.rs",
+    "plans/reports/advisory-m-owner-decisions-and-parked-questions-261008.md",
+    "plugins/fgOS/skills/fgos-group-thinking/SKILL.md",
+    "plugins/fgOS/skills/fgos-panel/SKILL.md",
+    "src/cli/command-registry.mjs",
+    "src/convention/convention-client.mjs",
+    "src/runner/dispatch/herdr-round.mjs",
+    "src/setup/registrations.mjs",
+    "src/util/host-bin.mjs",
+    "test/convention/convention-client.test.mjs",
+    "test/docs/agents-doctrine-anchors.test.mjs",
+    "test/e2e/root-file-guard-hook.test.mjs",
+    "test/install-packaging.test.mjs",
+    "test/runner/herdr-prompt-ready.test.mjs",
+    "test/rust-host/command-routes.test.mjs",
+    "test/rust-host/release-tree.test.mjs",
+    "test/rust-host/vectors/envelope/version.json",
+    "test/setup/checks.test.mjs",
+    "test/setup/convention-doctor-check.test.mjs",
+    "test/util/host-bin.test.mjs"
+  ],
+  "mainCheckoutWrites": false,
+  "extractorChanges": [],
+  "ratchetLedgerPaths": [
+    "docs/specs/distribution.md",
+    "docs/specs/system-overview.md",
+    "docs/specs/runner.md"
+  ],
+  "outsideRatchetRootAccounting": [
+    {
+      "path": "docs/architecture-manifest.json",
+      "before": null,
+      "after": {
+        "path": "docs/architecture-manifest.json",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "57f522e7bd7a46f900381611e3c36386b269f0048a54463f34dc20d66f131428",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/README.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/README.md",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "2aed12ac464558e409827031c72de90fadf67cc8e13dec8b16c11e25e5e3aec1",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/component-boundary.md",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "259dc64a98021ab4e559e86673b797e6a8d91e7af0b38aeda8faa2348b941a09",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/convention/spec.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/convention/spec.md",
+        "kind": "allowed-new-file",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "ce58ee5ab16696335be7cbe7b5be46449eca2799b4eb5266aa0b13a4276424a6",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "before": null,
+      "after": {
+        "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+        "kind": "allowed-edit",
+        "rationale": "Accounted main-side documentation change imported by merge 727a9bd0183cd870611ccc22f2ee44303b6f0493 from main a9abe55f25e3dcc8733734ecb16a69211ffe58c1 under A25; Plan B merge 1819b9548 owns exactly the seven recorded docs paths. No author-side legacy or Plan B prose edit; content review owed.",
+        "approvedBy": "Owner A25 ae3a742e13e5e84c13a651dd115747e6a50851ac, 2026-10-11; standing main-sync accounting; content review owed",
+        "owner": "documentation-authority-unification-lead",
+        "expectedDigest": "fe8372caa7b5cd7c88e2a38e2da59c22bf6e098425e44e5ee4716c7c9e21c9e9",
+        "reviewedAt": "2026-10-11",
+        "revisitTrigger": "atomic platform-authority cutover; main-side content review owed"
+      }
+    }
+  ],
+  "ratchetValidation": {
+    "exit": 0,
+    "output": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+    "note": "Frozen checker rejects unused out-of-root entries; the five remaining Plan B paths are merge/digest accounting in this report, not active ratchet exceptions."
+  }
+}
