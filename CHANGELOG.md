@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Codex and AGY hook commands now point at the project's shim by absolute path, so the hook runs wherever the agent starts it (AGY ran it outside the project and every tool call failed with exit 127). Rerun `fgos setup` in a project to regenerate its `.codex/hooks.json` and `.agents/hooks.json`; `fgos doctor` reports the old relative form. Codex shows its hook review once for the changed command.
 - Coding review rejection with findings now follows its declared repair route instead of blocking; Claude herdr workers receive scoped read directories for settled cross-repo report refs, without granting the whole assignment store.
 - A panel seat whose provider capacity is exhausted or quarantined is no longer counted as passed. Its result had no outcome, which was read as success, so the panel went on to its synthesizer with a missing report. It now counts as a provider limit, so the seat moves to the next candidate of its pool and, with none left, the unit fails visibly.
 - A workflow run whose unit could not even start (for example a hand-off reference that no longer resolves) now fails its step and the run with the reason recorded, instead of ending the advance with the run still `running` and nothing in its event log.

@@ -41,6 +41,13 @@ export function getProjectShimPath(repoRoot) {
   return path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
 }
 
+/** The shim as a shell command: an absolute, single-quoted path, so it runs whatever directory the
+ * agent starts the hook in (agy runs it outside the project; codex uses the session directory). */
+function shimCommand(repoRoot, args) {
+  const shim = getProjectShimPath(path.resolve(repoRoot)).replace(/'/g, `'\\''`);
+  return `'${shim}' ${args}`;
+}
+
 export function isShimRunnable(repoRoot) {
   const shim = getProjectShimPath(repoRoot);
   if (!existsSync(shim)) return { runnable: false, reason: 'shim-missing' };
@@ -199,16 +206,16 @@ export function checkClaudeHook(cwd) {
 // 2. Codex CLI (.codex/hooks.json)
 // ---------------------------------------------------------------------------
 
-const CODEX_HOOKS = [
+const codexHooks = (repoRoot) => [
   {
     kind: HOOK_KINDS.DISPATCH,
     matcher: '.*',
-    canonicalCommand: '.fgos/installation/bin/fgos hook dispatch-decide',
+    canonicalCommand: shimCommand(repoRoot, 'hook dispatch-decide'),
   },
   {
     kind: HOOK_KINDS.DECISION,
     matcher: 'RequestUserInput|ask.*',
-    canonicalCommand: '.fgos/installation/bin/fgos hook decision-question',
+    canonicalCommand: shimCommand(repoRoot, 'hook decision-question'),
   },
 ];
 
@@ -221,7 +228,7 @@ export function installCodexHook(repoRoot) {
   let preToolUse = Array.isArray(config.hooks.PreToolUse) ? config.hooks.PreToolUse : [];
 
   let changed = false;
-  for (const hookSpec of CODEX_HOOKS) {
+  for (const hookSpec of codexHooks(repoRoot)) {
     const idx = preToolUse.findIndex(
       (e) => Array.isArray(e?.hooks) && e.hooks.some((h) => h?.command?.includes(hookSpec.kind)),
     );
@@ -270,7 +277,7 @@ export function checkCodexHook(cwd) {
   }
 
   const missing = [];
-  for (const hookSpec of CODEX_HOOKS) {
+  for (const hookSpec of codexHooks(cwd)) {
     const ok = preToolUse.some(
       (e) =>
         e?.matcher === hookSpec.matcher &&
@@ -296,16 +303,16 @@ export function checkCodexHook(cwd) {
 // 3. AGY (.agents/hooks.json)
 // ---------------------------------------------------------------------------
 
-const AGY_GROUPS = {
+const agyGroups = (repoRoot) => ({
   'fgos-dispatch-guard': {
     matcher: '.*',
-    command: '.fgos/installation/bin/fgos hook dispatch-decide --format=agy',
+    command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'),
   },
   'fgos-decision-guard': {
     matcher: 'ask.*|AskUserQuestion',
-    command: '.fgos/installation/bin/fgos hook decision-question --format=agy',
+    command: shimCommand(repoRoot, 'hook decision-question --format=agy'),
   },
-};
+});
 
 export function installAgyHook(repoRoot) {
   const hooksPath = path.join(repoRoot, '.agents', 'hooks.json');
@@ -313,7 +320,7 @@ export function installAgyHook(repoRoot) {
   if (config === null) return { wired: false, skippedExisting: 'malformed' };
 
   let changed = false;
-  for (const [groupName, spec] of Object.entries(AGY_GROUPS)) {
+  for (const [groupName, spec] of Object.entries(agyGroups(repoRoot))) {
     const existing = config[groupName];
     const isMatching =
       existing &&
@@ -357,7 +364,7 @@ export function checkAgyHook(cwd) {
   }
 
   const missing = [];
-  for (const [groupName, spec] of Object.entries(AGY_GROUPS)) {
+  for (const [groupName, spec] of Object.entries(agyGroups(cwd))) {
     const group = config[groupName];
     const ok =
       group &&
