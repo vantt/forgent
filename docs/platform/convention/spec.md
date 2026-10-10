@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, tool author
 Purpose: Define the executable source of truth for fgOS names and repository-relative placement
 Design status: Accepted
-Implementation status: Proposed
+Implementation status: Implemented
 Canonical: Yes
 Owner: Convention component
 Source: packages/convention/rust
@@ -304,3 +304,61 @@ Schema v1 reserves `placement-glob`, cardinality, classification, per-kind postu
 ### 2026-10-10 — Keep project overlay location open
 
 The merge-by-rule-id semantic is reserved, but overlay location, setup merge, doctor discovery, loading, and enforcement remain unimplemented until Q13 is explicitly decided.
+
+### 2026-10-10 — Implementation record
+
+| Delivery | Commit |
+|---|---|
+| Approved component contract | `6c82c8df0`, corrected by `a471977f7` |
+| Shared host-runtime civil time | `15fa94988` |
+| Native Convention component and golden contracts | `e6372acc6` |
+| Native route, catalog, and generated command routes | `7e5861303` |
+| Thin Node host client | `8185b0fb0` |
+| Doctor cutoff enforcement and warning-only pre-commit integration | `d02e2b879`, `302a607cf` |
+| Always-loaded contributor guidance | `461e12d12` |
+| Status, caller notes, verification evidence, and changelog | `docs(convention): record implemented Convention contracts` |
+
+## 14. Caller migration
+
+- Keep `resolveRepoRoot`, `resolveMainCheckoutRoot`, `resolveFgosDir`,
+  `resolveLogsDir`, `resolveSkillRoot`, `resolveTaskSpecPath`, and
+  `resolveContentRoot` in `src/runner/paths.mjs`. They resolve storage and
+  execution roots rather than documentation conventions. Move one only when
+  its caller is host-owned; do not add a process spawn to a hot path.
+- The source pre-commit hook and `convention-conformance` doctor check now call
+  Convention through the thin Node client.
+- No current JavaScript source generates report names from a duplicated
+  template. `scripts/measure-verify-cost.mjs` writes a fixed historical name;
+  `scripts/measure-p08-performance.mjs` targets an archived plan path and is a
+  separate dead-write cleanup; `scripts/test-select-promote.mjs` writes a JSON
+  ledger outside Convention's artifact kinds. None moves in this change.
+- External `ak plan create` and ak/ck hooks remain external callers. Checking
+  accepts the forms they currently emit.
+- Stateful id allocation and `branchNameFor` remain deferred candidates.
+  Convention does not allocate uniqueness.
+
+## 15. Verification record
+
+Observed on 2026-10-10 from the implementation worktree:
+
+| Acceptance surface | Evidence |
+|---|---|
+| 1. Canonical report name | Native CLI returned `report-261006-1415-harness-audit.md` for the pinned `+07:00` instant. |
+| 2. Canonical report paths | Native CLI returned both the central `plans/reports/` path and the requested per-plan generation path byte-for-byte. |
+| 3. Check outcomes | Six explicit paths produced the four named violations and no findings for the two accepted paths. |
+| 4. Golden contracts | `cargo test --workspace` passed 325 tests across 49 suites; Convention tests load cases from `packages/convention/contracts/`. |
+| 5. Native route | Command-route export check passed; 14 command-route tests passed with `convention` native-owned by `packages/convention/rust`. |
+| 6. Data-driven host dispatch | No hard-coded `selector == "metrics"` branch remains in `apps/fgos/src/main.rs`. |
+| 7. Shared civil time | Civil conversion is implemented only in `fgos-host-runtime`; Convention, Observe, Distribution, and the host presenter import it. |
+| 8. Doctor | Live JSON output contained `convention-conformance`, passing with 91 pre-cutoff and 0 post-cutoff violations across 277 scoped files. |
+| 9. Thin Node caller | No `RegExp`, six-digit date pattern, or `YYMMDD` rule copy exists in `src/convention/` or the hook. |
+| 10. Always-loaded guidance | `AGENTS.md` contains exactly one physical line mentioning `fgos convention`. |
+| 11. Release note | `CHANGELOG.md` has one Convention entry under `[Unreleased]`, including doctor cutoff and warning-only hook behavior. |
+
+`doc-current-path-missing` still reports one unrelated pre-existing knowledge
+document path; none of the Convention documents is named in that finding.
+
+Final `npm test` exercised 7,057 tests: 6,983 passed, 8 skipped, 65 todo,
+and one unrelated live-Herdr gateway test failed with
+`reason: confinement-mismatch`. The same test failed identically in all three
+post-implementation full-suite runs; no Convention path appears in its stack.

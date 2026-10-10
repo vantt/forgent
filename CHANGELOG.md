@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos convention name|path|check|classify` provides one native Rust authority for report, plan, and journal names and repository-relative paths. `convention-conformance` reports old violations without failing and fails for violations introduced after each rule cutoff; the source-repository pre-commit hook warns, but never blocks, on newly staged direct report and journal files.
 - A mutating assignment whose worker settled with a `findings` verdict now stops with the reason `assignment-<operation>-findings` instead of `-insufficient-confidence`, which read as missing evidence. It still stops.
 - `fgos dispatch reconcile provider-capacity quarantine --provider <p> --account <id> --until <ISO> --reason "<why>"` lets the owner take an exhausted account out of selection until a given time (clear stays `clear-quarantine`). A codex usage-limit message that names a clock time ("try again at 6:02 PM") now sets the quarantine end to that time instead of the one-hour default.
 - Confined claude workers no longer stop at the "new MCP server found in this project" dialog: the servers the project's `.mcp.json` declares are approved for that worker process only (never written to `~/.claude.json`), and only where the project root is already trusted.

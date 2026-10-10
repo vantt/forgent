@@ -21,7 +21,7 @@ coverage: partial
 - decision-citation-drift — quét backlog/spec tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế (chỉ phát hiện, không tự sửa); spec: decision-citation-drift.md
 - distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: distillery.md (partial — chỉ phủ porting lifecycle, xem Open Gaps trong spec đó)
 - distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
-- convention — nguồn quy tắc máy-chạy được cho sinh/kiểm tên và vị trí repository-relative, không sở hữu state hay sức khoẻ thân tài liệu; trạng thái proposed; spec: `../platform/convention/spec.md`
+- convention — nguồn quy tắc máy-chạy được cho sinh/kiểm tên và vị trí repository-relative, không sở hữu state hay sức khoẻ thân tài liệu; trạng thái implemented; spec: `../platform/convention/spec.md`
 
 ## Shared Entities
 
