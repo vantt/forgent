@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-current-closure-classifications",
+  "authorSession": "codex-session:1@2026-10-11",
+  "sources": [],
+  "claims": [],
+  "candidateClassifications": [
+    {
+      "claimId": "claim_34a32f99c4c1c82582e2d139b889a296",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_4301c71a6dd4a373fdf88cbfcce6abce",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_8cfb187edeb487966e2ff6b9926809e0",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_0c80eeeb663fbf52cd06f23f7ba03a35",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_5fbeb634b61fd393084cc27a51b8c72e",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_60bdeefbc7b8a3bee3c9ba06e7759dc4",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_ea240d60d4890dc2a5c9ea5f4c41c1bc",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_32f1855de59cc4ae4f957e5af1ccb12d",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_8ed59b72fce0ae8cbe96ceb925f68cdc",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_b7202aa695a3b6cde058ea7bd48d8f0e",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_70d93814bdfb1389bb31b561553a0125",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_b0188851071b323c139f18947b7b3c60",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_34a87472629191c59355e5f74ef2c2d2",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_3b6225e7c695ed53efcfccc9231de32a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_e8e710ab280697b1c9a2841a53b903d1",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_9306c12cf83959d8c3a1fbf694b5874d",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_ecb2e520b230a8a2b046055258ba807f",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_980e880d4eafee30cc1f150861879760",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_4a2d3f838f4aee3d98e6447fc810ac11",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_9bdadc017bd7be0e7a28a0ecda44225a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_4a0fce2c25bbabc9a480091dc6cc7a6f",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_7b115d68e3b31d84ec60ecd82f7f608a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_c74944581e23cedd527e23016d0c5999",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_aeac2f321e1ccb5d0fde1c5de4df5124",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_8ec8b196432858ddf302aab3c106812a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    },
+    {
+      "claimId": "claim_27a13b2a9450b5ef70d8a048936ccd7a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
+      "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending",
+      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+    }
+  ]
+}
