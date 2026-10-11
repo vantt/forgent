@@ -4524,7 +4524,7 @@ registerCheck({
 // awaits every check, so a check may return its result directly or as a promise.
 registerCheck({
   id: 'workflow-pools-satisfy-independence',
-  description: 'for every panel or reviewed Workflow unit, the capability prefer pool supplies enough distinct provider families for bind() to place every role independently',
+  description: 'for every reviewed Workflow unit, the capability prefer pool supplies a provider family different from the producer\'s (hard); a panel unit whose pool has fewer families than seats is reported as seats sharing a family, not as a failure',
   check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigFromDir,

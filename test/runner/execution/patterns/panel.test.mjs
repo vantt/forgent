@@ -45,9 +45,10 @@ test('runPanel runs N panel members in parallel and synthesizes results', async 
     assert.equal(panelistCalls[i].role, expectedRole);
     assert.equal(panelistCalls[i].readOnly, true);
     assert.equal(panelistCalls[i].unit, unit);
-    // independentOf should contain all other panelists
-    const expectedIndependentOf = ['panelist-1', 'panelist-2', 'panelist-3'].filter((r) => r !== expectedRole);
-    assert.deepEqual(panelistCalls[i].independentOf, expectedIndependentOf);
+    // A different family per seat is a soft preference over every other seat, never a hard rule.
+    const expectedPreferred = ['panelist-1', 'panelist-2', 'panelist-3'].filter((r) => r !== expectedRole);
+    assert.deepEqual(panelistCalls[i].preferIndependentOf, expectedPreferred);
+    assert.equal(panelistCalls[i].independentOf, undefined);
   }
 
   // Verify synthesizer call
@@ -59,7 +60,8 @@ test('runPanel runs N panel members in parallel and synthesizes results', async 
   assert.ok(synthCall.unit.objective.includes(unit.objective));
   assert.deepEqual({ ...synthCall.unit, objective: unit.objective }, unit);
   assert.equal(synthCall.inputs.length, 3);
-  assert.deepEqual(synthCall.independentOf, ['panelist-1', 'panelist-2', 'panelist-3']);
+  assert.deepEqual(synthCall.preferIndependentOf, ['panelist-1', 'panelist-2', 'panelist-3']);
+  assert.equal(synthCall.independentOf, undefined);
   assert.equal(synthCall.inputs[0].role, 'panelist-1');
 
   // Verify returned result shape
@@ -144,8 +146,8 @@ test('runPanel supports members, role, and synthesizeRole overrides in params', 
   assert.equal(calls[0].role, 'researcher-1');
   assert.equal(calls[1].role, 'researcher-2');
   assert.equal(calls[2].role, 'synthesizer');
-  assert.deepEqual(calls[0].independentOf, ['researcher-2']);
-  assert.deepEqual(calls[1].independentOf, ['researcher-1']);
+  assert.deepEqual(calls[0].preferIndependentOf, ['researcher-2']);
+  assert.deepEqual(calls[1].preferIndependentOf, ['researcher-1']);
   assert.equal(res.outcome, 'pass');
   assert.equal(res.results.length, 3);
 });
@@ -181,3 +183,9 @@ test('a thrown panelist waits for the other seat to settle before the unit can b
   await rejection;
 });
 
+
+test('panel.mjs declares seat intent only: no executor, family or tier names', async () => {
+  const fs = await import('node:fs/promises');
+  const source = await fs.readFile(new URL('../../../../src/runner/execution/patterns/panel.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /\b(claude|openai|codex|gemini|xai|glm|nano|flagship|frontier)\b/i);
+});

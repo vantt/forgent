@@ -33,6 +33,18 @@
     "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
     "inline": {"type": "boolean"},
     "stanceOptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "sharedFamilies": {
+      "type": "array",
+      "description": "Optional, additive. Present only when two or more final seats were bound to one provider family although their binding asked for a soft spread across families (a panel with more seats than the pool has families). Each entry names the family and the role/round seats that share it. Absent means no seat shared a family; readers must treat it as optional.",
+      "items": {
+        "type": "object",
+        "required": ["family", "seats"],
+        "properties": {
+          "family": {"type": "string", "minLength": 1},
+          "seats": {"type": "array", "minItems": 2, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
     "seats": {
       "type": "array",
       "items": {

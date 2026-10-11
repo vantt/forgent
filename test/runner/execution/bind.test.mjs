@@ -567,6 +567,80 @@ test('bind: with no prefer pool anywhere a headless unit is refused and its desc
   assert.equal(bind(ask, { runnerConfig: config, session: { headless: true } }).refused.reason, 'headless-no-executor');
 });
 
+// Soft spread: a seat prefers a provider family no listed seat uses, falls back to the least
+// used family, and is never refused for sharing one. Pool order (claude, openai, gemini) is the
+// tie-break.
+const SPREAD_UNIT = { id: 'u-spread', capability: 'code:implement', writes: [] };
+const seatOn = (role, executor) => ({ role, executor });
+const spreadAsk = (preferIndependentOf, extra = {}) => ({
+  unit: SPREAD_UNIT, role: 'panelist-9', readOnly: true, preferIndependentOf, ...extra,
+});
+
+test('bind spread: the first family in pool order that no listed seat uses is chosen', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const first = bind(spreadAsk([]), ctx);
+  assert.equal(first.executor, 'claude');
+  assert.equal(first.provenance.familySpread.source, 'prefer-independent-of:distinct-family', 'the first seat records that it asked for spread');
+  assert.equal(bind(spreadAsk([seatOn('panelist-1', 'claude')]), ctx).executor, 'codex');
+  const third = bind(spreadAsk([seatOn('panelist-1', 'claude'), seatOn('panelist-2', 'codex')]), ctx);
+  assert.equal(third.executor, 'gemini-cli');
+  assert.deepEqual(third.provenance.familySpread.value.sharedWith, []);
+  assert.equal(third.provenance.familySpread.source, 'prefer-independent-of:distinct-family');
+});
+
+test('bind spread: seats outnumbering the families share the least used family instead of being refused', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const used = [seatOn('panelist-1', 'claude'), seatOn('panelist-2', 'codex'), seatOn('panelist-3', 'gemini-cli')];
+  const fourth = bind(spreadAsk(used), ctx);
+  assert.equal(fourth.refused, undefined);
+  assert.equal(fourth.executor, 'claude', 'every family used once: pool order breaks the tie');
+  assert.deepEqual(fourth.provenance.familySpread.value, { family: 'claude', sharedWith: ['panelist-1'] });
+  assert.equal(fourth.provenance.familySpread.source, 'prefer-independent-of:no-eligible-unused-family');
+
+  const fifth = bind(spreadAsk([...used, seatOn('panelist-4', 'claude')]), ctx);
+  assert.equal(fifth.executor, 'codex', 'claude is used twice, so the least used family wins');
+  assert.deepEqual(fifth.provenance.familySpread.value.sharedWith, ['panelist-2']);
+});
+
+test('bind spread: a family the same provider reaches through another executor counts as used', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  // native-agent is also a claude-family executor
+  assert.equal(bind(spreadAsk([seatOn('panelist-1', 'native-agent')]), ctx).executor, 'codex');
+});
+
+test('bind spread: families filtered out by governance are not candidates, so the next best is chosen', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.governance = { disallowedExecutors: ['codex'] };
+  const res = bind(spreadAsk([seatOn('panelist-1', 'claude')]), { runnerConfig, session: {} });
+  assert.equal(res.executor, 'gemini-cli');
+});
+
+test('bind spread: never overrides the hard independence filter', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const res = bind(spreadAsk([seatOn('panelist-1', 'claude')], { independentOf: ['codex', 'gemini-cli', 'claude'] }), ctx);
+  assert.equal(res.refused.reason, 'independence');
+  const hardOnly = bind({ unit: SPREAD_UNIT, role: 'reviewer', readOnly: true, independentOf: ['claude'] }, ctx);
+  assert.equal(hardOnly.executor, 'codex');
+  assert.equal(hardOnly.provenance.familySpread, undefined, 'no spread asked: nothing recorded');
+});
+
+test('bind spread: a human-cli acceptDependence override still applies and is unaffected by spread', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const res = bind(spreadAsk([seatOn('panelist-1', 'claude')], {
+    independentOf: ['claude'],
+    overrides: [{ scope: { role: 'panelist-9' }, origin: 'human-cli', executor: 'claude', acceptDependence: true }],
+  }), ctx);
+  assert.equal(res.executor, 'claude');
+});
+
+test('bind spread: a provider-limit fallback keeps ranking the remaining candidates by family use', () => {
+  const ctx = { runnerConfig: createMockRunnerConfig(), session: {} };
+  const ask = spreadAsk([seatOn('panelist-1', 'claude')]);
+  const first = bind(ask, ctx);
+  assert.equal(first.executor, 'codex');
+  assert.equal(nextCandidate(first, ask, ctx).executor, 'gemini-cli');
+});
+
 test('architecture guard: bind.mjs does NOT import src/state or src/runner/coordination', async () => {
   const fs = await import('node:fs/promises');
   const content = await fs.readFile(new URL('../../../src/runner/execution/bind.mjs', import.meta.url), 'utf8');

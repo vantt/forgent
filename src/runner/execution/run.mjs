@@ -381,7 +381,7 @@ export async function runUnit(options = {}) {
   };
 
   // Helper to run a role
-  const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], inputs = [] }) => {
+  const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], preferIndependentOf = [], inputs = [] }) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
     const session = {
       provider: options.session?.provider,
@@ -396,6 +396,7 @@ export async function runUnit(options = {}) {
       role,
       readOnly,
       independentOf: resolveIndependence(independentOf),
+      ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
       overrides: unitRecord.overrides || [],
       ...(unit.blind ? { blind: true } : {}),
     };

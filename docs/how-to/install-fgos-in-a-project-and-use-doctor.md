@@ -244,7 +244,7 @@ manual step.
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
 | `agent-cli-project-trusted` | The project root is trusted in every codex home and agy sub-HOME the configured executors use | `codex config ~/.codex-x/config.toml (openai) has no entry for /path; codex will stop at "Trust this folder?"`; `agy settings ... does not list /path in trustedWorkspaces` | you | codex: add `[projects."<root>"]` and `trust_level = "trusted"` to the named `config.toml`. agy: add the root to the `trustedWorkspaces` array in the named `settings.json`. fgOS never edits these files |
-| `workflow-pools-satisfy-independence` | For every panel or reviewed Workflow unit, the `prefer` pool has enough distinct provider families to place every role independently | `capability prefer pools cannot supply the independent provider families these Workflow units need: ...` | you | Add a `prefer` entry on another provider family under `runner.capabilities.<capability>` |
+| `workflow-pools-satisfy-independence` | For every reviewed Workflow unit, the `prefer` pool has a provider family different from the producer's; a panel pool with fewer families than seats is noted (seats share a family), not failed | `capability prefer pools cannot supply the independent provider families these Workflow units need: ...` | you | Add a `prefer` entry on another provider family under `runner.capabilities.<capability>` |
 | `trust-store-readable` | Claude's folder-trust store `~/.claude.json` is readable and has a `projects` object, so fgOS can pre-trust its own worktrees | `trust store at ~/.claude.json is unreadable: ...` or `... is not valid JSON` or `... has no usable "projects" object` | you | Start `claude` once so it creates the file; fix its permissions or its content |
 | `non-claude-trust-stores-readable` | Every codex or agy trust store named in an executor is readable | names the unreadable store | you | Fix the path in the executor config, or start that CLI once so the file exists |
 | `confined-pane-accounts` | Every confined herdr invocation with a private home has an account whose credential files exist | `no runner.providers.z-ai.accounts in the global config, so its pane starts in an empty private home, logged out` | you | Add the account under `runner.providers.<provider>.accounts` in `~/.fgos/config.json`, and log that CLI in |
@@ -359,11 +359,14 @@ runner picks executors from that capability's pool in
   ] } } }
 ```
 
-A panel or reviewed unit has roles that must come from different provider
-families (a synthesizer may not share a family with the panelists it
-summarizes). With three panelists you need a fourth family for the synthesizer;
-three families fail on the synthesizer after the panelists already ran. The
-`workflow-pools-satisfy-independence` check finds this before a paid run.
+A reviewed unit's checkers must come from a different provider family than the
+producer (hard rule). A panel only prefers a different family per seat:
+`bind()` gives each seat the first family in `prefer` order that no earlier seat
+uses, then the least used one, so a panel may have more seats than the pool has
+families and some seats share a family (the run's `unit-summary.json` lists them
+under `sharedFamilies`). The `workflow-pools-satisfy-independence` check fails
+on a reviewed unit that lacks a second family and only notes, without failing,
+which panel seats would share a family.
 "Runnable" here means what the binder can place (allow-list, confinement,
 herdr). It does not see a family whose CLI is blocked on a trust prompt or whose
 account is out of quota, so a green pool check is not enough on its own.
@@ -457,7 +460,7 @@ own home, then run again." Concretely:
 
 | Symptom | Likely cause | What to do |
 |---|---|---|
-| Step refused with `policy-refusal ... violates independence requirement against [...]` | Pool lacks enough provider families | Add a family to the pool (5.2); the panelists already ran |
+| Step refused with `policy-refusal ... violates independence requirement against [...]` | A `reviewed` checker has no provider family different from the producer's (a panel never refuses for this) | Add a family to the pool (5.2); the producer already ran |
 | `execution-timeout` after a long wait | An agent looped or stalled. A busy stream is not treated as idle | Read the round's `stdout.log` and `herdr-diagnosis.json`; consider a different executor in the pool |
 | `parked` with an open question | A human gate | Answer: `fgos workflow answer <run-id> --step <step-id> --answer "<text>"`; the run continues |
 | `status` says `running`, no progress, `advance.running` false | Detached advance died | `fgos workflow resume <run-id>` |

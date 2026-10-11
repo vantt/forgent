@@ -16,14 +16,14 @@ import { createRoleExecutorLedger } from './role-ledger.mjs';
  * @param {object} runnerConfig Runner config (capabilities, executors, patterns, ...).
  * @param {object} [options]
  * @param {object} [options.session] bind() session context. Defaults to a headless session.
- * @returns {Promise<{ outcome: string, roles: Array<{ role: string, executor?: string, invocation?: string|null, refused?: { reason: string, detail: string } }> }>}
+ * @returns {Promise<{ outcome: string, roles: Array<{ role: string, executor?: string, invocation?: string|null, sharesFamilyWith?: string[], refused?: { reason: string, detail: string } }> }>}
  */
 export async function simulateUnitBindings(unit, runnerConfig, { session = {} } = {}) {
   const ledger = createRoleExecutorLedger();
   const roles = [];
-  const runRole = async ({ role, unit: roleUnit, readOnly = false, independentOf = [] }) => {
+  const runRole = async ({ role, unit: roleUnit, readOnly = false, independentOf = [], preferIndependentOf = [] }) => {
     const bound = bind(
-      { unit: roleUnit || unit, role, readOnly, independentOf: ledger.resolve(independentOf), overrides: [] },
+      { unit: roleUnit || unit, role, readOnly, independentOf: ledger.resolve(independentOf), ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}), overrides: [] },
       { runnerConfig, session: { headless: true, ...session } },
     );
     if (bound.refused) {
@@ -31,7 +31,12 @@ export async function simulateUnitBindings(unit, runnerConfig, { session = {} } 
       return { outcome: 'policy-refusal', role, refused: bound.refused };
     }
     ledger.note(role, bound.executor);
-    roles.push({ role, executor: bound.executor, invocation: bound.invocation });
+    roles.push({
+      role,
+      executor: bound.executor,
+      invocation: bound.invocation,
+      ...(bound.provenance?.familySpread?.value.sharedWith.length ? { sharesFamilyWith: bound.provenance.familySpread.value.sharedWith } : {}),
+    });
     return { outcome: 'pass', role };
   };
   const result = await runPattern(unit.pattern || 'solo', unit, runnerConfig, { runRole });

@@ -120,6 +120,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     role,
     readOnly = false,
     independentOf = [],
+    preferIndependentOf = null,
     lockedPersona = null,
     overrides = [],
     blind = false,
@@ -161,9 +162,21 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     candidateSource = `capability:${capKey}`;
   }
 
+  // Soft spread: `preferIndependentOf` is [{ role, executor }] of the seats already bound (empty
+  // for the first seat of a spread; absent when the role asks for none). It never refuses; it only
+  // ranks the candidates that passed every filter (see below).
+  const spreadRequested = Array.isArray(preferIndependentOf);
+  const familyUse = new Map();
+  for (const seat of spreadRequested ? preferIndependentOf : []) {
+    if (!seat?.executor) continue;
+    const family = getProviderFamily(runnerConfig, seat.executor).toLowerCase();
+    familyUse.set(family, (familyUse.get(family) ?? 0) + 1);
+  }
+
   // 3. Candidate resolution & Filtering
   let chosenCandidate = null;
   let chosenCandidateIndex = -1;
+  let chosenFamilyUse = Infinity;
   let refusalReason = null;
   let refusalDetail = null;
 
@@ -232,10 +245,16 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
         continue;
       }
 
-      // Candidate passed filters
-      chosenCandidate = { ...cand, invocation: approved.invocation };
-      chosenCandidateIndex = poolIndex;
-      break;
+      // Candidate passed filters. Without a soft spread the first one in pool order wins. With
+      // one, the family used by the fewest listed seats wins (an unused family has 0), and the
+      // pool order breaks ties because a later candidate must be strictly better to replace it.
+      const use = spreadRequested ? (familyUse.get(providerFamily.toLowerCase()) ?? 0) : 0;
+      if (!chosenCandidate || use < chosenFamilyUse) {
+        chosenCandidate = { ...cand, invocation: approved.invocation };
+        chosenCandidateIndex = poolIndex;
+        chosenFamilyUse = use;
+      }
+      if (!spreadRequested || use === 0) break;
     }
   }
 
@@ -391,6 +410,19 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     mechanism: { value: mechanism, source: mechanismSource },
     posture: { value: posture, source: isReadOnlyPosture ? 'read-only-ask-or-writes-empty' : 'producer-writes-declared' },
   };
+
+  // Degraded independence is recorded, never hidden: which seats this one shares a provider
+  // family with, and that no eligible (governance, posture) unused family was left in the pool.
+  if (spreadRequested && !chosenCandidate.isInlineFallback) {
+    const family = providerFamily.toLowerCase();
+    const sharedWith = preferIndependentOf
+      .filter((seat) => seat?.executor && getProviderFamily(runnerConfig, seat.executor).toLowerCase() === family)
+      .map((seat) => seat.role);
+    provenance.familySpread = {
+      value: { family: providerFamily, sharedWith: [...new Set(sharedWith)] },
+      source: sharedWith.length === 0 ? 'prefer-independent-of:distinct-family' : 'prefer-independent-of:no-eligible-unused-family',
+    };
+  }
 
   if (matchingOverride?.origin) {
     provenance.overridesOrigin = { value: matchingOverride.origin, source: 'override' };
