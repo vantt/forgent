@@ -74,7 +74,9 @@ test('every capability of the committed config binds headless to a runnable invo
       assertRunnable(result, `${capability} writes=${writes.length}`);
     }
   }
-  assert.ok(bound > 10, 'the committed config binds a real set of capabilities');
+  // Only capabilities whose pool names no invocation are counted here; the pools that pin one
+  // (the five-family pools) bind to pane invocations and are covered by their own tests.
+  assert.ok(bound > 5, 'the committed config binds a real set of capabilities');
 });
 
 test('Workflow capabilities that name a same-verb pool bind headless', () => {
