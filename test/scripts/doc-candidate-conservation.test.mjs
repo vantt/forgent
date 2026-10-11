@@ -231,3 +231,95 @@ test('a failed command is not a true-and-current behaviour proof', (t) => {
   const fixture = receiptFixture(t, { class: 'candidate-native-content', commandEvidence: true, commandExit: 1 });
   assert.deepEqual(fixture.check().map(row => row.claimId), ['native-unit']);
 });
+
+function historyReceiptFixture(t, options = {}) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'history-receipt-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: 'pipe' }).trim();
+  const write = (file, text) => {
+    fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    fs.writeFileSync(path.join(root, file), text);
+  };
+  const digestOf = text => createHash('sha256').update(text).digest('hex');
+  const originalPath = 'docs/platform/alpha/spec.md';
+  const historyPath = options.historyPath || 'docs/platform/alpha/history/spec.md';
+  const original = '# Earlier Spec\n\nThe former engine executes legacy sessions.\n';
+  const author = 'codex-session:author@2026-10-11';
+  const reviewer = options.reviewer || 'reviewer:claude-session:independent@2026-10-11';
+  git('init', '-q');
+  git('config', 'user.name', 'Fixture');
+  git('config', 'user.email', 'fixture@example.invalid');
+  write(originalPath, original);
+  git('add', '--', originalPath); git('commit', '-qm', 'original document');
+  const provenanceCommit = git('rev-parse', 'HEAD');
+  const body = options.body || original.trimEnd();
+  const payload = options.plain ? body : `~~~~text\n${body}\n~~~~`;
+  const provenance = options.noProvenance ? 'Earlier design' : `${originalPath} at ${provenanceCommit}`;
+  write(historyPath, `# Historical Spec\n\n\`\`\`txt\nDocument type: History\nProvenance: ${provenance}\n\`\`\`\n\n## Literal Snapshot\n\n${payload}\n`);
+  git('add', '--', historyPath); git('commit', '-qm', 'historical snapshot');
+  const native = buildConservationUnitLookup(root, git('rev-parse', 'HEAD'))(historyPath);
+  const nativeUnit = native.find(row => options.wrapper ? row.anchor === 'unheaded-block-1' : row.text.includes(body));
+  assert.ok(nativeUnit);
+  const shownText = nativeUnit.sectionText ?? nativeUnit.text;
+  const receiptPath = 'plans/fixture/ledger/candidate-classifications-history.json';
+  const reportPath = 'plans/fixture/reports/phase-06/review-2-history.md';
+  const historyEvidence = {
+    provenancePath: originalPath, provenanceCommit,
+    blobSha: git('rev-parse', `${provenanceCommit}:${originalPath}`),
+    containedTextDigest: digestOf(options.proofText || body),
+    ...options.proof,
+  };
+  const receipt = { claimId: 'historical-unit', path: historyPath, anchor: nativeUnit.anchor, unitDigest: nativeUnit.textDigest, shownText, shownTextDigest: digestOf(shownText), class: 'history-snapshot', authoredBy: author, historyEvidence };
+  write(receiptPath, JSON.stringify({ version: 1, authorSession: author, receipts: [receipt] }));
+  git('add', '--', receiptPath); git('commit', '-qm', 'snapshot receipt');
+  const receiptCommit = git('rev-parse', 'HEAD');
+  const note = 'The historical payload is byte-contained in the named provenance blob; no current truth approval.';
+  write(reportPath, `# Independent snapshot review\nAuthor session: ${author}\nReviewer: ${reviewer}\nReceipt commit: ${receiptCommit}\n\n| Claim | Class | Verdict | Unit digest | Shown text digest | Note | Evidence digest |\n|---|---|---|---|---|---|---|\n| historical-unit | history-snapshot | ${options.verdict || 'ok'} | ${receipt.unitDigest} | ${receipt.shownTextDigest} | ${note} | ${options.reportEvidenceDigest || digestOf(JSON.stringify(historyEvidence))} |\n`);
+  if (!options.uncommittedReport) { git('add', '--', reportPath); git('commit', '-qm', 'independent snapshot review'); }
+  const inventory = { commit: git('rev-parse', 'HEAD'), items: [{ path: historyPath, authorityStatus: 'candidate' }], claimLedger: [unit(receipt.claimId, historyPath, receipt.anchor, { sourceUnitDigest: receipt.unitDigest })] };
+  const ref = { claimId: receipt.claimId, receiptPath, receiptCommit, reviewStatus: options.pending ? 'pending' : 'reviewed', reviewedBy: reviewer, reviewedAt: '2026-10-11', reviewReport: reportPath, reviewReportCommit: inventory.commit, reviewNote: note };
+  const shard = { version: 1, shard: 'history', authorSession: author, sources: [], claims: [], candidateClassifications: [ref] };
+  return { root, git, write, historyPath, originalPath, inventory, receipt, ref, check: () => checkConservation({ repoRoot: root, inventory, vocabulary, decisions: [shard] }).unreferencedCandidateRows };
+}
+
+test('independently reviewed historical fenced content closes by provenance bytes rather than current truth', t => {
+  const fixture = historyReceiptFixture(t);
+  assert.deepEqual(fixture.check(), []);
+});
+
+test('a complete historical paragraph can close when its bytes occur in the provenance blob', t => {
+  const fixture = historyReceiptFixture(t, { plain: true, body: 'The former engine executes legacy sessions.' });
+  assert.deepEqual(fixture.check(), []);
+});
+
+for (const [name, options] of [
+  ['canonical document kind', { historyPath: owner }],
+  ['missing provenance pin', { noProvenance: true }],
+  ['different provenance path', { proof: { provenancePath: 'docs/platform/alpha/other.md' } }],
+  ['different provenance commit', { proof: { provenanceCommit: 'f'.repeat(40) } }],
+  ['different source blob digest', { proof: { blobSha: 'f'.repeat(40) } }],
+  ['only a fragment of the full fenced body proven', { proofText: '# Earlier Spec' }],
+  ['extra content outside the provenance blob', { body: '# Earlier Spec\n\nThe former engine executes legacy sessions.\n\nAn invented historical obligation.' }],
+  ['normalized rather than literal bytes', { body: '# Earlier Spec\n\nThe former engine  executes legacy sessions.' }],
+  ['snapshot metadata instead of historical payload', { wrapper: true }],
+  ['different independently reviewed evidence digest', { reportEvidenceDigest: 'f'.repeat(64) }],
+  ['uncommitted independent review', { uncommittedReport: true }],
+  ['non-accepted verdict', { verdict: 'rework' }],
+  ['pending receipt reference', { pending: true }],
+  ['same author and reviewer session', { reviewer: 'reviewer:codex-session:author@2026-10-12' }],
+]) {
+  test(`history snapshot remains open with ${name}`, t => {
+    const fixture = historyReceiptFixture(t, options);
+    assert.deepEqual(fixture.check().map(row => row.claimId), ['historical-unit']);
+  });
+}
+
+test('a snapshot proof is invalidated by a committed provenance change even when payload bytes are unchanged', t => {
+  const fixture = historyReceiptFixture(t);
+  assert.deepEqual(fixture.check(), []);
+  const text = fs.readFileSync(path.join(fixture.root, fixture.historyPath), 'utf8');
+  fixture.write(fixture.historyPath, text.replace(fixture.receipt.historyEvidence.provenanceCommit, 'f'.repeat(40)));
+  fixture.git('add', '--', fixture.historyPath); fixture.git('commit', '-qm', 'changed provenance');
+  fixture.inventory.commit = fixture.git('rev-parse', 'HEAD');
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['historical-unit']);
+});
