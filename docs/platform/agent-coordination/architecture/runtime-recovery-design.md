@@ -272,7 +272,7 @@ They do not describe a shipped session-recovery contract.
 | R07/R08/R09 | Fallback defines one default, ceiling/spawn mapping, budget arithmetic and typed effect eligibility. |
 | R10 | Historical session-policy proof correction; not a current engine implementation claim. |
 | R11/R12/R13 | RunHandle separates liveness/progress, defines transitions/control coverage and one visibility binding source. |
-| R14/R15 | Ownership table, shared mutation door, versioned rollout and dependency gates. |
+| R14/R15 | Ownership table, versioned rollout and dependency gates. |
 
 No distributed lease, live session transfer, shared chain-budget allocator,
 health scoring store or generic business-effect ledger is implemented here.
@@ -284,6 +284,12 @@ The current Herdr launch identity uses normalized
 runId alone. The standalone reassign action is a fenced controller-epoch
 record with a checked authority input; it does not launch a replacement
 worker or execute the retired session `driver-replaced` continuation door.
+Evidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random
+launch command; `src/runner/dispatch/confinement/authority.mjs:1608-1629`
+normalizes and persists its identity. Replacement authority is checked in
+`src/runner/dispatch/recovery-planner.mjs:160-171,204-212`; reassign records
+the fenced epoch without launching a worker in
+`src/verbs/dispatch/recover.mjs:235-247,382-398`.
 
 Operation-specific grants/effect policies must be supplied by their owner;
 no adapter may infer permission to duplicate external effects. Live-process

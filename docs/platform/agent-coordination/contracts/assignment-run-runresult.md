@@ -29,9 +29,9 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Section | Status | Evidence / limit |
 |---|---|---|
 | Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |
-| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1565-1590 (run.json contents) |
+| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |
 | Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |
-| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |
+| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |
 | RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |
 | Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |
 | Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |
@@ -61,7 +61,10 @@ Current construction has three provenance kinds:
 
 [ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
 distinguishes their shapes. Declared/inline builders stamp policy/normalizer
-versions; Unit-run provenance is written by `execution/run.mjs:334-338`.
+versions (`src/runner/dispatch/assignment.mjs:455-460,663-667`; constants in
+`src/runner/dispatch/execution-contract.mjs:47` and
+`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is
+written by `execution/run.mjs:334-338`.
 Mutation/evidence normalization is current implementation, not an assumption
 that the retired session stamp-producing door still exists.
 

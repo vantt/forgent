@@ -226,7 +226,7 @@ Confidence ladder:
 
 | Confidence | Meaning | Allowed use |
 |---|---|---|
-| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |
+| `verified` | A structured done claim on a mutating operation plus at least one changed file produced by the run, or a dirty-before file the run mutated (`src/runner/dispatch/settlement.mjs:206-226,290`). | May feed lifecycle decisions that require proof. |
 | `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |
 | `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |
 | `no-evidence` | Process settled without proof. | Must not advance Work. |
