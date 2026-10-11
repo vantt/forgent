@@ -2,7 +2,7 @@
 
 Pack commit: e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d
 
-Pack id: a370847ad4ed9c541fcdb9bd060577bbfa1cddbb9d2a3265d3eca048fa1b93f2
+Pack id: c5bc8fed601291972bb3f5f5f5dac2e1b2534ff933cfae42c369672e91f2b04c
 
 Author session: codex-session:1@2026-10-10
 
@@ -238,6 +238,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:architecture/dispatch-control-plane.md#unheaded-block-32 -\> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Legacy Component-Outer Boundary Note body sent to history although its live principle has no current counterpart. |
+| targetUnitDigest | 17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a |
+| targetAncestry | \["Historical File: surviving dispatch runtime, mixed obsolete resolver contract"\] |
 
 ### Source unit
 
@@ -1044,6 +1046,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:architecture/dispatch-control-plane.md#unheaded-block-35 -\> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Live 'dispatch does not care which source proposed the Assignment' sentences sent to history with the retired tail. |
+| targetUnitDigest | 17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a |
+| targetAncestry | \["Historical File: surviving dispatch runtime, mixed obsolete resolver contract"\] |
 
 ### Source unit
 
@@ -1850,6 +1854,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:architecture/runtime-recovery-design.md#unheaded-block-26 -\> PLAT:history/retired-engine/files/architecture/runtime-recovery-design.md#literal-snapshot: Low: versioning paragraph moved wholly to history though its non-session half (assignment-run.v2, opt-in, no old reader) is live. |
+| targetUnitDigest | 580dfc2f724fe297a7443197c18203de2548e150e639376f8853f5cbf255a843 |
+| targetAncestry | \["Historical File: surviving dispatch recovery; old session continuation mixed"\] |
 
 ### Source unit
 
@@ -2604,6 +2610,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:architecture/work-integration.md#unheaded-block-9 -\> PLAT:history/retired-engine/files/architecture/work-integration.md#literal-snapshot: Legacy Work Driver handoff body mapped to history; live obligation has no current counterpart. |
+| targetUnitDigest | c756c8dfd65a47212c4b31dbc9ef0066a2de62d68d43fe357627a19d49cfab38 |
+| targetAncestry | \["Historical File: surviving Work-versus-execution authority boundary; old stage/session model mixed"\] |
 
 ### Source unit
 
@@ -2862,6 +2870,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/contracts/
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:contracts/assignment-run-runresult.md#unheaded-block-14 -\> PLAT:history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot: Legacy Admission-rules bullets are mapped to history only; they are live (assignment-runner.mjs:917-940) and the current file keeps a dangling label. |
+| targetUnitDigest | dff3fbf72617cd063209bfc6f48097c9e9c7538929e960a55403549353c290d6 |
+| targetAncestry | \["Historical File: surviving Assignment/Run/RunResult ownership, mixed old session/effect schema"\] |
 
 ### Source unit
 
@@ -3624,6 +3634,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/contracts/
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:contracts/assignment-run-runresult.md#unheaded-block-17 -\> PLAT:history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot: Legacy Implementation-status paragraph retired to history although two of its three live facts (expectedRunId refusal, fsynced publication) are no longer stated as contract text. |
+| targetUnitDigest | dff3fbf72617cd063209bfc6f48097c9e9c7538929e960a55403549353c290d6 |
+| targetAncestry | \["Historical File: surviving Assignment/Run/RunResult ownership, mixed old session/effect schema"\] |
 
 ### Source unit
 
@@ -4386,6 +4398,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/decisions/
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-3 -\> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text. |
+| targetUnitDigest | 64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc |
+| targetAncestry | \["Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"\] |
 
 ### Source unit
 
@@ -4527,6 +4541,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/decisions/
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-4 -\> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text. |
+| targetUnitDigest | 64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc |
+| targetAncestry | \["Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"\] |
 
 ### Source unit
 
@@ -4668,6 +4684,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/playbooks/
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:playbooks/architecture-advisory-role-doctrine.md#unheaded-block-129 -\> PLAT:history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot: unheaded-block-129 (diversity is a hedge) moved to history although SKILL.md:121-122 restates it as live rule. |
+| targetUnitDigest | 2b85016e03dc5ae4f7344406ffca58011d3e12593121661b1a40e2fef4e11ffc |
+| targetAncestry | \["Historical File: still-consumed advisory role doctrine; mixed historical dispatch/confinement recipes"\] |
 
 ### Source unit
 
@@ -7972,6 +7990,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/playbooks/
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:playbooks/prompts/master-coordinator.md#unheaded-block-6 -\> PLAT:history/retired-engine/files/playbooks/prompts/master-coordinator.md#literal-snapshot: Live prompt body routed to history only; correct target is the current Master Prompt section, which itself needs the listed corrections. |
+| targetUnitDigest | b9467328cc36895629c10e72b9823dda79f2ad825571db7391d6dc529bb38f0f |
+| targetAncestry | \["Historical File: Master Multi-Agent Implementation Coordinator Prompt"\] |
 
 ### Source unit
 
@@ -9358,6 +9378,8 @@ Target: docs/platform/agent-coordination/vocabulary/concept-relationships.md#coo
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | The current successor at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings supersedes the stale current-state claim shown at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. |
 | reviewNote | legacy:vocabulary/concept-relationships.md#coordination-rings -\> vocabulary/concept-relationships.md#coordination-rings (supersede): text honestly bounded as responsibility model, no Orchestrator/Launcher entity in src (git grep), owners named exist Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph. |
+| targetUnitDigest | 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823 |
+| targetAncestry | \["Agent Coordination Concept Relationships"\] |
 
 ### Source unit
 
@@ -9438,6 +9460,8 @@ Target: docs/platform/agent-coordination/vocabulary/concept-relationships.md#coo
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | legacy:vocabulary/concept-relationships.md#unheaded-block-13 -\> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true and labelled future-open, no ring entities asserted as implemented Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph. |
+| targetUnitDigest | 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823 |
+| targetAncestry | \["Agent Coordination Concept Relationships"\] |
 
 ### Source unit
 
@@ -9511,6 +9535,8 @@ Target: docs/platform/agent-coordination/vocabulary/concept-relationships.md#coo
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | legacy:vocabulary/concept-relationships.md#unheaded-block-14 -\> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true, responsibility-boundary meaning preserved and future typed rings stated as open Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph. |
+| targetUnitDigest | 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823 |
+| targetAncestry | \["Agent Coordination Concept Relationships"\] |
 
 ### Source unit
 
@@ -9576,6 +9602,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#component-outer-boundary-note is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:architecture/dispatch-control-plane.md#component-outer-boundary-note -\> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Legacy Component-Outer Boundary Note heading sent to history; current keeps an empty heading that other sections cite. |
+| targetUnitDigest | 17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a |
+| targetAncestry | \["Historical File: surviving dispatch runtime, mixed obsolete resolver contract"\] |
 
 ### Source unit
 
@@ -10382,6 +10410,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#separation-of-concerns is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:architecture/dispatch-control-plane.md#separation-of-concerns -\> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Separation Of Concerns section unit mapped to history while its live paragraph has no current counterpart. |
+| targetUnitDigest | 17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a |
+| targetAncestry | \["Historical File: surviving dispatch runtime, mixed obsolete resolver contract"\] |
 
 ### Source unit
 
@@ -11189,6 +11219,8 @@ Target: docs/platform/agent-coordination/architecture/runtime-recovery-design.md
 | rationale | Supersede current publication/writer assertions by the full docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-19 counterpart. The historical P12 causal clause is retained byte-for-byte by docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md#unheaded-block-3 (unit digest 26a57d578e22c5a79a66d676baf496649fc5bd18ff1d4a63863c14a82baf7fe8): This retains exclusive-create semantics while avoiding empty-lock and conditional-unlink races seen in P12. The current publication, mutable-writer and filesystem-design qualifications remain in the primary counterpart; the P12 clause is explicitly carried as dated history, not as current engine behavior. The whole source/current units plus this exact clause witness are supplied for independent A25 whole-unit review; this is not a bare supersede or a claim that the clause vanished. |
 | reviewNote | Label supersede is wrong under the whole-unit rule: the source sentence "This retains exclusive-create semantics while avoiding empty-lock and conditional-unlink races seen in P12" (source line 189-190) appears nowhere in the target or elsewhere in the platform doc (grep for P12/conditional-unlink/empty-lock: no hits). The rest is reworded and verified (settlement.mjs:434, proof-helpers.mjs:73-125, settlement.mjs:737,832 for run.json updates, assignment-runner.mjs:1947-1954, no filesystem probe in src). Fix: either relabel partial-carry and record that clause as the remainder, or cite another unit that carries it; do not leave a bare supersede. |
 | shownTargetDigest | 8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11 |
+| targetUnitDigest | 8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11 |
+| targetAncestry | \["Runtime Recovery And Work Continuity","6. Local Concurrency And Durability"\] |
 
 ### Source unit
 
@@ -11288,6 +11320,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/architectu
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/architecture/work-integration.md#work-driver-handoff-to-dispatch is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/work-integration.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:architecture/work-integration.md#work-driver-handoff-to-dispatch -\> PLAT:history/retired-engine/files/architecture/work-integration.md#literal-snapshot: Legacy Work Driver Handoff section mapped to history; current keeps an empty heading. |
+| targetUnitDigest | c756c8dfd65a47212c4b31dbc9ef0066a2de62d68d43fe357627a19d49cfab38 |
+| targetAncestry | \["Historical File: surviving Work-versus-execution authority boundary; old stage/session model mixed"\] |
 
 ### Source unit
 
@@ -11546,6 +11580,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/decisions/
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md#context is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:decisions/ADR-002-stage-operation-compatibility.md#context -\> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text. |
+| targetUnitDigest | 64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc |
+| targetAncestry | \["Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"\] |
 
 ### Source unit
 
@@ -11689,6 +11725,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/decisions/
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md#decision is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:decisions/ADR-002-stage-operation-compatibility.md#decision -\> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text. |
+| targetUnitDigest | 64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc |
+| targetAncestry | \["Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"\] |
 
 ### Source unit
 
@@ -11832,6 +11870,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/playbooks/
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md#master-prompt is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:playbooks/prompts/master-coordinator.md#master-prompt -\> PLAT:history/retired-engine/files/playbooks/prompts/master-coordinator.md#literal-snapshot: Live prompt body routed to history only; correct target is the current Master Prompt section, which itself needs the listed corrections. |
+| targetUnitDigest | b9467328cc36895629c10e72b9823dda79f2ad825571db7391d6dc529bb38f0f |
+| targetAncestry | \["Historical File: Master Multi-Agent Implementation Coordinator Prompt"\] |
 
 ### Source unit
 
@@ -13070,6 +13110,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/proposals/
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This particular legacy unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-140 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation. |
 | reviewNote | LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-140 -\> PLAT:history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot: Legacy unit lands in current text (line 805) that is stale or false against code; location (current) is right but the content needs relabel/fix |
+| targetUnitDigest | 8de508af0aaca7f2e7b6f58ea70fd47af9fcf72c735f6bd510fb87a1e8d0819d |
+| targetAncestry | \["Historical File: Dispatch Control Plane Redesign"\] |
 
 ### Source unit
 
@@ -15161,6 +15203,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#v-003-a-predeclared-workflow-or-protocol-is-optional -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -16055,6 +16099,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-26 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -16947,6 +16993,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-27 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -17836,6 +17884,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-28 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -18724,6 +18774,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#v-006-planning-is-pluggable-and-composable -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: V-006 is live as the ADR-007 seam. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -19618,6 +19670,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-34 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: V-006 is live as the ADR-007 seam. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -20506,6 +20560,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-35 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: V-006 is live as the ADR-007 seam. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -21396,6 +21452,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#v-009-runtime-graphs-may-be-trivial-dynamic-or-declared -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -22290,6 +22348,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-42 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -23181,6 +23241,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-43 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -24069,6 +24131,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-54 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -24963,6 +25027,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#open-design-questions-under-this-vision -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -25857,6 +25923,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vision.md#unheaded-block-63 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -26751,6 +26819,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vocabulary/canonical-concepts.md#unheaded-block-58 -\> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Job reserved-term definition and text go to history while the concept is live. |
+| targetUnitDigest | 2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f |
+| targetAncestry | \["Historical File: Canonical Agent Coordination Concepts"\] |
 
 ### Source unit
 
@@ -27457,6 +27527,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vocabulary/concept-relationships.md#unheaded-block-7 -\> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading. |
+| targetUnitDigest | 5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc |
+| targetAncestry | \["Historical File: Agent Coordination Concept Relationships"\] |
 
 ### Source unit
 
@@ -27825,6 +27897,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vocabulary/concept-relationships.md#unheaded-block-8 -\> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading. |
+| targetUnitDigest | 5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc |
+| targetAncestry | \["Historical File: Agent Coordination Concept Relationships"\] |
 
 ### Source unit
 
@@ -28193,6 +28267,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-3 -\> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings. |
+| targetUnitDigest | 90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1 |
+| targetAncestry | \["Historical File: Deprecated And Reserved Coordination Terms"\] |
 
 ### Source unit
 
@@ -28451,6 +28527,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-4 -\> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings. |
+| targetUnitDigest | 90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1 |
+| targetAncestry | \["Historical File: Deprecated And Reserved Coordination Terms"\] |
 
 ### Source unit
 
@@ -28704,6 +28782,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | reviewStatus | pending |
 | reviewNote | LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-11 -\> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings. |
+| targetUnitDigest | 90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1 |
+| targetAncestry | \["Historical File: Deprecated And Reserved Coordination Terms"\] |
 
 ### Source unit
 
@@ -28962,6 +29042,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/verificati
 | reviewStatus | pending |
 | rationale | The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding. |
 | reviewNote | LEG:verification/README.md#unheaded-block-4 -\> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index. |
+| targetUnitDigest | 65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476 |
+| targetAncestry | \["Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"\] |
 
 ### Source unit
 
@@ -29138,6 +29220,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/verificati
 | reviewStatus | pending |
 | rationale | The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding. |
 | reviewNote | LEG:verification/README.md#unheaded-block-6 -\> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index. |
+| targetUnitDigest | 65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476 |
+| targetAncestry | \["Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"\] |
 
 ### Source unit
 
@@ -29318,6 +29402,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/verificati
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This particular legacy unit docs/architect/agent-coordination/verification/README.md#unheaded-block-5 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/verification/README.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/verification/README.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation. |
 | reviewNote | LEG:verification/README.md#unheaded-block-5 -\> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index. |
+| targetUnitDigest | 65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476 |
+| targetAncestry | \["Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"\] |
 
 ### Source unit
 
@@ -29493,6 +29579,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This particular legacy unit docs/architect/agent-coordination/vision.md#unheaded-block-41 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vision.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vision.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation. |
 | reviewNote | LEG:vision.md#unheaded-block-41 -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -30380,6 +30468,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vision.md#
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/vision.md#rejected-interpretations is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vision.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:vision.md#rejected-interpretations -\> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell. |
+| targetUnitDigest | 780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2 |
+| targetAncestry | \["Historical File: Agent Coordination Foundation Vision"\] |
 
 ### Source unit
 
@@ -31274,6 +31364,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#job is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:vocabulary/canonical-concepts.md#job -\> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Job reserved-term definition and text go to history while the concept is live. |
+| targetUnitDigest | 2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f |
+| targetAncestry | \["Historical File: Canonical Agent Coordination Concepts"\] |
 
 ### Source unit
 
@@ -31982,6 +32074,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#creation-rules is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:vocabulary/concept-relationships.md#creation-rules -\> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading. |
+| targetUnitDigest | 5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc |
+| targetAncestry | \["Historical File: Agent Coordination Concept Relationships"\] |
 
 ### Source unit
 
@@ -32350,6 +32444,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#participant is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:vocabulary/deprecated-and-reserved.md#participant -\> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings. |
+| targetUnitDigest | 90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1 |
+| targetAncestry | \["Historical File: Deprecated And Reserved Coordination Terms"\] |
 
 ### Source unit
 
@@ -32608,6 +32704,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#job is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:vocabulary/deprecated-and-reserved.md#job -\> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings. |
+| targetUnitDigest | 90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1 |
+| targetAncestry | \["Historical File: Deprecated And Reserved Coordination Terms"\] |
 
 ### Source unit
 
@@ -32863,6 +32961,8 @@ Target: docs/platform/agent-coordination/history/retired-engine/files/vocabulary
 | authoredBy | codex-session:1@2026-10-10 |
 | rationale | This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#forbidden-equivalences is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries. |
 | reviewNote | LEG:vocabulary/deprecated-and-reserved.md#forbidden-equivalences -\> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings. |
+| targetUnitDigest | 90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1 |
+| targetAncestry | \["Historical File: Deprecated And Reserved Coordination Terms"\] |
 
 ### Source unit
 

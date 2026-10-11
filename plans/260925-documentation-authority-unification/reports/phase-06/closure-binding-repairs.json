@@ -1,0 +1,560 @@
+{
+  "version": 1,
+  "authorization": "A24 standing inherited-binding correction; no disposition, text, ancestry rule or approval change.",
+  "rows": [
+    {
+      "claimId": "claim_c80e24787a57aedd0631d6a970f15f51",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_0048419ea3512ca74c2fd495ac685c56",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_23552d92b2ac7fba3602f03a6054140e",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "580dfc2f724fe297a7443197c18203de2548e150e639376f8853f5cbf255a843",
+      "targetAncestry": [
+        "Historical File: surviving dispatch recovery; old session continuation mixed"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_7b0b3b8e08dcf64cdb7d758d7d9eb0b5",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "c756c8dfd65a47212c4b31dbc9ef0066a2de62d68d43fe357627a19d49cfab38",
+      "targetAncestry": [
+        "Historical File: surviving Work-versus-execution authority boundary; old stage/session model mixed"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_e97742a8d5a8286abc87f5d8c17883f2",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "dff3fbf72617cd063209bfc6f48097c9e9c7538929e960a55403549353c290d6",
+      "targetAncestry": [
+        "Historical File: surviving Assignment/Run/RunResult ownership, mixed old session/effect schema"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_56ea6fdd352d842f377020b1194e814a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "dff3fbf72617cd063209bfc6f48097c9e9c7538929e960a55403549353c290d6",
+      "targetAncestry": [
+        "Historical File: surviving Assignment/Run/RunResult ownership, mixed old session/effect schema"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_5edc02c406ce378a7cf264dd1eb65abd",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
+      "targetAncestry": [
+        "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_34ac52da53d254b82c397a5d4af20ef0",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
+      "targetAncestry": [
+        "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_3461c242e4f895a547f8fe1f1a69363e",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "2b85016e03dc5ae4f7344406ffca58011d3e12593121661b1a40e2fef4e11ffc",
+      "targetAncestry": [
+        "Historical File: still-consumed advisory role doctrine; mixed historical dispatch/confinement recipes"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_a991c1dd447fd6546e089c8f0026616c",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "b9467328cc36895629c10e72b9823dda79f2ad825571db7391d6dc529bb38f0f",
+      "targetAncestry": [
+        "Historical File: Master Multi-Agent Implementation Coordinator Prompt"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_d6db58a3090422d42154f240f54c9f5a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ],
+      "sourceTextContained": false
+    },
+    {
+      "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ],
+      "sourceTextContained": false
+    },
+    {
+      "claimId": "claim_4db6549f98828d78392e55a2acf3dbea",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_79960c77d072c79fd26c8cf58d1660d3",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_f0435011b158171bddbfd8053eb545be",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
+      "targetAncestry": [
+        "Runtime Recovery And Work Continuity",
+        "6. Local Concurrency And Durability"
+      ],
+      "sourceTextContained": false
+    },
+    {
+      "claimId": "claim_617be84c8e3d790239657cc052131b8a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "c756c8dfd65a47212c4b31dbc9ef0066a2de62d68d43fe357627a19d49cfab38",
+      "targetAncestry": [
+        "Historical File: surviving Work-versus-execution authority boundary; old stage/session model mixed"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_fcab1689d89dced7408962b32d6d8af0",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
+      "targetAncestry": [
+        "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_5b9e29fcd989c11bf46a7052bec34002",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
+      "targetAncestry": [
+        "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_8d5fe615a6f396fd52966c2e90fd5cb8",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "b9467328cc36895629c10e72b9823dda79f2ad825571db7391d6dc529bb38f0f",
+      "targetAncestry": [
+        "Historical File: Master Multi-Agent Implementation Coordinator Prompt"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_4a0a9bc480a7091d9b8f4653766a31ad",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "8de508af0aaca7f2e7b6f58ea70fd47af9fcf72c735f6bd510fb87a1e8d0819d",
+      "targetAncestry": [
+        "Historical File: Dispatch Control Plane Redesign"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_bfaf5269a0c18d3f7bdae49f24f7c76d",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_411508f58fbc6311fa74dc1c304bc777",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_6aad1a569d57f64372470a1142a9c071",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_b297c94d5589e3b8c9d8aa44d4c31170",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_0a4e4450d6c9d06979738ec78ce272b4",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_fc8b2e43e26d7b52a0eff343def86333",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_2face653f27f39f50d1c05f7d201a7f9",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_2facc3f5655d7150a46042db0f992179",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_2b5b7d7d0b24f6f46d32abd3acc2453a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_299d12d352c31ec48ab901cb7d8790fd",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_624eb957517f0d874fff22f37be96d0f",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_0fef556ca618d0be23ea8b4670f161ef",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_32686d2ad0720fa4de86217d34a58678",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_9f7fc04826912b000537192c71595dc5",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
+      "targetAncestry": [
+        "Historical File: Canonical Agent Coordination Concepts"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_c350f90477676de34d5be1397785d8fe",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Concept Relationships"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_eaad287a417b0d1a585f4ca53534feb2",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Concept Relationships"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_c7b11963a02b7f53ed13ae86bf33769c",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_9a0d607bd7020040eeb744460e6a6edb",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_dd6eb97609401d2c54350922576b89a9",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_768ae397efb4f9e23b6f120bed92f78a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_29427a2a05e942cef415e5a9991da2cf",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_a41fa095e3c0bb83b1c7e5b55ebbe110",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_3e63b14f9703f11715ef1cc4d4bf7a8c",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_252424201835ab948c571d4fe8064c6a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_9950b45abbe07bf669b4603700a12d25",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
+      "targetAncestry": [
+        "Historical File: Canonical Agent Coordination Concepts"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_ef46af833dcb1f76ff7ca72844c4aa74",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Concept Relationships"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_93545a04eef4e8bb80b1db130614c870",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_726792257e15bca8a1724a65842fb9af",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ],
+      "sourceTextContained": true
+    },
+    {
+      "claimId": "claim_cf37dde46ef351853e49583cd5304c7c",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "reason": "Inherited pending row lacks the current native target digest/ancestry; real unchanged target is pinned, no approval carries.",
+      "beforeTargetUnitDigest": null,
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ],
+      "sourceTextContained": true
+    }
+  ],
+  "sourceRows": 56,
+  "retiredAndSuccessorRows": 10,
+  "bindingAssertions": 132
+}

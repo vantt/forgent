@@ -1401,7 +1401,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#unheaded-block-32 -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Legacy Component-Outer Boundary Note body sent to history although its live principle has no current counterpart."
+      "reviewNote": "LEG:architecture/dispatch-control-plane.md#unheaded-block-32 -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Legacy Component-Outer Boundary Note body sent to history although its live principle has no current counterpart.",
+      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ]
     },
     {
       "claimId": "claim_2668b04d02367d6019d87a54a7ce3f1d",
@@ -1457,7 +1461,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#unheaded-block-35 -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Live 'dispatch does not care which source proposed the Assignment' sentences sent to history with the retired tail."
+      "reviewNote": "LEG:architecture/dispatch-control-plane.md#unheaded-block-35 -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Live 'dispatch does not care which source proposed the Assignment' sentences sent to history with the retired tail.",
+      "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
+      "targetAncestry": [
+        "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
+      ]
     },
     {
       "claimId": "claim_eb513de9dd1f55fd74ba8a7e2edede13",
@@ -3924,7 +3932,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/runtime-recovery-design.md#unheaded-block-26 -> PLAT:history/retired-engine/files/architecture/runtime-recovery-design.md#literal-snapshot: Low: versioning paragraph moved wholly to history though its non-session half (assignment-run.v2, opt-in, no old reader) is live."
+      "reviewNote": "LEG:architecture/runtime-recovery-design.md#unheaded-block-26 -> PLAT:history/retired-engine/files/architecture/runtime-recovery-design.md#literal-snapshot: Low: versioning paragraph moved wholly to history though its non-session half (assignment-run.v2, opt-in, no old reader) is live.",
+      "targetUnitDigest": "580dfc2f724fe297a7443197c18203de2548e150e639376f8853f5cbf255a843",
+      "targetAncestry": [
+        "Historical File: surviving dispatch recovery; old session continuation mixed"
+      ]
     },
     {
       "claimId": "claim_a718209070ead83b35c89432cd4f8f93",
@@ -4623,7 +4635,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:architecture/work-integration.md#unheaded-block-9 -> PLAT:history/retired-engine/files/architecture/work-integration.md#literal-snapshot: Legacy Work Driver handoff body mapped to history; live obligation has no current counterpart."
+      "reviewNote": "LEG:architecture/work-integration.md#unheaded-block-9 -> PLAT:history/retired-engine/files/architecture/work-integration.md#literal-snapshot: Legacy Work Driver handoff body mapped to history; live obligation has no current counterpart.",
+      "targetUnitDigest": "c756c8dfd65a47212c4b31dbc9ef0066a2de62d68d43fe357627a19d49cfab38",
+      "targetAncestry": [
+        "Historical File: surviving Work-versus-execution authority boundary; old stage/session model mixed"
+      ]
     },
     {
       "claimId": "claim_b2e7ba276481b1271c469d12fd614bdf",
@@ -4876,7 +4892,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-14 -> PLAT:history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot: Legacy Admission-rules bullets are mapped to history only; they are live (assignment-runner.mjs:917-940) and the current file keeps a dangling label."
+      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-14 -> PLAT:history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot: Legacy Admission-rules bullets are mapped to history only; they are live (assignment-runner.mjs:917-940) and the current file keeps a dangling label.",
+      "targetUnitDigest": "dff3fbf72617cd063209bfc6f48097c9e9c7538929e960a55403549353c290d6",
+      "targetAncestry": [
+        "Historical File: surviving Assignment/Run/RunResult ownership, mixed old session/effect schema"
+      ]
     },
     {
       "claimId": "claim_56ea6fdd352d842f377020b1194e814a",
@@ -4888,7 +4908,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-17 -> PLAT:history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot: Legacy Implementation-status paragraph retired to history although two of its three live facts (expectedRunId refusal, fsynced publication) are no longer stated as contract text."
+      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-17 -> PLAT:history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot: Legacy Implementation-status paragraph retired to history although two of its three live facts (expectedRunId refusal, fsynced publication) are no longer stated as contract text.",
+      "targetUnitDigest": "dff3fbf72617cd063209bfc6f48097c9e9c7538929e960a55403549353c290d6",
+      "targetAncestry": [
+        "Historical File: surviving Assignment/Run/RunResult ownership, mixed old session/effect schema"
+      ]
     },
     {
       "claimId": "claim_7e5e5d438d0d2e57ff9ed5a1dc164df2",
@@ -8680,7 +8704,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-3 -> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text."
+      "reviewNote": "LEG:decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-3 -> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text.",
+      "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
+      "targetAncestry": [
+        "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
+      ]
     },
     {
       "claimId": "claim_34ac52da53d254b82c397a5d4af20ef0",
@@ -8692,7 +8720,11 @@
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "LEG:decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-4 -> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text."
+      "reviewNote": "LEG:decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-4 -> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text.",
+      "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
+      "targetAncestry": [
+        "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
+      ]
     },
     {
       "claimId": "claim_e01236b3d96b0e99faca677970dc026f",

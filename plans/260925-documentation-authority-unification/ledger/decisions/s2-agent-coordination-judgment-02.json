@@ -1430,7 +1430,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md#master-prompt is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:playbooks/prompts/master-coordinator.md#master-prompt -> PLAT:history/retired-engine/files/playbooks/prompts/master-coordinator.md#literal-snapshot: Live prompt body routed to history only; correct target is the current Master Prompt section, which itself needs the listed corrections."
+      "reviewNote": "LEG:playbooks/prompts/master-coordinator.md#master-prompt -> PLAT:history/retired-engine/files/playbooks/prompts/master-coordinator.md#literal-snapshot: Live prompt body routed to history only; correct target is the current Master Prompt section, which itself needs the listed corrections.",
+      "targetUnitDigest": "b9467328cc36895629c10e72b9823dda79f2ad825571db7391d6dc529bb38f0f",
+      "targetAncestry": [
+        "Historical File: Master Multi-Agent Implementation Coordinator Prompt"
+      ]
     },
     {
       "claimId": "claim_2034a40430020976b24af82cf834447d",
@@ -3196,7 +3200,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-140 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-140 -> PLAT:history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot: Legacy unit lands in current text (line 805) that is stale or false against code; location (current) is right but the content needs relabel/fix"
+      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-140 -> PLAT:history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot: Legacy unit lands in current text (line 805) that is stale or false against code; location (current) is right but the content needs relabel/fix",
+      "targetUnitDigest": "8de508af0aaca7f2e7b6f58ea70fd47af9fcf72c735f6bd510fb87a1e8d0819d",
+      "targetAncestry": [
+        "Historical File: Dispatch Control Plane Redesign"
+      ]
     },
     {
       "claimId": "claim_fc9c2f153cc759c58c5ebfd8cfbb76ce",

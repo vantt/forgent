@@ -171,3 +171,5 @@ Both prior-registry full D proofs pass/fatal zero. Both strict E proofs remain o
 ## Historical receipt amendment and remaining open boundary
 
 A26 resolves the historical-native class stop: the spec body now has a genuine `history-snapshot` containment receipt, pending independent acceptance. `c44bad368` pins 374 new receipts; no approval has been invented. `closure-open-reverse-units.json` lists exactly 321 remaining units without a complete fresh source/receipt proof. They stay open under A26; the batch is not closed. Three Coordination Rings holds remain. No new archive/delete, promoted-document edit, main-side conflict or main-checkout action is introduced.
+
+Fifty inherited pending target fingerprints are corrected under A24 and remain pending; exact IDs, paths, before/after digests and containment results are in `closure-binding-repairs.json`. They are part of the same 56-source-row closure request, not an extra approval or disposition round.

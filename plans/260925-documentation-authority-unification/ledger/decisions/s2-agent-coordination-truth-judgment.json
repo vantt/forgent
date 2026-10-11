@@ -8878,7 +8878,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The current successor at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings supersedes the stale current-state claim shown at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "legacy:vocabulary/concept-relationships.md#coordination-rings -> vocabulary/concept-relationships.md#coordination-rings (supersede): text honestly bounded as responsibility model, no Orchestrator/Launcher entity in src (git grep), owners named exist Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph."
+      "reviewNote": "legacy:vocabulary/concept-relationships.md#coordination-rings -> vocabulary/concept-relationships.md#coordination-rings (supersede): text honestly bounded as responsibility model, no Orchestrator/Launcher entity in src (git grep), owners named exist Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph.",
+      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ]
     },
     {
       "claimId": "claim_cbedb41c7a00cb4db2b9e3840a028b36",
@@ -9432,7 +9436,11 @@
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-13 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true and labelled future-open, no ring entities asserted as implemented Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph."
+      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-13 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true and labelled future-open, no ring entities asserted as implemented Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph.",
+      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ]
     },
     {
       "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
@@ -9444,7 +9452,11 @@
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-14 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true, responsibility-boundary meaning preserved and future typed rings stated as open Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph."
+      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-14 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true, responsibility-boundary meaning preserved and future typed rings stated as open Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph.",
+      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ]
     },
     {
       "claimId": "claim_371515038b57bcd114632a79a36a922e",

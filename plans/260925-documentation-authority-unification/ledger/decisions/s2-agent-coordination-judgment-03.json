@@ -2988,7 +2988,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/verification/README.md#unheaded-block-5 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/verification/README.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/verification/README.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
-      "reviewNote": "LEG:verification/README.md#unheaded-block-5 -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index."
+      "reviewNote": "LEG:verification/README.md#unheaded-block-5 -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index.",
+      "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
+      "targetAncestry": [
+        "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
+      ]
     },
     {
       "claimId": "claim_80b2ae85ad0727c18030b4739c02bb7b",
@@ -3129,7 +3133,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This particular legacy unit docs/architect/agent-coordination/vision.md#unheaded-block-41 is retained verbatim inside docs/platform/agent-coordination/history/retired-engine/files/vision.md#literal-snapshot as the dated pre-rework statement, not as an assertion that the whole surviving file is retired. The current version of docs/platform/agent-coordination/vision.md distinguishes present runtime behaviour/design obligations from the original session-only, obsolete interface or dated implementation wording. Retirement 2180b4e72 applies only to session-engine portions; live guidance is restored at its current path and receives a separate independent check. No old approval carries to this corrected unit-specific explanation.",
-      "reviewNote": "LEG:vision.md#unheaded-block-41 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision."
+      "reviewNote": "LEG:vision.md#unheaded-block-41 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ]
     },
     {
       "claimId": "claim_2c531f09f9410d21fc5d8767b601b9b0",
@@ -3162,7 +3170,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vision.md#rejected-interpretations is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vision.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:vision.md#rejected-interpretations -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell."
+      "reviewNote": "LEG:vision.md#rejected-interpretations -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell.",
+      "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Foundation Vision"
+      ]
     },
     {
       "claimId": "claim_f4c5bd9dd0a8f97df4596c47519e4f9c",
@@ -4107,7 +4119,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/canonical-concepts.md#job is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/canonical-concepts.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:vocabulary/canonical-concepts.md#job -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Job reserved-term definition and text go to history while the concept is live."
+      "reviewNote": "LEG:vocabulary/canonical-concepts.md#job -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Job reserved-term definition and text go to history while the concept is live.",
+      "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
+      "targetAncestry": [
+        "Historical File: Canonical Agent Coordination Concepts"
+      ]
     },
     {
       "claimId": "claim_9832d0298e9320dc2ec4d4497b411db6",
@@ -4241,7 +4257,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/concept-relationships.md#creation-rules is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/concept-relationships.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:vocabulary/concept-relationships.md#creation-rules -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading."
+      "reviewNote": "LEG:vocabulary/concept-relationships.md#creation-rules -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading.",
+      "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Concept Relationships"
+      ]
     },
     {
       "claimId": "claim_c9d4728b2c921461f0d3ffa2022f5368",
@@ -4333,7 +4353,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#participant is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#participant -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings."
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#participant -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings.",
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ]
     },
     {
       "claimId": "claim_726792257e15bca8a1724a65842fb9af",
@@ -4345,7 +4369,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#job is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#job -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings."
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#job -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings.",
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ]
     },
     {
       "claimId": "claim_ced41289f087b866d0a34602c3009c65",
@@ -4487,7 +4515,11 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#forbidden-equivalences is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#forbidden-equivalences -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings."
+      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#forbidden-equivalences -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings.",
+      "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+      "targetAncestry": [
+        "Historical File: Deprecated And Reserved Coordination Terms"
+      ]
     },
     {
       "claimId": "claim_5fbe0e914039d88235adf86cbf69914a",
