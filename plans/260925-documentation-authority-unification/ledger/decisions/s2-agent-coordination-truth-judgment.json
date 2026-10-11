@@ -1809,14 +1809,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "unheaded-block-45",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Actual native target text changed in the authorized truth correction; pending independent review.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. A25 rework claim_4a4bddcb fixed against code: src/intake/discovery.mjs:535-561 moves an unclear verdict at discovery to exploring (moveStep) and then parks (putInAwaiting); the owner skill never parks itself. Wording says only that transition advances to exploring and parks, which stays accurate although a separate verify-dispute park exists at discovery.mjs:481 without stage advance (non-blocking observation). Replacement block-45 named.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "10. Coding-Domain Workflow Step Operations",
         "10.1 Discovery"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_242208b542d4bb24c84796f43f775d4a",
@@ -8490,15 +8495,20 @@
       "targetAnchor": "101-discovery",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#101-discovery source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#101-discovery. A25 corrects this unit in [\"Team Communication Protocol V1\",\"10. Coding-Domain Workflow Step Operations\"]: the source/old target wording \"### 10.1 Discovery\\n\\nDiscovery is machine-alone.\\n\\nAllowed behavior:\\n\\n- owner reads existing Work context;\\n- owner consults researcher helpers for evidence;\\n- owner logs consult inte\" is replaced by the complete current counterpart \"### 10.1 Discovery\\n\\nDiscovery is machine-alone.\\n\\nAllowed behavior:\\n\\n- owner reads existing Work context;\\n- owner consults researcher helpers for evidence;\\n- owner logs consult inte\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
-      "reviewNote": "Actual native target text changed in the authorized truth correction; pending independent review.",
+      "reviewNote": "ok. Heading-only unit: words identical; digest differs because heading digest binds its section payload; the changed forbidden-behavior bullet is judged in the block row. Supersede names the replacement.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "10. Coding-Domain Workflow Step Operations"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_f7388f36e2422375b8acf615e169e8c3",
@@ -8878,11 +8888,7 @@
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The current successor at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings supersedes the stale current-state claim shown at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "legacy:vocabulary/concept-relationships.md#coordination-rings -> vocabulary/concept-relationships.md#coordination-rings (supersede): text honestly bounded as responsibility model, no Orchestrator/Launcher entity in src (git grep), owners named exist Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph.",
-      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
-      "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ]
+      "reviewNote": "hold. Coordination Rings hold kept. Target paragraph is true (no Orchestrator/Launcher/Router/Driver class or entity in src; named owners src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch exist) but whether to retain a typed ring architecture is an owner decision, not clearable by a true paragraph. No reviewer stamp."
     },
     {
       "claimId": "claim_cbedb41c7a00cb4db2b9e3840a028b36",
@@ -9436,11 +9442,7 @@
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-13 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true and labelled future-open, no ring entities asserted as implemented Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph.",
-      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
-      "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ]
+      "reviewNote": "hold. Coordination Rings hold kept: ring-to-entity mapping table (Orchestrator/Launcher/Router+Driver/Dispatcher) is superseded by a true responsibility-model paragraph, but the owner decision on retaining a typed ring architecture is open. No reviewer stamp."
     },
     {
       "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
@@ -9452,11 +9454,7 @@
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "legacy:vocabulary/concept-relationships.md#unheaded-block-14 -> vocabulary/concept-relationships.md#coordination-rings (supersede): target paragraph true, responsibility-boundary meaning preserved and future typed rings stated as open Reviewer checked: the paragraph is true (git grep finds no class or entity named Orchestrator, Launcher, Router or Driver; the named owners exist: src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch). Hold kept: whether to retain a typed ring architecture is the owner decision, not clearable by a true paragraph.",
-      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
-      "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ]
+      "reviewNote": "hold. Coordination Rings hold kept: sentence that rings are responsibility boundaries is preserved in meaning by the target, but the owner decision on a typed ring architecture is still open. No reviewer stamp."
     },
     {
       "claimId": "claim_371515038b57bcd114632a79a36a922e",

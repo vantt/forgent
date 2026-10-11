@@ -48726,17 +48726,23 @@
       "targetAnchor": "101-discovery",
       "shownTargetDigest": "b883ea8d66ed93289bf2b4f014cfc5e2bfb5218fb116e1bd7c8135cf409d41b7",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#101-discovery unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#101-discovery unit. The before/current complete texts are retained in the closure packet. Native target digest changes from dc81ca680b5d3e5316f7487a46993730e333cf84943141bd6319cde2c0a10304 to 84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\",\"10. Coding-Domain Workflow Step Operations\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "shownSourceText": "### 10.1 Discovery\n\nDiscovery is machine-alone.\n\nAllowed behavior:\n\n- owner reads existing Work context;\n- owner consults researcher helpers for evidence;\n- owner logs consult interactions;\n- owner chooses `clear` or `unclear`;\n- `clear` can route to planning;\n- `unclear` routes to exploring.\n\nForbidden behavior:\n\n- asking the human directly;\n- parking as `awaiting-human`;\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
       "shownSourceDigest": "e5a545a3ca9ecfbfdf9760677de4025c8632bda8c36d932f8e0fd0b008234c9e",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Source d23045c2d unit 101-discovery (10.1 Discovery section) and target at HEAD recomputed equal to pinned digests, shown texts byte-equal to units, ancestry real (target parent is 10. Coding-Domain Workflow Step Operations, source parent was the older 10. Coding-Domain Stage Protocols). Only the awaiting-human forbidden bullet changed: old text claimed parking is forbidden, new text says only the owner parking on its own is forbidden and the unclear verdict transition advances to exploring and parks, cited src/intake/discovery.mjs:535-561 which I opened (moveStep at 535, putInAwaiting at 559-561); nextDiscoveryEdge and domains/coding/workflows/feature.yaml (discover steps discovery then exploring) confirm unclear routes to exploring and clear to plan. All other lines identical; supersede with the correction recorded in rationale is correct.",
+      "shownTargetText": "### 10.1 Discovery\n\nDiscovery is machine-alone.\n\nAllowed behavior:\n\n- owner reads existing Work context;\n- owner consults researcher helpers for evidence;\n- owner logs consult interactions;\n- owner chooses `clear` or `unclear`;\n- `clear` can route to planning;\n- `unclear` routes to exploring.\n\nForbidden behavior:\n\n- asking the human directly;\n- the owner parking the item as `awaiting-human` on its own; only the `unclear` verdict's transition advances to exploring and parks the item (`src/intake/discovery.mjs:535-561`);\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "10. Coding-Domain Workflow Step Operations"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_62b29f4c64dc7de2225b13258a71d394",
@@ -48885,18 +48891,24 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "13-acceptance-criteria-for-v1-protocol",
-      "targetUnitDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b",
       "shownTargetDigest": "def1347614dfe96e65e1d6eccf69ea89118dc841c5ecaeb81a4274f97836b838",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol unit. The before/current complete texts are retained in the closure packet. Native target digest changes from 47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae to da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "shownSourceText": "## 13. Acceptance Criteria For V1 Protocol\n\nThe protocol is ready for driver adoption when:\n\n- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only operations can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
       "shownSourceDigest": "493923b439c600b2ad89e179691475d59df1db5285b3d9b8da184ad647fdb1c1",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Source d23045c2d and target HEAD heading units recomputed equal to pinned digests, shown texts byte-equal. Only change is read-only operations can return reported to read-only done claims can return reported only through worker artifacts; true because blocked and failed-findings claims also yield reported (run-result.mjs:1273-1278, settlement.mjs:269-280) while read-only done without worker report is no-evidence (run-result.mjs:1278). Other criteria unchanged (dirty-before excluded from changedFiles, settlement.mjs:206-216; claimInvalid gives failed, run-result.mjs:1253). Supersede carries all remaining criteria. Note unheaded-block-62 child row is bound separately.",
+      "shownTargetText": "## 13. Acceptance Criteria For V1 Protocol\n\nThe protocol is ready for driver adoption when:\n\n- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only done claims can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_0db106f41cd28c543735740b7b37e012",
@@ -49079,16 +49091,22 @@
       "targetAnchor": "8-runresult-confidence",
       "shownTargetDigest": "3c244cb11cbdbd1b91ecf30ca5c261bd4be3b3a7451dede0d624f5f7d4f33148",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence unit. The before/current complete texts are retained in the closure packet. Native target digest changes from df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e to b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "shownSourceText": "## 8. RunResult Confidence\n\nRunResult status and confidence are control-plane judgments.\n\nConfidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |\n\nThe driver must treat `done/no-evidence` as not done. It may retry, ask for a\nproper artifact, or route to a different legal operation.",
       "shownSourceDigest": "af738b83403692261f546f3655326fd51f066065e7549ce91cb480454f58822f",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Source d23045c2d and target HEAD section 8 heading units recomputed equal to pinned digests, shown texts byte-equal. reported and failed ladder rows rewritten to match code. Code truth verified: settlement.mjs:269-280 (failed claim from reviewer/red-team role or findings verdict with worker report, exit 0, no timeout is reported), run-result.mjs:1273-1278 (blocked is reported with no report needed; read-only done is reported only with worker report), run-result.mjs:1250-1271 (failed cases incl. read-only mutation, claimInvalid, non-qualifying failed claim). All assertions true. Rationale phrase native target digest changes from df9d32cf... is the target digest just before efb60a3ff (verified at 865ad66be), not the pinned source digest b930743c; wording only, pins are correct. Unchanged driver sentence carried verbatim.",
+      "shownTargetText": "## 8. RunResult Confidence\n\nRunResult status and confidence are control-plane judgments.\n\nConfidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |\n\nThe driver must treat `done/no-evidence` as not done. It may retry, ask for a\nproper artifact, or route to a different legal operation.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_7ccd85bfb4fd99e859b7ae6d5e723589",
@@ -49908,17 +49926,23 @@
       "targetAnchor": "unheaded-block-38",
       "shownTargetDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-34 unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38 unit. The before/current complete texts are retained in the closure packet. Native target digest changes from 21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e to 4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\",\"8. RunResult Confidence\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "shownSourceText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |",
       "shownSourceDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Source d23045c2d unheaded-block-34 (old ladder table) digest 09432ca4 recomputed and byte-equal; target unheaded-block-38 at HEAD digest 4e6e8e73 recomputed, ancestry Team Communication Protocol V1 > 8. RunResult Confidence real, anchor unique. Rows verified/inferred/no-evidence carried verbatim, reported and failed rows corrected. Code truth verified: settlement.mjs:269-280 (failed claim from reviewer/red-team role or findings verdict with worker report, exit 0, no timeout is reported), run-result.mjs:1273-1278 (blocked is reported with no report needed; read-only done is reported only with worker report), run-result.mjs:1250-1271 (failed cases incl. read-only mutation, claimInvalid, non-qualifying failed claim). Successor claim_e9bb00004e75ca737f2eeca58152063d exists with this digest and lists this lineage via previousReferences. Rationale old-target digest 21cfbd22 is the 865ad66be target text, wording only.",
+      "shownTargetText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_84b7cd3e67c87c553e30f60243f2aaa9",
@@ -50129,18 +50153,24 @@
       "targetAnchor": "unheaded-block-45",
       "shownTargetDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-41 unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-45 unit. The before/current complete texts are retained in the closure packet. Native target digest changes from b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565 to f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\",\"10. Coding-Domain Workflow Step Operations\",\"10.1 Discovery\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "shownSourceText": "Forbidden behavior:\n\n- asking the human directly;\n- parking as `awaiting-human`;\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
       "shownSourceDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Source d23045c2d unheaded-block-41 (Forbidden behavior list) digest b343cb61 recomputed byte-equal; target unheaded-block-45 at HEAD digest f42832dd recomputed, ancestry through 10.1 Discovery real. Three bullets carried verbatim, the parking bullet corrected; the new assertion is true at src/intake/discovery.mjs:535-561 (opened). Supersede with the correction recorded; successor claim_590258ace8cf7e3e45578a33f1db8ca1 exists with same digest.",
+      "shownTargetText": "Forbidden behavior:\n\n- asking the human directly;\n- the owner parking the item as `awaiting-human` on its own; only the `unclear` verdict's transition advances to exploring and parks the item (`src/intake/discovery.mjs:535-561`);\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "10. Coding-Domain Workflow Step Operations",
         "10.1 Discovery"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_f34be39fff111922b3bcfdececd9cbf5",
@@ -50825,17 +50855,23 @@
       "targetAnchor": "unheaded-block-62",
       "shownTargetDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-64 unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62 unit. The before/current complete texts are retained in the closure packet. Native target digest changes from aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae to 284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\",\"13. Acceptance Criteria For V1 Protocol\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "shownSourceText": "- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only operations can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
       "shownSourceDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Source d23045c2d unheaded-block-64 (acceptance bullets) digest aaded8bc recomputed byte-equal; target unheaded-block-62 at HEAD digest 284bb031 recomputed, ancestry 13. Acceptance Criteria real. Seven bullets verbatim, one changed to read-only done claims; true per run-result.mjs:1273-1278 and settlement.mjs:312-331. Remaining bullets still consistent with code (dirty-before exclusion settlement.mjs:206-216, claimInvalid failed run-result.mjs:1253). Successor claim_c0b3f970980065d2fba32affc5036073 exists with same digest.",
+      "shownTargetText": "- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only done claims can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "13. Acceptance Criteria For V1 Protocol"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_d64648495877bd05b5ef3ba2f5c799cc",
@@ -80393,16 +80429,22 @@
       "shownSourceText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | Structured claim plus a worker-produced report for read-only consult/review work. | May feed driver judgment, but should not close mutating work. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid schema, or explicit failure. | Must not advance Work. |",
       "shownSourceDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede the complete historical docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-35 unit with the full A25-corrected docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38 unit. The before/current complete texts are retained in the closure packet. Native target digest changes from 21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e to 4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1; read-only done evidence, reviewer/red-team findings or unclear-transition parking is corrected as applicable to [\"Team Communication Protocol V1\",\"8. RunResult Confidence\"]. Independent whole-unit review is required; prior approvals are not carried.",
       "owningBatch": "agent-coordination",
       "nextIndependentReview": "the targeted truth-fix check after A22",
-      "reviewNote": "A25 genuine changed-text historical successor binding; pending independent closure review.",
+      "reviewNote": "Retired row (status removed-pending-disposition, retired at f4bc8027f). Native source a4e132ccd unheaded-block-35 digest 09432ca4 recomputed byte-equal (same text also at d23045c2d block-34, a distinct claim id 63156). Target unheaded-block-38 at HEAD digest 4e6e8e73 and ancestry real. Same ladder correction as claim_63156, code truth verified. Code truth verified: settlement.mjs:269-280 (failed claim from reviewer/red-team role or findings verdict with worker report, exit 0, no timeout is reported), run-result.mjs:1273-1278 (blocked is reported with no report needed; read-only done is reported only with worker report), run-result.mjs:1250-1271 (failed cases incl. read-only mutation, claimInvalid, non-qualifying failed claim). Supersede is a knowing correction of reported and failed rows with the other rows carried verbatim.",
+      "shownTargetText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     }
   ]
 }

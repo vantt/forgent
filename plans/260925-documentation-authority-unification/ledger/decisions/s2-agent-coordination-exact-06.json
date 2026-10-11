@@ -1735,12 +1735,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#v-003-a-predeclared-workflow-or-protocol-is-optional -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_411508f58fbc6311fa74dc1c304bc777",
@@ -1751,12 +1756,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-26 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_6aad1a569d57f64372470a1142a9c071",
@@ -1767,12 +1777,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-27 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_b297c94d5589e3b8c9d8aa44d4c31170",
@@ -1783,12 +1798,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-28 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_5342c8ef0f0b234c4b9a57a8aead329d",
@@ -1913,12 +1933,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#v-006-planning-is-pluggable-and-composable -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: V-006 is live as the ADR-007 seam.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_fc8b2e43e26d7b52a0eff343def86333",
@@ -1929,12 +1954,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-34 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: V-006 is live as the ADR-007 seam.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_2face653f27f39f50d1c05f7d201a7f9",
@@ -1945,12 +1975,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-35 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: V-006 is live as the ADR-007 seam.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_05020154cd83da9598526a30ac5db55f",
@@ -2120,12 +2155,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#v-009-runtime-graphs-may-be-trivial-dynamic-or-declared -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_2b5b7d7d0b24f6f46d32abd3acc2453a",
@@ -2136,12 +2176,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-42 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_299d12d352c31ec48ab901cb7d8790fd",
@@ -2152,12 +2197,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-43 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Engine-independent design principle written with retired vocabulary; owner decision.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_2956fb9f215e0d0336571eef8fc0540e",
@@ -2481,12 +2531,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-54 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_07c68665d6b19d67c6b26491297ed6ba",
@@ -2652,12 +2707,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#open-design-questions-under-this-vision -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_32686d2ad0720fa4de86217d34a58678",
@@ -2668,12 +2728,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vision.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vision.md#unheaded-block-63 -> PLAT:history/retired-engine/files/vision.md#literal-snapshot: Contains engine-independent live items; the current section is an empty shell.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Vision principles written with retired session vocabulary: current vision.md restates the live parts (V-006 lines 195-200, rejected interpretations, open questions) and states the V-003/V-009 session-graph forms are historical.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "780e06906996002df1314b863f2c37680919754d5ce74f09b43f6aed040c7da2",
       "targetAncestry": [
         "Historical File: Agent Coordination Foundation Vision"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
@@ -3593,12 +3658,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/canonical-concepts.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/canonical-concepts.md#unheaded-block-58 -> PLAT:history/retired-engine/files/vocabulary/canonical-concepts.md#literal-snapshot: Job reserved-term definition and text go to history while the concept is live.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current vocabulary documents carry restated Job, Participant, creation-rule and forbidden-equivalence text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c9564be355c2dce70a799958e221d3830aa47cac0ebea743b827d7b487e5d2f",
       "targetAncestry": [
         "Historical File: Canonical Agent Coordination Concepts"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_f0a15a953f8fce5e049e2f69f17fdabf",
@@ -3693,12 +3763,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/concept-relationships.md#unheaded-block-7 -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current vocabulary documents carry restated Job, Participant, creation-rule and forbidden-equivalence text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_eaad287a417b0d1a585f4ca53534feb2",
@@ -3709,12 +3784,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/concept-relationships.md#unheaded-block-8 -> PLAT:history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot: Live creation rules go to history leaving an empty heading.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current vocabulary documents carry restated Job, Participant, creation-rule and forbidden-equivalence text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ef9007e5e26a4e17a3cbfb10a2f2b25a6b1b9850f1f408744ae0d36c7a7e6dc",
       "targetAncestry": [
         "Historical File: Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_c7b11963a02b7f53ed13ae86bf33769c",
@@ -3725,12 +3805,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-3 -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current vocabulary documents carry restated Job, Participant, creation-rule and forbidden-equivalence text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
       "targetAncestry": [
         "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_9a0d607bd7020040eeb744460e6a6edb",
@@ -3741,12 +3826,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-4 -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current vocabulary documents carry restated Job, Participant, creation-rule and forbidden-equivalence text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
       "targetAncestry": [
         "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_08942c238304e477f7c3db6fb0042a82",
@@ -3870,12 +3960,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "LEG:vocabulary/deprecated-and-reserved.md#unheaded-block-11 -> PLAT:history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Live reservations and rules moved to history leaving empty headings.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current vocabulary documents carry restated Job, Participant, creation-rule and forbidden-equivalence text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
       "targetAncestry": [
         "Historical File: Deprecated And Reserved Coordination Terms"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_9e18f03a6f954d19d1be580ad0cd2302",
@@ -4101,13 +4196,18 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding.",
-      "reviewNote": "LEG:verification/README.md#unheaded-block-4 -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current verification README Verification Boundary restates the checklist.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
       "targetAncestry": [
         "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_29427a2a05e942cef415e5a9991da2cf",
@@ -4117,13 +4217,18 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/verification/README.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The corrected current unit invalidates the former script-exact proof. Its complete dated source version remains verbatim inside this same-file historical carrier, while current cognitive/design guidance remains current and independently reviewed. The prior engine-only whole-file explanation is not carried; no old script/human approval carries to this changed binding.",
-      "reviewNote": "LEG:verification/README.md#unheaded-block-6 -> PLAT:history/retired-engine/files/verification/README.md#literal-snapshot: Policy sentence and checklist have no engine subject and are not carried in the current index.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Current verification README Verification Boundary restates the checklist.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "65e878b7f2f55cb911e1e0fcd8a7b759e8490fd6961a21afd433d5d73bfa8476",
       "targetAncestry": [
         "Historical File: dated evidence navigation; constitution-required owner of 867 physical payloads"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     }
   ],
   "exact": [],

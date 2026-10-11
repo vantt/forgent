@@ -10,24 +10,39 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Table rows true: run meta carries assignmentId/attempt/supersedesRunId/retryId (assignment-runner.mjs:1563-1573), refuseIfSettled at 1561; no workUnits/session-chain symbol anywhere in src (git grep empty); former proposal present in history snapshot. Non-blocking: deterministic runId run_<assignmentId>_<NN> (assignment-runner.mjs:783) and write-once assignment.json (1304-1313) are true but outside the cited ranges.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4301c71a6dd4a373fdf88cbfcce6abce",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Same table as the section; all three rows true (see section note). Shown digest recomputed from committed lines 49-53 and equals unit digest. Non-blocking: runId derivation at assignment-runner.mjs:783 is outside the cited ranges.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_8cfb187edeb487966e2ff6b9926809e0",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. workUnits/chain proposal is in history/retired-engine/files/architecture/runtime-recovery-design.md (1 hit); no workUnits, session-chain or chainId symbol in src; Run admission/recovery keep assignmentId/runId (assignment-runner.mjs:1563-1573; recovery-planner.mjs:243-266).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_0c80eeeb663fbf52cd06f23f7ba03a35",
@@ -35,15 +50,20 @@
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
       "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewNote": "Sentence: R14/R15 row says the design response includes a shared mutation door. No such component exists: grep finds the phrase only in this row and its history copy, section 3 of this document has no mutation door and says not to create a shared mutable recovery manager, and src has no such door (the retired session engine mutation doors are gone). Fix: drop shared mutation door from the R14/R15 row (keep ownership table section 3, versioned rollout section 8, dependency gates section 9). Other rows verified against run-handle.md, executor-health-and-fallback.md, assignment-run-runresult.md and section 6."
     },
     {
       "claimId": "claim_5fbeb634b61fd393084cc27a51b8c72e",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Absence claims confirmed by git grep (no distributed lease, health scoring store, chain budget allocator, business-effect ledger, session transfer in src). plan() returns kind park or needs-input for unsafe/unknown cases (recovery-planner.mjs:243-250, cited range).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_60bdeefbc7b8a3bee3c9ba06e7759dc4",
@@ -51,31 +71,46 @@
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
       "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewNote": "Sentence: The current Herdr launch identity uses a persisted random launch command, and the standalone reassign action is a fenced controller-epoch record with a checked authority input that does not launch a replacement worker. Both statements are true in code but no cited range shows them: the random launchCommandId is assignment-runner.mjs:2118 (cmd_<Date.now()>_<randomBytes>), and reassign is recovery-planner.mjs:160-171 and 204-212 (replacement-authority evidence) plus src/verbs/dispatch/recover.mjs:235-247 (claim cleared only for resume-driver) and 382-398 (epoch bump, recovery record, no launch). Cited authority.mjs:1608-1629 does back normalized fgos-<runId>-<launchCommandId> and the persisted commands/<id>.json. Fix: add those citations."
     },
     {
       "claimId": "claim_ea240d60d4890dc2a5c9ea5f4c41c1bc",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Normative grant/effect-policy sentence is a design rule, not contradicted by code. Force-release absence confirmed: no force-release symbol in src and run-lock.mjs:296 treats a live holder as held regardless of staleness.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_32f1855de59cc4ae4f957e5af1ccb12d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Metadata block and link only; no code assertions. Link target history/retired-engine/files/contracts/assignment-run-runresult.md exists with a Literal Snapshot heading; Related files exist; provenance commit 7880fbc74b07 exists and holds the path.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_8ed59b72fce0ae8cbe96ceb925f68cdc",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Link-only paragraph; target file and Literal Snapshot anchor exist.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
@@ -83,15 +118,20 @@
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
       "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewNote": "Sentence: assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' (Proposed Runtime Recovery Amendment row) and :1565-1590 (run.json contents) (Run row). The contract literal is at line 1563 (buildRunMeta opens at 1562) so both ranges exclude the line they cite. Fix: use 1563-1582 in both. Every other line reference verified at HEAD (assignment.mjs:17,276; normalizer 2-20; runner 70-81,431,560,574,697,784,917-940,932,1016,1941,2024,2118; recovery-planner 251-327; runtime-inspection 160,255; run-result 7,22-23,350-385,1276-1285,1305-1325; claim contract 5; evidence-attribution 10,69,197; lib.rs:129; runner.md:3072-3081; the five test files exist; no src/state import, no run-retried, no admitRun/admissionKey/authorityRef/writerRuntime in src)."
     },
     {
       "claimId": "claim_b7202aa695a3b6cde058ea7bd48d8f0e",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Preamble paragraph, no code assertions; consistent with the status table it introduces.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
@@ -99,23 +139,33 @@
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
       "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewNote": "Same table as the section. Sentence: assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' and :1565-1590 (run.json contents). The literal is at line 1563 so both ranges exclude it. Fix: 1563-1582. All other references verified true at HEAD (see section note)."
     },
     {
       "claimId": "claim_70d93814bdfb1389bb31b561553a0125",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Three provenance kinds confirmed: declared (assignment.mjs:457), inline (664), unit-run (execution/run.mjs:338); unit-run assignment runs through executeAssignment (run.mjs:355).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_b0188851071b323c139f18947b7b3c60",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. List matches code: declared operation/TaskSpec, inline contract plus domain-harness-seam validator (assignment.mjs:666, execution-contract.mjs:195-199), unit-run binding (run.mjs:336-342).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_34a87472629191c59355e5f74ef2c2d2",
@@ -123,111 +173,176 @@
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
       "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewNote": "Sentence: Declared/inline builders stamp policy/normalizer versions. True (assignment.mjs:455-460 and 663-667 set contractPolicyVersion and normalizerVersion from execution-contract.mjs:47 and assignment-normalizer.mjs:44) but no cited range covers it: cited normalizer 95-144 stamps mutation and evidence.required only. Fix: add those citations. Rest verified: run.mjs:337-343 writes unit-run provenance (334-338 covers mutation, binding and kind), normalizer stamping at 95-144 is current implementation, no session stamp door in src (git grep empty)."
     },
     {
       "claimId": "claim_3b6225e7c695ed53efcfccc9231de32a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Metadata block and link only. Link target and Literal Snapshot heading exist; Related files exist; provenance commit 7880fbc74b07 exists.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_e8e710ab280697b1c9a2841a53b903d1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Link-only paragraph; target and anchor exist.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_9306c12cf83959d8c3a1fbf694b5874d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Declared, inline and unit-run all reach executeAssignment (assignment.mjs:457,664; run.mjs:355) with the cited validation (execution-contract.mjs:295-340) and stamping (normalizer 95-188). Vision paragraph matches vision.md:162-177 and 231.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_ecb2e520b230a8a2b046055258ba807f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Same current sentence as above; verified against assignment.mjs, run.mjs:355 and execution-contract.mjs.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_980e880d4eafee30cc1f150861879760",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Registered graph framing, shaping, critique, synthesis, explanation, close human gate verified at architecture-advisory.yaml:8-84 (file is 84 lines). The workflow writes no companion trace files, so no crash-recovery guarantee for them; SKILL.md:17-37 and 113-142 do not contradict.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4a2d3f838f4aee3d98e6447fc810ac11",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Workflow has no step or gate that reads companion files, so a missing one is not a completion failure (yaml:8-84).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_9bdadc017bd7be0e7a28a0ecda44225a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Rubric concern only; the registered close gate (yaml:78-84) checks no authorization or quote line. Template names stay inside this playbook.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4a0fce2c25bbabc9a480091dc6cc7a6f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Label-only sentence; matches the Registered Output Boundary section and the registered workflow (yaml:8-84).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_7b115d68e3b31d84ec60ecd82f7f608a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Label-only sentence; same as above.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_c74944581e23cedd527e23016d0c5999",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Label-only sentence; same as above.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_aeac2f321e1ccb5d0fde1c5de4df5124",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Label-only sentence; same as above.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_8ec8b196432858ddf302aab3c106812a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. Both named files exist and ship (yaml:8-84; SKILL.md:17-37 execution boundary). No runtime conformance gate reads this rubric (git grep shows no consumer).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_27a13b2a9450b5ef70d8a048936ccd7a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-current-closure.json",
       "receiptCommit": "c44bad368ab841445f97bcfababaf1c314ef222e",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
-      "reviewNote": "New exact native unit and shown-text receipt pin; independent committed classification acceptance required; no previous approval carries."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text bound to committed unit at inventory commit e931b74c and HEAD. Every assertion true against code. execution-contract.mjs:180-240 (accepted field sets) and 295-340 (validateExecutionContract entry) exist at HEAD; unit-run (run.mjs:334-343) and inline (assignment.mjs:664) are separate paths. Text matches vision.md:174-177.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     }
   ]
 }

@@ -671,14 +671,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#component-outer-boundary-note is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#component-outer-boundary-note -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Legacy Component-Outer Boundary Note heading sent to history; current keeps an empty heading that other sections cite.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Heading unit; same section is retained in the current document with restored live text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
       "targetAncestry": [
         "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_453b627ec6b0763fa920582fc2922f6b",
@@ -708,14 +713,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/dispatch-control-plane.md#separation-of-concerns is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/dispatch-control-plane.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/dispatch-control-plane.md#separation-of-concerns -> PLAT:history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot: Separation Of Concerns section unit mapped to history while its live paragraph has no current counterpart.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Heading unit; same section is retained in the current document with restored live text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "17ecc00c3ce536698978b4d73be4c5f3a4bf6d3c3055779fb65103314712f96a",
       "targetAncestry": [
         "Historical File: surviving dispatch runtime, mixed obsolete resolver contract"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_f42fcb530d066e79cb2632b13a7faa0e",
@@ -1994,16 +2004,21 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "Supersede current publication/writer assertions by the full docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-19 counterpart. The historical P12 causal clause is retained byte-for-byte by docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md#unheaded-block-3 (unit digest 26a57d578e22c5a79a66d676baf496649fc5bd18ff1d4a63863c14a82baf7fe8): This retains exclusive-create semantics while avoiding empty-lock and conditional-unlink races seen in P12. The current publication, mutable-writer and filesystem-design qualifications remain in the primary counterpart; the P12 clause is explicitly carried as dated history, not as current engine behavior. The whole source/current units plus this exact clause witness are supplied for independent A25 whole-unit review; this is not a bare supersede or a claim that the clause vanished.",
-      "reviewNote": "Label supersede is wrong under the whole-unit rule: the source sentence \"This retains exclusive-create semantics while avoiding empty-lock and conditional-unlink races seen in P12\" (source line 189-190) appears nowhere in the target or elsewhere in the platform doc (grep for P12/conditional-unlink/empty-lock: no hits). The rest is reworded and verified (settlement.mjs:434, proof-helpers.mjs:73-125, settlement.mjs:737,832 for run.json updates, assignment-runner.mjs:1947-1954, no filesystem probe in src). Fix: either relabel partial-carry and record that clause as the remainder, or cite another unit that carries it; do not leave a bare supersede.",
+      "reviewNote": "ok. Label supersede is acceptable now: the dropped P12 clause (exclusive-create semantics, empty-lock and conditional-unlink races) is named and carried byte-for-byte by history unit unheaded-block-3 (digest 26a57d57 confirmed; clause present at history lines 232-233), the A23 cite-a-carrier path; the history snapshot differs from the source only by one re-wrapped line. Every target assertion true: settlement.mjs:434 publishImmutableProof; proof-helpers.mjs:73-125 fsync, hard link without overwrite, EEXIST returns existing, other errors rethrown, directory fsync best-effort; run.json via publishMutableProjection (settlement.mjs:737,832); unreadable result refuses relaunch (assignment-runner.mjs:1935-1954); no filesystem probe in src/setup. A25 rework claim_f0435011 fixed.",
       "shownTargetDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "6. Local Concurrency And Durability"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_ec0a4abadcdee949f582694b3f34ae5e",
@@ -2611,14 +2626,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/work-integration.md#work-driver-handoff-to-dispatch is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/work-integration.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/work-integration.md#work-driver-handoff-to-dispatch -> PLAT:history/retired-engine/files/architecture/work-integration.md#literal-snapshot: Legacy Work Driver Handoff section mapped to history; current keeps an empty heading.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Heading unit; same section is retained in the current document with restored live text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c756c8dfd65a47212c4b31dbc9ef0066a2de62d68d43fe357627a19d49cfab38",
       "targetAncestry": [
         "Historical File: surviving Work-versus-execution authority boundary; old stage/session model mixed"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_edee0cf1c7011c8dbdc736cbdad94e2d",
@@ -4174,14 +4194,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md#context is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:decisions/ADR-002-stage-operation-compatibility.md#context -> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Heading unit; same section is retained in the current document with restored live text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
       "targetAncestry": [
         "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_5b9e29fcd989c11bf46a7052bec34002",
@@ -4190,14 +4215,19 @@
       "targetAnchor": "literal-snapshot",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md#decision is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:decisions/ADR-002-stage-operation-compatibility.md#decision -> PLAT:history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot: Original Stage-wording units are in history, but the live replacement in the current Context/Decision keeps the unsupported step.taskSpec claim, so these live units are not yet correctly carried as current text.",
+      "reviewNote": "ok. Containment checked by script and by reading: the complete legacy unit text is a byte substring of the history file (Document type History, first Provenance line names the candidate path at d23045c2 with SHA256 equal to the blob) and of git show d23045c2 for that path; the target heading Literal Snapshot digest binds the whole fenced body so every claim is kept verbatim. Heading unit; same section is retained in the current document with restored live text.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "64b50f7a8b9e4e6993e6be83e4d2e949e886bc0efe7133a345d6ab5f9c2effcc",
       "targetAncestry": [
         "Historical File: ADR-002: Preserve Stage Primary Operation Compatibility"
-      ]
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_5dae13aa43cc25797aed9b60d65ce67e",

@@ -15,11 +15,24 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "unheaded-block-38",
-      "targetUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
       "successorClaimId": "claim_e9bb00004e75ca737f2eeca58152063d",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_4c05b748365100a7b2cb1fd5daa040d2 as a pending successor decision to claim_e9bb00004e75ca737f2eeca58152063d at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
+      "reviewStatus": "reviewed",
+      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_4c05b748365100a7b2cb1fd5daa040d2 as a pending successor decision to claim_e9bb00004e75ca737f2eeca58152063d at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost.",
+      "shownSourceDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "shownTargetText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "shownTargetDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "reviewNote": "Pending successor decision in s2-agent-coordination-closure-successors.json registryGaps (not in retired ledger). Source 865ad66be unheaded-block-38 digest 21cfbd22 recomputed, shown text byte-equal (intermediate text citing run-result.mjs:1261-1278); target HEAD block-38 digest 4e6e8e73 real, successor claim_e9bb00004e75ca737f2eeca58152063d exists with previousReferences to this id/digest/commit. Successor keeps blocked and read-only-done parts, and widens failed-findings to reviewer/red-team role (settlement.mjs:269-280) while fixing citations (run-result.mjs:1250-1271, 1273-1278), all opened and true. Supersede is correct; no remainder lost.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "targetAncestry": [
+        "Team Communication Protocol V1",
+        "8. RunResult Confidence"
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
@@ -31,11 +44,25 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "unheaded-block-45",
-      "targetUnitDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
       "successorClaimId": "claim_590258ace8cf7e3e45578a33f1db8ca1",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_4a4bddcbf0fc4ffa406c51d5df8d5623 as a pending successor decision to claim_590258ace8cf7e3e45578a33f1db8ca1 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-45, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
+      "reviewStatus": "reviewed",
+      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_4a4bddcbf0fc4ffa406c51d5df8d5623 as a pending successor decision to claim_590258ace8cf7e3e45578a33f1db8ca1 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-45, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost.",
+      "shownSourceDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "shownTargetText": "Forbidden behavior:\n\n- asking the human directly;\n- the owner parking the item as `awaiting-human` on its own; only the `unclear` verdict's transition advances to exploring and parks the item (`src/intake/discovery.mjs:535-561`);\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "shownTargetDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "reviewNote": "Pending successor decision in registryGaps. Source 865ad66be unheaded-block-45 digest b343cb61 recomputed byte-equal; target HEAD block-45 digest f42832dd real with ancestry through 10.1 Discovery; successor claim_590258ace8cf7e3e45578a33f1db8ca1 exists with previousReferences back to this claim. Only the parking bullet changed and its new assertion is true at src/intake/discovery.mjs:535-561 (opened). Supersede correct, other three bullets verbatim.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "targetAncestry": [
+        "Team Communication Protocol V1",
+        "10. Coding-Domain Workflow Step Operations",
+        "10.1 Discovery"
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     },
     {
       "claimId": "claim_8de909df847b8689807abcfe156b704a",
@@ -47,11 +74,24 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "unheaded-block-62",
-      "targetUnitDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
       "successorClaimId": "claim_c0b3f970980065d2fba32affc5036073",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_8de909df847b8689807abcfe156b704a as a pending successor decision to claim_c0b3f970980065d2fba32affc5036073 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
+      "reviewStatus": "reviewed",
+      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_8de909df847b8689807abcfe156b704a as a pending successor decision to claim_c0b3f970980065d2fba32affc5036073 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost.",
+      "shownSourceDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "shownTargetText": "- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only done claims can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "shownTargetDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "reviewNote": "Pending successor decision in registryGaps. Source 865ad66be unheaded-block-62 digest aaded8bc recomputed byte-equal; target HEAD block-62 digest 284bb031 real with 13. Acceptance Criteria ancestry; successor claim_c0b3f970980065d2fba32affc5036073 exists with previousReferences back to this claim. One bullet narrowed to read-only done claims, true per run-result.mjs:1273-1278 and settlement.mjs:312-331; other bullets verbatim. Supersede correct.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-retired.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "targetAncestry": [
+        "Team Communication Protocol V1",
+        "13. Acceptance Criteria For V1 Protocol"
+      ],
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c"
     }
   ],
   "candidateClassifications": [
@@ -61,7 +101,7 @@
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewNote": "Shown text equals committed unit at efb60a3, e6c02b0 and HEAD; blob pins match. reported row (blocked; read-only done with report; failed claim by reviewer/red-team role or findings verdict with report, exit 0, no timeout) is true: settlement.mjs:269-280, run-result.mjs:1273-1278; failed row true vs run-result.mjs:1250-1271. FALSE: verified row lists \"test artifact, or verified result file\" as post-run external evidence; code (settlement.mjs:290, computeChangedFiles/safeGitStatusFiles 153-226) counts only git-visible changed files outside .fgos (new dirty or committed-diff files); worker reports and result files are not verified evidence for a mutating run. Fix: reword verified to a done claim on a mutating operation plus at least one changed file outside .fgos (new dirty file or file in the pre/post-run committed diff). Caveat: the evidence-floor re-derivation in operation-choice.mjs:395-420 has no role input, so a reviewer-role failed claim without a findings verdict is downgraded there; say settlement-time."
     },
     {
       "claimId": "claim_e9bb00004e75ca737f2eeca58152063d",
@@ -69,47 +109,72 @@
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewNote": "Same table as the 8-runresult-confidence section, shown text equals committed unit; all bytes and pins match. Same defect: verified row names \"test artifact, or verified result file\" as evidence but code counts only changed files outside .fgos (settlement.mjs:290; computeChangedFiles 206-226). Same fix. reported and failed rows are true against settlement.mjs:269-280, run-result.mjs:1250-1278."
     },
     {
       "claimId": "claim_d28774522afab8bf70f022a2e71ab0c5",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text equals committed unit; pins match. Opened discovery.mjs:513-561: clear path moveStep via nextDiscoveryEdge to plan step; unclear at the first discover step moves to the next discover step (exploring) at 535-542, then putInAwaiting at 559-561 unless already awaiting-human. No owner-initiated parking path exists; sentence true. Other lines are normative role rules, no contradicting code.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_590258ace8cf7e3e45578a33f1db8ca1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text equals committed unit (bullet list inside 10.1); same code evidence as parent unit, discovery.mjs:535-561 verified: only the unclear verdict advances to exploring and parks.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text equals committed unit; pins match. Bullets are adoption conditions and hold against code: claimInvalid gives failed (run-result.mjs:1253), missing claim gives inferred or no-evidence only; read-only done claim reports only with companion worker report (1276-1278; settlement.mjs); mutating verified needs changedFiles (1280). Dirty-before bullet is supported by computeChangedFiles (settlement.mjs:206-226) which is outside the cited range but true; mark as citation gap, not falsity.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_c0b3f970980065d2fba32affc5036073",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text equals committed unit (bullet list); same assertions and code as the parent section, verified true against run-result.mjs:1235-1285 and settlement.mjs:264-347. Dirty-before bullet is true via computeChangedFiles outside the cited range.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_f2b49dde03982181f6b70e8673696528",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Shown text equals committed unit; pins match. liveness.mjs:93-109 confirms paused-limit and provider-limit keep-always and closeAlways never overrides them (paneFateFor); 238-246 confirms ladder settles on result file; evaluateLadder emits provider-limit for credential/quota screen matches (293-299). Block cites no stale lines.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md",
+      "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4206c1d35ff143014142819046d69771",
@@ -117,7 +182,7 @@
       "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+      "reviewNote": "Shown text equals committed unit; evidence blob pins current. Cites liveness.mjs:267-299, 93-109, 238-246 and recovery.mjs:105-107 all verified true (15000ms auth probe, ceiling after truth/blocked/death, death threshold 3, retry for worker-timeout). STALE: shown text cites herdr-round.mjs:346-357 for the blocked-to-worker-timeout mapping, but after the main sync that mapping is ERROR_CLASS_FOR_OUTCOME at 362-369 (blocked at 364) with its seam comment at 356-361; 346-357 is cleanupAndKeepScreen plus the start of that comment. Fix: cite herdr-round.mjs:356-367 (the evidence range was rebound to 351-369 but the in-text cite was not). Rest of the section is true or labelled proposed; retryAfter and handshake sentences have no code and are design statements."
     }
   ]
 }
