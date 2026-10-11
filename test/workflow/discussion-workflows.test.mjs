@@ -390,3 +390,18 @@ test('the independent panel steps of the council-like workflows run blind and no
   assert.deepEqual(blindUnits('architecture-advisory'), ['shape-proposals']);
   assert.deepEqual(blindUnits('business-discussion'), ['explore-perspectives']);
 });
+
+test('critique checkers of group-cognition and business-discussion read the supplied artifact, not the latest commit', () => {
+  const critiqueParams = (id, unitId) =>
+    loadWorkflow(id).steps.flatMap((s) => s.units).find((u) => u.id === unitId).template.params;
+  for (const [id, unitId] of [['group-cognition', 'dialectical-critique'], ['business-discussion', 'challenge-assumptions']]) {
+    const { roleTasks } = critiqueParams(id, unitId);
+    for (const role of ['reviewer', 'red-team']) {
+      const text = roleTasks[role];
+      assert.match(text, /Context refs/, `${id} ${role} must point at Context refs`);
+      assert.match(text, /artifact the task names/, `${id} ${role} must point at the supplied artifact`);
+      assert.match(text, /Do not look at git history unless the task names a commit/, `${id} ${role} must not default to git log`);
+      assert.ok(text.includes('{objective}'), `${id} ${role} must carry the unit objective`);
+    }
+  }
+});
