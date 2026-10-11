@@ -105,19 +105,25 @@ fgos workflow start nominal-group --stance-options "<a>|<b>|<c>"
 ### Seats (specialised panel perspectives)
 
 On `group-cognition`, `business-discussion`, `nominal-group` and `delphi`, `--seats` rebuilds
-the base with one panel seat per lens, everything else as registered:
+the base with one panel seat per entry, everything else as registered:
 
 ```bash
-fgos workflow start group-cognition --request "<question>" --seats "<lens one>|<lens two>|<lens three>" --context-ref <doc>
+fgos workflow start group-cognition --request "<question>" --seats "<lens one>|@<persona>|<lens three>" --context-ref <doc>
 ```
 
-- At least 2 lenses, each a short plain-text concern (3-160 characters, one line, no braces, no `|`),
-  distinct; `@name` is refused (not supported yet). No seat maximum: seats beyond the provider
-  families share one and `start` reports it as `seatsPreflight`.
+- At least 2 entries. A lens is a short plain-text concern (3-160 characters, one line, no braces,
+  no `|`), distinct. An entry `@name` (lowercase letters, digits and `-`) seats a named persona on
+  that seat only: it is looked up as `<name>.yaml` in the project's `fgos/agents/`, then
+  `domains/*/agents/`, then `core/agents/` (the first tier that has it wins, whole file; a name
+  twice in one tier, an unknown name, or the same persona on two seats refuses the start and creates
+  no run). Choose names only from files you listed and read; never invent one. The persona text is
+  pinned when the run starts, so editing or deleting the file later does not change the run. No
+  seat maximum: seats beyond the provider families share one and `start` reports it as
+  `seatsPreflight`.
 - Delphi uses the same seats in both rounds. `council-lite` and `architecture-advisory` keep their
   own seats and refuse `--seats`. `workflow resume` refuses a different `--seats` than the run began with.
-- `fgos workflow status <id>` shows the stored `seats` (lenses, base id and digest, refs) and the
-  expanded `workflow`.
+- `fgos workflow status <id>` shows the stored `seats` (entries, base id and digest, refs, and the
+  pinned `personas` with tier, source file and digest) and the expanded `workflow`.
 
 The Workflow Runner parses the YAML definition, resolves unit capability bindings
 via `src/runner/execution/bind.mjs`, and executes steps sequentially or in parallel

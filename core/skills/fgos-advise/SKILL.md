@@ -66,15 +66,24 @@ does not govern the delegated architecture route, which keeps the hook table of
    gates come only from the chosen Workflow or preset, never from this skill.
    Seat lenses come from the chosen Workflow, or from `--seats` on the four
    bases with generic panels.
-   - **`--seats "<lens one>|<lens two>|<lens three>"`** (optional) only on
+   - **`--seats "<lens one>|@<persona>|<lens three>"`** (optional) only on
      `group-cognition`, `business-discussion`, `nominal-group` and `delphi`.
      Write 2-4 non-redundant perspectives that the person's own request names or
      plainly implies (default 3; never invent a fourth to fill a quota). A lens
      is a short plain-text analytic concern, 3-160 characters on one line, no
      braces and no `|`, for example "cash flow and payback over 36 months", not
-     a role to act ("act as the CFO") and not a persona name, a standard or a
-     fact the person did not give. Entries starting with `@` are not supported
-     yet. Pair the lenses with `--context-ref` documents about the domain
+     a role to act ("act as the CFO") and not a standard or a fact the person
+     did not give. An entry may instead be `@name`, a named persona that
+     applies to that seat only. Before you use one, list what exists: the
+     `*.yaml` files in `fgos/agents/` (the person's own definitions), then
+     `domains/*/agents/`, then `core/agents/` of the project (a project that has
+     no `core/agents/` of its own reads the installed set, which you cannot
+     list from there: use only names you saw). Read each file's `description`
+     and `decision_boundary`, pick a persona only when it plainly fits the
+     person's concern, and write its name exactly as the file name without
+     `.yaml`. Never invent or guess a name, never write a persona file, and
+     never put one persona on two seats. A start with an unknown or duplicated
+     name is refused and creates no run. Pair the lenses with `--context-ref` documents about the domain
      (policies, data, standards the person named or that sit plainly in scope);
      every seat and checker receives them. If the request supports fewer than two
      distinct angles, omit `--seats`: the base runs as registered. Never use
@@ -118,10 +127,12 @@ does not govern the delegated architecture route, which keeps the hook table of
   the only part of a base this skill specialises; it never sets a seat count
   separately, a critique, a gate, a synthesizer, or any step.
 - Domain flavour (customer, finance, ops) goes into the request text, the seat
-  lenses and the `--context-ref` documents. Never invent persona names, file
-  paths, standards or external facts, and add no new persona files.
+  lenses, the persona names you found in the three folders, and the
+  `--context-ref` documents. Never invent persona names, file paths, standards
+  or external facts, and add no new persona files.
 - Never set provider, model, executor, tier, `invocation`, `prefer`, or a
-  persona override.
+  persona override (the `@name` seat entry is the one persona input; it is not
+  an override and carries no provider or tier).
 - **Unmet knob** (for example 3 rounds, or a seat count the person insists on
   but `--seats` cannot serve on the chosen route): run the closest registered
   route; state the unmet knob in the pre-launch line and in the result; never
