@@ -1,0 +1,376 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-10",
+  "sourceCommit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+  "receipts": [
+    {
+      "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "8-runresult-confidence",
+      "unitDigest": "b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7",
+      "shownText": "## 8. RunResult Confidence\n\nRunResult status and confidence are control-plane judgments.\n\nConfidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |\n\nThe driver must treat `done/no-evidence` as not done. It may retry, ask for a\nproper artifact, or route to a different legal operation.",
+      "shownTextDigest": "3c244cb11cbdbd1b91ecf30ca5c261bd4be3b3a7451dede0d624f5f7d4f33148",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The complete 8-runresult-confidence current unit is the A25-authorized replacement of the old shown text. Independent review must check its whole current/proposed boundary and every current assertion against the exact current-code citations; no old approval carries.",
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 229,
+            "endLine": 367,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1235,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          }
+        ],
+        "scope": "Settlement includes reviewer/red-team or findings failed-claim reports at exit zero without timeout; the confidence ladder is checked against the settlement writer and evidence floor, not only one helper.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "previousReferences": [
+        {
+          "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
+          "sourceUnitDigest": "df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e",
+          "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_e9bb00004e75ca737f2eeca58152063d",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-38",
+      "unitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "shownText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "shownTextDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The complete unheaded-block-38 current unit is the A25-authorized replacement of the old shown text. Independent review must check its whole current/proposed boundary and every current assertion against the exact current-code citations; no old approval carries.",
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 229,
+            "endLine": 367,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1235,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          }
+        ],
+        "scope": "Settlement includes reviewer/red-team or findings failed-claim reports at exit zero without timeout; the confidence ladder is checked against the settlement writer and evidence floor, not only one helper.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "previousReferences": [
+        {
+          "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
+          "sourceUnitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+          "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_d28774522afab8bf70f022a2e71ab0c5",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "101-discovery",
+      "unitDigest": "84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6",
+      "shownText": "### 10.1 Discovery\n\nDiscovery is machine-alone.\n\nAllowed behavior:\n\n- owner reads existing Work context;\n- owner consults researcher helpers for evidence;\n- owner logs consult interactions;\n- owner chooses `clear` or `unclear`;\n- `clear` can route to planning;\n- `unclear` routes to exploring.\n\nForbidden behavior:\n\n- asking the human directly;\n- the owner parking the item as `awaiting-human` on its own; only the `unclear` verdict's transition advances to exploring and parks the item (`src/intake/discovery.mjs:535-561`);\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "shownTextDigest": "b883ea8d66ed93289bf2b4f014cfc5e2bfb5218fb116e1bd7c8135cf409d41b7",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The complete 101-discovery current unit is the A25-authorized replacement of the old shown text. Independent review must check its whole current/proposed boundary and every current assertion against the exact current-code citations; no old approval carries.",
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/intake/discovery.mjs",
+            "startLine": 513,
+            "endLine": 561,
+            "blobSha": "a83fad5a3b64d03dea6f13e3eca629949cbc315f"
+          }
+        ],
+        "scope": "Owner-initiated parking is forbidden; the unclear verdict advances to exploring and parks. The existing clear/researcher and workflow statements retain their explicitly proposed/manual boundary.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "previousReferences": [
+        {
+          "claimId": "claim_d28774522afab8bf70f022a2e71ab0c5",
+          "sourceUnitDigest": "dc81ca680b5d3e5316f7487a46993730e333cf84943141bd6319cde2c0a10304",
+          "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_590258ace8cf7e3e45578a33f1db8ca1",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-45",
+      "unitDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "shownText": "Forbidden behavior:\n\n- asking the human directly;\n- the owner parking the item as `awaiting-human` on its own; only the `unclear` verdict's transition advances to exploring and parks the item (`src/intake/discovery.mjs:535-561`);\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "shownTextDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The complete unheaded-block-45 current unit is the A25-authorized replacement of the old shown text. Independent review must check its whole current/proposed boundary and every current assertion against the exact current-code citations; no old approval carries.",
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/intake/discovery.mjs",
+            "startLine": 513,
+            "endLine": 561,
+            "blobSha": "a83fad5a3b64d03dea6f13e3eca629949cbc315f"
+          }
+        ],
+        "scope": "Owner-initiated parking is forbidden; the unclear verdict advances to exploring and parks. The existing clear/researcher and workflow statements retain their explicitly proposed/manual boundary.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "previousReferences": [
+        {
+          "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+          "sourceUnitDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+          "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "13-acceptance-criteria-for-v1-protocol",
+      "unitDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b",
+      "shownText": "## 13. Acceptance Criteria For V1 Protocol\n\nThe protocol is ready for driver adoption when:\n\n- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only done claims can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "shownTextDigest": "def1347614dfe96e65e1d6eccf69ea89118dc841c5ecaeb81a4274f97836b838",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The complete 13-acceptance-criteria-for-v1-protocol current unit is the A25-authorized replacement of the old shown text. Independent review must check its whole current/proposed boundary and every current assertion against the exact current-code citations; no old approval carries.",
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1235,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 264,
+            "endLine": 347,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          }
+        ],
+        "scope": "Read-only done claims require a worker report; blocked claims may be reported without one. The listed adoption criteria remain conditions, not a declaration that the proposal is adopted.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "previousReferences": [
+        {
+          "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
+          "sourceUnitDigest": "47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae",
+          "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_c0b3f970980065d2fba32affc5036073",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-62",
+      "unitDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "shownText": "- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only done claims can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "shownTextDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The complete unheaded-block-62 current unit is the A25-authorized replacement of the old shown text. Independent review must check its whole current/proposed boundary and every current assertion against the exact current-code citations; no old approval carries.",
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1235,
+            "endLine": 1285,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 264,
+            "endLine": 347,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          }
+        ],
+        "scope": "Read-only done claims require a worker report; blocked claims may be reported without one. The listed adoption criteria remain conditions, not a declaration that the proposal is adopted.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "previousReferences": [
+        {
+          "claimId": "claim_8de909df847b8689807abcfe156b704a",
+          "sourceUnitDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+          "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_f2b49dde03982181f6b70e8673696528",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+      "shownText": "A requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).",
+      "shownTextDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The previously independently accepted shown text is unchanged, but main changed a cited code blob. Every cited span is uniquely located byte-for-byte in current code; the updated ranges/blob pins require independent closure re-confirmation. No prior code-evidence approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_c26b6c8149e0b5bc78dab2b6e1fb6e0a",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        },
+        {
+          "claimId": "claim_ad392d3c304da7625a3e2f75aa0753e6",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "authorized precision/obligation correction to real existing section primitive; changed shown text pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-production-ladder-semantics",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 351,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          },
+          {
+            "path": "src/runner/recovery.mjs",
+            "startLine": 105,
+            "endLine": 112,
+            "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 93,
+            "endLine": 109,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 238,
+            "endLine": 246,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      },
+      "codeRebindingWitnesses": [
+        {
+          "path": "src/runner/dispatch/herdr-round.mjs",
+          "oldStart": 341,
+          "oldEnd": 359,
+          "newStart": 351,
+          "newEnd": 369,
+          "spanDigest": "fcf68e268844e4680f66cb745565474ba85adab1155f7682b2f4e22e0114debf",
+          "unchangedCitedBytes": true
+        }
+      ]
+    },
+    {
+      "claimId": "claim_4206c1d35ff143014142819046d69771",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "2-production-ladder-semantics",
+      "unitDigest": "21295b47dae8583ef4b70ea406ad45275bdb1902af772589db488dafa179f7c8",
+      "shownText": "## 2. Production Ladder Semantics\n\nThe order and behavior in `src/runner/dispatch/liveness.mjs` are ported:\n1. Worker result file beats all runtime readings; it still requires normalization.\n2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:346-357`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.\n3. Death requires consecutive absent readings (default 3); unknown/present reset.\n4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.\n5. Idle/stale evaluation subtracts blind time; working is progress even with\n   zero stdout. Screen reads are requested at the stale boundary, and an early\n   credential probe also runs after fifteen seconds of non-working idle time\n   (`liveness.mjs:267-299`). Thus screen reads are not stale-only.\n\nA requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).\n\nZero output is a fact orthogonal to outcome. A 35-minute zero-output incident can\nbe timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.\nHandshake timeout with unknown delivery is not proof of launch failure.\nThe ladder supplies the matching screen line, not a parsed retryAfter timestamp.\nAn adapter may parse a known provider reset format, preserving the original line;\notherwise retryAfter is absent. RetryAfter only schedules inspection.",
+      "shownTextDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The previously independently accepted shown text is unchanged, but main changed a cited code blob. Every cited span is uniquely located byte-for-byte in current code; the updated ranges/blob pins require independent closure re-confirmation. No prior code-evidence approval is carried.",
+      "previousReferences": [
+        {
+          "claimId": "claim_4206c1d35ff143014142819046d69771",
+          "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+          "reason": "same real named section; changed full shown text or inherited stale receipt digest, pending current-code recheck"
+        }
+      ],
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "2-production-ladder-semantics",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "efb60a3ff30c63262c121a2d371557cda7e88a84",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 351,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          },
+          {
+            "path": "src/runner/recovery.mjs",
+            "startLine": 105,
+            "endLine": 112,
+            "blobSha": "a2272b4a665b8d366932129cd91fd5f3b6f4014f"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 93,
+            "endLine": 109,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 238,
+            "endLine": 246,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          }
+        ],
+        "scope": "The reviewer verifies the complete shown unit against this unchanged current code, including its explicit proposed/manual/retired boundaries. This evidence does not claim live execution or implementation of labelled design. The section-level proof and any supporting context references are separately shown.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "supportingContextReferences": []
+      },
+      "codeRebindingWitnesses": [
+        {
+          "path": "src/runner/dispatch/herdr-round.mjs",
+          "oldStart": 341,
+          "oldEnd": 359,
+          "newStart": 351,
+          "newEnd": 369,
+          "spanDigest": "fcf68e268844e4680f66cb745565474ba85adab1155f7682b2f4e22e0114debf",
+          "unchangedCitedBytes": true
+        }
+      ]
+    }
+  ]
+}

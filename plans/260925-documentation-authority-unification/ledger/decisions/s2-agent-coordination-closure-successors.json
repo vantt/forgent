@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-closure-successors",
+  "authorSession": "codex-session:1@2026-10-10",
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-38",
+      "sourceUnitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+      "shownSourceText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed findings verdict with a report and exit 0 (`run-result.mjs:1261-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "successorClaimId": "claim_e9bb00004e75ca737f2eeca58152063d",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_4c05b748365100a7b2cb1fd5daa040d2 as a pending successor decision to claim_e9bb00004e75ca737f2eeca58152063d at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
+    },
+    {
+      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-45",
+      "sourceUnitDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+      "shownSourceText": "Forbidden behavior:\n\n- asking the human directly;\n- parking as `awaiting-human`;\n- treating a helper's unsupported answer as proof;\n- opening a new Work item just to answer a bounded evidence question.",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-45",
+      "targetUnitDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "successorClaimId": "claim_590258ace8cf7e3e45578a33f1db8ca1",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_4a4bddcbf0fc4ffa406c51d5df8d5623 as a pending successor decision to claim_590258ace8cf7e3e45578a33f1db8ca1 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-45, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
+    },
+    {
+      "claimId": "claim_8de909df847b8689807abcfe156b704a",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-62",
+      "sourceUnitDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+      "shownSourceText": "- every runtime assignment receives an explicit result artifact path;\n- malformed or missing structured claims cannot produce `verified` or\n  `reported`;\n- dirty-before files cannot be counted as post-run evidence;\n- read-only operations can return `reported` only through worker artifacts;\n- mutating operations require post-run external evidence;\n- stage skills agree on when Assignment is used versus direct invocation;\n- `validate-plan` role prose is consistent across skill and task-spec docs;\n- discovery remains machine-alone.",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-62",
+      "targetUnitDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "successorClaimId": "claim_c0b3f970980065d2fba32affc5036073",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_8de909df847b8689807abcfe156b704a as a pending successor decision to claim_c0b3f970980065d2fba32affc5036073 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
+    }
+  ]
+}
