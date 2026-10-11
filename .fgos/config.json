@@ -142,10 +142,13 @@
         }
       },
       "marketing:research": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -154,15 +157,19 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
       "marketing:write": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -171,15 +178,19 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
       "marketing:publish": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -188,7 +199,8 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -298,10 +310,13 @@
         ]
       },
       "business:frame": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -310,15 +325,19 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
       "business:perspectives": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -327,15 +346,19 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
       "business:critique": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -344,15 +367,19 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
       "business:synthesize": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -361,15 +388,19 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
       "business:plan": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -378,7 +409,8 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -578,10 +610,13 @@
         "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "coding:plan": {
-        "description": "Workflow unit capability \"coding:plan\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -590,7 +625,8 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
