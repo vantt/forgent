@@ -3,9 +3,10 @@
 
 The one kind-to-route map for [`fgos-advise`](../SKILL.md). It describes
 selection only. The Workflow YAML (`core/workflows/*.yaml`) or preset
-(`src/runner/execution/patterns/presets.mjs`) stays authoritative for seats,
-lenses, rounds, blind, and gates. Every route id below exists in one of those
-two places.
+(`src/runner/execution/patterns/presets.mjs`) stays authoritative for topology,
+rounds, blind, and gates, and for the seats of every route except the four
+generic-panel bases, whose seat lenses `--seats` may fill. Every route id below
+exists in one of those two places.
 
 ## Signals
 
@@ -54,7 +55,7 @@ specialist skill; **"approve, then roadmap" explicitly wanted** routes to
 Tie-break: pick the narrower, gate-free route.
 
 Launch doors: Workflows start with `fgos workflow start <id> --request ...
-[--context-ref ...] [--stance-options ...]`; presets run with
+[--context-ref ...] [--stance-options ...] [--seats ...]`; presets run with
 `fgos run --pattern <preset> --unit <file>`, which has no `--request` or
 `--context-ref`, so the request and the artifact path go in the unit's
 `objective`. Both are described in `fgos-group-thinking`.
@@ -89,34 +90,30 @@ Only these four; when more than one applies, batch them in one message.
    options can be generated, do not ask: use kind C.
 4. The only ambiguity is authority: advice or an actual change?
 
-Never ask for: pattern, seat count, lenses, rounds, blind, gate, attendance,
-provider, model, executor, tier.
+Never ask for: pattern, seat count, seat lenses, rounds, blind, gate,
+attendance, provider, model, executor, tier.
 
 ## Launch inputs
 
 | Input | When |
 |---|---|
 | `--request "<verbatim>"` | Always |
-| `--context-ref <path>` | Artifacts or evidence the person named or that are plainly in scope (workflow routes) |
+| `--context-ref <path>` | Artifacts or evidence the person named or that are plainly in scope (workflow routes). With `--seats`, every seat and checker receives them, so put domain documents here |
+| `--seats "a\|b\|c"` | Only for `group-cognition`, `business-discussion`, `nominal-group`, `delphi`, and only when the request supports at least 2 distinct angles. 2-4 non-redundant lenses (default 3), each a short plain-text concern of 3-160 characters, one line, no braces, no `\|`, distinct; the person's own concerns, never invented persona names, standards or facts. `@name` is refused (not supported yet). `council-lite`, `architecture-advisory` and presets refuse it. No seat maximum: more seats than provider families share a family; each is a pane and quota, so say so when asked for more than is sensible |
 | `--stance-options "a\|b\|c"` | Only for `council-lite`, `delphi`, `nominal-group`, `group-cognition`, and only when the person's words contain 2-4 mutually exclusive answers. Never paraphrased, never invented. For `nominal-group` the options normally do not exist yet, so omit |
 | `--worktree` / `--dir` | Same meaning as in `fgos-architecture-panel`: target project versus state root |
 
-Everything else (seats, per-seat lens, rounds, blind, human gate) comes only
-from the chosen route. Per-seat lens sets that exist: the `council-*` postures
-and the architecture system, alternative and constraint lenses; picking the
-workflow picks the lens set. Domain flavour goes into the request text. Do not
-pass stance options on the architecture route.
+Everything else (rounds, blind, human gate, topology) comes only from the chosen
+route, and so do the seats of `council-lite` and `architecture-advisory` (the
+`council-*` postures; the architecture system, alternative and constraint
+lenses). On the four generic-panel bases the seats are `--seats` lenses, or the
+default three unspecialised seats when it is omitted. Domain flavour goes into
+the request text, the lenses and `--context-ref` documents. Do not pass stance
+options on the architecture route.
 
 When a needed knob is not exposed, follow the unmet-knob rule in `SKILL.md`.
 If the same knob keeps coming up across real requests, that is evidence for a
 future runtime override, not a reason for a new workflow per request.
-
-## Known gap: checker briefing outside `rfc`
-
-The reviewer steps of `group-cognition` and `business-discussion` declare no
-`roleTasks`, so their checkers likely inherit the default text that points at
-the latest commit. Treat their critique as briefed for code until that is
-fixed.
 
 ## Verification cases
 
@@ -133,6 +130,8 @@ method words and expect the same route.
 | 4 | "Independent estimates, then revise: how many months until the Rust host replaces the Node CLI?" | Kind D: `delphi`. Open estimate, so no stance |
 | 5 | "Panel: should the plugin loader live in core or a plugin?" | Kind A plus architecture overlay: `fgos-architecture-panel` then `architecture-advisory --request "<verbatim>"`. Close gate expected. No stance |
 | 6 | Negative: (a) "Review this" with nothing in scope. (b) "Implement rate limiting and get it reviewed." | (a) exactly one question (question 2). (b) `fgos-run`; no discussion workflow starts |
+| 7 | (non-code) "Why does our month-end close keep slipping? Use `docs/finance/close-policy.md` and `docs/finance/reconciliation-aging.md`." | Kind E: `group-cognition --request "<verbatim>" --seats "reconciliation bottlenecks and evidence quality\|handoff timing and ownership\|automation failure modes" --context-ref docs/finance/close-policy.md --context-ref docs/finance/reconciliation-aging.md`; pre-launch line lists the three lenses in order; no persona names, no stance options |
+| 8 | "Compare these 4 options with 6 perspectives: A, B, C, D." | Kind A: `council-lite` (its postures are fixed, `--seats` is refused there); say the 6 perspectives cannot be served on this route and offer `group-cognition` with `--seats` if the person wants lenses instead |
 
 Live check, one run per route class: `fgos workflow status <id>` reaches
 `completed` or parks at the expected gate, and the roles match the YAML. For

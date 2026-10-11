@@ -102,6 +102,23 @@ fgos workflow start nominal-group --stance-options "<a>|<b>|<c>"
 - Open-ended question: omit the flag and expect `measurement: unmeasured`. Do not invent
   options just to get a number. The measurement never changes pass/fail.
 
+### Seats (specialised panel perspectives)
+
+On `group-cognition`, `business-discussion`, `nominal-group` and `delphi`, `--seats` rebuilds
+the base with one panel seat per lens, everything else as registered:
+
+```bash
+fgos workflow start group-cognition --request "<question>" --seats "<lens one>|<lens two>|<lens three>" --context-ref <doc>
+```
+
+- At least 2 lenses, each a short plain-text concern (3-160 characters, one line, no braces, no `|`),
+  distinct; `@name` is refused (not supported yet). No seat maximum: seats beyond the provider
+  families share one and `start` reports it as `seatsPreflight`.
+- Delphi uses the same seats in both rounds. `council-lite` and `architecture-advisory` keep their
+  own seats and refuse `--seats`. `workflow resume` refuses a different `--seats` than the run began with.
+- `fgos workflow status <id>` shows the stored `seats` (lenses, base id and digest, refs) and the
+  expanded `workflow`.
+
 The Workflow Runner parses the YAML definition, resolves unit capability bindings
 via `src/runner/execution/bind.mjs`, and executes steps sequentially or in parallel
 according to declared DAG dependencies (`dependsOn`).

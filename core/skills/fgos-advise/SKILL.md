@@ -52,17 +52,38 @@ does not govern the delegated architecture route, which keeps the hook table of
    the subject is absent; a review (kind B) has no readable artifact; kind A was
    named but the options are neither supplied nor discoverable (if options can
    be generated, use kind C instead of asking); the only ambiguity is advice
-   versus an actual change. Never ask for pattern, seats, lenses, rounds,
-   blind, gate, attendance, provider, model, executor, or tier.
+   versus an actual change. Never ask for pattern, seat count, seat lenses,
+   rounds, blind, gate, attendance, provider, model, executor, or tier.
 4. **State one line before launching** (informs, does not ask): "You need
-   [use]; I chose [route] because [reason]; configuration [seats/lenses/rounds/gate]."
+   [use]; I chose [route] because [reason]; configuration [seats (the lenses, in
+   order, when you set `--seats`)/rounds/gate]."
 5. **Fill only these launch inputs:** the request verbatim (`--request`), the
    artifacts or evidence the person named (`--context-ref`), `--stance-options`
    only when their words contain 2-4 mutually exclusive answers (verbatim, never
    paraphrased or invented; panel-bearing workflows only, see "Stance options"
-   in `fgos-group-thinking`), and `--worktree` / `--dir` as in
-   `fgos-architecture-panel`. Seats, lenses, rounds, blind and gates come only
-   from the chosen Workflow or preset, never from this skill.
+   in `fgos-group-thinking`), `--seats` as described below, and
+   `--worktree` / `--dir` as in `fgos-architecture-panel`. Rounds, blind and
+   gates come only from the chosen Workflow or preset, never from this skill.
+   Seat lenses come from the chosen Workflow, or from `--seats` on the four
+   bases with generic panels.
+   - **`--seats "<lens one>|<lens two>|<lens three>"`** (optional) only on
+     `group-cognition`, `business-discussion`, `nominal-group` and `delphi`.
+     Write 2-4 non-redundant perspectives that the person's own request names or
+     plainly implies (default 3; never invent a fourth to fill a quota). A lens
+     is a short plain-text analytic concern, 3-160 characters on one line, no
+     braces and no `|`, for example "cash flow and payback over 36 months", not
+     a role to act ("act as the CFO") and not a persona name, a standard or a
+     fact the person did not give. Entries starting with `@` are not supported
+     yet. Pair the lenses with `--context-ref` documents about the domain
+     (policies, data, standards the person named or that sit plainly in scope);
+     every seat and checker receives them. If the request supports fewer than two
+     distinct angles, omit `--seats`: the base runs as registered. Never use
+     `--seats` on `council-lite`, `architecture-advisory` or any preset (they
+     carry their own seats; the start is refused).
+   - If the person asks for more seats than are sensible (each seat is a
+     provider pane and quota, and seats beyond the provider families share one),
+     say so and propose the sensible count; no maximum is enforced, so the
+     person decides. Do not silently shrink or inflate the list.
 6. **Launch and report.**
    - Architecture overlay: follow `fgos-architecture-panel` (do not pass stance
      options there).
@@ -88,19 +109,25 @@ does not govern the delegated architecture route, which keeps the hook table of
 
 ## Configuration rules
 
-- Seats, per-seat lenses (posture files `core/agents/council-*.yaml`,
-  architecture lenses), rounds, `blind`, and human gates are data in the chosen
-  YAML or preset. "The person wants a gate" is a constraint on which route to
-  pick, not a switch to flip.
-- Domain flavour (customer, finance, ops) goes into the request text only,
-  never into seat configuration. No new persona files.
+- Rounds, `blind`, topology and human gates are data in the chosen YAML or
+  preset. "The person wants a gate" is a constraint on which route to pick, not
+  a switch to flip.
+- Per-seat lenses are data in the chosen YAML or preset (posture files
+  `core/agents/council-*.yaml`, architecture lenses), except on the four bases
+  with generic panels, where this skill may fill `--seats` (step 5). Seats are
+  the only part of a base this skill specialises; it never sets a seat count
+  separately, a critique, a gate, a synthesizer, or any step.
+- Domain flavour (customer, finance, ops) goes into the request text, the seat
+  lenses and the `--context-ref` documents. Never invent persona names, file
+  paths, standards or external facts, and add no new persona files.
 - Never set provider, model, executor, tier, `invocation`, `prefer`, or a
   persona override.
-- **Unmet knob** (for example 5 seats, a custom lens, 3 rounds): run the closest
-  registered route; state the unmet knob in the pre-launch line and in the
-  result; never fake it in the request text ("act as 5 people"), never write an
-  inline workflow, never simulate a gate or a round. If the unmet knob defeats
-  the outcome, report that and offer the closest real alternative.
+- **Unmet knob** (for example 3 rounds, or a seat count the person insists on
+  but `--seats` cannot serve on the chosen route): run the closest registered
+  route; state the unmet knob in the pre-launch line and in the result; never
+  fake it in the request text ("act as 5 people"), never write an inline
+  workflow, never simulate a gate or a round. If the unmet knob defeats the
+  outcome, report that and offer the closest real alternative.
 
 ## Facade Hook Values (Route Step 6's Generic Path Only)
 
