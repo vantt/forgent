@@ -1,0 +1,1968 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:1@2026-10-11",
+  "inventoryCommit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+  "authorization": "Owner A26, with unchanged prior-class invariants; all receipts require independent committed acceptance.",
+  "receipts": [
+    {
+      "claimId": "claim_34a32f99c4c1c82582e2d139b889a296",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "2-identity-and-existing-reality",
+      "unitDigest": "40e8420ecedfdc8389c27e6a3e7b8446da8062301b6a306fd601f59de579c8fd",
+      "shownText": "## 2. Identity And Existing Reality\n\n| Identity | Owner | Current evidence and design consequence |\n|---|---|---|\n| Track/cell | Consuming track/domain harness | A manual-harness convention, not a universal core entity or current session-chain API. See the owner-retained operating harness and its trace contract. |\n| Assignment | Assignment builder/store | Immutable semantic task; execution attempts are separate Run records. |\n| Run | Dispatch runtime | One attempt, deterministic identity, eligibility and settlement; retry retains Assignment. |\n\nThe former session-owned workUnits/chain correlation proposal is preserved in the complete historical snapshot. It is not a current execution identity or acceptance owner. Current Run admission and recovery retain the Assignment/Run identities above.",
+      "shownTextDigest": "d6dfa94679cf29d1dc8f8f53e24f9560ed39967f74c7d05120b737507bad33f7",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 2. Identity And Existing Reality"
+      },
+      "priorTruthSection": {
+        "anchor": "2-identity-and-existing-reality",
+        "shownTextDigest": "d6dfa94679cf29d1dc8f8f53e24f9560ed39967f74c7d05120b737507bad33f7",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_4301c71a6dd4a373fdf88cbfcce6abce",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "36446e8234df1d9b71b5689bee83d41fa25dd3ef34eb8e6ea79c31641a74b4ad",
+      "shownText": "| Identity | Owner | Current evidence and design consequence |\n|---|---|---|\n| Track/cell | Consuming track/domain harness | A manual-harness convention, not a universal core entity or current session-chain API. See the owner-retained operating harness and its trace contract. |\n| Assignment | Assignment builder/store | Immutable semantic task; execution attempts are separate Run records. |\n| Run | Dispatch runtime | One attempt, deterministic identity, eligibility and settlement; retry retains Assignment. |",
+      "shownTextDigest": "36446e8234df1d9b71b5689bee83d41fa25dd3ef34eb8e6ea79c31641a74b4ad",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 2. Identity And Existing Reality"
+      },
+      "priorTruthSection": {
+        "anchor": "2-identity-and-existing-reality",
+        "shownTextDigest": "d6dfa94679cf29d1dc8f8f53e24f9560ed39967f74c7d05120b737507bad33f7",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_8cfb187edeb487966e2ff6b9926809e0",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "92cf91fdafe6f647dcb2221e43f4ce687a88415b3a75437899771b413d16bcd6",
+      "shownText": "The former session-owned workUnits/chain correlation proposal is preserved in the complete historical snapshot. It is not a current execution identity or acceptance owner. Current Run admission and recovery retain the Assignment/Run identities above.",
+      "shownTextDigest": "92cf91fdafe6f647dcb2221e43f4ce687a88415b3a75437899771b413d16bcd6",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 2. Identity And Existing Reality"
+      },
+      "priorTruthSection": {
+        "anchor": "2-identity-and-existing-reality",
+        "shownTextDigest": "d6dfa94679cf29d1dc8f8f53e24f9560ed39967f74c7d05120b737507bad33f7",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_0c80eeeb663fbf52cd06f23f7ba03a35",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-31",
+      "unitDigest": "77ec27c0fab5c3dcc3977ae078c9f10c67101aec51293bd8eed29532880e76d2",
+      "shownText": "| Findings | Design response |\n|---|---|\n| R01/R02 | Run amendment specifies exact supersession identity, serialized admit/publish, pending declaration recovery and launch reconciliation. |\n| R03 | Section 6 and RunHandle specify no TTL theft, immutable lock generation and pending remote-control handling. |\n| R04/R05/R06 | Retired session continuation design; preserved in the complete historical snapshot, not a current contract. |\n| R07/R08/R09 | Fallback defines one default, ceiling/spawn mapping, budget arithmetic and typed effect eligibility. |\n| R10 | Historical session-policy proof correction; not a current engine implementation claim. |\n| R11/R12/R13 | RunHandle separates liveness/progress, defines transitions/control coverage and one visibility binding source. |\n| R14/R15 | Ownership table, shared mutation door, versioned rollout and dependency gates. |",
+      "shownTextDigest": "77ec27c0fab5c3dcc3977ae078c9f10c67101aec51293bd8eed29532880e76d2",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 11. Review Finding Resolution And Limits"
+      },
+      "priorTruthSection": {
+        "anchor": "11-review-finding-resolution-and-limits",
+        "shownTextDigest": "a3746d2025b01bf82d4b8069758e72856b14b35524072ac909e6e10af4772afd",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_5fbeb634b61fd393084cc27a51b8c72e",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-32",
+      "unitDigest": "fdec51c73bc036c0e680a60d482fb1ecc9e81e0b092639d33b9e5974833f1ad4",
+      "shownText": "No distributed lease, live session transfer, shared chain-budget allocator,\nhealth scoring store or generic business-effect ledger is implemented here.\nCurrent recovery plans park or request authority for unsafe/unknown cases;\ndo not infer a universal typed unsupported enum from this design.",
+      "shownTextDigest": "fdec51c73bc036c0e680a60d482fb1ecc9e81e0b092639d33b9e5974833f1ad4",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 11. Review Finding Resolution And Limits"
+      },
+      "priorTruthSection": {
+        "anchor": "11-review-finding-resolution-and-limits",
+        "shownTextDigest": "a3746d2025b01bf82d4b8069758e72856b14b35524072ac909e6e10af4772afd",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_60bdeefbc7b8a3bee3c9ba06e7759dc4",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-33",
+      "unitDigest": "2e25b357cdeb5ecd739d6f3b5399ab27cf2153b1191d769d9352eda8c525d631",
+      "shownText": "The current Herdr launch identity uses normalized\n`fgos-<runId>-<launchCommandId>`, with a persisted random launch command, not\nrunId alone. The standalone reassign action is a fenced controller-epoch\nrecord with a checked authority input; it does not launch a replacement\nworker or execute the retired session `driver-replaced` continuation door.",
+      "shownTextDigest": "2e25b357cdeb5ecd739d6f3b5399ab27cf2153b1191d769d9352eda8c525d631",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 11. Review Finding Resolution And Limits"
+      },
+      "priorTruthSection": {
+        "anchor": "11-review-finding-resolution-and-limits",
+        "shownTextDigest": "a3746d2025b01bf82d4b8069758e72856b14b35524072ac909e6e10af4772afd",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_ea240d60d4890dc2a5c9ea5f4c41c1bc",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-34",
+      "unitDigest": "716b58c5f151140195596e7539a793527c003faf50948f0fb0193233398f1d92",
+      "shownText": "Operation-specific grants/effect policies must be supplied by their owner;\nno adapter may infer permission to duplicate external effects. Live-process\nforce-release is not a current local-lock capability.",
+      "shownTextDigest": "716b58c5f151140195596e7539a793527c003faf50948f0fb0193233398f1d92",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Runtime Recovery And Work Continuity > 11. Review Finding Resolution And Limits"
+      },
+      "priorTruthSection": {
+        "anchor": "11-review-finding-resolution-and-limits",
+        "shownTextDigest": "a3746d2025b01bf82d4b8069758e72856b14b35524072ac909e6e10af4772afd",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "startLine": 1608,
+          "endLine": 1629,
+          "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e",
+          "priorEvidence": "src/runner/dispatch/confinement/authority.mjs:1589-1610",
+          "excerptSha256": "8b21b0133b721561369245ae1d630020546528a156e39638c72feec76ae3ed0c"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/recovery-planner.mjs",
+          "startLine": 243,
+          "endLine": 316,
+          "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26",
+          "priorEvidence": "src/runner/dispatch/recovery-planner.mjs:243-316",
+          "excerptSha256": "589f5f1e367df5dfe40098b9a3b2a1c938aba9fce1eb61c5ed233a54ae6f1876"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_32f1855de59cc4ae4f957e5af1ccb12d",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "assignment-run-and-runresult-contract",
+      "unitDigest": "1b900f3ed9bf1b88166ca2f33d7ab6d95d0344d3d791c2547e748bda1fd46e6b",
+      "shownText": "# Assignment, Run, And RunResult Contract\n\n```txt\nDocument type: Contract\nAudience: Maintainer, implementation agent and independent reviewer\nPurpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history\nDesign status: Candidate\nImplementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims\nProvenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review\nWriter type: Human + agent coauthor\nCanonical for: The current subject and design boundaries stated in this file; not retired engine authority\nUse this when: Reading the surviving contract, its implementation limits or current proposals\nDo not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior\nLast reviewed: Pending independent liveness re-review\nRelated:\n- docs/platform/agent-coordination/README.md\n- docs/specs/runner.md\nSupersedes: Incorrect whole-file retirement or over-removal only\nSuperseded by: None for the surviving current subject\nAdded in candidate: Liveness evidence and explicit implementation/proposal distinction\n```\n\nComplete pre-rework input: [historical snapshot](../history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.",
+      "shownTextDigest": "d73b37898c78ff58bb1a6f4f56396de435ad04c43c27b2e2e5cecff43d9a8f58",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract"
+      },
+      "priorTruthSection": {
+        "anchor": "assignment-run-and-runresult-contract",
+        "shownTextDigest": "d73b37898c78ff58bb1a6f4f56396de435ad04c43c27b2e2e5cecff43d9a8f58",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1245,
+          "endLine": 1330,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+          "priorEvidence": "src/runner/dispatch/run-result.mjs:1245-1330",
+          "excerptSha256": "50c8e2860e27e28e74a040303380d35ddd58d360dc41d7ec4017bc750a3e192e"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_8ed59b72fce0ae8cbe96ceb925f68cdc",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "27ed3816193e24b624b27dc8db157ce4b0becb3b6647ae1604414ea1e44b35e1",
+      "shownText": "Complete pre-rework input: [historical snapshot](../history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.",
+      "shownTextDigest": "27ed3816193e24b624b27dc8db157ce4b0becb3b6647ae1604414ea1e44b35e1",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract"
+      },
+      "priorTruthSection": {
+        "anchor": "assignment-run-and-runresult-contract",
+        "shownTextDigest": "d73b37898c78ff58bb1a6f4f56396de435ad04c43c27b2e2e5cecff43d9a8f58",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1245,
+          "endLine": 1330,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+          "priorEvidence": "src/runner/dispatch/run-result.mjs:1245-1330",
+          "excerptSha256": "50c8e2860e27e28e74a040303380d35ddd58d360dc41d7ec4017bc750a3e192e"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "implementation-and-design-status",
+      "unitDigest": "bd0c65de1fac15e5f118923e09326c0308655a7c19caeddba1a38e55f7149d65",
+      "shownText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1565-1590 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
+      "shownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract > Implementation And Design Status"
+      },
+      "priorTruthSection": {
+        "anchor": "implementation-and-design-status",
+        "shownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1245,
+          "endLine": 1330,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+          "priorEvidence": "src/runner/dispatch/run-result.mjs:1245-1330",
+          "excerptSha256": "50c8e2860e27e28e74a040303380d35ddd58d360dc41d7ec4017bc750a3e192e"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_b7202aa695a3b6cde058ea7bd48d8f0e",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+      "shownText": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.",
+      "shownTextDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract > Implementation And Design Status"
+      },
+      "priorTruthSection": {
+        "anchor": "implementation-and-design-status",
+        "shownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1245,
+          "endLine": 1330,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+          "priorEvidence": "src/runner/dispatch/run-result.mjs:1245-1330",
+          "excerptSha256": "50c8e2860e27e28e74a040303380d35ddd58d360dc41d7ec4017bc750a3e192e"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "b3c903ac85ecab9f28e45c445a2893c61d3427805a3a7f7b867a62938c7a4a00",
+      "shownText": "| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1565-1590 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
+      "shownTextDigest": "b3c903ac85ecab9f28e45c445a2893c61d3427805a3a7f7b867a62938c7a4a00",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1550,
+            "endLine": 1595,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/run-result.mjs",
+            "startLine": 1245,
+            "endLine": 1330,
+            "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract > Implementation And Design Status"
+      },
+      "priorTruthSection": {
+        "anchor": "implementation-and-design-status",
+        "shownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "startLine": 1550,
+          "endLine": 1595,
+          "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f",
+          "priorEvidence": "src/runner/dispatch/assignment-runner.mjs:1550-1595",
+          "excerptSha256": "34d90f3737554a096f81636d0ae22729e9db4fbff48a890ba32bf686f6b726aa"
+        },
+        {
+          "path": "src/runner/dispatch/run-result.mjs",
+          "startLine": 1245,
+          "endLine": 1330,
+          "blobSha": "a08dc676045d3775598287963ff8c157b5fabcba",
+          "priorEvidence": "src/runner/dispatch/run-result.mjs:1245-1330",
+          "excerptSha256": "50c8e2860e27e28e74a040303380d35ddd58d360dc41d7ec4017bc750a3e192e"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_70d93814bdfb1389bb31b561553a0125",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "8305af07b5cc1dfb4abafe35643b56651fee378610fe1722422cafde6213fb65",
+      "shownText": "Current construction has three provenance kinds:",
+      "shownTextDigest": "8305af07b5cc1dfb4abafe35643b56651fee378610fe1722422cafde6213fb65",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract > Assignment"
+      },
+      "priorTruthSection": {
+        "anchor": "assignment",
+        "shownTextDigest": "ec43a1215725c5ec8a524ee2717ee2e12682b837af35bbeb8f58c546c147cab2",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_b0188851071b323c139f18947b7b3c60",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "9fe7fb81663c9b4a1776063cb5507a962b567dfeb4abfc56cf9568bfb82f9e09",
+      "shownText": "1. declared Workflow step operation/TaskSpec;\n2. validated inline contract and applicable registered domain harness;\n3. Unit-run execution and its computed binding.",
+      "shownTextDigest": "9fe7fb81663c9b4a1776063cb5507a962b567dfeb4abfc56cf9568bfb82f9e09",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract > Assignment"
+      },
+      "priorTruthSection": {
+        "anchor": "assignment",
+        "shownTextDigest": "ec43a1215725c5ec8a524ee2717ee2e12682b837af35bbeb8f58c546c147cab2",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_34a87472629191c59355e5f74ef2c2d2",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "5861765263e6557b7b6542fbb308cc5bb10cd919f0e521532284054431e54a8e",
+      "shownText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions; Unit-run provenance is written by `execution/run.mjs:334-338`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
+      "shownTextDigest": "5861765263e6557b7b6542fbb308cc5bb10cd919f0e521532284054431e54a8e",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Assignment, Run, And RunResult Contract > Assignment"
+      },
+      "priorTruthSection": {
+        "anchor": "assignment",
+        "shownTextDigest": "ec43a1215725c5ec8a524ee2717ee2e12682b837af35bbeb8f58c546c147cab2",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_3b6225e7c695ed53efcfccc9231de32a",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot",
+      "unitDigest": "0f92ff45e3f725fe4903ac850e30385d1199d6278c8a8ec2afd54232cce813bd",
+      "shownText": "# ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot\n\n```txt\nDocument type: Decision\nAudience: Maintainer, implementation agent and independent reviewer\nPurpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history\nDesign status: Candidate\nImplementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims\nProvenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review\nWriter type: Human + agent coauthor\nCanonical for: The current subject and design boundaries stated in this file; not retired engine authority\nUse this when: Reading the surviving contract, its implementation limits or current proposals\nDo not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior\nLast reviewed: Pending independent liveness re-review\nRelated:\n- docs/platform/agent-coordination/README.md\n- docs/specs/runner.md\nSupersedes: Incorrect whole-file retirement or over-removal only\nSuperseded by: None for the surviving current subject\nAdded in candidate: Liveness evidence and explicit implementation/proposal distinction\n```\n\nComplete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.",
+      "shownTextDigest": "e98157308c83f0bd05e096838a8a7127087b57f0be4f3be32e1a91fc8d024c33",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 164,
+            "endLine": 188,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot"
+      },
+      "priorTruthSection": {
+        "anchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot",
+        "shownTextDigest": "e98157308c83f0bd05e096838a8a7127087b57f0be4f3be32e1a91fc8d024c33",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 164,
+          "endLine": 188,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:164-188",
+          "excerptSha256": "ff114dc5434cfe3ac364d652e55ccf82954d8a973c6a1a455309a6170a0ce3fa"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_e8e710ab280697b1c9a2841a53b903d1",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "71a2d0b002b69d549be7a107e175e1dd8c54903c28734e84dbf75218eb5319de",
+      "shownText": "Complete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.",
+      "shownTextDigest": "71a2d0b002b69d549be7a107e175e1dd8c54903c28734e84dbf75218eb5319de",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 164,
+            "endLine": 188,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot"
+      },
+      "priorTruthSection": {
+        "anchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot",
+        "shownTextDigest": "e98157308c83f0bd05e096838a8a7127087b57f0be4f3be32e1a91fc8d024c33",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 164,
+          "endLine": 188,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:164-188",
+          "excerptSha256": "ff114dc5434cfe3ac364d652e55ccf82954d8a973c6a1a455309a6170a0ce3fa"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_9306c12cf83959d8c3a1fbf694b5874d",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "context",
+      "unitDigest": "c91b14b9a4ae7b59bba753d6cb386d9d883a3ddd59a3abcd0da593e34d1c6029",
+      "shownText": "## Context\n\nThe original first-slice motivation is preserved in the complete historical input. Current build/execute accepts validated declared, inline and Unit-run provenance through the same governed Assignment path.\n\nThe Vision requires agent-led planning to lower into the same governed\nAssignment path with equivalent objective, constraint, output, mutation,\nevidence, capability, budget, and provenance semantics.",
+      "shownTextDigest": "25391265a6f3b3016c824d8719c913fb1ebb17538de38a49cb13dc91c524e564",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 164,
+            "endLine": 188,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Context"
+      },
+      "priorTruthSection": {
+        "anchor": "context",
+        "shownTextDigest": "25391265a6f3b3016c824d8719c913fb1ebb17538de38a49cb13dc91c524e564",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 164,
+          "endLine": 188,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:164-188",
+          "excerptSha256": "ff114dc5434cfe3ac364d652e55ccf82954d8a973c6a1a455309a6170a0ce3fa"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_ecb2e520b230a8a2b046055258ba807f",
+      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "0e13876e4a761e17e1a93c5a254d556e8dddabefcd233e548e78bbf825030604",
+      "shownText": "The original first-slice motivation is preserved in the complete historical input. Current build/execute accepts validated declared, inline and Unit-run provenance through the same governed Assignment path.",
+      "shownTextDigest": "0e13876e4a761e17e1a93c5a254d556e8dddabefcd233e548e78bbf825030604",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 164,
+            "endLine": 188,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Context"
+      },
+      "priorTruthSection": {
+        "anchor": "context",
+        "shownTextDigest": "25391265a6f3b3016c824d8719c913fb1ebb17538de38a49cb13dc91c524e564",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 164,
+          "endLine": 188,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:164-188",
+          "excerptSha256": "ff114dc5434cfe3ac364d652e55ccf82954d8a973c6a1a455309a6170a0ce3fa"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_980e880d4eafee30cc1f150861879760",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-65",
+      "unitDigest": "2db5aa0626ffab0aa6b69c1919cb1551818430cf50aca8360248ee726fba850e",
+      "shownText": "**Why this exists.** An optional manual response trace can help a successor\nunderstand whether a person was answered and which artifact supports the reply.\nIt is not the retired Dialogue Turn Protocol's fourth runtime layer, and the\nregistered Workflow does not guarantee crash recovery of these companion files.\nThe registered graph remains framing, shaping, critique, synthesis, explanation\nand the human close gate (`core/workflows/architecture-advisory.yaml:8-84`).",
+      "shownTextDigest": "2db5aa0626ffab0aa6b69c1919cb1551818430cf50aca8360248ee726fba850e",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > 12. Dialogue Response — `dialogue/<n>-response.md`"
+      },
+      "priorTruthSection": {
+        "anchor": "12-dialogue-response-dialogue-responsemd",
+        "shownTextDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_4a2d3f838f4aee3d98e6447fc810ac11",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-67",
+      "unitDigest": "1b9f4ef34d2e0c76b8471f62c3c0a712e4f8f3cb4f1fbc6d5e9b539e6beb4bce",
+      "shownText": "When the owner chooses this manual convention, even a short cited response is\nuseful. A missing companion file is not a current Workflow completion failure.",
+      "shownTextDigest": "1b9f4ef34d2e0c76b8471f62c3c0a712e4f8f3cb4f1fbc6d5e9b539e6beb4bce",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > 12. Dialogue Response — `dialogue/<n>-response.md`"
+      },
+      "priorTruthSection": {
+        "anchor": "12-dialogue-response-dialogue-responsemd",
+        "shownTextDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_9bdadc017bd7be0e7a28a0ecda44225a",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-69",
+      "unitDigest": "5b0758b83c45498c322dd5117f15bb1f73e9f4b2da5e1c9e8718c04eab9b37da",
+      "shownText": "**Bad fill.** A response with no `Authorized by` line, which means either the\nauthorization was never recorded or the panel answered on its own initiative —\nboth are findings for a red-team. A response that quietly exceeds its\nauthorization: authorized to answer a clarification, it also revises the\nrecommendation. A response that answers the impact assessment's reading rather\nthan the person's actual words — the tell is that it never quotes or cites\n`human/<n>-person.md`. Under the chosen manual convention, an undocumented reply\nloses traceability; this rubric concern is not a registered runtime acceptance gate.\n\n---",
+      "shownTextDigest": "5b0758b83c45498c322dd5117f15bb1f73e9f4b2da5e1c9e8718c04eab9b37da",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > 12. Dialogue Response — `dialogue/<n>-response.md`"
+      },
+      "priorTruthSection": {
+        "anchor": "12-dialogue-response-dialogue-responsemd",
+        "shownTextDigest": "de3f2594907ef074f8ff3d533092b268c38653ffaeb50379149afc0256d91ce9",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_4a0fce2c25bbabc9a480091dc6cc7a6f",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-77",
+      "unitDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "shownText": "**Optional manual-harness example only; not registered Workflow storage or completion instructions.**",
+      "shownTextDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > 14. Session Status Board — `session.md`"
+      },
+      "priorTruthSection": {
+        "anchor": "14-session-status-board-sessionmd",
+        "shownTextDigest": "307e7e4a81bb4e122129c2ca026af7b6b58888a661045ce4a6f4a88029cd7d25",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_7b115d68e3b31d84ec60ecd82f7f608a",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-81",
+      "unitDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "shownText": "**Optional manual-harness example only; not registered Workflow storage or completion instructions.**",
+      "shownTextDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > 15. Prompt Package — `prompts/<role>.md`"
+      },
+      "priorTruthSection": {
+        "anchor": "15-prompt-package-promptsmd",
+        "shownTextDigest": "e59730f96a2e60e858211e47a847ca1d74aaca740cb2f87e91212edd9a013f9c",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_c74944581e23cedd527e23016d0c5999",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-85",
+      "unitDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "shownText": "**Optional manual-harness example only; not registered Workflow storage or completion instructions.**",
+      "shownTextDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > 16. Run Record — `runs/<ordinal>-<role>.json`"
+      },
+      "priorTruthSection": {
+        "anchor": "16-run-record-runs-json",
+        "shownTextDigest": "f96a6d002a2c8808b04ae441176901abaa80746e5000b953753be170d0f270c5",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_aeac2f321e1ccb5d0fde1c5de4df5124",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-101",
+      "unitDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "shownText": "**Optional manual-harness example only; not registered Workflow storage or completion instructions.**",
+      "shownTextDigest": "da4960d0094f2e0cc1ba958a3ae4d3834ab544bb3439ecce2b1bd4befa7262c6",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Artifact Templates > Assembling A Session Directory"
+      },
+      "priorTruthSection": {
+        "anchor": "assembling-a-session-directory",
+        "shownTextDigest": "37bebf350550552ac17089e2aa3cecc902dd65ac8d3ba38aa7f4909b2288ff80",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_8ec8b196432858ddf302aab3c106812a",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
+      "anchor": "unheaded-block-76",
+      "unitDigest": "439f92f23954ca436793647589998e475053c2fe2155920221eed42a9fe3294c",
+      "shownText": "- **Length or polish.** A short session that reached a good decision beats a long\n  one that reached the same decision more impressively.\n- **Whether the person took the recommendation.** They hold the authority. A\n  session where they decided against the panel, for reasons the panel helped them\n  articulate, is a success.\n- **Whether the panel agreed with itself.** Preserved disagreement is a feature.\n- **Volume of alternatives.** Three real candidates beat six with three escorts.\n- **Protocol conformance.** This manual quality rubric is not a runtime\n  conformance gate. The architecture-advisory Workflow and skill already ship\n  (`core/workflows/architecture-advisory.yaml`, `core/skills/fgos-architecture-panel/SKILL.md`).\n  Compare advice quality on the same case without treating this rubric as a\n  required score the registered runtime must pass; conformance alone is not quality.",
+      "shownTextDigest": "439f92f23954ca436793647589998e475053c2fe2155920221eed42a9fe3294c",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "core/workflows/architecture-advisory.yaml",
+            "startLine": 8,
+            "endLine": 84,
+            "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 17,
+            "endLine": 37,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          },
+          {
+            "path": "core/skills/fgos-architecture-panel/SKILL.md",
+            "startLine": 113,
+            "endLine": 142,
+            "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Architecture Advisory Evaluation Rubric > What This Rubric Deliberately Does Not Measure"
+      },
+      "priorTruthSection": {
+        "anchor": "what-this-rubric-deliberately-does-not-measure",
+        "shownTextDigest": "3357fa8a8a6f2670aed4737be57a566d0d12724e54456719f0abe00f62a786ac",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "core/workflows/architecture-advisory.yaml",
+          "startLine": 8,
+          "endLine": 84,
+          "blobSha": "b410140108c30e0617bfe1ca9993dcd069cc99d1",
+          "priorEvidence": "core/workflows/architecture-advisory.yaml:8-84",
+          "excerptSha256": "96d8ff4fddadae00626bff0a94b764056979791df047f1b80c2eb705d25aab5e"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 17,
+          "endLine": 37,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:17-37",
+          "excerptSha256": "4715d9b5e41ea63569cc73ab8b1a64cd4407ba3aae6e7eb962331239415f1a5c"
+        },
+        {
+          "path": "core/skills/fgos-architecture-panel/SKILL.md",
+          "startLine": 113,
+          "endLine": 142,
+          "blobSha": "b0ba02ef448976223812f15bc560588b88cc9fe3",
+          "priorEvidence": "core/skills/fgos-architecture-panel/SKILL.md:113-142",
+          "excerptSha256": "43d2e6e213903b63f6e66520aa6dc8729c73c863eeaf963dca41d7c763a6284e"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_27a13b2a9450b5ef70d8a048936ccd7a",
+      "path": "docs/platform/agent-coordination/vision.md",
+      "anchor": "unheaded-block-28",
+      "unitDigest": "9f86c10b3db679c6b1e77b8adbe126822d323fa1b106dcf3b90a6d8bf4e1a68f",
+      "shownText": "A Workflow operation/TaskSpec, Unit or validated inline contract supplies the\napplicable execution contract. Inline validation is implemented in\n`src/runner/dispatch/execution-contract.mjs:180-240,295-340`; it is not still an\nundecided schema. Unit and generic inline admission are distinct current paths.",
+      "shownTextDigest": "9f86c10b3db679c6b1e77b8adbe126822d323fa1b106dcf3b90a6d8bf4e1a68f",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The native unit belongs to a verified truth-ledger section. Every prior cited code excerpt is located byte-identically and uniquely in the actual current blob, with fresh line/blob pins. Independent review must check the complete shown unit against those current citations, including proposal/current boundaries; no previous approval carries.",
+      "currentEvidence": {
+        "commit": "e931b74c3ffd2b02d1cb00a1e0f610ff998acb5d",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 180,
+            "endLine": 240,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 95,
+            "endLine": 144,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/execution/run.mjs",
+            "startLine": 334,
+            "endLine": 343,
+            "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2"
+          }
+        ],
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "scope": "Complete native shown text; verified parent section Agent Coordination Foundation Vision > Accepted Vision Decisions > V-004: Runtime Execution Contracts Are Mandatory"
+      },
+      "priorTruthSection": {
+        "anchor": "v-004-runtime-execution-contracts-are-mandatory",
+        "shownTextDigest": "227a52a3025b0e699d1b81a95448c70b892a8d7b1ca72eac64d146ce3876e897",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-current.md"
+      },
+      "translatedEvidence": [
+        {
+          "path": "src/runner/dispatch/execution-contract.mjs",
+          "startLine": 180,
+          "endLine": 240,
+          "blobSha": "ac3a26083e375666764c7c722d615c308032e99b",
+          "priorEvidence": "src/runner/dispatch/execution-contract.mjs:180-240",
+          "excerptSha256": "9ab011936fd65572ec0ba98999317c5409f5bcede3458e8b6b6622e46efee17a"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-normalizer.mjs",
+          "startLine": 95,
+          "endLine": 144,
+          "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1",
+          "priorEvidence": "src/runner/dispatch/assignment-normalizer.mjs:95-144",
+          "excerptSha256": "50d9522a5f7beb4d2cb6f105fcb7531d593754ad55e47ba8d2403c31d02e52e9"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "startLine": 334,
+          "endLine": 343,
+          "blobSha": "98ab4b4c2124285530c3ff676e6eb2864c6baef2",
+          "priorEvidence": "src/runner/execution/run.mjs:331-340",
+          "excerptSha256": "c342412e8bfcfd827b25c3acbe23e02b5720070b0159481a35487b4b931f3d6b"
+        }
+      ]
+    }
+  ]
+}
