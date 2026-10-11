@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "authorization": "317e5b78b7657826d337e8d6af2d9e8443f2d430",
+  "red": {
+    "commit": "1d10d2e6ddddf0313e900984fc4d8efbcb86d6c4",
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/doc-candidate-conservation.test.mjs"
+    ],
+    "tests": 59,
+    "pass": 56,
+    "fail": 3,
+    "failedBehaviors": [
+      "accepted complete historical fenced payload",
+      "accepted complete historical plain paragraph",
+      "valid receipt before provenance-change invalidation"
+    ]
+  },
+  "additionalBoundaryRed": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "--test-name-pattern=a later provenance line",
+      "test/scripts/doc-candidate-conservation.test.mjs"
+    ],
+    "tests": 1,
+    "pass": 0,
+    "fail": 1
+  },
+  "scriptsGreen": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/backfill-status-category.test.mjs",
+      "test/scripts/check-decision-citation-drift.test.mjs",
+      "test/scripts/check-decision-codes.test.mjs",
+      "test/scripts/check-decision-supersession.test.mjs",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-conservation.test.mjs",
+      "test/scripts/check-doc-constitution.test.mjs",
+      "test/scripts/check-doc-retirement.test.mjs",
+      "test/scripts/check-legacy-docs-ratchet.test.mjs",
+      "test/scripts/check-locked-decisions-heading-drift.test.mjs",
+      "test/scripts/decision-question-hook.test.mjs",
+      "test/scripts/dispatch-decide-hook.test.mjs",
+      "test/scripts/doc-alias-resolver.test.mjs",
+      "test/scripts/doc-candidate-conservation.test.mjs",
+      "test/scripts/doc-corpus-decisions.test.mjs",
+      "test/scripts/doc-decision-conservation.test.mjs",
+      "test/scripts/doc-decision-exact.test.mjs",
+      "test/scripts/doc-decision-mirrors.test.mjs",
+      "test/scripts/doc-decision-review.test.mjs",
+      "test/scripts/doc-restoration-proofs.test.mjs",
+      "test/scripts/doc-review-authorship.test.mjs",
+      "test/scripts/doc-review-format.test.mjs",
+      "test/scripts/fgos-shell-integration.test.mjs",
+      "test/scripts/full-suite-queue.test.mjs",
+      "test/scripts/generate-doc-inventory.test.mjs",
+      "test/scripts/generate-shipped-path-inventory.test.mjs",
+      "test/scripts/herdr-cockpit-notify.test.mjs",
+      "test/scripts/install-git-hooks.test.mjs",
+      "test/scripts/is-main-module.test.mjs",
+      "test/scripts/knowledge-classifier.test.mjs",
+      "test/scripts/knowledge-migration.test.mjs",
+      "test/scripts/list-doc-anchors.test.mjs",
+      "test/scripts/migrate-actor-to-role.test.mjs",
+      "test/scripts/next-doc-id.test.mjs",
+      "test/scripts/prepare-release.test.mjs",
+      "test/scripts/probe-storytelling-material.test.mjs",
+      "test/scripts/project-agents.test.mjs",
+      "test/scripts/run-test-canary.test.mjs",
+      "test/scripts/run-tests.test.mjs",
+      "test/scripts/test-ownership-lint.test.mjs",
+      "test/scripts/test-plan-out.test.mjs",
+      "test/scripts/test-proof-inventory.test.mjs",
+      "test/scripts/test-select-compare.test.mjs",
+      "test/scripts/test-select-coverage-map.test.mjs",
+      "test/scripts/test-select-mutate.test.mjs",
+      "test/scripts/test-select-promote-report.test.mjs",
+      "test/scripts/test-select-promote.test.mjs",
+      "test/scripts/test-select.test.mjs",
+      "test/scripts/test-timing.test.mjs",
+      "test/scripts/verify-phase-02.test.mjs",
+      "test/scripts/write-test-marker.test.mjs",
+      "test/scripts/write-wrapper-script.test.mjs"
+    ],
+    "files": 52,
+    "exitCode": 0,
+    "tests": 935,
+    "pass": 935,
+    "fail": 0,
+    "skip": 0,
+    "cancel": 0,
+    "todo": 0,
+    "stdoutSha256": "0ff5a5f69e7cb1be8e0070e432dd84e951aaf050608054ec5ab8ec1810467ccb"
+  },
+  "realRepositorySmoke": {
+    "command": [
+      "node",
+      "/tmp/phase06/smoke-history-snapshot.mjs"
+    ],
+    "exitCode": 0,
+    "result": {
+      "commit": "1d10d2e6ddddf0313e900984fc4d8efbcb86d6c4",
+      "path": "docs/platform/agent-coordination/history/retired-engine/spec.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "06226c4d8a55289f7ae5e92c3ccd84ac6f0cb396105f5e618f8af45f9fd059dd",
+      "kind": "history",
+      "provenancePath": "docs/platform/agent-coordination/spec.md",
+      "provenanceCommit": "54c2698ee8c5b8f1baeac7244e946c793a637d29",
+      "containedBytes": 12368,
+      "containedTextDigest": "e46ae13850b71a5dbcb873004d9e5d306b93f5068daf7f3f4289b24dd46e4e31",
+      "byteContained": true,
+      "pendingApprovalStillOpen": 1,
+      "result": "pass"
+    },
+    "script": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';import {buildConservationUnitLookup,checkConservation} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';import {classifyPath} from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-constitution.mjs';const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),path='docs/platform/agent-coordination/history/retired-engine/spec.md';const doc=execFileSync('git',['show',commit+':'+path],{encoding:'utf8'}),u=buildConservationUnitLookup(process.cwd(),commit)(path).find(x=>x.anchor==='unheaded-block-3'),shown=u.sectionText??u.text,prov=doc.match(/^Provenance:\\s*(.*)$/m)[1].match(/^(\\S+) at ([0-9a-f]{40})/),source=execFileSync('git',['show',prov[2]+':'+prov[1]]),fence=shown.match(/^(`{3,}|~{3,})[^\\r\\n]*\\r?\\n([\\s\\S]*?)\\r?\\n\\1$/),body=Buffer.from(fence?fence[2]:shown),constitution=JSON.parse(fs.readFileSync('plans/260925-documentation-authority-unification/minimum-constitution.json'));assert.equal(classifyPath(path,constitution,{header:doc.slice(0,800)}).kind,'history');assert(source.includes(body));const inv={commit,items:[{path,authorityStatus:'candidate'}],claimLedger:[{claimId:'actual-history-unit',sourcePath:path,sourceAnchor:u.anchor,sourceUnitDigest:u.textDigest,disposition:'unknown-blocking',reviewStatus:'blocking'}]},shard={version:1,shard:'pending-history',authorSession:'codex-session:1@2026-10-11',sources:[],claims:[],candidateClassifications:[{claimId:'actual-history-unit',reviewStatus:'pending'}]},r=checkConservation({inventory:inv,vocabulary:{sourceDispositions:[{id:'unknown-blocking'}]},decisions:[shard],repoRoot:process.cwd()});assert.equal(r.unreferencedCandidateRows.length,1);const sha=b=>crypto.createHash('sha256').update(b).digest('hex');console.log(JSON.stringify({commit,path,anchor:u.anchor,unitDigest:u.textDigest,kind:'history',provenancePath:prov[1],provenanceCommit:prov[2],containedBytes:body.length,containedTextDigest:sha(body),byteContained:true,pendingApprovalStillOpen:1,result:'pass'}));\n"
+  },
+  "baselineDefault": [
+    {
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/history-default-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/history-default-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/history-default-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/history-default-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exitCode": 0,
+      "expectedSha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "actualSha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "byteIdentical": true,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs",
+        "--repo-root",
+        "/tmp/phase06/history-default-baseline",
+        "--inventory",
+        "/tmp/phase06/owner-step0-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/history-default-baseline/plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--decisions",
+        "/tmp/phase06/history-default-baseline/plans/260925-documentation-authority-unification/pilot/decisions",
+        "--previous-registry",
+        "/tmp/phase06/history-default-baseline/plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exitCode": 0,
+      "expectedSha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "actualSha256": "3a0a6a50c7c8682483d7127090c578c05c4cf8bbfc353bf605444db2589e795b",
+      "byteIdentical": true,
+      "stderr": ""
+    }
+  ],
+  "blastRadius": {
+    "repository": "/home/vantt/projects/forgentX-phase00-documentation-authority-unification",
+    "indexCommit": "45792a1",
+    "risk": "LOW",
+    "directCaller": "unreferencedCandidateRows",
+    "upstream": [
+      "checkConservation",
+      "checkInventory"
+    ],
+    "indexedProcessFlows": 7,
+    "indexFreshness": "stale; no index mutation outside the authoring allowlist"
+  },
+  "receiptContract": {
+    "class": "history-snapshot",
+    "historyKind": "history",
+    "canonical": false,
+    "evidenceFields": [
+      "provenancePath",
+      "provenanceCommit",
+      "blobSha",
+      "containedTextDigest"
+    ],
+    "evidenceDigest": "SHA256(JSON.stringify(historyEvidence))",
+    "source": "first committed Provenance line; git show provenanceCommit:provenancePath",
+    "fence": "paired outer fence delimiters only; complete body; no normalization",
+    "review": "committed independent report, unchanged receipt/report/authorship/shown-text pins"
+  },
+  "unchanged": [
+    "four prior receipt classes",
+    "checkpoint sensitivity",
+    "H1 authorship",
+    "source/target digest rules",
+    "all other gate functions",
+    "extractor closure",
+    "history bytes"
+  ],
+  "fullSuite": "UNPROVEN until the post-tool-commit complete run",
+  "batchIndependentAcceptance": "UNPROVEN; all new receipts remain pending",
+  "gitNexus": {
+    "command": [
+      "node",
+      ".gitnexus/run.cjs",
+      "detect_changes",
+      "--scope",
+      "all",
+      "--repo",
+      "/home/vantt/projects/forgentX-phase00-documentation-authority-unification"
+    ],
+    "files": 8,
+    "symbols": [
+      "acceptedCandidateClassifications",
+      "receiptOf",
+      "unreferencedCandidateRows"
+    ],
+    "affectedProcesses": 0,
+    "risk": "low",
+    "checkout": "/home/vantt/projects/forgentX-phase00-documentation-authority-unification"
+  }
+}

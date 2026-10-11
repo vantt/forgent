@@ -323,3 +323,13 @@ test('a snapshot proof is invalidated by a committed provenance change even when
   fixture.inventory.commit = fixture.git('rev-parse', 'HEAD');
   assert.deepEqual(fixture.check().map(row => row.claimId), ['historical-unit']);
 });
+
+test('a later provenance line cannot replace an unpinned snapshot provenance', t => {
+  const fixture = historyReceiptFixture(t);
+  assert.deepEqual(fixture.check(), []);
+  const text = fs.readFileSync(path.join(fixture.root, fixture.historyPath), 'utf8');
+  fixture.write(fixture.historyPath, text.replace(/^Provenance: (.+)$/m, 'Provenance: Earlier design without a pin\nProvenance: $1'));
+  fixture.git('add', '--', fixture.historyPath); fixture.git('commit', '-qm', 'unpinned snapshot wrapper');
+  fixture.inventory.commit = fixture.git('rev-parse', 'HEAD');
+  assert.deepEqual(fixture.check().map(row => row.claimId), ['historical-unit']);
+});

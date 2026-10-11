@@ -337,3 +337,9 @@ Owner amendment A11, committed `8dd0140ce`, adds `candidate-native-content` for 
 
 The existing navigation, structural-frame and bookkeeping classes, canonical semantic-owner uniqueness and checkpoint sensitivity path are unchanged. This is an additive class, not an authority promotion or a new source-disposition value. Evidence: committed `review-2rework-classifications.md` (`8e2fc315f`) and `reports/phase-06/candidate-content-verification.json`.
 
+## Additive historical snapshot receipt class (v2.7-001)
+
+Owner amendment A26, committed `317e5b78b`, adds `history-snapshot` to reverse closure for files whose constitution kind is `history` with `canonical: false`. The committed file's first `Provenance:` line must name a source path and commit. A committed receipt pins the native unit and full shown text, provenance path/full commit, source blob and SHA-256 of the contained bytes. The checker recomputes byte containment in the named Git blob. For a complete fenced snapshot, only its outer fence delimiters are excluded; the entire body is checked, with no whitespace normalization, truncation or semantic substitution.
+
+Independent acceptance checks history kind and literal containment, not current implementation truth. The historical wrapper title and metadata retain the existing structural-frame/bookkeeping channels. Missing provenance, noncontained text, an altered proof or missing independent committed approval leaves the unit open. Current-code truth, authorship, session independence, committed report/receipt pins, shown-text binding, semantic ownership, checkpoint sensitivity and the four prior classes are unchanged. This adds no disposition or authority promotion and changes no historical bytes. Tests-first and real-repository evidence: `reports/phase-06/history-snapshot-verification.json`.
+

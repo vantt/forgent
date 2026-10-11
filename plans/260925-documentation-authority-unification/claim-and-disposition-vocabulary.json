@@ -827,9 +827,15 @@
       "minor": 6,
       "change": "Add candidate-native-content to the reverse-closure classification receipt channel, only after independent committed true-and-current checking against cited current implementation or behaviour. Existing vocabulary values and the three prior receipt classes are unchanged.",
       "evidence": "Owner decision 8dd0140ce1b42a817f3fa8b9fb6dbf2e75c804de; minimum-constitution.json amendment v2.6-001; independent review-2rework-classifications.md at 8e2fc315f; tests-first candidate-content-verification.json."
+    },
+    {
+      "id": "v2.7-001",
+      "minor": 7,
+      "change": "Add history-snapshot only to reverse-closure receipts for constitution kind history, canonical false. The shown historical unit, or complete outer fenced body, must be byte-contained in the provenance path at its committed pin. Independent acceptance checks containment and history kind, not current truth. Wrappers retain structural-frame/bookkeeping; every prior class and other invariant is unchanged.",
+      "evidence": "Owner amendment A26 resolves closure-routing-stop-request.md. history-snapshot-verification.json records tests-first boundaries, actual provenance-byte audit and unchanged-class proof; no history bytes are edited."
     }
   ],
-  "minorVersion": 6,
+  "minorVersion": 7,
   "authorityClasses": [
     {
       "id": "navigation",

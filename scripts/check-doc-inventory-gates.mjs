@@ -1006,8 +1006,10 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
   const reportOf = buildCommittedReviewReportLookup(repoRoot, inventory.commit);
   const unitsOf = buildConservationUnitLookup(repoRoot, inventory.commit);
   const receipts = new Map();
+  const historyDocuments = new Map();
+  const historyProvenanceBlobs = new Map();
   const ancestors = new Map([[inventory.commit, true]]);
-  const classes = ['candidate-native-navigation', 'structural-frame', 'bookkeeping', 'candidate-native-content'];
+  const classes = ['candidate-native-navigation', 'structural-frame', 'bookkeeping', 'candidate-native-content', 'history-snapshot'];
   const receiptOf = (ref) => {
     if (!/^[0-9a-f]{40}$/.test(ref.receiptCommit || '') || typeof ref.receiptPath !== 'string' ||
         path.posix.normalize(ref.receiptPath) !== ref.receiptPath || !/^plans\/[^/]+\/ledger\/candidate-classifications-[a-z0-9-]+\.json$/.test(ref.receiptPath)) return null;
@@ -1047,6 +1049,37 @@ function acceptedCandidateClassifications(inventory, shards, repoRoot) {
         header('Reviewer') !== ref.reviewedBy || reviewReportAuthor(report) !== artifact.authorSession ||
         header('Receipt commit') !== ref.receiptCommit) continue;
     let evidenceDigest = null;
+    if (receipt.class === 'history-snapshot') {
+      const evidence = receipt.historyEvidence;
+      if (!evidence || typeof evidence.provenancePath !== 'string' ||
+          path.posix.isAbsolute(evidence.provenancePath) || evidence.provenancePath.startsWith('../') ||
+          path.posix.normalize(evidence.provenancePath) !== evidence.provenancePath ||
+          /[:\\\0]/.test(evidence.provenancePath) || !/^[0-9a-f]{40}$/.test(evidence.provenanceCommit || '') ||
+          !/^[0-9a-f]{40}$/.test(evidence.blobSha || '')) continue;
+      try {
+        if (!historyDocuments.has(receipt.path)) historyDocuments.set(receipt.path, readBlobAtCommit(inventory.commit, receipt.path, repoRoot).toString('utf8'));
+        const document = historyDocuments.get(receipt.path);
+        const placement = ownerConstitution ||= JSON.parse(fs.readFileSync(new URL(`../${DEFAULT_CONSTITUTION_PATH}`, import.meta.url), 'utf8'));
+        if (classifyPath(receipt.path, placement, { header: document.slice(0, 800) }).kind !== 'history' ||
+            !placement.documentKinds.some(kind => kind.id === 'history' && kind.canonical === false)) continue;
+        const provenanceLine = document.match(/^Provenance:\s*(.*)$/m)?.[1];
+        const provenance = provenanceLine?.match(/^(\S+) at ([0-9a-f]{7,40})(?=$|[\s;(])/);
+        if (!provenance || provenance[1] !== evidence.provenancePath) continue;
+        const namedCommit = execFileSync('git', ['rev-parse', '--verify', `${provenance[2]}^{commit}`], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+        if (namedCommit !== evidence.provenanceCommit) continue;
+        const key = `${namedCommit}:${evidence.provenancePath}`;
+        if (!historyProvenanceBlobs.has(key)) {
+          const blobSha = execFileSync('git', ['rev-parse', key], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' }).trim();
+          historyProvenanceBlobs.set(key, { blobSha, bytes: readBlobAtCommit(namedCommit, evidence.provenancePath, repoRoot) });
+        }
+        const original = historyProvenanceBlobs.get(key);
+        const fenced = shown.match(/^(`{3,}|~{3,})[^\r\n]*\r?\n([\s\S]*?)\r?\n\1$/);
+        const historicalBytes = Buffer.from(fenced ? fenced[2] : shown);
+        if (historicalBytes.length === 0 || original.blobSha !== evidence.blobSha ||
+            evidence.containedTextDigest !== sha256Buffer(historicalBytes) || !original.bytes.includes(historicalBytes)) continue;
+      } catch { continue; }
+      evidenceDigest = sha256Buffer(Buffer.from(JSON.stringify(evidence)));
+    }
     if (receipt.class === 'candidate-native-content') {
       const evidence = receipt.currentEvidence;
       if (!evidence || evidence.finding !== 'true-and-current' || !/^[0-9a-f]{40}$/.test(evidence.commit || '') ||
