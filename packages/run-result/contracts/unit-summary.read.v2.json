@@ -86,7 +86,10 @@
             "executor": {"type": "string", "minLength": 1},
             "reason": {"type": "string", "minLength": 1},
             "invocation": {"$ref": "#/definitions/nullableString"},
-            "transport": {"$ref": "#/definitions/nullableString"}
+            "transport": {"$ref": "#/definitions/nullableString"},
+            "kind": {"enum": ["account-rotation", "next-candidate"], "description": "Optional, additive (no version change; readers ignore unknown values). account-rotation: the same executor ran again on another account of its provider after a provider failure. next-candidate: the next executor of the capability pool ran. Absent on records written before this field existed."},
+            "provider": {"$ref": "#/definitions/nullableString", "description": "Optional, additive. Present with kind account-rotation: the provider whose accounts were rotated."},
+            "accountsHealthy": {"type": "integer", "minimum": 0, "description": "Optional, additive. Present with kind account-rotation: how many accounts of that provider were still usable when the retry was decided."}
           }
         }
       ]

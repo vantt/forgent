@@ -38,6 +38,7 @@ import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
+import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine } from './provider-auth-failure.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -579,12 +580,28 @@ export async function settleRunOutcome({
     ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots)
     : [];
 
+  // A process that exits non-zero with a dead-credential message as its last words (pi: "No API key
+  // found for openrouter.") stopped because the provider cannot serve it, which is a provider limit
+  // like any other: the account is quarantined and the caller moves on instead of failing the role.
+  // A claim the worker managed to write means the worker did report, so it is judged as reported.
+  const alreadyProviderStop = adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked';
+  const exitedOnDeadCredential = !alreadyProviderStop
+    && !isTimeout
+    && typeof exitCode === 'number' && exitCode !== 0
+    && !agentClaim
+    && matchAuthFailureLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
+  const settledAdapterOutcome = exitedOnDeadCredential ? 'provider-limit' : adapterOutcome;
+  // Whether the stop is a dead credential, as opposed to a quota: a caller that walks to another
+  // candidate must not land on the provider whose login just failed.
+  const credentialFault = (settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
+    && matchAuthFailureLine(stderrText) !== null;
+
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {
     const fault = classifyProviderCapacityFault({
       provider: providerCapacitySelection.provider,
       stderr: stderrText,
-      adapterOutcome: adapterOutcome || (exitCode === 0 ? 'success' : 'failed'),
+      adapterOutcome: settledAdapterOutcome || (exitCode === 0 ? 'success' : 'failed'),
       structuredAgent: agentClaim,
     });
     if (fault?.action && fault.action !== 'none') {
@@ -694,8 +711,8 @@ export async function settleRunOutcome({
     // generic exit the adapter reported; the code is what lets a caller move to the
     // next candidate instead of retrying the same provider. One waiting on a prompt only
     // a person can answer is `blocked`: retrying or moving on does not clear it.
-    ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked'
-      ? { failureOverride: { family: 'provider', code: adapterOutcome } }
+    ...(settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit' || settledAdapterOutcome === 'blocked'
+      ? { failureOverride: { family: 'provider', code: settledAdapterOutcome, ...(credentialFault ? { cause: 'credential' } : {}) } }
       : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {

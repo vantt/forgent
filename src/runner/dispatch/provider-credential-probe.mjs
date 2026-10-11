@@ -14,7 +14,7 @@ import { spawn } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 
-import { AUTH_FAILURE_PATTERNS } from './provider-auth-failure.mjs';
+import { matchAuthFailureLine } from './provider-auth-failure.mjs';
 
 const PROMPT = 'Reply with the single word OK.';
 const OUTPUT_LIMIT = 16 * 1024;
@@ -50,7 +50,7 @@ export function credentialProbeCommand(credentialSource) {
  */
 export function judgeProbeOutput({ exitCode, timedOut, output }) {
   if (timedOut) return { ok: false, detail: 'the call did not finish in time' };
-  if (AUTH_FAILURE_PATTERNS.some((pattern) => pattern.test(output))) return { ok: false, detail: 'the login is still rejected' };
+  if (matchAuthFailureLine(output)) return { ok: false, detail: 'the login is still rejected' };
   if (QUOTA_PATTERN.test(output) && exitCode !== 0) return { ok: false, detail: 'the account answers with a usage limit' };
   if (exitCode !== 0) return { ok: false, detail: `the call exited with code ${exitCode}` };
   return { ok: true };

@@ -270,6 +270,16 @@ test('an idle agent showing a dead credential is called provider-limit long befo
   assert.match(r.screenLine, /invalid_grant/);
 });
 
+test('an idle pane that printed a missing key is called provider-limit, and one that merely quotes the wording is not', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const observation = { agentState: 'idle', lastProgressAt: 1000, now: 21000 };
+  const dead = run({ ...observation, screen: ' No API key found for openrouter.\n Use /login to log into a provider.\n> ' }, limits);
+  assert.equal(dead.outcome, 'provider-limit');
+  assert.match(dead.screenLine, /No API key found for openrouter/);
+  const quoted = run({ ...observation, screen: ' The test asserts that "No API key found for x" is shown\n> ' }, limits);
+  assert.equal(quoted.outcome, null);
+});
+
 test('an idle agent with an ordinary screen is left alone until the idle timeout', () => {
   const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
   const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 21000, screen: 'thinking about it\n> ' }, limits);

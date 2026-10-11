@@ -98,7 +98,7 @@ function findMatchingOverride(overrides, unit, role) {
 /**
  * Resolve provider family for an executor id or candidate
  */
-function getProviderFamily(runnerConfig, executorId) {
+export function getProviderFamily(runnerConfig, executorId) {
   const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
   const executorEntry = executors[executorId];
   const globalCommand = runnerConfig?.executor?.command ?? runnerConfig?.runner?.executor?.command;
@@ -114,7 +114,7 @@ function getProviderFamily(runnerConfig, executorId) {
  * @param {object} ctx
  * @returns {object} success binding or { refused: { reason, detail } }
  */
-export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
+export function bind(ask, ctx, { skipCandidateIndex = -1, excludeFamilies = [] } = {}) {
   const {
     unit,
     role,
@@ -173,6 +173,9 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     familyUse.set(family, (familyUse.get(family) ?? 0) + 1);
   }
 
+  // Families a fallback walk must not land on (a login that just failed); lower-cased like the spread.
+  const excludedFamilies = new Set((Array.isArray(excludeFamilies) ? excludeFamilies : []).map((family) => String(family).toLowerCase()));
+
   // 3. Candidate resolution & Filtering
   let chosenCandidate = null;
   let chosenCandidateIndex = -1;
@@ -196,6 +199,13 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
       if (govResult.disallowed || (Array.isArray(disallowedExecutors) && disallowedExecutors.includes(executorId))) {
         refusalReason = 'governance';
         refusalDetail = `Governance rejected executor "${executorId}" (provider: "${govResult.canonicalProvider || providerFamily}")`;
+        continue;
+      }
+
+      // Filter: a family excluded by the caller (a dead credential seen earlier in this unit).
+      if (excludedFamilies.has(providerFamily.toLowerCase())) {
+        refusalReason = 'family-excluded';
+        refusalDetail = `Candidate "${executorId}" (provider: "${providerFamily}") is excluded because its credential just failed`;
         continue;
       }
 
@@ -445,15 +455,17 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
 
 /**
  * Quota helper: walks to the next candidate in prefer[] matching all filters,
- * recording provenance fallbackFrom.
+ * recording provenance fallbackFrom (`kind: 'next-candidate'`).
  *
  * @param {object} prevBinding
  * @param {object} ask
  * @param {object} ctx
  * @param {string} [reason='provider-limit']
+ * @param {object} [opts]
+ * @param {string[]} [opts.excludeFamilies] provider families the walk must not land on
  * @returns {object} next binding or refusal
  */
-export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit') {
+export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit', { excludeFamilies = [] } = {}) {
   const prevIndex = Number.isInteger(prevBinding?.candidateIndex) ? prevBinding.candidateIndex : -1;
   if (prevIndex < 0) {
     return {
@@ -463,7 +475,7 @@ export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit') 
       },
     };
   }
-  const nextResult = bind(ask, ctx, { skipCandidateIndex: prevIndex });
+  const nextResult = bind(ask, ctx, { skipCandidateIndex: prevIndex, excludeFamilies });
 
   if (nextResult.refused) {
     return nextResult;
@@ -477,9 +489,37 @@ export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit') 
       invocation: prevBinding.invocation ?? null,
       transport: prevBinding.transport ?? null,
       reason,
+      kind: 'next-candidate',
     },
   };
 
   return nextResult;
+}
+
+/**
+ * The same candidate again, for another account of its provider: the binding is unchanged (same
+ * executor, invocation, transport and pool position, so a later walk resumes where this one
+ * would have) and only its provenance says it is a retry of `prevBinding` (`kind:
+ * 'account-rotation'`). Which account the retry runs on is the lease's choice, not bind()'s.
+ *
+ * @param {object} prevBinding
+ * @param {object} [detail] extra provenance, e.g. { provider, accountsHealthy }
+ * @param {string} [reason='provider-limit']
+ */
+export function retrySameCandidate(prevBinding, detail = {}, reason = 'provider-limit') {
+  return {
+    ...prevBinding,
+    provenance: {
+      ...prevBinding.provenance,
+      fallbackFrom: {
+        executor: prevBinding.executor,
+        invocation: prevBinding.invocation ?? null,
+        transport: prevBinding.transport ?? null,
+        reason,
+        kind: 'account-rotation',
+        ...detail,
+      },
+    },
+  };
 }
 export { canApplyPosture };
