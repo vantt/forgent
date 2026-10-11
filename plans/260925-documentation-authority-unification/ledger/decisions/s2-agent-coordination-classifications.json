@@ -6505,12 +6505,6 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_0c80eeeb663fbf52cd06f23f7ba03a35",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending"
-    },
-    {
       "claimId": "claim_0163b6cd415134b4b484475f3919e806",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
@@ -6823,19 +6817,7 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending"
-    },
-    {
       "claimId": "claim_b7202aa695a3b6cde058ea7bd48d8f0e",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"

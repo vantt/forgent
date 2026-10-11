@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "shard": "agent-coordination-closure-fixes-source",
+  "authorSession": "codex-session:1@2026-10-11",
+  "sources": [
+    "docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md",
+    "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md",
+    "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+    "docs/architect/agent-coordination/contracts/assignment-run-runresult.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_1c155ab462849e3ec4136ee9fa08a218",
+      "sourceUnitDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-35 source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38. A25 corrects this unit in [\"Team Communication Protocol V1\",\"8. RunResult Confidence\"]: the source/old target wording \"Confidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, tes\" is replaced by the complete current counterpart \"Confidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, tes\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-38",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "targetUnitDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
+      "targetAncestry": [
+        "Team Communication Protocol V1",
+        "8. RunResult Confidence"
+      ]
+    },
+    {
+      "claimId": "claim_901dae1b8039d130359712125f4d69f9",
+      "sourceUnitDigest": "dbaf1434220173d1544ccc02f9daa13ca9f87453ace7ad899ef0b8167d758b97",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "beforeTargetedFix": {
+        "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "targetAnchor": "2-production-ladder-semantics",
+        "disposition": "supersede",
+        "shownTargetDigest": null,
+        "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      },
+      "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
+      "targetAncestry": [
+        "Executor Fallback And Effect Eligibility"
+      ]
+    },
+    {
+      "claimId": "claim_f35f68bb3feae40702d02c97d02cea0b",
+      "sourceUnitDigest": "3cf3dc60ee31fd5df6ab2864b92ed1f3bdc96982df814f65c4afb545b4458957",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "beforeTargetedFix": {
+        "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "targetAnchor": "2-production-ladder-semantics",
+        "disposition": "supersede",
+        "shownTargetDigest": null,
+        "reviewCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      },
+      "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "targetUnitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
+      "targetAncestry": [
+        "Executor Fallback And Effect Eligibility"
+      ]
+    },
+    {
+      "claimId": "claim_06019161f3eadb87a1a6fe714da0d8e6",
+      "sourceUnitDigest": "16a6a7ab095e99754b130605651b5c88ba99d377a3a22f140b254077ba6733fb",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "targetAnchor": "2-production-ladder-semantics",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "targetUnitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
+      "targetAncestry": [
+        "Executor Fallback And Effect Eligibility"
+      ]
+    },
+    {
+      "claimId": "claim_358f4471159df6d56b6f9ae689efc338",
+      "sourceUnitDigest": "4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "The current successor at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#11-review-finding-resolution-and-limits supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-28 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "11-review-finding-resolution-and-limits",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
+      "targetAncestry": [
+        "Runtime Recovery And Work Continuity"
+      ]
+    },
+    {
+      "claimId": "claim_c4295f45877ba69492d2a2ea9620acf0",
+      "sourceUnitDigest": "d00a98ac29267f7fefda5343b52e11ebec9212c6042187f6d6cbda7fa1dd9983",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "rationale": "The current successor at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#11-review-finding-resolution-and-limits supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-29 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "11-review-finding-resolution-and-limits",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
+      "targetAncestry": [
+        "Runtime Recovery And Work Continuity"
+      ]
+    },
+    {
+      "claimId": "claim_d95063546b7db6e2eefcccef844da414",
+      "sourceUnitDigest": "5b70c17ccf304cd9b34dfd3d35a8c2de11bd40b4276e7b07fcbf563cc3f8321e",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "rationale": "The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#assignment supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-7 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "targetAnchor": "assignment",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "targetUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
+      "targetAncestry": [
+        "Assignment, Run, And RunResult Contract"
+      ]
+    },
+    {
+      "claimId": "claim_1a54f3db0a30f97f58e3f5bdf48a2f18",
+      "sourceUnitDigest": "af0984cd7f09308d4738fa381f862a7dab8983aa738675df60636e0dc72e57b4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "rationale": "The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#assignment supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-8 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "targetAnchor": "assignment",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "targetUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
+      "targetAncestry": [
+        "Assignment, Run, And RunResult Contract"
+      ]
+    },
+    {
+      "claimId": "claim_2ef5d353dab2d57f38906df73e709125",
+      "sourceUnitDigest": "b930743c66d1a445599637265e539d903ae758f754be54c8a992ce2eaf080872",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "8-runresult-confidence",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence. A25 corrects this unit in [\"Team Communication Protocol V1\"]: the source/old target wording \"## 8. RunResult Confidence\\n\\nRunResult status and confidence are control-plane judgments.\\n\\nConfidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | St\" is replaced by the complete current counterpart \"## 8. RunResult Confidence\\n\\nRunResult status and confidence are control-plane judgments.\\n\\nConfidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | St\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
+      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "targetUnitDigest": "1d42fd96aef4ef913b24081cda50703c80f418e1431f840a80e82e5bb6a59f1c",
+      "targetAncestry": [
+        "Team Communication Protocol V1"
+      ]
+    }
+  ]
+}

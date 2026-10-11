@@ -1,0 +1,865 @@
+{
+  "version": 1,
+  "batch": "agent-coordination",
+  "authorSession": "codex-session:1@2026-10-11",
+  "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+  "rows": [
+    {
+      "claimId": "claim_f717d716d9d154bd0320605ad788f2af",
+      "previousClaimId": "claim_0c80eeeb663fbf52cd06f23f7ba03a35",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-31",
+      "unitDigest": "68f6db1a7638efc58e4d8adc8bda563b8cacec6c1c289d790c9919e7fc78b74b",
+      "shownText": "| Findings | Design response |\n|---|---|\n| R01/R02 | Run amendment specifies exact supersession identity, serialized admit/publish, pending declaration recovery and launch reconciliation. |\n| R03 | Section 6 and RunHandle specify no TTL theft, immutable lock generation and pending remote-control handling. |\n| R04/R05/R06 | Retired session continuation design; preserved in the complete historical snapshot, not a current contract. |\n| R07/R08/R09 | Fallback defines one default, ceiling/spawn mapping, budget arithmetic and typed effect eligibility. |\n| R10 | Historical session-policy proof correction; not a current engine implementation claim. |\n| R11/R12/R13 | RunHandle separates liveness/progress, defines transitions/control coverage and one visibility binding source. |\n| R14/R15 | Ownership table, versioned rollout and dependency gates. |",
+      "shownTextDigest": "68f6db1a7638efc58e4d8adc8bda563b8cacec6c1c289d790c9919e7fc78b74b",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Sentence: R14/R15 row says the design response includes a shared mutation door. No such component exists: grep finds the phrase only in this row and its history copy, section 3 of this document has no mutation door and says not to create a shared mutable recovery manager, and src has no such door (the retired session engine mutation doors are gone). Fix: drop shared mutation door from the R14/R15 row (keep ownership table section 3, versioned rollout section 8, dependency gates section 9). Other rows verified against run-handle.md, executor-health-and-fallback.md, assignment-run-runresult.md and section 6.",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "77ec27c0fab5c3dcc3977ae078c9f10c67101aec51293bd8eed29532880e76d2",
+      "previousShownText": "| Findings | Design response |\n|---|---|\n| R01/R02 | Run amendment specifies exact supersession identity, serialized admit/publish, pending declaration recovery and launch reconciliation. |\n| R03 | Section 6 and RunHandle specify no TTL theft, immutable lock generation and pending remote-control handling. |\n| R04/R05/R06 | Retired session continuation design; preserved in the complete historical snapshot, not a current contract. |\n| R07/R08/R09 | Fallback defines one default, ceiling/spawn mapping, budget arithmetic and typed effect eligibility. |\n| R10 | Historical session-policy proof correction; not a current engine implementation claim. |\n| R11/R12/R13 | RunHandle separates liveness/progress, defines transitions/control coverage and one visibility binding source. |\n| R14/R15 | Ownership table, shared mutation door, versioned rollout and dependency gates. |",
+      "previousShownTextDigest": "77ec27c0fab5c3dcc3977ae078c9f10c67101aec51293bd8eed29532880e76d2"
+    },
+    {
+      "claimId": "claim_8fc3d7758ba46b4c8878be5ae3f54b60",
+      "previousClaimId": "claim_60bdeefbc7b8a3bee3c9ba06e7759dc4",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "anchor": "unheaded-block-33",
+      "unitDigest": "a14c802a8c352309fd3079bcab98c31477502e299dc4d0b24e1097d1efdb0e85",
+      "shownText": "The current Herdr launch identity uses normalized\n`fgos-<runId>-<launchCommandId>`, with a persisted random launch command, not\nrunId alone. The standalone reassign action is a fenced controller-epoch\nrecord with a checked authority input; it does not launch a replacement\nworker or execute the retired session `driver-replaced` continuation door.\nEvidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random\nlaunch command; `src/runner/dispatch/confinement/authority.mjs:1608-1629`\nnormalizes and persists its identity. Replacement authority is checked in\n`src/runner/dispatch/recovery-planner.mjs:160-171,204-212`; reassign records\nthe fenced epoch without launching a worker in\n`src/verbs/dispatch/recover.mjs:235-247,382-398`.",
+      "shownTextDigest": "a14c802a8c352309fd3079bcab98c31477502e299dc4d0b24e1097d1efdb0e85",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Sentence: The current Herdr launch identity uses a persisted random launch command, and the standalone reassign action is a fenced controller-epoch record with a checked authority input that does not launch a replacement worker. Both statements are true in code but no cited range shows them: the random launchCommandId is assignment-runner.mjs:2118 (cmd_<Date.now()>_<randomBytes>), and reassign is recovery-planner.mjs:160-171 and 204-212 (replacement-authority evidence) plus src/verbs/dispatch/recover.mjs:235-247 (claim cleared only for resume-driver) and 382-398 (epoch bump, recovery record, no launch). Cited authority.mjs:1608-1629 does back normalized fgos-<runId>-<launchCommandId> and the persisted commands/<id>.json. Fix: add those citations.",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "2e25b357cdeb5ecd739d6f3b5399ab27cf2153b1191d769d9352eda8c525d631",
+      "previousShownText": "The current Herdr launch identity uses normalized\n`fgos-<runId>-<launchCommandId>`, with a persisted random launch command, not\nrunId alone. The standalone reassign action is a fenced controller-epoch\nrecord with a checked authority input; it does not launch a replacement\nworker or execute the retired session `driver-replaced` continuation door.",
+      "previousShownTextDigest": "2e25b357cdeb5ecd739d6f3b5399ab27cf2153b1191d769d9352eda8c525d631"
+    },
+    {
+      "claimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
+      "previousClaimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "implementation-and-design-status",
+      "unitDigest": "a00fc58404877c13a6aab83779a6fb62e5dbdfe91a024c3f9c9f0cb981427ffa",
+      "shownText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
+      "shownTextDigest": "676a85a6862b68726cae1721974db1646a894933e76a7369e1d7fdca85c303fe",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Sentence: assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' (Proposed Runtime Recovery Amendment row) and :1565-1590 (run.json contents) (Run row). The contract literal is at line 1563 (buildRunMeta opens at 1562) so both ranges exclude the line they cite. Fix: use 1563-1582 in both. Every other line reference verified at HEAD (assignment.mjs:17,276; normalizer 2-20; runner 70-81,431,560,574,697,784,917-940,932,1016,1941,2024,2118; recovery-planner 251-327; runtime-inspection 160,255; run-result 7,22-23,350-385,1276-1285,1305-1325; claim contract 5; evidence-attribution 10,69,197; lib.rs:129; runner.md:3072-3081; the five test files exist; no src/state import, no run-retried, no admitRun/admissionKey/authorityRef/writerRuntime in src).",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "bd0c65de1fac15e5f118923e09326c0308655a7c19caeddba1a38e55f7149d65",
+      "previousShownText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1565-1590 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
+      "previousShownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1"
+    },
+    {
+      "claimId": "claim_3f9ba37c7158c1b4756d97ad3cf1fefd",
+      "previousClaimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-4",
+      "unitDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
+      "shownText": "| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
+      "shownTextDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Same table as the section. Sentence: assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' and :1565-1590 (run.json contents). The literal is at line 1563 so both ranges exclude it. Fix: 1563-1582. All other references verified true at HEAD (see section note).",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "b3c903ac85ecab9f28e45c445a2893c61d3427805a3a7f7b867a62938c7a4a00",
+      "previousShownText": "| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1565-1590 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1565-1585 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
+      "previousShownTextDigest": "b3c903ac85ecab9f28e45c445a2893c61d3427805a3a7f7b867a62938c7a4a00"
+    },
+    {
+      "claimId": "claim_a7fe161ceda021436c44dad7dcf1a3a2",
+      "previousClaimId": "claim_34a87472629191c59355e5f74ef2c2d2",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
+      "shownText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/dispatch/assignment.mjs:455-460,663-667`; constants in\n`src/runner/dispatch/execution-contract.mjs:47` and\n`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is\nwritten by `execution/run.mjs:334-338`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
+      "shownTextDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Sentence: Declared/inline builders stamp policy/normalizer versions. True (assignment.mjs:455-460 and 663-667 set contractPolicyVersion and normalizerVersion from execution-contract.mjs:47 and assignment-normalizer.mjs:44) but no cited range covers it: cited normalizer 95-144 stamps mutation and evidence.required only. Fix: add those citations. Rest verified: run.mjs:337-343 writes unit-run provenance (334-338 covers mutation, binding and kind), normalizer stamping at 95-144 is current implementation, no session stamp door in src (git grep empty).",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "5861765263e6557b7b6542fbb308cc5bb10cd919f0e521532284054431e54a8e",
+      "previousShownText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions; Unit-run provenance is written by `execution/run.mjs:334-338`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
+      "previousShownTextDigest": "5861765263e6557b7b6542fbb308cc5bb10cd919f0e521532284054431e54a8e"
+    },
+    {
+      "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
+      "previousClaimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "8-runresult-confidence",
+      "unitDigest": "1d42fd96aef4ef913b24081cda50703c80f418e1431f840a80e82e5bb6a59f1c",
+      "shownText": "## 8. RunResult Confidence\n\nRunResult status and confidence are control-plane judgments.\n\nConfidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | A structured done claim on a mutating operation plus at least one changed file produced by the run, or a dirty-before file the run mutated (`src/runner/dispatch/settlement.mjs:206-226,290`). | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |\n\nThe driver must treat `done/no-evidence` as not done. It may retry, ask for a\nproper artifact, or route to a different legal operation.",
+      "shownTextDigest": "38d84521c15b178031abb8c3878df4904186a9d66c5e230d8adbd68eef3cd9c4",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Shown text equals committed unit at efb60a3, e6c02b0 and HEAD; blob pins match. reported row (blocked; read-only done with report; failed claim by reviewer/red-team role or findings verdict with report, exit 0, no timeout) is true: settlement.mjs:269-280, run-result.mjs:1273-1278; failed row true vs run-result.mjs:1250-1271. FALSE: verified row lists \"test artifact, or verified result file\" as post-run external evidence; code (settlement.mjs:290, computeChangedFiles/safeGitStatusFiles 153-226) counts only git-visible changed files outside .fgos (new dirty or committed-diff files); worker reports and result files are not verified evidence for a mutating run. Fix: reword verified to a done claim on a mutating operation plus at least one changed file outside .fgos (new dirty file or file in the pre/post-run committed diff). Caveat: the evidence-floor re-derivation in operation-choice.mjs:395-420 has no role input, so a reviewer-role failed claim without a findings verdict is downgraded there; say settlement-time.",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7",
+      "previousShownText": "## 8. RunResult Confidence\n\nRunResult status and confidence are control-plane judgments.\n\nConfidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |\n\nThe driver must treat `done/no-evidence` as not done. It may retry, ask for a\nproper artifact, or route to a different legal operation.",
+      "previousShownTextDigest": "3c244cb11cbdbd1b91ecf30ca5c261bd4be3b3a7451dede0d624f5f7d4f33148"
+    },
+    {
+      "claimId": "claim_b5cc705cc64dd03a1ad6d66f05e98a39",
+      "previousClaimId": "claim_e9bb00004e75ca737f2eeca58152063d",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-38",
+      "unitDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
+      "shownText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | A structured done claim on a mutating operation plus at least one changed file produced by the run, or a dirty-before file the run mutated (`src/runner/dispatch/settlement.mjs:206-226,290`). | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "shownTextDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Same table as the 8-runresult-confidence section, shown text equals committed unit; all bytes and pins match. Same defect: verified row names \"test artifact, or verified result file\" as evidence but code counts only changed files outside .fgos (settlement.mjs:290; computeChangedFiles 206-226). Same fix. reported and failed rows are true against settlement.mjs:269-280, run-result.mjs:1250-1278.",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "previousShownText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
+      "previousShownTextDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1"
+    },
+    {
+      "claimId": "claim_4206c1d35ff143014142819046d69771",
+      "previousClaimId": "claim_4206c1d35ff143014142819046d69771",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "2-production-ladder-semantics",
+      "unitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
+      "shownText": "## 2. Production Ladder Semantics\n\nThe order and behavior in `src/runner/dispatch/liveness.mjs` are ported:\n1. Worker result file beats all runtime readings; it still requires normalization.\n2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:356-367`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.\n3. Death requires consecutive absent readings (default 3); unknown/present reset.\n4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.\n5. Idle/stale evaluation subtracts blind time; working is progress even with\n   zero stdout. Screen reads are requested at the stale boundary, and an early\n   credential probe also runs after fifteen seconds of non-working idle time\n   (`liveness.mjs:267-299`). Thus screen reads are not stale-only.\n\nA requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).\n\nZero output is a fact orthogonal to outcome. A 35-minute zero-output incident can\nbe timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.\nHandshake timeout with unknown delivery is not proof of launch failure.\nThe ladder supplies the matching screen line, not a parsed retryAfter timestamp.\nAn adapter may parse a known provider reset format, preserving the original line;\notherwise retryAfter is absent. RetryAfter only schedules inspection.",
+      "shownTextDigest": "0422668681d2aa7cc31fa4f1114e09984e0d82476db79c9db3c97a289d2ea8e4",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Shown-text binding for the explicitly requested correction; independent check pending. This packet does not close a reverse unit.",
+      "reviewInstruction": "Shown text equals committed unit; evidence blob pins current. Cites liveness.mjs:267-299, 93-109, 238-246 and recovery.mjs:105-107 all verified true (15000ms auth probe, ceiling after truth/blocked/death, death threshold 3, retry for worker-timeout). STALE: shown text cites herdr-round.mjs:346-357 for the blocked-to-worker-timeout mapping, but after the main sync that mapping is ERROR_CLASS_FOR_OUTCOME at 362-369 (blocked at 364) with its seam comment at 356-361; 346-357 is cleanupAndKeepScreen plus the start of that comment. Fix: cite herdr-round.mjs:356-367 (the evidence range was rebound to 351-369 but the in-text cite was not). Rest of the section is true or labelled proposed; retryAfter and handshake sentences have no code and are design statements.",
+      "currentEvidence": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 160,
+            "endLine": 171,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 204,
+            "endLine": 212,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 235,
+            "endLine": 247,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/verbs/dispatch/recover.mjs",
+            "startLine": 382,
+            "endLine": 398,
+            "blobSha": "b864b0dee667cc3b4df4c999292de413ee4fe634"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 2118,
+            "endLine": 2118,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/confinement/authority.mjs",
+            "startLine": 1608,
+            "endLine": 1629,
+            "blobSha": "7c75f05f2d7a7e78c41d9e6a596cfd00801fc89e"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 455,
+            "endLine": 460,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/assignment.mjs",
+            "startLine": 663,
+            "endLine": 667,
+            "blobSha": "b252e866575596b5de51ef94d6f1967c94d5ef91"
+          },
+          {
+            "path": "src/runner/dispatch/execution-contract.mjs",
+            "startLine": 47,
+            "endLine": 47,
+            "blobSha": "ac3a26083e375666764c7c722d615c308032e99b"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-normalizer.mjs",
+            "startLine": 44,
+            "endLine": 44,
+            "blobSha": "192664dc4272d0e99e5b1bd91b9102ab6a4758a1"
+          },
+          {
+            "path": "src/runner/dispatch/assignment-runner.mjs",
+            "startLine": 1563,
+            "endLine": 1582,
+            "blobSha": "8489abd5368457a7bc8ac54b506d7e48183adc5f"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 206,
+            "endLine": 226,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/settlement.mjs",
+            "startLine": 290,
+            "endLine": 290,
+            "blobSha": "00fbe59dc5a30eccd4b39e027e4dbd33587a9e22"
+          },
+          {
+            "path": "src/runner/dispatch/herdr-round.mjs",
+            "startLine": 356,
+            "endLine": 369,
+            "blobSha": "2409e8c6ca41a473e88bcdd9ef81e51760d93e37"
+          }
+        ],
+        "scope": "Eight authorized corrections only; this artifact makes no truth claim about the remaining candidate-unverified units."
+      },
+      "reviewStatus": "pending",
+      "previousUnitDigest": "21295b47dae8583ef4b70ea406ad45275bdb1902af772589db488dafa179f7c8",
+      "previousShownText": "## 2. Production Ladder Semantics\n\nThe order and behavior in `src/runner/dispatch/liveness.mjs` are ported:\n1. Worker result file beats all runtime readings; it still requires normalization.\n2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:346-357`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.\n3. Death requires consecutive absent readings (default 3); unknown/present reset.\n4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.\n5. Idle/stale evaluation subtracts blind time; working is progress even with\n   zero stdout. Screen reads are requested at the stale boundary, and an early\n   credential probe also runs after fifteen seconds of non-working idle time\n   (`liveness.mjs:267-299`). Thus screen reads are not stale-only.\n\nA requested screen is the second stage of the sample, not another death read.\n`evaluateLadder` emits `provider-limit` for credential/quota screen matches.\nIts pane fate is `keep-always`; `paused-limit` remains a recognized alias.\nKeep all failure panes by default; both limit outcomes survive automated\n`closeAlways` (`liveness.mjs:93-109`). Operator destructive intent is separate\nand guarded. Never infer Run completion from `agent_status` or pane idleness;\nthe ladder settles on the result file, which still requires normalization\n(`liveness.mjs:238-246`).\n\nZero output is a fact orthogonal to outcome. A 35-minute zero-output incident can\nbe timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.\nHandshake timeout with unknown delivery is not proof of launch failure.\nThe ladder supplies the matching screen line, not a parsed retryAfter timestamp.\nAn adapter may parse a known provider reset format, preserving the original line;\notherwise retryAfter is absent. RetryAfter only schedules inspection.",
+      "previousShownTextDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc"
+    }
+  ],
+  "purpose": "Shown-text packet for eight bounded truth/citation fixes only; not a reverse-closure receipt and never referenced by candidateClassifications."
+}

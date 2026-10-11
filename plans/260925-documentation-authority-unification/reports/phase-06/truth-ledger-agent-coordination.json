@@ -1099,7 +1099,7 @@
       "anchor": "2-production-ladder-semantics",
       "startLine": 68,
       "endLine": 94,
-      "shownTextDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "shownTextDigest": "0422668681d2aa7cc31fa4f1114e09984e0d82476db79c9db3c97a289d2ea8e4",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
@@ -1109,9 +1109,23 @@
         "src/runner/dispatch/herdr-round.mjs:341-359",
         "src/runner/recovery.mjs:105-112",
         "src/runner/dispatch/liveness.mjs:93-109",
-        "src/runner/dispatch/liveness.mjs:238-246"
+        "src/runner/dispatch/liveness.mjs:238-246",
+        "src/runner/dispatch/recovery-planner.mjs:160-171",
+        "src/runner/dispatch/recovery-planner.mjs:204-212",
+        "src/verbs/dispatch/recover.mjs:235-247",
+        "src/verbs/dispatch/recover.mjs:382-398",
+        "src/runner/dispatch/assignment-runner.mjs:2118-2118",
+        "src/runner/dispatch/confinement/authority.mjs:1608-1629",
+        "src/runner/dispatch/assignment.mjs:455-460",
+        "src/runner/dispatch/assignment.mjs:663-667",
+        "src/runner/dispatch/execution-contract.mjs:47-47",
+        "src/runner/dispatch/assignment-normalizer.mjs:44-44",
+        "src/runner/dispatch/assignment-runner.mjs:1563-1582",
+        "src/runner/dispatch/settlement.mjs:206-226",
+        "src/runner/dispatch/settlement.mjs:290-290",
+        "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "870fa30fefb1f699690eeec5b3ba9973bd32fedfd1eff755b1f26adc9b92692d",
       "priorReviewSection": "Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics",
@@ -1127,7 +1141,13 @@
       "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
       "reviewedAt": "2026-10-11",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
-      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "closureCorrection": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "authorization": "A27/A28",
+        "reviewRequired": true,
+        "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
+      }
     },
     {
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
@@ -1628,9 +1648,9 @@
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "section": "Runtime Recovery And Work Continuity > 11. Review Finding Resolution And Limits",
       "anchor": "11-review-finding-resolution-and-limits",
-      "startLine": 263,
-      "endLine": 294,
-      "shownTextDigest": "a3746d2025b01bf82d4b8069758e72856b14b35524072ac909e6e10af4772afd",
+      "startLine": 265,
+      "endLine": 300,
+      "shownTextDigest": "0f96fbfea53c5877b19c9d367c088ae1006cd6d6c1f5b1217d7596b4bf0d9f34",
       "status": "verified",
       "classification": "normative-obligation",
       "reason": null,
@@ -1638,9 +1658,23 @@
       "evidence": [
         "src/runner/dispatch/confinement/authority.mjs:1589-1610",
         "src/runner/dispatch/assignment-runner.mjs:1550-1595",
-        "src/runner/dispatch/recovery-planner.mjs:243-316"
+        "src/runner/dispatch/recovery-planner.mjs:243-316",
+        "src/runner/dispatch/recovery-planner.mjs:160-171",
+        "src/runner/dispatch/recovery-planner.mjs:204-212",
+        "src/verbs/dispatch/recover.mjs:235-247",
+        "src/verbs/dispatch/recover.mjs:382-398",
+        "src/runner/dispatch/assignment-runner.mjs:2118-2118",
+        "src/runner/dispatch/confinement/authority.mjs:1608-1629",
+        "src/runner/dispatch/assignment.mjs:455-460",
+        "src/runner/dispatch/assignment.mjs:663-667",
+        "src/runner/dispatch/execution-contract.mjs:47-47",
+        "src/runner/dispatch/assignment-normalizer.mjs:44-44",
+        "src/runner/dispatch/assignment-runner.mjs:1563-1582",
+        "src/runner/dispatch/settlement.mjs:206-226",
+        "src/runner/dispatch/settlement.mjs:290-290",
+        "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "f9a77e9b9c13ab77bf93ba7acfc2eccca593e2a925ae0a64c653f66baaed6af6",
       "priorReviewSection": null,
@@ -1650,7 +1684,13 @@
         "verdict": "verified-ok"
       },
       "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "closureCorrection": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "authorization": "A27/A28",
+        "reviewRequired": true,
+        "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
+      }
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -1685,8 +1725,8 @@
       "section": "Assignment, Run, And RunResult Contract > Implementation And Design Status",
       "anchor": "implementation-and-design-status",
       "startLine": 25,
-      "endLine": 41,
-      "shownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
+      "endLine": 40,
+      "shownTextDigest": "676a85a6862b68726cae1721974db1646a894933e76a7369e1d7fdca85c303fe",
       "status": "verified",
       "classification": "navigation",
       "reason": null,
@@ -1694,9 +1734,23 @@
       "evidence": [
         "src/runner/dispatch/assignment-runner.mjs:1550-1595",
         "src/runner/dispatch/run-result.mjs:1245-1330",
-        "src/runner/execution/run.mjs:331-340"
+        "src/runner/execution/run.mjs:331-340",
+        "src/runner/dispatch/recovery-planner.mjs:160-171",
+        "src/runner/dispatch/recovery-planner.mjs:204-212",
+        "src/verbs/dispatch/recover.mjs:235-247",
+        "src/verbs/dispatch/recover.mjs:382-398",
+        "src/runner/dispatch/assignment-runner.mjs:2118-2118",
+        "src/runner/dispatch/confinement/authority.mjs:1608-1629",
+        "src/runner/dispatch/assignment.mjs:455-460",
+        "src/runner/dispatch/assignment.mjs:663-667",
+        "src/runner/dispatch/execution-contract.mjs:47-47",
+        "src/runner/dispatch/assignment-normalizer.mjs:44-44",
+        "src/runner/dispatch/assignment-runner.mjs:1563-1582",
+        "src/runner/dispatch/settlement.mjs:206-226",
+        "src/runner/dispatch/settlement.mjs:290-290",
+        "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": false,
       "beforeShownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
       "priorReviewSection": "Assignment, Run, And RunResult Contract > Implementation And Design Status",
@@ -1706,15 +1760,21 @@
         "verdict": "verified-ok"
       },
       "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "closureCorrection": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "authorization": "A27/A28",
+        "reviewRequired": true,
+        "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
+      }
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "section": "Assignment, Run, And RunResult Contract > Assignment",
       "anchor": "assignment",
       "startLine": 42,
-      "endLine": 70,
-      "shownTextDigest": "ec43a1215725c5ec8a524ee2717ee2e12682b837af35bbeb8f58c546c147cab2",
+      "endLine": 72,
+      "shownTextDigest": "cf83a7491359458862dadcdc6e435756a103f23f2cc90eb0aba15e29b971db3e",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
@@ -1722,9 +1782,23 @@
       "evidence": [
         "src/runner/execution/run.mjs:331-340",
         "src/runner/dispatch/assignment-normalizer.mjs:95-144",
-        "src/runner/dispatch/execution-contract.mjs:180-240"
+        "src/runner/dispatch/execution-contract.mjs:180-240",
+        "src/runner/dispatch/recovery-planner.mjs:160-171",
+        "src/runner/dispatch/recovery-planner.mjs:204-212",
+        "src/verbs/dispatch/recover.mjs:235-247",
+        "src/verbs/dispatch/recover.mjs:382-398",
+        "src/runner/dispatch/assignment-runner.mjs:2118-2118",
+        "src/runner/dispatch/confinement/authority.mjs:1608-1629",
+        "src/runner/dispatch/assignment.mjs:455-460",
+        "src/runner/dispatch/assignment.mjs:663-667",
+        "src/runner/dispatch/execution-contract.mjs:47-47",
+        "src/runner/dispatch/assignment-normalizer.mjs:44-44",
+        "src/runner/dispatch/assignment-runner.mjs:1563-1582",
+        "src/runner/dispatch/settlement.mjs:206-226",
+        "src/runner/dispatch/settlement.mjs:290-290",
+        "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": true,
       "beforeShownTextDigest": "516df5144769aade9a7133072917fae83f283c06659c1952197da1fc4d1d33f7",
       "priorReviewSection": "Assignment, Run, And RunResult Contract > Assignment",
@@ -1734,7 +1808,13 @@
         "verdict": "verified-ok"
       },
       "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "closureCorrection": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "authorization": "A27/A28",
+        "reviewRequired": true,
+        "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
+      }
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -5151,16 +5231,30 @@
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "section": "Team Communication Protocol V1 > 8. RunResult Confidence",
       "anchor": "8-runresult-confidence",
-      "startLine": 211,
-      "endLine": 227,
-      "shownTextDigest": "3c244cb11cbdbd1b91ecf30ca5c261bd4be3b3a7451dede0d624f5f7d4f33148",
+      "startLine": 221,
+      "endLine": 236,
+      "shownTextDigest": "38d84521c15b178031abb8c3878df4904186a9d66c5e230d8adbd68eef3cd9c4",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
       "verificationType": "A25-code-verified-truth-correction",
       "evidence": [
         "src/runner/dispatch/settlement.mjs:269-280",
-        "src/runner/dispatch/run-result.mjs:1273-1278"
+        "src/runner/dispatch/run-result.mjs:1273-1278",
+        "src/runner/dispatch/recovery-planner.mjs:160-171",
+        "src/runner/dispatch/recovery-planner.mjs:204-212",
+        "src/verbs/dispatch/recover.mjs:235-247",
+        "src/verbs/dispatch/recover.mjs:382-398",
+        "src/runner/dispatch/assignment-runner.mjs:2118-2118",
+        "src/runner/dispatch/confinement/authority.mjs:1608-1629",
+        "src/runner/dispatch/assignment.mjs:455-460",
+        "src/runner/dispatch/assignment.mjs:663-667",
+        "src/runner/dispatch/execution-contract.mjs:47-47",
+        "src/runner/dispatch/assignment-normalizer.mjs:44-44",
+        "src/runner/dispatch/assignment-runner.mjs:1563-1582",
+        "src/runner/dispatch/settlement.mjs:206-226",
+        "src/runner/dispatch/settlement.mjs:290-290",
+        "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
       "reviewStatus": "pending",
       "changed": false,
@@ -5175,7 +5269,13 @@
       "targetedChanged": true,
       "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
       "authorSession": "codex-session:1@2026-10-10",
-      "reviewNote": "Actual shown current text changed under A25; old approval is not carried."
+      "reviewNote": "Actual shown current text changed under A25; old approval is not carried.",
+      "closureCorrection": {
+        "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
+        "authorization": "A27/A28",
+        "reviewRequired": true,
+        "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
+      }
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
