@@ -3,6 +3,7 @@
 Status: READY FOR INDEPENDENT REVIEW. Batch closure: UNPROVEN.
 Author session: codex-session:1@2026-10-11
 Authorization: owner A28, committed verbatim alone at `4ed399671`; A27 correction scope and A22 binding remain.
+Authored snapshot for the frozen gate proof: `221ac1e8eebc71a2b1ece554b34e0e75b89c7c49`. Text pin above remains byte-identical in this snapshot.
 
 ## Only two checks
 
@@ -33,6 +34,7 @@ Commit independent reports with a typed `Reviewer:` identity different from the 
 ```
 
 Use sourceUnitDigest / targetUnitDigest from the packets, not a full-document hash. The eight truth findings may be reported together or separately, naming previous/current IDs and digests. The list-equality/status check is a report finding, not 326 invented ok verdicts. No author-made report or approval stamp will be used.
+Source/retired/gap reports must include `Review mode: ordinary`, `Reviewer: reviewer:<different-session>@<date>` and `Author session: codex-session:1@2026-10-11`. No pack seed/score is required for this ordinary bounded check; committed report pins and independence remain mandatory.
 
 ## Proof boundary
 
