@@ -24,6 +24,7 @@ import {
   resumeWorkflow,
   answerWorkflowDetached,
   resumeWorkflowDetached,
+  preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs } from '../../src/workflow/definition.mjs';
@@ -1705,4 +1706,139 @@ test('cross-repo workflows reject plain context paths before recording a run, bu
     contextRefs: ['README.md'], repoRoot: stateRoot, cwd: linked,
   });
   assert.equal(sameRepo.status, 'parked', 'linked worktrees are not different repositories');
+});
+
+// A base whose only panel is generic (no seat tasks) followed by a step that depends on it.
+function writeSeatBase(tmp) {
+  fs.mkdirSync(path.join(tmp, 'core', 'workflows'), { recursive: true });
+  fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'note.md'), '# Domain note\n');
+  execFileSync('git', ['add', 'docs/note.md'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'add note'], { cwd: tmp, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tmp, 'core', 'workflows', 'seat-base.json'), JSON.stringify({
+    id: 'seat-base',
+    steps: [
+      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', blind: true, objective: 'Weigh the question', writes: [] } }] },
+      { id: 'decide', dependsOn: ['opinions'], units: [{ id: 'verdict', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
+    ],
+  }));
+}
+
+test('workflow start --seats through the real CLI stores the expanded definition and provenance, seats the lenses and reaches downstream units', { timeout: 4 * STANCE_CLI_CALL_TIMEOUT_MS }, (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma', 'delta']);
+  writeSeatBase(tmp);
+  const runFgos = (args) => JSON.parse(execFileSync(process.execPath, [BIN_FGOS, ...args], { cwd: tmp, encoding: 'utf8', timeout: STANCE_CLI_CALL_TIMEOUT_MS })).data;
+  const lenses = ['cash flow and payback', 'delivery capacity and lock-in', 'renewal leverage'];
+  const state = runFgos(['workflow', 'start', 'seat-base', '--request', 'Which retainer?', '--seats', lenses.join('|'), '--context-ref', 'docs/note.md', '--dir', tmp, '--foreground']);
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.seatsPreflight, undefined, 'four families serve three seats and a synthesizer: nothing to warn about');
+
+  // The stored definition and provenance are what status and resume read back.
+  const status = runFgos(['workflow', 'status', state.workflowRunId, '--dir', tmp]);
+  const panel = status.workflow.steps[0].units[0].template;
+  assert.equal(panel.params.members, 3);
+  assert.deepEqual(Object.keys(panel.params.roleTasks), ['panelist-1', 'panelist-2', 'panelist-3']);
+  assert.equal(status.workflowId, 'seat-base');
+  assert.deepEqual(status.seats.seats, lenses);
+  assert.equal(status.seats.baseId, 'seat-base');
+  assert.match(status.seats.baseDigest, /^[0-9a-f]{64}$/);
+  assert.deepEqual(status.seats.refs, ['docs/note.md']);
+  assert.deepEqual(status.workflow.steps[1].units[0].template.contextRefs, ['docs/note.md'], 'the shared ref is copied to the step run-level refs cannot reach');
+  const startEvent = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0];
+  assert.deepEqual(startEvent.payload.workflow.steps[0].units[0].template.params, panel.params);
+  assert.deepEqual(startEvent.payload.seats, status.seats);
+
+  // Each seat was briefed with its own lens only, and the synthesizer got no lens.
+  const unitDir = path.join(tmp, '.fgos', 'assignments', state.steps.opinions.units.panel.unitRunId);
+  const prompt = (role) => {
+    const envelope = JSON.parse(fs.readFileSync(path.join(unitDir, role, '1', 'runs', '01', 'protected', 'launch-envelope.json'), 'utf8'));
+    return envelope.invocation.args.find((arg) => arg.includes('Write structured JSON to'));
+  };
+  lenses.forEach((lens, i) => {
+    const brief = prompt(`panelist-${i + 1}`);
+    assert.match(brief, new RegExp(`Your analytic lens for this question: ${lens}\\.`));
+    assert.match(brief, /Weigh the question/);
+    for (const other of lenses.filter((l) => l !== lens)) assert.ok(!brief.includes(other), `seat ${i + 1} must not see "${other}"`);
+  });
+  assert.ok(!fs.existsSync(path.join(unitDir, 'panelist-4')));
+  assert.doesNotMatch(prompt('synthesizer'), /analytic lens/);
+
+  // The downstream unit received the shared ref.
+  const verdict = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', state.steps.decide.units.verdict.unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.ok(JSON.stringify(verdict).includes('docs/note.md'), 'the downstream assignment lists the shared ref');
+
+  // Resume refuses seats that differ from the stored ones and accepts the same ones.
+  assert.throws(
+    () => execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'resume', state.workflowRunId, '--seats', 'other one|other two', '--dir', tmp, '--foreground'], { cwd: tmp, encoding: 'utf8', stdio: 'pipe', timeout: STANCE_CLI_CALL_TIMEOUT_MS }),
+    (error) => error.status !== 0 && /resume refuses different --seats/.test(`${error.stdout}${error.stderr}`),
+  );
+  const same = runFgos(['workflow', 'resume', state.workflowRunId, '--seats', lenses.join('|'), '--dir', tmp, '--foreground']);
+  assert.equal(same.status, 'completed');
+});
+
+test('workflow start --seats refusals create no run', (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  writeSeatBase(tmp);
+  fs.copyFileSync(path.resolve('core/workflows/council-lite.yaml'), path.join(tmp, 'core', 'workflows', 'council-lite.yaml'));
+  const refuse = (workflowId, seats, pattern) => {
+    assert.throws(
+      () => execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', workflowId, '--seats', seats, '--dir', tmp, '--foreground'], { cwd: tmp, encoding: 'utf8', stdio: 'pipe', timeout: STANCE_CLI_CALL_TIMEOUT_MS }),
+      (error) => error.status !== 0 && pattern.test(`${error.stdout}${error.stderr}`),
+      `${workflowId} --seats ${seats}`,
+    );
+  };
+  refuse('seat-base', 'only one', /at least 2 lenses/);
+  refuse('seat-base', 'good lens||another lens', /seat 2 is empty/);
+  refuse('seat-base', 'Good lens|good LENS', /repeats seat 1/);
+  refuse('seat-base', 'good lens|@finance-controller', /named personas are not supported yet/);
+  refuse('seat-base', `good lens|${'x'.repeat(161)}`, /3-160 characters/);
+  refuse('seat-base', 'good lens|has {brace}', /braces/);
+  refuse('council-lite', 'one lens|two lens', /fixes its own seats/);
+  refuse('no-such-base', 'one lens|two lens', /no-such-base/);
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')) || fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length === 0, 'a refused start creates no run');
+});
+
+test('six seats on a pool with fewer provider families start without a waiver and report the shared families', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  useDistinctFamilies(tmp, ['alpha', 'beta']);
+  writeSeatBase(tmp);
+  const seats = Array.from({ length: 6 }, (_, i) => `perspective ${i + 1}`);
+  const params = { workflowId: 'seat-base', seats, repoRoot: tmp, cwd: tmp, worktree: tmp };
+  const { warnings } = await preflightWorkflowSeats(params);
+  assert.ok(warnings.length > 0 && warnings.every((w) => /shares a provider family with/.test(w)), warnings.join('\n'));
+  const state = await startWorkflow(params);
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.seats.seats.length, 6);
+  const unitDir = path.join(tmp, '.fgos', 'assignments', state.steps.opinions.units.panel.unitRunId);
+  for (let i = 1; i <= 6; i += 1) assert.ok(fs.existsSync(path.join(unitDir, `panelist-${i}`)), `panelist-${i} ran`);
+  assert.ok(!fs.existsSync(path.join(unitDir, 'panelist-7')));
+});
+
+test('a pool that cannot serve a panel role at all refuses the seated start before any run exists', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  writeSeatBase(tmp);
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  delete cfg.runner.capabilities['docs:write'];
+  delete cfg.runner.defaultExecutor;
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg));
+  await assert.rejects(() => preflightWorkflowSeats({ workflowId: 'seat-base', seats: ['one lens', 'two lens'], repoRoot: tmp, cwd: tmp, worktree: tmp }), /--seats cannot be served/);
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), 'the preflight records nothing');
+});
+
+test('without --seats the preflight is a no-op and the start event and projection carry no seat data', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  writeSeatBase(tmp);
+  const params = { workflowId: 'seat-base', repoRoot: tmp, cwd: tmp, worktree: tmp };
+  assert.deepEqual(await preflightWorkflowSeats(params), { warnings: [] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: 'seat-base', workflow: validateWorkflow(JSON.parse(fs.readFileSync(path.join(tmp, 'core', 'workflows', 'seat-base.json'), 'utf8'))) });
+  const [start] = readWorkflowEvents({ repoRoot: tmp, workflowRunId });
+  assert.equal('seats' in start.payload, false);
+  assert.equal('seats' in projectWorkflowState([start]), false);
 });

@@ -22,7 +22,9 @@ import {
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
 import { translatePlanToWorkflow } from './plan-source.mjs';
-import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
+import { runUnit, snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { expandWorkflowSeats, normalizeSeats, seatedPanelUnits } from './seats.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
@@ -749,11 +751,11 @@ function detachedResult({ mainRoot, workflowRunId, detached }) {
 }
 
 /**
- * Resolve the Workflow definition and record a new run, without advancing it. The run exists
- * in the store (status `running`, nothing started) as soon as this returns, so its id can be
- * handed to a caller before any step executes.
+ * Resolve everything a start needs without touching the store: the roots, the definition to run
+ * (the registered one, or that one rebuilt with `params.seats`), and the shared context refs.
+ * A refused request throws here, so it creates no run.
  */
-function prepareWorkflowRun(params) {
+function resolveStart(params) {
   const cwd = params.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd);
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
@@ -776,12 +778,54 @@ function prepareWorkflowRun(params) {
   }
 
   const contextRefs = normalizeContextRefs(params.contextRefs);
+  let seats;
+  if (params.seats !== undefined) {
+    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs }));
+  }
   const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
   if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
       && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
     throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
   }
+  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats };
+}
 
+/**
+ * Dry-bind a seated definition before anything is spent: every panel unit's seats and synthesizer are
+ * bound against the pool exactly as a run would bind them, nothing is dispatched or written.
+ * Seats that would share a provider family are only reported (a preference, bind() spreads what it
+ * can); a role no candidate can serve refuses the start. Without `params.seats` it does nothing.
+ *
+ * @param {object} params the same params as startWorkflow
+ * @returns {Promise<{ warnings: string[] }>}
+ */
+export async function preflightWorkflowSeats(params = {}) {
+  if (params.seats === undefined) return { warnings: [] };
+  const { mainRoot, workflow } = resolveStart(params);
+  const runnerConfig = snapshotRunnerConfig(mainRoot).runner;
+  const session = { headless: true, herdrPresent: detectHerdrPresent() };
+  const warnings = [];
+  const refused = [];
+  for (const unit of seatedPanelUnits(workflow)) {
+    const { roles } = await simulateUnitBindings(unit, runnerConfig, { session });
+    for (const role of roles) {
+      if (role.refused) refused.push(`${unit.id}/${role.role}: ${role.refused.reason}: ${role.refused.detail}`);
+      else if (role.sharesFamilyWith?.length) warnings.push(`${unit.id}/${role.role}=${role.executor} shares a provider family with ${role.sharesFamilyWith.join(', ')}`);
+    }
+  }
+  if (refused.length > 0) {
+    throw new RunnerConfigError(`--seats cannot be served by the current pools, no run was created: ${refused.join('; ')}`);
+  }
+  return { warnings };
+}
+
+/**
+ * Resolve the Workflow definition and record a new run, without advancing it. The run exists
+ * in the store (status `running`, nothing started) as soon as this returns, so its id can be
+ * handed to a caller before any step executes.
+ */
+function prepareWorkflowRun(params) {
+  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats } = resolveStart(params);
   const configSnapshot = snapshotRunnerConfig(mainRoot);
   const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
@@ -791,6 +835,7 @@ function prepareWorkflowRun(params) {
     request: params.request,
     stanceOptions: normalizeStanceOptions(params.stanceOptions),
     contextRefs,
+    seats,
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };
@@ -827,6 +872,7 @@ export function startWorkflowDetached(params = {}) {
  * @param {object} [params.workflow] In-memory workflow object
  * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
  * @param {string} [params.request] The owner's request this run serves; given to every unit
+ * @param {string[]} [params.seats] Ordered lenses: rebuild the base with one panel seat per lens (see seats.mjs)
  * @param {string} [params.repoRoot]
  * @param {string} [params.cwd]
  * @param {string} [params.worktree]
@@ -1073,7 +1119,15 @@ function resolveResumeTarget(workflowRunId, options) {
   if (events.length === 0) {
     throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
   }
-  return { mainRoot, worktreePath, state: projectWorkflowState(events) };
+  const state = projectWorkflowState(events);
+  if (options.seats !== undefined) {
+    const given = normalizeSeats(options.seats);
+    const stored = state.seats?.seats ?? [];
+    if (JSON.stringify(given) !== JSON.stringify(stored)) {
+      throw new RunnerConfigError(`Workflow run "${workflowRunId}" started with ${stored.length > 0 ? `seats "${stored.join('|')}"` : 'no --seats'}; resume refuses different --seats (given "${given.join('|')}")`);
+    }
+  }
+  return { mainRoot, worktreePath, state };
 }
 
 /**

@@ -239,6 +239,7 @@
     "src/workflow/runner.mjs": "use-case",
     "src/workflow/index.mjs": "use-case",
     "src/workflow/checked.mjs": "infra",
+    "src/workflow/seats.mjs": "infra",
     "src/workflow/steps.mjs": "kernel",
     "src/state/domain-registry.mjs": "kernel",
     "src/state/step-fsm.mjs": "domain",
