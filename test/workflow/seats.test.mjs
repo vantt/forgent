@@ -125,12 +125,56 @@ test('invalid seat lists are refused with the reason', () => {
     [['fine lens', 'has {objective} brace'], /braces/],
     [['fine lens', 'has } brace'], /braces/],
     [['fine lens', 'has | pipe'], /must not contain "\|"/],
-    [['fine lens', '@finance-controller'], /named personas are not supported yet/],
+    [['fine lens', '@'], /names a persona \("@"\)/],
+    [['fine lens', '@Finance'], /names a persona \("@Finance"\)/],
+    [['fine lens', '@9lives'], /names a persona/],
+    [['fine lens', '@two words'], /names a persona/],
+    [['fine lens', `@a${'b'.repeat(64)}`], /names a persona/],
+    [['@finance-controller', '@Finance-Controller'], /names a persona/],
+    [['@finance-controller', '@finance-controller'], /seat 2 repeats seat 1/],
     [['fine lens', 42], /must be text/],
   ];
   for (const [seats, pattern] of cases) assert.throws(() => normalizeSeats(seats), pattern, JSON.stringify(seats));
   assert.throws(() => normalizeSeats('a|b'), /ordered list/);
   assert.equal(normalizeSeats(['x'.repeat(160), 'abc']).length, 2, '3 and 160 characters are allowed');
+  assert.deepEqual(normalizeSeats([' @finance-controller ', `@a${'b'.repeat(63)}`]), ['@finance-controller', `@a${'b'.repeat(63)}`]);
+});
+
+const persona = (name, text = `name: ${name}\ndescription: ${name} posture\n`) => ({
+  name, tier: 'workspace', source: `fgos/agents/${name}.yaml`, text, digest: `digest-of-${name}`,
+});
+
+test('a named persona seat keeps its order, gets no lens task and is recorded with the pinned text', () => {
+  const finance = persona('finance-controller', 'name: finance-controller\ndescription: weigh {objective} literally\n');
+  const { workflow, provenance } = expandWorkflowSeats(base('group-cognition'), ['first angle', '@finance-controller', 'third angle'], {
+    personas: { 'finance-controller': finance },
+  });
+  const [panel] = workflow.steps[0].units;
+  assert.equal(panel.template.params.members, 3);
+  assert.equal(panel.template.params.roleTasks['panelist-1'], seatTask('first angle'));
+  assert.equal(panel.template.params.roleTasks['panelist-2'], undefined, 'the persona carries the posture; the seat keeps the unit objective');
+  assert.equal(panel.template.params.roleTasks['panelist-3'], seatTask('third angle'));
+  assert.deepEqual(provenance.seats, ['first angle', '@finance-controller', 'third angle']);
+  assert.deepEqual(provenance.personas, [{
+    seat: 'panelist-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml',
+    digest: 'digest-of-finance-controller', text: finance.text,
+  }]);
+  assert.ok(!JSON.stringify(workflow).includes('weigh {objective} literally'), 'persona text is never copied into the definition');
+  assert.doesNotThrow(() => validateWorkflow(JSON.parse(JSON.stringify(workflow))));
+});
+
+test('delphi binds a persona to the same seat in both rounds and the list may be all personas', () => {
+  const personas = { 'a-one': persona('a-one'), 'b-two': persona('b-two') };
+  const { workflow, provenance } = expandWorkflowSeats(base('delphi'), ['@b-two', '@a-one'], { personas });
+  const rounds = workflow.steps.flatMap((step) => step.units).filter((unit) => unit.template.pattern === 'panel');
+  assert.deepEqual(rounds[0].template.params, rounds[1].template.params);
+  assert.deepEqual(provenance.personas.map((p) => [p.seat, p.name]), [['panelist-1', 'b-two'], ['panelist-2', 'a-one']]);
+  assert.equal(Object.keys(rounds[0].template.params.roleTasks).filter((r) => r.startsWith('panelist-')).length, 0);
+});
+
+test('a persona entry that was not resolved is refused, and an inline-only list records no personas', () => {
+  assert.throws(() => expandWorkflowSeats(base('group-cognition'), ['fine lens', '@missing-one'], {}), /names persona "missing-one" but it was not resolved/);
+  assert.equal(expandWorkflowSeats(base('group-cognition'), LENSES, { personas: { unused: persona('unused') } }).provenance.personas, undefined);
 });
 
 test('bases with curated seats or no generic panel are refused with a reason', () => {

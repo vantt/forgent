@@ -2040,7 +2040,16 @@ export async function executeAssignment(assignment, opts = {}) {
     runDir: path.resolve(runDir),
     effectiveContract,
     ...(effectivePolicy.persona
-      ? { persona: { value: effectivePolicy.persona, source: effectivePolicy.provenance?.persona?.source ?? null } }
+      ? {
+        persona: {
+          value: effectivePolicy.persona,
+          source: effectivePolicy.provenance?.persona?.source ?? null,
+          // Text pinned by whoever bound the persona; the renderer reads it instead of a file.
+          ...(effectiveAssignment.policy?.personaPin?.name === effectivePolicy.persona
+            ? { pinnedText: effectiveAssignment.policy.personaPin.text }
+            : {}),
+        },
+      }
       : {}),
   });
 

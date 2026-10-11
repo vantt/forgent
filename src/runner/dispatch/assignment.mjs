@@ -729,7 +729,12 @@ function renderPersonaSection(personaRef, options = {}) {
   const root = options.repoRoot ?? options.cwd ?? process.cwd();
   const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
   let content = null;
-  if (fs.existsSync(personaFile)) {
+  // Text a caller pinned when it bound the persona wins over any file: the same definition
+  // reaches every attempt and every resume, whatever the file says by then.
+  const pinned = options.persona?.pinnedText;
+  if (typeof pinned === 'string') {
+    content = parseSimplePersonaYaml(pinned);
+  } else if (fs.existsSync(personaFile)) {
     const raw = fs.readFileSync(personaFile, 'utf8');
     content = parseSimplePersonaYaml(raw);
   }

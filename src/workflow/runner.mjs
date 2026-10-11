@@ -24,7 +24,8 @@ import {
 import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { expandWorkflowSeats, normalizeSeats, seatedPanelUnits } from './seats.mjs';
+import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
+import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
@@ -175,13 +176,26 @@ function unitPatternOf(template) {
 }
 
 /**
- * The overrides a template implies. `persona` binds that persona on every seat of the unit, as the
+ * The overrides a unit implies. `persona` binds that persona on every seat of the unit, as the
  * `--override` JSON `{"scope":{"unit":"<id>"},"persona":"<name>"}` would; the origin says the
  * Workflow definition set it, not a person at the CLI.
+ *
+ * A `--seats` run also binds each named persona to its own seat of every panel unit, scoped by role,
+ * with the persona text pinned at start. bind() takes the first override whose scope matches, so the
+ * seat entries come ahead of the unit-wide one: the named seat keeps its persona, every other role
+ * (the synthesizer included) falls through to the unit's own.
  */
-function unitOverridesOf(unit) {
+function unitOverridesOf(unit, seatPersonas = []) {
+  const seatScoped = unit.template.pattern === 'panel'
+    ? seatPersonas.map(({ seat, name, digest, text }) => ({
+      scope: { unit: unit.id, role: seat },
+      persona: name,
+      personaPin: { name, digest, text },
+      origin: 'workflow',
+    }))
+    : [];
   const persona = unit.template.persona;
-  return persona ? [{ scope: { unit: unit.id }, persona, origin: 'workflow' }] : [];
+  return [...seatScoped, ...(persona ? [{ scope: { unit: unit.id }, persona, origin: 'workflow' }] : [])];
 }
 
 function gitOk(cwd, args) {
@@ -469,7 +483,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               cwd: unitWorktree,
               worktree: unitWorktree,
               pattern: unitPatternOf(u.template),
-              overrides: unitOverridesOf(u),
+              overrides: unitOverridesOf(u, state.seats?.personas),
               workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
               ...(resumeUnitRunId ? { resumeUnitRunId } : {
                 onUnitRunCreated: (unitRunId) => {
@@ -780,7 +794,14 @@ function resolveStart(params) {
   const contextRefs = normalizeContextRefs(params.contextRefs);
   let seats;
   if (params.seats !== undefined) {
-    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs }));
+    // Names are resolved (and a missing or duplicated one refused) here, before any run exists; the
+    // text found now is what the run pins, so a later edit of the file never reaches it.
+    const personas = {};
+    for (const entry of normalizeSeats(params.seats)) {
+      const name = personaNameOf(entry);
+      if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath });
+    }
+    ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
   }
   const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
   if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
@@ -872,7 +893,7 @@ export function startWorkflowDetached(params = {}) {
  * @param {object} [params.workflow] In-memory workflow object
  * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
  * @param {string} [params.request] The owner's request this run serves; given to every unit
- * @param {string[]} [params.seats] Ordered lenses: rebuild the base with one panel seat per lens (see seats.mjs)
+ * @param {string[]} [params.seats] Ordered entries (lenses or `@name` personas): rebuild the base with one panel seat per entry (see seats.mjs)
  * @param {string} [params.repoRoot]
  * @param {string} [params.cwd]
  * @param {string} [params.worktree]

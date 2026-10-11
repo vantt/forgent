@@ -41,6 +41,16 @@ function publishUnitSummary(unitDir) {
 }
 
 /**
+ * `{ personaPin }` for an assignment policy when an override scoped to this very role bound `persona`
+ * with pinned text, else nothing. Matching on role and name keeps one role's pin from reaching another
+ * role that happens to resolve the same persona name from the capability.
+ */
+function pinnedPersonaFor(overrides, role, persona) {
+  const hit = (overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
+  return hit ? { personaPin: hit.personaPin } : {};
+}
+
+/**
  * Whether this process runs inside a live herdr session: herdr exports HERDR_ENV=1 and the
  * socket path into every pane it starts. A caller that already knows passes
  * `session.herdrPresent` and skips the probe.
@@ -349,6 +359,9 @@ export async function runUnit(options = {}) {
         preferExecutor: bound.executor,
         preferInvocation: bound.invocation,
         preferPersona: bound.persona,
+        // The persona text a caller pinned for this role when it supplied the override: the prompt
+        // renders that text, never a file read again at dispatch time.
+        ...pinnedPersonaFor(unitRecord.overrides, role, bound.persona),
       },
     };
 

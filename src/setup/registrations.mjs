@@ -34,6 +34,7 @@ import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
+import { agentShapeProblem, findAgentDuplicates, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import {
   checkClaudeHook,
@@ -1242,40 +1243,38 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   return problems;
 }
 
+// A name is unique within a tier (fgos/agents, domains/*/agents, core/agents); a higher tier shadows a
+// lower one by whole-file replacement (RUL13). The customer's own tier is also checked for shape.
 function checkAgentTypeNamesUnique(cwd) {
-  const agentFiles = allAgentYamlFiles(cwd);
-  const nameToFiles = new Map();
-  for (const file of agentFiles) {
+  const scan = scanAgentTiers({ projectRoot: cwd });
+  const problems = findAgentDuplicates(scan).map(({ label, name, files }) => `duplicate agent-type name "${name}" in ${label} (${files.join(', ')})`);
+
+  const workspace = scan.find((tier) => tier.tier === 'workspace');
+  const lowerEntries = scan.filter((tier) => tier.tier !== 'workspace').flatMap((tier) => tier.entries);
+  const customizations = [];
+  for (const entry of workspace.entries) {
+    let text;
     try {
-      const text = fs.readFileSync(file.filePath, 'utf8');
-      const nameMatch = text.match(/^name:\s*(\S+)/m);
-      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
-      if (!nameToFiles.has(name)) {
-        nameToFiles.set(name, []);
-      }
-      const relPath = path.relative(cwd, file.filePath);
-      nameToFiles.get(name).push(relPath);
-    } catch {
+      text = fs.readFileSync(entry.file, 'utf8');
+    } catch (error) {
+      problems.push(`${entry.rel} cannot be read (${error.message})`);
       continue;
     }
+    const problem = agentShapeProblem(entry.name, text);
+    if (problem) problems.push(`${entry.rel} ${problem}`);
+    const shadowed = lowerEntries.find((lower) => lower.name === entry.name);
+    customizations.push(shadowed ? `${entry.name} (replaces ${shadowed.rel})` : entry.name);
   }
+  for (const rel of workspace.ignored) problems.push(`${rel} is ignored: only .yaml files are read`);
 
-  const duplicates = [];
-  for (const [name, paths] of nameToFiles.entries()) {
-    if (paths.length > 1) {
-      duplicates.push(`"${name}" (${paths.join(', ')})`);
-    }
-  }
-
-  if (duplicates.length > 0) {
-    return {
-      passed: false,
-      message: `duplicate agent-type name(s) found across core/agents/ and domains/*/agents/: ${duplicates.join('; ')} (D33)`,
-    };
+  if (problems.length > 0) {
+    return { passed: false, message: `agent definitions: ${problems.join('; ')}` };
   }
   return {
     passed: true,
-    message: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',
+    message: customizations.length > 0
+      ? `agent-type names are unique within each tier; fgos/agents holds ${customizations.join(', ')}`
+      : 'agent-type names are unique within each tier (fgos/agents, domains/*/agents, core/agents)',
   };
 }
 
@@ -1442,7 +1441,7 @@ registerCheck({
 
 registerCheck({
   id: 'agent-type-names-unique',
-  description: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',
+  description: 'agent definition names are unique within each tier (fgos/agents, domains/*/agents, core/agents); a higher tier replaces a lower one whole, and fgos/agents files have the shape the renderer needs',
   check: (cwd) => checkAgentTypeNamesUnique(cwd),
 });
 
