@@ -12745,13 +12745,6 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
-    },
-    {
       "claimId": "claim_c1974ba10c18fcb93584e84c68311d05",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
@@ -12768,13 +12761,6 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d28774522afab8bf70f022a2e71ab0c5",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_cc1143308f7b159157e4004197432ee4",
@@ -12805,13 +12791,6 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
       "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
       "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-liveness-rework.json",
-      "receiptCommit": "090840a6c7e941926813efb6d76298d10b1dcd68",
-      "reviewStatus": "pending",
-      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_8b867d968a2f7af6d73eb4c4e2e7233f",

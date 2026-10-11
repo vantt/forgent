@@ -53,5 +53,71 @@
       "reviewStatus": "pending",
       "rationale": "The A25-authorized current truth correction changes this unstable block identity. Preserve original claim_8de909df847b8689807abcfe156b704a as a pending successor decision to claim_c0b3f970980065d2fba32affc5036073 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62, citing authored commit efb60a3ff30c63262c121a2d371557cda7e88a84. Both complete shown texts and digests are retained for independent review; no claim ID or approval is lost."
     }
+  ],
+  "candidateClassifications": [
+    {
+      "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_e9bb00004e75ca737f2eeca58152063d",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_d28774522afab8bf70f022a2e71ab0c5",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_590258ace8cf7e3e45578a33f1db8ca1",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_c0b3f970980065d2fba32affc5036073",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_f2b49dde03982181f6b70e8673696528",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    },
+    {
+      "claimId": "claim_4206c1d35ff143014142819046d69771",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-closure.json",
+      "receiptCommit": "e6c02b00eb74b94ef50a7d8b0e34febc3f86fac2",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "reviewStatus": "pending",
+      "reviewNote": "Current shown text and code evidence require a new independent committed classification verdict; no prior approval carried."
+    }
   ]
 }

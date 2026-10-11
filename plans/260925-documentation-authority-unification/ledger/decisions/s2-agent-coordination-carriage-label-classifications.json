@@ -19,19 +19,6 @@
       "reviewMode": "ordinary"
     },
     {
-      "claimId": "claim_f2b49dde03982181f6b70e8673696528",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
-      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "liveness.mjs: provider-limit emitted for credential/usage screens (evaluateLadder 267-299 incl. early probe at AUTH_PROBE_IDLE_MS=15000, line 84); PANE_FATE provider-limit and paused-limit = keep-always, paneFateFor lets closeAlways turn keep into close but never keep-always (93-109); closeAlways defaults false (transport.mjs:789); result file settles first (238-246). 'Second stage of the sample': herdr-round.mjs:1118-1124 re-calls evaluateLadder with the same prior, so absentStreak is not double counted. Not proven by cited code (non-blocking): 'Operator destructive intent is separate and guarded' - no operator pane-destroy path found in src/runner/dispatch. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics; prior refs: c26b6c81:gap, ad392d3c:gap.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
-      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
-      "reviewMode": "ordinary"
-    },
-    {
       "claimId": "claim_d2ccffd941fae05969fc134130f7237a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
@@ -162,19 +149,6 @@
       "reviewMode": "ordinary"
     },
     {
-      "claimId": "claim_4206c1d35ff143014142819046d69771",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
-      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Heading unit; whole section 68-95 incl. items 1-5 (verified in the block rows and herdr-round.mjs:346-358 ERROR_CLASS_FOR_OUTCOME blocked->worker-timeout, recovery.mjs:105-107 retry) and the closing paragraph. 'retryAfter': nothing in src reads or parses retryAfter (git grep), so 'ladder supplies the screen line, not a timestamp' and 'otherwise absent' hold; 'an adapter may parse' is permissive. Zero-output/35-minute P08 sentence is a dated incident, not code-checkable (liveness.mjs ceiling is absolute: 256-259). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Executor Fallback And Effect Eligibility; prior refs: 4206c1d3:self.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
-      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
-      "reviewMode": "ordinary"
-    },
-    {
       "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
@@ -253,14 +227,6 @@
       "reviewMode": "ordinary"
     },
     {
-      "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
-      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
-    },
-    {
       "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
@@ -337,14 +303,6 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
       "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
       "reviewMode": "ordinary"
-    },
-    {
-      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
-      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
@@ -514,14 +472,6 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
       "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
       "reviewMode": "ordinary"
-    },
-    {
-      "claimId": "claim_8de909df847b8689807abcfe156b704a",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
-      "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_978add6195798b64b599b1a2050ca2b2",
