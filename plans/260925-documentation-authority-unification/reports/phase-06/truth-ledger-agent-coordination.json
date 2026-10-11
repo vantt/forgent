@@ -458,19 +458,23 @@
         "src/runner/dispatch/resolve.mjs:25-66",
         "src/runner/dispatch/resolve.mjs:269-310"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "25ba341466fa9e25e0781e9f1345b4e3747e0426fb22f425328366595691a9c7",
       "priorReviewSection": "Dispatch Control Plane > Component-Internal Ownership",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
-        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+        "commit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
         "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "988f26e393e2e268b09a42bce3ecfaa4404687c961df916c468ec08f0f9ed6d7",
       "targetedChanged": true,
       "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
-      "beforeCarriageLabelFollowupShownTextDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734"
+      "beforeCarriageLabelFollowupShownTextDigest": "c77c9ac742680d242e27e938cb4639de2fedbad83731cea9bc7804b207bd9734",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
@@ -1107,19 +1111,23 @@
         "src/runner/dispatch/liveness.mjs:93-109",
         "src/runner/dispatch/liveness.mjs:238-246"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "870fa30fefb1f699690eeec5b3ba9973bd32fedfd1eff755b1f26adc9b92692d",
       "priorReviewSection": "Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
-        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+        "commit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
         "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "50b5b0b87b09a60e2f5b4e8f04bc6487800595bff29955b6e8ea4f9890a85b12",
       "targetedChanged": true,
       "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
-      "beforeCarriageLabelFollowupShownTextDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163"
+      "beforeCarriageLabelFollowupShownTextDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
@@ -1480,19 +1488,23 @@
         "src/runner/dispatch/proof-helpers.mjs:73-125",
         "src/runner/dispatch/assignment-runner.mjs:999-1022"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "6e392e74988bbfe7d294f5e52354ea67d0ff54ce610a429c2cef63cfd760a687",
       "priorReviewSection": "Runtime Recovery And Work Continuity > 6. Local Concurrency And Durability",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
-        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+        "commit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
         "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "6e392e74988bbfe7d294f5e52354ea67d0ff54ce610a429c2cef63cfd760a687",
       "targetedChanged": true,
       "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
-      "beforeCarriageLabelFollowupShownTextDigest": "0dbc105ed07e7650ce5578efc360ef95ff64fb445697018ffdc0674e76aa4bb2"
+      "beforeCarriageLabelFollowupShownTextDigest": "0dbc105ed07e7650ce5578efc360ef95ff64fb445697018ffdc0674e76aa4bb2",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
@@ -2313,19 +2325,23 @@
         "src/runner/dispatch/execution-contract.mjs:337-384",
         "docs/specs/runner.md:3058"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "b5041b026fa8ecb712fa0264026690ce6c99e52517cb8d9e1e264291a6a6685a",
       "priorReviewSection": "ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Decision",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
-        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+        "commit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
         "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "b2ae4b3442d2ef6e9cea4e516f1491f0fdd7d187b70118897ddeb4af1865d5e7",
       "targetedChanged": true,
       "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
-      "beforeCarriageLabelFollowupShownTextDigest": "73de1c83930c66622cb0c813e1d5eac7d247ef016bf64850ad155b01ab2414f3"
+      "beforeCarriageLabelFollowupShownTextDigest": "73de1c83930c66622cb0c813e1d5eac7d247ef016bf64850ad155b01ab2414f3",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
     },
     {
       "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
@@ -4530,19 +4546,23 @@
         "src/runner/operation-choice.mjs:733-761",
         "src/runner/dispatch/assignment.mjs:328-345"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "fb816315c338c1743053a8726b41a58f17f0b480e7d3b762050613cbd033252e",
       "priorReviewSection": "Coordination Protocol Model > Compatibility",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
-        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+        "commit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
         "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "cfc246f0a3b1c86e4a58ddb2a76655ddd5f20d8c6d973bbcbd41effbea7139c3",
       "targetedChanged": true,
       "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
-      "beforeCarriageLabelFollowupShownTextDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276"
+      "beforeCarriageLabelFollowupShownTextDigest": "21a1dd556a8c10fcc2a3b8aa2149152bacf605c97661681fdc5d3cfd20a1c276",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
     },
     {
       "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
@@ -5109,19 +5129,23 @@
         "src/runner/operation-choice.mjs:747-761",
         "src/runner/dispatch/assignment.mjs:328-345"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "2f53bb9660924f94b45a8be4d630ec157d9f1396de174f8be57841a0bc95e458",
       "priorReviewSection": "Team Communication Protocol V1 > 7. Agent Result Schema",
       "priorIndependentReview": {
-        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-current.md",
-        "commit": "9351a257f718ae8f41545792fda3b477a0616e9e",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+        "commit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
         "verdict": "verified-ok"
       },
       "beforeTargetedFixShownTextDigest": "3d4d430de86be88e3b46f2bf4c66ce2a4c19ab40b2ac64910825d8c7330a4c3c",
       "targetedChanged": true,
       "codeEvidenceCommit": "9351a257f718ae8f41545792fda3b477a0616e9e",
-      "beforeCarriageLabelFollowupShownTextDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a"
+      "beforeCarriageLabelFollowupShownTextDigest": "2f4a6f53fd826569ac2e5e3580a8e8469df16367656a6e25968e6443074fb53a",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -5129,16 +5153,16 @@
       "anchor": "8-runresult-confidence",
       "startLine": 211,
       "endLine": 227,
-      "shownTextDigest": "7aa709fd3f5866327701b3f8c010b77cc7f3db49e7fa7fbbfb7e8db8baf1782e",
+      "shownTextDigest": "3c244cb11cbdbd1b91ecf30ca5c261bd4be3b3a7451dede0d624f5f7d4f33148",
       "status": "verified",
       "classification": "live-runtime",
       "reason": null,
-      "verificationType": "targeted-current-code-correction-with-unchanged-review-context",
+      "verificationType": "A25-code-verified-truth-correction",
       "evidence": [
-        "src/runner/dispatch/run-result.mjs:1245-1330",
-        "src/runner/dispatch/run-result.mjs:1250-1285"
+        "src/runner/dispatch/settlement.mjs:269-280",
+        "src/runner/dispatch/run-result.mjs:1273-1278"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": false,
       "beforeShownTextDigest": "af738b83403692261f546f3655326fd51f066065e7549ce91cb480454f58822f",
       "priorReviewSection": "Team Communication Protocol V1 > 8. RunResult Confidence",
@@ -5150,9 +5174,8 @@
       "beforeTargetedFixShownTextDigest": "af738b83403692261f546f3655326fd51f066065e7549ce91cb480454f58822f",
       "targetedChanged": true,
       "codeEvidenceCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
+      "authorSession": "codex-session:1@2026-10-10",
+      "reviewNote": "Actual shown current text changed under A25; old approval is not carried."
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -5215,17 +5238,15 @@
       "anchor": "101-discovery",
       "startLine": 245,
       "endLine": 264,
-      "shownTextDigest": "e5a545a3ca9ecfbfdf9760677de4025c8632bda8c36d932f8e0fd0b008234c9e",
+      "shownTextDigest": "b883ea8d66ed93289bf2b4f014cfc5e2bfb5218fb116e1bd7c8135cf409d41b7",
       "status": "verified",
       "classification": "normative-obligation",
       "reason": null,
-      "verificationType": "current-code-scope-and-proposal-boundary",
+      "verificationType": "A25-code-verified-truth-correction",
       "evidence": [
-        "domains/coding/workflows/feature.yaml:12-140",
-        "domains/coding/registry.yaml:3-64",
-        "src/workflow/steps.mjs:40-86"
+        "src/intake/discovery.mjs:535-561"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": false,
       "beforeShownTextDigest": "e5a545a3ca9ecfbfdf9760677de4025c8632bda8c36d932f8e0fd0b008234c9e",
       "priorReviewSection": null,
@@ -5234,8 +5255,8 @@
         "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
         "verdict": "verified-ok"
       },
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "authorSession": "codex-session:1@2026-10-10",
+      "reviewNote": "Actual shown current text changed under A25; old approval is not carried."
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
@@ -5383,17 +5404,15 @@
       "anchor": "13-acceptance-criteria-for-v1-protocol",
       "startLine": 333,
       "endLine": 346,
-      "shownTextDigest": "493923b439c600b2ad89e179691475d59df1db5285b3d9b8da184ad647fdb1c1",
+      "shownTextDigest": "def1347614dfe96e65e1d6eccf69ea89118dc841c5ecaeb81a4274f97836b838",
       "status": "verified",
       "classification": "normative-obligation",
       "reason": null,
-      "verificationType": "current-code-scope-and-proposal-boundary",
+      "verificationType": "A25-code-verified-truth-correction",
       "evidence": [
-        "domains/coding/workflows/feature.yaml:12-140",
-        "domains/coding/registry.yaml:3-64",
-        "src/workflow/steps.mjs:40-86"
+        "src/runner/dispatch/run-result.mjs:1273-1278"
       ],
-      "reviewStatus": "reviewed",
+      "reviewStatus": "pending",
       "changed": false,
       "beforeShownTextDigest": "493923b439c600b2ad89e179691475d59df1db5285b3d9b8da184ad647fdb1c1",
       "priorReviewSection": "Team Communication Protocol V1 > 13. Acceptance Criteria For V1 Protocol",
@@ -5402,8 +5421,8 @@
         "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
         "verdict": "verified-ok"
       },
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "authorSession": "codex-session:1@2026-10-10",
+      "reviewNote": "Actual shown current text changed under A25; old approval is not carried."
     },
     {
       "path": "docs/platform/agent-coordination/vision.md",

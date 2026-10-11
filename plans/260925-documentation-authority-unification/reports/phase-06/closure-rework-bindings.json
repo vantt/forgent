@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "authorization": "ae3a742e13e5e84c13a651dd115747e6a50851ac",
+  "passStart": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+  "sourceBindings": [
+    {
+      "claimId": "claim_1c155ab462849e3ec4136ee9fa08a218",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "reason": "Authorized changed target text; pending supersede",
+      "beforeDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "afterDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "anchor": "unheaded-block-38"
+    },
+    {
+      "claimId": "claim_bf7bc8618e95e7e89fdfb50cef192b53",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "reason": "Authorized changed target text; pending supersede",
+      "beforeDigest": "47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae",
+      "afterDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b",
+      "anchor": "13-acceptance-criteria-for-v1-protocol"
+    },
+    {
+      "claimId": "claim_6ed12fe83f43ad052bbcde7a88beee1d",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "reason": "Authorized changed target text; pending supersede",
+      "beforeDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "afterDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "anchor": "unheaded-block-62"
+    },
+    {
+      "claimId": "claim_78524c36c6f57c543377be47620d748c",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "reason": "Authorized changed target text; pending supersede",
+      "beforeDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "afterDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "anchor": "unheaded-block-45"
+    },
+    {
+      "claimId": "claim_a3ced60be2e244d272f2e7db26acf24f",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "reason": "Authorized changed target text; pending supersede",
+      "beforeDigest": "dc81ca680b5d3e5316f7487a46993730e333cf84943141bd6319cde2c0a10304",
+      "afterDigest": "84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6",
+      "anchor": "101-discovery"
+    },
+    {
+      "claimId": "claim_f0435011b158171bddbfd8053eb545be",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "reason": "A25 P12 rework: exact historical clause carrier cited; pending supersede",
+      "carrier": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md#unheaded-block-3",
+      "carrierDigest": "26a57d578e22c5a79a66d676baf496649fc5bd18ff1d4a63863c14a82baf7fe8",
+      "clause": "This retains exclusive-create\nsemantics while avoiding empty-lock and conditional-unlink races seen in P12."
+    },
+    {
+      "claimId": "claim_2ef5d353dab2d57f38906df73e709125",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "reason": "Authorized changed target text; pending supersede",
+      "beforeDigest": "df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e",
+      "afterDigest": "b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7",
+      "anchor": "8-runresult-confidence"
+    }
+  ],
+  "retiredBindings": [
+    {
+      "claimId": "claim_3f53fea4dd48fe710ad03555e0a8cdba",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "101-discovery",
+      "oldTargetDigest": "dc81ca680b5d3e5316f7487a46993730e333cf84943141bd6319cde2c0a10304",
+      "targetDigest": "84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6",
+      "targetAnchor": "101-discovery"
+    },
+    {
+      "claimId": "claim_79a1b5880608e1300cd641c014e2a49f",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "13-acceptance-criteria-for-v1-protocol",
+      "oldTargetDigest": "47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae",
+      "targetDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b",
+      "targetAnchor": "13-acceptance-criteria-for-v1-protocol"
+    },
+    {
+      "claimId": "claim_78f79863a6eafd66861e3199b4a554f0",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "8-runresult-confidence",
+      "oldTargetDigest": "df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e",
+      "targetDigest": "b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7",
+      "targetAnchor": "8-runresult-confidence"
+    },
+    {
+      "claimId": "claim_63156a6026de7a0ff7fbad44aa1b4281",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-34",
+      "oldTargetDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "targetDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "targetAnchor": "unheaded-block-38"
+    },
+    {
+      "claimId": "claim_9a9308ce7c8e42934677d8cb5eabe705",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-41",
+      "oldTargetDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "targetDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8",
+      "targetAnchor": "unheaded-block-45"
+    },
+    {
+      "claimId": "claim_2898e0b9ca684155967180fa0230b8ae",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-64",
+      "oldTargetDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "targetDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
+      "targetAnchor": "unheaded-block-62"
+    },
+    {
+      "claimId": "claim_424bbeb8e8fe53a80b03440fb53ae248",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-35",
+      "oldTargetDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "targetDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "targetAnchor": "unheaded-block-38"
+    }
+  ],
+  "withdrawnReceipts": [
+    {
+      "claimId": "claim_1be365c3dba9fdac9a98c3e70acd5a9f",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "8-runresult-confidence",
+      "beforeDigest": "df9d32cf08bb1d1ad7eeb00936e175005cfd2305b9de8a713672fbc3c690039e",
+      "afterDigest": "b4a0c8d83dd5c194ca589f52e9210e32a294ab6c4fce7f3ac40ea8867aeb6ce7"
+    },
+    {
+      "claimId": "claim_d28774522afab8bf70f022a2e71ab0c5",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "101-discovery",
+      "beforeDigest": "dc81ca680b5d3e5316f7487a46993730e333cf84943141bd6319cde2c0a10304",
+      "afterDigest": "84be6a93f80db7dc09bbb93c6d2f0024071e3ea4aad47923877786fcfadd57b6"
+    },
+    {
+      "claimId": "claim_7bacc65ad2be7cac42a956c5831df76a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "13-acceptance-criteria-for-v1-protocol",
+      "beforeDigest": "47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae",
+      "afterDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b"
+    },
+    {
+      "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-38",
+      "beforeDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "afterDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1"
+    },
+    {
+      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-45",
+      "beforeDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "afterDigest": "f42832dd9d28c44207fbe2744e8b61f1cda6b1f0b4a58c35f949e6909790f2a8"
+    },
+    {
+      "claimId": "claim_8de909df847b8689807abcfe156b704a",
+      "shard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-carriage-label-classifications.json",
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "unheaded-block-62",
+      "beforeDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "afterDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b"
+    }
+  ],
+  "currentSections": [
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "8-runresult-confidence",
+      "beforeShownTextDigest": "7aa709fd3f5866327701b3f8c010b77cc7f3db49e7fa7fbbfb7e8db8baf1782e",
+      "shownTextDigest": "3c244cb11cbdbd1b91ecf30ca5c261bd4be3b3a7451dede0d624f5f7d4f33148",
+      "evidence": [
+        "src/runner/dispatch/settlement.mjs:269-280",
+        "src/runner/dispatch/run-result.mjs:1273-1278"
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "101-discovery",
+      "beforeShownTextDigest": "e5a545a3ca9ecfbfdf9760677de4025c8632bda8c36d932f8e0fd0b008234c9e",
+      "shownTextDigest": "b883ea8d66ed93289bf2b4f014cfc5e2bfb5218fb116e1bd7c8135cf409d41b7",
+      "evidence": [
+        "src/intake/discovery.mjs:535-561"
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "anchor": "13-acceptance-criteria-for-v1-protocol",
+      "beforeShownTextDigest": "493923b439c600b2ad89e179691475d59df1db5285b3d9b8da184ad647fdb1c1",
+      "shownTextDigest": "def1347614dfe96e65e1d6eccf69ea89118dc841c5ecaeb81a4274f97836b838",
+      "evidence": [
+        "src/runner/dispatch/run-result.mjs:1273-1278"
+      ]
+    }
+  ],
+  "p12ClauseProof": {
+    "sourceClaim": "claim_f0435011b158171bddbfd8053eb545be",
+    "sourceContainsClause": true,
+    "carrier": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+    "anchor": "unheaded-block-3",
+    "unitDigest": "26a57d578e22c5a79a66d676baf496649fc5bd18ff1d4a63863c14a82baf7fe8",
+    "carrierContainsClause": true,
+    "clause": "This retains exclusive-create\nsemantics while avoiding empty-lock and conditional-unlink races seen in P12.",
+    "clauseDigest": "3c123e0f0ed8b9e728c1cbded1bbc4931abd7667c210656939ee08de8aef0578",
+    "meaning": "Historical incident/design claim retained verbatim; no current-engine assertion"
+  },
+  "codeEvidence": [
+    {
+      "path": "src/runner/dispatch/settlement.mjs",
+      "startLine": 269,
+      "endLine": 280
+    },
+    {
+      "path": "src/runner/dispatch/run-result.mjs",
+      "startLine": 1273,
+      "endLine": 1278
+    },
+    {
+      "path": "src/intake/discovery.mjs",
+      "startLine": 535,
+      "endLine": 561
+    }
+  ],
+  "reviewStatus": "pending",
+  "noApprovalCarry": true
+}

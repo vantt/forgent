@@ -1372,14 +1372,19 @@
       "targetAnchor": "domain-augmentation",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "Supersede the complete older Domain Augmentation section with its whole current counterpart: the extension list replaces declared protocols with Workflow definitions/operations and domain harnesses while preserving the full extension responsibilities and two-unlike-consumers common-seam condition. These claim-bearing words make the inherited move label false under A23; A24 permits this same-batch label correction. The current and source whole sections are shown for independent verification, with no approval carry.",
-      "reviewNote": "A24 inherited same-batch changed-claim move label corrected; pending independent whole-unit verification.",
+      "reviewNote": "A24 same-batch relabel move->supersede correct: \"declared protocols\" became \"declared Workflow definitions/operations and domain harnesses\"; remaining words and the two-unlike-consumers condition identical. Both whole-section digests recomputed from file (payload and following-block). Consistent with the sibling retired row for the same paragraph (supersede, pending). before=move/reviewed, after=supersede/pending, target digest unchanged.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "719057129311d43f8d206c76a7d74e0e5ba1410de21d3b527729f45561e80ef1",
       "targetAncestry": [
         "Coordination Protocol Model"
-      ]
+      ],
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_b651958d419c963a53013dc032c0a56c",
@@ -1983,13 +1988,8 @@
       "disposition": "supersede",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
-      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
-      "targetUnitDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11",
-      "targetAncestry": [
-        "Runtime Recovery And Work Continuity",
-        "6. Local Concurrency And Durability"
-      ],
+      "rationale": "Supersede current publication/writer assertions by the full docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-19 counterpart. The historical P12 causal clause is retained byte-for-byte by docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md#unheaded-block-3 (unit digest 26a57d578e22c5a79a66d676baf496649fc5bd18ff1d4a63863c14a82baf7fe8): This retains exclusive-create semantics while avoiding empty-lock and conditional-unlink races seen in P12. The current publication, mutable-writer and filesystem-design qualifications remain in the primary counterpart; the P12 clause is explicitly carried as dated history, not as current engine behavior. The whole source/current units plus this exact clause witness are supplied for independent A25 whole-unit review; this is not a bare supersede or a claim that the clause vanished.",
+      "reviewNote": "Label supersede is wrong under the whole-unit rule: the source sentence \"This retains exclusive-create semantics while avoiding empty-lock and conditional-unlink races seen in P12\" (source line 189-190) appears nowhere in the target or elsewhere in the platform doc (grep for P12/conditional-unlink/empty-lock: no hits). The rest is reworded and verified (settlement.mjs:434, proof-helpers.mjs:73-125, settlement.mjs:737,832 for run.json updates, assignment-runner.mjs:1947-1954, no filesystem probe in src). Fix: either relabel partial-carry and record that clause as the remainder, or cite another unit that carries it; do not leave a bare supersede.",
       "shownTargetDigest": "8b0822d6aee06fb803ed5f4d5ee08be2d6971c66153ef18b4707e7cd8f327e11"
     },
     {

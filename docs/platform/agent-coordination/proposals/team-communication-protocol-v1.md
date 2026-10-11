@@ -227,7 +227,7 @@ Confidence ladder:
 | Confidence | Meaning | Allowed use |
 |---|---|---|
 | `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, test artifact, or verified result file. | May feed lifecycle decisions that require proof. |
-| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed findings verdict with a report and exit 0 (`run-result.mjs:1261-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |
+| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |
 | `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |
 | `no-evidence` | Process settled without proof. | Must not advance Work. |
 | `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |
@@ -270,7 +270,7 @@ Allowed behavior:
 Forbidden behavior:
 
 - asking the human directly;
-- parking as `awaiting-human`;
+- the owner parking the item as `awaiting-human` on its own; only the `unclear` verdict's transition advances to exploring and parks the item (`src/intake/discovery.mjs:535-561`);
 - treating a helper's unsupported answer as proof;
 - opening a new Work item just to answer a bounded evidence question.
 
@@ -350,7 +350,7 @@ The protocol is ready for driver adoption when:
 - malformed or missing structured claims cannot produce `verified` or
   `reported`;
 - dirty-before files cannot be counted as post-run evidence;
-- read-only operations can return `reported` only through worker artifacts;
+- read-only done claims can return `reported` only through worker artifacts;
 - mutating operations require post-run external evidence;
 - stage skills agree on when Assignment is used versus direct invocation;
 - `validate-plan` role prose is consistent across skill and task-spec docs;

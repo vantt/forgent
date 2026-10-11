@@ -9212,13 +9212,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "7-agent-result-schema",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Shown target text changed under the authorized citation/wording or full-unit obligation correction; rebound to its real native digest and ancestry, pending independent targeted verification. No approval is carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "supersede. Source minimal schema (v1, nextRecommendedOperation:null) replaced by v2 claim with contract and assessment; the field is now an explicit proposal. Verified: agent-result-claim-contract.mjs:5-30,81-85 (assessment required for reviewer/red-team/recheck), :9-15,67-85 and :70-79; run-result.mjs:1276-1285; assignment.mjs:881-898 and :328-345; operation-choice.mjs:747-761; git grep nextRecommendedOperation in src/core is empty (no consumer). Driver-boundary link anchor exists (workflow-stage-operation.md:78).",
+      "shownTargetDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b4795ed4e9d009f97e13c46b1802463563b2be105e68f19856392ca56c8d8c4f",
       "targetAncestry": [
         "Team Communication Protocol V1"
       ],
-      "shownTargetDigest": "cc9aaee50766d26c7a5bf53b41ac3ed918fdc0c6de50489280857b2d672a7920"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_d645da105a558068961c06e1d47aa9ee",
@@ -9252,30 +9257,30 @@
       "targetAnchor": "unheaded-block-37",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-34 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-34: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim, same ancestry. Old block-34 to block-37 is an ordinal shift (equal digest, equal ancestry). Non-blocking: rationale/reviewNote still cite stale anchor unheaded-block-34.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "f9a43ac823ac553c41f0f8734a247e9e88404201676f68476f9b003961fd475f",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_1c155ab462849e3ec4136ee9fa08a218",
       "sourceUnitDigest": "09432ca4e37e6469053ef9ae2f7931a444dd0b05c9d58a2fe25d34daede483f6",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Whole-unit replacement, not a structural move or promotion: The whole confidence ladder is retained with the exact reported and failed branch qualifications, separate status/confidence and unchanged lifecycle restrictions. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
+      "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-35 source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38. A25 corrects this unit in [\"Team Communication Protocol V1\",\"8. RunResult Confidence\"]: the source/old target wording \"Confidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, tes\" is replaced by the complete current counterpart \"Confidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | Structured claim plus post-run external evidence such as a new commit, new changed file, tes\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "unheaded-block-38",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
-      "targetUnitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "reviewNote": "Actual native target text changed in the authorized truth correction; pending independent review.",
+      "targetUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
@@ -9291,17 +9296,17 @@
       "targetAnchor": "unheaded-block-39",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-36 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-36: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim, same ancestry. Block-36 to block-39 ordinal shift. Still true against run-result.mjs:1278,1280 (done without evidence becomes no-evidence). Non-blocking: rationale cites stale anchor -36.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "9b769b73c2920816c9da55624eb71f9c6704bb633a32db6a0ba27d71aaef2e6a",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_b602d530010f3b2f66ef5485bbff5bcb",
@@ -9313,17 +9318,17 @@
       "targetAnchor": "unheaded-block-40",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-37 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-37: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim, same ancestry. Block-37 to block-40. Non-blocking: rationale cites stale anchor -37.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "45448dcaa1ce69055f61288526e27178ab68b9657ad3c6ea0471592547570269",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "9. Handoff Versus Assignment"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_c37da632abaadd051eff58492f71c8c7",
@@ -9335,17 +9340,17 @@
       "targetAnchor": "unheaded-block-41",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-38 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-38: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim list, same ancestry. Block-38 to block-41. Non-blocking: rationale cites stale anchor -38.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5e110b497e1da92942a6973ad6b43884d4085ad25ae9ee9a6d23c44d8c63b6bd",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "9. Handoff Versus Assignment"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_c52e0d7342545a9365e507c17a99e946",
@@ -9357,17 +9362,17 @@
       "targetAnchor": "unheaded-block-42",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-39 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-39: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim, same ancestry. Block-39 to block-42. Non-blocking: rationale cites stale anchor -39.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "d804ea47af68c0aa6bcdc1058abb3dd934cfe47cfbc766e23bbed4772b98ad1f",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "9. Handoff Versus Assignment"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_f4f513bfd7ca5fd9708005243a624f95",
@@ -9379,17 +9384,17 @@
       "targetAnchor": "unheaded-block-56",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-53 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-53: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim lead-in, same ancestry (section 11). Block-53 to block-56. Non-blocking: rationale cites stale anchor -53.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "99fd2729268c130f3b988b8833fb4ec10dedeb48094339156e687cba619bebb3",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "11. Coordination Operating Harness"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_b165c6ca3702ce5335599867e447ae55",
@@ -9401,17 +9406,17 @@
       "targetAnchor": "unheaded-block-57",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-54 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-54: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim code block; names match coordination-operating-harness.md:85-87 (trace/index.md, current-cell.md, <cell>.md). Block-54 to block-57. Non-blocking: rationale cites stale anchor -54.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "3136bedc9eac77f08874328886bc22baa033ea44009227abad3fe36e05878c8f",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "11. Coordination Operating Harness"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_8b6511ceef7788eaaecfbe1c17de0ccf",
@@ -9423,17 +9428,17 @@
       "targetAnchor": "unheaded-block-58",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-55 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-55: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim; linked ../playbooks/coordination-operating-harness.md exists at pack commit. Block-55 to block-58. Non-blocking: rationale cites stale anchor -55.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "68cb00b63900ec23e263a0a39ed605cf5e1f2a3a841467c8632d7f06e99f4264",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "11. Coordination Operating Harness"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_34510cf59404d2487bd8e2b0859cd859",
@@ -9607,22 +9612,17 @@
       "claimId": "claim_bf7bc8618e95e7e89fdfb50cef192b53",
       "sourceUnitDigest": "47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae",
       "claimKind": "contract",
-      "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "disposition": "supersede",
+      "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol. A25 corrects this unit in [\"Team Communication Protocol V1\"]: the source/old target wording \"## 13. Acceptance Criteria For V1 Protocol\\n\\nThe protocol is ready for driver adoption when:\\n\\n- every runtime assignment receives an explicit result artifact path;\\n- malformed or mi\" is replaced by the complete current counterpart \"## 13. Acceptance Criteria For V1 Protocol\\n\\nThe protocol is ready for driver adoption when:\\n\\n- every runtime assignment receives an explicit result artifact path;\\n- malformed or mi\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "13-acceptance-criteria-for-v1-protocol",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol -> PLAT:proposals/team-communication-protocol-v1.md#13-acceptance-criteria-for-v1-protocol: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "47ede54461f940b4f0cdf6846459520e09e43ff36bc485d69735315112dc0bae",
+      "reviewStatus": "pending",
+      "reviewNote": "Actual native target text changed in the authorized truth correction; pending independent review.",
+      "targetUnitDigest": "da9ea183ddaee37998c3886a5c276b818c388bbe7539b71f37d48090cd69277b",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_033a7b790516e8618c276525412173f8",
@@ -9634,39 +9634,34 @@
       "targetAnchor": "unheaded-block-61",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-64 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-58: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
+      "reviewNote": "move. Verbatim lead-in, same ancestry (section 13). Block-64 to block-61. Non-blocking: rationale and reviewNote cite stale target anchor -58 (actual -61).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "734cc0979352c1a8d01a9e6c05a6fd4d544665459d9c6bdc8a3e71b9622321d5",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "13. Acceptance Criteria For V1 Protocol"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_6ed12fe83f43ad052bbcde7a88beee1d",
       "sourceUnitDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
       "claimKind": "contract",
-      "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-65 is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-59. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "disposition": "supersede",
+      "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-65 source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62. A25 corrects this unit in [\"Team Communication Protocol V1\",\"13. Acceptance Criteria For V1 Protocol\"]: the source/old target wording \"- every runtime assignment receives an explicit result artifact path;\\n- malformed or missing structured claims cannot produce `verified` or\\n  `reported`;\\n- dirty-before files canno\" is replaced by the complete current counterpart \"- every runtime assignment receives an explicit result artifact path;\\n- malformed or missing structured claims cannot produce `verified` or\\n  `reported`;\\n- dirty-before files canno\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
       "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "targetAnchor": "unheaded-block-62",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-65 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-59: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-04.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "reviewStatus": "pending",
+      "reviewNote": "Actual native target text changed in the authorized truth correction; pending independent review.",
+      "targetUnitDigest": "284bb0319c37f14be8fd7cde229ca7f4b89fe56e995d6d2568a3a84c4549440b",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "13. Acceptance Criteria For V1 Protocol"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_697953a12eaab6e9b67367bcfcc7fd2f",

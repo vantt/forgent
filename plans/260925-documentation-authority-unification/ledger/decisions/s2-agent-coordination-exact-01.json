@@ -2491,17 +2491,17 @@
       "targetAnchor": "unheaded-block-16",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "reviewed",
-      "reviewNote": "LEG:architecture/protocol-model.md#unheaded-block-16 -> PLAT:architecture/protocol-model.md#unheaded-block-16: Unit carried unchanged in the matching current section whose text is true against src/workflow and assignment code, except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
+      "reviewNote": "Label move correct: text and ancestry [Coordination Protocol Model > Compatibility] identical, link target docs/platform/agent-coordination/contracts/workflow-stage-operation.md exists. Ordinal anchor block-15 to block-16 is a mechanical rebind.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "1336340eee4a4baf5590bfd842f9ba0d8c3bd0c08e501ed16e6742ede9b06088",
       "targetAncestry": [
         "Coordination Protocol Model",
         "Compatibility"
       ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_1c0b0de71c204a2b67b11243119764a1",
@@ -2554,13 +2554,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
       "targetAnchor": "unheaded-block-18",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "supersede correct: `declared protocols` replaced by `Workflow definitions/operations and domain harnesses`; the rest of the sentence and the two-consumer rule are kept. Replacement matches domains/coding/workflows/feature.yaml and the retired engine (2180b4e72). Block-19 to block-18, same ancestry. The same target unit is also the A24 target of retired claim_a5d7cd08 (different source, no double-owned source).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "55cb6ba79e492af45076c573cbd3a10cbe633ce0684f83856244121df23a3800",
       "targetAncestry": [
         "Coordination Protocol Model",
         "Domain Augmentation"
-      ]
+      ],
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_bbfec57ec238fde3f31a05dce2a811f1",
@@ -3722,13 +3727,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "unheaded-block-12",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "supersede correct: source asserted result-scan precedence and a cancel bar as rules; target restates them as a proposal and adds the current behavior. Cites verified: herdr-reconcile.mjs:351-355 and reconcile-cli-spawn.mjs:38-47 both return `cancel-unsupported` as the first check, before any result scan. `Cancellation bars retry/continuation` is carried by `without admitting another execution`. No uncarried claim.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "eb464ad4bcc6c521f6b0c5d435c1477899f37e122184bdb2e8277b560a3b5e06",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "4. Recovery Choice"
-      ]
+      ],
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_c1e8b4748fe7936ad09f5b92cd914640",

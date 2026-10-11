@@ -10,152 +10,247 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Items 1-8 and forbidden list verified at 3378386db: resolve.mjs:269-310 binds only executor-id, default executor, capability.prefer (aliases/for[] only in resolveCapabilityDetailsFromHints, resolve.mjs:25-100); resolveAssignmentDispatchPolicy assignment-policy.mjs:181, resolveExecutorConfig resolve.mjs:316, decideDispatchMechanism/decideExecutorDispatchMechanism mechanism.mjs:42,82, compileDispatchPlan plan.mjs:45; mergePolicyStack and cohort-planner absent from src; Unit door bind() execution/run.mjs:407, revalidation assignment-runner.mjs:500-528, compile :1419. Boundary tests import-graph.test.mjs:276-308,336-395,434-443 exist. Block is the numbered list only (268-289). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Dispatch Control Plane > Component-Internal Ownership; prior refs: c70a8a1f:gap, 3917668d:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_f2b49dde03982181f6b70e8673696528",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "liveness.mjs: provider-limit emitted for credential/usage screens (evaluateLadder 267-299 incl. early probe at AUTH_PROBE_IDLE_MS=15000, line 84); PANE_FATE provider-limit and paused-limit = keep-always, paneFateFor lets closeAlways turn keep into close but never keep-always (93-109); closeAlways defaults false (transport.mjs:789); result file settles first (238-246). 'Second stage of the sample': herdr-round.mjs:1118-1124 re-calls evaluateLadder with the same prior, so absentStreak is not double counted. Not proven by cited code (non-blocking): 'Operator destructive intent is separate and guarded' - no operator pane-destroy path found in src/runner/dispatch. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics; prior refs: c26b6c81:gap, ad392d3c:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_d2ccffd941fae05969fc134130f7237a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "steps.mjs:52-54 skillForStep reads step.skill then statusSkills; 57-64 taskSpecForStep picks primary or first operation; isLegalStepMove 44-46; operationsForStep 70-86 (cite 67-85 ok). Work driver operation-choice.mjs:733-761 (operations, primary default 745, undeclared refusal 754-761); assignment.mjs:328-345 requires declared legal operation and taskSpec. 'Mandatory, non-weakening' is a normative statement backed by those refusals. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Coordination Protocol Model > Compatibility; prior refs: aa0e4003:gap, a0dbbb85:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_18a3cfd6a8ea03de8c4fedbb261d68ea",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "True: src/runner/definitions and src/coordination do not exist; Workflow operations normalize directly; the 'historical snapshot linked above' exists (protocol-model.md:23 -> history/retired-engine/files/architecture/protocol-model.md, Literal Snapshot at :25). Only residual FlowDefinition mentions are comments (src/setup/registrations.mjs:4064-4081, execution-contract.mjs:200). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Coordination Protocol Model > Standalone Coordination; prior refs: 18a3cfd6:self, 18a3cfd6:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_8583ddde780e3b33f160facfa96d595a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Heading unit; shown text is the whole section (125-167), unit digest recomputed independently. run-lock.mjs:51-61 holder {id,pid,bootId,processStartTime,host}; reclaim table is process-identity.mjs resolveHolderLiveness (run-lock.mjs:69 wrapper): no pid/boot mismatch/dead pid/start-time mismatch -> dead; live pid, unreadable /proc stat, no processStartTime -> held. acquireRunControl run-lock.mjs:306-345 refuses reclaim while held. result.json via publishImmutableProof settlement.mjs:434; proof-helpers.mjs:86-110 fsync, linkSync, EEXIST->false, others rethrown, dir fsync best-effort 73-84; unreadable result refuses relaunch assignment-runner.mjs:1940-1954. Precision only (non-blocking): 'run.json updates ... mutable/marker writers' is exact for status updates (settlement.mjs:737,832) but two run.json patches use plain writeFileSync plus best-effort fsync (assignment-runner.mjs:1777-1781 fallback adoption, 1895-1898 capacity selection). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Runtime Recovery And Work Continuity; prior refs: 8583ddde:self, 8583ddde:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_d8a077877f29a3795a186e52b7c20cb7",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Heading unit: '## Decision' plus the block-5 text (its prefix, verified item by item in the block row) plus item 7. Item 7 is not covered by the block row: its conditional is already satisfied in code (assignment.mjs:938-941 isReadOnlyAssignment reads only .mutation; assignment-normalizer.mjs:19-21; no 'workId === null' clause in src), so the tense reads pending although the retirement happened. Not a false current-state claim; non-blocking staleness. runner.md:3058 is the mutating-gate item (checked). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot; prior refs: d8a07787:self, d8a07787:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_23d876a3d8a3d6065303317b2200500c",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Items 1-6 verified: assignment.mjs:456-459,663-666 stamp versions/validators; run.mjs:337-342 provenance.kind 'unit-run'; normalizer 95-124 (declared tables+fallbacks), 116-144 (resultKind/onAdvance), 164-188 (inline stamp, 173-177 reserved stamp); execution-contract.mjs:180-205 accepted fields (role/budget required 345-347,371-380; tokens telemetry 381-383; policy tier only 361-369,232), 327-335 reserved stamp, unknown fields rejected (assertOnlyAcceptedFields 301); runner.md:3058 is the Unit-run mutating gate; assignment-runner.mjs:500-528 recompute+worktree match. Minor cite looseness: 345-346 is the role check (budget is 371-382); caller validation proper starts 385. No false claim. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot > Decision; prior refs: d04f3528:gap, 90f9d9a8:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4c0c970dae43e8703d7a3cb196d0abff",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "agent-result-claim-contract.mjs: statuses :6, summary :70, blocker for blocked :71, error for failed :72-77, evidenceRefs checked only if supplied :78-80, no reason field for no-evidence. done row: read-only needs a companion report (run-result.mjs:1276-1278, settlement.mjs:312-330; prompt says REQUIRED assignment.mjs:893-896), mutating needs changedFiles (run-result.mjs:1280, settlement.mjs:332-347). Cites 1276-1285 and 881-898 land on those lines. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 7. Agent Result Schema; prior refs: 241d8e8d:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_78039339074d6cb799f0cc05212bc1b2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "domains/coding/workflows/feature.yaml:70-79 declares shape-plan (implementer, primary) and validate-plan (role reviewer); planning step 64-91, units 92-102 inside cited 64-100. Scope statement (no future step needed) is true. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.3 Planning; prior refs: 78039339:self, 94f214f5:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_75b676acfa47fb48346fdb41a14eb88b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Scoping sentence: no src code references trace/current-cell or the harness playbook as a gate (git grep only a code comment); playbook exists (playbooks/coordination-operating-harness.md). Normative, not contradicted. Evidence cited (steps.mjs:40-86) is generic. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 11. Coordination Operating Harness; prior refs: 75b676ac:self, 1ab27a36:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_d8b4cce034d24c66cc78b3b542a08754",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "src/coordination and session-engine are absent; Unit/CollaborationPattern door exists (execution/run.mjs, execution/patterns/{solo,reviewed,panel}); 'harness stays current by owner decision' matches owner-answers.md:86 (item 4). Cited evidence is generic but claim is true. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 12. Standalone Read-Only Coordination; prior refs: d8b4cce0:self, d8b4cce0:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_ad21fc833125360407f6b23ca8a6d951",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Heading unit; shown text is the whole section (262-302) and includes the numbered list verified in the block row plus forbidden list: lifecycle/appendEvent bans are enforced by import-graph.test.mjs:276-308,336-395; no appendEvent under src/runner/dispatch/**; dispatch-log.mjs owns executor.dispatch append (dispatch-log.mjs:1-30); loop.mjs and fanout-batch.mjs exist; work-compat.mjs/operation-choice.mjs exist; cohort-planner absent. Residual: 'exclusively in Work Driver' is a boundary claim, not machine-checked by cited tests. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Dispatch Control Plane; prior refs: ad21fc83:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4206c1d35ff143014142819046d69771",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Heading unit; whole section 68-95 incl. items 1-5 (verified in the block rows and herdr-round.mjs:346-358 ERROR_CLASS_FOR_OUTCOME blocked->worker-timeout, recovery.mjs:105-107 retry) and the closing paragraph. 'retryAfter': nothing in src reads or parses retryAfter (git grep), so 'ladder supplies the screen line, not a timestamp' and 'otherwise absent' hold; 'an adapter may parse' is permissive. Zero-output/35-minute P08 sentence is a dated incident, not code-checkable (liveness.mjs ceiling is absolute: 256-259). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Executor Fallback And Effect Eligibility; prior refs: 4206c1d3:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_ebaa71c8fb1db8ef94dc08f83f51807f",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Heading unit; whole Compatibility section (103-123) = the three blocks (rows for blocks 14/15/16) and the contract link (contracts/workflow-stage-operation.md exists, has Primary Compatibility Path and Driver Boundary). All claims verified as in the block rows. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Coordination Protocol Model; prior refs: ebaa71c8:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_56c5cdf17d45ca7bc8a06b045cd7ef6a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Mandatory/non-weakening verified against operation-choice.mjs:733-761 (legal ops via domain operationsForStep, primary default, undeclared-operation refusal reason 'undeclared-stage-operation-*') and assignment.mjs:328-345 (declared Assignment needs legal operation + taskSpec, throws otherwise); retired engine not referenced (src/coordination absent). Evidence digest identical to its heading's (same section evidence). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Coordination Protocol Model > Compatibility; prior refs: 3817494a:retired.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_747e62e56c75416974d865f34776dc1b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Link sentence; contracts/workflow-stage-operation.md exists (## Contract/Primary Compatibility Path/Driver Boundary). No claim beyond pointing at the contract. Evidence is the section's shared set. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Coordination Protocol Model > Compatibility; prior refs: 747e62e5:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_1c28dede124fbc48e2aed31bcb6bb448",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Second paragraph of section 6 (152-166): result.json via publishImmutableProof (settlement.mjs:434, proof-helpers.mjs:86-110), unreadable result refuses relaunch (assignment-runner.mjs:1940-1954), no unsupported-filesystem probe exists (git grep). Same run.json-writer precision note as the heading row (two plain-write patches at assignment-runner.mjs:1777-1781,1895-1898); 'mutable/marker writers' stays non-false. Design requirements are labelled as such. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Runtime Recovery And Work Continuity > 6. Local Concurrency And Durability; prior refs: ba596951:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_36b0160e2c6b33c6b3b6958486805043",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Heading unit; whole section 7 (171-220) = blocks 33,36 and the frame/ext paragraphs verified in their rows; example claim validates under validateAgentResultClaimContract (v2 contract id, summary, status done, assessment.verdict pass, unknown 'findings' ignored); assessment required for reviewer/red-team/'recheck' operations :21-25,81-86. nextRecommendedOperation has no reader or validator (git grep); the different 'nextOperation' consumed at operation-choice.mjs:748-752 comes from contextSignals/work, not agent-result.json. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1; prior refs: 36b0160e:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_820ca8318df78e7426ab81c938a0d83a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Legal-only recommendation true: operation-choice.mjs:747-761 refuses any requested operation not declared at the step; assignment.mjs:328-345 same at build. 'Do not implement a consumer for the proposed field' true (no nextRecommendedOperation in src/domains/core). Anchor ../contracts/workflow-stage-operation.md#driver-boundary exists (## Driver Boundary). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 7. Agent Result Schema; prior refs: 442970a9:gap.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
@@ -163,55 +258,85 @@
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_d12a88745c6473898f8e3946bfd6a282",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Normative driver rule consistent with code: done claim without evidence settles status/confidence no-evidence (settlement.mjs:324-347,360-366), so treating it as not done is consistent; retry/ask/route options are not code-asserted. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 8. RunResult Confidence; prior refs: d12a8874:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_03e3bf1a24b5712d6df990d5af622dcd",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "handoff = role-axis record: store.mjs:1497-1562 recordCall writes work.handoff (async, holder changes) or work.call-summary (sync, holder untouched) after evaluateHandoff; text claims only that scope. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 9. Handoff Versus Assignment; prior refs: 03e3bf1a:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_97229569942e2e64f1f92b89a23bd513",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Normative selection criteria for Assignment vs handoff; consistent with store.mjs:1497-1562 (handoff has no Run/RunResult) and assignment/Run model. Not a current-behavior claim; no contradiction found. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 9. Handoff Versus Assignment; prior refs: 97229569:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_1c7027aa91b45aed495eaff739ad27a5",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "True that handoff records visibility/holder (store.mjs:1557-1559, no execution evidence); 'not enough evidence once it influences lifecycle' is a normative rule consistent with RunResult requirement. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 9. Handoff Versus Assignment; prior refs: 1c7027aa:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_1fa64800fce6ec3602dc783078b1daef",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Discovery machine-alone is true: feature.yaml:12-31 (skill fgos-coding-discovering, pattern solo), task-specs/judge-ambiguity.md ('machine-alone'). Evidence digest cites only steps.mjs:40-86 (generic); claim holds on feature.yaml/task-spec. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.1 Discovery; prior refs: 1fa64800:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_9ccb2418b7aec6f7f91493359b13f7cb",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "clear->planning, unclear->exploring: feature.yaml:155-156 transitions; nextDiscoveryEdge used at intake/discovery.mjs:513-518,536-541; researcher consult resolve-question role researcher feature.yaml:22-26; task-spec judge-ambiguity table row. Note: the unclear verdict also parks the item awaiting-human (see the 'Forbidden behavior' row). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.1 Discovery; prior refs: 9ccb2418:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
@@ -219,111 +344,176 @@
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_9b3f9c72ffb5b9fbe4bfda4d054139c2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Exploring is human-adjacent: feature.yaml:33-63 (human gate 'Lock decisions for this item?', answer-question dispatch human-only, lock-decisions primary). Cited evidence generic; claim true. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.2 Exploring; prior refs: 9b3f9c72:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_223b98d1f2a5e3b6828b08b8e4370931",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "feature.yaml:38-54: lock-decisions, answer-question (role advisor, human-only), resolve-question (role researcher); 'lock decisions into CONTEXT.md' matches task-specs/lock-decisions.md. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.2 Exploring; prior refs: 223b98d1:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_f842daa15a1440ce53c57b28b577a61d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Normative: exploring may ask a human (answer-question human-only, human gate feature.yaml:61-63); 'only after machine evidence' is a should-rule, not contradicted. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.2 Exploring; prior refs: f842daa1:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_80dd38236997a4794fe26e44e1dcfcad",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "feature.yaml:70-79 shape-plan and validate-plan are the two planning operations that belong to this family (scout-blast-radius/resolve-question exist as helpers; 'two main families' is accurate). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.3 Planning; prior refs: 80dd3823:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_19eb3db5e5020a16b00678f6a1912c64",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "feature.yaml:70-74 shape-plan role implementer (primary); :75-79 validate-plan role reviewer. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.3 Planning; prior refs: 19eb3db5:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_e47495f1bcf3abc217aa128346ffe56b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "True: validate-plan is role reviewer (feature.yaml:75-79; task-specs/validate-plan.md:3 'role: reviewer'). The second sentence is a to-do before adoption; no remaining implementer-only validating prose found in task-specs/validate-plan.md. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.3 Planning; prior refs: e47495f1:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_988e3a8a6c0362f62381f07d896adee4",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Lead-in sentence for the executing role list; executing declares implementer, reviewer, helper and researcher operations (feature.yaml:103-143). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.4 Executing; prior refs: 988e3a8a:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_f97e179a706fe5ce55a5ce146e23fb59",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Roles map to feature.yaml:108-137: implement-item/fix-verify-red implementer, scout-blast-radius/resolve-question researcher, scoped-subtask helper, review-item reviewer; advisor is carried by task-specs/implement-item.md:33 (advise to advisor for a product decision outside locked decisions), not as a feature.yaml operation. Evidence digest cites only steps.mjs:40-86; claim true on feature.yaml/task-spec. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.4 Executing; prior refs: f97e179a:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_b80a6e9ecbbe65bdc1b568c9635c76fe",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Consistent with ADR-006 and the dispatch rules (Assignment must not call Work lifecycle verbs unless task-spec says driver: assignment.mjs:898 prompt line); child Work promotion is by explicit submit. No contradiction. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 10. Coding-Domain Workflow Step Operations > 10.4 Executing; prior refs: b80a6e9e:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_a3282845dc3dfd02de60631741d5f4fa",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Lead-in for the harness artifact list; harness playbook exists and is manual practice (playbooks/coordination-operating-harness.md:85-86 lists trace/index.md and trace/current-cell.md). Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 11. Coordination Operating Harness; prior refs: a3282845:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_c5d72d517bde5f2eadf2afee05649af7",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Fenced txt list of harness artifacts; playbook confirms trace/index.md and trace/current-cell.md (lines 85-86) and review/red-team/live-proof practices. Manual practice, not code. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 11. Coordination Operating Harness; prior refs: c5d72d51:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_5906c3d46cacca0ac1ad8aae963a8304",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Link target ../playbooks/coordination-operating-harness.md exists; 'not runtime infrastructure/lifecycle system' true: no src references to the harness (git grep). Wording, not behavior. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 11. Coordination Operating Harness; prior refs: 5906c3d4:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_d0a734e0e2ffe167a8576cd898e4279d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "Lead-in for acceptance criteria; criteria are conditions, not current-state assertions. Identity: claim id, path, anchor and identity digest match the pinned registry row; heading ancestry Team Communication Protocol V1 > 13. Acceptance Criteria For V1 Protocol; prior refs: d0a734e0:self.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     },
     {
       "claimId": "claim_8de909df847b8689807abcfe156b704a",
@@ -331,15 +521,20 @@
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
       "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewNote": "A25 changed current-unit text; old receipt binds the previously shown text, not this replacement. Fresh native receipt and independent review required."
     },
     {
       "claimId": "claim_978add6195798b64b599b1a2050ca2b2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-carriage-labels.json",
       "receiptCommit": "e3989e217d932ced11b99f40f7cfd9c9097c6c31",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "A24 actual native ID, complete shown text, digest/ancestry and current-code or frame classification require independent targeted review; no old approval is inherited."
+      "reviewStatus": "reviewed",
+      "reviewNote": "One-line label 'For this proposed extension, the legality obligation remains:' (team-communication-protocol-v1.md:211) under 7. Agent Result Schema; it is a real native unit (over 20 non-space characters, so not merged by the short-block rule), introduces no current-runtime claim, and the paragraph it frames (receipt claim_820ca831) carries the proposal boundary; class structural-frame is an existing accepted receipt class (check-doc-inventory-gates.mjs:1010). Digests recomputed independently. No previous references.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-classifications.md",
+      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewMode": "ordinary"
     }
   ]
 }

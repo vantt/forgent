@@ -12,48 +12,63 @@
       "sourceUnitDigest": "732cda65ebd7af7948f6c88b0edff5c2d628edd0c27eda62481934c9cda01e66",
       "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "12-dialogue-response-dialogue-responsemd",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: The full response-trace purpose is replaced by optional manual guidance, explicit absence of a companion-file recovery guarantee and the same authorized-response trace structure. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
+      "reviewNote": "supersede. Source says protocol layer 4 is likely-unwritten and crash recovery needs it; target (platform templates.md section 12) replaces that with optional manual trace and no crash-recovery guarantee. Claim-bearing change, so supersede is right. Cite core/workflows/architecture-advisory.yaml:8-84 checked: framing, shaping, critique, synthesis, explanation, human close gate. git grep for dialogue/ or -response.md in src and core finds nothing, so the no-guarantee claim is true.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "13d5476dee5a0e24b4fad8dd926f3d676fa2c6c2ea16c14a9e60067a6831221a",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates"
       ],
-      "claimKind": "contract",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "Whole-unit replacement, not a structural move or promotion: The full response-trace purpose is replaced by optional manual guidance, explicit absence of a companion-file recovery guarantee and the same authorized-response trace structure. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried."
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_234cfe4ee6319f76a699a920567daac2",
       "sourceUnitDigest": "054c801e9bc4afa2e28220d6e8687e0ed3f5dbcad32d9e4eb97f191b2e14d1b1",
       "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "12-dialogue-response-dialogue-responsemd",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: The whole response-file completeness rule is replaced by an owner-chosen manual convention: short cited replies remain useful, and a missing companion is not a registered completion failure. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
+      "reviewNote": "supersede. Source rule 'every turn gets one; missing file is not complete' is flipped to 'short cited reply is useful; missing companion is not a completion failure'. Whole-unit change. No runtime code requires the file (grep empty).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "13d5476dee5a0e24b4fad8dd926f3d676fa2c6c2ea16c14a9e60067a6831221a",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates"
       ],
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "Whole-unit replacement, not a structural move or promotion: The whole response-file completeness rule is replaced by an owner-chosen manual convention: short cited replies remain useful, and a missing companion is not a registered completion failure. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried."
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_8c81cb12fcc0ff0408e9b5bb594cb1dc",
       "sourceUnitDigest": "5c25ba934123a77f41c1e242b1ef0746ca48edd4794f118dc40112830846a769",
       "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
       "targetAnchor": "12-dialogue-response-dialogue-responsemd",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: The full bad-fill rule retains authorization, scope and the person's words, while an undocumented manual reply is trace loss rather than a registered runtime gate. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
+      "reviewNote": "supersede. Bad-fill unit keeps the first three failure modes verbatim; the 'worst one: no file at all' clause is dropped and replaced by 'undocumented reply loses traceability; not a runtime gate'. Dropped clause is knowingly superseded, target is true against code.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "13d5476dee5a0e24b4fad8dd926f3d676fa2c6c2ea16c14a9e60067a6831221a",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates"
       ],
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "Whole-unit replacement, not a structural move or promotion: The full bad-fill rule retains authorization, scope and the person's words, while an undocumented manual reply is trace loss rather than a registered runtime gate. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried."
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_0b93b00d9997cfc522b58c1c23c32e13",
@@ -1071,16 +1086,21 @@
       "sourceUnitDigest": "a976fc60a3892a75a48cec0a4158ba463d2e0f8acc1346ea6cfb37e196e73c7c",
       "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md",
       "targetAnchor": "what-this-rubric-deliberately-does-not-measure",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-10",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: The whole non-measured rubric list remains, with current shipped Workflow/skill status and same-case advice-quality comparison replacing the future-productization claim. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
+      "reviewNote": "supersede. First four bullets verbatim; 'Protocol conformance' bullet rewritten (future productized panel becomes shipped Workflow/skill). Dropped 'rubric is the thing it must beat' is knowingly superseded. core/workflows/architecture-advisory.yaml and core/skills/fgos-architecture-panel/SKILL.md exist at pack commit.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9324fd893207958e7d4de33a9ec0259955a7107417fcbe9f707b94e0f5439366",
       "targetAncestry": [
         "Architecture Advisory Evaluation Rubric"
       ],
-      "claimKind": "decision",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "Whole-unit replacement, not a structural move or promotion: The whole non-measured rubric list remains, with current shipped Workflow/skill status and same-case advice-quality comparison replacing the future-productization claim. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried."
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     }
   ]
 }

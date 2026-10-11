@@ -5310,14 +5310,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-63",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "supersede correct: Constraints and Fallback rows changed, other five rows unchanged. assignment-policy.mjs:459-461 spreads `opPolicy.constraints` over `requiresSkills` (override); :380-388 records only `cliOverride.fallbackExecutors ?? opPolicy.fallbackExecutors`, reserved-not-executed. Dropped `fail closed if unsatisfied` has no enforcing code (grep of `constraints` in src/runner finds none), so nothing to restore.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1fbaaf88c36de2e7e4edd84567ee5fe71382be4b94cd04f3d9ad0f7b7e38994d",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_5eef231348dcdc9566a29285fce97d59",
@@ -5328,14 +5333,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-64",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Pending independent carriage-label verification after the accepted truth verdict; no earlier approval is carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "supersede correct: `role ... minTier` replaced by `operation ... rigor` and `work.rigor`. Code: assignment-policy.mjs:235-240 applies work.rigor by strongest-wins (rigor.mjs rank low<standard<high<critical). Persona/executor/egress lines unchanged. Nit only: `operation reviewer` names a role, not an operation id (feature.yaml uses validate-plan with policy rigor standard); illustrative example, not a false claim.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "02ee7e3e7835a160002d151febae81ba521e7a0346444890f38df54bdbf0cdaa",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
     },
     {
       "claimId": "claim_38aac4df7d285fdf53ffb4b24a909a4b",
