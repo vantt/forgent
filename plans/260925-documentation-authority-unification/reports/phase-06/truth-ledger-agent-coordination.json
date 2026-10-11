@@ -1125,7 +1125,7 @@
         "src/runner/dispatch/settlement.mjs:290-290",
         "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "870fa30fefb1f699690eeec5b3ba9973bd32fedfd1eff755b1f26adc9b92692d",
       "priorReviewSection": "Executor Fallback And Effect Eligibility > 2. Production Ladder Semantics",
@@ -1140,12 +1140,12 @@
       "beforeCarriageLabelFollowupShownTextDigest": "54250d75257d50afab4cbf4617ddc95bdd2c21fd3fa9d39300f5d2041f3f2163",
       "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
       "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-current.md",
-      "reviewReportCommit": "2e43dd595d91b08f35346ce10d7bd8d47a745a29",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec",
       "closureCorrection": {
         "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
         "authorization": "A27/A28",
-        "reviewRequired": true,
+        "reviewRequired": false,
         "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
       }
     },
@@ -1674,7 +1674,7 @@
         "src/runner/dispatch/settlement.mjs:290-290",
         "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "f9a77e9b9c13ab77bf93ba7acfc2eccca593e2a925ae0a64c653f66baaed6af6",
       "priorReviewSection": null,
@@ -1683,14 +1683,15 @@
         "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
         "verdict": "verified-ok"
       },
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec",
       "closureCorrection": {
         "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
         "authorization": "A27/A28",
-        "reviewRequired": true,
+        "reviewRequired": false,
         "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
-      }
+      },
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -1750,7 +1751,7 @@
         "src/runner/dispatch/settlement.mjs:290-290",
         "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "fa631815341a1035dbfbd08f8c5943e124953969c017a61e654ef3a36de2d8a1",
       "priorReviewSection": "Assignment, Run, And RunResult Contract > Implementation And Design Status",
@@ -1759,14 +1760,15 @@
         "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
         "verdict": "verified-ok"
       },
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec",
       "closureCorrection": {
         "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
         "authorization": "A27/A28",
-        "reviewRequired": true,
+        "reviewRequired": false,
         "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
-      }
+      },
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -1798,7 +1800,7 @@
         "src/runner/dispatch/settlement.mjs:290-290",
         "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": true,
       "beforeShownTextDigest": "516df5144769aade9a7133072917fae83f283c06659c1952197da1fc4d1d33f7",
       "priorReviewSection": "Assignment, Run, And RunResult Contract > Assignment",
@@ -1807,14 +1809,15 @@
         "commit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
         "verdict": "verified-ok"
       },
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec",
       "closureCorrection": {
         "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
         "authorization": "A27/A28",
-        "reviewRequired": true,
+        "reviewRequired": false,
         "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
-      }
+      },
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md"
     },
     {
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -5256,7 +5259,7 @@
         "src/runner/dispatch/settlement.mjs:290-290",
         "src/runner/dispatch/herdr-round.mjs:356-369"
       ],
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "changed": false,
       "beforeShownTextDigest": "af738b83403692261f546f3655326fd51f066065e7549ce91cb480454f58822f",
       "priorReviewSection": "Team Communication Protocol V1 > 8. RunResult Confidence",
@@ -5273,9 +5276,12 @@
       "closureCorrection": {
         "commit": "0ddec07f86f5289a304d6070e27595650625ac7f",
         "authorization": "A27/A28",
-        "reviewRequired": true,
+        "reviewRequired": false,
         "scope": "Only the independently identified correction is newly checked; unchanged assertions retain their prior committed review evidence."
-      }
+      },
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",

@@ -262,10 +262,10 @@
       "targetAnchor": "2-production-ladder-semantics",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "The existing supersede whole-unit carriage decision is retained; the authorized precision/obligation correction changes the shown target bytes, not the source identity or historical carriage. This current counterpart is bound by the frozen native unit digest and real heading ancestry. Exact byte equality and earlier approval are not asserted for the corrected target; the changed binding is pending independent targeted review under A22/A23.",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewNote": "ok. supersede correct: heading unit, native digest binds section; delta since accepted binding is only the herdr-round cite change 346-357 to 356-367 (true at HEAD). Digests and ancestry recomputed.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
         "targetAnchor": "2-production-ladder-semantics",
@@ -275,10 +275,15 @@
       },
       "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_5a75f48c0b4d226df6e8ae2dad84c43f",
@@ -2464,8 +2469,8 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "targetAnchor": "2-production-ladder-semantics",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. supersede correct: blocked and stale-only-screen claims are replaced by the corrected statements, other items carried; delta is the cite fix only. Recomputed.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
         "targetAnchor": "2-production-ladder-semantics",
@@ -2475,10 +2480,15 @@
       },
       "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_06019161f3eadb87a1a6fe714da0d8e6",
@@ -2489,13 +2499,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "targetAnchor": "2-production-ladder-semantics",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. supersede correct: screen-second-stage, pane fate and no-inference-from-idleness carried and cited; delta is the cite fix only. Recomputed.",
       "shownTargetDigest": "a35fb469efa3a059e4b81b4abc4cf83ce4f35ea323bb4a311e8f380003086bdc",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3d95844be204d09682bd0607ce5cc1da692ddb3b700fac27cab45779bdcbddea",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
@@ -3107,12 +3122,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "11-review-finding-resolution-and-limits",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. supersede correct: the typed-unsupported claim is explicitly contradicted; delta is dropping shared mutation door and adding the random-launch and reassign evidence paragraph. Recomputed.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_c4295f45877ba69492d2a2ea9620acf0",
@@ -3123,12 +3143,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "11-review-finding-resolution-and-limits",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. supersede correct: runId-naming and driver-replaced door are replaced by the current identity and fenced reassign; same section delta as claim_358f4471. Recomputed.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_1f7afbbdef971d513de11c3bd40fd5c4",
@@ -3202,12 +3227,17 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "assignment",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. supersede correct (two provenance classes replaced by three kinds); target Assignment section delta is only the added policy and normalizer stamp citations. Recomputed.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_1a54f3db0a30f97f58e3f5bdf48a2f18",
@@ -3218,12 +3248,17 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "assignment",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewStatus": "reviewed",
+      "reviewNote": "ok. supersede correct (list of two sources replaced by three provenance kinds); same Assignment section delta as claim_d9506354. Recomputed.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_b0ed3798ba3d726ad708747bf9f3e417",

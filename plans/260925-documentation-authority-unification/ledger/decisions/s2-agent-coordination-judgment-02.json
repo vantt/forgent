@@ -6342,14 +6342,19 @@
       "targetAnchor": "8-runresult-confidence",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "Supersede the complete docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence source unit with docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#8-runresult-confidence. A25 corrects this unit in [\"Team Communication Protocol V1\"]: the source/old target wording \"## 8. RunResult Confidence\\n\\nRunResult status and confidence are control-plane judgments.\\n\\nConfidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | St\" is replaced by the complete current counterpart \"## 8. RunResult Confidence\\n\\nRunResult status and confidence are control-plane judgments.\\n\\nConfidence ladder:\\n\\n| Confidence | Meaning | Allowed use |\\n|---|---|---|\\n| `verified` | St\". Current evidence: settlement.mjs:269-280, run-result.mjs:1273-1278, or intake/discovery.mjs:535-561 as shown in the section evidence. Changed claim-bearing words require independent whole-unit review; no old approval is carried.",
-      "reviewNote": "Authorized closure truth correction changes the shown target text; independent check required, no approval carried.",
+      "reviewNote": "ok. supersede correct: heading unit whose digest binds the section; delta is the verified row rewrite only. Recomputed.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1d42fd96aef4ef913b24081cda50703c80f418e1431f840a80e82e5bb6a59f1c",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_afb1772a0dd83cd513d09e9dadf17e49",

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "reviewCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec",
+  "reviewer": "reviewer:claude-session:4df9e88c@2026-10-11",
+  "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+  "counts": {
+    "sourceOk": 9,
+    "retiredOk": 9,
+    "gapOk": 6
+  },
+  "notesVerbatim": true,
+  "nativeApplication": "applyReviewVerdicts with ordinaryReview:true; real pinned retired witnesses grafted transiently, no persistent inventory mutation",
+  "sourceShards": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json"
+  ],
+  "holdsUnchanged": [
+    "claim_d6db58a3090422d42154f240f54c9f5a",
+    "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+    "claim_bd4897029d5fdbab80b1b7ccee475e12"
+  ],
+  "nonBlockingNits": "Recorded by the committed reviewer for the next authorized edit, not reopened or edited in this closure application."
+}

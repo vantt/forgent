@@ -17,17 +17,22 @@
       "targetAnchor": "unheaded-block-38",
       "successorClaimId": "claim_b5cc705cc64dd03a1ad6d66f05e98a39",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The authorized verified-confidence correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this original unit at 865ad66bebcc4748341e676bdc5b53a453ce1556 with actual current successor claim_b5cc705cc64dd03a1ad6d66f05e98a39 at docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38. The earlier successor identity remains recorded in identity gaps; original source text and the new target text are shown here. No claim or approval is silently carried.",
       "shownSourceDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
       "shownTargetText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | A structured done claim on a mutating operation plus at least one changed file produced by the run, or a dirty-before file the run mutated (`src/runner/dispatch/settlement.mjs:206-226,290`). | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
       "shownTargetDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
-      "reviewNote": "Authorized confidence truth correction changed the shown successor; no prior approval carries.",
+      "reviewNote": "ok. Identity-gap successor of claim_4c05b748 now claim_b5cc705c at block 38; supersede correct, widens failed-findings to reviewer role and corrects the verified row; no approval carried.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
-      ]
+      ],
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
@@ -101,16 +106,21 @@
       "targetAnchor": "unheaded-block-31",
       "successorClaimId": "claim_f717d716d9d154bd0320605ad788f2af",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_f717d716d9d154bd0320605ad788f2af. Original and successor shown text are retained here; no approval carries.",
       "shownTargetText": "| Findings | Design response |\n|---|---|\n| R01/R02 | Run amendment specifies exact supersession identity, serialized admit/publish, pending declaration recovery and launch reconciliation. |\n| R03 | Section 6 and RunHandle specify no TTL theft, immutable lock generation and pending remote-control handling. |\n| R04/R05/R06 | Retired session continuation design; preserved in the complete historical snapshot, not a current contract. |\n| R07/R08/R09 | Fallback defines one default, ceiling/spawn mapping, budget arithmetic and typed effect eligibility. |\n| R10 | Historical session-policy proof correction; not a current engine implementation claim. |\n| R11/R12/R13 | RunHandle separates liveness/progress, defines transitions/control coverage and one visibility binding source. |\n| R14/R15 | Ownership table, versioned rollout and dependency gates. |",
       "shownTargetDigest": "68f6db1a7638efc58e4d8adc8bda563b8cacec6c1c289d790c9919e7fc78b74b",
+      "reviewNote": "ok. Gap successor claim_f717d716; supersede correct; delta is exactly dropping shared mutation door.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "68f6db1a7638efc58e4d8adc8bda563b8cacec6c1c289d790c9919e7fc78b74b",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "11. Review Finding Resolution And Limits"
       ],
-      "reviewNote": "Pending independent check of the authorized correction and actual successor binding."
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_60bdeefbc7b8a3bee3c9ba06e7759dc4",
@@ -125,16 +135,21 @@
       "targetAnchor": "unheaded-block-33",
       "successorClaimId": "claim_8fc3d7758ba46b4c8878be5ae3f54b60",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_8fc3d7758ba46b4c8878be5ae3f54b60. Original and successor shown text are retained here; no approval carries.",
       "shownTargetText": "The current Herdr launch identity uses normalized\n`fgos-<runId>-<launchCommandId>`, with a persisted random launch command, not\nrunId alone. The standalone reassign action is a fenced controller-epoch\nrecord with a checked authority input; it does not launch a replacement\nworker or execute the retired session `driver-replaced` continuation door.\nEvidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random\nlaunch command; `src/runner/dispatch/confinement/authority.mjs:1608-1629`\nnormalizes and persists its identity. Replacement authority is checked in\n`src/runner/dispatch/recovery-planner.mjs:160-171,204-212`; reassign records\nthe fenced epoch without launching a worker in\n`src/verbs/dispatch/recover.mjs:235-247,382-398`.",
       "shownTargetDigest": "a14c802a8c352309fd3079bcab98c31477502e299dc4d0b24e1097d1efdb0e85",
+      "reviewNote": "ok. Gap successor claim_8fc3d775; supersede correct; delta is exactly the added Evidence paragraph.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a14c802a8c352309fd3079bcab98c31477502e299dc4d0b24e1097d1efdb0e85",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "11. Review Finding Resolution And Limits"
       ],
-      "reviewNote": "Pending independent check of the authorized correction and actual successor binding."
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
@@ -149,16 +164,21 @@
       "targetAnchor": "unheaded-block-4",
       "successorClaimId": "claim_3f9ba37c7158c1b4756d97ad3cf1fefd",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_3f9ba37c7158c1b4756d97ad3cf1fefd. Original and successor shown text are retained here; no approval carries.",
       "shownTargetText": "| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
       "shownTargetDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
+      "reviewNote": "ok. Gap successor claim_3f9ba37c; supersede correct; delta is exactly the 1565-15xx to 1563-1582 cites.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Implementation And Design Status"
       ],
-      "reviewNote": "Pending independent check of the authorized correction and actual successor binding."
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_34a87472629191c59355e5f74ef2c2d2",
@@ -173,16 +193,21 @@
       "targetAnchor": "unheaded-block-9",
       "successorClaimId": "claim_a7fe161ceda021436c44dad7dcf1a3a2",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_a7fe161ceda021436c44dad7dcf1a3a2. Original and successor shown text are retained here; no approval carries.",
       "shownTargetText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/dispatch/assignment.mjs:455-460,663-667`; constants in\n`src/runner/dispatch/execution-contract.mjs:47` and\n`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is\nwritten by `execution/run.mjs:334-338`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
       "shownTargetDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
+      "reviewNote": "ok. Gap successor claim_a7fe161c; supersede correct; delta is exactly the added citations.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Assignment"
       ],
-      "reviewNote": "Pending independent check of the authorized correction and actual successor binding."
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     },
     {
       "claimId": "claim_e9bb00004e75ca737f2eeca58152063d",
@@ -197,16 +222,21 @@
       "targetAnchor": "unheaded-block-38",
       "successorClaimId": "claim_b5cc705cc64dd03a1ad6d66f05e98a39",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_b5cc705cc64dd03a1ad6d66f05e98a39. Original and successor shown text are retained here; no approval carries.",
       "shownTargetText": "Confidence ladder:\n\n| Confidence | Meaning | Allowed use |\n|---|---|---|\n| `verified` | A structured done claim on a mutating operation plus at least one changed file produced by the run, or a dirty-before file the run mutated (`src/runner/dispatch/settlement.mjs:206-226,290`). | May feed lifecycle decisions that require proof. |\n| `reported` | A blocked claim, even without a companion report; or a read-only done claim with a worker report; or a failed claim from a reviewer/red-team role or with a findings verdict, with a worker report, exit 0 and no timeout (`settlement.mjs:269-280`; `run-result.mjs:1273-1278`). | May feed driver judgment, but should not close mutating work; status remains separate from confidence. |\n| `inferred` | Post-run external evidence exists but no structured claim exists. | May be surfaced for inspection; driver should avoid automatic lifecycle movement. |\n| `no-evidence` | Process settled without proof. | Must not advance Work. |\n| `failed` | Timeout, nonzero exit, signal, invalid claim, read-only mutation, or a failed claim not qualifying for the reported findings branch (`run-result.mjs:1250-1271`). | Must not advance Work; an explicit failure is not always failed confidence. |",
       "shownTargetDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
+      "reviewNote": "ok. Gap successor claim_b5cc705c; supersede correct; delta is exactly the verified-row rewrite.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
+      "reviewedAt": "2026-10-11",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-fixes.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fceb7268243db222d91bb44cad7ba6f8295cd93894435623b133687f80bda457",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "8. RunResult Confidence"
       ],
-      "reviewNote": "Pending independent check of the authorized correction and actual successor binding."
+      "reviewReportCommit": "9aa37b12a329abd16900dad73ab98408e6ef3aec"
     }
   ],
   "candidateClassifications": [
