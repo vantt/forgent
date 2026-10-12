@@ -145,7 +145,8 @@ mod tests {
         let temp_dir = std::env::temp_dir().join(format!(
             "fgos_test_extract_{}_{}",
             std::process::id(),
-            extra_path.replace(['/', '.'], "_")
+            // Any character a Windows path segment cannot hold (`:`, `\`, ...) becomes `_`.
+            extra_path.replace(|c: char| !c.is_ascii_alphanumeric(), "_")
         ));
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();

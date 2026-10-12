@@ -30,6 +30,9 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The convention check reads history, so a shallow clone would skip it.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
