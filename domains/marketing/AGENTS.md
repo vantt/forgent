@@ -11,7 +11,7 @@ Draft personas for sales, marketing and content questions of a small operator. N
 | `buyer-channel-skeptic` | Real buyer pain, first niche, first channel |
 | `solo-capacity-checker` | One person's load: sell, deliver, maintain, make content |
 
-Use them on a panel seat as `--seats "@value-chain-strategist|@offer-pricing-critic|@buyer-channel-skeptic"`. Names are copied from the file names; a persona carries posture and a decision boundary, never facts, so pair seats with `--context-ref` documents.
+List what is installed with `fgos agents list`. Use them on a panel seat as `--seats "@value-chain-strategist|@offer-pricing-critic|@buyer-channel-skeptic"`. Names are copied from the file names; a persona carries posture and a decision boundary, never facts, so pair seats with `--context-ref` documents.
 
 ## Make it yours (no manifest, only folders)
 

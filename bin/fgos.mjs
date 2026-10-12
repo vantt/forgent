@@ -2191,7 +2191,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // --foreground keeps the run in this process until it completes, fails, or parks.
         const startWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         const started = foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams);
-        return attachDirWarning(seatsPreflight?.warnings.length ? { ...started, seatsPreflight } : started, startWarning);
+        // What the start pinned, stated before the first seat spends anything (see src/workflow/ref-digests.mjs).
+        const { seatsEcho } = await import('../src/workflow/ref-digests.mjs');
+        const echoed = started.seats ? { ...started, seatsEcho: seatsEcho(started.seats) } : started;
+        return attachDirWarning(seatsPreflight?.warnings.length ? { ...echoed, seatsPreflight } : echoed, startWarning);
       }
       if (sub === 'status') {
         const { statusWorkflow } = await import('../src/workflow/index.mjs');
@@ -3708,6 +3711,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // missing (absent capability is a fact to report, never a CLI error);
     // `query` merges the two (config-declared tools + local overlay) at
     // read time.
+    // Read-only listing of the personas a `--seats "@name"` seat can name; a pure read of the
+    // three definition tiers (src/runner/agent-listing.mjs), no store and no event.
+    case 'agents': {
+      const sub = requireField(positional[0], 'agents requires a sub-verb: fgos agents list');
+      if (sub !== 'list') throw new StoreError('validation', `unknown agents sub-verb "${sub}". Usage: fgos agents list`);
+      const { listAgents } = await import('../src/runner/agent-listing.mjs');
+      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;
+      return { projectRoot, ...listAgents({ projectRoot }) };
+    }
     case 'tool': {
       const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
       const repoRoot = path.dirname(dir);

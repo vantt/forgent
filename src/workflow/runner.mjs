@@ -25,6 +25,8 @@ import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } from './seats.mjs';
+import { digestContextRefs } from './ref-digests.mjs';
+import { seatProviders } from './seat-providers.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
@@ -802,6 +804,7 @@ function resolveStart(params) {
       if (name !== null) personas[name] = resolveAgentDefinition(name, { projectRoot: worktreePath });
     }
     ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas }));
+    seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };
   }
   const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
   if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
@@ -949,7 +952,9 @@ export function statusWorkflow(workflowRunId, options = {}) {
     throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
   }
   const state = projectWorkflowState(events);
-  return { ...state, advance: advanceReport(workflowRunDirOf(mainRoot, workflowRunId), workflowRunId, state, events) };
+  // A seated run also says who actually served each seat; an unseated run's status is unchanged.
+  const served = state.seats ? { seatProviders: seatProviders(state) } : {};
+  return { ...state, ...served, advance: advanceReport(workflowRunDirOf(mainRoot, workflowRunId), workflowRunId, state, events) };
 }
 
 /**

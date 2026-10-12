@@ -35,6 +35,7 @@ import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-di
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { agentShapeProblem, findAgentDuplicates, scanAgentTiers } from '../runner/agent-definitions.mjs';
+import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import {
   checkClaudeHook,
@@ -1252,6 +1253,7 @@ function checkAgentTypeNamesUnique(cwd) {
   const workspace = scan.find((tier) => tier.tier === 'workspace');
   const lowerEntries = scan.filter((tier) => tier.tier !== 'workspace').flatMap((tier) => tier.entries);
   const customizations = [];
+  const notes = [];
   for (const entry of workspace.entries) {
     let text;
     try {
@@ -1262,19 +1264,30 @@ function checkAgentTypeNamesUnique(cwd) {
     }
     const problem = agentShapeProblem(entry.name, text);
     if (problem) problems.push(`${entry.rel} ${problem}`);
+    // Keys the renderer drops are not an error (the file still seats); they are said here because
+    // nothing else says it, and a persona that silently loses its voice or boundary is a failure.
+    for (const warning of agentRenderWarnings(text)) notes.push(`${entry.rel}: ${warning}`);
     const shadowed = lowerEntries.find((lower) => lower.name === entry.name);
     customizations.push(shadowed ? `${entry.name} (replaces ${shadowed.rel})` : entry.name);
   }
   for (const rel of workspace.ignored) problems.push(`${rel} is ignored: only .yaml files are read`);
 
+  // A project that ships its own domains/ or core/agents/ is read there instead of the install, so the
+  // installed definitions it lacks cannot be seated; this is reported, not failed, because a project may
+  // choose that.
+  for (const hidden of listAgents({ projectRoot: cwd }).masked) {
+    notes.push(`installed persona "${hidden.name}" (${hidden.source}) is hidden by ${hidden.hiddenBy}; copy it there or into fgos/agents to seat it`);
+  }
+
   if (problems.length > 0) {
     return { passed: false, message: `agent definitions: ${problems.join('; ')}` };
   }
+  const tail = notes.length > 0 ? `; warning: ${notes.join('; ')}` : '';
   return {
     passed: true,
-    message: customizations.length > 0
+    message: (customizations.length > 0
       ? `agent-type names are unique within each tier; fgos/agents holds ${customizations.join(', ')}`
-      : 'agent-type names are unique within each tier (fgos/agents, domains/*/agents, core/agents)',
+      : 'agent-type names are unique within each tier (fgos/agents, domains/*/agents, core/agents)') + tail,
   };
 }
 

@@ -74,18 +74,24 @@ does not govern the delegated architecture route, which keeps the hook table of
      braces and no `|`, for example "cash flow and payback over 36 months", not
      a role to act ("act as the CFO") and not a standard or a fact the person
      did not give. An entry may instead be `@name`, a named persona that
-     applies to that seat only. Before you use one, list what exists: the
-     `*.yaml` files in `fgos/agents/` (the person's own definitions), then
-     `domains/*/agents/`, then `core/agents/` of the project (a project that has
-     no `core/agents/` of its own reads the installed set, which you cannot
-     list from there: use only names you saw). Read each file's `description`
-     and `decision_boundary`, pick a persona only when it plainly fits the
-     person's concern, and write its name exactly as the file name without
+     applies to that seat only. Before you use one, run `fgos agents list`: it
+     reads the project's own definitions (`fgos/agents/`), then `domains/*/agents/`,
+     then `core/agents/`, falling back to the installed set when the project has
+     none of its own, and prints each name with its tier and description. Use only
+     names it lists; a name under `masked` is hidden by the project's own folder and
+     cannot be seated. Read each description and `decision_boundary`, pick a
+     persona only when it plainly fits the person's concern, and write its name
+     exactly as listed, without
      `.yaml`. Never invent or guess a name, never write a persona file, and
      never put one persona on two seats. A start with an unknown or duplicated
      name is refused and creates no run. Pair the lenses with `--context-ref` documents about the domain
-     (policies, data, standards the person named or that sit plainly in scope);
-     every seat and checker receives them. If the request supports fewer than two
+     (policies, data, standards the person named, `fgos/knowledge/**/*.md` of the
+     project that plainly bears on the request, or anything else in scope); every
+     seat and checker receives them. Keep them to about six short documents and
+     point at an excerpt for a long one, because each seat reads every ref. The
+     start prints what it pinned (personas, and a count and byte total of the refs,
+     digested at start only): relay that line, and say that the documents may reach
+     several external providers (`fgos workflow status` lists which ran each seat). If the request supports fewer than two
      distinct angles, omit `--seats`: the base runs as registered. Never use
      `--seats` on `council-lite`, `architecture-advisory` or any preset (they
      carry their own seats; the start is refused).

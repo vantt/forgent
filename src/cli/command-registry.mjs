@@ -1416,6 +1416,26 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'agents',
+    invoke: 'fgos agents',
+    description: 'Personas a panel seat can name with `--seats "@name"`: "list" shows every definition the seat lookup can find from the project (fgos/agents, then domains/*/agents, then core/agents; the first tier holding a name wins), the tier it comes from, the one-line description, any key the renderer would drop, and the installed definitions that the project\'s own domains/ or core/agents/ folder hides. Read-only.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['list'] },
+        worktree: { type: 'string', description: 'Project root to read from; defaults to the git worktree of the current directory.' },
+      },
+      positional: ['sub'],
+      required: ['sub'],
+    },
+    examples: ['fgos agents list'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'setup',
     invoke: 'fgos setup',
     description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init (it needs --from <source> when .fgos/distribution.json is absent), then local fgos doctor --fix and fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write. Shell/global setup compatibility stays here until a compatibility-window decision retires it.',

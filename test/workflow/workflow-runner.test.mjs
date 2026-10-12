@@ -1746,6 +1746,10 @@ test('workflow start --seats through the real CLI stores the expanded definition
   assert.equal(status.seats.baseId, 'seat-base');
   assert.match(status.seats.baseDigest, /^[0-9a-f]{64}$/);
   assert.deepEqual(status.seats.refs, ['docs/note.md']);
+  assert.deepEqual(status.seats.refDigests, [{ ref: 'docs/note.md', sha256: crypto.createHash('sha256').update('# Domain note\n').digest('hex'), bytes: 14 }], 'the document is digested at start');
+  assert.deepEqual(state.seatsEcho.refs, { count: 1, totalBytes: 14, unreadable: [] }, 'the start echoes what it pinned');
+  assert.deepEqual(state.seatsEcho.personas, [], 'lenses carry no persona');
+  assert.ok(status.seatProviders.length >= 3 && status.seatProviders.every((row) => typeof row.executor === 'string'), 'status says which executor served each seat');
   assert.deepEqual(status.workflow.steps[1].units[0].template.contextRefs, ['docs/note.md'], 'the shared ref is copied to the step run-level refs cannot reach');
   const startEvent = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0];
   assert.deepEqual(startEvent.payload.workflow.steps[0].units[0].template.params, panel.params);
