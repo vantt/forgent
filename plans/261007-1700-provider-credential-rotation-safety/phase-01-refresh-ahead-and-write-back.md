@@ -128,6 +128,7 @@ executeAssignment
 
 - **Scratch renewal redeems P1 and then the apply fails** (crash between): the scratch copy holds the only good pair; it stays in the account directory and the next lock holder applies it. Signal: leftover scratch found. Response: apply, then remove.
 - **The owner's CLI renews the source concurrently by itself** (it was inside its own 5-min window): both redeem P1 → one refused. Same exposure as today, made rarer because fgOS renews at ≤ threshold, long before the CLI's own window.
+- **Refresh-ahead spends the token a running pane still holds** (accepted, not fixed): a pane that copied the login just outside the window holds the refresh token a later dispatch redeems inside the window; that pane's own renewal is then refused and write-back cannot help. No worse than today; sizing `thresholdMs` above the longest pane would shrink it.
 - **Codex interval unknown**: fall back to JWT `exp`; Codex then still renews inside copies at its interval → write-back covers it.
 - **`VACUUM INTO` cost** on each confined omp dispatch: agent.db is ~170 KB; negligible.
 - **Rollback**: stop passing the function (one line per caller). The `VACUUM INTO` copy and the omp probe branch are independent fixes; revert separately if needed. New persisted state: the account-lock directory with pending/scratch/cooldown files.

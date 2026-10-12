@@ -875,3 +875,22 @@ test('an unlock probe that cannot get the account lock in time reports that and 
   assert.equal(tried.every((t) => t.unlocked === false), true);
   holders.forEach((h) => h.release());
 });
+
+test('the unlock probe can report its child, which is recorded in the account lock record', async () => {
+  const { runtimeDir, config } = lockedAccountFixture();
+  let recorded = null;
+  const tried = await probeQuarantinedAccounts({
+    runnerConfig: config,
+    provider: 'openai-codex',
+    runtimeDir,
+    probe: async ({ accountId, onSpawn }) => {
+      onSpawn({ pid: process.pid });
+      const lockDir = path.join(providerAccountDir(runtimeDir, 'openai-codex', accountId), 'lock');
+      const file = fs.readdirSync(lockDir).filter((n) => /^\d+\.json$/.test(n)).sort().pop();
+      recorded = JSON.parse(fs.readFileSync(path.join(lockDir, file), 'utf8')).child;
+      return { ok: true };
+    },
+  });
+  assert.equal(tried[0].unlocked, true);
+  assert.equal(recorded.pid, process.pid);
+});

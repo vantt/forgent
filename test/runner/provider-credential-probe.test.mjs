@@ -122,3 +122,12 @@ test('a dead login named at the end of a long output is still seen, so the accou
   assert.equal(result.ok, false);
   assert.match(result.detail, /still rejected/);
 });
+
+test('the probe tells its caller about the child it started', async () => {
+  const { spawnFn } = fakeSpawn({ output: 'OK' });
+  const pids = [];
+  const wrapped = (...args) => { const child = spawnFn(...args); child.pid = 777; return child; };
+  const result = await createCredentialProbe({ spawnFn: wrapped, env: {} })({ account: { credentialSource: piSource }, onSpawn: (child) => pids.push(child.pid) });
+  assert.equal(result.ok, true);
+  assert.deepEqual(pids, [777]);
+});

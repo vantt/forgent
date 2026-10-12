@@ -1350,6 +1350,31 @@ test('with a renewal function, a confined launch renews the login of the account
   assert.deepEqual(calls[0].credentialSource, { kind: 'codex-home', home: path.join(tempDir, 'codex-home') });
 });
 
+test('a renewal that did not leave the login fresh is reported on stderr by code; a quiet outcome is not', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+  const outcomes = [{ status: 'failed', reason: 'probe-failed' }, { status: 'fresh', reason: 'outside-window' }, { status: 'skipped', reason: 'unsupported-layout' }];
+  const lines = [];
+  const realWrite = process.stderr.write;
+  try {
+    for (const [index, outcome] of outcomes.entries()) {
+      process.stderr.write = (chunk) => { lines.push(String(chunk)); return true; };
+      await executeAssignment(
+        buildAssignment({ work: { id: `tsk-renew-report-${index}`, status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+        {
+          cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir,
+          cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+          providerCredentialRenew: async () => outcome,
+        },
+      );
+      process.stderr.write = realWrite;
+    }
+  } finally { process.stderr.write = realWrite; }
+  const reported = lines.filter((l) => l.includes('credential refresh-ahead'));
+  assert.equal(reported.length, 1);
+  assert.match(reported[0], /openai-codex\/codex-acct: failed \(probe-failed\)/);
+});
+
 test('a renewal function that throws never fails the dispatch, and an unconfined launch never calls it', async () => {
   const tempDir = mkTempDir();
   const confined = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });

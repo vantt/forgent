@@ -46,3 +46,20 @@ Confirmed from openai/codex `codex-rs/login/src/auth/manager.rs`: `const TOKEN_R
 - Account lock directories grow one small record per acquisition, same trade-off as the state lock (documented there).
 - GitNexus impact analysis: `fgos tool query --capability impact-analysis --status present` returned 0 providers (inactive); callers were found with grep (4 callers of the probe option, 3 removal paths).
 - Phase file status not updated (not in the file list).
+
+## Fix round
+
+Decisions by the Lead applied as given. Review: `code-review-261013-credential-rotation-implementation.md`.
+
+| Finding | Change | Test (`provider-credential-renewal.test.mjs` unless noted) |
+|---|---|---|
+| H1 write-back / leftovers dropped a later-but-expired login | Apply rule is now: strictly later expiry AND refresh token differs (in-memory compare, null counts as differs). `requireFuture` only for a fresh scratch result; write-back (`copyIsNewer`) and leftovers (`applyLeftovers`) apply without it. A copy with the source's own refresh token is never applied. | retained home removed after renewed access expired -> applied; staged copy past expiry applied only with `requireFuture: false`; leftover scratch with same refresh token and later-looking expiry never applied and removed; call that keeps the refresh token -> `not-renewed`, source byte-equal |
+| H2 window/judgement over all entries | `selectProviderEntry`: single oauth entry, else owner (pi key, omp row provider, Codex single) equal to provider or `<provider>-` prefix; zero/several -> `skipped: entry-unidentified`. Window, mark-due, apply and leftover/write-back all use that one key. | unrelated expired entry (pi, omp) -> no spawn; omp `xai-oauth` row matched, other row neither made due nor applied; several/none -> skipped, lone entry used |
+| M1 detached child outlives runner | Probe command wrapped in `timeout --kill-after=5 <s>` resolved on PATH (`withKillTimeout`); in-process timer kept; unwrapped when `timeout` absent. | wrapped args asserted; `PATH` without timeout -> plain `pi` |
+| M3 silent raw copy | Node:sqlite present + snapshot failure -> plain copy plus one stderr line `credential-snapshot-failed` (file name only). | failing sqlite stub: copy made, one line, no path |
+| L1 unlock probe child not recorded | `probeQuarantinedAccounts` passes `onSpawn` recording the child in the account lock; `createCredentialProbe` forwards it. | `provider-capacity.test.mjs` (child pid in lock record), `provider-credential-probe.test.mjs` |
+| L2 outcome invisible | `assignment-runner` writes `fgos: credential refresh-ahead <provider>/<account>: <status> (<reason>)` unless `fresh` or `skipped:unsupported-layout`. | `assignment-dispatch.test.mjs` |
+| M2 | No code. One sentence added to RUL75 in `runner.md` (item 5) and to phase-01 Risk Assessment. | - |
+| L3 | No change. | - |
+
+Not done: the review's suggestion of a provider/model argument on the probe call (decision H2 only scopes the entry; the probe still uses the CLI default model, so a store whose default model belongs to another provider can still renew nothing for the dispatched provider, reported as `not-renewed` with cooldown).

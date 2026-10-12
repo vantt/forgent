@@ -98,9 +98,9 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
 
 /** A probe function for `probeQuarantinedAccounts`. `spawnFn` is injectable for tests. */
 export function createCredentialProbe({ spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
-  return async function probeCredential({ account }) {
+  return async function probeCredential({ account, onSpawn }) {
     const plan = credentialProbeCommand(account?.credentialSource);
     if (!plan) return { ok: false, detail: 'no probe exists for this credential layout' };
-    return runCredentialProbe(plan, { spawnFn, timeoutMs, env });
+    return runCredentialProbe(plan, { spawnFn, timeoutMs, env, onSpawn });
   };
 }

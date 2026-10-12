@@ -118,7 +118,7 @@ function fakeSpawn({ layoutName, behaviour, output = 'OK', exitCode = 0, delayMs
   const starts = [];
   const spawnFn = (command, args, options) => {
     const homeDir = options.env.PI_CODING_AGENT_DIR ?? options.env.CODEX_HOME;
-    starts.push({ command, homeDir, pid: 424242 + starts.length });
+    starts.push({ command, args, homeDir, pid: 424242 + starts.length });
     onStart?.(homeDir);
     const child = new EventEmitter();
     child.pid = 424242 + starts.length - 1;
@@ -818,5 +818,176 @@ test('no token string appears in any result, cooldown record, lock record, marke
     for (const text of everything) {
       for (const fragment of FAKE_FRAGMENTS) assert.equal(text.includes(fragment), false, `a token fragment leaked: ${fragment}`);
     }
+  } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// A copy renewed earlier is applied by its refresh token, not by whether its access token is still good
+// ---------------------------------------------------------------------------------------------------
+
+test('a retained home removed after its renewed access token expired still writes the newer refresh token back', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const dir = privateHomeWithRenewedLogin(w, { accountHomeExpiryMs: now - 3 * HOUR });
+    renewHome('pi', dir, { expiresMs: now - 10 * 60 * 1000 }); // renewed in the pane, and expired again since
+    assert.equal(cleanupConfinementResource(dir, 'disp_wb').cleaned, true);
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh, 'the source no longer holds the spent token');
+  } finally { w.cleanup(); }
+});
+
+test('a staged copy applied after its access token expired is applied, while a fresh renewal result must still be in the future', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writePi(w.home, piDoc(now - 5 * HOUR));
+    const copy = path.join(w.tmp, 'copy');
+    writePi(copy, piDoc(now - 2 * HOUR, { refresh: FAKE.newRefresh }));
+    const base = { layoutName: 'pi-auth-json', sourceHome: w.home, copyHome: copy, provider: 'xai' };
+    assert.equal(applyRenewedCredential({ ...base }).status, 'unchanged', 'a fresh renewal that is already expired renewed nothing');
+    assert.equal(applyRenewedCredential({ ...base, requireFuture: false }).status, 'applied');
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
+  } finally { w.cleanup(); }
+});
+
+test('a leftover scratch copy whose call never ran (same refresh token, expiry that merely looks later) is never applied', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writePi(w.home, piDoc(now + 5 * HOUR));
+    const original = sha(path.join(w.home, 'auth.json'));
+    writePi(path.join(w.accountDir, 'scratch-1-1'), piDoc(now + 8 * HOUR)); // same refresh token as the source
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.equal(result.status, 'fresh');
+    assert.equal(starts.length, 0);
+    assert.equal(sha(path.join(w.home, 'auth.json')), original);
+    assert.equal(fs.existsSync(path.join(w.accountDir, 'scratch-1-1')), false, 'the useless copy is removed');
+  } finally { w.cleanup(); }
+});
+
+test('a call that leaves the refresh token as it was renewed nothing, whatever the expiry says', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const original = sha(path.join(w.home, 'auth.json'));
+    const { spawnFn } = fakeSpawn({
+      behaviour: (dir) => { const doc = readPi(dir); doc.xai.expires = Date.now() + 6 * HOUR; writePi(dir, doc); },
+    });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'failed', reason: 'not-renewed' });
+    assert.equal(sha(path.join(w.home, 'auth.json')), original);
+  } finally { w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Only the dispatched provider's entry counts
+// ---------------------------------------------------------------------------------------------------
+
+test('an expired login of an unrelated provider in the same store never starts a renewal', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writePi(w.home, { ...piDoc(now + 6 * HOUR), 'github-copilot': { type: 'oauth', access: 'x', refresh: 'y', expires: now - 30 * 24 * HOUR } });
+    const piStarts = fakeSpawn({ layoutName: 'pi' });
+    const piResult = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: piStarts.spawnFn });
+    assert.deepEqual(piResult, { status: 'fresh', reason: 'outside-window' });
+    assert.equal(piStarts.starts.length, 0);
+
+    const omp = path.join(w.tmp, 'omp');
+    writeOmp(omp, [
+      { id: 1, provider: 'xai-oauth', data: ompData(now + 6 * HOUR) },
+      { id: 2, provider: 'github-copilot', data: ompData(now - 30 * 24 * HOUR, { access: FAKE.other }) },
+    ]).close();
+    const ompStarts = fakeSpawn({ layoutName: 'omp' });
+    const ompResult = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(omp), runtimeDir: w.runtimeDir, spawnFn: ompStarts.spawnFn });
+    assert.equal(ompResult.status, 'fresh');
+    assert.equal(ompStarts.starts.length, 0);
+  } finally { w.cleanup(); }
+});
+
+test('only the dispatched provider\'s entry is made due in the scratch copy and applied; the prefixed omp row is matched', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeOmp(w.home, [
+      { id: 1, provider: 'xai-oauth', data: ompData(now + 10 * 60 * 1000) },
+      { id: 2, provider: 'github-copilot', data: ompData(now + 20 * 60 * 1000, { access: FAKE.other }) },
+    ]).close();
+    const otherBefore = readOmpRows(w.home)[1].data;
+    let otherInScratch = null;
+    const { spawnFn, starts } = fakeSpawn({
+      layoutName: 'omp',
+      onStart: (dir) => { otherInScratch = readOmpRows(dir)[1].data; },
+    });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.equal(result.status, 'renewed');
+    assert.equal(starts.length, 1);
+    assert.equal(otherInScratch, otherBefore, 'the unrelated row was not made due');
+    assert.equal(readOmpRows(w.home)[1].data, otherBefore, 'and was not applied over');
+    assert.equal(JSON.parse(readOmpRows(w.home)[0].data).refresh, FAKE.newRefresh);
+  } finally { w.cleanup(); }
+});
+
+test('a store whose entry cannot be told apart is skipped, and a lone oauth entry is the one', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
+    const run = () => refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+
+    writePi(w.home, { xai: piDoc(now + 10 * 60 * 1000).xai, 'xai-extra': { type: 'oauth', access: 'a', refresh: 'b', expires: now + 10 * 60 * 1000 } });
+    assert.deepEqual(await run(), { status: 'skipped', reason: 'entry-unidentified' }, 'several matches');
+    writePi(w.home, { 'github-copilot': { type: 'oauth', access: 'a', refresh: 'b', expires: now + 10 * 60 * 1000 }, other: { type: 'oauth', access: 'a', refresh: 'b', expires: now + 10 * 60 * 1000 } });
+    assert.deepEqual(await run(), { status: 'skipped', reason: 'entry-unidentified' }, 'no match');
+    assert.equal(starts.length, 0);
+
+    writePi(w.home, { 'something-else': { type: 'oauth', access: FAKE.oldAccess, refresh: FAKE.oldRefresh, expires: now + 10 * 60 * 1000 } });
+    const solo = fakeSpawn({
+      behaviour: (dir) => { const doc = readPi(dir); doc['something-else'] = { ...doc['something-else'], refresh: FAKE.newRefresh, expires: now + 6 * HOUR }; writePi(dir, doc); },
+    });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: solo.spawnFn });
+    assert.equal(result.status, 'renewed');
+    assert.equal(readPi(w.home)['something-else'].refresh, FAKE.newRefresh);
+  } finally { w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// The call ends on its own; a failed snapshot is said
+// ---------------------------------------------------------------------------------------------------
+
+test('the renewal call is wrapped in coreutils timeout, and runs unwrapped when timeout is not on PATH', async (t) => {
+  const onPath = (process.env.PATH ?? '').split(path.delimiter).some((d) => fs.existsSync(path.join(d, 'timeout')));
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    if (onPath) {
+      const wrapped = fakeSpawn({ layoutName: 'pi' });
+      await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: wrapped.spawnFn, probeTimeoutMs: 90_000 });
+      assert.match(path.basename(wrapped.starts[0].command), /^timeout$/);
+      assert.deepEqual(wrapped.starts[0].args.slice(0, 3), ['--kill-after=5', '90', 'pi']);
+    } else t.diagnostic('timeout is not on PATH here');
+
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const bare = fakeSpawn({ layoutName: 'pi' });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: bare.spawnFn, env: { PATH: '/nonexistent-dir' }, cooldownMs: 0 });
+    assert.equal(bare.starts[0].command, 'pi');
+  } finally { w.cleanup(); }
+});
+
+test('a failed snapshot with node:sqlite present copies the file as it is and says so by code, without a path or a value', () => {
+  const w = workspace();
+  const captured = [];
+  const realWrite = process.stderr.write;
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + HOUR) }]).close();
+    const brokenSqlite = { DatabaseSync: class { constructor() { throw new Error(`cannot open ${w.home}`); } } };
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    copyCredentialFiles(path.join(w.tmp, 'private-home'), w.home, ['agent.db'], { loadSqlite: () => brokenSqlite });
+    process.stderr.write = realWrite;
+    assert.deepEqual(fs.readFileSync(path.join(w.tmp, 'private-home', 'agent.db')), fs.readFileSync(path.join(w.home, 'agent.db')));
+    assert.equal(captured.length, 1);
+    assert.match(captured[0], /credential-snapshot-failed/);
+    assert.equal(captured[0].includes(w.home), false);
   } finally { process.stderr.write = realWrite; w.cleanup(); }
 });

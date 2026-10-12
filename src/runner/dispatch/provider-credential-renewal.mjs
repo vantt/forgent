@@ -173,8 +173,16 @@ export function copyCredentialFiles(destinationRoot, sourceHome, files, { makeEr
     const destination = path.join(destinationRoot, rel);
     try {
       mkdir(path.dirname(destination));
-      const snapshotted = path.basename(rel) === 'agent.db' && snapshotSqliteFile(realSource, destination, { loadSqlite });
-      if (!snapshotted) fs.copyFileSync(realSource, destination);
+      const isStore = path.basename(rel) === 'agent.db';
+      const snapshotted = isStore && snapshotSqliteFile(realSource, destination, { loadSqlite });
+      if (!snapshotted) {
+        // Without node:sqlite the plain copy is all there is. With it, a failed snapshot means the copy
+        // may lack what is still in the write-ahead log: say so (the name only, no value) and go on.
+        if (isStore && (loadSqlite ?? defaultLoadSqlite)()) {
+          process.stderr.write('fgos: credential snapshot of agent.db failed (credential-snapshot-failed); copying the file as it is\n');
+        }
+        fs.copyFileSync(realSource, destination);
+      }
       // Credentials stay owner-only; a listed helper binary keeps its exec bit.
       fs.chmodSync(destination, fs.statSync(realSource).mode & 0o100 ? 0o700 : 0o600);
     } catch (copyErr) {
@@ -208,6 +216,29 @@ function jwtExpiryMs(token) {
 
 const toMs = (expires) => (expires < 1e12 ? expires * 1000 : expires);
 
+// The refresh token of an entry, only ever compared in memory, never returned or printed. A store whose
+// refresh field cannot be found yields null, and null on either side counts as "differs" so that the
+// expiry rule alone decides.
+function refreshOf(object) {
+  for (const name of ['refresh', 'refresh_token', 'refreshToken']) {
+    if (typeof object?.[name] === 'string') return object[name];
+  }
+  return null;
+}
+const refreshDiffers = (a, b) => a === null || b === null || a !== b;
+
+// A copy entry replaces the source's only when its expiry is strictly later and its refresh token is a
+// different one (a copy that still holds the source's own refresh token has renewed nothing: a marked-due
+// scratch copy whose call never ran looks "later" only by accident). `requireFuture` is for a fresh
+// renewal, where an expiry already past means "not renewed"; a copy staged earlier (a pane's home, a
+// leftover) is applied even when its access token has since expired, because its refresh token is the
+// newer one and the source's is already spent.
+function isReplacement(copyEntry, sourceEntry, { now, requireFuture }) {
+  return copyEntry.expiresMs > sourceEntry.expiresMs
+    && (!requireFuture || copyEntry.expiresMs > now)
+    && refreshDiffers(copyEntry.refresh, sourceEntry.refresh);
+}
+
 // pi: `auth.json`, an object keyed by provider id; an `oauth` entry carries `expires` (ms, or seconds when
 // below 1e12). An API key entry has no expiry and is not renewable here.
 const piLayout = {
@@ -221,7 +252,7 @@ const piLayout = {
     for (const [key, value] of Object.entries(parsed.doc)) {
       if (isObject(value) && value.type === 'oauth' && Number.isFinite(value.expires)) {
         const expiresMs = toMs(value.expires);
-        entries.push({ key, expiresMs, dueMs: expiresMs, value });
+        entries.push({ key, owner: key, expiresMs, dueMs: expiresMs, refresh: refreshOf(value), value });
       }
     }
     return entries.length > 0 ? { ok: true, entries, doc: parsed.doc, raw: parsed.raw } : fail('unexpected-shape');
@@ -237,7 +268,7 @@ const piLayout = {
     }
     fs.writeFileSync(file, serializeJson(parsed.doc, parsed.raw), { mode: 0o600 });
   },
-  apply(sourceHome, copyRead, { now }) {
+  apply(sourceHome, copyRead, { now, key, requireFuture }) {
     const file = path.join(sourceHome, 'auth.json');
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const source = readJsonFile(file);
@@ -245,9 +276,10 @@ const piLayout = {
       if (!isObject(source.doc)) throw new Error('unexpected-shape');
       const applied = [];
       for (const entry of copyRead.entries) {
+        if (key !== undefined && entry.key !== key) continue;
         const current = source.doc[entry.key];
         if (!isObject(current) || current.type !== 'oauth' || !Number.isFinite(current.expires)) continue;
-        if (entry.expiresMs > toMs(current.expires) && entry.expiresMs > now) {
+        if (isReplacement(entry, { expiresMs: toMs(current.expires), refresh: refreshOf(current) }, { now, requireFuture })) {
           source.doc[entry.key] = entry.value;
           applied.push(entry.key);
         }
@@ -288,7 +320,7 @@ const codexLayout = {
     const dueMs = Math.min(exp ?? Infinity, byAge ?? Infinity);
     return {
       ok: true,
-      entries: [{ key: 'codex', expiresMs: exp ?? byAge, dueMs, value: { tokens, last_refresh: parsed.doc.last_refresh } }],
+      entries: [{ key: 'codex', owner: null, expiresMs: exp ?? byAge, dueMs, refresh: refreshOf(tokens), value: { tokens, last_refresh: parsed.doc.last_refresh } }],
       doc: parsed.doc,
       raw: parsed.raw,
     };
@@ -309,14 +341,14 @@ const codexLayout = {
     }
     fs.writeFileSync(file, serializeJson(parsed.doc, parsed.raw), { mode: 0o600 });
   },
-  apply(sourceHome, copyRead, { now }) {
+  apply(sourceHome, copyRead, { now, requireFuture }) {
     const file = path.join(sourceHome, 'auth.json');
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const source = codexLayout.read(sourceHome);
       if (!source.ok) throw new Error(source.code);
       const current = source.entries[0];
       const next = copyRead.entries[0];
-      if (!next || !(next.expiresMs > current.expiresMs && next.expiresMs > now)) return [];
+      if (!next || !isReplacement(next, current, { now, requireFuture })) return [];
       source.doc.tokens = next.value.tokens;
       if (next.value.last_refresh !== undefined) source.doc.last_refresh = next.value.last_refresh;
       if (writeIfUnchanged(file, source.raw, serializeJson(source.doc, source.raw))) return ['codex'];
@@ -356,7 +388,7 @@ function ompEntries(db) {
       continue;
     }
     if (isObject(data) && Number.isFinite(data.expires)) {
-      entries.push({ key: ompKey(row), expiresMs: data.expires, dueMs: data.expires, value: { id: row.id, provider: row.provider, data: String(row.data), row } });
+      entries.push({ key: ompKey(row), owner: String(row.provider), expiresMs: data.expires, dueMs: data.expires, refresh: refreshOf(data), value: { id: row.id, provider: row.provider, data: String(row.data), row } });
     }
   }
   return entries;
@@ -386,7 +418,7 @@ const ompLayout = {
       }
     });
   },
-  apply(sourceHome, copyRead, { now, loadSqlite }) {
+  apply(sourceHome, copyRead, { now, loadSqlite, key, requireFuture }) {
     // A row update in one transaction, never a replacement of the file: the owner's omp may hold the
     // database open, and every other row and column must stay as it is.
     return withDatabase(path.join(sourceHome, 'agent.db'), { loadSqlite, readOnly: false }, (db) => {
@@ -396,8 +428,9 @@ const ompLayout = {
       try {
         const current = new Map(ompEntries(db).map((entry) => [entry.key, entry]));
         for (const entry of copyRead.entries) {
+          if (key !== undefined && entry.key !== key) continue;
           const target = current.get(entry.key);
-          if (!target || !(entry.expiresMs > target.expiresMs && entry.expiresMs > now)) continue;
+          if (!target || !isReplacement(entry, target, { now, requireFuture })) continue;
           if (hasUpdatedAt) {
             db.prepare('UPDATE auth_credentials SET data = ?, updated_at = ? WHERE id = ? AND provider = ?')
               .run(entry.value.data, entry.value.row.updated_at ?? null, entry.value.id, entry.value.provider);
@@ -451,31 +484,55 @@ export function readCredentialExpiry(layoutName, home, { loadSqlite = defaultLoa
 
 const earliestDue = (entries) => Math.min(...entries.map((entry) => entry.dueMs));
 
+// The one entry that belongs to the dispatched fgOS provider: a store may hold logins of other providers
+// (an abandoned one must not make every dispatch renew, and a renewal of another provider's entry would
+// not give this dispatch a fresh login). A single oauth entry is the one; otherwise the entry whose owner
+// (pi: the key, omp: the row's provider) is the provider id or starts with `<provider>-`; zero or several
+// matches cannot be told apart.
+function selectProviderEntry(entries, provider) {
+  if (entries.length === 1) return { ok: true, entry: entries[0] };
+  const matches = entries.filter((entry) => entry.owner !== null && (entry.owner === provider || entry.owner.startsWith(`${provider}-`)));
+  return matches.length === 1 ? { ok: true, entry: matches[0] } : fail('entry-unidentified');
+}
+
 // ---------------------------------------------------------------------------------------------------
 // Apply
 // ---------------------------------------------------------------------------------------------------
 
 /**
- * Apply the entries of `copyHome` that are strictly newer than the source's (and still in the future).
- * The caller holds the account lock. Returns `{status: 'applied'|'unchanged', keys}`, or
- * `{status: 'unreadable', code}` when the copy cannot be read, in which case the source is untouched.
+ * Apply the entry of `copyHome` that is strictly newer than the source's and carries a different refresh
+ * token. With `provider`, only that provider's entry is considered (see selectProviderEntry); without it,
+ * every entry. `requireFuture` (default true) also demands an expiry still ahead, which is what a fresh
+ * renewal result must satisfy; a copy staged earlier is applied with `requireFuture: false`. The caller
+ * holds the account lock. Returns `{status: 'applied'|'unchanged', keys}`, or `{status: 'unreadable',
+ * code}` when the copy or the source's entry cannot be read, in which case the source is untouched.
  * Throws only when writing the source itself fails.
  */
-export function applyRenewedCredential({ layoutName, sourceHome, copyHome, now = Date.now(), loadSqlite = defaultLoadSqlite }) {
+export function applyRenewedCredential({ layoutName, sourceHome, copyHome, provider, requireFuture = true, now = Date.now(), loadSqlite = defaultLoadSqlite }) {
   const layout = LAYOUTS[layoutName];
   if (!layout) return { status: 'unreadable', code: 'unknown-layout' };
   const copy = layout.read(copyHome, { loadSqlite });
   if (!copy.ok) return { status: 'unreadable', code: copy.code };
-  const keys = layout.apply(sourceHome, copy, { now, loadSqlite });
+  let key;
+  if (provider !== undefined) {
+    const source = layout.read(sourceHome, { loadSqlite });
+    if (!source.ok) return { status: 'unreadable', code: source.code };
+    const selected = selectProviderEntry(source.entries, provider);
+    if (!selected.ok) return { status: 'unreadable', code: selected.code };
+    key = selected.entry.key;
+  }
+  const keys = layout.apply(sourceHome, copy, { now, loadSqlite, key, requireFuture });
   return { status: keys.length > 0 ? 'applied' : 'unchanged', keys };
 }
 
-function copyIsNewer({ layout, sourceHome, copyHome, now, loadSqlite }) {
+function copyIsNewer({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
   const source = layout.read(sourceHome, { loadSqlite });
   const copy = layout.read(copyHome, { loadSqlite });
   if (!source.ok || !copy.ok) return false;
-  const current = new Map(source.entries.map((entry) => [entry.key, entry.expiresMs]));
-  return copy.entries.some((entry) => current.has(entry.key) && entry.expiresMs > current.get(entry.key) && entry.expiresMs > now);
+  const selected = selectProviderEntry(source.entries, provider);
+  if (!selected.ok) return false;
+  const next = copy.entries.find((entry) => entry.key === selected.entry.key);
+  return next !== undefined && isReplacement(next, selected.entry, { now, requireFuture: false });
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -500,15 +557,16 @@ const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 const DISCARDABLE_CODES = new Set(['unreadable-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
 
 /**
- * Apply and remove every leftover. A leftover is kept when applying it failed for a reason that may pass
+ * Apply (see applyRenewedCredential, without the future-expiry rule) and remove every leftover. A leftover is kept when applying it failed for a reason that may pass
  * (the source is busy, SQLite is unavailable) and removed when it can never be applied.
  */
-function applyLeftovers({ accountDir, layoutName, sourceHome, now, loadSqlite }) {
+function applyLeftovers({ accountDir, layoutName, provider, sourceHome, now, loadSqlite }) {
   const outcomes = [];
   for (const dir of listLeftovers(accountDir)) {
     let keep = false;
     try {
-      const result = applyRenewedCredential({ layoutName, sourceHome, copyHome: dir, now, loadSqlite });
+      const result = applyRenewedCredential({ layoutName, sourceHome, copyHome: dir, provider, requireFuture: false, now, loadSqlite });
+      // An unidentifiable source entry is a property of the source, not of the copy: keep the copy.
       keep = result.status === 'unreadable' && !DISCARDABLE_CODES.has(result.code);
       outcomes.push(result.status);
     } catch {
@@ -572,11 +630,15 @@ export async function refreshAhead({
     if (!layoutName || !home || !accountDir) return { status: 'skipped', reason: 'unsupported-layout' };
     const layout = LAYOUTS[layoutName];
 
-    const inWindow = (read) => earliestDue(read.entries) - now() < thresholdMs;
+    // Only the dispatched provider's entry counts, both for the window and for "was it renewed".
+    const entryOf = (read) => selectProviderEntry(read.entries, provider);
+    const inWindow = (entry) => entry.dueMs - now() < thresholdMs;
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
+    const beforeEntry = entryOf(before);
+    if (!beforeEntry.ok) return { status: 'skipped', reason: beforeEntry.code };
     // A copy renewed in a pane may hold the only good pair even while the source still looks fresh.
-    if (!inWindow(before) && !hasLeftovers(accountDir)) return { status: 'fresh', reason: 'outside-window' };
+    if (!inWindow(beforeEntry.entry) && !hasLeftovers(accountDir)) return { status: 'fresh', reason: 'outside-window' };
 
     let lock;
     try {
@@ -585,13 +647,15 @@ export async function refreshAhead({
       return { status: 'skipped', reason: 'lock-busy' };
     }
     try {
-      applyLeftovers({ accountDir, layoutName, sourceHome: home, now: now(), loadSqlite });
+      applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite });
       const source = layout.read(home, { loadSqlite });
       if (!source.ok) return { status: 'skipped', reason: source.code };
-      if (!inWindow(source)) return { status: 'fresh', reason: 'outside-window' };
+      const entry = entryOf(source);
+      if (!entry.ok) return { status: 'skipped', reason: entry.code };
+      if (!inWindow(entry.entry)) return { status: 'fresh', reason: 'outside-window' };
       if (inCooldown(accountDir, cooldownMs, now())) return { status: 'cooldown', reason: 'recent-failure' };
       return await renewInScratch({
-        layout, layoutName, credentialSource, home, accountDir, source, lock, inWindow, probeTimeoutMs, spawnFn, env, loadSqlite, now,
+        layout, layoutName, provider, credentialSource, home, accountDir, key: entry.entry.key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now,
       });
     } finally {
       try { lock.release(); } catch { /* a release problem must not fail the dispatch */ }
@@ -601,19 +665,32 @@ export async function refreshAhead({
   }
 }
 
-async function renewInScratch({ layout, layoutName, credentialSource, home, accountDir, source, lock, inWindow, probeTimeoutMs, spawnFn, env, loadSqlite, now }) {
+// The call must end on its own even when this runner dies: it runs detached, and the account lock stays
+// held while it lives. coreutils `timeout` ends it after the limit (and kills it five seconds after that);
+// the runner's own timer stays as well. Without `timeout` on PATH the plan runs as it is.
+function withKillTimeout(plan, timeoutMs, env = process.env) {
+  if (!plan) return plan;
+  const dirs = String(env?.PATH ?? process.env.PATH ?? '').split(path.delimiter).filter(Boolean);
+  const timeoutBin = dirs.map((dir) => path.join(dir, 'timeout')).find((candidate) => {
+    try { fs.accessSync(candidate, fs.constants.X_OK); return fs.statSync(candidate).isFile(); } catch { return false; }
+  });
+  if (!timeoutBin) return plan;
+  return { ...plan, command: timeoutBin, args: ['--kill-after=5', String(Math.max(1, Math.ceil(timeoutMs / 1000))), plan.command, ...plan.args] };
+}
+
+async function renewInScratch({ layout, layoutName, provider, credentialSource, home, accountDir, key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now }) {
   const scratch = path.join(accountDir, `${SCRATCH_PREFIX}${process.pid}-${now()}`);
   const files = credentialSource.kind === 'codex-home' ? layout.files : credentialSource.files;
   try {
     fs.mkdirSync(scratch, { recursive: true, mode: 0o700 });
     copyCredentialFiles(scratch, home, files, { loadSqlite });
-    layout.markDue(scratch, source.entries.filter((entry) => inWindow({ entries: [entry] })).map((entry) => entry.key), { loadSqlite });
+    layout.markDue(scratch, [key], { loadSqlite });
   } catch {
     try { fs.rmSync(scratch, { recursive: true, force: true }); } catch { /* the next holder removes it */ }
     return { status: 'failed', reason: 'scratch-copy-failed' };
   }
 
-  const plan = credentialProbeCommand({ ...credentialSource, home: scratch });
+  const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: scratch }), probeTimeoutMs, env);
   const probe = plan
     ? await runCredentialProbe(plan, { spawnFn, timeoutMs: probeTimeoutMs, env, onSpawn: (child) => lock.recordChild(child?.pid) })
     : { ok: false, detail: 'no probe exists for this credential layout' };
@@ -622,7 +699,7 @@ async function renewInScratch({ layout, layoutName, credentialSource, home, acco
   // redeemed the refresh token, and the scratch copy then holds the only good pair.
   let applied;
   try {
-    applied = applyRenewedCredential({ layoutName, sourceHome: home, copyHome: scratch, now: now(), loadSqlite });
+    applied = applyRenewedCredential({ layoutName, sourceHome: home, copyHome: scratch, provider, requireFuture: true, now: now(), loadSqlite });
   } catch {
     // The scratch copy may be the only good pair: it stays for the next holder of the lock.
     return { status: 'failed', reason: 'apply-failed' };
@@ -683,7 +760,7 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
   const accountDir = providerAccountDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId);
   if (!accountDir) return { status: 'failed', code: 'invalid-marker' };
   try {
-    if (!copyIsNewer({ layout, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite })) return { status: 'unchanged' };
+    if (!copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite })) return { status: 'unchanged' };
 
     const pendingDir = path.join(accountDir, PENDING_DIR);
     const staging = path.join(pendingDir, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
@@ -700,7 +777,7 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
     const lock = tryLock({ runtimeDir: writeBack.runtimeDir, provider: writeBack.provider, accountId: writeBack.accountId });
     if (!lock) return { status: 'staged' };
     try {
-      applyLeftovers({ accountDir, layoutName: writeBack.layout, sourceHome: writeBack.home, now: now(), loadSqlite });
+      applyLeftovers({ accountDir, layoutName: writeBack.layout, provider: writeBack.provider, sourceHome: writeBack.home, now: now(), loadSqlite });
     } finally {
       try { lock.release(); } catch { /* the staged copy is already safe */ }
     }

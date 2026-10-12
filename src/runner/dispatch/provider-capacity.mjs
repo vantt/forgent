@@ -921,7 +921,8 @@ export async function probeQuarantinedAccounts({
     let accountLock = null;
     try {
       accountLock = await acquireAccountLock({ runtimeDir, provider, accountId, waitMs: accountLockWaitMs });
-      result = await probe({ provider, accountId, account: accounts[accountId] });
+      // The probe reports its child so that a dead holder with a live child keeps the lock.
+      result = await probe({ provider, accountId, account: accounts[accountId], onSpawn: (child) => accountLock.recordChild(child?.pid) });
     } catch (err) {
       result = { ok: false, detail: err?.message ?? String(err) };
     } finally {

@@ -2201,12 +2201,17 @@ export async function executeAssignment(assignment, opts = {}) {
   if (typeof opts.providerCredentialRenew === 'function' && providerCapacitySelection?.status === 'selected' && mayCopyCredential) {
     const credentialRuntimeDir = opts.providerCapacityRuntimeDir ?? defaultProviderCapacityRuntimeDir();
     try {
-      await opts.providerCredentialRenew({
+      const renewal = await opts.providerCredentialRenew({
         provider: providerCapacitySelection.provider,
         accountId: providerCapacitySelection.accountId,
         credentialSource: providerCapacitySelection.credentialSource,
         runtimeDir: credentialRuntimeDir,
       });
+      // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
+      const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');
+      if (renewal && !quiet) {
+        process.stderr.write(`fgos: credential refresh-ahead for ${providerCapacitySelection.provider}/${providerCapacitySelection.accountId}: ${renewal.status} (${renewal.reason})\n`);
+      }
     } catch { /* the launch goes on with the login as it is */ }
     providerCapacityForLaunch = { ...providerCapacitySelection, credentialWriteBack: { runtimeDir: credentialRuntimeDir } };
   }
