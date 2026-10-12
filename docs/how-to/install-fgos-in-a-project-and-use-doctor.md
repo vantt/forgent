@@ -72,15 +72,23 @@ refuses outside one).
    `FGCTL_INSTALL_DIR`). If `~/.local/bin` is not on `PATH` it tells you what to
    export. Only `x86_64-unknown-linux-gnu` is supported today.
 
-2. Activate fgOS in the project with `fgctl init`. The release must come from
-   somewhere: `fgctl init` with no argument works only when the project already
-   carries a committed `.fgos/distribution.json` pin. For a first install, give
-   it the release asset (the `fgos-<version>-<target>.tar.gz` from the same
-   GitHub release):
+2. Activate fgOS in the project with `fgctl init`. Where the release comes
+   from, first match wins: `--from <path|URL>`, then `FGCTL_FROM`, then
+   `FGCTL_VERSION=<tag>`, then the release pinned by the project's committed
+   `.fgos/distribution.json`, then the latest GitHub release. For a first
+   install nothing needs downloading by hand:
 
    ```bash
-   fgctl init --from ./fgos-<version>-x86_64-unknown-linux-gnu.tar.gz
+   fgctl init                              # no pin: downloads the latest release
+   FGCTL_VERSION=v0.2.0-rc.1 fgctl init    # an exact tag (pre-releases are never "latest")
+   FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a non-release build
    ```
+
+   A download goes through `curl` and is verified against the release's
+   `SHA256SUMS`: a missing or mismatching entry stops the init before anything
+   is staged. A URL given to `--from`/`FGCTL_FROM` must have a `SHA256SUMS` next
+   to it; a local path is used as is. `FGCTL_ASSET_BASE_URL` points downloads at
+   a mirror. The `curl-available` doctor check reports a missing `curl`.
 
    `fgctl init` stages the release into the machine store, writes
    `.fgos/installation/`, and then, using the new shim, runs this tail in order:
@@ -130,7 +138,7 @@ Check what is active with `fgctl status` (`--json` for machines).
 |---|---|---|
 | `install.sh` | Installs the `fgctl` binary | `~/.local/bin/fgctl` |
 | `fgctl stage --from <release>` | Puts a release into the machine store without activating it | machine store |
-| `fgctl init [--from <release>]` | Stages (if needed), activates in this project, runs the init/doctor tail | `.fgos/installation/`, machine store |
+| `fgctl init [--from <release or URL>]` | Downloads the release when none is given or pinned, stages (if needed), activates in this project, runs the init/doctor tail | `.fgos/installation/`, machine store |
 | `fgctl upgrade --from <release>` | Moves the project to another release, keeps the previous one, runs the tail | `.fgos/installation/` |
 | `fgctl repair` | Rolls back to the previous release if one is recorded, otherwise re-verifies and re-publishes the same one | `.fgos/installation/` |
 | `fgctl verify` | Verifies the active release's files against its manifest and quarantines it on drift | quarantine on failure |
@@ -259,6 +267,7 @@ manual step.
 | `executor-confinement` | No executor has `permissionMode: bypass` without `privateHome`, `isolatedSession` and `ownWorktree` all true | names the executor | you | Set the three flags or drop `bypass` |
 | `invocation-git-write-grants` | No executor or invocation grants workers `git add` or `git commit` | `warning: ... still grant git add/git commit` | you | Remove the grant from `--allowedTools`; the runner commits |
 | `bwrap-available` | `bwrap` resolves and passes a smoke test (`bwrap --ro-bind / / -- true`) | `bwrap is unavailable or failed smoke test: ...` | you | Install bubblewrap; on a restricted kernel allow user namespaces |
+| `curl-available` | `curl` runs (`fgctl init` downloads releases through it) | `warning: curl is not usable on PATH ...` (never a failure: local `--from` paths do not need it) | you | Install curl, or pass a local `--from` path |
 
 ### 4.4. Confinement
 

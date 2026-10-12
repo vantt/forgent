@@ -18,13 +18,34 @@ clone, no npm, no Rust toolchain required:
 curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
 ```
 
-Then initialize your project. A plain `fgctl init` works only when the project
-already carries a committed `.fgos/distribution.json` pin; for a first install
-pass the release asset:
+`install.sh` installs the latest release; a pre-release is never "latest", so
+install one with `FGCTL_VERSION=<tag>` (for example `v0.2.0-rc.1`):
 
 ```bash
-fgctl init --from ./fgos-<version>-x86_64-unknown-linux-gnu.tar.gz
+curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | FGCTL_VERSION=v0.2.0-rc.1 sh
 ```
+
+Then initialize your project from inside its git repository. A plain
+`fgctl init` uses the release the project's committed `.fgos/distribution.json`
+pins; with no pin it downloads the latest release (through `curl`), checks it
+against the release's `SHA256SUMS`, and installs it. No tarball download by hand:
+
+```bash
+fgctl init
+```
+
+To pick a different release:
+
+```bash
+FGCTL_VERSION=v0.2.0-rc.1 fgctl init         # an exact tag; needed for pre-releases
+FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a local build, build dir, or URL
+fgctl init --from <path-or-URL>              # same as FGCTL_FROM
+```
+
+Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > latest.
+A downloaded release is refused unless its entry in `SHA256SUMS` matches; a URL
+source needs a `SHA256SUMS` file in the same directory. A local path is used as
+is. `FGCTL_ASSET_BASE_URL` redirects downloads to a mirror, as for `install.sh`.
 
 `fgctl init` ends by running `fgos doctor --fix` and `fgos doctor`, which only run
 registered fixes: run `fgos setup` once in the project for the config defaults,

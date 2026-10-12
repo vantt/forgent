@@ -1588,6 +1588,28 @@ export function checkBwrapAvailable(binary = 'bwrap') {
   return res;
 }
 
+// `fgctl init` shells out to the system `curl` when it downloads a release
+// (no source given, FGCTL_VERSION, or a URL source). A
+// machine that only ever installs from a local path never needs it, so a
+// missing curl is a warning, not a failure.
+export function checkCurlAvailable(binary = 'curl') {
+  try {
+    execFileSync(binary, ['--version'], { stdio: 'ignore' });
+    return { passed: true, message: `${binary} is available on PATH` };
+  } catch (err) {
+    return {
+      passed: true,
+      message: `warning: ${binary} is not usable on PATH (${err.code ?? err.message}); fgctl init cannot download a release -- install curl or pass a local --from path`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'curl-available',
+  description: 'curl resolves on PATH (fgctl init downloads releases through it); a missing curl only blocks the download paths',
+  check: () => checkCurlAvailable(),
+});
+
 registerCheck({
   id: 'bwrap-available',
   description: 'bwrap binary resolves on PATH and minimal smoke test (bwrap --ro-bind / / -- true) exits 0',
