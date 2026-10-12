@@ -1469,6 +1469,11 @@
           ]
         }
       }
+    },
+    "governance": {
+      "disallowedExecutors": [
+        "xai"
+      ]
     }
   },
   "gateBypass": {
