@@ -135,3 +135,9 @@ A29 (owner-decided in the recovery session): bounded registry recovery, not reco
 4. D must pass with zero fatal against both prior registries. Scoped strict E must equal the held rows, identical-unit exceptions and the bound candidate-unverified list.
 5. Commit the actual registry as `reports/phase-06/working-identity-registry.json`; persist it at every subsequent batch closure.
 6. Close Agent Coordination only after those proofs, then execute Step 3 under A28.
+
+A30 (owner-decided in the recovery session, extends A29 for this recovery only): rebind accepted classification receipts by exact digest.
+1. For each of the 677 additional reverse-open units and the 6 listed-missing units in `boundedRegistryRecovery.nativeEquality.result`, bind the current claim ID to an existing classification row with verdict ok in a committed `review-2-*.md` report, only when the full unit digest is equal. Record the receipt report, row claim ID and digest for every binding. Do not re-review truth.
+2. A unit whose digest matches only a source or retired row, not a classification row, goes to the candidate-unverified list if its file is eligible under A28; otherwise collect it for Lead review.
+3. Apply the reviewed verdicts of `review-2-registry-recovery.md` for the 26 rows (7 retired without witness, 11 classifications without disposition, 8 gaps); hold verdicts stay open.
+4. Then regenerate from the persisted registry, rerun D and scoped strict E against both prior registries, and repeat the full native identity-set comparison. Close Agent Coordination only when D has zero fatal findings and strict E equals the holds, the identical-unit exceptions and the candidate-unverified list.
