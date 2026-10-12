@@ -286,9 +286,11 @@ jobs:
       - name: cargo test
         run: cargo test --workspace
 
+  # Packages through the same script release.yml uses, so this proof and a release can
+  # never differ. Built on ubuntu-22.04 like the release asset (see release-assets.yml).
   external-consumer:
     name: external consumer proof
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -307,18 +309,11 @@ jobs:
       - name: Build workspace (release)
         run: cargo build --release --workspace
 
-      - name: Build and package distribution assets
-        run: |
-          set -eu
-          TARGET="x86_64-unknown-linux-gnu"
-          VERSION="v$(node -pe "require('./package.json').version")"
+      - name: Check glibc ceiling of the shipped binaries
+        run: scripts/check-glibc-ceiling.sh target/release/fgos target/release/fgctl
 
-          mkdir -p dist
-          node scripts/build-rust-distribution.mjs --out dist/tree
-          tar -czf "dist/fgos-${VERSION}-${TARGET}.tar.gz" -C dist/tree .
-          tar -czf "dist/fgctl-${VERSION}-${TARGET}.tar.gz" -C target/release fgctl
-          cp install.sh dist/
-          (cd dist && sha256sum fgos-*.tar.gz fgctl-*.tar.gz > SHA256SUMS)
+      - name: Build and package distribution assets
+        run: node scripts/package-release-assets.mjs --version "v$(node -pe "require('./package.json').version")" --out dist
 
       - name: Run external consumer proof
         run: scripts/ci-external-consumer.sh --assets dist

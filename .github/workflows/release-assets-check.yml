@@ -1,0 +1,16 @@
+name: Release assets check
+
+# Builds and proves the release assets exactly as release.yml would, on every target,
+# without publishing anything. Publishing lives only in release.yml, under the tag trigger.
+
+on:
+  push:
+    branches: [feat/windows-release]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assets:
+    uses: ./.github/workflows/release-assets.yml
