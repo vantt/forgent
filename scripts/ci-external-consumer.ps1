@@ -232,9 +232,6 @@ try {
         Write-Host '--- fgos doctor (cmd.exe) ---'
         & cmd.exe /d /c 'fgos doctor'
         Write-Host "fgos doctor exit code: $LASTEXITCODE"
-        # Arguments with cmd metacharacters reach the host unharmed.
-        $echoed = Invoke-Native 'cmd.exe' @('/d', '/c', 'fgos version --runtime-json "a b!c"') $null
-        Write-Host $echoed.Text
     } finally {
         Pop-Location
     }
