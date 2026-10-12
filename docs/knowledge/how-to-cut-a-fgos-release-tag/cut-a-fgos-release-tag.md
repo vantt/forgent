@@ -32,7 +32,8 @@ publishes the GitHub Release.
    this is the first real release.
 
 3. **Prepare the release metadata.** This updates `package.json`,
-   `package-lock.json`, and `CHANGELOG.md`; it refuses a dirty working
+   `package-lock.json`, `CHANGELOG.md` and the Rust crate versions
+   (`Cargo.toml`, the `Cargo.lock` files); it refuses a dirty working
    tree by default:
 
    ```bash
@@ -43,7 +44,7 @@ publishes the GitHub Release.
 4. **Commit, tag, and push exactly what the script printed:**
 
    ```bash
-   git add package.json package-lock.json CHANGELOG.md
+   git add package.json package-lock.json CHANGELOG.md Cargo.toml Cargo.lock apps/fgos-gateway/Cargo.toml apps/fgos-gateway/Cargo.lock herdr-dashboard/Cargo.toml herdr-dashboard/Cargo.lock
    git commit -m "chore: prepare vX.Y.Z"
    git tag vX.Y.Z
    git push origin HEAD vX.Y.Z

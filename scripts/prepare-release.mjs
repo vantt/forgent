@@ -43,6 +43,65 @@ export function updatePackageLockText(text, baseVersion) {
   return `${JSON.stringify(parsed, null, 2)}\n`;
 }
 
+// Rust crates share the npm package's version. The root manifest carries it for
+// every workspace member (`version.workspace = true`); the two crates outside
+// the workspace carry their own literal. Lockfiles list every path crate.
+export const RUST_VERSION_MANIFESTS = ['Cargo.toml', 'apps/fgos-gateway/Cargo.toml', 'herdr-dashboard/Cargo.toml'];
+export const RUST_VERSION_LOCKFILES = ['Cargo.lock', 'apps/fgos-gateway/Cargo.lock', 'herdr-dashboard/Cargo.lock'];
+
+// Sets the literal `version` of `[package]` / `[workspace.package]`; a manifest
+// that inherits the workspace version has no literal and comes back unchanged.
+export function updateCargoManifestText(text, baseVersion) {
+  let section = '';
+  return text
+    .split('\n')
+    .map((line) => {
+      const header = /^\[([^\]]+)\]\s*$/.exec(line);
+      if (header) {
+        section = header[1];
+        return line;
+      }
+      if ((section === 'package' || section === 'workspace.package') && /^version\s*=\s*"[^"]*"\s*$/.test(line)) {
+        return `version = "${baseVersion}"`;
+      }
+      return line;
+    })
+    .join('\n');
+}
+
+// Sets the version of every path crate (a package block with no `source`).
+export function updateCargoLockText(text, baseVersion) {
+  return text
+    .split('\n[[package]]\n')
+    .map((block, index) => {
+      if (index === 0 || /\nsource = /.test(`\n${block}`)) {
+        return block;
+      }
+      return block.replace(/^(name = "[^"]*"\nversion = )"[^"]*"/, `$1"${baseVersion}"`);
+    })
+    .join('\n[[package]]\n');
+}
+
+// Every Rust version literal in the repo that differs from `baseVersion`.
+export function findRustVersionDrift(root, baseVersion) {
+  const drift = [];
+  for (const [files, update] of [
+    [RUST_VERSION_MANIFESTS, updateCargoManifestText],
+    [RUST_VERSION_LOCKFILES, updateCargoLockText],
+  ]) {
+    for (const file of files) {
+      const filePath = path.join(root, file);
+      if (fs.existsSync(filePath)) {
+        const text = fs.readFileSync(filePath, 'utf8');
+        if (update(text, baseVersion) !== text) {
+          drift.push(file);
+        }
+      }
+    }
+  }
+  return drift;
+}
+
 export function updateChangelogText(text, tag, date) {
   assertIsoDate(date);
 
@@ -115,6 +174,18 @@ export function prepareRelease({
     [changelogPath, updateChangelogText(readText(changelogPath), tag, date)],
   ];
 
+  for (const [files, update] of [
+    [RUST_VERSION_MANIFESTS, updateCargoManifestText],
+    [RUST_VERSION_LOCKFILES, updateCargoLockText],
+  ]) {
+    for (const file of files) {
+      const filePath = path.join(root, file);
+      if (fs.existsSync(filePath)) {
+        updates.push([filePath, update(readText(filePath), baseVersion)]);
+      }
+    }
+  }
+
   if (!dryRun) {
     for (const [filePath, nextText] of updates) {
       writeText(filePath, nextText);
@@ -128,7 +199,7 @@ export function prepareRelease({
     dryRun,
     changedFiles: updates.map(([filePath]) => path.relative(root, filePath)),
     nextCommands: [
-      `git add package.json package-lock.json CHANGELOG.md`,
+      `git add ${updates.map(([filePath]) => path.relative(root, filePath)).join(' ')}`,
       `git commit -m "chore: prepare ${tag}"`,
       `git tag ${tag}`,
       `git push origin HEAD ${tag}`,
@@ -169,7 +240,8 @@ function parseArgs(argv) {
 function printHelp() {
   console.log(`Usage: node scripts/prepare-release.mjs <vX.Y.Z[-pre.N]> [--date YYYY-MM-DD] [--dry-run]
 
-Updates package.json, package-lock.json, and CHANGELOG.md for a release.
+Updates package.json, package-lock.json, CHANGELOG.md and the Rust crate versions
+(Cargo.toml, the Cargo.lock files) for a release.
 The script refuses a dirty working tree unless --skip-clean-check is passed.
 It never creates or pushes the git tag; it prints the exact commands to run next.`);
 }

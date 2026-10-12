@@ -476,7 +476,7 @@ dependencies = [
 
 [[package]]
 name = "fgos-distribution"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fgos-host-runtime",
  "flate2",
@@ -491,7 +491,7 @@ dependencies = [
 
 [[package]]
 name = "fgos-gateway"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "axum",
  "axum-embed",
@@ -514,7 +514,7 @@ dependencies = [
 
 [[package]]
 name = "fgos-host-runtime"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -711,7 +711,7 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
 name = "herdr-fgos-common"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
  "serde_json",
