@@ -18619,5 +18619,164 @@
       "Native strict membership has six listed units not open and 677 additional open units; no list expansion or receipt reassignment authorized here",
       "D zero fatal and strict equality are UNPROVEN; Agent Coordination not closed and Step 3 not started"
     ]
+  },
+  "boundedRegistryRecoveryPostCommit": {
+    "authoredCommit": "3f172e1c8cbaa8a9280b211878d776850818bf37",
+    "refreshCommand": [
+      "node",
+      "scripts/generate-doc-inventory.mjs",
+      "--refresh",
+      "--commit",
+      "HEAD",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--json-out",
+      "/tmp/phase06/review-doc-inventory.json",
+      "--md-out",
+      "/tmp/phase06/review-doc-inventory.md"
+    ],
+    "refreshExitCode": 0,
+    "registrySha256": "9d32ccc33bf7d83fae87ec509731175658b033d52a487502765d8b6f5c3a117f",
+    "results": [
+      {
+        "commandReference": "boundedRegistryRecovery.gates[0].command",
+        "exitCode": 1,
+        "fatalCount": 26,
+        "types": [
+          "decision-gap-unknown",
+          "retired-row-disposition-missing"
+        ],
+        "open": [
+          {
+            "type": "files-unknown-blocking",
+            "count": 1169
+          },
+          {
+            "type": "claims-unknown-blocking",
+            "count": 22334
+          },
+          {
+            "type": "claims-not-reviewed",
+            "count": 22665
+          },
+          {
+            "type": "claims-without-own-rationale",
+            "count": 22334
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "count": 343
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "count": 376
+          },
+          {
+            "type": "dropped-claims-unreviewed",
+            "count": 17
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "count": 2366
+          }
+        ]
+      },
+      {
+        "commandReference": "boundedRegistryRecovery.gates[1].command",
+        "exitCode": 1,
+        "fatalCount": 26,
+        "types": [
+          "decision-gap-unknown",
+          "retired-row-disposition-missing"
+        ],
+        "open": [
+          {
+            "type": "files-unknown-blocking",
+            "count": 1169
+          },
+          {
+            "type": "claims-unknown-blocking",
+            "count": 22334
+          },
+          {
+            "type": "claims-not-reviewed",
+            "count": 22665
+          },
+          {
+            "type": "claims-without-own-rationale",
+            "count": 22334
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "count": 343
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "count": 376
+          },
+          {
+            "type": "dropped-claims-unreviewed",
+            "count": 17
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "count": 2366
+          }
+        ]
+      },
+      {
+        "commandReference": "boundedRegistryRecovery.gates[2].command",
+        "exitCode": 1,
+        "fatalCount": 29,
+        "types": [
+          "decision-gap-unknown",
+          "retired-row-disposition-missing",
+          "claims-not-reviewed",
+          "identical-units-multiple-owners",
+          "candidate-blocks-unreferenced"
+        ],
+        "open": [
+          {
+            "type": "claims-not-reviewed",
+            "count": 3
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "count": 342
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "count": 997
+          }
+        ]
+      },
+      {
+        "commandReference": "boundedRegistryRecovery.gates[3].command",
+        "exitCode": 1,
+        "fatalCount": 29,
+        "types": [
+          "decision-gap-unknown",
+          "retired-row-disposition-missing",
+          "claims-not-reviewed",
+          "identical-units-multiple-owners",
+          "candidate-blocks-unreferenced"
+        ],
+        "open": [
+          {
+            "type": "claims-not-reviewed",
+            "count": 3
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "count": 342
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "count": 997
+          }
+        ]
+      }
+    ],
+    "closure": "UNPROVEN; independent recovery review required"
   }
 }
