@@ -148,3 +148,10 @@ A30 representation approval (Lead-approved in the projection session; within A30
 3. Publish `review-request-2-registry-projection.md` with the receipt pin, all 683 rows and exact machine-comparison method, then stop.
 4. Lead independently compares every projection with its original committed receipt and ok row, then commits `review-2-registry-projection.md` with Reviewer, Author session and Receipt commit headers and current-ID Class-column rows. Notes use `identity projection of <original report> row <original claim>; bytes equal`.
 5. Only after that independent commit, copy notes verbatim into refs, pin report/report commit, rerun both prior-registry D/E and full native identity-set equality, persist the working registry, close Agent Coordination if equal and continue Step 3 under A28.
+
+A30 post-closure main-sync order (owner instruction, supplements the representation approval):
+1. Do not merge main before Agent Coordination closes; pin its closure evidence to the current plan source tree.
+2. After proven closure and before Step 3, merge main into the plan branch using `git merge`, never rebase. Owner reports 20 additional main commits, nine touching seven docs files, and a trial merge with one conflicted file in three locations: `docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md`. Keep the plan's restructured document shape and import main's content changes without changing meaning beyond those main changes.
+3. Carry `working-identity-registry.json` directly to the merge commit with one native refresh; do not rebuild from a seed or reconstruct the old chain.
+4. Run D and scoped E against both prior registries. Route every unit whose text/binding changed because of the merge into `review-request-2-main-merge.md` for independent Lead review, preserving the established ratchet accounting for any legacy-root edits.
+5. Only after the Lead's committed merge review, persist the updated working registry and begin Step 3 under A28. This supersedes any earlier instruction to sync main before the current batch closure.
