@@ -155,3 +155,10 @@ A30 post-closure main-sync order (owner instruction, supplements the representat
 3. Carry `working-identity-registry.json` directly to the merge commit with one native refresh; do not rebuild from a seed or reconstruct the old chain.
 4. Run D and scoped E against both prior registries. Route every unit whose text/binding changed because of the merge into `review-request-2-main-merge.md` for independent Lead review, preserving the established ratchet accounting for any legacy-root edits.
 5. Only after the Lead's committed merge review, persist the updated working registry and begin Step 3 under A28. This supersedes any earlier instruction to sync main before the current batch closure.
+
+A31 (owner-decided in the recovery session): main merges at batch boundaries; merged upstream edits are not plan moves.
+1. Code-evidence receipts whose cited code bytes are unchanged by the merge (same lines, or the identical cited text at shifted lines) are re-pinned to the new blob and line range. Lead verifies the re-pin by machine against the old receipt; there is no truth re-review.
+2. Receipts whose cited code actually changed are moved to the candidate-unverified list under A28. They are not re-verified now; the full truth check happens at promotion. The receipt rows stay in history.
+3. Independent review covers only (a) the merge conflict resolution and (b) the conservation rows the merge created: D findings, new retired units and new gaps. For files changed only by main, the reviewer checks main's diff as the successor or supersede target, not code truth.
+4. Units still reverse-open after these steps go to the candidate-unverified list when their file is eligible under A28; any other unit is collected for Lead.
+5. Then rerun D and scoped strict E against both prior registries, compare the full identity set, commit the working registry and start Step 3. The same rule applies to later main merges, made only at batch boundaries.
