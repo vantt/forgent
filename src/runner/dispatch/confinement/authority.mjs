@@ -27,7 +27,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -1834,7 +1834,7 @@ export async function finalizeConfinementResources({
           break;
         }
         try {
-          fs.rmSync(targetPath, { recursive: true, force: true });
+          removeConfinementDir(targetPath);
         } catch (err) {
           willClean = false;
           typedReason = `cleanup-failed: ${err.message}`;

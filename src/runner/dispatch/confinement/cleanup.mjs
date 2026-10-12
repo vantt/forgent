@@ -11,6 +11,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { envForSession } from '../worker-session.mjs';
+import { writeBackRenewedCredential } from '../provider-credential-renewal.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -107,6 +108,21 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
 }
 
 /**
+ * Add fields to the marker of a home this process created. Used for facts only known once the home is
+ * filled (which account login it was copied from).
+ */
+export function extendOwnershipMarker(dirPath, fields) {
+  const marker = readOwnershipMarker(dirPath);
+  if (!marker) return false;
+  fs.writeFileSync(
+    path.join(dirPath, OWNERSHIP_MARKER_FILE),
+    JSON.stringify({ ...marker, ...fields }, null, 2),
+    { encoding: 'utf8', mode: 0o600 },
+  );
+  return true;
+}
+
+/**
  * Read and validate ownership marker.
  */
 export function readOwnershipMarker(dirPath) {
@@ -138,6 +154,26 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
 }
 
 /**
+ * Delete a confinement directory. The one removal every path goes through (the driver's cleanup, the
+ * finalizer of a settled dispatch and the orphan reaper), so a login renewed inside a private home is
+ * offered to its source before the home is gone, whichever path gets there. A home whose marker does not
+ * ask for write-back is removed exactly as before; a write-back problem is reported by a fixed code on
+ * stderr and never stops the removal.
+ *
+ * @param {string} dirPath
+ * @param {{stopProcesses?: boolean}} [options] `stopProcesses`: end whatever still runs from inside first
+ */
+export function removeConfinementDir(dirPath, { stopProcesses = false } = {}) {
+  if (stopProcesses) stopProcessesInside(dirPath);
+  const marker = readOwnershipMarker(dirPath);
+  if (marker?.credentialWriteBack !== undefined) {
+    const result = writeBackRenewedCredential(dirPath, marker);
+    if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
+  }
+  fs.rmSync(dirPath, { recursive: true, force: true });
+}
+
+/**
  * Cleanup a single confinement resource safely.
  * Only removes if ownership marker matches dispatchId.
  */
@@ -158,8 +194,7 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
   try {
     // Whatever still runs from inside a resource that is being deleted is a leftover of its
     // dispatch (an agent CLI's own background server); it would outlive the files it runs from.
-    stopProcessesInside(dirPath);
-    fs.rmSync(dirPath, { recursive: true, force: true });
+    removeConfinementDir(dirPath, { stopProcesses: true });
     removeEmptyDispatchParent(dirPath, marker.dispatchId);
     return { cleaned: true, path: dirPath, dispatchId: marker.dispatchId };
   } catch (err) {
