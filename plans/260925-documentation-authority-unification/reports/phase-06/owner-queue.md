@@ -203,3 +203,9 @@ The previous 26 accounting questions are resolved by `9855bf6cb` and their ok ve
 The unchanged gate does not consume a digest-only current-ID-to-old-receipt-ID association: it requires the same claim ID in the inventory, pinned receipt and committed classification table. The actual 683-reference native run closes zero units. Request `review-request-2-registry-recovery.md` now contains the representation-only follow-up. Recommended decision: a current-ID receipt projection with original provenance and an independently committed matching report; no checker change and no truth re-review. No author-generated reviewer report, global old-ID restore, synthetic identity merges or open-list expansion is made.
 
 Three Rings holds stay; no new archive/delete, promoted-doc edits or main-spec conflicts. Strict E equality, batch closure and Step 3 remain UNPROVEN until the independently committed representation is accepted by the native gate.
+
+## Projection review ready under the approved A30 representation
+
+The representation decision is resolved by Lead approval: current-ID receipt projection, no gate change and no truth re-review. Receipt commit `2269f2d2790f5bcef0a9ea4838cf27954619feda` contains only the 683-row projection file. The independent request is `review-request-2-registry-projection.md`; it includes the full current-ID Class-column templates, exact notes, provenance and machine comparison. Author comparison passes 683/683 against the real pinned originals. No reviewed refs are added to any shard.
+
+Next owner/Lead action: independently machine-check every receipt, then commit `review-2-registry-projection.md` with the pinned Receipt commit and original Author session. After that, Doer applies only the ok notes verbatim and reruns both prior-registry D/E and native full-set equality. Three Rings holds stay; no new archive/delete, promoted-doc edits or main-spec conflict. Acceptance and batch closure remain UNPROVEN; Step 3 has not started.

@@ -141,3 +141,10 @@ A30 (owner-decided in the recovery session, extends A29 for this recovery only):
 2. A unit whose digest matches only a source or retired row, not a classification row, goes to the candidate-unverified list if its file is eligible under A28; otherwise collect it for Lead review.
 3. Apply the reviewed verdicts of `review-2-registry-recovery.md` for the 26 rows (7 retired without witness, 11 classifications without disposition, 8 gaps); hold verdicts stay open.
 4. Then regenerate from the persisted registry, rerun D and scoped strict E against both prior registries, and repeat the full native identity-set comparison. Close Agent Coordination only when D has zero fatal findings and strict E equals the holds, the identical-unit exceptions and the candidate-unverified list.
+
+A30 representation approval (Lead-approved in the projection session; within A30, no gate change):
+1. Create version-1 `ledger/candidate-classifications-agent-coordination-recovery.json` with 683 current-ID receipts. Preserve original path, anchor, full unit digest, shown text/digest, class, evidence and original authorship; add original receipt commit/path, report and verdict-row claim-ID provenance. No script-prefixed author.
+2. Commit that file alone; its immutable commit is the Receipt commit. Do not mark any shard reference reviewed.
+3. Publish `review-request-2-registry-projection.md` with the receipt pin, all 683 rows and exact machine-comparison method, then stop.
+4. Lead independently compares every projection with its original committed receipt and ok row, then commits `review-2-registry-projection.md` with Reviewer, Author session and Receipt commit headers and current-ID Class-column rows. Notes use `identity projection of <original report> row <original claim>; bytes equal`.
+5. Only after that independent commit, copy notes verbatim into refs, pin report/report commit, rerun both prior-registry D/E and full native identity-set equality, persist the working registry, close Agent Coordination if equal and continue Step 3 under A28.
