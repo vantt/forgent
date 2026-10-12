@@ -42,6 +42,10 @@ FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a local b
 fgctl init --from <path-or-URL>              # same as FGCTL_FROM
 ```
 
+A download writes its tag into the committed `.fgos/distribution.json`, so a
+teammate who clones the project and runs a plain `fgctl init` gets the same
+release downloaded (and checked) without being told which one.
+
 Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > latest.
 A downloaded release is refused unless its entry in `SHA256SUMS` matches; a URL
 source needs a `SHA256SUMS` file in the same directory. A local path is used as

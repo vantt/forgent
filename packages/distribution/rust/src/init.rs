@@ -714,11 +714,36 @@ pub fn init_workspace_resolving(
 
     // Refuse outside a repository checkout before any network traffic.
     let workspace_root = resolve_workspace_root(start_dir)?;
-    let has_pin =
-        read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))?.is_some();
+    let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))?;
 
-    match choose_source(inputs, has_pin) {
-        SourceChoice::Pinned => init_workspace(start_dir, None),
+    match choose_source(inputs, pin.is_some()) {
+        SourceChoice::Pinned => {
+            // A pin that records its release tag can be re-acquired on a machine
+            // that has not staged it. A digest-only pin cannot (a digest names no
+            // download), so it keeps the original behavior.
+            let missing_tag = pin.as_ref().and_then(|p| {
+                let runtime = &p.project_runtime;
+                let staged = is_release_staged(
+                    &resolve_machine_release_store_root(),
+                    &runtime.artifact_digest,
+                );
+                runtime.release_version.clone().filter(|_| !staged)
+            });
+            match missing_tag {
+                Some(tag) => {
+                    eprintln!("pinned release {tag} is not staged on this machine; downloading it");
+                    let downloaded = fetch_release(endpoint, Some(&tag))?;
+                    eprintln!("downloaded and verified {}", downloaded.origin);
+                    // The pin's digest is checked against what was fetched.
+                    init_workspace_tagged(
+                        start_dir,
+                        Some(&downloaded.tarball),
+                        downloaded.tag.as_deref(),
+                    )
+                }
+                None => init_workspace(start_dir, None),
+            }
+        }
         SourceChoice::Local(path) => init_workspace(start_dir, Some(&path)),
         SourceChoice::Url(url) => {
             eprintln!("downloading {url}");
@@ -730,13 +755,28 @@ pub fn init_workspace_resolving(
             eprintln!("no local release given; downloading {which}");
             let downloaded = fetch_release(endpoint, version.as_deref())?;
             eprintln!("downloaded and verified {}", downloaded.origin);
-            init_workspace(start_dir, Some(&downloaded.tarball))
+            init_workspace_tagged(
+                start_dir,
+                Some(&downloaded.tarball),
+                downloaded.tag.as_deref(),
+            )
         }
     }
 }
 
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
 pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<(), InitError> {
+    init_workspace_tagged(start_dir, from_source, None)
+}
+
+/// [`init_workspace`] plus the release tag the source was downloaded as. A new
+/// pin records that tag (`projectRuntime.releaseVersion`) so a teammate with an
+/// empty machine store can download the same release.
+fn init_workspace_tagged(
+    start_dir: &Path,
+    from_source: Option<&Path>,
+    release_tag: Option<&str>,
+) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
     let workspace_root = resolve_workspace_root(start_dir)?;
 
@@ -990,6 +1030,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         previous_artifact_digest,
         tracked_pin: tracked_pin.as_ref(),
         update_pin: false,
+        release_tag,
         _lock: &_activation_lock,
     })
 }
@@ -1003,6 +1044,9 @@ pub struct PublishArgs<'a> {
     pub previous_artifact_digest: Option<String>,
     pub tracked_pin: Option<&'a TrackedDistributionPin>,
     pub update_pin: bool,
+    /// Release tag the candidate was downloaded as; recorded in a newly written
+    /// pin in preference to the manifest's own version.
+    pub release_tag: Option<&'a str>,
     pub _lock: &'a ActivationLockGuard,
 }
 
@@ -1102,7 +1146,10 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
             project_runtime: ProjectRuntimePin {
                 policy: "exact-digest".to_string(),
                 artifact_digest: args.manifest.artifact_digest.clone(),
-                release_version: args.manifest.release_version.clone(),
+                release_version: args
+                    .release_tag
+                    .map(str::to_string)
+                    .or_else(|| args.manifest.release_version.clone()),
                 channel: None,
                 allow_prerelease: false,
             },
@@ -1346,6 +1393,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         previous_artifact_digest,
         tracked_pin: None,
         update_pin: true,
+        release_tag: None,
         _lock: &lock,
     })
 }
@@ -1498,6 +1546,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         previous_artifact_digest: None,
         tracked_pin: None,
         update_pin: true,
+        release_tag: None,
         _lock: &lock,
     })
 }

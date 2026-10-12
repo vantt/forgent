@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `fgctl init` no longer needs a hand-downloaded tarball. With no `--from` and no committed pin it downloads the latest GitHub release (through `curl`) and verifies it against `SHA256SUMS`, refusing on a mismatch or a missing entry. `FGCTL_VERSION=<tag>` installs an exact tag (needed for pre-releases, which "latest" skips); `FGCTL_FROM=<path | URL>` (or `--from`) installs a non-release build. Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > project pin > latest. `fgos doctor` gains a `curl-available` check (a warning only). README's Install section now says `install.sh` installs the latest release and a pre-release needs `FGCTL_VERSION`.
+- `fgctl init` no longer needs a hand-downloaded tarball. With no `--from` and no committed pin it downloads the latest GitHub release (through `curl`) and verifies it against `SHA256SUMS`, refusing on a mismatch or a missing entry. `FGCTL_VERSION=<tag>` installs an exact tag (needed for pre-releases, which "latest" skips); `FGCTL_FROM=<path | URL>` (or `--from`) installs a non-release build. Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > project pin > latest. `fgos doctor` gains a `curl-available` check (a warning only). A download records its tag in `.fgos/distribution.json` (`projectRuntime.releaseVersion`); a pin with a tag whose release is not staged on the machine makes a plain `fgctl init` download that tag, checksum-verified, and refuse unless its digest is the pinned one. README's Install section now says `install.sh` installs the latest release and a pre-release needs `FGCTL_VERSION`.
 
 ## [v0.2.0-rc.1] - 2026-10-12
 

@@ -210,6 +210,8 @@ pub struct Downloaded {
     pub tarball: PathBuf,
     /// Human-readable origin for progress output.
     pub origin: String,
+    /// The release tag this was downloaded as (`None` for a bare URL).
+    pub tag: Option<String>,
     _scratch: ScratchDir,
 }
 
@@ -331,6 +333,7 @@ fn download_verified(base: &str, asset: &str, origin: String) -> Result<Download
     Ok(Downloaded {
         tarball,
         origin,
+        tag: None,
         _scratch: scratch,
     })
 }
@@ -355,7 +358,9 @@ pub fn fetch_release(
         None => format!("{DEFAULT_RELEASE_REPO_URL}/releases/download/{tag}"),
     };
     let origin = format!("{asset} ({tag}) from {base}");
-    download_verified(&base, &asset, origin)
+    let mut downloaded = download_verified(&base, &asset, origin)?;
+    downloaded.tag = Some(tag);
+    Ok(downloaded)
 }
 
 /// Downloads a `.tar.gz` from an explicit URL. Its `SHA256SUMS` must sit next
