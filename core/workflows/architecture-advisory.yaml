@@ -57,7 +57,7 @@ steps:
               red-team: 'Read the producer final RAW JSON packet listed in Context refs for this round. Attack that packet, not git changes or earlier proposals: framing, authority, unsupported claims, residual risks, missing expertise, and dissent laundering. Do not rewrite it or change files; report concrete failures with evidence or explicitly none. {objective}'
           objective: >-
             Produce the final recommendation packet as a RAW JSON object, without Markdown fences.
-            Require "missing expertise" as an array of nonempty expertise names, or [] when none.
+            Require the exact JSON key "missing expertise" (lowercase, with a space; never missingExpertise or missing_expertise) as an array of nonempty expertise names, or [] when none. The file must start with the character { and contain only the JSON object.
             Include the verdict, evidence, alternatives, attributed findings, dispositions, unresolved
             dissent, named defaults, residual risks, and reversal triggers; never invent consensus or approval.
             Reviewers and red-team must challenge THIS final packet, not merely the earlier proposals:
