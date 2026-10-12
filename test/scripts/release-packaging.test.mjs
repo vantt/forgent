@@ -11,7 +11,8 @@ import { RELEASE_TARGETS } from '../../src/util/release-targets.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const workflows = path.join(repoRoot, '.github', 'workflows');
-const read = (...parts) => fs.readFileSync(path.join(repoRoot, ...parts), 'utf8');
+// Line endings are normalized: a Windows checkout may convert them.
+const read = (...parts) => fs.readFileSync(path.join(repoRoot, ...parts), 'utf8').replace(/\r\n/g, '\n');
 
 test('asset names follow <kind>-<tag>-<target>.tar.gz for every published target', () => {
   assert.equal(
@@ -47,7 +48,7 @@ test('release workflows: publishing lives only in release.yml under the tag trig
 
   for (const file of fs.readdirSync(workflows)) {
     if (file === 'release.yml') continue;
-    const text = fs.readFileSync(path.join(workflows, file), 'utf8');
+    const text = fs.readFileSync(path.join(workflows, file), 'utf8').replace(/\r\n/g, '\n');
     assert.doesNotMatch(text, /gh release (create|upload|edit)/, `${file} must not publish`);
     assert.doesNotMatch(text, /contents:\s*write/, `${file} must not hold write permission`);
     assert.doesNotMatch(text, /tags:/, `${file} must not run on tags`);

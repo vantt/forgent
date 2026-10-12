@@ -6,8 +6,9 @@ import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import http from 'node:http';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
+import { releaseTargetForHost } from '../../src/util/release-targets.mjs';
 
 import {
   REPO_ROOT,
@@ -1109,7 +1110,9 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
 
 // ---- Release download: FGCTL_VERSION / FGCTL_FROM / latest, checksum-verified ----
 
-const RELEASE_TARGET = 'x86_64-unknown-linux-gnu';
+// The target this host downloads; a host with no published release (a developer's macOS machine)
+// still exercises the download path against the Linux-named fixture through FGCTL_TARGET.
+const RELEASE_TARGET = releaseTargetForHost()?.triple ?? 'x86_64-unknown-linux-gnu';
 
 function makeDownloadProject(tag) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), `fgctl-${tag}-`));
@@ -1130,7 +1133,8 @@ function makeReleaseAssets(dir, tag, { sums = 'correct' } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const asset = `fgos-${tag}-${RELEASE_TARGET}.tar.gz`;
   const tarball = path.join(dir, asset);
-  execFileSync('tar', ['-czf', tarball, '-C', fixtureReleaseDir, '.']);
+  // Relative archive name from inside `dir`: a GNU tar (Git for Windows) reads `C:` as a remote host.
+  execFileSync('tar', ['-czf', asset, '-C', fixtureReleaseDir, '.'], { cwd: dir });
   const hash = (data) => crypto.createHash('sha256').update(data).digest('hex');
   let line;
   if (sums === 'correct') line = `${hash(fs.readFileSync(tarball))}  ${asset}\n`;
@@ -1156,11 +1160,11 @@ test('download: FGCTL_VERSION installs that exact tag from the asset base, verif
         HOME: t.home,
         FGCTL_VERSION: 'v0.0.1-rc.1',
         FGCTL_TARGET: RELEASE_TARGET,
-        FGCTL_ASSET_BASE_URL: `file://${assets}`,
+        FGCTL_ASSET_BASE_URL: pathToFileURL(assets).href,
       },
     });
     assert.equal(res.status, 0, `stdout=${res.stdout} stderr=${res.stderr}`);
-    assert.match(res.stderr, /downloaded and verified fgos-v0\.0\.1-rc\.1-x86_64-unknown-linux-gnu\.tar\.gz/);
+    assert.match(res.stderr, new RegExp(`downloaded and verified fgos-v0\\.0\\.1-rc\\.1-${RELEASE_TARGET}\\.tar\\.gz`));
     assert.equal(readActivation(t.proj).artifactDigest, fixtureDigest);
     const pin = JSON.parse(fs.readFileSync(path.join(t.proj, '.fgos', 'distribution.json'), 'utf8'));
     assert.equal(pin.projectRuntime.releaseVersion, 'v0.0.1-rc.1', 'the downloaded tag is recorded in the pin');
@@ -1179,7 +1183,7 @@ test('download: a pin with a tag re-acquires that release on an empty machine st
     const env = (t) => ({
       HOME: t.home,
       FGCTL_TARGET: RELEASE_TARGET,
-      FGCTL_ASSET_BASE_URL: `file://${assets}`,
+      FGCTL_ASSET_BASE_URL: pathToFileURL(assets).href,
     });
     const initial = runFgctl(['init'], {
       cwd: first.proj,
@@ -1229,7 +1233,7 @@ test('download: a pinned tag whose download does not match the pinned digest is 
       env: {
         HOME: t.home,
         FGCTL_TARGET: RELEASE_TARGET,
-        FGCTL_ASSET_BASE_URL: `file://${assets}`,
+        FGCTL_ASSET_BASE_URL: pathToFileURL(assets).href,
       },
     });
     assert.notEqual(res.status, 0);
@@ -1260,7 +1264,7 @@ test('download: a pin tag without the leading v is normalized to the v-prefixed 
     const res = runFgctl(['init'], {
       cwd: t.proj,
       stateHome: t.state,
-      env: { HOME: t.home, FGCTL_TARGET: RELEASE_TARGET, FGCTL_ASSET_BASE_URL: `file://${assets}` },
+      env: { HOME: t.home, FGCTL_TARGET: RELEASE_TARGET, FGCTL_ASSET_BASE_URL: pathToFileURL(assets).href },
     });
     assert.equal(res.status, 0, res.stderr);
     assert.match(res.stderr, /downloaded and verified fgos-v0\.0\.5-/);
@@ -1316,7 +1320,7 @@ for (const [mode, expected] of [
           HOME: t.home,
           FGCTL_VERSION: 'v0.0.1',
           FGCTL_TARGET: RELEASE_TARGET,
-          FGCTL_ASSET_BASE_URL: `file://${assets}`,
+          FGCTL_ASSET_BASE_URL: pathToFileURL(assets).href,
         },
       });
       assert.notEqual(res.status, 0);
