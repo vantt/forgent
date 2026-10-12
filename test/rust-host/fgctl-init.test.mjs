@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
+import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 
@@ -1102,6 +1104,198 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     fs.rmSync(tempState, { recursive: true, force: true });
     fs.rmSync(tempProj, { recursive: true, force: true });
     fs.rmSync(tailFailReleaseDir, { recursive: true, force: true });
+  }
+});
+
+// ---- Release download: FGCTL_VERSION / FGCTL_FROM / latest, checksum-verified ----
+
+const RELEASE_TARGET = 'x86_64-unknown-linux-gnu';
+
+function makeDownloadProject(tag) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `fgctl-${tag}-`));
+  const proj = path.join(root, 'proj');
+  fs.mkdirSync(proj);
+  execFileSync('git', ['init'], { cwd: proj });
+  execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: proj });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: proj });
+  const home = path.join(root, 'home');
+  const state = path.join(root, 'state');
+  fs.mkdirSync(home);
+  fs.mkdirSync(state);
+  return { root, proj, home, state };
+}
+
+// Writes fgos-<tag>-<target>.tar.gz of the fixture release plus SHA256SUMS.
+function makeReleaseAssets(dir, tag, { sums = 'correct' } = {}) {
+  fs.mkdirSync(dir, { recursive: true });
+  const asset = `fgos-${tag}-${RELEASE_TARGET}.tar.gz`;
+  const tarball = path.join(dir, asset);
+  execFileSync('tar', ['-czf', tarball, '-C', fixtureReleaseDir, '.']);
+  const hash = (data) => crypto.createHash('sha256').update(data).digest('hex');
+  let line;
+  if (sums === 'correct') line = `${hash(fs.readFileSync(tarball))}  ${asset}\n`;
+  else if (sums === 'wrong') line = `${hash('not the tarball')}  ${asset}\n`;
+  else line = `${hash('x')}  unrelated-${asset}\n`;
+  fs.writeFileSync(path.join(dir, 'SHA256SUMS'), line);
+  return asset;
+}
+
+function readActivation(proj) {
+  return JSON.parse(fs.readFileSync(path.join(proj, '.fgos', 'installation', 'activation.json'), 'utf8'));
+}
+
+test('download: FGCTL_VERSION installs that exact tag from the asset base, verified against SHA256SUMS', () => {
+  const t = makeDownloadProject('dl-version');
+  try {
+    const assets = path.join(t.root, 'assets');
+    makeReleaseAssets(assets, 'v0.0.1-rc.1');
+    const res = runFgctl(['init'], {
+      cwd: t.proj,
+      stateHome: t.state,
+      env: {
+        HOME: t.home,
+        FGCTL_VERSION: 'v0.0.1-rc.1',
+        FGCTL_TARGET: RELEASE_TARGET,
+        FGCTL_ASSET_BASE_URL: `file://${assets}`,
+      },
+    });
+    assert.equal(res.status, 0, `stdout=${res.stdout} stderr=${res.stderr}`);
+    assert.match(res.stderr, /downloaded and verified fgos-v0\.0\.1-rc\.1-x86_64-unknown-linux-gnu\.tar\.gz/);
+    assert.equal(readActivation(t.proj).artifactDigest, fixtureDigest);
+  } finally {
+    fs.rmSync(t.root, { recursive: true, force: true });
+  }
+});
+
+for (const [mode, expected] of [
+  ['wrong', /checksum verification failed/],
+  ['missing', /no checksum entry found/],
+]) {
+  test(`download: a ${mode} SHA256SUMS entry refuses init and writes nothing`, () => {
+    const t = makeDownloadProject(`dl-${mode}`);
+    try {
+      const assets = path.join(t.root, 'assets');
+      makeReleaseAssets(assets, 'v0.0.1', { sums: mode });
+      const res = runFgctl(['init'], {
+        cwd: t.proj,
+        stateHome: t.state,
+        env: {
+          HOME: t.home,
+          FGCTL_VERSION: 'v0.0.1',
+          FGCTL_TARGET: RELEASE_TARGET,
+          FGCTL_ASSET_BASE_URL: `file://${assets}`,
+        },
+      });
+      assert.notEqual(res.status, 0);
+      assert.match(res.stderr, expected);
+      assert.ok(!fs.existsSync(path.join(t.proj, '.fgos', 'installation')), 'no installation may be created');
+      assert.ok(!fs.existsSync(path.join(t.proj, '.fgos', 'distribution.json')), 'no pin may be written');
+    } finally {
+      fs.rmSync(t.root, { recursive: true, force: true });
+    }
+  });
+}
+
+test('download: --from beats FGCTL_FROM beats FGCTL_VERSION (the losing sources are never touched)', () => {
+  const t = makeDownloadProject('dl-precedence');
+  try {
+    // Flag wins over a bogus FGCTL_FROM and an unreachable FGCTL_VERSION base.
+    const viaFlag = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: t.proj,
+      stateHome: t.state,
+      env: {
+        HOME: t.home,
+        FGCTL_FROM: '/nonexistent/never-used',
+        FGCTL_VERSION: 'v9.9.9',
+        FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:1',
+      },
+    });
+    assert.equal(viaFlag.status, 0, viaFlag.stderr);
+    assert.ok(!/downloading/.test(viaFlag.stderr), 'a local --from must not download');
+  } finally {
+    fs.rmSync(t.root, { recursive: true, force: true });
+  }
+
+  const t2 = makeDownloadProject('dl-precedence-env');
+  try {
+    // FGCTL_FROM wins over FGCTL_VERSION and installs without any download.
+    const viaEnv = runFgctl(['init'], {
+      cwd: t2.proj,
+      stateHome: t2.state,
+      env: {
+        HOME: t2.home,
+        FGCTL_FROM: fixtureReleaseDir,
+        FGCTL_VERSION: 'v9.9.9',
+        FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:1',
+      },
+    });
+    assert.equal(viaEnv.status, 0, viaEnv.stderr);
+    assert.ok(!/downloading/.test(viaEnv.stderr), 'FGCTL_FROM must not download');
+    assert.equal(readActivation(t2.proj).artifactDigest, fixtureDigest);
+  } finally {
+    fs.rmSync(t2.root, { recursive: true, force: true });
+  }
+});
+
+test('download: a committed pin beats "latest" (no network when nothing explicit is given)', () => {
+  const t = makeDownloadProject('dl-pin');
+  try {
+    const first = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: t.proj,
+      stateHome: t.state,
+      env: { HOME: t.home },
+    });
+    assert.equal(first.status, 0, first.stderr);
+
+    // The asset base is unreachable: a download attempt would fail the run.
+    const again = runFgctl(['init'], {
+      cwd: t.proj,
+      stateHome: t.state,
+      env: { HOME: t.home, FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:1' },
+    });
+    assert.equal(again.status, 0, again.stderr);
+    assert.ok(!/downloading/.test(again.stderr), 'a pinned workspace must not download');
+  } finally {
+    fs.rmSync(t.root, { recursive: true, force: true });
+  }
+});
+
+test('download: with no pin and nothing explicit, init resolves and installs the latest release', async () => {
+  const t = makeDownloadProject('dl-latest');
+  const assets = path.join(t.root, 'assets');
+  const asset = makeReleaseAssets(assets, 'v0.0.2');
+  const server = http.createServer((req, res) => {
+    if (req.url === '/releases/latest') {
+      res.writeHead(302, { Location: '/releases/tag/v0.0.2' });
+      res.end();
+    } else if (req.url === '/releases/tag/v0.0.2') {
+      res.end('release page');
+    } else if (req.url === `/${asset}` || req.url === '/SHA256SUMS') {
+      res.end(fs.readFileSync(path.join(assets, req.url.slice(1))));
+    } else {
+      res.writeHead(404);
+      res.end();
+    }
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const proc = spawn(FGCTL_BIN, ['init'], {
+      cwd: t.proj,
+      env: {
+        ...process.env,
+        FGOS_STATE_HOME: t.state,
+        HOME: t.home,
+        FGCTL_TARGET: RELEASE_TARGET,
+        FGCTL_ASSET_BASE_URL: `http://127.0.0.1:${server.address().port}`,
+      },
+    });
+    const { code, stderr } = await waitForProcess(proc);
+    assert.equal(code, 0, stderr);
+    assert.match(stderr, /downloaded and verified fgos-v0\.0\.2-/);
+    assert.equal(readActivation(t.proj).artifactDigest, fixtureDigest);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+    fs.rmSync(t.root, { recursive: true, force: true });
   }
 });
 

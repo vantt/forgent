@@ -4,6 +4,7 @@
 
 pub mod canonical;
 pub mod extract;
+pub mod fetch;
 pub mod init;
 pub mod lock;
 pub mod manifest;

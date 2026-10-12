@@ -188,6 +188,8 @@ pub enum InitError {
     Preflight(String),
     #[error("tail command '{cmd}' failed with status {status}")]
     TailFailed { cmd: String, status: i32 },
+    #[error("{0}")]
+    Fetch(#[from] crate::fetch::FetchError),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
     #[error("json error: {0}")]
@@ -688,6 +690,51 @@ fn is_release_staged(store_root: &Path, digest: &str) -> bool {
     release_dir_path(store_root, digest).exists()
 }
 
+/// Reads the committed `.fgos/distribution.json` pin. A missing file or one
+/// that does not parse as a pin is "no pin".
+fn read_tracked_pin(distribution_path: &Path) -> Result<Option<TrackedDistributionPin>, InitError> {
+    if !distribution_path.exists() {
+        return Ok(None);
+    }
+    let content = std::fs::read_to_string(distribution_path)?;
+    Ok(serde_json::from_str(&content).ok())
+}
+
+/// Executes `fgctl init`, choosing the release source by precedence
+/// (`--from` flag > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > the
+/// latest GitHub release) and downloading it first when it is a URL or a
+/// release asset. The download is checksum-verified before it reaches
+/// [`init_workspace`], and its scratch copy is removed when init returns.
+pub fn init_workspace_resolving(
+    start_dir: &Path,
+    inputs: &crate::fetch::SourceInputs,
+    endpoint: &crate::fetch::DownloadEndpoint,
+) -> Result<(), InitError> {
+    use crate::fetch::{choose_source, fetch_release, fetch_url, SourceChoice};
+
+    // Refuse outside a repository checkout before any network traffic.
+    let workspace_root = resolve_workspace_root(start_dir)?;
+    let has_pin =
+        read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))?.is_some();
+
+    match choose_source(inputs, has_pin) {
+        SourceChoice::Pinned => init_workspace(start_dir, None),
+        SourceChoice::Local(path) => init_workspace(start_dir, Some(&path)),
+        SourceChoice::Url(url) => {
+            eprintln!("downloading {url}");
+            let downloaded = fetch_url(&url)?;
+            init_workspace(start_dir, Some(&downloaded.tarball))
+        }
+        SourceChoice::Release(version) => {
+            let which = version.as_deref().unwrap_or("latest release");
+            eprintln!("no local release given; downloading {which}");
+            let downloaded = fetch_release(endpoint, version.as_deref())?;
+            eprintln!("downloaded and verified {}", downloaded.origin);
+            init_workspace(start_dir, Some(&downloaded.tarball))
+        }
+    }
+}
+
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
 pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
@@ -704,12 +751,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     let distribution_path = workspace_root.join(".fgos").join("distribution.json");
 
     // Read tracked .fgos/distribution.json if present (R3).
-    let tracked_pin: Option<TrackedDistributionPin> = if distribution_path.exists() {
-        let content = std::fs::read_to_string(&distribution_path)?;
-        serde_json::from_str(&content).ok()
-    } else {
-        None
-    };
+    let tracked_pin = read_tracked_pin(&distribution_path)?;
 
     // Read current activation.json if present (R9 / Reviewer M2).
     let current_activation: Option<WorkspaceActivationBinding> = if activation_path.exists() {
@@ -852,7 +894,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         }
         (None, None) => {
             return Err(InitError::Custom(
-                "--from <source> is required when .fgos/distribution.json is absent".to_string(),
+                "a release source is required when .fgos/distribution.json is absent (--from, FGCTL_FROM or FGCTL_VERSION)".to_string(),
             ));
         }
     };
