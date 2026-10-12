@@ -12,6 +12,7 @@ import {
 
 const codexSource = { kind: 'codex-home', home: '${HOME}/.codex-test' };
 const piSource = { kind: 'home-files', home: '/home/someone/.pi/accounts/x', files: ['auth.json', 'settings.json'] };
+const ompSource = { kind: 'home-files', home: '/home/someone/.omp/profiles/x/agent', files: ['agent.db', 'config.yml'] };
 const agySource = { kind: 'home-files', home: '/home/someone/.agy-homes/x', files: ['.gemini/antigravity-cli/antigravity-oauth-token'] };
 
 test('the call is built per credential layout, pointing the CLI at the account home', () => {
@@ -23,6 +24,14 @@ test('the call is built per credential layout, pointing the CLI at the account h
   const pi = credentialProbeCommand(piSource);
   assert.equal(pi.command, 'pi');
   assert.equal(pi.env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
+});
+
+test('an omp profile (a store that carries agent.db) is probed with omp, and that wins over pi when both are listed', () => {
+  const omp = credentialProbeCommand(ompSource);
+  assert.equal(omp.command, 'omp');
+  assert.equal(omp.env.PI_CODING_AGENT_DIR, '/home/someone/.omp/profiles/x/agent');
+  assert.deepEqual(omp.args.slice(0, 2), ['-p', 'Reply with the single word OK.']);
+  assert.equal(credentialProbeCommand({ ...ompSource, files: ['auth.json', 'agent.db'] }).command, 'omp');
 });
 
 test('a layout fgOS cannot name, or a home that is not absolute, has no call', () => {
@@ -65,6 +74,21 @@ test('the probe runs the planned command with the account home in its environmen
   assert.equal(seen[0].command, 'pi');
   assert.equal(seen[0].env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
   assert.equal(seen[0].env.PATH, '/usr/bin');
+});
+
+test('the omp call is started with no stdin, because omp waits for end of input on a pipe', async () => {
+  const seen = [];
+  const spawnFn = (command, args, options) => {
+    seen.push(options.stdio);
+    const child = new EventEmitter();
+    child.stdout = new EventEmitter();
+    child.stderr = new EventEmitter();
+    setImmediate(() => { child.stdout.emit('data', 'OK'); child.emit('close', 0); });
+    return child;
+  };
+  const result = await createCredentialProbe({ spawnFn, env: {} })({ account: { credentialSource: ompSource } });
+  assert.deepEqual(result, { ok: true });
+  assert.equal(seen[0][0], 'ignore');
 });
 
 test('the probe says so, without running anything, when the layout has no call', async () => {

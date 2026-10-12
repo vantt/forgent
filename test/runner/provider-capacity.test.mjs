@@ -7,8 +7,12 @@ import { fork, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
+  acquireAccountLock,
   acquireProviderAccountLease,
   clearProviderAccountQuarantine,
+  probeQuarantinedAccounts,
+  providerAccountDir,
+  tryAcquireAccountLock,
   classifyProviderCapacityFault,
   parseQuotaResetWindowMs,
   parseQuotaResetClockTime,
@@ -769,4 +773,105 @@ test('the clock time codex prints ("try again at 6:02 PM") becomes the next such
   assert.equal(parseQuotaResetClockTime('no reset named here', now), null);
   const classified = classifyProviderCapacityFault({ provider: 'openai', stderr: "You've hit your usage limit. try again at 6:02 PM.", now });
   assert.equal(new Date(classified.until).getHours(), 18);
+});
+
+// --- Account lock: one per provider account, separate from the state lock ---
+
+test('the account lock is exclusive per account, independent of other accounts and of the state lock', () => {
+  const runtimeDir = mkTempDir();
+  const first = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });
+  assert.ok(first);
+  assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'a live holder keeps it');
+  assert.ok(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'b' }), 'another account is not affected');
+  assert.ok(acquireProviderAccountLease({ runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run-1', runtimeDir }), 'leasing does not wait for an account lock');
+  first.release();
+  const again = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });
+  assert.ok(again, 'released, it can be taken again');
+  assert.equal(again.dir, providerAccountDir(runtimeDir, 'xai', 'a'));
+});
+
+test('an unsafe provider or account id never becomes a path', () => {
+  const runtimeDir = mkTempDir();
+  assert.equal(providerAccountDir(runtimeDir, 'xai', '../escape'), null);
+  assert.equal(providerAccountDir(runtimeDir, 'a/b', 'a'), null);
+  assert.throws(() => tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: '../escape' }), /unsafe provider\/account/);
+});
+
+test('the async acquire waits with timers, so the event loop keeps running, and times out with a lock error', async () => {
+  const runtimeDir = mkTempDir();
+  const held = tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' });
+  let ticks = 0;
+  const timer = setInterval(() => { ticks += 1; }, 10);
+  setTimeout(() => held.release(), 120);
+  const lock = await acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: 2000 });
+  clearInterval(timer);
+  assert.ok(ticks >= 5, `timers fired while waiting (${ticks})`);
+  await assert.rejects(
+    () => acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: 60 }),
+    (err) => err instanceof ProviderCapacityLockError,
+  );
+  lock.release();
+});
+
+test('a lock whose holder died is reclaimed at once', async () => {
+  const runtimeDir = mkTempDir();
+  const dead = spawnSync(process.execPath, ['-e', '']);
+  const lockDir = path.join(providerAccountDir(runtimeDir, 'xai', 'a'), 'lock');
+  fs.mkdirSync(lockDir, { recursive: true });
+  fs.writeFileSync(path.join(lockDir, '0000000001.json'), JSON.stringify({ holder: { pid: dead.pid }, acquiredAt: new Date().toISOString() }));
+  const lock = await acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: 100 });
+  assert.ok(lock);
+  lock.release();
+});
+
+// --- Lazy-probe unlock holds the account lock around its real call ---
+
+function lockedAccountFixture() {
+  const runtimeDir = mkTempDir();
+  const config = runnerConfig();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  const quarantine = { kind: 'manual-clear', reasonCode: 'auth-token', quarantinedAt: new Date().toISOString() };
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: { 'openai-codex': { accounts: { a: { quarantine }, b: { quarantine }, c: { quarantine } } } },
+    assignments: {},
+    audit: [],
+  }));
+  return { runtimeDir, config };
+}
+
+test('the unlock probe runs while holding the account lock, so a renewal elsewhere cannot overlap it', async () => {
+  const { runtimeDir, config } = lockedAccountFixture();
+  const seen = [];
+  const tried = await probeQuarantinedAccounts({
+    runnerConfig: config,
+    provider: 'openai-codex',
+    runtimeDir,
+    probe: async ({ accountId }) => {
+      seen.push([accountId, tryAcquireAccountLock({ runtimeDir, provider: 'openai-codex', accountId }) === null]);
+      return { ok: true };
+    },
+  });
+  assert.equal(tried[0].unlocked, true);
+  assert.deepEqual(seen, [[tried[0].accountId, true]], 'the lock was held during the call');
+  const free = tryAcquireAccountLock({ runtimeDir, provider: 'openai-codex', accountId: tried[0].accountId });
+  assert.ok(free, 'and released after it');
+  free.release();
+});
+
+test('an unlock probe that cannot get the account lock in time reports that and keeps the account locked', async () => {
+  const { runtimeDir, config } = lockedAccountFixture();
+  const holders = ['a', 'b', 'c'].map((accountId) => tryAcquireAccountLock({ runtimeDir, provider: 'openai-codex', accountId }));
+  let called = 0;
+  const tried = await probeQuarantinedAccounts({
+    runnerConfig: config,
+    provider: 'openai-codex',
+    runtimeDir,
+    accountLockWaitMs: 40,
+    probe: async () => { called += 1; return { ok: true }; },
+  });
+  assert.equal(called, 0);
+  assert.equal(tried.every((t) => t.unlocked === false), true);
+  holders.forEach((h) => h.release());
 });

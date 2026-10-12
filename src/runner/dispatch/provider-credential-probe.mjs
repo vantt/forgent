@@ -6,9 +6,10 @@
 // when it renews would, in a throwaway copy, use the token up on the provider's side and leave the
 // original stale; in the home the owner also uses, the renewed token lands where it belongs.
 //
-// Only the credential layouts fgOS can name are probed: a Codex home, and a pi account directory (a
-// home-files source that carries `auth.json`). Any other layout answers "no probe", so the account stays
-// locked for a person to clear, exactly as before.
+// Only the credential layouts fgOS can name are probed: a Codex home, an omp profile directory (a
+// home-files source that carries the SQLite store `agent.db`) and a pi account directory (a home-files
+// source that carries `auth.json`). Any other layout answers "no probe", so the account stays locked for a
+// person to clear, exactly as before.
 
 import { spawn } from 'node:child_process';
 import os from 'node:os';
@@ -34,6 +35,15 @@ export function credentialProbeCommand(credentialSource) {
       env: { CODEX_HOME: home },
     };
   }
+  // omp keeps its login in `agent.db`; the layout is tested before pi's `auth.json`, since an omp profile
+  // may list both. omp waits for end of input on a piped stdin, so the call below gives it none.
+  if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('agent.db')) {
+    return {
+      command: 'omp',
+      args: ['-p', PROMPT, '--mode', 'json', '--tools', 'read'],
+      env: { PI_CODING_AGENT_DIR: home },
+    };
+  }
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('auth.json')) {
     return {
       command: 'pi',
@@ -56,32 +66,41 @@ export function judgeProbeOutput({ exitCode, timedOut, output }) {
   return { ok: true };
 }
 
+/**
+ * Run one planned call and judge what it printed. `spawnFn` is injectable for tests. `onSpawn(child)` is
+ * told about the child as soon as it exists, so a caller can record its pid.
+ */
+export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env, onSpawn } = {}) {
+  return new Promise((resolve) => {
+    let output = '';
+    let timedOut = false;
+    let child;
+    try {
+      child = spawnFn(plan.command, plan.args, { env: { ...env, ...plan.env }, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+    } catch (err) {
+      resolve({ ok: false, detail: `could not start ${plan.command}: ${err.message}` });
+      return;
+    }
+    try { onSpawn?.(child); } catch { /* recording the pid is best effort */ }
+    // The END of what the call printed is what says whether the login works: pi lists its loaded
+    // skills first (tens of KB) and prints the refresh failure last, so the tail is kept.
+    const collect = (chunk) => { output = (output + String(chunk)).slice(-OUTPUT_LIMIT); };
+    child.stdout?.on('data', collect);
+    child.stderr?.on('data', collect);
+    const timer = setTimeout(() => {
+      timedOut = true;
+      try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch { /* already gone */ } }
+    }, timeoutMs);
+    child.on('error', (err) => { clearTimeout(timer); resolve({ ok: false, detail: `could not run ${plan.command}: ${err.message}` }); });
+    child.on('close', (exitCode) => { clearTimeout(timer); resolve(judgeProbeOutput({ exitCode, timedOut, output })); });
+  });
+}
+
 /** A probe function for `probeQuarantinedAccounts`. `spawnFn` is injectable for tests. */
 export function createCredentialProbe({ spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
   return async function probeCredential({ account }) {
     const plan = credentialProbeCommand(account?.credentialSource);
     if (!plan) return { ok: false, detail: 'no probe exists for this credential layout' };
-    return new Promise((resolve) => {
-      let output = '';
-      let timedOut = false;
-      let child;
-      try {
-        child = spawnFn(plan.command, plan.args, { env: { ...env, ...plan.env }, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
-      } catch (err) {
-        resolve({ ok: false, detail: `could not start ${plan.command}: ${err.message}` });
-        return;
-      }
-      // The END of what the call printed is what says whether the login works: pi lists its loaded
-      // skills first (tens of KB) and prints the refresh failure last, so the tail is kept.
-      const collect = (chunk) => { output = (output + String(chunk)).slice(-OUTPUT_LIMIT); };
-      child.stdout?.on('data', collect);
-      child.stderr?.on('data', collect);
-      const timer = setTimeout(() => {
-        timedOut = true;
-        try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch { /* already gone */ } }
-      }, timeoutMs);
-      child.on('error', (err) => { clearTimeout(timer); resolve({ ok: false, detail: `could not run ${plan.command}: ${err.message}` }); });
-      child.on('close', (exitCode) => { clearTimeout(timer); resolve(judgeProbeOutput({ exitCode, timedOut, output })); });
-    });
+    return runCredentialProbe(plan, { spawnFn, timeoutMs, env });
   };
 }
