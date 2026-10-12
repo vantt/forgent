@@ -32,6 +32,21 @@ README Install, docs/how-to/install-fgos-in-a-project-and-use-doctor.md, docs/sp
 
 See final message for counts.
 
+## Follow-up 1: tag recorded in the pin
+
+- A new pin written after a download stores the resolved tag in `projectRuntime.releaseVersion` (the field already existed in the Rust struct and the pin contract, so serde and the schema goldens needed no change; `schema_golden` passes). Local/URL sources record no tag; an existing pin is never rewritten; `fgctl upgrade` writes none (it takes a path).
+- Pin with a tag whose digest is not staged: plain `fgctl init` downloads that tag, checksum-verified; `init_workspace` then reconciles the fetched digest with the pin and refuses with `pin-mismatch` if different. Digest-only pin: unchanged (needs a source). A quarantined release is re-acquired the same way.
+- Existing test fixture for the "pinned, unstaged, no source" refusal carried `releaseVersion: '0.1.0'`; it now uses a null tag (it is the digest-only legacy case). A pin whose `releaseVersion` is not a published tag (for example a manifest version without the `v`) will fail at download with a clear curl error.
+- New tests: tag written (FGCTL_VERSION and latest), teammate flow (pin with tag, empty store and HOME, file:// base), pinned-tag digest mismatch refused.
+
+## Follow-up 2: Rust version drift
+
+- Cause: the Rust tests hardcoded "0.1.0" and the crates sat at 0.1.0 while package.json moved to 0.2.0. The product version the binaries report already comes from the embedded package.json; the crate version (`CARGO_PKG_VERSION`) was the stale one.
+- Fix: root `[workspace.package] version = "0.2.0"`, nine workspace crates use `version.workspace = true`; the two excluded crates (`apps/fgos-gateway`, `herdr-dashboard`) carry a literal 0.2.0. Cargo.lock files updated.
+- Tests now derive the expected value: lib test compares package.json with `CARGO_PKG_VERSION`; build-show test uses `resolve_package_version()`; `apps/fgos/tests/cli_tests.rs` reads package.json. The envelope vector keeps its frozen sample version (its hashes depend on it), so the parity test compares shape only.
+- `scripts/prepare-release.mjs` now also rewrites those manifests and lockfiles (only files that exist) and lists them in the printed `git add`; `test/scripts/prepare-release.test.mjs` covers the rewrite and has a drift guard that fails if any Rust version differs from package.json. How-to for cutting a tag updated.
+- Knock-on: `activatedBy.version` in new activation records is now 0.2.0 (`CARGO_PKG_VERSION`); no test asserted it. Release manifests do not carry the crate version. Golden fixtures in `schema_golden.rs` keep their own 0.1.0 sample data on purpose. Excluded crates cannot inherit the workspace version, hence the literals.
+
 ## Known separate issue (not fixed)
 
 Release binaries require glibc 2.39; they fail the loader on Ubuntu 22.04.
