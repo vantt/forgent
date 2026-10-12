@@ -1328,6 +1328,55 @@ test('Step 2: a fallback candidate WITH a confined invocation is dispatched thro
   assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the quarantined primary must never spawn');
 });
 
+test('with a renewal function, a confined launch renews the login of the account actually provisioned, the executor-fallback account included', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+  const calls = [];
+  const assignment = buildAssignment({ work: { id: 'tsk-renew-fallback-account', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' });
+
+  await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+    providerCredentialRenew: async (request) => { calls.push(request); return { status: 'fresh', reason: 'outside-window' }; },
+  });
+
+  assert.equal(calls.length, 1, 'renewed once, before the private home is built');
+  assert.equal(calls[0].provider, 'openai-codex', 'the fallback account, not the quarantined primary');
+  assert.equal(calls[0].accountId, 'codex-acct');
+  assert.equal(calls[0].runtimeDir, runtimeDir);
+  assert.deepEqual(calls[0].credentialSource, { kind: 'codex-home', home: path.join(tempDir, 'codex-home') });
+});
+
+test('a renewal function that throws never fails the dispatch, and an unconfined launch never calls it', async () => {
+  const tempDir = mkTempDir();
+  const confined = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+  const throwing = await executeAssignment(
+    buildAssignment({ work: { id: 'tsk-renew-throws', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+    {
+      cwd: tempDir, repoRoot: tempDir, runnerConfig: confined.runnerConfig, providerCapacityRuntimeDir: confined.runtimeDir,
+      cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+      providerCredentialRenew: async () => { throw new Error('renewal exploded'); },
+    },
+  );
+  assert.notEqual(throwing.classification?.failure?.code, 'provider-capacity-refused');
+  assert.equal(fs.existsSync(confined.codexConfinedExecutor.argvCapturePath), true, 'the launch went on');
+
+  const unconfinedDir = mkTempDir();
+  const unconfined = buildFallbackFixture(unconfinedDir, { primaryQuarantined: false, fallbackQuarantined: false });
+  let called = 0;
+  await executeAssignment(
+    buildAssignment({ work: { id: 'tsk-renew-unconfined', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+    {
+      cwd: unconfinedDir, repoRoot: unconfinedDir, runnerConfig: unconfined.runnerConfig, providerCapacityRuntimeDir: unconfined.runtimeDir,
+      providerCredentialRenew: async () => { called += 1; return { status: 'fresh' }; },
+    },
+  );
+  assert.equal(called, 0, 'no login is copied into an unconfined launch, so nothing is renewed for it');
+});
+
 test('Phase B: a resumed Run that already committed a fallback rehydrates the fallback, never recompiles the refused primary', async () => {
   const tempDir = mkTempDir();
   const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });

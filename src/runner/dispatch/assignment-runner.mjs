@@ -118,6 +118,7 @@ import {
 import {
   acquireProviderAccountLease,
   classifyProviderCapacityFault,
+  defaultProviderCapacityRuntimeDir,
   hasProviderAccounts,
   probeQuarantinedAccounts,
   quarantineProviderAccount,
@@ -2183,6 +2184,33 @@ export async function executeAssignment(assignment, opts = {}) {
   let cwdLockRes = null;
   let cwdLockHeartbeat = null;
 
+  // Opted in with a renewal function: a login close to expiry is renewed once, in a copy fgOS holds, and
+  // applied to the account's real store BEFORE the private home is copied from it (so no pane has to
+  // renew in a throwaway copy, which would use up the source's single-use refresh token). The account is
+  // the one actually selected for this launch, the executor-fallback lease included. A home whose login a
+  // pane renewed anyway is offered back to the source when it is removed: the request carries the opt-in.
+  // Only a confined launch copies a login, and which invocation is confined is settled later, so any
+  // executor that can be confined (by posture, executor config or a confined invocation) counts; renewal
+  // never blocks or fails the dispatch.
+  const launchExecutor = cfg.executors?.[resolvedExecutorId] ?? cfg.executor;
+  const isConfined = (entry) => entry?.confinement && typeof entry.confinement === 'object' && Object.keys(entry.confinement).length > 0;
+  const mayCopyCredential = confinementRequirement.mode !== 'unconfined'
+    || isConfined(launchExecutor)
+    || (Array.isArray(launchExecutor?.invocations) && launchExecutor.invocations.some(isConfined));
+  let providerCapacityForLaunch = providerCapacitySelection;
+  if (typeof opts.providerCredentialRenew === 'function' && providerCapacitySelection?.status === 'selected' && mayCopyCredential) {
+    const credentialRuntimeDir = opts.providerCapacityRuntimeDir ?? defaultProviderCapacityRuntimeDir();
+    try {
+      await opts.providerCredentialRenew({
+        provider: providerCapacitySelection.provider,
+        accountId: providerCapacitySelection.accountId,
+        credentialSource: providerCapacitySelection.credentialSource,
+        runtimeDir: credentialRuntimeDir,
+      });
+    } catch { /* the launch goes on with the login as it is */ }
+    providerCapacityForLaunch = { ...providerCapacitySelection, credentialWriteBack: { runtimeDir: credentialRuntimeDir } };
+  }
+
   try {
     if (useSupervisorRecovery && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true) {
       const cwdLockIdentity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
@@ -2390,7 +2418,7 @@ export async function executeAssignment(assignment, opts = {}) {
             body: resolvedCmd.body,
             resourceBindings: resolvedCmd.resourceBindings,
           },
-          providerCapacity: providerCapacitySelection,
+          providerCapacity: providerCapacityForLaunch,
           ...(opts.blind === true ? { blind: true } : {}),
           context: {
             cwd: effectiveCwd,
@@ -2636,7 +2664,7 @@ export async function executeAssignment(assignment, opts = {}) {
           // `needsAssignmentLaunchContext`, so `assignmentLaunchContext` stays
           // null here and this call is byte-identical to before this fix.
           ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
-          ...(providerCapacitySelection ? { providerCapacity: providerCapacitySelection } : {}),
+          ...(providerCapacityForLaunch ? { providerCapacity: providerCapacityForLaunch } : {}),
           // Read-only Assignments never take the per-cwd lock on the supervisor path above; the
           // herdr door holds its own, so it is told the same thing or a panel's panelists collide.
           ...(effectiveMutation !== 'mutating' ? { sharedCwd: true } : {}),
