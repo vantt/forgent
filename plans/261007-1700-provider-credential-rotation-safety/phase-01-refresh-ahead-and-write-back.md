@@ -1,19 +1,20 @@
 ---
 phase: 1
-title: "Forced refresh-ahead under an account lock, and write-back at private-home removal"
+title: "Refresh-ahead in an fgOS-held scratch copy, and write-back of renewed copies"
 status: pending
 priority: P1
-effort: "1.5d"
+effort: "2d"
 dependencies: []
 ---
 
 # Phase 01: Refresh-ahead and write-back
 
 <!-- Updated: Validation Session 1 - omp layout, forced renewal, write-back moved to private-home removal -->
+<!-- Updated: Red Team Session 1 - renewal moved into a scratch copy; real store never marked due; async lock; shared removal; VACUUM INTO copy; Codex due time -->
 
 ## Overview
 
-Make a rotating login survive concurrent panes. Make the source due and renew it once in the real home before any private home is built from it, and keep a compare-before-write write-back, run when the private home is removed, as a safety net for a pane that outlives the remaining validity.
+Make a rotating login survive concurrent panes. Before a private home is built from an account, renew the login once, inside a scratch copy that fgOS owns, and apply the renewed pair to the real store with compare-before-write. Renewals that still happen inside a pane's private home are staged when the home is removed and applied the same way. The real store is never made to look expired.
 
 ## Parallel runs: the cases
 
@@ -21,87 +22,116 @@ A source holds access token T1 and refresh token P1. A refresh token is single u
 
 | Case | Today | With this phase |
 |---|---|---|
-| Two panes start on a login inside the window | Each copy renews P1 when its CLI decides to; the second is refused, the account is quarantined as `auth-token` | The first dispatcher takes the account lock, makes the source due, renews it in the real home, releases; the second takes the lock, sees hours left and skips. Both panes copy a login good for hours |
-| Provider treats a reused refresh token as theft | The chain may be revoked | Reuse cannot happen while every copy starts fresh |
-| Two panes both renew anyway and both are written back | Not applicable | Compare-before-write under the lock: only a later expiry replaces the source |
-| A pane outlives the remaining validity | Its renewal is lost with the home | Write-back at private-home removal keeps it |
-| The renewal itself fails | Not applicable | Recorded, never blocks the dispatch; the store keeps its refresh token (only the expiry marker was moved earlier, which the CLI renews from next time); the classifier and the lazy probe decide the account state |
-| The private home is removed later, by settlement in another process or by the reaper | Not applicable | The write-back runs in the removal path itself, from the marker written at provisioning |
+| Two panes start on a login inside the window | Each copy renews P1 when its CLI decides to; the second is refused, the account is quarantined `auth-token` | The first dispatcher takes the account lock, renews in a scratch copy, applies the new pair to the source, releases; the second sees hours left and skips. Both panes copy a login good for hours |
+| The owner's own omp/pi/Codex session runs on the same home meanwhile | Not affected | Not affected: the real store keeps its real expiry (not due), so that CLI does not renew because of us |
+| The renewal fails | Not applicable | The source was never touched; the failure is recorded with a cooldown; the dispatch goes on |
+| The runner dies while the renewal runs | Not applicable | The scratch copy stays under the account directory; the next holder of the account lock applies it if it is newer, then removes it |
+| A pane outlives the remaining validity and renews in its private home | Lost with the home | Staged at removal, applied under the account lock (now or by the next refresh-ahead) |
+| Two renewed copies are applied | Not applicable | Only a strictly later expiry replaces the source entry |
 
 ## Requirements
 
-- One account lock per provider account: its own lock directory under the provider-capacity runtime directory (`<runtimeDir>/account-locks/<provider>/<accountId>`), the same `withFileLock` generation-lock shape, separate from `state-lock` so a slow call never holds the state lock. `withFileLock` is synchronous: the renewal spawn is async, so use the lock for the decide-and-mark step and the re-read/record step, and hold mutual exclusion across the spawn with an equivalent async helper in `provider-capacity.mjs` built on the same acquire/release generation functions (do not fork a second lock format). The wait must exceed the probe timeout (90 s) plus margin.
-- Layouts and their expiry, read without printing any value:
-  - **pi** `home-files` with `auth.json`: any top-level entry with `type: "oauth"` and numeric `expires` (ms; treat values below 1e12 as seconds). No such entry (API key, e.g. OpenRouter) → unreadable → skipped.
-  - **omp** `home-files` whose `files` include `agent.db`: SQLite, table `auth_credentials`, rows with `credential_type = 'oauth'` and `disabled_cause IS NULL`, JSON `data.expires` (ms). Open with `node:sqlite` (`DatabaseSync`), loaded lazily; when it cannot be loaded the layout is unreadable. Read-only open for reads.
-  - **Codex** `codex-home`: decode the payload of `tokens.access_token` (base64url JWT, no signature check needed) and read `exp` (s).
-  - Anything else (agy/Gemini): unreadable → skipped, exactly as today.
-- Forced refresh-ahead, in the dispatch path, after the final account is selected (including the fail-over rotation from `1de852877`) and before the private home is provisioned, only when the dispatch is confined (a credential copy will be made) and the expiry is readable and less than `thresholdMs` (default 60 min, injectable) away:
-  1. Under the account lock, re-read; if still inside the window, move only the "due" marker in the **real** store: pi/omp `expires` → a past value; Codex `last_refresh` → a timestamp older than its refresh interval. pi/Codex files: write through a temporary file and a rename in the same directory, mode `0600`. omp: `UPDATE auth_credentials SET data = json_set(data, '$.expires', ?) WHERE id = ?` in a transaction (never replace the db file).
-  2. Run the probe command (`credentialProbeCommand`) against the real home, still holding the account lock.
-  3. Re-read; record the outcome (renewed: expiry moved forward; or failed with the judged detail) and release. Never throw into the dispatch.
-- `credentialProbeCommand` learns the omp layout: `home-files` with `agent.db` → `omp -p <PROMPT> --mode json --tools read` with `PI_CODING_AGENT_DIR=<home>`; the probe already ignores stdin (omp waits for EOF on a piped stdin). This also lets the lazy-probe unlock reach the omp xai account.
-- Write-back at private-home removal:
-  - At provisioning, when the dispatch opted in, write into the private-home ownership marker the credential identity needed later: `provider`, `accountId`, credential `kind`, expanded `home`, the layout name. No token values.
-  - `cleanupConfinementResource` (the one removal path used by the driver cleanup, `finalizeConfinementResources` and the reaper) calls the write-back before deleting, when the marker carries that field. A write-back error is reported on stderr and never prevents the removal.
-  - Rule: under the account lock, read the copy and the source; the copy must parse and have the expected shape; replace only when the copy's expiry is strictly later. pi/Codex: temp file + rename, `0600`. omp: update the matching row (`provider` + `identity_key`, or the single oauth row when only one exists) in a transaction, `data` only.
-  - A retained home (failed pane left open, `markResourceRetained`) is written back when it is finally removed, by the same path.
-- Opt-in by function, like the lazy probe: `executeAssignment` takes `providerCredentialRenew` (an object or function created by `createCredentialRenewal()` holding threshold, spawn and lock wait); the four callers that pass `providerCredentialProbe` (`dispatch/cli.mjs` ×2, `operation-choice.mjs`, `execution/run.mjs`) pass the real one. A caller that passes none changes nothing, and no marker field is written, so removal is byte-identical too.
-- No token value in any log, event, error message, marker or test output.
+### Locks
+- One account lock per provider account: `<runtimeDir>/account-locks/<provider>/<accountId>/lock`, the same generation-record format as `state-lock` (reuse `acquireGenerationLock`/`releaseGenerationLock` internals), separate from `state-lock`.
+- Add an **async** acquire in `provider-capacity.mjs` that retries with `setTimeout` instead of `Atomics.wait` (the sync one blocks the event loop; panel seats run in one process and may share an account). Every caller in this phase that may wait uses the async form. Sync callers only try once (no wait).
+- The holder record also carries the renewal child pid while a renewal runs; a reclaimer that finds a dead runner but a live child does not start a second renewal (it waits or skips this dispatch).
+- The lazy-probe unlock (`probeQuarantinedAccounts`) takes the same account lock around its real call.
+
+### Layouts (read without ever printing a value)
+- **pi** `home-files` with `auth.json`: entries with `type: "oauth"` and numeric `expires` (ms; below 1e12 → seconds). Entry key = provider id. No oauth entry (API key, e.g. OpenRouter) → unreadable → skipped.
+- **omp** `home-files` whose `files` include `agent.db`: SQLite (`node:sqlite` `DatabaseSync`, loaded lazily; unavailable → unreadable). Table `auth_credentials`, rows `credential_type = 'oauth'` and `disabled_cause IS NULL`, `data.expires` (ms). Entry key = row `id` + `provider`.
+- **Codex** `codex-home`: due time = min(JWT `exp` of `tokens.access_token`, `last_refresh` + Codex's own refresh interval). The interval constant must be read from the Codex source (`gh api` on openai/codex, `codex-rs` auth code) before use and cited in a code comment; if it cannot be confirmed, use JWT `exp` only and say so in the report.
+- Anything else (agy/Gemini): unreadable → skipped, as today.
+- Errors from parsing a store are reported by a fixed code (`unreadable-json`, `unexpected-shape`, `sqlite-unavailable`), never by the parser message (it quotes nearby input).
+
+### Refresh-ahead (`refreshAhead`)
+- Runs in the dispatch path for the account that is actually provisioned (after the final selection, including the executor fallback lease), right before the confined private home is prepared, only when a credential copy will be made, the layout is readable, and the source has less than `thresholdMs` left. `thresholdMs` defaults to `max(60 min, probe timeout + 5 min)`, injectable.
+- Under the account lock (async wait ≥ probe timeout + margin):
+  1. Apply any pending staged copies and any leftover scratch copy (compare-before-write), then remove them.
+  2. Re-read the source; if no longer inside the window, release and return `fresh`.
+  3. Skip with `cooldown` if the last failed renewal for this account is younger than the cooldown (default 30 min; recorded in the account directory).
+  4. Build a scratch home under `<account dir>/scratch-<pid>-<time>/` (mode `0700`) with the same listed files (omp `agent.db` via `VACUUM INTO`), set the "due" marker **in the scratch copy only** (pi/omp `expires` in the past; Codex `last_refresh` older than its interval), run `credentialProbeCommand` against the scratch home (record the child pid in the lock holder), judge the output.
+  5. On success with a later expiry: apply the scratch entry to the source (see apply). Then remove the scratch home. On failure: record the cooldown, remove the scratch home (its refresh token was not redeemed or was refused; either way the source is untouched).
+- Never throws into the dispatch; returns `{status: fresh|renewed|failed|cooldown|skipped, reason}` with no values.
+
+### Apply (compare-before-write, shared by refresh-ahead and write-back)
+- Under the account lock. Read copy and source; the copy entry must parse and have the expected shape; replace **only the matching entry** and only when its expiry is strictly later. Other entries/rows/fields stay byte-equal.
+- pi/Codex: write the merged JSON through a temp file and a rename in the same directory, mode `0600`. omp: `UPDATE auth_credentials SET data = ?, updated_at = ? WHERE id = ? AND provider = ?` in a transaction; never replace the db file; then `PRAGMA wal_checkpoint(PASSIVE)` (best effort).
+
+### Provisioning copy
+- `copyHomeFiles` copies a listed `agent.db` with `VACUUM INTO` through `node:sqlite` (consistent snapshot including the WAL) when the module is available; otherwise the plain copy as today. Only `agent.db`; the allow list does not change.
+- When the dispatch opted in, the private-home ownership marker (`writeOwnershipMarker`, written before the copy) is extended after the copy with `credentialWriteBack: { provider, accountId, kind, home, layout }`. No values.
+
+### Write-back at private-home removal
+- One shared removal function used by all three removal paths: the driver `cleanup` (herdr-spawn), `finalizeConfinementResources` (`authority.mjs`, which today calls `fs.rmSync` itself on the cli-spawn path) and the orphan reaper (`reapOrphanedConfinementResources`), including retained homes when they are finally removed.
+- Before deleting, when the marker has `credentialWriteBack` and the copy's entry is later than the source's: copy the credential file(s) into `<account dir>/pending/<unique>/` (atomic rename), then try the account lock once without waiting; if acquired, apply and clear; if not, leave it pending for the next `refreshAhead`. A write-back problem is reported on stderr by code only and never stops the removal.
+
+### Probe command
+- `credentialProbeCommand` learns omp: `home-files` whose files include `agent.db` → `omp -p <PROMPT> --mode json --tools read` with `PI_CODING_AGENT_DIR=<home>`. This branch is tested **before** the pi `auth.json` branch. The probe keeps `stdin: 'ignore'` (omp waits for EOF on a piped stdin).
+
+### Opt-in
+- `executeAssignment` takes `providerCredentialRenew` (from `createCredentialRenewal()`); the four callers that already pass `providerCredentialProbe` (`dispatch/cli.mjs` ×2, `operation-choice.mjs`, `execution/run.mjs`) pass the real one. Without it: no refresh-ahead, no marker field, so removal is byte-identical to today. The `VACUUM INTO` copy and the omp probe branch apply regardless (they fix copy staleness and the unlock probe, independent of the opt-in) — say so in the changelog.
+- No token value in any log, event, error, marker, report or test output.
 
 ## Architecture
 
 ```
 executeAssignment
-  select account (+ fail-over)  ──►  providerCredentialRenew.refreshAhead({provider, accountId, credentialSource})
-                                        account lock ─ read expiry ─ mark due ─ spawn probe in real home ─ re-read ─ release
-  prepareConfinementForLaunch ──► bwrap provisionSelectedCodexCredential
-                                        copy listed files ─ writeOwnershipMarker(+ credentialWriteBack when opted in)
+  select account (+ executor fallback lease)
+  └► renew.refreshAhead(account)              [async account lock]
+        apply pending/scratch ─ re-read ─ cooldown? ─ scratch copy ─ mark due in scratch
+        ─ spawn probe on scratch ─ apply newer entry to source ─ rm scratch
+  prepareConfinementForLaunch ─► bwrap: marker ─ copy (agent.db via VACUUM INTO) ─ marker += credentialWriteBack
   ... pane runs ...
-  cleanup / finalizeConfinementResources / reaper
-        └► cleanupConfinementResource ─ marker.credentialWriteBack? ─ writeBackIfNewer ─ rm
+  driver cleanup | finalizeConfinementResources | reaper
+  └► removePrivateHome(dir)  (shared)
+        credentialWriteBack? ─ stage newer copy to pending ─ try-lock ─ apply ─ rm home
 ```
 
 ## Related Code Files
 
-- Create: `src/runner/dispatch/provider-credential-renewal.mjs` (layout detection, expiry read, mark-due, `refreshAhead`, `writeBackIfNewer`; reuses `credentialProbeCommand`, `judgeProbeOutput`).
-- Modify: `src/runner/dispatch/provider-credential-probe.mjs` (omp layout), `src/runner/dispatch/provider-capacity.mjs` (account lock path + async lock helper on the existing generation lock), `src/runner/dispatch/assignment-runner.mjs` (call after final selection, before provisioning; pass the opt-in to the confinement request), `src/runner/dispatch/confinement/drivers/bwrap.mjs` (marker field at provisioning), `src/runner/dispatch/confinement/cleanup.mjs` (write-back before removal), the four callers.
-- Tests: new `test/runner/provider-credential-renewal.test.mjs`; extend the probe and cleanup tests that exist.
-- Docs: `docs/specs/runner.md` (refresh-ahead + write-back rule; move the lazy-probe unlock rule out of `docs/specs/distribution.md` row 5d into it, leave a pointer), `docs/specs/confinement-authority.md` (one line: the private home receives a renewed copy; a newer copy is written back at removal), `CHANGELOG.md` `[Unreleased]`, `docs/architecture-manifest.json` (new module).
+- Create: `src/runner/dispatch/provider-credential-renewal.mjs` (layouts, expiry, scratch renewal, apply, staging).
+- Modify: `src/runner/dispatch/provider-credential-probe.mjs` (omp branch first), `src/runner/dispatch/provider-capacity.mjs` (account lock paths, async acquire, try-acquire, lazy probe takes the account lock), `src/runner/dispatch/assignment-runner.mjs` (call after final lease, before confinement prepare; pass the opt-in into the confinement request), `src/runner/dispatch/confinement/drivers/bwrap.mjs` (`VACUUM INTO` copy, marker field), `src/runner/dispatch/confinement/cleanup.mjs` (shared removal with write-back), `src/runner/dispatch/confinement/authority.mjs` (`finalizeConfinementResources` uses the shared removal), the four callers.
+- Tests: new `test/runner/provider-credential-renewal.test.mjs`; extend the probe, cleanup/finalize and provider-capacity lock tests.
+- Docs: `docs/specs/runner.md` (refresh-ahead, apply, write-back; move the lazy-probe unlock rule from `docs/specs/distribution.md` row 5d into it, leave a pointer), `docs/specs/confinement-authority.md` (the private home receives a renewed copy; SQLite store copied as a snapshot; a newer copy is written back at removal), `CHANGELOG.md` `[Unreleased]`, `docs/architecture-manifest.json`.
 
 ## Implementation Steps
 
-1. Read the current code paths named above on the worktree HEAD; confirm the four callers and the removal paths.
-2. Test-first, with temp dirs and an injectable spawn (never the real CLIs, never real tokens; fixtures use obviously fake strings):
-   - expiry read per layout (pi oauth/API-key, omp row/no row/disabled row/no `node:sqlite`, Codex JWT, unknown layout);
-   - two concurrent `refreshAhead` calls → one spawn; outside the window → no spawn; unreadable → no spawn; spawn failure/timeout → no throw, store refresh token unchanged;
-   - mark-due touches only the expiry marker (other fields byte-equal);
-   - write-back: newer copy replaces; older/equal/unreadable/malformed copy leaves the source byte-equal; omp row update keeps other rows and columns;
-   - removal without the marker field: identical to today; with it: write-back then removal; write-back error still removes.
-3. Implement the module, the lock helper, the probe extension.
-4. Wire into `assignment-runner.mjs`, bwrap provisioning marker, `cleanupConfinementResource`, and the four callers.
-5. Run targeted tests, then `env -u CLAUDE_CODE_SESSION_ID npm test`.
-6. Real check once (the Lead or a verifier, not the builder): on omp xai, with the source inside the window (or by using a threshold larger than the remaining validity), two confined dispatches started together → one renewal recorded, both runs answer, a later plain `omp -p` from the source answers. Evidence: fingerprints (short sha256) and expiry deltas only.
-7. Move the spec text to its owners, update the changelog and the architecture manifest.
+1. Re-read the code paths above on the worktree HEAD; confirm the three removal paths, the four callers, the executor fallback lease site.
+2. Confirm the Codex refresh interval from its source; record the citation.
+3. Test-first, with temp dirs, an injectable spawn and obviously fake token strings (never the real CLIs, never real stores):
+   - expiry per layout (pi oauth / API key / several entries; omp one row / several rows / disabled / no `node:sqlite`; Codex `exp` vs `last_refresh`; unknown layout);
+   - async lock: two concurrent `refreshAhead` in one process → one spawn, event loop not blocked; dead runner + live child → no second spawn;
+   - outside window → no spawn; cooldown → no spawn; spawn failure/timeout → source byte-equal, cooldown recorded;
+   - the real store is never written with a past expiry (assert on every write);
+   - apply: later entry replaces only that entry; older/equal/unreadable/malformed leaves the source byte-equal; omp other rows/columns unchanged;
+   - leftover scratch and pending copies are applied by the next holder;
+   - removal via each of the three paths: without marker field identical to today; with it, staged then removed; write-back error still removes;
+   - `VACUUM INTO` copy carries a row committed only in the WAL;
+   - no parser message or token substring in any stderr/result (scan test output for the fake token strings).
+4. Implement, then wire the callers.
+5. `env -u CLAUDE_CODE_SESSION_ID npm test` (targeted suites first).
+6. Real check (by the Lead/verifier, not the builder): a small script in the scratch directory calls `refreshAhead` with a `thresholdMs` larger than the remaining validity on the omp xai account → `renewed`; the source fingerprints change and a plain `omp -p` from the source answers; then two confined dispatches started together → no renewal inside either pane (source expiry unchanged by them). Fingerprints and expiry deltas only.
+7. Spec text, changelog, architecture manifest.
 
 ## Success Criteria
 
-- [ ] Concurrency test: two callers, one spawn.
-- [ ] Byte-identical behaviour without the opt-in (tests cover provisioning and removal).
-- [ ] Write-back never replaces a newer or equal source; never touches the source on a bad copy.
-- [ ] omp layout handled through row updates; db file never replaced.
-- [ ] Full suite green; real check evidence recorded with fingerprints only.
+- [ ] Two concurrent dispatches, one renewal, real store never marked due.
+- [ ] Byte-identical removal and provisioning marker without the opt-in.
+- [ ] Apply never replaces a newer/equal entry and never touches the source on a bad copy; only the matching entry changes.
+- [ ] Write-back reachable from driver cleanup, `finalizeConfinementResources` and the reaper.
+- [ ] No event-loop blocking lock in the async paths.
+- [ ] Full suite green; real-check evidence by fingerprints only.
 - [ ] Spec text in `runner.md` and `confinement-authority.md`; unlock rule moved out of `distribution.md`.
 
 ## Risk Assessment
 
-- **Mark-due then the renewal fails**: the store's refresh token is unchanged; the CLI renews from it on the next call. Signal: outcome `failed` recorded. Response: none needed beyond the record; repeated failure ends in the existing `auth-token` quarantine path.
-- **A live CLI in the real home writes the store at the same moment** (the unconfined `omp-cli-vantt` invocation uses the real profile): omp writes go through SQLite transactions, ours too; pi/Codex file writes can race a CLI rewrite. Mitigation: re-read and compare expiry inside the lock right before writing; never write when the source is already later.
-- **omp WAL**: a running omp in the real profile may hold newer rows in `agent.db-wal`, which the plain file copy (`copyHomeFiles`) does not carry. Out of scope to change the copy; after a successful renewal run `PRAGMA wal_checkpoint(PASSIVE)` so the copy made next sees the renewed row. Signal: the real check shows a pane renewing right after a fresh renewal. Response: replan the copy for SQLite layouts.
-- **The CLI's own "due" rule differs from what we mark** (e.g. Codex interval): the real check proves it. Signal: expiry does not move after a forced renewal. Response: adjust the mark-due value for that layout; if it cannot be forced, skip that layout and keep only the write-back.
-- **Renewal cost**: one small request per account per window. Only inside the threshold.
-- **Rollback**: stop passing the function (one line per caller); markers without the field are removed as today; the only new persisted thing is the account-lock directory.
-- **Reuse revokes the chain** and a race still slips through: the owner logs in again and the lazy probe (now omp-aware) unlocks the account.
+- **Scratch renewal redeems P1 and then the apply fails** (crash between): the scratch copy holds the only good pair; it stays in the account directory and the next lock holder applies it. Signal: leftover scratch found. Response: apply, then remove.
+- **The owner's CLI renews the source concurrently by itself** (it was inside its own 5-min window): both redeem P1 → one refused. Same exposure as today, made rarer because fgOS renews at ≤ threshold, long before the CLI's own window.
+- **Codex interval unknown**: fall back to JWT `exp`; Codex then still renews inside copies at its interval → write-back covers it.
+- **`VACUUM INTO` cost** on each confined omp dispatch: agent.db is ~170 KB; negligible.
+- **Rollback**: stop passing the function (one line per caller). The `VACUUM INTO` copy and the omp probe branch are independent fixes; revert separately if needed. New persisted state: the account-lock directory with pending/scratch/cooldown files.
+- **Reuse revokes the chain**: owner logs in again; the lazy probe (now omp-aware) unlocks the account.
 
 ## Validation
 

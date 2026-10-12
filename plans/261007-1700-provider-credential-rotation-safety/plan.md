@@ -1,6 +1,6 @@
 ---
 title: "Provider credential rotation safety: refresh once at the source, write back what a pane renewed"
-description: "A pane that renews a rotating login inside its throwaway home strands the source login; design for a forced refresh-ahead under an account lock plus a compare-before-write write-back at private-home removal."
+description: "A pane that renews a rotating login inside its throwaway home strands the source login; design for a refresh-ahead done in an fgOS-held scratch copy under an account lock, plus a compare-before-write write-back of copies renewed inside panes."
 status: pending
 priority: P1
 branch: feat/provider-credential-rotation-safety
@@ -28,11 +28,11 @@ What is proven and what is not (re-measured 2026-10-12, fingerprints only):
 | Gemini (agy homes) | **Unknown**: no expiry field or renewal behaviour read; left as today |
 | OpenRouter (`z-ai`, pi `auth.json`) | An API key, no `expires`: left as today |
 
-Code read (main @ `97ca636f9`): fgOS provisions credentials in `src/runner/dispatch/confinement/drivers/bwrap.mjs` (`provisionSelectedCodexCredential`, `copyHomeFiles`), only the listed files. The private home is removed by `cleanupConfinementResource` (`confinement/cleanup.mjs`), reached from the driver `cleanup`, from `finalizeConfinementResources` (assignment-runner and `settlement.mjs`, possibly in a later process) and from the orphan reaper; all of these run **before** `releaseSelectedProviderLease`. `credentialProbeCommand` (`provider-credential-probe.mjs`) knows Codex and pi `auth.json` only, so the lazy-probe unlock cannot probe the omp xai account today.
+Code read (main @ `97ca636f9`): fgOS provisions credentials in `src/runner/dispatch/confinement/drivers/bwrap.mjs` (`provisionSelectedCodexCredential`, `copyHomeFiles`), only the listed files, `agent.db` without its WAL. The private home is removed on three paths: the herdr driver `cleanup` (`cleanupConfinementResource`), `finalizeConfinementResources` (`authority.mjs`, its own `fs.rmSync`, the only removal on the cli-spawn path; also reached from `settlement.mjs`, possibly in a later process) and the orphan reaper; all before `releaseSelectedProviderLease`. `withFileLock` waits with `Atomics.wait`, blocking the event loop. `credentialProbeCommand` (`provider-credential-probe.mjs`) knows Codex and pi `auth.json` only, so the lazy-probe unlock cannot probe the omp xai account today.
 
 ## Scope
 
-In: make the source login due and renew it once in the real home, under an account lock, before a private home is created from it; write a renewed login back when the private home is removed, only when it is newer; teach the probe command the omp layout; tests; the spec text in its owning documents.
+In: renew the login once in an fgOS-held scratch copy, under an account lock, and apply the newer entry to the real store before a private home is created from it; stage and apply a login renewed inside a pane when its private home is removed, only when newer; copy `agent.db` as a consistent SQLite snapshot; teach the probe command the omp layout; tests; the spec text in its owning documents.
 
 Out: changing which files are copied (the allow list stays), binding the real home into the confinement, any change to executor, model or policy selection, calling a provider's OAuth endpoint directly, editing `~/.fgos/config.json`.
 
@@ -40,7 +40,7 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 
 | # | Phase | Depends on | Exit |
 |---|---|---|---|
-| 01 | [Refresh-ahead and write-back](phase-01-refresh-ahead-and-write-back.md) | none open (see Constraints) | Behaviour proven by tests and one real forced renewal; spec moved to its owners |
+| 01 | [Refresh-ahead and write-back](phase-01-refresh-ahead-and-write-back.md) | none open (see Constraints) | Behaviour proven by tests and one real scratch renewal; spec moved to its owners |
 
 ## Constraints
 
@@ -52,10 +52,10 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 
 ## Acceptance criteria
 
-- Two dispatches that start together on an account inside the refresh-ahead window cause exactly one renewal, and both runs start with a login that is good for hours.
+- Two dispatches that start together on an account inside the refresh-ahead window cause exactly one renewal, and both runs start with a login that is good for hours. The real store is never written with a past expiry.
 - A renewed login written back never replaces a newer one, and a failed, unreadable or malformed copy never touches the source.
-- With no renewal function passed, behaviour is byte-identical to today (the same opt-in shape as the lazy probe), including private-home removal.
-- One real forced renewal (omp xai) leaves the source usable for a second call; evidence is fingerprints.
+- With no renewal function passed, refresh-ahead and write-back are off and private-home removal is byte-identical to today (the same opt-in shape as the lazy probe). The SQLite snapshot copy and the omp probe branch apply regardless.
+- One real scratch renewal (omp xai) leaves the source usable for a second call; evidence is fingerprints.
 - Spec text sits in `runner.md` and `confinement-authority.md`; the unlock rule moves from `distribution.md` to `runner.md` in the same change.
 
 ## Open questions
@@ -81,10 +81,32 @@ Out: changing which files are copied (the allow list stays), binding the real ho
   7. Account fail-over (`1de852877`) can switch the selected account after the first lease; refresh-ahead must run for the account actually provisioned.
 
 #### Decisions (taken by the planner from evidence; no option was close)
-- **Forced refresh-ahead**: under the account lock, if the source has less than the threshold left, rewrite only the expiry marker in the real store so the CLI sees it as due (pi/omp `expires` set in the past; Codex `last_refresh` set past its interval), then run the probe command in the real home, then re-read. Rejected: threshold equal to the CLI's own window (leaves the concurrent-pane race for any pane started in the last pane-length before expiry); calling OAuth endpoints directly (owns other projects' client contracts).
+- **Forced refresh-ahead** (superseded by the red team: now done in a scratch copy, see below): under the account lock, rewrite the expiry marker in the real store, run the probe in the real home, re-read. Rejected: threshold equal to the CLI's own window (leaves the concurrent-pane race for any pane started in the last pane-length before expiry); calling OAuth endpoints directly (owns other projects' client contracts).
 - **Threshold**: 60 min by default, injectable. omp/pi tokens live 6 h, Codex 240 h; panes run minutes to tens of minutes.
-- **Write-back placement**: inside the single private-home removal path, driven by a field written into the ownership marker at provisioning time only when the dispatch opted in. Covers the normal cleanup, `finalizeConfinementResources` in a later process, and the reaper.
+- **Write-back placement**: at private-home removal, driven by a field written into the ownership marker at provisioning time only when the dispatch opted in (red team: through one shared removal function).
 - **omp store access**: `node:sqlite` loaded lazily; when the module is not available the layout counts as unreadable and is left as today.
 
 ### Red Team Review
-Pending (session 1, step 2).
+
+Report: [reports/red-team-261012-2345-credential-rotation-plan-review.md](reports/red-team-261012-2345-credential-rotation-plan-review.md) (Opus reviewer, code read only). 12 findings; all accepted, decided by the planner:
+
+| # | Sev | Finding | Disposition |
+|---|---|---|---|
+| 1 | Critical | Write-back unreachable on cli-spawn: `finalizeConfinementResources` removes the home with its own `fs.rmSync` | Accepted: one shared removal function for driver cleanup, finalize and reaper |
+| 2 | High | A failed renewal leaves the real store marked due, so every later pane renews in its copy | Accepted, redesigned: the due marker is set only in an fgOS scratch copy; the real store is never marked due; failure cooldown |
+| 3 | High | Detached probe survives a dead runner; lock reclaim lets a second renewal redeem the same token | Accepted: child pid in the lock holder; leftover scratch copy applied by the next holder |
+| 4 | High | `Atomics.wait` lock blocks the event loop; seats in one process deadlock | Accepted: async acquire for waiting callers; sync callers try once and stage |
+| 5 | High | Copy of `agent.db` omits the WAL; checkpoint PASSIVE is not a guarantee | Accepted: copy `agent.db` with `VACUUM INTO` |
+| 6 | High | Marking the real store due makes the owner's own CLIs renew concurrently | Accepted: resolved by the scratch-copy design |
+| 7 | High | Codex renews on `last_refresh` interval, not only JWT `exp` | Accepted: due time = min(exp, last_refresh + interval), interval cited from Codex source |
+| 8 | Medium | Copy made outside the lock could catch a store marked due | Moot: the real store is never marked due; apply is atomic |
+| 9 | Medium | Several credentials per store; whole-file replace can roll back other entries | Accepted: apply merges only the matching entry/row |
+| 10 | Medium | `JSON.parse` messages quote input (token fragments) | Accepted: fixed error codes only |
+| 11 | Low | Factual slips (marker order, fallback vs rotation site, lazy probe lock, probe branch order) | Accepted: corrected in phase 01 |
+| 12 | Low | Defer write-back; threshold ≥ timeout | Threshold accepted (`max(60 min, timeout + 5 min)`). Deferral rejected: the owner asked for full scope and write-back reuses the same apply function |
+
+Superseded from validation session 1: "rewrite the expiry marker in the real store" (replaced by the scratch copy), "write-back inside `cleanupConfinementResource`" (now the shared removal function), "`PRAGMA wal_checkpoint` after renewal as the WAL answer" (now `VACUUM INTO` for the copy).
+
+### Whole-Plan Consistency Sweep
+- Re-read `plan.md` and phase 01 after the red-team edits. Searched for: `grok-vantt`, `30 min`, `lease-release`, `mark due` on the real store, `wal_checkpoint`, `forced renewal`. Remaining mentions are historical (measurement table, superseded list) or intentional (checkpoint as best effort after an omp row update).
+- Unresolved contradictions: 0.
