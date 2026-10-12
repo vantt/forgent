@@ -78,3 +78,15 @@ A real native API run checks full membership rather than examples: holds are exa
 ## Stop and next action
 
 Return one committed independent report with the decisions above and an explicit resolution of the native membership difference; any permission beyond exact identity recovery is an owner decision, not a checker patch. Then apply only genuinely approved accounting, regenerate from the persisted registry, rerun both prior-registry D/E and the full identity-set comparison. Close Agent Coordination and start Step 3 only after D=0 and strict equality hold. Until then both are UNPROVEN. Three Rings holds stay; no new archive/delete request, promoted-doc edit or main-spec conflict.
+
+## Follow-up: current-ID binding representation
+
+The 26-row request above is accepted by committed `review-2-registry-recovery.md` at `9855bf6cb` and applied; it is not reopened. D is now zero-fatal against both priors. All 683 units have exact committed classification matches, including the same current locator and complete shown text; no truth re-review is requested.
+
+The remaining blocker is the unchanged executable contract, not evidence search. `check-doc-inventory-gates.mjs:1032` reads a receipt by `receipt.claimId === ref.claimId`; lines 1035–1037 require that ID to be a current inventory row; lines 1116–1118 require a committed Class-column verdict for the same receipt ID. Each of the 683 current IDs differs from its accepted receipt-row ID. The native smoke `node --expose-gc /tmp/phase06/compare-a30-binding.mjs` supplies all current-ID reference projections and closes zero units: 997 before/after, six listed-missing, 677 additional open. Its complete runnable source, real inputs and result are saved in `closure-fixes-applied.json.acceptedRegistryRecovery.nativeBindingProof`.
+
+Please authorize the representation rather than re-review truth. Recommendation: project the existing receipts to current IDs while keeping every locator, full unit digest, complete shown text, class and evidence byte-identical, and attach provenance to the original receipt/report row. Lead commits a matching current-ID Class-column report with the projected receipt commit pin. The author must not produce that independent report or stamp those bindings reviewed before it exists. This satisfies H1 and the unchanged gate without a digest-alias exemption.
+
+The alternative of changing the gate to accept a different report/receipt ID by digest is not authorized and would change the frozen binding contract. Restoring old IDs globally also changes the authorized reconstructed base: 28 currently live prior-registry identities would need accounting, and six lack reviewed retirements. No such change is made.
+
+Current proof: both D exit 0; strict E is still 3 holds / 342 identical-owner exceptions / 997 reverse-open. All 683 associations, their receipt report/row ID/digest and the native full-set differences are in the persisted evidence. Three Rings holds remain; no new archive/delete, promoted-doc edit, main conflict or current-document edit. Close and Step 3 remain UNPROVEN pending an independently committed representation the gate can consume.

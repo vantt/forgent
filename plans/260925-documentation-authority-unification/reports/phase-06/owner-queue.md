@@ -195,3 +195,11 @@ A29 authorizes the reconstructed base and exact witnessed identity binding. The 
 Lead review request: `review-request-2-registry-recovery.md`. The 58/65 literal witness count consists of 47 reviewed source dispositions plus eleven classification-only witnesses, not 58 source dispositions. Seven retired units lack an exact witness; the eleven classifications cannot be converted into dispositions by guessing; eight old gap digests differ from current text. Both D runs consequently have 26 findings. The native E comparison also records six listed units no longer open and 677 additional open units. No expansion of the reviewed candidate-unverified list or reassignment of accepted receipts is made outside the bounded scope.
 
 This is a recovery/accounting review, not another current-truth pass. Three Rings holds stay; no new archive/delete request, promoted-doc edit or current main-spec conflict. Native D zero-fatal, E equality and Agent Coordination closure remain UNPROVEN. Step 3 must wait for the committed independent recovery decisions and passing reruns.
+
+## Receipt-ID contract after accepted A30 recovery
+
+The previous 26 accounting questions are resolved by `9855bf6cb` and their ok verdicts applied with notes verbatim. Both prior-registry D proofs pass with zero fatal. All 683 classification matches are exact and have the same current locator and complete shown payload. No additional truth question is raised.
+
+The unchanged gate does not consume a digest-only current-ID-to-old-receipt-ID association: it requires the same claim ID in the inventory, pinned receipt and committed classification table. The actual 683-reference native run closes zero units. Request `review-request-2-registry-recovery.md` now contains the representation-only follow-up. Recommended decision: a current-ID receipt projection with original provenance and an independently committed matching report; no checker change and no truth re-review. No author-generated reviewer report, global old-ID restore, synthetic identity merges or open-list expansion is made.
+
+Three Rings holds stay; no new archive/delete, promoted-doc edits or main-spec conflicts. Strict E equality, batch closure and Step 3 remain UNPROVEN until the independently committed representation is accepted by the native gate.

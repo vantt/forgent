@@ -1093267,6 +1093267,150 @@
       "dispositionSource": "carry-forward-classification",
       "dispositionConfidence": "high",
       "dispositionReviewer": "lead 2026-10-06"
+    },
+    {
+      "claimId": "claim_4c05b748365100a7b2cb1fd5daa040d2",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-38",
+      "sourceUnitDigest": "21cfbd22dd0b30278cfb44f38652360d02071c1a40a437cf07a59415fc28e29e",
+      "unitDigest": "1cab883684ce94e8f8af7e2efe687e9e511be55c908f1b7b5ada8fabbd3fa9d3",
+      "identityFingerprint": "1cab883684ce94e8f8af7e2efe687e9e511be55c908f1b7b5ada8fabbd3fa9d3",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-38",
+      "successorClaimId": "claim_1883fa80013cba2eb547872f2af5a698",
+      "dispositionRationale": "Supersede. Source text exact at 865ad66be (intermediate ladder, run-result.mjs:1261-1278 cites) and no longer anywhere at HEAD under any anchor (searched all 84544 HEAD docs units). Reviewed chain: 21cfbd22 to 4e6e8e73 (review-2-closure-retired.md, claim_4c05b748 row ok) then 4e6e8e73 to fceb7268 (verified-row correction, review-2-closure-fixes.md gap row ok, target fceb7268). Current unit: team-communication-protocol-v1.md#unheaded-block-38, registry claim_1883fa80...; the ledger successor id claim_b5cc705c... is not in the rebuilt registry. Target docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_4a4bddcbf0fc4ffa406c51d5df8d5623",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-45",
+      "sourceUnitDigest": "b343cb615e796f69b45669066da04a200bb366f9071bba646a4b1a546a9ce565",
+      "unitDigest": "8e09e6a0319b065484cd11ed379f5b103cc6f1920f18928676cb1de45b71c46a",
+      "identityFingerprint": "8e09e6a0319b065484cd11ed379f5b103cc6f1920f18928676cb1de45b71c46a",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-45",
+      "successorClaimId": "claim_ec40d1afc278f2d436200eecc52abdf5",
+      "dispositionRationale": "Supersede. Source b343cb61 exact at 865ad66be block 45; the same bytes still exist only in the retired copies (docs/architect/.../team-communication-protocol-v1.md block 42 and history/retired-engine/files/proposals copy), not in the platform file. Reviewed successor: HEAD block-45 digest f42832dd (parking bullet corrected; review-2-closure-retired.md claim_4a4bddcb row ok, src/intake/discovery.mjs:535-561). HEAD same-locator digest equals that reviewed target. Registry claim_ec40d1af...; ledger successor claim_590258ac... absent from rebuilt registry. Target docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-45; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_8de909df847b8689807abcfe156b704a",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-62",
+      "sourceUnitDigest": "aaded8bcb540dd65483aeec1913efc98975a6a30b92a0e1dbcd6505a5f03e4ae",
+      "unitDigest": "621f2a845e2e31dc35b6f13be951e10959e0c57a8cdb918d9cdaecdd3aca83c5",
+      "identityFingerprint": "621f2a845e2e31dc35b6f13be951e10959e0c57a8cdb918d9cdaecdd3aca83c5",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-62",
+      "successorClaimId": "claim_ba484d20b99fb878fdfaec06c2433f1f",
+      "dispositionRationale": "Supersede. Source aaded8bc exact at 865ad66be block 62; same bytes remain only in retired copies (legacy block 65). Reviewed successor: HEAD block-62 digest 284bb031 (one bullet narrowed to read-only done claims; review-2-closure-retired.md claim_8de909df row ok). HEAD same-locator digest equals that reviewed target. Registry claim_ba484d20...; ledger successor claim_c0b3f970... absent from rebuilt registry. Target docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-62; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_0c80eeeb663fbf52cd06f23f7ba03a35",
+      "sourcePath": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "sourceAnchor": "unheaded-block-31",
+      "sourceUnitDigest": "77ec27c0fab5c3dcc3977ae078c9f10c67101aec51293bd8eed29532880e76d2",
+      "unitDigest": "09953807e72c245e6adcfcef7edf383459809412fdeb4fa46e2d0cf75854a7fa",
+      "identityFingerprint": "09953807e72c245e6adcfcef7edf383459809412fdeb4fa46e2d0cf75854a7fa",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "unheaded-block-31",
+      "successorClaimId": "claim_6e3f989d0136d997e49c58dd5c604058",
+      "dispositionRationale": "Supersede. Source 77ec27c0 exact at b7fa93a72 block 31 (R14/R15 row with \"shared mutation door\"). Reviewed: review-2-closure-fixes.md gap row ok, delta exactly the dropped phrase; target 68f6db1a equals HEAD same-locator digest. Registry claim_6e3f989d...; ledger successor claim_f717d716... absent from rebuilt registry. Target docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-31; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_60bdeefbc7b8a3bee3c9ba06e7759dc4",
+      "sourcePath": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "sourceAnchor": "unheaded-block-33",
+      "sourceUnitDigest": "2e25b357cdeb5ecd739d6f3b5399ab27cf2153b1191d769d9352eda8c525d631",
+      "unitDigest": "f0a03297c20c7bfe7c47a2eb0a8da2d42e382106c5588d275a5d0e17e3e2def7",
+      "identityFingerprint": "f0a03297c20c7bfe7c47a2eb0a8da2d42e382106c5588d275a5d0e17e3e2def7",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "targetAnchor": "unheaded-block-33",
+      "successorClaimId": "claim_abd6501a89d2a8c792735eeda9550306",
+      "dispositionRationale": "Supersede. Source 2e25b357 exact at b7fa93a72 block 33. Reviewed: review-2-closure-fixes.md gap row ok, delta exactly the added Evidence paragraph; target a14c802a equals HEAD same-locator digest. Registry claim_abd6501a...; ledger successor claim_8fc3d775... absent. Target docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-33; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_f1ff9633d8902c2e7c7063895cdb2e8a",
+      "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceUnitDigest": "b3c903ac85ecab9f28e45c445a2893c61d3427805a3a7f7b867a62938c7a4a00",
+      "unitDigest": "b4ee279d68f6522a13bb62e09659df7132ce0eb6e9ebbf1ccc81159be6cb51d6",
+      "identityFingerprint": "b4ee279d68f6522a13bb62e09659df7132ce0eb6e9ebbf1ccc81159be6cb51d6",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "targetAnchor": "unheaded-block-4",
+      "successorClaimId": "claim_e1006302cec44bf7ea58a63ed94983d8",
+      "dispositionRationale": "Supersede. Source b3c903ac exact at b7fa93a72 block 4. Reviewed: review-2-closure-fixes.md gap row ok, delta exactly the run-metadata citation to assignment-runner.mjs:1563-1582; target d363fcef equals HEAD same-locator digest. Registry claim_e1006302...; ledger successor claim_3f9ba37c... absent. Target docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-4; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_34a87472629191c59355e5f74ef2c2d2",
+      "sourcePath": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceUnitDigest": "5861765263e6557b7b6542fbb308cc5bb10cd919f0e521532284054431e54a8e",
+      "unitDigest": "539a3e32bfd0d0a3c523b8d935c831a4dfec5e72764d3fb45041726b39853bdb",
+      "identityFingerprint": "539a3e32bfd0d0a3c523b8d935c831a4dfec5e72764d3fb45041726b39853bdb",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "targetAnchor": "unheaded-block-9",
+      "successorClaimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
+      "dispositionRationale": "Supersede. Source 58617652 exact at b7fa93a72 block 9. Reviewed: review-2-closure-fixes.md gap row ok, delta exactly the added policy/normalizer stamp citations; target eb1cabf7 equals HEAD same-locator digest. Registry claim_85872e0e...; ledger successor claim_a7fe161c... absent. Target docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-9; digest recomputed at HEAD with the repo extractor."
+    },
+    {
+      "claimId": "claim_e9bb00004e75ca737f2eeca58152063d",
+      "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "sourceAnchor": "unheaded-block-38",
+      "sourceUnitDigest": "4e6e8e73538d11308af160fc087ce34ae665f71430e79dbf0df679f5bc70d7b1",
+      "unitDigest": "34dce2f604f30ad877ec99ce7fe59cef6bd6e907fbf862018a9207dcf644e7d3",
+      "identityFingerprint": "34dce2f604f30ad877ec99ce7fe59cef6bd6e907fbf862018a9207dcf644e7d3",
+      "unitKind": "unheaded-block",
+      "status": "current",
+      "identityStatus": "identity-gap",
+      "gapReason": "Historical source identity restored from the committed independently reviewed supersede witness.",
+      "sourceCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
+      "targetAnchor": "unheaded-block-38",
+      "successorClaimId": "claim_1883fa80013cba2eb547872f2af5a698",
+      "dispositionRationale": "Supersede. Source 4e6e8e73 exact at b7fa93a72 block 38 and no longer present at HEAD under any anchor or file (exact search of all HEAD units; the earlier closure-retired note \"4e6e8e73 at HEAD\" predates the A19 verified-row fix). Reviewed successor: review-2-closure-fixes.md gap row ok, delta exactly the verified-row rewrite; target fceb7268 equals HEAD block-38. Registry claim_1883fa80... (same unit as claim_4c05b748 successor); ledger successor claim_b5cc705c... absent. Target docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-38; digest recomputed at HEAD with the repo extractor."
     }
   ],
   "retiredUnits": [
@@ -1094365,7 +1094509,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "current",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "no counterpart in current source"
+      "retiredReason": "no counterpart in current source",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "dc558d49b999971e97907511333bfd1be515560cab222baa7d9c26ece36d650c",
+      "dispositionRationale": "Supersede. Source: ed782e245 docs/platform/agent-coordination/README.md#unheaded-block-11 (8-row Relationship table; registry unitDigest 534b6c65...). Not carried by the HEAD live README, which was rewritten (A16 reframe). The table is carried inside the literal snapshot (lines 145-154 of the history file, unit unheaded-block-3, heading unit literal-snapshot). 7 of 8 rows are byte-equal; the only delta is the migration plan row, now \"migration plan (retired; non-authority history)\" linking history/documentation-migration/documentation-standardization-plan.md. That edit is commit 0a41d793e (route retired documents to their history carriers; recorded in post-review-edits.md), snapshotted by f719eeff9 and labelled by the Added in candidate line 157 of the history file. The same target unit (digest dc558d49...) is already the reviewed move target of README rows (review-2-liveness-retired-unit.md, claim_51e4adf4 row). Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/README.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 434f2ba85eec52711ee8ba1a2f0245c5ea1cc3fe62033694b516fea323585c6e",
+        "Target digest dc558d49b999971e97907511333bfd1be515560cab222baa7d9c26ece36d650c"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Supersede. Source: ed782e245 docs/platform/agent-coordination/README.md#unheaded-block-11 (8-row Relationship table; registry unitDigest 534b6c65...). Not carried by the HEAD live README, which was rewritten (A16 reframe). The table is carried inside the literal snapshot (lines 145-154 of the history file, unit unheaded-block-3, heading unit literal-snapshot). 7 of 8 rows are byte-equal; the only delta is the migration plan row, now \"migration plan (retired; non-authority history)\" linking history/documentation-migration/documentation-standardization-plan.md. That edit is commit 0a41d793e (route retired documents to their history carriers; recorded in post-review-edits.md), snapshotted by f719eeff9 and labelled by the Added in candidate line 157 of the history file. The same target unit (digest dc558d49...) is already the reviewed move target of README rows (review-2-liveness-retired-unit.md, claim_51e4adf4 row). Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/README.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: README.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/architecture/README.md",
@@ -1097945,7 +1098110,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "3d500396d86af8a042cdec8998b1d349753e1586d0b77f535c3e6bc36bc93f88",
+      "dispositionRationale": "Move. Existing reviewed move row (ledger/retired-engine-moves.json, review-2reframe-moves.md ok, same source digest, target tud 3d500396...). Recomputed: unit text is a byte-for-byte substring of the literal body at HEAD; target heading digest equals the ledger value. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest d9aa9975e7a7e7fd8eb83bfade4faca1ed15556b2de8b0d6263ace6c199a90d1",
+        "Target digest 3d500396d86af8a042cdec8998b1d349753e1586d0b77f535c3e6bc36bc93f88"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (ledger/retired-engine-moves.json, review-2reframe-moves.md ok, same source digest, target tud 3d500396...). Recomputed: unit text is a byte-for-byte substring of the literal body at HEAD; target heading digest equals the ledger value. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/architecture/system-context.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: architecture/system-context.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/architecture/system-context.md",
@@ -1098333,7 +1098519,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "debdc7a1326f062d6878779a4c1bd1dc9881f664e6d96433dbefe04f02c74c29",
+      "dispositionRationale": "Move (verbatim). Source: ed782e245 contracts/README.md#unheaded-block-2, the one-paragraph 2026-10-02 retirement note. The platform contracts/README.md no longer exists at HEAD (engine retired, A16). The full paragraph is a byte-for-byte substring of the literal body of the target file (unit unheaded-block-3, provenance d23045c2d) and is also the first paragraph of docs/architect/agent-coordination/contracts/README.md block 3. Target digest equals the literal-snapshot digest pinned by existing reviewed move rows of the same file (retired-unit-decisions.json, contracts/README.md rows). Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 881b3c1c170cc040a5a8d337a6b01e6dfd005fb6359db440870bebc5547a54de",
+        "Target digest debdc7a1326f062d6878779a4c1bd1dc9881f664e6d96433dbefe04f02c74c29"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move (verbatim). Source: ed782e245 contracts/README.md#unheaded-block-2, the one-paragraph 2026-10-02 retirement note. The platform contracts/README.md no longer exists at HEAD (engine retired, A16). The full paragraph is a byte-for-byte substring of the literal body of the target file (unit unheaded-block-3, provenance d23045c2d) and is also the first paragraph of docs/architect/agent-coordination/contracts/README.md block 3. Target digest equals the literal-snapshot digest pinned by existing reviewed move rows of the same file (retired-unit-decisions.json, contracts/README.md rows). Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/files/contracts/README.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Historical File: Agent Coordination Contracts"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/contracts/README.md",
@@ -1101310,7 +1101517,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "2544fffe806d4007375f7d8e43517d235b9315317d60468d7e59fe1be1800cc0",
+      "dispositionRationale": "Supersede. Source: ed782e245 contracts/coordination-session.md#unheaded-block-62 (Five bypasses paragraph). Carried in the literal body as the restored legacy paragraph (snapshot inner block 62, digest 4258e1e9..., byte-equal to docs/architect/agent-coordination/contracts/coordination-session.md block 63). Delta: the old text said bypass 4 (authorize a specialist) is never exposed in run.mjs vocabulary; the restored text carves it out (\"reasoning updated, I24a\"), which matches code history (f74780c26 adds the specialist-authorize request step). Restoration is commit b444f6cec (post-review-edits.md, 2026-10-08, \"semantic judgment remains unapproved\" until this review). No claim is lost; the stale one is corrected by the legacy text. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 802b66f9ec2b1f86157899aa5a8dfe9c3bd59cd5079e5a9f7d1d814a9036d31b",
+        "Target digest 2544fffe806d4007375f7d8e43517d235b9315317d60468d7e59fe1be1800cc0"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Supersede. Source: ed782e245 contracts/coordination-session.md#unheaded-block-62 (Five bypasses paragraph). Carried in the literal body as the restored legacy paragraph (snapshot inner block 62, digest 4258e1e9..., byte-equal to docs/architect/agent-coordination/contracts/coordination-session.md block 63). Delta: the old text said bypass 4 (authorize a specialist) is never exposed in run.mjs vocabulary; the restored text carves it out (\"reasoning updated, I24a\"), which matches code history (f74780c26 adds the specialist-authorize request step). Restoration is commit b444f6cec (post-review-edits.md, 2026-10-08, \"semantic judgment remains unapproved\" until this review). No claim is lost; the stale one is corrected by the legacy text. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Historical File: CoordinationSession Persistence And Recovery Contract"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/contracts/coordination-session.md",
@@ -1104169,7 +1104397,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "0f2cc8e432a3469e3309b0670524326f768fcfcdbb2e5203e847336a2420e900",
+      "dispositionRationale": "Supersede. Source: ed782e245 contracts/flow-definition.md#unheaded-block-53 (forbidden-field table, last row). Carried in the literal body (inner block 53, digest d2efd14e..., byte-equal to legacy docs/architect/.../flow-definition.md block 54). Delta is one clause of the last row: \"...is the correct channel if a specific run needs one.\" became \"...is the correct channel instead (proven protocol-agnostic, P10.1.md/P10.3.md, Step 09 Phase 10).\" Restored verbatim legacy bytes by commit 20a7c2514 (post-review-edits.md six restored blocks). Other 8 lines byte-equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 4de99f83d8a1c56ecbc463fc40783e575ad5f20f38969479d601fc2a25eefdf5",
+        "Target digest 0f2cc8e432a3469e3309b0670524326f768fcfcdbb2e5203e847336a2420e900"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Supersede. Source: ed782e245 contracts/flow-definition.md#unheaded-block-53 (forbidden-field table, last row). Carried in the literal body (inner block 53, digest d2efd14e..., byte-equal to legacy docs/architect/.../flow-definition.md block 54). Delta is one clause of the last row: \"...is the correct channel if a specific run needs one.\" became \"...is the correct channel instead (proven protocol-agnostic, P10.1.md/P10.3.md, Step 09 Phase 10).\" Restored verbatim legacy bytes by commit 20a7c2514 (post-review-edits.md six restored blocks). Other 8 lines byte-equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Historical File: FlowDefinition And Profile Schema Contract"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/contracts/flow-definition.md",
@@ -1106758,7 +1107007,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "22433abdc7e7363140744967a458d197b3d1a0fed1a90e7302632cc8242b9d26",
+      "dispositionRationale": "Supersede. Source: ed782e245 intent-preservation-ledger.md#unheaded-block-20 (deferred-preserved driver-loop entry, 33 lines). Carried in the literal body (lines 393-425 of the history file). 32 of 33 lines byte-equal; the only delta is the plan link, now rendered as a code span plus \"Added in candidate: historical path absent at the batch pin\". That is the A7 unavailable-reference labelling (commits 8a044365b/a5a153727, first row of post-review-edits.md) carried into the snapshot by f719eeff9. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 02b8fca7e65d051090b8a35be366a2c406092166a7bdb3c29b2226ae3fe3fce8",
+        "Target digest 22433abdc7e7363140744967a458d197b3d1a0fed1a90e7302632cc8242b9d26"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Supersede. Source: ed782e245 intent-preservation-ledger.md#unheaded-block-20 (deferred-preserved driver-loop entry, 33 lines). Carried in the literal body (lines 393-425 of the history file). 32 of 33 lines byte-equal; the only delta is the plan link, now rendered as a code span plus \"Added in candidate: historical path absent at the batch pin\". That is the A7 unavailable-reference labelling (commits 8a044365b/a5a153727, first row of post-review-edits.md) carried into the snapshot by f719eeff9. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: intent-preservation-ledger.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/intent-preservation-ledger.md",
@@ -1114894,7 +1115164,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8f6f42ea7ca9a2dbfe594bbbaaea6f832a09edaec4438482e64be68ecb3d013b",
+      "dispositionRationale": "Supersede. Source: ed782e245 proposals/dag-request-scheduler.md#unheaded-block-62 (materialized/settled paragraphs). Carried in the literal body (inner block 62, digest c6c533ff...). Deltas: (a) the unlabelled materialized sentence is now prefixed \"Added in candidate:\" with code citations and a not-active note (abf4bf803, post-review-edits.md); (b) the settled paragraph is replaced by the fuller legacy text (disk-evidence requirement, corrupt-evidence fail-closed), identical to docs/architect/.../dag-request-scheduler.md block 63, restored by e6937d14b. Nothing is dropped; scheduler is retired in 2180b4e72 so this is history. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest b517cc7a908387e6aab40f2ea1b8f79f97b2cc87fee16799664d1f990c488a86",
+        "Target digest 8f6f42ea7ca9a2dbfe594bbbaaea6f832a09edaec4438482e64be68ecb3d013b"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Supersede. Source: ed782e245 proposals/dag-request-scheduler.md#unheaded-block-62 (materialized/settled paragraphs). Carried in the literal body (inner block 62, digest c6c533ff...). Deltas: (a) the unlabelled materialized sentence is now prefixed \"Added in candidate:\" with code citations and a not-active note (abf4bf803, post-review-edits.md); (b) the settled paragraph is replaced by the fuller legacy text (disk-evidence requirement, corrupt-evidence fail-closed), identical to docs/architect/.../dag-request-scheduler.md block 63, restored by e6937d14b. Nothing is dropped; scheduler is retired in 2180b4e72 so this is history. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/files/proposals/dag-request-scheduler.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Historical File: DAG Request Scheduler For Coordination Runs"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
@@ -1116599,7 +1116890,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move (verbatim). No existing move row. The metadata fence (Document type: Architecture Proposal, Draft V2.1) is a byte-for-byte substring of the literal body of the history file; the live platform proposal file no longer exists at HEAD. Same target unit (8c50b051...) as the six reviewed sibling move rows of this file. Classification was bookkeeping, so no authority is invented. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 2205f5b26727e660d0ea709dcff98ca2945f21390710fbcaa186cab1077f0106",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move (verbatim). No existing move row. The metadata fence (Document type: Architecture Proposal, Draft V2.1) is a byte-for-byte substring of the literal body of the history file; the live platform proposal file no longer exists at HEAD. Same target unit (8c50b051...) as the six reviewed sibling move rows of this file. Classification was bookkeeping, so no authority is invented. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1116644,7 +1116956,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move. Existing reviewed move row (retired-engine-moves.json, review-2reframe-moves.md ok, source unheaded-block-11 at 54c2698ee). Verbatim substring of the literal body; target digest recomputed equal to ledger tud 8c50b051.... Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 139e7d6c9a1aee5db7ada78c939e4a7cfdbf3ee3627ede6436c67b2b6cd41ce3",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (retired-engine-moves.json, review-2reframe-moves.md ok, source unheaded-block-11 at 54c2698ee). Verbatim substring of the literal body; target digest recomputed equal to ledger tud 8c50b051.... Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1116658,7 +1116991,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-2). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 70b7d78dd9dc8e482d6ab7620785c06246f08d32df107530a136d7b96b52cbde",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-2). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1116672,7 +1117026,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-3). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest c193308a3bd4014028b5d1f7e2e5ebc4651143f85bdf48293b17e6686b0959e9",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-3). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1116686,7 +1117061,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-4). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 2a1a3dc98841d36b8b13603a532482486a26e96162ac5b4100bfca375c531742",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-4). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1116731,7 +1117127,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-6). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest af63a8a596d7e8a7863c8ce6c858e75816aca25b953b4ffce595ae9d4c969110",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-6). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1116745,7 +1117162,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903",
+      "dispositionRationale": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-7). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest e9e58fc019a2b0ed9f7539666b99fdfd9f4d0cfa5c892869101fa587f37627b4",
+        "Target digest 8c50b0515523c2944105b4cdfa22876be6eec1dc8fd277e4a8ede7019c960903"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-7). Verbatim substring of the literal body; target digest recomputed equal. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: proposals/semantic-cli-surface.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/semantic-cli-surface.md",
@@ -1158340,7 +1158778,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "28c6ed748d6b29beb4e8bfb2b653df34516b6498d9d435d95636210f65cd510a",
+      "dispositionRationale": "Move (verbatim). No existing move row. The metadata fence of the subcomponent portal (Design status Draft, provenance standardization plan 9.4) is a byte-for-byte substring of the literal body of the history file; the live platform file no longer exists. Same target unit as claim_9045ea7b. Classification was bookkeeping. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest a2f7f558687369ffb768196c543e8a1c54a307204b674ce222c214b14fd2aa7b",
+        "Target digest 28c6ed748d6b29beb4e8bfb2b653df34516b6498d9d435d95636210f65cd510a"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move (verbatim). No existing move row. The metadata fence of the subcomponent portal (Design status Draft, provenance standardization plan 9.4) is a byte-for-byte substring of the literal body of the history file; the live platform file no longer exists. Same target unit as claim_9045ea7b. Classification was bookkeeping. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: subcomponents/README.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/subcomponents/README.md",
@@ -1158385,7 +1158844,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "28c6ed748d6b29beb4e8bfb2b653df34516b6498d9d435d95636210f65cd510a",
+      "dispositionRationale": "Supersede. Source: ed782e245 subcomponents/README.md#unheaded-block-3 (22-line subcomponent table). Carried in the literal body (lines 50-71 of the history file). 16 of 22 lines byte-equal; the 6 rows that linked plan folders absent at the batch pin (Dispatch Operability, Executor Policy, Rotator, Code Implementation Track Policy, Test Feedback Cost, Cold-Resumable DAG) now show the path as a code span plus \"Added in candidate: historical path absent at the batch pin\" (A7 labelling, 8a044365b/a5a153727). Link text and other columns unchanged. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md#literal-snapshot, digest recomputed at HEAD.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest bf823848f462b9800fbacd036324e8bfdc6d193834facc40c04d9c53b2556f20",
+        "Target digest 28c6ed748d6b29beb4e8bfb2b653df34516b6498d9d435d95636210f65cd510a"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Supersede. Source: ed782e245 subcomponents/README.md#unheaded-block-3 (22-line subcomponent table). Carried in the literal body (lines 50-71 of the history file). 16 of 22 lines byte-equal; the 6 rows that linked plan folders absent at the batch pin (Dispatch Operability, Executor Policy, Rotator, Code Implementation Track Policy, Test Feedback Cost, Cold-Resumable DAG) now show the path as a code span plus \"Added in candidate: historical path absent at the batch pin\" (A7 labelling, 8a044365b/a5a153727). Link text and other columns unchanged. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition supersede; target docs/platform/agent-coordination/history/retired-engine/subcomponents/README.md#literal-snapshot, digest recomputed at HEAD.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: subcomponents/README.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/subcomponents/README.md",
@@ -1158492,7 +1158972,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "69b0ef4c8e480d23ec2a05e6b118d449e03079c04560a6541d66214e1a227998",
+      "dispositionRationale": "Move (verbatim). No existing move row. The Verification metadata fence is a byte-for-byte substring of the literal body of the history file; the live platform file no longer exists. Same target unit as reviewed row claim_d1a817c3 (69b0ef4c...). Classification was bookkeeping. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest af85c8be98a22908a855a0656f011cf997dadcc253abdf85f402c11d33657c4d",
+        "Target digest 69b0ef4c8e480d23ec2a05e6b118d449e03079c04560a6541d66214e1a227998"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move (verbatim). No existing move row. The Verification metadata fence is a byte-for-byte substring of the literal body of the history file; the live platform file no longer exists. Same target unit as reviewed row claim_d1a817c3 (69b0ef4c...). Classification was bookkeeping. Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: verification/implementation-alignment.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/verification/implementation-alignment.md",
@@ -1158537,7 +1159038,28 @@
       "status": "removed-pending-disposition",
       "priorStatus": "future",
       "retiredAtCommit": "44acff8ec03a60752495d2bec4a4cf96fb74890a",
-      "retiredReason": "source removed"
+      "retiredReason": "source removed",
+      "disposition": "move",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md",
+      "targetAnchor": "literal-snapshot",
+      "targetUnitDigest": "69b0ef4c8e480d23ec2a05e6b118d449e03079c04560a6541d66214e1a227998",
+      "dispositionRationale": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-3, 7148 chars). Verbatim substring of the literal body; target digest recomputed equal to ledger tud 69b0ef4c.... Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md#literal-snapshot.",
+      "dispositionEvidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md at 9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+        "Source digest 68a20f3a858320cd01857afa7ecdec632ac2f11ec699122e03668688ed5f21e0",
+        "Target digest 69b0ef4c8e480d23ec2a05e6b118d449e03079c04560a6541d66214e1a227998"
+      ],
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
+      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a",
+      "reviewMode": "ordinary",
+      "reviewNote": "Move. Existing reviewed move row (review-2reframe-moves.md ok, source unheaded-block-3, 7148 chars). Verbatim substring of the literal body; target digest recomputed equal to ledger tud 69b0ef4c.... Source recomputed with the repo extractor on git show ed782e245 (textDigest equal). Disposition move; target docs/platform/agent-coordination/history/retired-engine/verification/implementation-alignment.md#literal-snapshot.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "targetAncestry": [
+        "Retired engine snapshot: verification/implementation-alignment.md"
+      ]
     },
     {
       "sourcePath": "docs/platform/agent-coordination/verification/implementation-alignment.md",
