@@ -70,7 +70,7 @@ refuses outside one).
    It downloads `fgctl-<version>-<target>.tar.gz` from the release, verifies it
    against `SHA256SUMS`, and puts `fgctl` in `~/.local/bin` (override with
    `FGCTL_INSTALL_DIR`). If `~/.local/bin` is not on `PATH` it tells you what to
-   export. Only `x86_64-unknown-linux-gnu` is supported today.
+   export. `x86_64-unknown-linux-gnu` and `x86_64-pc-windows-msvc` are supported; on Windows use `install.ps1` from PowerShell instead (see the README Install section).
 
 2. Activate fgOS in the project with `fgctl init`. Where the release comes
    from, first match wins: `--from <path|URL>`, then `FGCTL_FROM`, then
@@ -211,7 +211,7 @@ file or key in their message; the message always names the exact target.
 | `plugin-skill-cli-reachable` | A `fgos` CLI is reachable from this project (workspace installation, local `bin/fgos.mjs`, project-local install, or global `PATH`) | `no bin/fgos.mjs at <cwd>, no project-local node_modules/.bin/fgos, and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use` | you | `fgctl init` in the project (its message still names the legacy `npm install -g github:vantt/forgent`) |
 | `bin-discovery-cache` | (fix only, no check) refreshes the cached global `fgos` path | none | tool | `fgos doctor --fix` |
 | `rust-host-binary-present` | The active release's `bin/fgos` exists and is executable | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
-| `rust-host-target-supported` | The OS and CPU are an approved Rust host target | names the unsupported platform | you | Use `x86_64-unknown-linux-gnu`; no other target is shipped |
+| `rust-host-target-supported` | The OS and CPU are an approved Rust host target | names the unsupported platform | you | Use `x86_64-unknown-linux-gnu` or `x86_64-pc-windows-msvc`; no other target is shipped |
 | `legacy-node-payload-present` | The legacy Node payload named by the release manifest exists | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
 | `active-release-matches-checkout` | Activated Node payload matches doctor's source working tree; staged dependencies excluded | changed/missing/extra counts, up to five paths, digest and activation time | you | Use `npm run fgos:dev -- <verb>` for working-tree code, or rebuild/stage/upgrade to update plain `fgos`; no automatic fix. Skips outside source checkouts, absent activation, same-checkout dev manifests and linked worktrees whose activation belongs to main. Does not certify Rust host freshness |
 | `command-routes-drift` | The command-routes descriptor matches the command registry | lists the drifted verbs | info | A release or contributor issue, not yours; report it |

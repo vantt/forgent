@@ -25,6 +25,23 @@ install one with `FGCTL_VERSION=<tag>` (for example `v0.2.0-rc.1`):
 curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | FGCTL_VERSION=v0.2.0-rc.1 sh
 ```
 
+On Windows 10 or later, use `install.ps1` from PowerShell (no Git Bash, no WSL,
+no administrator rights). It installs `fgctl.exe` into `%LOCALAPPDATA%\fgos\bin`
+(or `FGCTL_INSTALL_DIR`), checks the download against the release's `SHA256SUMS`,
+changes nothing on your `PATH` and prints the commands that would. Like
+`install.sh`, it installs the latest non-prerelease, so a pre-release needs
+`FGCTL_VERSION` (releases from `v0.2.0-rc.2` on carry the Windows assets):
+
+```powershell
+$env:FGCTL_VERSION = 'v0.2.0-rc.2'
+irm https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.ps1 | iex
+fgctl init
+```
+
+After `fgctl init`, put the project's launcher directory on `PATH` (or call it by
+path) and run `fgos` from PowerShell or `cmd.exe`:
+`.fgos\installation\bin\fgos.cmd doctor`.
+
 Then initialize your project from inside its git repository. A plain
 `fgctl init` uses the release the project's committed `.fgos/distribution.json`
 pins; with no pin it downloads the latest release (through `curl`), checks it
