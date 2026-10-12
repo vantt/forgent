@@ -21,7 +21,7 @@ steps:
             Use the supplied parent settled reports and verbatim owner request to revisit only affected
             claims. Do not rerun or impersonate blind seats; preserve unchanged evidence and decisions.
             Produce the final packet as a RAW JSON object without Markdown fences, with required
-            "missing expertise": an array of nonempty expertise names, or [] when none.
+            "missing expertise" as the exact JSON key (lowercase, with a space; never missingExpertise or missing_expertise): an array of nonempty expertise names, or [] when none. The file must start with the character { and contain only the JSON object.
             Include the verdict, evidence, alternatives, attributed findings and dispositions, unresolved
             dissent, named defaults, residual risks, reversal triggers, and what changed and why.
             Reviewers and red-team must challenge THIS revised final packet, not the earlier proposal:
