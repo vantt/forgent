@@ -7,6 +7,7 @@
 use crate::canonical::canonicalize_manifest_files;
 use crate::lock::check_main_checkout_lock;
 use crate::manifest::{read_manifest_from_dir, ReleaseManifest};
+use crate::shim::{check_workspace_shims, tail_shim_path, write_workspace_shims};
 use crate::store::{
     list_releases, now_millis, quarantine_dir_path, release_dir_path,
     resolve_machine_release_store_root, stage_release, ReleaseStatusEntry, StageOutcome,
@@ -21,44 +22,6 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use std::time::SystemTime;
-
-const SHIM_FGOS_BODY: &str = r#"#!/bin/sh
-# fgOS workspace stable shim -- written by fgctl. Do not hand-edit; run
-# `fgctl repair` to regenerate it.
-set -eu
-self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-activation="$self_dir/../activation.json"
-[ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
-[ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
-[ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
-entry="$release_path/bin/fgos"
-if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
-  entry="${entry}.exe"
-fi
-[ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
-exec "$entry" "$@"
-"#;
-
-const SHIM_FGOS_RUNNER_BODY: &str = r#"#!/bin/sh
-# fgOS workspace stable shim -- written by fgctl. Do not hand-edit; run
-# `fgctl repair` to regenerate it.
-set -eu
-self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-activation="$self_dir/../activation.json"
-[ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
-[ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
-[ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
-entry="$release_path/bin/fgos-runner"
-if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
-  entry="${entry}.exe"
-fi
-[ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
-exec "$entry" "$@"
-"#;
 
 /// Frozen schema version for tracked distribution pins.
 pub const DISTRIBUTION_PIN_SCHEMA_VERSION_V1: u32 = 1;
@@ -410,9 +373,11 @@ pub fn format_iso8601_utc(time: SystemTime) -> String {
 pub fn resolve_node_path() -> String {
     if let Ok(path_var) = std::env::var("PATH") {
         for dir in std::env::split_paths(&path_var) {
-            let candidate = dir.join("node");
-            if candidate.is_file() {
-                return candidate.to_string_lossy().to_string();
+            for name in ["node", "node.exe"] {
+                let candidate = dir.join(name);
+                if candidate.is_file() {
+                    return candidate.to_string_lossy().to_string();
+                }
             }
         }
     }
@@ -622,15 +587,9 @@ pub fn run_tail(
 
     for cmd_args in commands {
         let cmd_name = cmd_args.join(" ");
-        let mut cmd = if cfg!(windows) {
-            let mut c = Command::new("sh");
-            let p_str = shim_path.to_string_lossy();
-            let clean = p_str.trim_start_matches(r"\\?\").replace('\\', "/");
-            c.arg(clean);
-            c
-        } else {
-            Command::new(shim_path)
-        };
+        // A Windows host runs the `.cmd` form: no `sh` is assumed there.
+        let launcher = tail_shim_path(shim_path, cfg!(windows));
+        let mut cmd = Command::new(launcher);
         cmd.args(&cmd_args).current_dir(workspace_root);
 
         let output = match cmd.output() {
@@ -1083,26 +1042,9 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
     std::fs::create_dir_all(&bin_dir)?;
     std::fs::create_dir_all(installation_dir.join("projections"))?;
 
+    // The sh pair (Linux, macOS, Git Bash) and the .cmd pair (PowerShell, cmd.exe).
     let shim_fgos = bin_dir.join("fgos");
-    let shim_runner = bin_dir.join("fgos-runner");
-
-    std::fs::write(&shim_fgos, SHIM_FGOS_BODY)?;
-    std::fs::write(&shim_runner, SHIM_FGOS_RUNNER_BODY)?;
-
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(&shim_fgos, std::fs::Permissions::from_mode(0o755));
-        let _ = std::fs::set_permissions(&shim_runner, std::fs::Permissions::from_mode(0o755));
-    }
-
-    #[cfg(windows)]
-    {
-        let shim_fgos_cmd = bin_dir.join("fgos.cmd");
-        let shim_runner_cmd = bin_dir.join("fgos-runner.cmd");
-        let _ = std::fs::write(&shim_fgos_cmd, "@sh \"%~dp0fgos\" %*\r\n");
-        let _ = std::fs::write(&shim_runner_cmd, "@sh \"%~dp0fgos-runner\" %*\r\n");
-    }
+    write_workspace_shims(&bin_dir)?;
 
     // Write root.json
     let root_binding = WorkspaceRootBinding {
@@ -1609,6 +1551,11 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
 
     match verify_result {
         Ok(()) => {
+            // The release is intact; the launchers beside activation.json are
+            // not part of it, so a missing or edited one is reported (fix:
+            // `fgctl repair`) without quarantining a good release.
+            check_workspace_shims(&installation_dir.join("bin"), cfg!(windows))
+                .map_err(InitError::Custom)?;
             println!("verified active release {}", active_digest);
             Ok(())
         }

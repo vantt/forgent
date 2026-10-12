@@ -16,8 +16,31 @@ use std::time::{SystemTime, UNIX_EPOCH};
 /// Where release assets live when `FGCTL_ASSET_BASE_URL` is not set.
 pub const DEFAULT_RELEASE_REPO_URL: &str = "https://github.com/vantt/forgent";
 
-/// Targets a release asset is published for (mirrors `install.sh`).
-pub const SUPPORTED_TARGETS: &[&str] = &["x86_64-unknown-linux-gnu"];
+/// Targets a release asset is published for (mirrors `install.sh` and
+/// `install.ps1`). Adding a platform is one row here and one in
+/// [`host_target`], plus a matrix row in the release workflow.
+pub const SUPPORTED_TARGETS: &[&str] = &["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"];
+
+/// The release target triple for a host OS/architecture pair (the values of
+/// `std::env::consts::OS` and `ARCH`), or `None` when no release is published
+/// for it.
+pub fn host_target(os: &str, arch: &str) -> Option<&'static str> {
+    match (os, arch) {
+        ("linux", "x86_64") => Some("x86_64-unknown-linux-gnu"),
+        ("windows", "x86_64") => Some("x86_64-pc-windows-msvc"),
+        _ => None,
+    }
+}
+
+/// Where `curl` discards a response body (`-o`): `NUL` on Windows, where
+/// `/dev/null` does not exist.
+fn null_device() -> &'static str {
+    if cfg!(windows) {
+        "NUL"
+    } else {
+        "/dev/null"
+    }
+}
 
 /// Same bounds as `install.sh`'s `CURL_TIMEOUT_ARGS`: a server that connects
 /// but never finishes cannot hang `fgctl init`.
@@ -140,12 +163,25 @@ pub fn choose_source(inputs: &SourceInputs, has_pin: bool) -> SourceChoice {
 
 /// Resolves the release target triple the same way `install.sh` does.
 pub fn detect_target(override_target: Option<&str>) -> Result<String, FetchError> {
+    detect_target_for(
+        override_target,
+        std::env::consts::OS,
+        std::env::consts::ARCH,
+    )
+}
+
+/// [`detect_target`] for an explicit host, so every platform's answer can be
+/// tested from any machine.
+pub fn detect_target_for(
+    override_target: Option<&str>,
+    os: &str,
+    arch: &str,
+) -> Result<String, FetchError> {
     let target = match override_target.map(str::trim).filter(|t| !t.is_empty()) {
         Some(t) => t.to_string(),
-        None => match (std::env::consts::OS, std::env::consts::ARCH) {
-            ("linux", "x86_64") => "x86_64-unknown-linux-gnu".to_string(),
-            (os, arch) => format!("{os}-{arch}"),
-        },
+        None => host_target(os, arch)
+            .map(str::to_string)
+            .unwrap_or_else(|| format!("{os}-{arch}")),
     };
     if SUPPORTED_TARGETS.contains(&target.as_str()) {
         Ok(target)
@@ -258,7 +294,10 @@ fn resolve_latest_tag(endpoint: &DownloadEndpoint) -> Result<String, FetchError>
         None => DEFAULT_RELEASE_REPO_URL.to_string(),
     };
     let latest_url = format!("{base}/releases/latest");
-    let out = run_curl(&["-o", "/dev/null", "-w", "%{url_effective}"], &latest_url)?;
+    let out = run_curl(
+        &["-o", null_device(), "-w", "%{url_effective}"],
+        &latest_url,
+    )?;
     let effective = String::from_utf8_lossy(&out).to_string();
     let effective = effective.split(['?', '#']).next().unwrap_or("");
     let tag = effective
@@ -450,6 +489,49 @@ mod tests {
         );
         let err = detect_target(Some("aarch64-apple-darwin")).unwrap_err();
         assert!(err.to_string().contains("not supported"), "{err}");
+    }
+
+    #[test]
+    fn host_detection_covers_every_published_target_and_nothing_else() {
+        assert_eq!(
+            detect_target_for(None, "linux", "x86_64").unwrap(),
+            "x86_64-unknown-linux-gnu"
+        );
+        assert_eq!(
+            detect_target_for(None, "windows", "x86_64").unwrap(),
+            "x86_64-pc-windows-msvc"
+        );
+        for (os, arch) in [
+            ("macos", "aarch64"),
+            ("linux", "aarch64"),
+            ("windows", "aarch64"),
+        ] {
+            let err = detect_target_for(None, os, arch).unwrap_err();
+            assert!(err.to_string().contains(&format!("{os}-{arch}")), "{err}");
+        }
+        // An explicit override wins over the host, for either supported target.
+        assert_eq!(
+            detect_target_for(Some("x86_64-pc-windows-msvc"), "linux", "x86_64").unwrap(),
+            "x86_64-pc-windows-msvc"
+        );
+        // Every supported target is selected by some host.
+        for target in SUPPORTED_TARGETS {
+            assert!(
+                [("linux", "x86_64"), ("windows", "x86_64")]
+                    .iter()
+                    .any(|(os, arch)| host_target(os, arch) == Some(*target)),
+                "{target} has no host that selects it"
+            );
+        }
+    }
+
+    #[test]
+    fn windows_release_asset_names_follow_the_shared_pattern() {
+        let target = detect_target_for(None, "windows", "x86_64").unwrap();
+        assert_eq!(
+            format!("fgos-v0.2.0-rc.2-{target}.tar.gz"),
+            "fgos-v0.2.0-rc.2-x86_64-pc-windows-msvc.tar.gz"
+        );
     }
 
     #[test]

@@ -8,6 +8,7 @@ pub mod fetch;
 pub mod init;
 pub mod lock;
 pub mod manifest;
+pub mod shim;
 pub mod store;
 pub mod verify;
 pub mod workspace;

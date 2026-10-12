@@ -1445,3 +1445,87 @@ function waitForProcess(proc) {
     });
   });
 }
+
+test('fgctl init writes the sh and cmd launchers; verify names a missing one and repair rewrites it', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-shims-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-shims-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-shims-proj-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+    const opts = { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } };
+
+    const init = runFgctl(['init', '--from', fixtureReleaseDir], opts);
+    assert.equal(init.status, 0, `fgctl init: stdout=${init.stdout} stderr=${init.stderr}`);
+
+    const binDir = path.join(tempProj, '.fgos', 'installation', 'bin');
+    const names = fs.readdirSync(binDir).sort();
+    assert.deepEqual(names, ['fgos', 'fgos-runner', 'fgos-runner.cmd', 'fgos.cmd']);
+
+    for (const name of ['fgos', 'fgos-runner']) {
+      assert.ok(fs.readFileSync(path.join(binDir, name), 'utf8').startsWith('#!/bin/sh\n'), name);
+    }
+    const cmdShim = fs.readFileSync(path.join(binDir, 'fgos.cmd'), 'utf8');
+    assert.ok(cmdShim.startsWith('@echo off\r\n'));
+    assert.ok(cmdShim.includes('bin\\fgos.exe'));
+    assert.ok(!cmdShim.includes('#!/bin/sh'), 'the cmd launcher must not need sh');
+    const runnerCmd = fs.readFileSync(path.join(binDir, 'fgos-runner.cmd'), 'utf8');
+    assert.ok(runnerCmd.includes('bin\\fgos-runner.cmd'));
+    assert.ok(runnerCmd.includes('call "%FGOS_SHIM_ENTRY%"'));
+
+    const intact = runFgctl(['verify'], opts);
+    assert.equal(intact.status, 0, `fgctl verify: ${intact.stdout}${intact.stderr}`);
+
+    // A launcher this host needs goes missing: reported, and the intact release is not quarantined.
+    fs.rmSync(path.join(binDir, 'fgos-runner'));
+    const missing = runFgctl(['verify'], opts);
+    assert.notEqual(missing.status, 0);
+    assert.match(`${missing.stdout}${missing.stderr}`, /fgos-runner is missing; run fgctl repair/);
+    assert.equal(fs.readdirSync(path.join(tempState, 'releases')).length, 1, 'the release must stay staged');
+    assert.ok(
+      !fs.existsSync(path.join(tempState, 'quarantine')) || fs.readdirSync(path.join(tempState, 'quarantine')).length === 0,
+      'an intact release must not be quarantined over a launcher',
+    );
+
+    const repair = runFgctl(['repair'], opts);
+    assert.equal(repair.status, 0, `fgctl repair: ${repair.stdout}${repair.stderr}`);
+    assert.deepEqual(fs.readdirSync(binDir).sort(), ['fgos', 'fgos-runner', 'fgos-runner.cmd', 'fgos.cmd']);
+    assert.equal(runFgctl(['verify'], opts).status, 0);
+
+    // A hand-edited launcher is reported too.
+    fs.writeFileSync(path.join(binDir, 'fgos'), '#!/bin/sh\necho hand-edited\n');
+    const edited = runFgctl(['verify'], opts);
+    assert.notEqual(edited.status, 0);
+    assert.match(`${edited.stdout}${edited.stderr}`, /differs from the one this fgctl writes; run fgctl repair/);
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('the cmd launcher runs the activated fgos from a plain Windows shell', { skip: process.platform !== 'win32' ? 'needs cmd.exe' : false }, () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-cmdshim-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-cmdshim-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-cmdshim-proj-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+    const opts = { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome, USERPROFILE: tempHome } };
+    const init = runFgctl(['init', '--from', fixtureReleaseDir], opts);
+    assert.equal(init.status, 0, `fgctl init: stdout=${init.stdout} stderr=${init.stderr}`);
+
+    const cmdShim = path.join(tempProj, '.fgos', 'installation', 'bin', 'fgos.cmd');
+    const res = spawnSync('cmd.exe', ['/d', '/c', cmdShim, 'version', '--runtime-json'], { cwd: tempProj, encoding: 'utf8' });
+    assert.equal(res.status, 0, `fgos.cmd: stdout=${res.stdout} stderr=${res.stderr}`);
+    const info = JSON.parse(res.stdout);
+    assert.equal(info.data.host, 'rust');
+    assert.equal(info.data.artifactDigest, fixtureDigest);
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
