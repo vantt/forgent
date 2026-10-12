@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
+import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
@@ -4771,18 +4772,18 @@ function checkRustHostBinaryPresent(cwd) {
   }
 }
 
-function checkRustHostTargetSupported() {
-  const approvedTargets = ['x86_64-unknown-linux-gnu'];
-  const isApproved = process.platform === 'linux' && process.arch === 'x64';
-  if (isApproved) {
+export function checkRustHostTargetSupported(platform = process.platform, arch = process.arch) {
+  const approvedTargets = RELEASE_TARGETS.map((t) => t.triple);
+  const target = releaseTargetForHost(platform, arch);
+  if (target) {
     return {
       passed: true,
-      message: 'current platform (x86_64-unknown-linux-gnu) is an approved rust host target',
+      message: `current platform (${target.triple}) is an approved rust host target`,
     };
   }
   return {
     passed: false,
-    message: `current platform (${process.arch}-${process.platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`,
+    message: `current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`,
   };
 }
 
@@ -5044,7 +5045,7 @@ registerCheck({
 
 registerCheck({
   id: 'rust-host-target-supported',
-  description: 'current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu)',
+  description: 'current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc)',
   check: () => checkRustHostTargetSupported(),
 });
 

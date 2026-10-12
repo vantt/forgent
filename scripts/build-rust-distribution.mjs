@@ -4,7 +4,7 @@
  *
  * Stages a self-contained release tree into a disposable directory:
  * - bin/fgos (copied from target/release/fgos)
- * - bin/fgos-runner (POSIX sh shim)
+ * - bin/fgos-runner (POSIX sh shim) and, on a Windows host, bin/fgos-runner.cmd
  * - libexec/legacy-node/ (package.json files array payload)
  * - manifest.json (canonical release manifest with artifactDigest)
  */
@@ -14,6 +14,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
+import { manifestTargetForHost } from '../src/util/release-targets.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -211,6 +212,18 @@ function stageProductionDependencies(repoRoot, pkg, legacyNodeRoot) {
 }
 
 /**
+ * The release tree's `bin/fgos-runner` launcher: it runs the legacy Node runner
+ * entry beside it. `sh` is the POSIX form, `cmd` the batch form PowerShell and
+ * cmd.exe resolve; the cmd form is CRLF like every batch file.
+ */
+export function runnerShimContent(form) {
+  if (form === 'cmd') {
+    return ['@echo off', 'node "%~dp0..\\libexec\\legacy-node\\bin\\fgos-runner.mjs" %*', ''].join('\r\n');
+  }
+  return ['#!/bin/sh', 'exec node "$(dirname "$0")/../libexec/legacy-node/bin/fgos-runner.mjs" "$@"', ''].join('\n');
+}
+
+/**
  * Stages the release tree into outDir.
  */
 export function buildRustDistribution({
@@ -261,14 +274,12 @@ export function buildRustDistribution({
     fs.copyFileSync(releaseBin, path.join(stagedBinDir, 'fgos.exe'));
   }
 
-  // 2. Stage bin/fgos-runner shim
+  // 2. Stage bin/fgos-runner shim (and its .cmd form for a Windows host)
   const stagedRunner = path.join(stagedBinDir, 'fgos-runner');
-  const runnerShimContent = [
-    '#!/bin/sh',
-    'exec node "$(dirname "$0")/../libexec/legacy-node/bin/fgos-runner.mjs" "$@"',
-    '',
-  ].join('\n');
-  fs.writeFileSync(stagedRunner, runnerShimContent, { mode: 0o755 });
+  fs.writeFileSync(stagedRunner, runnerShimContent('sh'), { mode: 0o755 });
+  if (process.platform === 'win32') {
+    fs.writeFileSync(path.join(stagedBinDir, 'fgos-runner.cmd'), runnerShimContent('cmd'));
+  }
 
   // 3. Stage libexec/legacy-node/ from package.json files
   const pkgPath = path.join(resolvedRepo, 'package.json');
@@ -386,11 +397,7 @@ export function buildRustDistribution({
     requires: {
       node: pkg.engines?.node ?? '>=18',
     },
-    target: {
-      os: 'linux',
-      arch: 'x64',
-      libc: 'glibc',
-    },
+    target: manifestTargetForHost(),
     stateSchemas,
     files: fileEntries,
   };

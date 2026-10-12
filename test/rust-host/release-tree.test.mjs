@@ -127,7 +127,12 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
       hashFile(path.join(legacyNodeDir, 'bin', 'fgos.mjs'))
     );
     assert.equal(typeof manifest.requires.node, 'string');
-    assert.deepEqual(manifest.target, { os: 'linux', arch: 'x64', libc: 'glibc' });
+    assert.deepEqual(
+      manifest.target,
+      process.platform === 'win32'
+        ? { os: 'windows', arch: 'x64' }
+        : { os: 'linux', arch: 'x64', libc: 'glibc' },
+    );
 
     // 7. Verify files[] canonicalization
     assert.ok(Array.isArray(manifest.files) && manifest.files.length > 0);
@@ -284,7 +289,9 @@ test('R4: Doctor checks rust host packaging checks are registered and report the
     const entry = DOCTOR_CHECKS.find((c) => c.id === id);
     assert.ok(entry, `Doctor check "${id}" must be registered in DOCTOR_CHECKS`);
     const result = entry.check(REPO_ROOT);
-    if (id === 'rust-host-target-supported' && !(process.platform === 'linux' && process.arch === 'x64')) {
+    const approvedHost =
+      process.arch === 'x64' && (process.platform === 'linux' || process.platform === 'win32');
+    if (id === 'rust-host-target-supported' && !approvedHost) {
       assert.equal(
         result.passed,
         false,
