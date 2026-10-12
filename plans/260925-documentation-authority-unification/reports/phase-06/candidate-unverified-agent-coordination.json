@@ -4,7 +4,7 @@
   "authorization": "A28",
   "authoredCommit": "0ddec07f86f5289a304d6070e27595650625ac7f",
   "meaning": "Exact unchanged strict E reverse-open projection. Unverified is not true, reviewed, canonical or discarded. canonical records effective promotion status from the unchanged switchboard; kindCanonical records the separate frozen kind capability without changing it.",
-  "count": 326,
+  "count": 320,
   "rows": [
     {
       "claimId": "claim_126a9e26b86aa397f023828e5c9d948f",
@@ -3329,96 +3329,6 @@
       "fileStatus": {
         "kind": "collection-index",
         "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_55ad3c19a90e998bfb3078a6c705eb74",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-126",
-      "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_9d1985fa30e2c3e2e99a7323464c9461",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-127",
-      "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_365c0e0b36eb8a6cfb50e645f0301096",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-131",
-      "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_9ed42ab093823ffb06282f7b6e26bc62",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-132",
-      "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-135",
-      "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-136",
-      "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
         "authorityStatus": "candidate",
         "designStatus": "Candidate",
         "canonical": false,
