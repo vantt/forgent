@@ -710,7 +710,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -733,7 +733,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -896,7 +896,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -918,7 +918,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -940,7 +940,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -962,7 +962,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -987,7 +987,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -1012,7 +1012,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -1143,47 +1143,48 @@
       },
       "xai": {
         "kind": "agent",
-        "description": "xai (Grok) provider via pi CLI (2026-09-17 provider-naming pass, was executor id \"pi-grok\"). --provider omitted -- confirmed via real invocation that pi infers it from the single-provider account dir. grok-vantt account only.",
+        "description": "xai (Grok) provider via omp CLI (oh-my-pi, a pi fork) with the xai-vantt profile; replaces the pi grok-vantt login that kept needing re-OAuth. omp reads the profile through PI_CODING_AGENT_DIR like pi does. PI_CONFIG_DIR is a path relative to HOME that lands in /tmp, because omp writes a runtime directory under its config root and the confined home is read-only. omp has no ls/find tools (glob instead) and no herdr pane invocation yet. The account files are declared in the user-level ~/.fgos/config.json (providers.xai).",
         "allowCrossProvider": true,
         "providerModel": "xai",
         "invocations": [
           {
-            "id": "pi-cli-vantt",
+            "id": "omp-cli-vantt",
             "via": "cli",
             "adapter": "cli-spawn",
-            "command": "pi",
+            "command": "omp",
             "args": [
               "--model",
               "{model}",
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
-              "--approve",
+              "--auto-approve",
               "-p",
               "{prompt}"
             ],
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
+              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
             }
           },
           {
-            "id": "pi-cli-bwrap-vantt",
+            "id": "omp-cli-bwrap-vantt",
             "via": "cli",
             "adapter": "cli-spawn",
-            "command": "pi",
+            "command": "omp",
             "args": [
               "--model",
               "{model}",
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
-              "--approve",
+              "--auto-approve",
               "-p",
               "{prompt}"
             ],
@@ -1191,41 +1192,8 @@
               "backend": "bwrap"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
-          },
-          {
-            "id": "pi-herdr-vantt",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--approve"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/quit",
-              "kind": "pi"
-            },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
+              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/xai-vantt/agent",
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
             },
             "resourceBindings": [
               {
@@ -1260,7 +1228,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -1283,7 +1251,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--mode",
               "json",
               "--approve",
@@ -1360,7 +1328,7 @@
               "--thinking",
               "medium",
               "--tools",
-              "read,write,edit,bash,grep,find,ls",
+              "read,write,edit,bash,grep,glob",
               "--approve"
             ],
             "interactiveMode": {
@@ -1469,11 +1437,6 @@
           ]
         }
       }
-    },
-    "governance": {
-      "disallowedExecutors": [
-        "xai"
-      ]
     }
   },
   "gateBypass": {

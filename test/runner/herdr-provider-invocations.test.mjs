@@ -15,7 +15,6 @@ const find = (executor, id) => runner.executors[executor].invocations.find((inv)
 const providers = [
   { executor: 'openai', id: 'codex-herdr-fgovn', command: 'codex', homeVar: 'CODEX_HOME', kind: 'codex', trust: 'codex-toml' },
   { executor: 'gemini', id: 'agy-herdr-mucdong', command: 'agy', homeVar: 'HOME', kind: 'agy', trust: 'agy' },
-  { executor: 'xai', id: 'pi-herdr-vantt', command: 'pi', homeVar: 'PI_CODING_AGENT_DIR', kind: 'pi', trust: undefined },
 ];
 
 for (const p of providers) {
