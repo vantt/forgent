@@ -1240,6 +1240,66 @@ test('download: a pinned tag whose download does not match the pinned digest is 
   }
 });
 
+function writePinFor(proj, releaseVersion) {
+  fs.mkdirSync(path.join(proj, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(proj, '.fgos', 'distribution.json'),
+    JSON.stringify({
+      schemaVersion: 1,
+      projectRuntime: { policy: 'exact-digest', artifactDigest: fixtureDigest, releaseVersion, channel: null, allowPrerelease: false },
+    }),
+  );
+}
+
+test('download: a pin tag without the leading v is normalized to the v-prefixed release tag', () => {
+  const t = makeDownloadProject('dl-bare-tag');
+  try {
+    const assets = path.join(t.root, 'assets');
+    makeReleaseAssets(assets, 'v0.0.5');
+    writePinFor(t.proj, '0.0.5');
+    const res = runFgctl(['init'], {
+      cwd: t.proj,
+      stateHome: t.state,
+      env: { HOME: t.home, FGCTL_TARGET: RELEASE_TARGET, FGCTL_ASSET_BASE_URL: `file://${assets}` },
+    });
+    assert.equal(res.status, 0, res.stderr);
+    assert.match(res.stderr, /downloaded and verified fgos-v0\.0\.5-/);
+    assert.equal(readActivation(t.proj).artifactDigest, fixtureDigest);
+  } finally {
+    fs.rmSync(t.root, { recursive: true, force: true });
+  }
+});
+
+test('download: a pinned tag that cannot be downloaded says so and names FGCTL_VERSION and FGCTL_FROM', () => {
+  const t = makeDownloadProject('dl-pin-unreachable');
+  try {
+    writePinFor(t.proj, 'v0.0.6');
+    const res = runFgctl(['init'], {
+      cwd: t.proj,
+      stateHome: t.state,
+      env: { HOME: t.home, FGCTL_TARGET: RELEASE_TARGET, FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:1' },
+    });
+    assert.notEqual(res.status, 0);
+    assert.match(res.stderr, /pinned release v0\.0\.6 could not be downloaded/);
+    assert.match(res.stderr, /FGCTL_VERSION/);
+    assert.match(res.stderr, /FGCTL_FROM/);
+  } finally {
+    fs.rmSync(t.root, { recursive: true, force: true });
+  }
+});
+
+test('download: a local install writes a digest-only pin (a manifest version is not a download tag)', () => {
+  const t = makeDownloadProject('dl-local-pin');
+  try {
+    const res = runFgctl(['init', '--from', fixtureReleaseDir], { cwd: t.proj, stateHome: t.state, env: { HOME: t.home } });
+    assert.equal(res.status, 0, res.stderr);
+    const pin = JSON.parse(fs.readFileSync(path.join(t.proj, '.fgos', 'distribution.json'), 'utf8'));
+    assert.equal(pin.projectRuntime.releaseVersion, null);
+  } finally {
+    fs.rmSync(t.root, { recursive: true, force: true });
+  }
+});
+
 for (const [mode, expected] of [
   ['wrong', /checksum verification failed/],
   ['missing', /no checksum entry found/],

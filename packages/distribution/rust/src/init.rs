@@ -700,6 +700,16 @@ fn read_tracked_pin(distribution_path: &Path) -> Result<Option<TrackedDistributi
     Ok(serde_json::from_str(&content).ok())
 }
 
+/// Release tags are `v`-prefixed; a pin may hold a bare semantic version (for
+/// example one copied from a release manifest), which names the same release.
+fn normalize_pin_tag(tag: &str) -> String {
+    if tag.starts_with(|c: char| c.is_ascii_digit()) {
+        format!("v{tag}")
+    } else {
+        tag.to_string()
+    }
+}
+
 /// Executes `fgctl init`, choosing the release source by precedence
 /// (`--from` flag > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > the
 /// latest GitHub release) and downloading it first when it is a URL or a
@@ -732,7 +742,12 @@ pub fn init_workspace_resolving(
             match missing_tag {
                 Some(tag) => {
                     eprintln!("pinned release {tag} is not staged on this machine; downloading it");
-                    let downloaded = fetch_release(endpoint, Some(&tag))?;
+                    let downloaded = fetch_release(endpoint, Some(&normalize_pin_tag(&tag)))
+                        .map_err(|e| {
+                            InitError::Custom(format!(
+                                "pinned release {tag} could not be downloaded: {e}; pass FGCTL_VERSION=<tag> or FGCTL_FROM=<path | URL> to choose the release yourself"
+                            ))
+                        })?;
                     eprintln!("downloaded and verified {}", downloaded.origin);
                     // The pin's digest is checked against what was fetched.
                     init_workspace_tagged(
@@ -1146,10 +1161,9 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
             project_runtime: ProjectRuntimePin {
                 policy: "exact-digest".to_string(),
                 artifact_digest: args.manifest.artifact_digest.clone(),
-                release_version: args
-                    .release_tag
-                    .map(str::to_string)
-                    .or_else(|| args.manifest.release_version.clone()),
+                // Only a downloaded release has a tag that can be fetched again;
+                // a local build's own manifest version is not a download name.
+                release_version: args.release_tag.map(str::to_string),
                 channel: None,
                 allow_prerelease: false,
             },
@@ -1895,5 +1909,12 @@ mod tests {
         assert!(msg.contains("not executable"), "{msg}");
 
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn pin_tags_without_a_leading_v_name_the_v_prefixed_release() {
+        assert_eq!(normalize_pin_tag("0.2.0"), "v0.2.0");
+        assert_eq!(normalize_pin_tag("v0.2.0-rc.1"), "v0.2.0-rc.1");
+        assert_eq!(normalize_pin_tag("nightly"), "nightly");
     }
 }

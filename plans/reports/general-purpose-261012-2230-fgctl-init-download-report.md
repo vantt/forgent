@@ -47,6 +47,13 @@ See final message for counts.
 - `scripts/prepare-release.mjs` now also rewrites those manifests and lockfiles (only files that exist) and lists them in the printed `git add`; `test/scripts/prepare-release.test.mjs` covers the rewrite and has a drift guard that fails if any Rust version differs from package.json. How-to for cutting a tag updated.
 - Knock-on: `activatedBy.version` in new activation records is now 0.2.0 (`CARGO_PKG_VERSION`); no test asserted it. Release manifests do not carry the crate version. Golden fixtures in `schema_golden.rs` keep their own 0.1.0 sample data on purpose. Excluded crates cannot inherit the workspace version, hence the literals.
 
+## Follow-up 3: full-suite regressions
+
+- Upgrade test M1 failed because `fgctl init --from` itself wrote the build manifest's version ("0.1.0") into the pin, so a later plain init tried to download tag "0.1.0". Root cause was in my pin writer, not the fixture: only a downloaded release has a tag that can be fetched again, so a local or URL install now writes `releaseVersion: null` (digest-only pin). Hand-written pins with a bare version are read as `v<version>`, and a failed pinned download now says "pinned release X could not be downloaded" and names `FGCTL_VERSION` and `FGCTL_FROM`. Chose normalize plus clear message (both), documented in the spec and pin contract, tested in Rust (normalization) and Node (bare tag installs, unreachable pin message, local install null).
+- Fixture audit: the only other pins with a non-null `releaseVersion` were the ones I wrote in `fgctl-init.test.mjs` (staged or hermetic); `fgctl-upgrade` fixtures pass a manifest version to the builder, not a pin.
+- Decision-citation drift: the three RUL15 citations in `docs/specs/distribution.md` (and the one in the platform spec) now carry the gloss "(fgctl init downloads a checksum-verified release when no source is given)"; baseline untouched.
+- Data Dictionary #7 parser: the `curl-available` gloss had backticked `curl` and `fgctl init`, which the checker read as check ids; the gloss is now plain text.
+
 ## Known separate issue (not fixed)
 
 Release binaries require glibc 2.39; they fail the loader on Ubuntu 22.04.
