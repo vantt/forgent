@@ -22,7 +22,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_de9f2cca2df7b85999a169ed8f5c074e",
+      "claimId": "claim_55005dc915b1c104f51182a494cd9ab9",
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "5cad062cf07ace795aaffb222b30bc310244b292e211708a9effee5d90892e98",
@@ -37,7 +37,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e7d30be54ca02c737abd7c58dd8de40d",
+      "claimId": "claim_152a79cb71cac537e0b97b61f9f875f0",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "group-thinking-trigger-surface",
       "unitDigest": "dc977a1983d84f8a61154931c1b6316f39720b044185be77543a373816ee1426",
@@ -52,7 +52,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e567957e16ea86ccde79b3a9de321fe0",
+      "claimId": "claim_16d3b547b4cdc148a034475ae3ee4ce2",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "4f5b30df2e010a65fa9340335a52fb1cf17d94105be6233d3a54efd7c80071d7",
@@ -67,7 +67,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c95fd701dee0a1295df3644020991695",
+      "claimId": "claim_c32a28f2016271f43fee4042ca8880a5",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "45fb7242ecbb4927539dd2b6c32a8a4e98d049f695f2d3b1912ca5d1127f9438",
@@ -82,7 +82,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1620ed45e1df825d683acb28f7be5b29",
+      "claimId": "claim_f2566c195241285f988a07bc986527c1",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "0826ebde2163ee52d461ce28362158818cf288456c4f895a44e0e831b7024f79",
@@ -97,7 +97,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e32ee57627571212bb3ece334f5c79e5",
+      "claimId": "claim_ee5e4597c0b211fa2b719c74252910fb",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "f61c6ad8af2757ef8fa37927d015981784ba801d09e36b0fe53ac7758b9c9f7d",
@@ -112,7 +112,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3c06845f8df6fcb2cb37b5fbd4c1f6e7",
+      "claimId": "claim_66c10cf381258d3f9f462ded1d35e36d",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "surface-taxonomy",
       "unitDigest": "f86389980fc0ad4e9e84d5bfe2f57f0b982dc20df09e39804580ad873d3044e1",
@@ -127,7 +127,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1ecdf78c605a84acd3cc9e32cfb55b17",
+      "claimId": "claim_90f815cb1fd32a1d28f7737b29a686fe",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "3b351ebe037306b9ffbae3548788db1f0264229081e9ecc843a2527ad842a844",
@@ -142,7 +142,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_19cd11a8df9fda12ce0010078c3c87d4",
+      "claimId": "claim_b56ab2471e9785c53c493a27c7993e71",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "570ae4d1766df631ebee0e64824ebc44f26db4ac06e384f3a110f6652a0dc2f0",
@@ -157,7 +157,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_83e59e3584b91c9ab1892979106bbe68",
+      "claimId": "claim_b049950138ba6e9dc419b33e30db77f5",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "e42c64706184574034bdc45ded9047b6265d4ae8dc7fca70374be290f7de6073",
@@ -172,7 +172,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7f051d1b520980e5808c12df855818fe",
+      "claimId": "claim_46c0c1bbb9b1455283fc3d30d12a081f",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "core-owns",
       "unitDigest": "b8a9309de0c9b337835778f9497c4da88c00ad5af8e6d77d6d4c0c352e1d825f",
@@ -187,7 +187,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_658ae6b96f0cf3780de0b04bdf8e08fc",
+      "claimId": "claim_be12fd5bd2c483d11303f5cb5f3e66a5",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-15",
       "unitDigest": "45c76bb3e6feb7562fbd047022581e3f489b1665bd5dc5fec38908ad1f1b5563",
@@ -202,7 +202,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_64a062983f5eceb601c03692bdd1f990",
+      "claimId": "claim_16bbebb330e5cc5a9083d79f4a3c3c0a",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "surface-owns",
       "unitDigest": "d42f0aa04b9d97eb52296f9cb4e34dcd8b8007e7389846fa09ac1d20e791900e",
@@ -217,7 +217,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f520f7f76a56aa0e88a7d5689c4a5459",
+      "claimId": "claim_cfb21784c4048f2c824ec7c5bbbf7232",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-16",
       "unitDigest": "945a7af02363666803dce49bf0cca7866e825857238ee4ef5d98f7ce2b344195",
@@ -232,7 +232,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_23a64ff5e67f233d779fa69dbc2f22ed",
+      "claimId": "claim_6e9ac97e44e2b7b246e8dd5d75ff26cf",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "forbidden-coupling",
       "unitDigest": "174210097845f9c053bd6549aea86e055466b7413eeead3a73da186319daad82",
@@ -247,7 +247,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3a0fbc2bf294415b77fd411f573623cf",
+      "claimId": "claim_35b7de8b52f8d2c839f5730eabc8781b",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-17",
       "unitDigest": "81d6c23fc3935dba5232ff93ef5d0e0de864c875c6f8dcb0d4d91fb79da3832b",
@@ -262,7 +262,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4d710a6c343c2183e368ef40c5fab1f8",
+      "claimId": "claim_6fd498ac56fd30de3fc17cd561bc98f9",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-18",
       "unitDigest": "c3b3db0fa9d8bdf562937d8c9945d44bf503eb38c2086116f0dc2407111a5370",
@@ -277,7 +277,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_663aa1e678439532a98aefe829e1eff5",
+      "claimId": "claim_10ea5b34d1cb2496a39ba909a5040c16",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "entry-point-choice",
       "unitDigest": "b1220ed5cf862b0503a113f528a87ac72ca2383174af85b52966ea78b14fe90c",
@@ -292,7 +292,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3a849db806a32cbe1e526b071124983e",
+      "claimId": "claim_ed5fe02eb1cc2b14cea202aaaee9d6e0",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-19",
       "unitDigest": "11174c3ada20bc62707cd30603e17600391dbc00369e926f5358f5200396f326",
@@ -307,7 +307,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2965e6282040b814c828a867d167500e",
+      "claimId": "claim_0cdb7fb97f4690261abdaf36e8418a20",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-20",
       "unitDigest": "f1f9a41424ce27fd89f0829116816b8e04ada607633273a4ac44acd239e51588",
@@ -322,7 +322,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8e9eb8969a40809a71d2235f4cf3c4b9",
+      "claimId": "claim_a26993f5d56345789fe1888f4659a763",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-21",
       "unitDigest": "6773625e16ca5d9a1fd1dd0cc346ded0fe7b396078432a25f7a6073346e911cb",
@@ -337,7 +337,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_98c06ac35b1caed81eb213c17a6b3c80",
+      "claimId": "claim_2626788aeed7bfa0a8a3fca3fc4626a5",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-22",
       "unitDigest": "3d50fb225e2c762e81ebf3ce66cc27a877d7a3f372660184ab6235eecebd4477",
@@ -352,7 +352,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_72cf88dd4cf65226b1ba243f19a44e88",
+      "claimId": "claim_7604ae0924601f519d2a1bed6fe387e2",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "agent-coordination-architecture",
       "unitDigest": "77bdc33c67aad559e504dfa8333bbfd0e2ee1b7917506f9355df64b3d693da5b",
@@ -367,7 +367,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_314ebd33b3ae05bdf9650c19e5160c90",
+      "claimId": "claim_f3021e5b60acdabb7ff98933d3d1029c",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "87bf0f6f9465fb54b73f404102173282a8ff6d1fef717a93322457dcbcb82ef1",
@@ -382,7 +382,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_61fee7e06f715ff7eedff1f73881fdc5",
+      "claimId": "claim_c67a8053177b22178e5b82085dc82593",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "migration-status",
       "unitDigest": "2899cb65294c94a962e6d23502df68f1ab42fa94f3aa206e2a3f0dd47347cb7f",
@@ -397,7 +397,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_60ae869ae7730a8ded51cc66186072bf",
+      "claimId": "claim_878904e7b161e9e35e3123ed9621c3f3",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "9bf0348789f4183ba7499518cdad5697fbdd05e5f0775b468aff5b8d17c9d847",
@@ -412,7 +412,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e740b374636adf5d9287d387e48e145e",
+      "claimId": "claim_a1cbc8876d4ac5f459606b3fd3ce3c8c",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "1c3aa650f35e7cfef98f6899cd09f97de36cadbe665aab1e5a42ddc6d8bd9123",
@@ -427,7 +427,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a55230f9ea167976aa7f090971ebd153",
+      "claimId": "claim_0db3868c0a587c01b60d2142f0092e01",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "9893f162fcd94785c143fbdf88c1587d0e0ea5315b07c4ce2c39964442840a58",
@@ -442,7 +442,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d129adc8e9952341f8baa3c1cc859faf",
+      "claimId": "claim_624ce905aece3d9fca9bc3d58c85a918",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "4143d4deed67e6a38fa66eb47bb9e54de0c721527b61c6a365ae048de9958a19",
@@ -457,7 +457,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2f50704bc8fb509cf3192d2d1fd04faf",
+      "claimId": "claim_38b1a51cd898be5b44e182ac305c41ad",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "be227056666f03ecf1c5ff8a2f34a512507749ebb08ee33f75564d583d3fdd5c",
@@ -472,7 +472,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_38e0e951544d5e6d28c30dd515c8600f",
+      "claimId": "claim_fb37c44eec9ae59ad9829b0ed1b9a3d0",
       "path": "docs/platform/agent-coordination/architecture/README.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "96fdf74994a2ec20808bd9c3a44ec4078499776002ae9cd8d7f28372919a856a",
@@ -502,7 +502,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0b17b29e4fa49c53a1fec5e2f05aa2e1",
+      "claimId": "claim_5a56b09f9b38d3c629a3c86cbd64c28b",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "1615c7cbc87cc4bfd187f888c267492d8f256f8067415f3afe0f5e863f506048",
@@ -517,7 +517,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e2098c1e8a1de83c548fea661566f7f8",
+      "claimId": "claim_183223caaee65f2357dcdb00580be205",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "e2168582ecafd742473ce5ee7cfbd67ee90f450d681e0cea7c9a6f1c4c106495",
@@ -532,7 +532,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_75e2b13330b8a6d633d50954571e7263",
+      "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
@@ -547,7 +547,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0c4b587c8f31c990382e4757243c7827",
+      "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
@@ -562,7 +562,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f6dcb897bf752d07b4793c238f1643e4",
+      "claimId": "claim_bad34e9c7e80093808e67870fb15900f",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "3c31d5e4b95afe2b362506b35d2980423aed73f8c856cf6db0021dcbfb02058d",
@@ -592,7 +592,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e7e64d4f1a424597a418d244072ba80b",
+      "claimId": "claim_54c8dec47f267a03312d7dc9545bd146",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "1615c7cbc87cc4bfd187f888c267492d8f256f8067415f3afe0f5e863f506048",
@@ -607,7 +607,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_cf347c0d0af2725767c9ff292e17410c",
+      "claimId": "claim_45da950e085619af37630526f430e893",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "607535ced6cb64b8ab6157eca58ee92379333fd4b11bae33553d1db17af642ee",
@@ -622,7 +622,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2c026f233f274e41dbe8732a25e6dc9f",
+      "claimId": "claim_bd9b0e80a92e53bcf6b90d62e5fb56f8",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "54476b4ac6c7e789b06de7ac9da4599c217baa93e36756e878cace465fea73ba",
@@ -637,7 +637,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_81314de2792c63d49cc91e3ea0c9895b",
+      "claimId": "claim_7223fc45207432676e00b924a5fdc575",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
@@ -652,7 +652,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a2825294872e4a3b4da8b2c72376ac19",
+      "claimId": "claim_1023c89ee57f08b4e7f4834c0b9dfc0a",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "7aef7f901aec80eedb21cbd2c8a8703eb115ea701756043b25009b9d19ee9668",
@@ -682,7 +682,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c953c76915594d66306bc76ca7b94def",
+      "claimId": "claim_42028ed295552799f169bd5023c2fb75",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "883d40a62ead2bba11511d68e8bc61f9fa83c9e355af5ff3a72cb67e82561731",
@@ -697,7 +697,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a242604716f010a96933d1115709d617",
+      "claimId": "claim_a0ec5f0d507c3392035f5e3f20bf89ed",
       "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
       "anchor": "storage",
       "unitDigest": "479339bf3c75487b836b9984fdceec194e4e7fb23c32094180d99bf4b32a7b93",
@@ -712,7 +712,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2c7d7a9735c8419d50dd0969ae1bdfe3",
+      "claimId": "claim_b96fca80beff1423d12f5644b5118a8f",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "4-recovery-choice",
       "unitDigest": "4d4b34182c1b63b2f3f050cd4111b2fba219a7857e41f102b59856b454809d00",
@@ -727,7 +727,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6d7d3016a6f44a5729b0d68195414011",
+      "claimId": "claim_8abb20ad8e9ee0951a7b30dd06e847e2",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "9-implementation-slices-and-gates",
       "unitDigest": "dba7ab60a19acdb3e2a884c2ac4d4337dce9162766ec68be12a1fae902cd9727",
@@ -742,7 +742,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f717d716d9d154bd0320605ad788f2af",
+      "claimId": "claim_6e3f989d0136d997e49c58dd5c604058",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "unheaded-block-31",
       "unitDigest": "68f6db1a7638efc58e4d8adc8bda563b8cacec6c1c289d790c9919e7fc78b74b",
@@ -757,7 +757,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8fc3d7758ba46b4c8878be5ae3f54b60",
+      "claimId": "claim_abd6501a89d2a8c792735eeda9550306",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "unheaded-block-33",
       "unitDigest": "a14c802a8c352309fd3079bcab98c31477502e299dc4d0b24e1097d1efdb0e85",
@@ -787,7 +787,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6e9df39f162af4ac36190cb10adda9e1",
+      "claimId": "claim_907996879d88f61221a4ef06191c3df0",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "1615c7cbc87cc4bfd187f888c267492d8f256f8067415f3afe0f5e863f506048",
@@ -802,7 +802,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d27cc754de00aa5d5f7c007f2c752576",
+      "claimId": "claim_dbf8e42a61aacd8481784bee510fc2d7",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "12cd78ac4475730a73f355496d68ed0505f17b505aec72032ea4d91ad59eb403",
@@ -817,7 +817,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a44513679b1219cd8becfb1146bae52f",
+      "claimId": "claim_6f9c54a116dc642a85128b9127befc64",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "ad392bd9b835823ab19c313da2bbcb9fbb2d5aeb1664c24cf0df6f2d017d1474",
@@ -832,7 +832,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_45396078733f0a12804338ed7182f477",
+      "claimId": "claim_10f90075239d648edc330eba3f6736d5",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
@@ -847,7 +847,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_65f3ec65116c560e6b2915374153d6bd",
+      "claimId": "claim_8ca7d20643548ec3e7637c18d86d7c0e",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "6f2c8286c13d8339be92f8335f253ac8ad840e6c47983600d7c97ae84d78164a",
@@ -862,7 +862,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0e7653d4987c97c4e334a78c8e46a7d6",
+      "claimId": "claim_cdbd9216149533421aef04b79e027a31",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "invariant",
       "unitDigest": "964bfa3017cbde385deafacc835daa5d6e4ae8cc9511cc27860b733cf19a53d2",
@@ -877,7 +877,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_cc967493395f90140d5c1e922d516d56",
+      "claimId": "claim_a57c5ca4b83421c6242c5db8bb38b80f",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "4be6609f0e3acfc4dd1cf0bb5c6bbd00875aaa1de668f153e311a57338ea14eb",
@@ -892,7 +892,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b951449d70229fc6414e0231c2490afb",
+      "claimId": "claim_f06662657c22e671761ed571e42d37c4",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "observer-and-actor",
       "unitDigest": "1112d792399f91a99e3a0973dfaf679da84aab85092b8269ed58f4b1d686c8c5",
@@ -907,7 +907,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9892fc5285bfe975b7f79064ba6da5d7",
+      "claimId": "claim_1292e6b16da8180e3f9f951b7911a632",
       "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "3bab4f198561ba179702e3c58e35c2cd9171edf4cf5e45213101430a0379e10c",
@@ -937,7 +937,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0b063b698aafe4c5268ee3a0369548d5",
+      "claimId": "claim_c4f507e2aa446505bdd22813217dc5cf",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "0fd0f90a263ee4d081e4b7a88532cb534dd6c8f50d638fc4275789859a73ccc9",
@@ -952,7 +952,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2d6ea62b2e517d05b5c25c94acdd7da1",
+      "claimId": "claim_233df6f794b6af200ed452e1c432c0ce",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "dbd00828bb23529536bcd616860e38d3c33830ad2ae9bd6e999cff9fc1f39687",
@@ -967,7 +967,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_58fdaf1ee3ed858025cc4815c76fe3cc",
+      "claimId": "claim_97e7c91c7359d9c9ce23442abf3c99ea",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
@@ -982,7 +982,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_78536adcba9a8ff3ed1f91d4d93332d9",
+      "claimId": "claim_86b26d818c2a5662e866bf04240f4898",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "57518f6b2224e0a5c8ace843c73aa0a8bc406eae86516e8d4552b6f92942a592",
@@ -997,7 +997,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ffa5f6b77aff3c10ec804d4def38aa4a",
+      "claimId": "claim_3c38e1347ad5507cc38b8a2cff10fec1",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "2f2b50915866f0ec86e27d90c0830f8da5ffe0045fa959d6c1aafc7857698cac",
@@ -1012,7 +1012,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e9d27ecbaa28191d72fc54d02e72373f",
+      "claimId": "claim_78f6340ab50c6de69339459dceda377a",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "2c46d3b0f11449f00bb15754904f0b4a26c21d481b69fc4d88acb9b9b71c3072",
@@ -1027,7 +1027,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7fa8a394744b586962fa0f1ccd7d6d62",
+      "claimId": "claim_c0ae393b0537c1caf43afe1a5bc9c768",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "f33b0a29484eb4f51539672b512c13cfb01aa0c726f766be93b000ab1de8aefe",
@@ -1042,7 +1042,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bf7cf1b586ef2a7cd3724507f68cd91b",
+      "claimId": "claim_1f9f92839027f5ad037a2e4f3e226b52",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "18a57368e6df21ba3b21bb6422791b2e4a7a987542a49254246da188a5e91abc",
@@ -1057,7 +1057,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6e378a29ba0d52c97e5a7966aea55eba",
+      "claimId": "claim_ac80f168ddb2cd5c48306d46327ce034",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "child-work",
       "unitDigest": "91e8ed71109364b5698084e03b11191842edef9f23b8882f28d5395d95b67e41",
@@ -1072,7 +1072,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_89be14d063ff56c10b59a87817031441",
+      "claimId": "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "work-driver-handoff-to-dispatch",
       "unitDigest": "f80fbd765eff3f472a6159d5574b7083988ec66c70e680dfcb51921873386fb0",
@@ -1087,7 +1087,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4e60a88684a9b5d084c283c14cd074c7",
+      "claimId": "claim_d2fcca59c2c4c5feb63d4ca8a27b20eb",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "e093f09bae75a474ee2eb37e99c73b28c85877efb9ef6331ed1f375386a0f7a2",
@@ -1102,7 +1102,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_29b5be116955adc21de79032ea69f30a",
+      "claimId": "claim_20f2abbf10a006fc54c48caf67e25c45",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "a2ced60a011a5b42d1a5720f8ad4f82e83615cf1c76e92df1f06ef12ae3a81fe",
@@ -1117,7 +1117,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7099b489ae776a190b22b3b8d0ac0dd7",
+      "claimId": "claim_de83fb877d4286ef843b8f19172802c9",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "72aff64849bcc7a94572e626e21ab07d78adc3f6ca6b93b964fd2600db8a9d72",
@@ -1132,7 +1132,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9d92c86fcf368f83a283ab8d775451ad",
+      "claimId": "claim_7abe4b142f1f29f0ed2a833e62d114fc",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "isolation",
       "unitDigest": "2c4dcd4d191f510383943d434abc8a1a0a1c6211e49cf7b4490ee64a500c217d",
@@ -1147,7 +1147,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1acc05f15cb156d4b095f35e86bf2dbf",
+      "claimId": "claim_b54ea02037ae7c1a9d9a416d32a8f605",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "a00fc58404877c13a6aab83779a6fb62e5dbdfe91a024c3f9c9f0cb981427ffa",
@@ -1162,7 +1162,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3f9ba37c7158c1b4756d97ad3cf1fefd",
+      "claimId": "claim_e1006302cec44bf7ea58a63ed94983d8",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
@@ -1177,7 +1177,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a7fe161ceda021436c44dad7dcf1a3a2",
+      "claimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
@@ -1192,7 +1192,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_dc2c105fc12e4fb5647f736b70c6d2f8",
+      "claimId": "claim_1654b4c667bd157d0f1d6c513a85fc7c",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-23",
       "unitDigest": "0d2bae2da128ef7d1b117f6529bee082c7667609d8d23b2ae5e74962d70f05d9",
@@ -1207,7 +1207,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7b18c5bdeacc9f129fe6bf5ba17b52dd",
+      "claimId": "claim_d078eca02cd94ddfd038aea0d77b88fe",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-24",
       "unitDigest": "2ed2131cbf6e98bf4f60f5b2440190385e96d0fe6e462a88dc166f1f92273de4",
@@ -1222,7 +1222,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_27a79af9c455b8ea7f21d62c1ef538ec",
+      "claimId": "claim_3c94977cdab94fefddc571be78efb19d",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-28",
       "unitDigest": "f16abfb59e08c4afae75c5bac5d1ccc617fe6d7dc22c30504e8a7df382c2b6a0",
@@ -1237,7 +1237,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b2858c914e67440fba4e1e05af180e0b",
+      "claimId": "claim_74367d2dd7533a29898bebfd7196cdaa",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-30",
       "unitDigest": "d701a9a0b1d4d1128493ca4e9d72209c3603ce042efd1693cd708b0901efddac",
@@ -1252,7 +1252,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2122b9e6812d665b62645fa0d982b2b6",
+      "claimId": "claim_c158aa45a0ff76545179f92c7a9b6289",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-32",
       "unitDigest": "0331b147c9832bc5ba994a1c7b25e9f280285b8445100a29fc029a8d5d15e6e7",
@@ -1267,7 +1267,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6541791f2bd34e21e03dca5f25684568",
+      "claimId": "claim_b2dd31e9c91052bd98886561916f019a",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-34",
       "unitDigest": "ea0ec2f0079c4509270d735fc13b1550a25793e0e694905c4f2c56c0fff31940",
@@ -1282,7 +1282,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2d24107fc9c29afabe25362f804d8b15",
+      "claimId": "claim_206ebde0dd72e15b9025effa9f621ed8",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-37",
       "unitDigest": "51d00b90baad2c11f0c150cde7ad802c53a03064bd918b3002e81009c926099f",
@@ -1297,7 +1297,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0e48be4544799ffe558a0a1c41ef7e6e",
+      "claimId": "claim_2ddddb9cc6c71ffd233798be98f51ed8",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-39",
       "unitDigest": "c4f6467fe0b0b663f7fc9ad2c3806e0d4e2182ce200a3c88f8410e8c69c5268e",
@@ -1312,7 +1312,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_21cf2ded2db4e2f17826696e149c22c6",
+      "claimId": "claim_4d842b35c94f6153a04944349390c482",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-44",
       "unitDigest": "f764ec75ebc3003e457848fb7dcec4265507b84470f05317e944836e5825a703",
@@ -1327,7 +1327,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f8dc1be192e039d82c7417dc34f250aa",
+      "claimId": "claim_f7fa0b712f4ee017f10738733b639923",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "workflow-step-operation-contract",
       "unitDigest": "75eb5b151854f406d157da6dfcc855ce3860131879588e362449b703063d6e63",
@@ -1342,7 +1342,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a8a390fbe884ba34ab83b543cfe62e0e",
+      "claimId": "claim_26f71005619652f117531678e571d498",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "e1edc945b1c8bd664d58ad9ea76a18b36c4fa3d01700b8b946bf35efd01104f3",
@@ -1357,7 +1357,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_cb7fa31610ce2e09cd8a1bfcd0bda897",
+      "claimId": "claim_7062eaa4251ba21ca78ee5c27b3babbb",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "8eddd887e2d588447066723ac79b95ce3d2875aeb8709407a7c2e31cb01581f6",
@@ -1372,7 +1372,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c004a2258487723af407ab3a83702f6a",
+      "claimId": "claim_743b18cb18090e975cea8d0b17c5732f",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "contract",
       "unitDigest": "39891d3441ff40501937d2aa8dc696797b02b26e775dafeddb737ad77aa998d9",
@@ -1387,7 +1387,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7fd0751af2a101340d36b50daf4b19f7",
+      "claimId": "claim_100d36ba723b690d80dd4547835714ae",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "5c39182b31d4d246ca08ced647acc7ab610923f97d1119cfd20caf3982c7e92c",
@@ -1402,7 +1402,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_18cc117a8ac5fbf93b0af2161f31e613",
+      "claimId": "claim_0be8bf5bc762aaa3d4729e5f86cc095d",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "a2578bfb443f1321797c96217c5320f245049824e206e199bd02b408c909205d",
@@ -1417,7 +1417,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d0ee994185a4303987b04cfa6daff719",
+      "claimId": "claim_e45bbfb545bb9cacc2b17e3cda440adc",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "primary-compatibility-path",
       "unitDigest": "d47e760679183ec21b6692eebacc793099356359d097f3f7376a366333f06b33",
@@ -1432,7 +1432,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d2073d3fa690b3247a3833189c830778",
+      "claimId": "claim_699124b071f3f197fde4474126b9bc33",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "f1724926322871b20276907a832f3c34c1838300b2b9228ff976c661535ca19f",
@@ -1447,7 +1447,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b7c9e86c8d516a98b91e1815e4c5cc8e",
+      "claimId": "claim_a88c19bc0686379be88654834fc01f86",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "ee6f93197c5a47295058f4c792ec584ab31b14fbbc6814dedb645a2e47c54d9f",
@@ -1462,7 +1462,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_5ed79473c6096c7a89e0759f3b997740",
+      "claimId": "claim_89bb7b092897bc8d353f606c6638d00e",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "lookup",
       "unitDigest": "0cd44a1514535184b4d43b453e24e7320ca44ab8dcc12ad81a71014c663211fc",
@@ -1477,7 +1477,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3a842a4aeaa0aad6e91a4d1a9be20c8a",
+      "claimId": "claim_1bd4460d3c707962b334d138287de1c1",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "cb6868754f36c100bda2a048d08053bf8da2c6bc63550e03800672f26ff4b434",
@@ -1492,7 +1492,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_39b2902ce6d5cdf6163c3d05082a8438",
+      "claimId": "claim_fac4f5968177946e38a5a4f132055c1d",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "ea6bc768034c0c2933adcacab5c1a1d2ec3ad17602fbd6e59f4023817809e58c",
@@ -1507,7 +1507,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1cccdaba2851b5444c34b735f9c74acb",
+      "claimId": "claim_d0f605eff061958801f1c8b2b0dabade",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "c106161b675abae973e47920362b7f1cffbd56d4ee0a0b52b8f0b70861eb7880",
@@ -1522,7 +1522,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f2d514b30f2387108419ec9b62cfd741",
+      "claimId": "claim_91abb8361400c32acfb25b84a941fb96",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "validation",
       "unitDigest": "2f25bdad07861e55d667f2239402001a8a3d5a6c4db2e0823cd1798c55a4f981",
@@ -1537,7 +1537,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d085fafb271c21e967146dbea37280f4",
+      "claimId": "claim_2741251ef486c5a8fc1562e27f57a949",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "bec2bc5b83250475d021e20083926ecc8aa6a76cba68ee3876dda016f8627766",
@@ -1552,7 +1552,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_5bff2d45c446320fe8c9db63df10ea8e",
+      "claimId": "claim_2e685dec11d07f980e6e591cd5a364b4",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-13",
       "unitDigest": "b42f4dca7f44b229919bb6dc76ea2a2056d116b33621d0618aa7bb8512b1878a",
@@ -1567,7 +1567,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9d5c7ae3dd1968f7c334564ce6d178ed",
+      "claimId": "claim_6698e5cbbb001020b4317dc39235d7fb",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-14",
       "unitDigest": "4160f554a4045e1c54943337fa99638b9292e220c2a3d0f2345426ad1f803e6f",
@@ -1582,7 +1582,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bc9ccad6cb26f2994d44ed67826a6da5",
+      "claimId": "claim_f17983fb778f1a1eddd675d7f6efd4cf",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "driver-boundary",
       "unitDigest": "44248cd004fc18a6b73cbf5a3aae51cc6a71022b9c7acc5b45b8af5d21b54a85",
@@ -1597,7 +1597,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_436acb1ce9a4acb8d28b89ca3d60b935",
+      "claimId": "claim_f6eec54a4edc75ffb1aaef3d4e1ab31a",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-15",
       "unitDigest": "46e3767cbbebe17d47ea22544d7acfcd6095573b04bf24da77010f5aa2d7f915",
@@ -1612,7 +1612,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_849f1f7f3f9dc8563a4dff3a05ed1279",
+      "claimId": "claim_4a7dbfaf266c5d0fb960c6ab6c6f06f1",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "compatibility-proof-obligations",
       "unitDigest": "8f728a490f590f02ab9ee1371a9d7184886a06e888d87fcc01a56075e29e2d0a",
@@ -1627,7 +1627,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b83b59b971408bad9006930557b34bef",
+      "claimId": "claim_e37d2f5ccf0f8e3071d778a98406aeef",
       "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
       "anchor": "unheaded-block-16",
       "unitDigest": "e441817efae64169676251b86f10b28a0d4c0c32a8c8e62cebb13f7467252c4a",
@@ -1657,7 +1657,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_880c84de9a17e58cc3db9aeea4cf6226",
+      "claimId": "claim_fe0a394e549a8febdcfc6d1c8410e1eb",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "697001fc8f7b86512b784a3be01725796a8190977c4fe688955b6cb2a0346e65",
@@ -1672,7 +1672,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_99b97fdf86c284b9934a61edd19e9d8f",
+      "claimId": "claim_3c7f4b09a8f425a4586bcc88d0ba2558",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "7b179af5ef7f027e3675409b266b820933087bd98e354021a8fa06b47eeb838b",
@@ -1687,7 +1687,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_55d86702a9b241e09824a22b371e992e",
+      "claimId": "claim_e5132e280ca13e7965a67e5e9f94264e",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
@@ -1702,7 +1702,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9947ed9bd232bb1cea5e6d6772224b30",
+      "claimId": "claim_995a4a15bd340ccc3d178ad41516c200",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "9defe48ac14540b2a8a2b558d5d770ce463206fa6dc6b665233a8e2b99dd7ab1",
@@ -1717,7 +1717,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f3876232248becef6e7af6492f6f4ff6",
+      "claimId": "claim_c49d5f13e2456ac8e7daf75f21994683",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "674bbe27cf647f53884c32bc271140620ac70912b5d8d8551e1da9e51f0a6bfe",
@@ -1732,7 +1732,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7f27c3d41a300b5c89e4da70b27d651d",
+      "claimId": "claim_b3b162435447471769d802c40bfcf2f4",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "1d942d0a58ed3ccc822fdda3ace9f9e7f673113b260c0c8e44b862d2b8febe6a",
@@ -1747,7 +1747,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ba8565adfd87399d34a62232b07a6b73",
+      "claimId": "claim_f8a022102b2588dc2070033afaf5fb3a",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "707c750cc14299779a7ce05042d5d6925b41aa66de2203bde3aea8f344566820",
@@ -1762,7 +1762,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_766c04eccaf4b6e8dfaaa8f790f51d4d",
+      "claimId": "claim_3eac2dbc7835403907b48e3bc46e13f4",
       "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "c421f5dda54c8968588a99b2b452eb1a118c678d4bd4520ac11a256503f8c4c1",
@@ -1792,7 +1792,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bf0a84aafb86276b855e99345a6aff38",
+      "claimId": "claim_0de681f6735344e52097209884e0ca2b",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "c74e2e660e19034ec14b21639e621b21a03447cfcc4a654c8d5ba284e909360d",
@@ -1807,7 +1807,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_45173cd51ab9c71f670c60d719dee704",
+      "claimId": "claim_06f1e2385c0487b7256aff419d115abf",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "current-scope",
       "unitDigest": "73162204a2fae8b62504d86213650461f4baecf2e37b27af9cd2b6c58a22e9ab",
@@ -1822,7 +1822,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1ea8f003e2daa7e10458ff5a4f03c7c2",
+      "claimId": "claim_39dd4e7b16f018f0d5c07a2a02bc5682",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "3da7b3785eae9a90a5eefd48a05bd6b258b394066383fa3691d5340147d78e39",
@@ -1837,7 +1837,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3cb5d549fb447e5596ee794088c21bca",
+      "claimId": "claim_1555cd71461961cdde31a1244e2ede08",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "fb0d4597dd6ff252a772b15aedb8ed0dfe9e71cc14e6577b433709fe7875b036",
@@ -1852,7 +1852,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_df498b4d490c79b4bd7e5d37a3699092",
+      "claimId": "claim_0bea08780fd80afdeb60314ce93dd593",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "historical-sections",
       "unitDigest": "2f82913540957a593759ef87936a81ea07fd14aa5c8cb2f00c7532ea30f3bc6a",
@@ -1867,7 +1867,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d8953bb278f34089a4347d7fba2ecd3d",
+      "claimId": "claim_b187b51f6ea814259ee9e9c0aec08d8e",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "12b4765e844608f2a9b4db00b04a5089578659847112449f1b6e2e4ea3090468",
@@ -1882,7 +1882,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1daf5cd8391271f67cf5577d47391b51",
+      "claimId": "claim_5ab2c90c2f3b82e71e0b78ecdc589865",
       "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
       "anchor": "adr-004-reserve-job-for-a-future-scheduler",
       "unitDigest": "e74b166c875207b0233551f2f1b51ee6710247201033f8ef45fa7f127f7367bb",
@@ -1897,7 +1897,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d447dd32baeeddbf3e8fdf3430c6df37",
+      "claimId": "claim_124f115960f65795af14d106c9a498bd",
       "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "c1c9de828c627cfdc6f15f074dd343a03180110fc17f405cb7e5af065a36c205",
@@ -1912,7 +1912,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6ee522ffbfcab6ebd5ee731b3110829a",
+      "claimId": "claim_955a4bccc7e66fccb667a872660d4603",
       "path": "docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "58ffc90cefcb01d3b06edbdbc871bdfc20c442119ce43204462cf7c614ef0171",
@@ -1942,7 +1942,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a78c53f5a855f1d98075bf5867bbae8a",
+      "claimId": "claim_a9952f0e3e97a8de19ad6f79c51a2ef9",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "12354f18204fda9e7da78483eafe00a14a29c44b83857fe806ee0ea1a875163c",
@@ -1957,7 +1957,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1dc5e8257cc8ca3fb07bfb7b269acb0c",
+      "claimId": "claim_eefd21e417ee3e32c356caf5759b8166",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "current-scope",
       "unitDigest": "12ebb60222c1092105508d1ea2faea45c7530716f9176fdf308cb9ec79d46189",
@@ -1972,7 +1972,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4840753fbca71d489333edd2c52c23c9",
+      "claimId": "claim_5392c523415c538db19b5aa600efd102",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "3da7b3785eae9a90a5eefd48a05bd6b258b394066383fa3691d5340147d78e39",
@@ -1987,7 +1987,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0482ab7d930e3c7a295351f93e7ace25",
+      "claimId": "claim_5c6bea803446b9defca10e203135e1d2",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "568aca97f9f062bad9194604947e5144bb92f01fb4f2fe02f465183cc408307b",
@@ -2002,7 +2002,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_be45c6bc2a160678824211b09c9461ab",
+      "claimId": "claim_c4fd309fc34d31b751bf5b1bd6a9b3dd",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "historical-sections",
       "unitDigest": "b318f4cbb49196782b444bf50a6e4e93ea31079d4e2ee1e6cf9459c8ba6be341",
@@ -2017,7 +2017,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f79deaf34076575fa84d80552b48fec0",
+      "claimId": "claim_1e506ab415b527c4478af17efa8b99c3",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "29ea138a6e7de9c59a912c5aacdab53150c7969bd9fc5eda44bf67a02fdf7355",
@@ -2032,7 +2032,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d0d40206f5353b61687bbabd74139dba",
+      "claimId": "claim_37e2cb81ce8c6334f6f1dd6342e4c1ec",
       "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "8c0964079141b74dbe89abde9e7c28eaf9dfa8e6548a01bdb015119ba8a6637f",
@@ -2047,7 +2047,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f7bf609253786c27f45444d7e0f49b69",
+      "claimId": "claim_d9b0e2e7c22729b31685d343fd45bea8",
       "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "b4afa8d61c58a9f860f769095db369a3f159092b11d775e368ebfbb5151c455a",
@@ -2077,7 +2077,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4666fd6561c7d40c0da34e5837d3cb77",
+      "claimId": "claim_f47533c75ec7ea62ae14d6dfed30e9cb",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "c1c9de828c627cfdc6f15f074dd343a03180110fc17f405cb7e5af065a36c205",
@@ -2092,7 +2092,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e00cc202f3196b6f59b197292628c60f",
+      "claimId": "claim_a648b319d33c47d0ca4f2dbd86d18e76",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "9545e7a78cfc2ba4062f2fb71b1915b12128a6049d081a2420464e8a1bc82029",
@@ -2107,7 +2107,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0c7a1387cefc67c521cb5767c586eb49",
+      "claimId": "claim_66ff6d4d7a807ae1fa08177b779010b4",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "a50d6645738dd780db8229af178fcda3271fe3e8a71125abdfb6350266b01e41",
@@ -2122,7 +2122,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a3864029c63f7e858fd9c4db3a36b8b0",
+      "claimId": "claim_2e051f172e67dd7f2f53e035191f8308",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
@@ -2137,7 +2137,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_661d3e4d749da161fa894fb62b5c21a9",
+      "claimId": "claim_63bf31d577683147ba343cf497f71512",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "39b8090fb7a38b2a4a3a15a3048eeada78b34b814cd00a33954a325e93af733b",
@@ -2152,7 +2152,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3f40bdc0cac1242da3d80e0e92c42085",
+      "claimId": "claim_b9a6a22b61dad9e6fc1d5577002960aa",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "decision",
       "unitDigest": "076a75df7ff5f07e211f14a09f85f1fd011cf32c105519b5f88e3e16c9cb1171",
@@ -2167,7 +2167,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7eca22754b48a6ba133337a3b17f0bd9",
+      "claimId": "claim_dfd2832d007f7529febdb1f76961b10c",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "95ee78353e2b2e2d894ac35f32911577375386d33e389468669e7ea90caacb90",
@@ -2182,7 +2182,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e2b69f859404c5cd6e629cc259518716",
+      "claimId": "claim_d3e86738d2478c226d4000dc8533d9f7",
       "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "2c5fa31bb1ff254ef776858101d6ba73b19f4ebd2386088c5c39d8b87d92f880",
@@ -2197,7 +2197,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c86f7efdd1537faf5df35cde00608dab",
+      "claimId": "claim_7c27b97552db9fddd5c16dd532a597bc",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "agent-coordination-architecture-decisions",
       "unitDigest": "dbfe33443b6a1ce37adb02920e084f6f6c27671ff79a1031463855baa6b51e01",
@@ -2212,7 +2212,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_384f1f3b12e41442c12b4d84a3ed31ed",
+      "claimId": "claim_6c331697e53eda83dbd59d063e554c51",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "442a177c4c2ca65a160cf5a964acca5959e995ff3bebfb5e87de1c189891d0e8",
@@ -2227,7 +2227,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_254c86d14b2faa511db65f3698ded9a9",
+      "claimId": "claim_f06ad444a2c0a0c77ebc9976177564ea",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "migration-status",
       "unitDigest": "f9dca8d467b29a1bb8943cd430060c7d087d8df642c83d04ab34c61d02edd09b",
@@ -2242,7 +2242,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b571f43aa525f1c1d3c9b60c7fe4ae41",
+      "claimId": "claim_bd4002281cdc35f1640cdae079470070",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "024ac1cbb666d1711c3a0bdec7e2771a6169473e377ea1d67b4c67e2614544a0",
@@ -2257,7 +2257,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_85c3168356aa032548d0dbda7cabd1ce",
+      "claimId": "claim_3019de6a0779d84de3892db31e876dd0",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "dde12e1d9258df2e7b788747b4aa3ce3689047f1687aa2eab9562fb5f3818db1",
@@ -2272,7 +2272,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_30667139ca9b33424a73e2173687058a",
+      "claimId": "claim_f95ff1d02cb8912a1d79b5aadb3a87e3",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "5c6c25b3b7856a7673794ebc124cc922a31f6f87909cb15beb7a03a826117143",
@@ -2287,7 +2287,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_df9cc55981226e0d3ef9579495a93aa0",
+      "claimId": "claim_065c392793524decdbac998b713f5254",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "f8ba89ba979e88fa611abe915746c1055790a83ab25e882119e3c1c003573d23",
@@ -2302,7 +2302,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_84abe375f80c32e98714f277006d7a82",
+      "claimId": "claim_1e7f90b270eceef93f436a9ada51c274",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "7217363ddb0f6ac73c734be8c1ad3e93770b93752640a019c7a29117c17c44f0",
@@ -2317,7 +2317,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a1bb7c1b91f258f6812bd3f3092f4263",
+      "claimId": "claim_ca29cc821b9f2779786eb983797f81bc",
       "path": "docs/platform/agent-coordination/decisions/README.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "a9badbe5dd1ebd825ef52d44440598d99b8d519416a24c305539a26274f75a95",
@@ -2347,7 +2347,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3967e0556892b800f76902853f79a99a",
+      "claimId": "claim_a3da610dbb8fad874be1bd30076b6c44",
       "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "2f311c0ec1f144d0f0eaf86fb69e47220ee525c10969a49b8595acc2cf556c35",
@@ -2362,7 +2362,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_62ba2f8b3fa7570727b453ff1f201c2a",
+      "claimId": "claim_5fb81b267ea9c8a8912e6f26e4680116",
       "path": "docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "baa1b0f8db3e0c6f3cd009522db26e43c7bd63887a64c588ef9adf0a7dc50d7e",
@@ -2392,7 +2392,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e85e6a1bc650842a19a2fb94032a37a8",
+      "claimId": "claim_08f5d082f423a927de00828ccbf8e7ae",
       "path": "docs/platform/agent-coordination/history/documentation-migration/documentation-governance.md",
       "anchor": "agent-coordination-documentation-governance",
       "unitDigest": "f218e3addfb039ce41426ab72f33835e0a11e11fb666ef90e2ac23202f26eef1",
@@ -2407,7 +2407,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ac50db5d5bcefe61f0d4b4773b7ae29c",
+      "claimId": "claim_b44cc3f8193df5feb28069a3fa147a1c",
       "path": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
       "anchor": "agent-coordination-documentation-standardization-plan",
       "unitDigest": "b11eff289671f3513c50d8a465cd1af3d600188e4ad25a550da0f770ede1706a",
@@ -2452,7 +2452,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_97165e7ab70b9ac88bae637ebe9cda4b",
+      "claimId": "claim_d8ed01081e4f505f139a54a61ee33af9",
       "path": "docs/platform/agent-coordination/history/documentation-migration/migration-status.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "24b6f0590f13af79957ddc6d08552e7004044bf2d9cde287b4c33cecea28c066",
@@ -2557,7 +2557,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_90539273cd088a7d92479eb244287dbf",
+      "claimId": "claim_ffe968a067666709463769eeed0fe9ec",
       "path": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "1d8462a75ec26d527cbbdaec755464864e59e8d53cc388fc10ff34839d1fc372",
@@ -2572,7 +2572,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e97480270a9eacd2a6c4b54999c32e72",
+      "claimId": "claim_12089f9076e7e42951c1d52c5392d027",
       "path": "docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "ed6d86901254da5857dd8d49d300daa1721221cd5ce72cbd89b302918808ced0",
@@ -2617,7 +2617,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0137cbd6bfbcf8956c359956d88e4686",
+      "claimId": "claim_b7a6c27c6eb71aa202aab489fb00fd9d",
       "path": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "a04f26a52e06d02175e66cdaea037c20262df75dce7e399ff45bb6a7a8a6c607",
@@ -2632,7 +2632,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7abd34bbcaef598be54f10ec7653f09b",
+      "claimId": "claim_e30024ac67d6e2291e46148863895d64",
       "path": "docs/platform/agent-coordination/history/documentation-migration/proposal-status.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "e11ad8288d613303b2aeb346a0f4671f4321528aa1e037330d9b8c9ffd8b1042",
@@ -2707,7 +2707,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bda347a573675e6ca19bb64833ebad25",
+      "claimId": "claim_f4516a3d813d5d84104fdec2ff0b1bdf",
       "path": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
       "anchor": "unheaded-block-141",
       "unitDigest": "834e49d47ce2c61f7d2d0136623829f5d8234daa7eac1bface6f311b3558745c",
@@ -2737,7 +2737,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_13fee55a018ca072cd5905c5f0c42fbb",
+      "claimId": "claim_85c5f28bc7fdd0bb12be842c528a8b11",
       "path": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/stage-operation-taskspec-skill-relationship.svg",
       "anchor": "file-block",
       "unitDigest": "436b430c4e9e380b2feb5f073ecad0cb1d6115399b98bd80db81455bfba35104",
@@ -2752,7 +2752,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6a915df05f5d07764b43b3060525cf84",
+      "claimId": "claim_2b4bc14aaf5dc036ec43cf517167d4ed",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "coordination-operating-harness",
       "unitDigest": "cb62e71eb26ce3c074748f59e822d0fd672f17274094db45f78ba05dc0813f1f",
@@ -2767,7 +2767,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7e9466c6c93c365bda9015b7eba62d0a",
+      "claimId": "claim_e69a830c268356898cf79832b15df315",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "a5958b8f250cb031ce814899f2c3e9b802770c03719369eb34c52c6397ec8152",
@@ -2782,7 +2782,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7cb65149eabec607b4a1d2daf3bf1085",
+      "claimId": "claim_830b041a040edd6a2cb2dd80a3d9e934",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "620b2d9f5e2126084fb404bbcfcb92f48739f84b15b21847860df0ea5ef56a22",
@@ -2797,7 +2797,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_23c6fc38b1793e392d5f0736f80664cb",
+      "claimId": "claim_3b3cfb0ba029f69572ba030b6425d472",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "e45064b9541810eaa3aad81783a753acc242528099937d20052ad64d9d7d391e",
@@ -2812,7 +2812,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_28a677083b3de2a419cb76758d41f636",
+      "claimId": "claim_83247b3a0358a13bc4fdd5c3dc03cd8a",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "5c40a8d7d442b852ab243e55a9baab39eb365013d8f25cd2378b55b502df8e1d",
@@ -2827,7 +2827,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6c72b286d66c49c1e10aa4fed1175715",
+      "claimId": "claim_b7433c9c94af4442ddfabdf1fa91b8a7",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "edd377799f669fab22a601bbaa13589483540f8f594c8769f924f12682c7e587",
@@ -2842,7 +2842,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6a24a8942c3e83f00cc9483fe693c3ad",
+      "claimId": "claim_a5b2f8f57c1e5fb057837518bfee770b",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-14",
       "unitDigest": "045367b1b4a40cd791c515ac4a01e448ade6f32f379dcd3a4e15bc5bcf959052",
@@ -2857,7 +2857,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f2fd346a5ba0defaad67b504da3f55c7",
+      "claimId": "claim_3e2ec382361084ab456fa6059e6b0058",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-19",
       "unitDigest": "c43d7ba4b52008aa954ca00753625dee76380cbdb327f159730f79d65da467e5",
@@ -2872,7 +2872,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7e78a274ebd022f6bc6e82dbfb786a29",
+      "claimId": "claim_20e3ed71567a54f77beec72d349ed317",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-33",
       "unitDigest": "80462e9d382f67eca7584df75e09261d05fbcfe4dc047ac72cc2a07e2c7539c9",
@@ -2887,7 +2887,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3a36921296b5b2f43df70d27b3d8cdca",
+      "claimId": "claim_329b052087d6732f46cf42898a6ff4d2",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-42",
       "unitDigest": "886e6fb4965ca2a806118c31de3e113721126a131b0743053dd641b334e93074",
@@ -2902,7 +2902,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f75a000c193db9f29ba5b43fcdb53001",
+      "claimId": "claim_4bc90489906b9a1a00d1e014a85abe3b",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-57",
       "unitDigest": "8e80fb16c255a1008731e762582971fe89eb53301541996530ba5585261d2de3",
@@ -2917,7 +2917,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_69196f51899bef0e5613da40dd6e3978",
+      "claimId": "claim_d305f91b8713bd570e3b7547ff3c47f6",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-64",
       "unitDigest": "b30c7e78ac6637aa07ff6323eeba7542773dbeb0de5695a3305064e3bb06f6db",
@@ -2932,7 +2932,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_353e8db7cd0a182a914556bb2f45c8f8",
+      "claimId": "claim_9797afa2ed741b2a8c5ee54c21bb0d3d",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-68",
       "unitDigest": "ce18fea4ff1135aba75451ed29eedafb7ffd900032628ef9093efd33596a3d74",
@@ -2947,7 +2947,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_05f559a049244bcbede5549a559db884",
+      "claimId": "claim_2b4ff010d661fd14e7295b370b8882b2",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-69",
       "unitDigest": "de5ac80b7dc5295208e444997f4c70f05f3d0b841c1572327ce9c1748c082e69",
@@ -2962,7 +2962,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3c655b9b1b4fa85ec1134eb81a968974",
+      "claimId": "claim_f404994766ca890958a70b25bae7d832",
       "path": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "anchor": "unheaded-block-71",
       "unitDigest": "a8fc3d53c1cda6dac51d231c037a89cf7604c8ff4e4d25c5a309a20cff826be1",
@@ -2992,7 +2992,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3fa7778d69e83e2b286b2d6619d5ec49",
+      "claimId": "claim_0f9121eba009937cb43ec579ab1bc880",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "6a5eb27b8a7d9c5b66eefe93fc57a62a16bd9297d1facc13699883529e6229b3",
@@ -3022,7 +3022,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2442fcd3c62bddb5f063b1cfe80f5bd8",
+      "claimId": "claim_697f78bc6fc51d36644a77f59398b6f2",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "67ce1b833cb75e0544b705b2affac61d55ff8f20a39bff1c25d7de66579f8bc4",
@@ -3037,7 +3037,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_edd09db6a34635ed16b9bd7247830dad",
+      "claimId": "claim_978c45477c9be93a649babb9c1464663",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "cognitive-use",
       "unitDigest": "cc2babc471bc5cb4017a473aa2647ca4a34a440545f16778f0dd9c464a6a0fc5",
@@ -3052,7 +3052,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_69d55b72581013bc296db79da84f034a",
+      "claimId": "claim_c31a717d936cc856bc976bf3dede3eb8",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "36ddb615012fdeff25e32f21e70cbfecba9d6f2e6b3553835be579b1fdb3dac2",
@@ -3067,7 +3067,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_037ae193754c48e80ce731368617de9b",
+      "claimId": "claim_045d92e1779e073f0c8379323347cadc",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "abf843967f7017f49d88c38b8bb69372523d936bd60d2ec5cf7f73ece7f2a27c",
@@ -3082,7 +3082,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2a270d871e17d0de212cbe0e1c2721fa",
+      "claimId": "claim_22c8d23d563e72819bc15be3ec1178f2",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "historical-manual-prompt",
       "unitDigest": "4a2a194a700157862fd7de60d2432c33ba41b56bbf563b9d6a7c8064c74bb1ac",
@@ -3097,7 +3097,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f50f359c28038bb077050c773eec5a12",
+      "claimId": "claim_0f6e731857eb0fb4930f861e757d53c4",
       "path": "docs/platform/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "b71329c411fa0f732287dd7e96625b9f5107dcaa72f6d16871cfb082a8b0a6c5",
@@ -3112,7 +3112,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ffe09fa49c7fe42465f4eaca0d326201",
+      "claimId": "claim_45583598271686dc057ff2cafdbbe32b",
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
       "anchor": "master-multi-agent-implementation-coordinator-prompt",
       "unitDigest": "16a0d36e26f150366d87344c54e115da68c6eec147ce2f479549f68a0a7cfb28",
@@ -3127,7 +3127,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d086d7ab7a2e312a69ff9a8f357ba5b4",
+      "claimId": "claim_60a076f222ab4f9060104d3f9213a6d5",
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "8cd32027031b40206cd871628784a3223b1eb6042b0299cf31222c52b2036040",
@@ -3142,7 +3142,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_52862d9ab6d7997d8e040148df2b99d7",
+      "claimId": "claim_87edf4519b802122658385804c3acec4",
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "55e7d15b35bcdb16c3441ca4bea594380b1649c55fbf3454c403d872c3487d33",
@@ -3157,7 +3157,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7e9df4400e385d1285e96bccd39b59e4",
+      "claimId": "claim_040f57d607ba60cf07cdabba3974d274",
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "538c1c018852c484702415cfe8ce954a90d03be6d740182234dfb1db0a75b888",
@@ -3172,7 +3172,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_33c7f480221701b50855541c674d3fa5",
+      "claimId": "claim_ad31f4d3a4389c639946566db8d82b26",
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "2e2da339191d37fbc2671d7b9b5b73fc2178799aa795195dbc21f39e07d6807e",
@@ -3187,7 +3187,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_408b372cb2160b3c1ef7007dfbce9d30",
+      "claimId": "claim_4d6e29e1fec35e6fe5d21eab960fa1f1",
       "path": "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "4c28669fd934f7b1489d66a97f48da6add88a877632344e0dad155ec3162e6b8",
@@ -3202,7 +3202,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_569159a5bfbc75b9427176d6a3245b1a",
+      "claimId": "claim_7bb092601fb89279ea4750566d9e1667",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "agent-coordination-playbooks",
       "unitDigest": "147c893d9fdc0491709fcc74f28bfc1e58ebbd8766c28b377f5d114421ee4b4c",
@@ -3217,7 +3217,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_23e91f2e4f81511ed674799aca0f2d14",
+      "claimId": "claim_627aeb6981542b13066b81574cbeb94f",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "0aa1dcad5d1ca9207cae72b2b868d9e709c253ff9d526f9ddf85817c508c1ef9",
@@ -3232,7 +3232,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d5c4a32bc7da690146af94344354f454",
+      "claimId": "claim_fb55642843f6cbc42d2d89171349e55d",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "migration-status",
       "unitDigest": "efe71019b1ac49bea1370a3d1dc44c02f7354c1c704194737b9a668f73fdb68e",
@@ -3247,7 +3247,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b073f3e1d2e377eaa91560f7e86b3bc7",
+      "claimId": "claim_1ccdc1ea2272f773cca540a31f19bf9f",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "b922571489b0f00ea110f7584547508cdb156186f4727c28ccb96726f1a7c6f0",
@@ -3262,7 +3262,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_84fccd5ebf524b72d7bab084e399ae04",
+      "claimId": "claim_9860baf7fdb2ae9e8290a5b9a82d6c27",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "e2a8129827af37fa0cd260764abb289a2f07e2b87fb41e1f80fd17b82bbc894b",
@@ -3277,7 +3277,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1383b56af3faf19a7f9e36f013cd1b9e",
+      "claimId": "claim_e899a4c245c66a7ca1cfae5b2ac594f4",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "b8060e6b532eb7d328f059d88d7bc2075965b4e7c40886e957fa257c5f529bd9",
@@ -3292,7 +3292,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bcbfe4aeeffd6df2e394b5dff51f98c3",
+      "claimId": "claim_522b1302e1016fabaec77c85a1a62b1d",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "dd89ab520fa25afb98f9213d88699a1e685e293fd3484c62c949f22da2767a98",
@@ -3307,7 +3307,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_989b0393a09ec218821fb8cc8e0646e1",
+      "claimId": "claim_d8e4c7c1d0745cc89b6d63faf44465b6",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-13",
       "unitDigest": "b3940e7e61178482c6173086b35e3601d35b66e0009501d5195b027df2b10158",
@@ -3322,7 +3322,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b9811314fd67a11ab1353ca2186397b4",
+      "claimId": "claim_cb8a9b162eea1318b2a36829c042d4d1",
       "path": "docs/platform/agent-coordination/playbooks/README.md",
       "anchor": "unheaded-block-14",
       "unitDigest": "3b2deb1ad071012b2fa433b0324f2bdd9ad556386d887d912baa3bfe8dd7af98",
@@ -3337,7 +3337,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_96bb3933c2719fddb31f925a35273cd9",
+      "claimId": "claim_55ad3c19a90e998bfb3078a6c705eb74",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-126",
       "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
@@ -3352,7 +3352,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4c4883874ae9fb9222ef6718fff2db42",
+      "claimId": "claim_9d1985fa30e2c3e2e99a7323464c9461",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-127",
       "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
@@ -3367,7 +3367,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_80a63a701f55a637a67a1865bdc37533",
+      "claimId": "claim_365c0e0b36eb8a6cfb50e645f0301096",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-131",
       "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
@@ -3382,7 +3382,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8ecacf8f0e329351ca3e879f82ce3b22",
+      "claimId": "claim_9ed42ab093823ffb06282f7b6e26bc62",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-132",
       "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
@@ -3397,7 +3397,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6e4c0023bb233e42090268982627e092",
+      "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-135",
       "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
@@ -3412,7 +3412,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9c9c6e58ec3079beecc7ab4e32c282b8",
+      "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-136",
       "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
@@ -3427,7 +3427,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4f8c80b6fbd8a65295a7224cc527985e",
+      "claimId": "claim_55f78ccd9d037724999806c69c992c61",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "agent-coordination-proposals",
       "unitDigest": "f40527e80d711ea256df19e40034aa5acff9478770a7550ae3af3fa19cc8df7a",
@@ -3442,7 +3442,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_da4d99d30bd3d335fd133b6812e0ebe2",
+      "claimId": "claim_0bf03715b2dff9eef970831da20613d1",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "4d658708d33a684fc804bedcfbbb4d2074032666c5b5af25f45398587e82e284",
@@ -3457,7 +3457,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1b911fe3bec9aceb988859fce966b77e",
+      "claimId": "claim_4b24b4ddc11997d74842a0cb3327a025",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d8357f2733d8acf72a12e7f347f951c1296db32090550726712a88165b72934a",
@@ -3472,7 +3472,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bc834da3245f9d408ee2484f9ca5cf79",
+      "claimId": "claim_acfddb49837c4f852fcf2f25350ca71e",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "migration-status",
       "unitDigest": "0e07b45cb6c3dce5f627e856849d26cbe0ff8d2eb77ab8ed5fec210d9a845848",
@@ -3487,7 +3487,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ef87e8b180edc77acbe4fd089217b6b8",
+      "claimId": "claim_90a0972f21543efcdb889d72b7c3f125",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "5ad40f6336f4614dfd06456436faadc681e17caed5b9ecfc96c80e186562d13c",
@@ -3502,7 +3502,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b8d5bf5c7ae22ddc18e22ca195921ad8",
+      "claimId": "claim_5bc71e68e0eb7d0367da4dc8c6bc777d",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "efe61de9d7d5239d595cc0f51427c2f6d78f61d4b21d85da7583efa69daea661",
@@ -3517,7 +3517,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d7dec48517cb17479c36b06b391deff4",
+      "claimId": "claim_8ffc2ad7ae2e4f300d6dccaf068954c9",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "77005ad88fae2a8f1958c12e3c1d4b3d384e9342b305ba48d5314e5ca0105387",
@@ -3532,7 +3532,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_52f76860d032b363999075d59967c1a1",
+      "claimId": "claim_68b845cbd9551b6591900b3601e0477e",
       "path": "docs/platform/agent-coordination/proposals/README.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "61decfc7e60331377923681eda5e862852566fe991df6f99927b7b1705e3877e",
@@ -3547,7 +3547,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3cd3132aa22b67320c1e52dc20ff4518",
+      "claimId": "claim_8fb492a981f290167a6570db53670957",
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "anchor": "unheaded-block-28",
       "unitDigest": "54c136d4bedf05ff6b9432b89b7d8ca724e4436f5315a02e1d6b3c1732068a5a",
@@ -3562,7 +3562,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e5dd77ddc14e30738e8bd10a8e64687c",
+      "claimId": "claim_66b555ca40fccae25fca175a544d36e3",
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "anchor": "unheaded-block-29",
       "unitDigest": "afc662ebf617322b58edb31a6400643547ef07484a3264a20fae72f96eaec484",
@@ -3592,7 +3592,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0a11e2c1dc82c85460f549610a4aa16c",
+      "claimId": "claim_090ebd9cc224963fdc64bd75b839cd2c",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "4188d500b0f10c0965e89f50fae62cc4e448656b454be41be646c2a2b715ac93",
@@ -3622,7 +3622,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_fdf2e002148201fb7d6f22cc161d2678",
+      "claimId": "claim_673ec2128d21493f7be2e5ef46db9c23",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "1fa05e73fe203351e8d1668838d3bcde3fb6e825827fb0968dcc647c4296f6d0",
@@ -3637,7 +3637,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a30dc75b0dcb7236915a511eed44ba34",
+      "claimId": "claim_df7b8dd313cbf786ba1846dc2a8ca519",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "c028fc216163b591de1d2b9eaa6137436fd07376432ccc3954698e84c5885a96",
@@ -3652,7 +3652,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_897461b29dc167f9b24c9910aa491324",
+      "claimId": "claim_64e1ea23c81fc81bee349e087d0b5613",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "d9f730d360225c70b813f1c031ca013db80a4c96b0e187fafc9639b97dfc067b",
@@ -3682,7 +3682,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_120de07c46a0dba530e234e5298bf13b",
+      "claimId": "claim_e94d7488815a8009c8283bc41fe3e131",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "c5157b420803be8eb8678c3e99bf82a14ac85950b7a1e4ea6ebaeec931a15cdf",
@@ -3742,7 +3742,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_56423b38ed0daba89e6b0bc554e5c1b1",
+      "claimId": "claim_16eada5fae2d8ba7eee7d8328cf2378e",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "7ada478978873b0150434ccffbcba4ca6915187ee024a70e5690d3379eea5676",
@@ -3772,7 +3772,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_da7b0b147e0fe8cc04ab53733d585e0a",
+      "claimId": "claim_d7dabd2b889215118b1601bdb2e41247",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "fe7de6b9e89a3fdbdb9d622e40b979a36c79f5f3b7aebbdd445119bb43edfeb8",
@@ -3802,7 +3802,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_66ae1090fca905403485108ef8ce6ae3",
+      "claimId": "claim_08dca36dcd1bdff093251970b5800414",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "0150a3e8774d6edc3be5e3b58c3ef682594c89553572ae2821ab2fae56fd00fb",
@@ -3832,7 +3832,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c54c1ec976d0072516c3e001b42c7282",
+      "claimId": "claim_4bd5d26ffa7210f7eeb2fd4923263297",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "ea74865624780601cd67f4c2c5138432dfb6a150c7fb8cdb465299fab313b4e0",
@@ -3847,7 +3847,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_775198e1f3178e88630a9d2bcdf4b5e5",
+      "claimId": "claim_734d43b3f87b58f7ec0f0cd1073dc427",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "9dd2dfa0c08950203b2624139e0296f66212bb3f5f7718be9fff1c60df7a72ef",
@@ -3877,7 +3877,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a6165b935b5cfc5e33dc2895d178dfe3",
+      "claimId": "claim_dce19ec48d028c5f1657fd5df726b092",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-13",
       "unitDigest": "db902584bf169a7f175b8dc535d47e7374a407ee39bd59552e28e7d7ad73a462",
@@ -3907,7 +3907,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b4a145035c6a7f6db4cc95b9fcd651c7",
+      "claimId": "claim_2b96aae28bc1b797a0dd8e4902245caa",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-14",
       "unitDigest": "790e738aa6400fbe5b48c99dd432267319564e26d5c2c78b9c1e322a81c4af13",
@@ -3922,7 +3922,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8ca5273e2c5db0a31ce4a6437f0858b9",
+      "claimId": "claim_a6ddf48ee866f41e8f50b3f88df5bbaa",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-15",
       "unitDigest": "963da7c0751dd750d055ac3fc123e8f47533ab0cb6819ebfed1a59a2414ba0cf",
@@ -3952,7 +3952,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8fa11c037a72cdae3f84b0c8c2271a2b",
+      "claimId": "claim_461c8d744899c9dcceedcfe31024c6ec",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-16",
       "unitDigest": "897dce4f1eedf73927e88e7bd18e4151bf7daac694151605695d83e6eb387994",
@@ -3982,7 +3982,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1ed756b5b623fb0239857929d2c5c770",
+      "claimId": "claim_956983c278f6903d62b1b3dc303a46ef",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-17",
       "unitDigest": "c8e31fb9e478e637a8e6ea59121c143466ff0080d02ee9cc40f8f44d8d7be0d9",
@@ -4012,7 +4012,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_17bcf3da1e41112b719199da8b00453e",
+      "claimId": "claim_802aa66cc3bd5e566df4284b824a0bbb",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "2ebdabf4f7f9ba719667039150479e94e760f250d6ed72cb38811547b6f2e3a5",
@@ -4042,7 +4042,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_cd978575021e1363e680ac1d3ff30502",
+      "claimId": "claim_6e832b14f011ed48b4c1f142c76c30c4",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "dcf5cccd91698db8ce809027a11ee9891b2b11d0d466f9e46ee6fe6b21376d51",
@@ -4057,7 +4057,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_de5105ed13d72e5e64a49fc6eac41428",
+      "claimId": "claim_55f1fbea6bdbf31f83039f0f852ba9db",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "fce13a5deb632ac8979a6f050614d80b3407251c8b8eb885bc87e5710fe94313",
@@ -4072,7 +4072,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_43a149a73494993e557ee4fd45091916",
+      "claimId": "claim_02246b13770721ad701bf9d3d9ae3e28",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "7cbfd76ecdae82a79c1e3a4393cdfc22506d7286a3f6ffaa428c63070a57d47e",
@@ -4087,7 +4087,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bc78ebb67247fecfe2362f28c7079246",
+      "claimId": "claim_c5e19539c2bbcb3b75140ff96ce80155",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "verification-boundary",
       "unitDigest": "baaafa5682dfee7d1290f9ffea12a5f237ddf4f2eac3a5fdcec65f565e4e657d",
@@ -4102,7 +4102,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_390d5810dcb1f42e656d030b3f20d085",
+      "claimId": "claim_3817b992bc8fd6e470d3734210e76b20",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "76e0ec1ca475473a477df3542cede203acf264028c27b7e48ff7321f71b20978",
@@ -4117,7 +4117,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6e90c7b4ce57d2d8742d3f49478efd80",
+      "claimId": "claim_f9ddfd23e5bf7205e7d49c3c3d92a64a",
       "path": "docs/platform/agent-coordination/verification/README.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "ba5e20837e7695a8e9e821f1791636297cb68620106312540668010d87459676",
@@ -4132,7 +4132,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_067207ef1befd3007503f7a7b684b85d",
+      "claimId": "claim_0e8bfd16d4b3857d6f26b751e254ede5",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "agent-coordination-foundation-vision",
       "unitDigest": "693a867b80b05d722430b704a36d3a67069991712e8f47f3b9e2ab98366aa15e",
@@ -4147,7 +4147,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_15d1628e2cd4749de970b571c3e4b3c3",
+      "claimId": "claim_e4dba8c5eacb85b129561548c49022fc",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "8ce041c33b4318c838272aeb01103d2f3ebb12d07e7ba19db5bf341334fb25c2",
@@ -4162,7 +4162,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_410e7eb04cf9938af7485563ae1fa098",
+      "claimId": "claim_2a590f0d825b29033c65cb2824e06a57",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "dc8f8c3f6c7373fdc8f84b11363878d29c9c72b8d60ac40c62544e498f9463a4",
@@ -4177,7 +4177,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_996ddd8fe5694e9550daf5ec46f36e4f",
+      "claimId": "claim_b554cdc18942d45c9fa412f89265b62c",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "9b2deeeefb62d369699203752a218a5539eae3aae8f59e5ad36376530015009b",
@@ -4192,7 +4192,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2915530438baf33135d7a2e7cfb4f9b0",
+      "claimId": "claim_1ea3c2de20d20b7d30b3ea2a25a8510a",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-13",
       "unitDigest": "9e5be2daed252584c775ea2d0258338e5b119172c35add1d92879fa8ef6f018f",
@@ -4207,7 +4207,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_26859325a8ef94fcd5472610a4e5a4f4",
+      "claimId": "claim_ec65cf3925cb637f4aafe92848838fce",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-17",
       "unitDigest": "34d84522e6e64aa803135298efed9746a108d59ca182a2312879f46b95090dd1",
@@ -4222,7 +4222,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_549ff316aba30af82a81d01fbe8595d9",
+      "claimId": "claim_b94f19adcb82d31da81b1aa91ecfaecf",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "rejected-interpretations",
       "unitDigest": "bd83cadc4b74d5ea8f638787093a5c55081b335ce6b08e3c02e6dd14ef7b33a2",
@@ -4237,7 +4237,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_49a665aa6a3e55f2a9a14b4523d34ace",
+      "claimId": "claim_27025cbcf08775f9facaa5e8dfc7cfcd",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-47",
       "unitDigest": "e25c0cd889008242f8174b900f75e73e2649c8984d77188ea216324004b4d5d6",
@@ -4252,7 +4252,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_578a658cbea604f530224faffd4c36d2",
+      "claimId": "claim_07998dc6bd7885aa2a67f3e00bf3b915",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-48",
       "unitDigest": "37f8f684c950dbf4927447d5b1e9117090581f6ae8b3f774477043256a04d74d",
@@ -4267,7 +4267,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9c3b52908bf815f58ff0df89172d7d3d",
+      "claimId": "claim_a7d969d2bc5350c8ecef788adc82083a",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-53",
       "unitDigest": "376d7a550d887c3045e54f3822f65e9139b830403a2b78fb6fad356d4f58e6e1",
@@ -4282,7 +4282,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_09d02cf5762fc523dc0c95429537e949",
+      "claimId": "claim_ee4dea7fe7a83a712cfae93bcc2524fb",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-54",
       "unitDigest": "64689b33a6002a9e69b666fc02cee5c08cba791330e0e29344ac15c53eaa3379",
@@ -4297,7 +4297,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b7ce236b6ff8544837f479747734dcca",
+      "claimId": "claim_e813f171643912d5359ea9042c65fb48",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-55",
       "unitDigest": "193705ea44c0569bf34021d147e6a70a6181f5e64de865feac9b15dea288ef63",
@@ -4312,7 +4312,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f2630f0eae2de04ac7cddea56036c192",
+      "claimId": "claim_5404663725f76c2fbb60196c497b8ab3",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-57",
       "unitDigest": "64317c7696804228ccf55baf1f9d497c932d6da2377b4e2fe6d7386376574fc4",
@@ -4327,7 +4327,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b4a5ddbda5cd825d74eb5ae715240416",
+      "claimId": "claim_dc46a72d4122c51d8f3db72a8a450961",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "canonical-agent-coordination-concepts",
       "unitDigest": "036394a1e4f7cfe89f6d951c94a91c22877893341eea77855233256449b4d587",
@@ -4342,7 +4342,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_de7fc0774971a3167d2991aef889e13f",
+      "claimId": "claim_06e9b88dd77dd1df03e0eea44b23eb47",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "3915b1546b2d1e852536da69af5462a4dce90e184841fb506c1f1fee16e54be2",
@@ -4357,7 +4357,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_5667042f523d66856e56a805f9da448c",
+      "claimId": "claim_d48f84765887aacf38da8e5201c498e7",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "4c8efd437aa813f0162fb35bf7bbd7fdae9d4cf3630d61c85f2113e72800daab",
@@ -4372,7 +4372,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e3ddcbdd949364227cd131a4ad903f23",
+      "claimId": "claim_8896e1c504ce5f966e4896e95a17d8c5",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "role",
       "unitDigest": "b9dc034f8b98bd757c2a39912f4d9ed6575f2842e822e5aa25190e939d7c2be7",
@@ -4387,7 +4387,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_42efde0fa819389ca7d8fc0118fce35a",
+      "claimId": "claim_7a2af803ff55f1dedcca670eba5e1eff",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "unheaded-block-13",
       "unitDigest": "19a80fd66e00447c25112b946bbf6d53c77c3c227e07018cef6da25705c334f5",
@@ -4402,7 +4402,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f466306769282c99b108cd3f9de8c1d6",
+      "claimId": "claim_7d5645c697e71db0af1f0b26046b8842",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "taskcandidate",
       "unitDigest": "adaa83ab9fc0d5acdc8c205ac74141187c3a591ee2a383f6774a2f4ad84a95d0",
@@ -4417,7 +4417,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_aa0ffacae38f3376400c1df6e141b6a6",
+      "claimId": "claim_59fd40dfe0ac3d49ec01c6cbea688d87",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "unheaded-block-27",
       "unitDigest": "36842c2db50a6235a326afbc4fcd52eeed571feb1d50dd74970e6f1013294e6a",
@@ -4432,7 +4432,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1dcf0789ca44dc8f938e75b1aa1da2ac",
+      "claimId": "claim_fa91395592ccca2bed4d1658cc96908c",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "agentmessage",
       "unitDigest": "c3fdcc2e8906a67bf2786f09b243b31136c97b46a46a4c778d46cc9cb32bd78e",
@@ -4447,7 +4447,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_218d011d6a356f7b4c768c186c57c3ac",
+      "claimId": "claim_3ce0f66b8412c9a246ab42e4e74c09a0",
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "unheaded-block-28",
       "unitDigest": "6925609d901f7d3f3b1d0a42a5d7852c91b033b4336be1e9c478c34a6a3baff7",
@@ -4462,7 +4462,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e7bc0f0f6ed8d8b24c824459c4a0c460",
+      "claimId": "claim_f43d3c98c852d2e39cbf7483f562d99e",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "agent-coordination-concept-relationships",
       "unitDigest": "10bc38b3d9e7cf0861c3e39e1ab0fb9e91e54a4e5ebfd8b48e33eef56b010006",
@@ -4477,7 +4477,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6892817fe7d527ad0a1af460e1585724",
+      "claimId": "claim_05e1b5ee26adaad82dbebecbdb45ac69",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "c9129c04eaf57ea9c54874feb57b1a321660306fd71c83dc33855d68d60bdfd4",
@@ -4492,7 +4492,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7004092b626eab73fbef35d083a9f827",
+      "claimId": "claim_fa225c795bb3d9bdf3b9b9398d2a98cb",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "layer-map",
       "unitDigest": "6598ab0a6238af3c49311d72bfbc1daaa5654a9bfea52152b641a8820aa6d619",
@@ -4507,7 +4507,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_247f2861989c4bdfdfa8a88e49220962",
+      "claimId": "claim_fc1296e4267ac59584f7f27f60a3e893",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "6fd101e6ec274ceff1058dde0fc26004c0c60a37bd73be1306b702e6a1978588",
@@ -4522,7 +4522,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bebc7bd92d94eadba2556e78b3035836",
+      "claimId": "claim_0e4d6240eb393e1d517ec6b4e1c7d779",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "runtime-profiles",
       "unitDigest": "2deb3bacf1a2dbf8af58c9dbe97fc1932214375e9da1a5cea0c3ee8637d48164",
@@ -4537,7 +4537,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3acf26ed8ca4bf5cf728535dbc88b391",
+      "claimId": "claim_77a1aaf8f453d0e4f95beb3a4d3d0c88",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "0c00a23f736fd5d6bdea442f2522fab30073bf308320fef8013784b9158a34ae",
@@ -4552,7 +4552,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e8e4abe657dbe7d6c0220d5f6505c1f8",
+      "claimId": "claim_727ca8537017c1d11829cd969265ee8d",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "ownership-rules",
       "unitDigest": "cbc696074ad8cc9d6032c34412c013ae9d90111b777195193526c1803bb30b81",
@@ -4567,7 +4567,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_fb639bebff36fe5422399c57bdc28869",
+      "claimId": "claim_6cf4217152bca3863b02cebb7e96e4c6",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "fac76bc7fb4fabe4e34dc0c5bf25b3d673de5ad5b7a0f3dd37efb05a3376d554",
@@ -4582,7 +4582,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_0f2c82fd230c11bce6b4a400cfc19d59",
+      "claimId": "claim_e53acec9fed7aafb6a3e50ff01b2c904",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "creation-rules",
       "unitDigest": "09922627ec2a0e69b5926275f51a09c112c8fdae93292c79f932e819a95b7a6b",
@@ -4597,7 +4597,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_fbc82ecbd84dcbcce8bf80dc7dda4e36",
+      "claimId": "claim_13b451bd5646248127451db29f825c1a",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "6259889a8fcf1fb3b2083c85c66e99eb79774d680b8b293c7104da8104764386",
@@ -4612,7 +4612,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e330dc2089f7c865736c092f848273b2",
+      "claimId": "claim_df96dac638042ee318a6d361c589e9e1",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "a0034be6b7706853884b8db93a9388b64d211f47cd9d1ee767887a97c379626b",
@@ -4627,7 +4627,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a41f8c61eaba9dfb0826b89072b44174",
+      "claimId": "claim_8c4c1f65aa8a57775d5370bac9029e08",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "f8a70e3b29ac5b9f6dbf87a5b33af38778dbac7be62b9e34a5852bf7090fdb73",
@@ -4642,7 +4642,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_986f3857ecbb3618791b41510dbaeff4",
+      "claimId": "claim_eb1f873b3ca911f8b7f8e0c5fe65f4d7",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "69eef35b9e60c68994a6446198388478fa263eef44fdadb0f8738b6b26af7573",
@@ -4657,7 +4657,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_358a4cb0bf5b00affa8565d7129ed6a3",
+      "claimId": "claim_91e3a13b8a20d28290896a2bd6fd2ccf",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-10",
       "unitDigest": "81f8ee5c520c80a07883efafb3fe37fd1614705221aed9496882085fabf55495",
@@ -4672,7 +4672,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_422f524202d72b57a1f34490f8e53ecc",
+      "claimId": "claim_d0d7e56c33c1e307bb7a97312481c520",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "a9d013997755d9f3f8a0b723ffb7a022203f7b66a3ff07332f3dd64bc53018df",
@@ -4687,7 +4687,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_96bb1b26be4c70f72bdf08bfd5941cb4",
+      "claimId": "claim_c5cfb338523686093a2c92f94014fc97",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "aa01943e9305701d35d00d1542f51a2fb0088686175c7f45957d54f0ceadb365",
@@ -4702,7 +4702,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6c30dd4226a9195b7c0e781457836cf2",
+      "claimId": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-13",
       "unitDigest": "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb",
@@ -4717,7 +4717,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_fa79fc6dd8d97aa61c79ba6aadef3675",
+      "claimId": "claim_f14dee76d1f1cd06e10df1e5d57d5118",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "deprecated-and-reserved-coordination-terms",
       "unitDigest": "f16289ec9a9aec1188c3bf2f8ff3431239cfb78f912b300125f0baa7bfdd3305",
@@ -4732,7 +4732,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_fedc68aa1d624ef0962814f154106864",
+      "claimId": "claim_4d3dfb7d45c254a112114a19c0084f1d",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "97509e6de04664e3dfc9c84141cd9d18af542223eb462ab15f7ae65f6571b71f",
@@ -4747,7 +4747,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_01fe012966b52b40c2453cf086b27ab3",
+      "claimId": "claim_aa7d71885d9a4ae7755a9948dae67244",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "job",
       "unitDigest": "d6d9bbe70cf1d9ed414892cbe93795753a55302e18712752916d12a3fe9183b4",
@@ -4762,7 +4762,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1dc68ee3de68989e891fcc9841769281",
+      "claimId": "claim_d108674b5923a1587acef5fab2969136",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "a27b9cf544901570f296247ab450821af56fb075add6bd6381dc37830ffd1f7a",
@@ -4777,7 +4777,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3225dbe7a92188be73715d25aa2f3f3b",
+      "claimId": "claim_c627d864a78dc2cdfcd2be297c9312ad",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "mission",
       "unitDigest": "1552a0e3c44872de205f2286e6852d1aa335c9be20477f465768a8656446e16f",
@@ -4792,7 +4792,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8d6cc7046f541352b14f24d1229b3fbd",
+      "claimId": "claim_7fd220a747617580fa57c0580c29094a",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "381c5fe0209cba1d902d4fe1908a30461edb1f418e7681afb7d0051a8afca296",
@@ -4807,7 +4807,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4e0d08c99ca5614feb462c1a18dfa43f",
+      "claimId": "claim_9ce4398cd7ba3ad948afb6462401ad5a",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "51f58750eb2504515eb314299218f45c8a6c32dff926e4e9c2250b5ffe3227d9",
@@ -4822,7 +4822,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_459cbc26ae1e9bae2b424dcd704e4149",
+      "claimId": "claim_d408c54855ad1c3dca0bce996e3c5914",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "forbidden-equivalences",
       "unitDigest": "033dbbf89dea60b054e8e76b8245183c6cdc10811f6ef2821eed2b767cac1235",
@@ -4837,7 +4837,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_179b49ebfdfc023f90afcb4a4c21ba9d",
+      "claimId": "claim_a498b0c363c9b84049605afb4293d7e2",
       "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "7aa83cfd2fd8342f5e6f230ac955dae2200b88576dea6115dcd69d61ac290521",
@@ -4852,7 +4852,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c2262a9b3cb565c6502c07d59d23b9a6",
+      "claimId": "claim_751753ee0faecf306f26bcf1dfa8b05f",
       "path": "docs/platform/agent-coordination/vocabulary/README.md",
       "anchor": "agent-coordination-vocabulary",
       "unitDigest": "0fdff49b0d9554bf07d4264efd366cfeab24f638f05bedcb7fd3f1d7430719f5",
@@ -4867,7 +4867,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9c20c38bee75dbcf3978ee14a4c975ef",
+      "claimId": "claim_d87d9067df0dfeb083091b5e9bd7af8e",
       "path": "docs/platform/agent-coordination/vocabulary/README.md",
       "anchor": "unheaded-block-1",
       "unitDigest": "631eb21083f6131c12c5feead6284372aa4a68ff89d08307b13b3dd79c98e4d9",
@@ -4882,7 +4882,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_094a0e40707e1e91a5b4743f906915a1",
+      "claimId": "claim_037266521640d87d36cc1f7343c9916b",
       "path": "docs/platform/agent-coordination/vocabulary/README.md",
       "anchor": "unheaded-block-2",
       "unitDigest": "821d88eac46c26dfdd0d6439539e33c29536327733e315cf3d257f5b51ebb2d9",
