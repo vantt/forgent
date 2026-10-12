@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.1] - 2026-10-12
+
 ### Added
 
 - `domains/marketing/agents/` ships four draft go-to-market personas (`value-chain-strategist`, `offer-pricing-critic`, `buyer-channel-skeptic`, `solo-capacity-checker`) for `--seats "@name"`, with a how-to and knowledge templates in `domains/marketing/`. They have no domain-expert review. A person or company replaces or adds personas in `fgos/agents/` and keeps its own knowledge in `fgos/knowledge/<domain>/` for `--context-ref`.
@@ -74,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `z-ai` model policy (glm) now uses `z-ai/glm-5.3` for every tier instead of `z-ai/glm-5.2`.
 
 ### Fixed
-
+- The architecture advisory synthesis prompts (`architecture-advisory`, `architecture-advisory-reopen`) now name the exact packet key `"missing expertise"` and say the file must start with `{`; seats had written `missingExpertise` and a leading `+`, and the validator rejected both.
 - A seat whose provider fails no longer fails the unit while another account or provider could serve it. A process that exits on a missing or dead credential (for example pi's `No API key found for openrouter.`) now ends as `provider-limit` and quarantines the account as an auth fault; the seat then runs again on another usable account of the same provider (once per other account) before the walk moves to the next candidate, which skips a provider whose login just failed and still prefers a family the sibling seats did not use. Each attempt records `fallbackFrom.kind` (`account-rotation` or `next-candidate`); the seat fails only when both are used up.
 - Codex and AGY hook commands now point at the project's shim by absolute path, so the hook runs wherever the agent starts it (AGY ran it outside the project and every tool call failed with exit 127). Rerun `fgos setup` in a project to regenerate its `.codex/hooks.json` and `.agents/hooks.json`; `fgos doctor` reports the old relative form. Codex shows its hook review once for the changed command.
 - Coding review rejection with findings now follows its declared repair route instead of blocking; Claude herdr workers receive scoped read directories for settled cross-repo report refs, without granting the whole assignment store.
