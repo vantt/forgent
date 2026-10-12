@@ -521,6 +521,35 @@ test('runSelectedTests permits allowed mutations without failing the suite', () 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
+test('runSelectedTests tolerates a rewrite of the derived state view but still fails other cache changes', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');
+
+  const refreshed = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    spawn: () => {
+      fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{"refreshed":true}');
+      return { status: 0 };
+    },
+  });
+  assert.equal(refreshed.status, 0);
+  assert.equal(refreshed.fgosDiff.leaked, false);
+
+  const leaked = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    log: () => {},
+    spawn: () => {
+      fs.writeFileSync(path.join(fgosDir, 'cache', 'other.json'), '{}');
+      return { status: 0 };
+    },
+  });
+  assert.equal(leaked.status, 1);
+  assert.deepEqual(leaked.fgosDiff.added, [path.join('cache', 'other.json')]);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
 // --- Per-file time limit ----------------------------------------------------
 
 test('parseEtime reads ps elapsed-time formats', () => {

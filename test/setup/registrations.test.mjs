@@ -522,29 +522,55 @@ test('task-spec and workflow-operation checks still fail when the install root l
   }
 });
 
-test('agent-type-names-unique doctor check passes when agent-type names are globally unique', () => {
+test('agent-type-names-unique doctor check passes when agent-type names are unique within each tier', () => {
   const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
   assert.ok(entry, 'agent-type-names-unique check must be registered');
   const result = entry.check(process.cwd());
   assert.equal(result.passed, true, `agent-type-names-unique failed: ${result.message}`);
 });
 
-test('agent-type-names-unique doctor check fails when duplicate agent-type names exist across sources (D33)', () => {
+test('agent-type-names-unique doctor check fails on a duplicate within one tier and accepts a higher tier replacing a lower one', () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-unique-test-'));
   try {
-    const coreDir = path.join(tempDir, 'core', 'agents');
-    const domainDir = path.join(tempDir, 'domains', 'coding', 'agents');
-    fs.mkdirSync(coreDir, { recursive: true });
-    fs.mkdirSync(domainDir, { recursive: true });
+    const write = (rel, name) => {
+      fs.mkdirSync(path.join(tempDir, path.dirname(rel)), { recursive: true });
+      fs.writeFileSync(path.join(tempDir, rel), `name: ${name}\ndescription: a persona\n`);
+    };
+    const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
 
-    fs.writeFileSync(path.join(coreDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
-    fs.writeFileSync(path.join(domainDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+    // A name in core, a domain and the workspace is three tiers replacing one another, not a duplicate.
+    write('core/agents/dup-agent.yaml', 'dup-agent');
+    write('domains/coding/agents/dup-agent.yaml', 'dup-agent');
+    write('fgos/agents/dup-agent.yaml', 'dup-agent');
+    const shadowing = entry.check(tempDir);
+    assert.equal(shadowing.passed, true, shadowing.message);
+    assert.match(shadowing.message, /dup-agent \(replaces domains\/coding\/agents\/dup-agent\.yaml\)/);
 
+    // The same name in two domains is one tier defining it twice.
+    write('domains/finance/agents/dup-agent.yaml', 'dup-agent');
+    const sameTier = entry.check(tempDir);
+    assert.equal(sameTier.passed, false);
+    assert.match(sameTier.message, /duplicate agent-type name "dup-agent" in domains\/\*\/agents/);
+    assert.match(sameTier.message, /domains\/coding\/agents\/dup-agent\.yaml, domains\/finance\/agents\/dup-agent\.yaml/);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('agent-type-names-unique doctor check reports a workspace definition with the wrong shape or extension', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-shape-test-'));
+  try {
+    const dir = path.join(tempDir, 'fgos', 'agents');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'wrong-name.yaml'), 'name: other\ndescription: a persona\n');
+    fs.writeFileSync(path.join(dir, 'no-description.yaml'), 'name: no-description\n');
+    fs.writeFileSync(path.join(dir, 'typo.yml'), 'name: typo\ndescription: a persona\n');
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
     const result = entry.check(tempDir);
     assert.equal(result.passed, false);
-    assert.match(result.message, /duplicate agent-type name/);
-    assert.match(result.message, /"dup-agent"/);
+    assert.match(result.message, /fgos\/agents\/wrong-name\.yaml must declare name: wrong-name/);
+    assert.match(result.message, /fgos\/agents\/no-description\.yaml must declare a non-empty description/);
+    assert.match(result.message, /fgos\/agents\/typo\.yml is ignored: only \.yaml files are read/);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }

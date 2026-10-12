@@ -13,6 +13,8 @@ function collectFiles(dir, extensions = ['.js', '.mjs', '.cjs', '.json', '.yaml'
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (entry.name === 'node_modules' || entry.name === '.git') continue;
+      // Probe domains are added and removed by other test files while this walk runs.
+      if (entry.name.startsWith('zzz-test-')) continue;
       results.push(...collectFiles(fullPath, extensions));
     } else if (entry.isFile()) {
       if (extensions.some((ext) => entry.name.endsWith(ext))) {

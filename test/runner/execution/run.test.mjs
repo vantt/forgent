@@ -596,18 +596,51 @@ test('panel members run on different provider families', async () => {
   assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
 });
 
-test('a panel with fewer provider families than members refuses instead of repeating one', async () => {
+function panelRun(id, members) {
   const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  return { repoRoot, worktreeDir, pattern: members ? { pattern: 'panel', params: { members } } : 'panel', id };
+}
+
+const summaryOf = (repoRoot, res) => JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit-summary.json'), 'utf8'));
+
+test('a panel with fewer provider families than members runs anyway: seats share families in pool order and the summary says so', async () => {
+  const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-2', 6);
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
     unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
-    pattern: 'panel',
+    pattern,
   });
-  assert.equal(res.outcome, 'policy-refusal');
-  assert.ok(res.results.some((r) => r.refused?.reason === 'independence'));
+  assert.equal(res.outcome, 'pass');
+  assert.ok(!res.results.some((r) => r.refused), 'no seat is refused for sharing a family');
+  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  assert.deepEqual(
+    [1, 2, 3, 4, 5, 6].map((n) => byRole[`panelist-${n}`]),
+    ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma'],
+    'seats are bound in listed order, each on the first unused family in pool order, then the least used',
+  );
+  const summary = summaryOf(repoRoot, res);
+  assert.equal(summary.seats.filter((seat) => seat.kind === 'panelist').length, 6);
+  assert.deepEqual(summary.sharedFamilies.map((entry) => entry.seats.length).sort(), [2, 2, 3]);
+  const alpha = summary.sharedFamilies.find((entry) => entry.seats.includes('panelist-1/1'));
+  assert.deepEqual(alpha.seats, ['panelist-1/1', 'panelist-4/1', 'synthesizer/1']);
+});
+
+test('a panel with enough provider families lands every seat on its own family and the summary shows no sharing', async () => {
+  const { repoRoot, worktreeDir, pattern } = panelRun('u-panel-3', 3);
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-3', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern,
+  });
+  assert.equal(res.outcome, 'pass');
+  assert.deepEqual(res.results.map((r) => r.runResult?.executorId), ['alpha', 'beta', 'gamma', 'delta']);
+  assert.equal(summaryOf(repoRoot, res).sharedFamilies, undefined);
 });
 
 test('the panel synthesizer runs on a provider family none of the panelists used', async () => {
@@ -800,7 +833,7 @@ test('a reviewed run tells the reviewer to review and hands it the producer\'s r
   assert.ok(fs.existsSync(reviewer.contextRefs[0]));
 });
 
-test('a panel whose every provider family is taken by panelists refuses the synthesizer', async () => {
+test('a panel whose every provider family is taken by panelists still runs the synthesizer, on the least used family', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
   const res = await runUnit({
@@ -810,9 +843,11 @@ test('a panel whose every provider family is taken by panelists refuses the synt
     worktree: worktreeDir,
     pattern: 'panel',
   });
-  assert.equal(res.outcome, 'policy-refusal');
+  assert.equal(res.outcome, 'pass');
   const synth = res.results.find((r) => r.role === 'synthesizer');
-  assert.equal(synth.refused.reason, 'independence');
+  assert.equal(synth.refused, undefined);
+  assert.equal(synth.runResult.executorId, 'alpha', 'every family is used once, so pool order breaks the tie');
+  assert.deepEqual(synth.binding.provenance.familySpread.value.sharedWith, ['panelist-1']);
 });
 
 test('fgos run reclaims a private home whose owning process is gone before it does anything else', async () => {

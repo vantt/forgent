@@ -86,11 +86,16 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const rawSeats = readUnitRunSeats(unitDir);
   const settlementTimes = [];
   let inline = false;
+  // Provider family each final seat was bound to, when its binding asked for a soft spread.
+  const familyBySeat = new Map();
   const seats = rawSeats.filter((seat) => seat.final).map((seat) => {
     const project = (attempt) => {
       const result = attempt.runResult ?? {};
       const recordedBinding = record.bindings?.[`${seat.role}/${seat.round}`]?.find((entry) => entry.assignmentId === attempt.assignmentId);
       const binding = recordedBinding?.binding ?? attempt.assignment?.binding ?? result.binding ?? {};
+      if (attempt === seat.final && binding.provenance?.familySpread?.value?.family) {
+        familyBySeat.set(`${seat.role}/${seat.round}`, binding.provenance.familySpread.value.family);
+      }
       const executor = result.executorId ?? binding.executor ?? null;
       const isInline = !result.runId && result.unitRunId === unitRunId;
       inline ||= isInline;
@@ -119,6 +124,12 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
       attempts: seat.attempts.map(project),
     };
   }).sort((a, b) => a.role.localeCompare(b.role) || a.round - b.round);
+  // Seats that ended up on one provider family. Absent when every spread seat has its own, so a
+  // summary never claims independence it lacks and older summaries keep their bytes.
+  const seatsByFamily = new Map();
+  for (const [seat, family] of familyBySeat) seatsByFamily.set(family, [...(seatsByFamily.get(family) ?? []), seat]);
+  const sharedFamilies = [...seatsByFamily].filter(([, roles]) => roles.length > 1)
+    .map(([family, roles]) => ({ family, seats: roles.sort() })).sort((a, b) => a.family.localeCompare(b.family));
   settlementTimes.sort((a, b) => Date.parse(a) - Date.parse(b));
   const active = unitHasActiveRun(unitDir, record);
   const validCompletion = (completion) => VALID_OUTCOMES.includes(completion?.outcome) && timestamp(completion?.settledAt);
@@ -143,6 +154,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     stanceOptions: [...options],
     seats,
     inline,
+    ...(sharedFamilies.length > 0 ? { sharedFamilies } : {}),
     ...(legacy?.evidence && !settlement ? { derivation: legacy.evidence } : {}),
   };
 }

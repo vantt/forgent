@@ -28,19 +28,19 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 together. A person describes the outcome they want, such as review, compare,
 debate, red-team, or independent opinions. They do not select a protocol.
 
-`fgos-panel` owns intent-first selection and routes to a named Workflow or a
+`fgos-advise` (formerly `fgos-panel`) owns intent-first selection and routes to a named Workflow or a
 CollaborationPattern preset. For discussion Workflows it may start the Workflow
 directly or delegate to `fgos-group-thinking` after selecting the name. The latter
 is not a current protocol-pack gate. This surface adds no private execution path.
 
 ## Baseline UX Audit
 
-This is a dated pre-introduction UX audit, not a list of currently installed skills or commands. In particular `fgos-code-panel` and the protocol-pack gate below are historical; today's explicit implementation route is `fgos-run`.
+This is a dated pre-introduction UX audit of `fgos-panel` (now `fgos-advise`), not a list of currently installed skills or commands. In particular `fgos-code-panel` and the protocol-pack gate below are historical; today's explicit implementation route is `fgos-run`.
 
 | Current trigger | User mental model | Required knowledge | Problem | Proposed surface |
 |---|---|---|---|---|
-| `fgos-group-thinking` | "Ask several agents" | Exact pack member id and request shape | Internal selection gate leaked protocol identity to the person and its description missed natural requests | `fgos-panel` selects a preset; `fgos-group-thinking` remains the internal pack gate |
-| `fgos-architecture-panel` | Architecture advisory board | Only the architecture question | Good entrypoint, but intentionally limited to software architecture | Keep it; route architecture intents here from `fgos-panel` |
+| `fgos-group-thinking` | "Ask several agents" | Exact pack member id and request shape | Internal selection gate leaked protocol identity to the person and its description missed natural requests | `fgos-advise` selects a preset; `fgos-group-thinking` remains the internal pack gate |
+| `fgos-architecture-panel` | Architecture advisory board | Only the architecture question | Good entrypoint, but intentionally limited to software architecture | Keep it; route architecture intents here from `fgos-advise` |
 | `fgos-code-panel` | Usually "several agents discuss code" | Must know it actually implements, reviews, and red-teams a change | Name can capture advisory coding-decision requests even though it is a mutating implementation workflow | Keep for explicit implementation; route advisory coding decisions to `fgos-architecture-panel` or a non-mutating preset |
 | Raw protocol id | Runtime implementation identity | Registry id/version | Precise for machines, hostile to recall and discovery | Hide behind preset selection |
 | RFC-Review-Lite | Structured proposal critique | RFC vocabulary and protocol behavior | "RFC" sounds coding-specific although the protocol can review any concrete proposal | Surface name `proposal-review` |
@@ -56,7 +56,7 @@ This is a dated pre-introduction UX audit, not a list of currently installed ski
 
 | Term | Recall | Ambiguity | Cross-domain fit | Scale across protocols | Decision |
 |---|---|---|---|---|---|
-| `panel` | High | Low: clearly several viewpoints | Strong | Strong | Canonical noun and skill name |
+| `panel` | High | Low: clearly several viewpoints | Strong | Strong | Canonical noun; the skill is now `fgos-advise` |
 | `review` | High | Medium: may mean single reviewer | Strong | Strong | Intent verb; selects proposal review when group thinking is explicit |
 | `compare` | High | Low when options are supplied | Strong | Strong | Intent verb for option comparison |
 | `red-team` | High | Medium: attack only, not always synthesis | Strong | Strong | Intent verb, never a separate protocol identity |
@@ -69,30 +69,14 @@ This is a dated pre-introduction UX audit, not a list of currently installed ski
 
 ## Surface Taxonomy
 
-This candidate map reflects the current routes in `core/skills/fgos-panel/SKILL.md:45-59`; it is not yet the skill's linked authority. The skill still links the legacy docs/architect taxonomy at lines 36-39. Repointing that consumer belongs to the authorized link cutover, not this truth pass. The current execution owners below are Workflow/CollaborationPattern owners, not a second sequencer; the former protocol-id mapping is historical.
-
-| Requested use case | Selected surface | Current execution owner |
-|---|---|---|
-| Architecture advice or architectural coding design | architecture-panel / coding-design-panel | architecture-advisory Workflow via fgos-architecture-panel |
-| Independent feedback or reflection review | independent-feedback / reflection-review | delphi Workflow |
-| Option or strategy comparison | option-comparison / strategy-options | nominal-group Workflow |
-| Complex dialectical sense-making | group-cognition | group-cognition Workflow |
-| Proposal or business review | proposal-review / business-review | rfc preset, reviewed pattern with red-team |
-| One bounded advice request | consult | consult preset, solo advisor |
-| Independent research branches | research-fan-out | research-fan-out preset, panel of three |
-| Explicit implementation/change/fix request | code-change-panel | fgos-run; advice alone cannot authorize this route |
-
-## Happy Path Routing
-
-| User phrase | Expected route |
-|---|---|
-| "run a panel on whether we should split this service" | `architecture-panel` -> `fgos-architecture-panel` -> `architecture-advisory` Workflow |
-| "compare these 3 implementation options" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |
-| "red-team this architecture decision" | `architecture-panel`; reviewer/red-team checks belong to the registered advisory synthesis unit |
-| "get independent opinions before I commit" | `independent-feedback`; ask only for the subject if it is absent |
-| "review this proposal with group thinking" | `proposal-review`; use the proposal text or artifact already in scope |
-| "business panel: should we change pricing?" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |
-| "coding panel: should this be a plugin or core feature?" | `coding-design-panel` -> `architecture-panel`; never the mutating `code-change-panel` route because no implementation was requested |
+The kind-to-route map no longer lives in this document. It ships with the
+skill that applies it:
+[`request-kinds-and-routes.md`](../../../../core/skills/fgos-advise/references/request-kinds-and-routes.md)
+(owner: [`fgos-advise`](../../../../core/skills/fgos-advise/SKILL.md), the
+renamed `fgos-panel`). The protocol-id table that stood here named retired
+`-lite` protocols; routes now name registered Workflows and presets directly.
+Boundaries below still hold: the surface selects and fills request data, and
+never defines actors, transitions, visibility, or close rules.
 
 ## Clarification Rules
 
@@ -127,7 +111,7 @@ Extract the subject, accessible artifact/options and material scope, select the 
 
 ### Forbidden coupling
 
-Do not invent actors, grants, transitions, quorum, close rules, routing pins or an alternate session engine in task prose. Status and human answers use the registered Workflow doors. Evidence: core/skills/fgos-panel/SKILL.md:65-108.
+Do not invent actors, grants, transitions, quorum, close rules, routing pins or an alternate session engine in task prose. Status and human answers use the registered Workflow doors. Evidence: core/skills/fgos-advise/SKILL.md:18-27,102-118.
 
 A purpose/use-case preset is not another dispatch ontology or routing identity.
 Selection fills the existing advisory/coding capability and task contract; it
@@ -135,7 +119,7 @@ must not manufacture a capability merely because an alias is used in conversatio
 
 ## Entry Point Choice
 
-Use fgos-panel for intent-first preset selection, fgos-group-thinking for named discussion Workflow use, and fgos-architecture-panel for architecture-advisory. Only explicit code implementation/change requests route to fgos-run. Workflow status, answer and resume use the Workflow run id; the retired coordination run/show doors are not current. Evidence: core/skills/fgos-panel/SKILL.md:45-75.
+Use fgos-advise for intent-first request-kind and route selection, fgos-group-thinking for named discussion Workflow use, and fgos-architecture-panel for architecture-advisory. Only explicit code implementation/change requests route to fgos-run. Workflow status, answer and resume use the Workflow run id; the retired coordination run/show doors are not current. Evidence: core/skills/fgos-advise/SKILL.md:18-27,102-118.
 
 ## Alternatives Considered
 
@@ -145,7 +129,7 @@ Historically this left protocol-pack selection exposed to the person. The
 current named-Workflow skill can execute an already selected method, but it does
 not replace intent-first surface selection.
 
-### B. Add `fgos-panel`
+### B. Add `fgos-advise`
 
 Selected. Natural requests use one surface and the canonical table, while named
 Workflow/CollaborationPattern owners retain execution semantics. Selection is

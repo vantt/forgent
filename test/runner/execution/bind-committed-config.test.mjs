@@ -45,11 +45,15 @@ function assertRunnable(binding, label) {
 }
 
 test('each executor bound by override gets a confined, home-provisioned cli invocation', () => {
+  // Governance may take an executor out of dispatch (xai is disallowed); its invocations stay
+  // configured and must still be well formed for the day it is allowed again, so they are checked
+  // without that filter.
+  const ungoverned = { ...runnerConfig, governance: undefined };
   for (const executor of ['claude', 'openai', 'gemini', 'xai', 'deepseek']) {
     for (const writes of [[], ['x.txt']]) {
       const result = bind(
         { ...ask('docs:probe', writes), overrides: [{ executor, origin: 'human-cli' }] },
-        { runnerConfig, session: headless },
+        { runnerConfig: ungoverned, session: headless },
       );
       assert.ok(!result.refused, `${executor}: ${JSON.stringify(result.refused)}`);
       assertRunnable(result, `${executor} writes=${writes.length}`);
@@ -74,7 +78,9 @@ test('every capability of the committed config binds headless to a runnable invo
       assertRunnable(result, `${capability} writes=${writes.length}`);
     }
   }
-  assert.ok(bound > 10, 'the committed config binds a real set of capabilities');
+  // Only capabilities whose pool names no invocation are counted here; the pools that pin one
+  // (the five-family pools) bind to pane invocations and are covered by their own tests.
+  assert.ok(bound > 5, 'the committed config binds a real set of capabilities');
 });
 
 test('Workflow capabilities that name a same-verb pool bind headless', () => {

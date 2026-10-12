@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { AUTH_FAILURE_PATTERNS } from './provider-auth-failure.mjs';
+import { matchAuthFailureLine } from './provider-auth-failure.mjs';
 import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
@@ -983,7 +983,7 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
   if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
     // A round that ended on a dead credential is not a quota hit: the account stays out until a
     // person logs in again, and the reset-window rule below must not retry it in an hour.
-    if (AUTH_FAILURE_PATTERNS.some((pattern) => pattern.test(text))) {
+    if (matchAuthFailureLine(text)) {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     // The text carries the reset window when the provider named one; otherwise the

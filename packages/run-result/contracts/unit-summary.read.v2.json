@@ -33,6 +33,18 @@
     "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
     "inline": {"type": "boolean"},
     "stanceOptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "sharedFamilies": {
+      "type": "array",
+      "description": "Optional, additive. Present only when two or more final seats were bound to one provider family although their binding asked for a soft spread across families (a panel with more seats than the pool has families). Each entry names the family and the role/round seats that share it. Absent means no seat shared a family; readers must treat it as optional.",
+      "items": {
+        "type": "object",
+        "required": ["family", "seats"],
+        "properties": {
+          "family": {"type": "string", "minLength": 1},
+          "seats": {"type": "array", "minItems": 2, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
     "seats": {
       "type": "array",
       "items": {
@@ -74,7 +86,10 @@
             "executor": {"type": "string", "minLength": 1},
             "reason": {"type": "string", "minLength": 1},
             "invocation": {"$ref": "#/definitions/nullableString"},
-            "transport": {"$ref": "#/definitions/nullableString"}
+            "transport": {"$ref": "#/definitions/nullableString"},
+            "kind": {"enum": ["account-rotation", "next-candidate"], "description": "Optional, additive (no version change; readers ignore unknown values). account-rotation: the same executor ran again on another account of its provider after a provider failure. next-candidate: the next executor of the capability pool ran. Absent on records written before this field existed."},
+            "provider": {"$ref": "#/definitions/nullableString", "description": "Optional, additive. Present with kind account-rotation: the provider whose accounts were rotated."},
+            "accountsHealthy": {"type": "integer", "minimum": 0, "description": "Optional, additive. Present with kind account-rotation: how many accounts of that provider were still usable when the retry was decided."}
           }
         }
       ]

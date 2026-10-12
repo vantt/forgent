@@ -82,16 +82,15 @@ test('both checks are registered in the doctor registry', () => {
   assert.ok(ids.includes('agent-cli-project-trusted'));
 });
 
-test('a panel whose pool has only as many families as panelists fails on the synthesizer', async () => {
+test('a panel whose pool has only as many families as panelists passes and reports the synthesizer sharing a family', async () => {
   const result = await run(PANEL_WORKFLOW, {
     'fixture:generate': prefer('alpha', 'beta', 'gamma'),
     'fixture:rank': prefer('alpha'),
   });
-  assert.equal(result.passed, false);
+  assert.equal(result.passed, true, result.message);
   assert.match(result.message, /panel-fixture\/ideas\/generate \(panel, capability "fixture:generate"\)/);
-  assert.match(result.message, /synthesizer refused for independence/);
-  assert.match(result.message, /panelist-1=alpha, panelist-2=beta, panelist-3=gamma/);
-  assert.doesNotMatch(result.message, /panelist-\d refused/);
+  assert.match(result.message, /synthesizer=alpha shares a family with panelist-1/);
+  assert.match(result.message, /a preference, not a failure/);
   assert.doesNotMatch(result.message, /fixture\/tally/);
 });
 
@@ -99,16 +98,37 @@ test('a panel with a fourth family for the synthesizer passes', async () => {
   const result = await run(PANEL_WORKFLOW, { 'fixture:generate': prefer('alpha', 'beta', 'gamma', 'delta') });
   assert.equal(result.passed, true, result.message);
   assert.match(result.message, /\(1\)/);
+  assert.doesNotMatch(result.message, /shares a family/);
 });
 
-test('a panel pool with two executors of one family cannot place three independent panelists', async () => {
+test('a panel pool with two executors of one family spreads panelists over distinct families and the synthesizer shares one', async () => {
   const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'alpha-twin', 'gamma') });
   config.executors['alpha-twin'] = { agentType: 'alpha-twin', providerModel: 'claude' };
   const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [] };
   const { roles } = await simulateUnitBindings(unit, config);
   const bound = Object.fromEntries(roles.map((r) => [r.role, r.executor]));
-  assert.deepEqual(bound, { 'panelist-1': 'alpha', 'panelist-2': 'beta', 'panelist-3': 'gamma', synthesizer: undefined });
-  assert.equal(roles.find((r) => r.role === 'synthesizer').refused.reason, 'independence');
+  assert.deepEqual(bound, { 'panelist-1': 'alpha', 'panelist-2': 'beta', 'panelist-3': 'gamma', synthesizer: 'alpha' });
+  assert.equal(roles.every((r) => !r.refused), true);
+  assert.deepEqual(roles.find((r) => r.role === 'synthesizer').sharesFamilyWith, ['panelist-1']);
+});
+
+test('six panel seats over three families all bind with no waiver and share families in pool order', async () => {
+  const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'gamma') });
+  const unit = { id: 'u', capability: 'fixture:generate', pattern: { pattern: 'panel', params: { members: 6 } }, writes: [] };
+  const { outcome, roles } = await simulateUnitBindings(unit, config);
+  assert.equal(outcome, 'pass');
+  assert.deepEqual(roles.map((r) => r.executor), ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma', 'alpha']);
+  assert.equal(roles.length, 7);
+  assert.deepEqual(roles[0].sharesFamilyWith, undefined, 'the first seat is bound before anyone shares with it');
+  assert.deepEqual(roles[3].sharesFamilyWith, ['panelist-1']);
+});
+
+test('with enough families every panel seat and the synthesizer land on distinct families in pool order', async () => {
+  const config = runnerConfig({ 'fixture:generate': prefer('alpha', 'beta', 'gamma', 'delta') });
+  const unit = { id: 'u', capability: 'fixture:generate', pattern: 'panel', writes: [] };
+  const { roles } = await simulateUnitBindings(unit, config);
+  assert.deepEqual(roles.map((r) => r.executor), ['alpha', 'beta', 'gamma', 'delta']);
+  assert.equal(roles.some((r) => r.sharesFamilyWith), false);
 });
 
 test('a reviewed unit whose pool is a single family fails on the checker', async () => {

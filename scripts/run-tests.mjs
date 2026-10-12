@@ -198,6 +198,15 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) 
 }
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
+// Derived files that any read of the live store may rewrite: the state view is a cache folded
+// from the event log, and the truncation guard records the last log size it saw. A test that
+// reads the store therefore refreshes them without leaking anything; test-written state still
+// shows up as added or changed event, observe and work files, which stay guarded.
+export const DERIVED_FGOS_FILES = new Set([
+  path.join('cache', 'state.json'),
+  path.join('runtime', 'events-jsonl.truncation-guard.json'),
+]);
+
 /**
  * Recursively snapshots the repository's `.fgos` store before/after test runs.
  * Excludes sensitive secret files.
@@ -283,7 +292,7 @@ export function runSelectedTests(files, {
   env = process.env,
   stdio = 'inherit',
   log = (msg) => console.error(msg),
-  allowedFgosMutations = new Set(),
+  allowedFgosMutations = DERIVED_FGOS_FILES,
   fileTimeoutMs = Number(env[FILE_TIMEOUT_ENV]) || DEFAULT_FILE_TIMEOUT_MS,
   watchdogPollMs = DEFAULT_WATCHDOG_POLL_MS,
   // Only a real spawnSync has child processes to supervise.
@@ -396,7 +405,7 @@ export function runTests({
   cwd = REPO_ROOT,
   stdio = 'inherit',
   queue = null,
-  allowedFgosMutations = new Set(),
+  allowedFgosMutations = DERIVED_FGOS_FILES,
   ...limitOptions
 } = {}) {
   const files = discoverTestFiles(root);

@@ -26,6 +26,21 @@ steps:
           capability: group-cognition:critique
           pattern: reviewed
           acceptOutcomes: [pass, findings]
+          params:
+            roleTasks:
+              reviewer: >-
+                You are the reviewer of work another agent just produced. Do not change any file. Read the
+                artifact the task names and the producer's own account of it, listed under Context refs; for a
+                code task also read the changed files. Do not look at git history unless the task names a
+                commit. Report what is wrong, unsupported or missing, with quoted evidence, or say plainly that
+                you found nothing. The task that was assigned: {objective}
+              red-team: >-
+                You are the red-team for work another agent just produced. Do not change any file. Read the
+                artifact the task names and the producer's own account of it, listed under Context refs; for a
+                code task also read the changed files. Do not look at git history unless the task names a
+                commit. Try to break it: wrong claims, hidden assumptions, missed cases. Report concrete
+                failures with quoted evidence, or say plainly that you found none. The task that was assigned:
+                {objective}
           persona: critic
           objective: Subject sense-making hypotheses to critical challenge, counter-arguments, and red-team review
   - id: action-synthesis

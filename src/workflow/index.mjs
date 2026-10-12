@@ -19,6 +19,7 @@ export { translatePlanToWorkflow } from './plan-source.mjs';
 export {
   startWorkflow,
   startWorkflowDetached,
+  preflightWorkflowSeats,
   answerWorkflowDetached,
   resumeWorkflowDetached,
   statusWorkflow,

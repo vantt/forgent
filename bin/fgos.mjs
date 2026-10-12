@@ -2169,7 +2169,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const foreground = flags.foreground !== undefined && flags.foreground !== 'false';
       const swallowedId = typeof flags.foreground === 'string' && flags.foreground !== 'true' ? flags.foreground : undefined;
       if (sub === 'start') {
-        const { startWorkflow, startWorkflowDetached } = await import('../src/workflow/index.mjs');
+        const { startWorkflow, startWorkflowDetached, preflightWorkflowSeats } = await import('../src/workflow/index.mjs');
         const workflowId = positional[1] ?? flags.id ?? swallowedId;
         const planPath = flags.plan;
         if (!workflowId && !planPath) {
@@ -2181,13 +2181,20 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           request: typeof flags.request === 'string' ? flags.request : undefined,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
+          seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
         };
+        // --seats: dry-bind the rebuilt definition first; a refusal creates no run, shared-family notes ride along.
+        const seatsPreflight = startParams.seats === undefined ? undefined : await preflightWorkflowSeats(startParams);
         // Default: record the run, hand advancing to a detached process, return the run id.
         // --foreground keeps the run in this process until it completes, fails, or parks.
         const startWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-        return attachDirWarning(foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams), startWarning);
+        const started = foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams);
+        // What the start pinned, stated before the first seat spends anything (see src/workflow/ref-digests.mjs).
+        const { seatsEcho } = await import('../src/workflow/ref-digests.mjs');
+        const echoed = started.seats ? { ...started, seatsEcho: seatsEcho(started.seats) } : started;
+        return attachDirWarning(seatsPreflight?.warnings.length ? { ...echoed, seatsPreflight } : echoed, startWarning);
       }
       if (sub === 'status') {
         const { statusWorkflow } = await import('../src/workflow/index.mjs');
@@ -2207,7 +2214,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
         const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
-        const resumeOptions = { repoRoot: flags.dir, worktree: flags.worktree };
+        // --seats on resume is only a consistency check: the run keeps the seats it started with.
+        const resumeOptions = {
+          repoRoot: flags.dir,
+          worktree: flags.worktree,
+          seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
+        };
         const resumeWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
         return attachDirWarning(foreground ? await resumeWorkflow(workflowRunId, resumeOptions) : resumeWorkflowDetached(workflowRunId, resumeOptions), resumeWarning);
       }
@@ -3699,6 +3711,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // missing (absent capability is a fact to report, never a CLI error);
     // `query` merges the two (config-declared tools + local overlay) at
     // read time.
+    // Read-only listing of the personas a `--seats "@name"` seat can name; a pure read of the
+    // three definition tiers (src/runner/agent-listing.mjs), no store and no event.
+    case 'agents': {
+      const sub = requireField(positional[0], 'agents requires a sub-verb: fgos agents list');
+      if (sub !== 'list') throw new StoreError('validation', `unknown agents sub-verb "${sub}". Usage: fgos agents list`);
+      const { listAgents } = await import('../src/runner/agent-listing.mjs');
+      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;
+      return { projectRoot, ...listAgents({ projectRoot }) };
+    }
     case 'tool': {
       const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
       const repoRoot = path.dirname(dir);

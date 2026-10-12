@@ -2,6 +2,7 @@
 
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -24,6 +25,7 @@ import {
   resumeWorkflow,
   answerWorkflowDetached,
   resumeWorkflowDetached,
+  preflightWorkflowSeats,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs } from '../../src/workflow/definition.mjs';
@@ -1705,4 +1707,329 @@ test('cross-repo workflows reject plain context paths before recording a run, bu
     contextRefs: ['README.md'], repoRoot: stateRoot, cwd: linked,
   });
   assert.equal(sameRepo.status, 'parked', 'linked worktrees are not different repositories');
+});
+
+// A base whose only panel is generic (no seat tasks) followed by a step that depends on it.
+function writeSeatBase(tmp) {
+  fs.mkdirSync(path.join(tmp, 'core', 'workflows'), { recursive: true });
+  fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'note.md'), '# Domain note\n');
+  execFileSync('git', ['add', 'docs/note.md'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'add note'], { cwd: tmp, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tmp, 'core', 'workflows', 'seat-base.json'), JSON.stringify({
+    id: 'seat-base',
+    steps: [
+      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', blind: true, objective: 'Weigh the question', writes: [] } }] },
+      { id: 'decide', dependsOn: ['opinions'], units: [{ id: 'verdict', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
+    ],
+  }));
+}
+
+test('workflow start --seats through the real CLI stores the expanded definition and provenance, seats the lenses and reaches downstream units', { timeout: 4 * STANCE_CLI_CALL_TIMEOUT_MS }, (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma', 'delta']);
+  writeSeatBase(tmp);
+  const runFgos = (args) => JSON.parse(execFileSync(process.execPath, [BIN_FGOS, ...args], { cwd: tmp, encoding: 'utf8', timeout: STANCE_CLI_CALL_TIMEOUT_MS })).data;
+  const lenses = ['cash flow and payback', 'delivery capacity and lock-in', 'renewal leverage'];
+  const state = runFgos(['workflow', 'start', 'seat-base', '--request', 'Which retainer?', '--seats', lenses.join('|'), '--context-ref', 'docs/note.md', '--dir', tmp, '--foreground']);
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.seatsPreflight, undefined, 'four families serve three seats and a synthesizer: nothing to warn about');
+
+  // The stored definition and provenance are what status and resume read back.
+  const status = runFgos(['workflow', 'status', state.workflowRunId, '--dir', tmp]);
+  const panel = status.workflow.steps[0].units[0].template;
+  assert.equal(panel.params.members, 3);
+  assert.deepEqual(Object.keys(panel.params.roleTasks), ['panelist-1', 'panelist-2', 'panelist-3']);
+  assert.equal(status.workflowId, 'seat-base');
+  assert.deepEqual(status.seats.seats, lenses);
+  assert.equal(status.seats.baseId, 'seat-base');
+  assert.match(status.seats.baseDigest, /^[0-9a-f]{64}$/);
+  assert.deepEqual(status.seats.refs, ['docs/note.md']);
+  assert.deepEqual(status.seats.refDigests, [{ ref: 'docs/note.md', sha256: crypto.createHash('sha256').update('# Domain note\n').digest('hex'), bytes: 14 }], 'the document is digested at start');
+  assert.deepEqual(state.seatsEcho.refs, { count: 1, totalBytes: 14, unreadable: [] }, 'the start echoes what it pinned');
+  assert.deepEqual(state.seatsEcho.personas, [], 'lenses carry no persona');
+  assert.ok(status.seatProviders.length >= 3 && status.seatProviders.every((row) => typeof row.executor === 'string'), 'status says which executor served each seat');
+  assert.deepEqual(status.workflow.steps[1].units[0].template.contextRefs, ['docs/note.md'], 'the shared ref is copied to the step run-level refs cannot reach');
+  const startEvent = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0];
+  assert.deepEqual(startEvent.payload.workflow.steps[0].units[0].template.params, panel.params);
+  assert.deepEqual(startEvent.payload.seats, status.seats);
+
+  // Each seat was briefed with its own lens only, and the synthesizer got no lens.
+  const unitDir = path.join(tmp, '.fgos', 'assignments', state.steps.opinions.units.panel.unitRunId);
+  const prompt = (role) => {
+    const envelope = JSON.parse(fs.readFileSync(path.join(unitDir, role, '1', 'runs', '01', 'protected', 'launch-envelope.json'), 'utf8'));
+    return envelope.invocation.args.find((arg) => arg.includes('Write structured JSON to'));
+  };
+  lenses.forEach((lens, i) => {
+    const brief = prompt(`panelist-${i + 1}`);
+    assert.match(brief, new RegExp(`Your analytic lens for this question: ${lens}\\.`));
+    assert.match(brief, /Weigh the question/);
+    for (const other of lenses.filter((l) => l !== lens)) assert.ok(!brief.includes(other), `seat ${i + 1} must not see "${other}"`);
+  });
+  assert.ok(!fs.existsSync(path.join(unitDir, 'panelist-4')));
+  assert.doesNotMatch(prompt('synthesizer'), /analytic lens/);
+
+  // The downstream unit received the shared ref.
+  const verdict = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', state.steps.decide.units.verdict.unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
+  assert.ok(JSON.stringify(verdict).includes('docs/note.md'), 'the downstream assignment lists the shared ref');
+
+  // Resume refuses seats that differ from the stored ones and accepts the same ones.
+  assert.throws(
+    () => execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'resume', state.workflowRunId, '--seats', 'other one|other two', '--dir', tmp, '--foreground'], { cwd: tmp, encoding: 'utf8', stdio: 'pipe', timeout: STANCE_CLI_CALL_TIMEOUT_MS }),
+    (error) => error.status !== 0 && /resume refuses different --seats/.test(`${error.stdout}${error.stderr}`),
+  );
+  const same = runFgos(['workflow', 'resume', state.workflowRunId, '--seats', lenses.join('|'), '--dir', tmp, '--foreground']);
+  assert.equal(same.status, 'completed');
+});
+
+test('workflow start --seats refusals create no run', (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  writeSeatBase(tmp);
+  fs.copyFileSync(path.resolve('core/workflows/council-lite.yaml'), path.join(tmp, 'core', 'workflows', 'council-lite.yaml'));
+  const refuse = (workflowId, seats, pattern) => {
+    assert.throws(
+      () => execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', workflowId, '--seats', seats, '--dir', tmp, '--foreground'], { cwd: tmp, encoding: 'utf8', stdio: 'pipe', timeout: STANCE_CLI_CALL_TIMEOUT_MS }),
+      (error) => error.status !== 0 && pattern.test(`${error.stdout}${error.stderr}`),
+      `${workflowId} --seats ${seats}`,
+    );
+  };
+  refuse('seat-base', 'only one', /at least 2 lenses/);
+  refuse('seat-base', 'good lens||another lens', /seat 2 is empty/);
+  refuse('seat-base', 'Good lens|good LENS', /repeats seat 1/);
+  refuse('seat-base', 'good lens|@finance-controller', /persona "finance-controller" not found; searched fgos\/agents/);
+  refuse('seat-base', 'good lens|@', /names a persona \("@"\)/);
+  refuse('seat-base', `good lens|${'x'.repeat(161)}`, /3-160 characters/);
+  refuse('seat-base', 'good lens|has {brace}', /braces/);
+  refuse('council-lite', 'one lens|two lens', /fixes its own seats/);
+  refuse('no-such-base', 'one lens|two lens', /no-such-base/);
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')) || fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length === 0, 'a refused start creates no run');
+});
+
+test('six seats on a pool with fewer provider families start without a waiver and report the shared families', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  useDistinctFamilies(tmp, ['alpha', 'beta']);
+  writeSeatBase(tmp);
+  const seats = Array.from({ length: 6 }, (_, i) => `perspective ${i + 1}`);
+  const params = { workflowId: 'seat-base', seats, repoRoot: tmp, cwd: tmp, worktree: tmp };
+  const { warnings } = await preflightWorkflowSeats(params);
+  assert.ok(warnings.length > 0 && warnings.every((w) => /shares a provider family with/.test(w)), warnings.join('\n'));
+  const state = await startWorkflow(params);
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.equal(state.seats.seats.length, 6);
+  const unitDir = path.join(tmp, '.fgos', 'assignments', state.steps.opinions.units.panel.unitRunId);
+  for (let i = 1; i <= 6; i += 1) assert.ok(fs.existsSync(path.join(unitDir, `panelist-${i}`)), `panelist-${i} ran`);
+  assert.ok(!fs.existsSync(path.join(unitDir, 'panelist-7')));
+});
+
+test('a pool that cannot serve a panel role at all refuses the seated start before any run exists', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  writeSeatBase(tmp);
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  delete cfg.runner.capabilities['docs:write'];
+  delete cfg.runner.defaultExecutor;
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg));
+  await assert.rejects(() => preflightWorkflowSeats({ workflowId: 'seat-base', seats: ['one lens', 'two lens'], repoRoot: tmp, cwd: tmp, worktree: tmp }), /--seats cannot be served/);
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), 'the preflight records nothing');
+});
+
+test('without --seats the preflight is a no-op and the start event and projection carry no seat data', async (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  writeSeatBase(tmp);
+  const params = { workflowId: 'seat-base', repoRoot: tmp, cwd: tmp, worktree: tmp };
+  assert.deepEqual(await preflightWorkflowSeats(params), { warnings: [] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: 'seat-base', workflow: validateWorkflow(JSON.parse(fs.readFileSync(path.join(tmp, 'core', 'workflows', 'seat-base.json'), 'utf8'))) });
+  const [start] = readWorkflowEvents({ repoRoot: tmp, workflowRunId });
+  assert.equal('seats' in start.payload, false);
+  assert.equal('seats' in projectWorkflowState([start]), false);
+});
+
+// A customer workspace: a repository with no core/agents or domains of its own, so installed
+// definitions come from the running package and `fgos/agents` is the customer's own folder.
+const FINANCE_PERSONA = (extra = '') => [
+  'name: finance-controller',
+  'version: 0.1.0',
+  'description: Weighs the cash impact of {objective} before anything else',
+  'role: Panelist',
+  'persona:',
+  `  voice: Plain controller voice${extra}`,
+  '  style: Numbers first',
+  '  archetype: A cautious controller',
+  'decision_boundary:',
+  '  can_decide:',
+  '    - Whether the cash impact is acceptable',
+  '  must_escalate:',
+  '    - Anything needing board approval',
+  '',
+].join('\n');
+
+function writeWorkspacePersona(tmp, name, text) {
+  fs.mkdirSync(path.join(tmp, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'fgos', 'agents', `${name}.yaml`), text);
+}
+
+// Two generic panels, the second behind a human gate, so a resume dispatches seats after the start.
+function writeTwoRoundSeatBase(tmp) {
+  fs.mkdirSync(path.join(tmp, 'core', 'workflows'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'core', 'workflows', 'two-round.json'), JSON.stringify({
+    id: 'two-round',
+    steps: [
+      { id: 'opinions', units: [{ id: 'panel', template: { capability: 'docs:write', pattern: 'panel', persona: 'panelist', objective: 'Weigh the question', writes: [] } }] },
+      {
+        id: 'again',
+        dependsOn: ['opinions'],
+        gate: { kind: 'human', question: 'Run the second round?' },
+        units: [{ id: 'panel-two', template: { capability: 'docs:write', pattern: 'panel', persona: 'panelist', objective: 'Weigh it again', writes: [] } }],
+      },
+    ],
+  }));
+}
+
+function seatBrief(tmp, unitRunId, role) {
+  const dir = path.join(tmp, '.fgos', 'assignments', unitRunId, role, '1');
+  const envelope = JSON.parse(fs.readFileSync(path.join(dir, 'runs', '01', 'protected', 'launch-envelope.json'), 'utf8'));
+  return envelope.invocation.args.find((arg) => arg.includes('Write structured JSON to'));
+}
+
+function seatAssignment(tmp, unitRunId, role) {
+  return JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, role, '1', 'assignment.json'), 'utf8'));
+}
+
+function consumerWorkspace(t, { families = ['alpha', 'beta', 'gamma', 'delta'] } = {}) {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  useDistinctFamilies(tmp, families);
+  writeTwoRoundSeatBase(tmp);
+  return tmp;
+}
+
+const seatedParams = (tmp, seats) => ({ workflowId: 'two-round', seats, request: 'Which retainer?', repoRoot: tmp, cwd: tmp, worktree: tmp });
+const sha256 = (text) => crypto.createHash('sha256').update(text).digest('hex');
+
+test('a named persona lands on its own seat only, mixed with a lens and an installed persona, in a consumer workspace', { timeout: 4 * STANCE_CLI_CALL_TIMEOUT_MS }, async (t) => {
+  const tmp = consumerWorkspace(t);
+  const personaText = FINANCE_PERSONA();
+  writeWorkspacePersona(tmp, 'finance-controller', personaText);
+  const seats = ['cash flow and payback', '@finance-controller', '@council-assumptions'];
+
+  const state = await startWorkflow(seatedParams(tmp, seats));
+  assert.equal(state.status, 'parked', JSON.stringify(state.steps));
+  assert.equal(state.steps.opinions.status, 'completed');
+
+  // Pinned at start, in the event and the projection, with the digest of the exact bytes.
+  const installed = fs.readFileSync(path.resolve('core/agents/council-assumptions.yaml'), 'utf8');
+  const expected = [
+    { seat: 'panelist-2', name: 'finance-controller', tier: 'workspace', source: 'fgos/agents/finance-controller.yaml', digest: sha256(personaText), text: personaText },
+    { seat: 'panelist-3', name: 'council-assumptions', tier: 'core', source: 'core/agents/council-assumptions.yaml', digest: sha256(installed), text: installed },
+  ];
+  assert.deepEqual(state.seats.seats, seats);
+  assert.deepEqual(state.seats.personas, expected);
+  const startEvent = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0];
+  assert.deepEqual(startEvent.payload.seats.personas, expected);
+  assert.deepEqual(statusWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp }).seats.personas, expected);
+
+  const unitRunId = state.steps.opinions.units.panel.unitRunId;
+  // The seat entries come ahead of the unit-wide persona, which still serves every other role.
+  const unitRecord = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+  assert.deepEqual(unitRecord.overrides.map((o) => [o.scope.role ?? null, o.persona]), [
+    ['panelist-2', 'finance-controller'], ['panelist-3', 'council-assumptions'], [null, 'panelist'],
+  ]);
+  const personaOf = (role) => seatAssignment(tmp, unitRunId, role).policy.preferPersona;
+  assert.equal(personaOf('panelist-1'), 'panelist', 'a lens seat keeps the unit-wide persona');
+  assert.equal(personaOf('panelist-2'), 'finance-controller');
+  assert.equal(personaOf('panelist-3'), 'council-assumptions');
+  assert.equal(personaOf('synthesizer'), 'panelist', 'the synthesizer never inherits a seat persona');
+  assert.equal(seatAssignment(tmp, unitRunId, 'synthesizer').policy.personaPin, undefined);
+
+  // What each seat was actually briefed with: the pinned text on its own seat, the lens on the lens seat.
+  const second = seatBrief(tmp, unitRunId, 'panelist-2');
+  assert.match(second, /resolved persona "finance-controller"/);
+  assert.ok(second.includes('Description: Weighs the cash impact of {objective} before anything else'), 'persona text stays literal');
+  assert.ok(second.includes('Voice: Plain controller voice') && second.includes('- Whether the cash impact is acceptable'));
+  assert.doesNotMatch(second, /analytic lens/);
+  assert.match(second, /Weigh the question/, 'a named seat keeps the unit objective as its task');
+  const third = seatBrief(tmp, unitRunId, 'panelist-3');
+  assert.match(third, /resolved persona "council-assumptions"/);
+  assert.ok(third.includes('Description: Council task posture: assumption testing.'));
+  assert.ok(!third.includes('finance-controller') && !third.includes('Plain controller voice'));
+  const first = seatBrief(tmp, unitRunId, 'panelist-1');
+  assert.match(first, /Your analytic lens for this question: cash flow and payback\./);
+  assert.match(first, /resolved persona "panelist"/);
+  assert.ok(!first.includes('Plain controller voice') && !first.includes('assumption testing'));
+  const synthesizer = seatBrief(tmp, unitRunId, 'synthesizer');
+  assert.ok(!synthesizer.includes('Plain controller voice') && !synthesizer.includes('assumption testing'));
+  assert.match(synthesizer, /resolved persona "panelist"/);
+});
+
+test('resume uses the persona text pinned at start after the file is edited or deleted', { timeout: 6 * STANCE_CLI_CALL_TIMEOUT_MS }, async (t) => {
+  for (const [label, change] of [
+    ['edited', (tmp) => writeWorkspacePersona(tmp, 'finance-controller', FINANCE_PERSONA(' EDITED AFTER START'))],
+    ['deleted', (tmp) => fs.rmSync(path.join(tmp, 'fgos', 'agents', 'finance-controller.yaml'))],
+  ]) {
+    const tmp = consumerWorkspace(t);
+    writeWorkspacePersona(tmp, 'finance-controller', FINANCE_PERSONA());
+    const parked = await startWorkflow(seatedParams(tmp, ['@finance-controller', 'cash flow and payback']));
+    assert.equal(parked.status, 'parked', label);
+    change(tmp);
+
+    const done = await answerWorkflow(parked.workflowRunId, { stepId: 'again', answer: 'go', approved: true, repoRoot: tmp, cwd: tmp, worktree: tmp });
+    assert.equal(done.status, 'completed', `${label}: ${JSON.stringify(done.steps)}`);
+    const brief = seatBrief(tmp, done.steps.again.units['panel-two'].unitRunId, 'panelist-1');
+    assert.ok(brief.includes('Voice: Plain controller voice\n'), `${label}: the pinned voice reaches the later round`);
+    assert.ok(!brief.includes('EDITED AFTER START'), `${label}: the live file must not be re-read`);
+    assert.ok(brief.includes('Description: Weighs the cash impact of {objective}'), label);
+    assert.equal(done.seats.personas[0].digest, parked.seats.personas[0].digest);
+  }
+});
+
+test('a workspace definition replaces the installed one of the same name whole', async (t) => {
+  const tmp = consumerWorkspace(t);
+  writeWorkspacePersona(tmp, 'council-assumptions', 'name: council-assumptions\ndescription: Customer assumption tester\n');
+  const state = await startWorkflow(seatedParams(tmp, ['cash flow and payback', '@council-assumptions']));
+  assert.equal(state.status, 'parked', JSON.stringify(state.steps));
+  assert.equal(state.seats.personas[0].tier, 'workspace');
+  const brief = seatBrief(tmp, state.steps.opinions.units.panel.unitRunId, 'panelist-2');
+  assert.ok(brief.includes('Description: Customer assumption tester'));
+  assert.ok(!brief.includes('Voice:') && !brief.includes('Blind spot: questioning without convergence'), 'fields of the installed file are not merged in');
+});
+
+test('unknown, colliding, duplicated and malformed persona entries refuse the start and create no run', async (t) => {
+  const tmp = consumerWorkspace(t);
+  writeWorkspacePersona(tmp, 'finance-controller', FINANCE_PERSONA());
+  fs.mkdirSync(path.join(tmp, 'domains', 'finance', 'agents'), { recursive: true });
+  fs.mkdirSync(path.join(tmp, 'domains', 'hr', 'agents'), { recursive: true });
+  const body = 'name: shared-name\ndescription: defined twice\n';
+  fs.writeFileSync(path.join(tmp, 'domains', 'finance', 'agents', 'shared-name.yaml'), body);
+  fs.writeFileSync(path.join(tmp, 'domains', 'hr', 'agents', 'shared-name.yaml'), body);
+  writeWorkspacePersona(tmp, 'wrong-shape', 'name: other\ndescription: x\n');
+
+  const refused = [
+    [['good lens', '@nobody-here'], /persona "nobody-here" not found; searched fgos\/agents \(.*domains\/\*\/agents \(.*core\/agents \(/],
+    [['good lens', '@shared-name'], /persona "shared-name" is defined more than once in the domains\/\*\/agents tier \(domains\/finance\/agents\/shared-name\.yaml, domains\/hr\/agents\/shared-name\.yaml\)/],
+    [['@finance-controller', '@finance-controller'], /seat 2 repeats seat 1/],
+    [['good lens', '@'], /names a persona \("@"\)/],
+    [['good lens', '@Finance-Controller'], /names a persona/],
+    [['good lens', '@wrong-shape'], /\(fgos\/agents\/wrong-shape\.yaml\) must declare name: wrong-shape/],
+    [['@finance-controller'], /at least 2/],
+  ];
+  for (const [seats, pattern] of refused) {
+    await assert.rejects(() => preflightWorkflowSeats(seatedParams(tmp, seats)), pattern, `preflight ${seats.join('|')}`);
+    await assert.rejects(() => startWorkflow(seatedParams(tmp, seats)), pattern, `start ${seats.join('|')}`);
+  }
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')) || fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length === 0, 'a refused start creates no run');
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'assignments')) || fs.readdirSync(path.join(tmp, '.fgos', 'assignments')).length === 0, 'no pane was opened');
+});
+
+test('workflow start --seats with an unknown persona through the real CLI exits non-zero, names the tiers searched and creates no run', (t) => {
+  const tmp = consumerWorkspace(t);
+  assert.throws(
+    () => execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', 'two-round', '--seats', 'good lens|@finance-controller', '--dir', tmp, '--foreground'], { cwd: tmp, encoding: 'utf8', stdio: 'pipe', timeout: STANCE_CLI_CALL_TIMEOUT_MS }),
+    (error) => error.status !== 0 && /persona "finance-controller" not found; searched fgos\/agents/.test(`${error.stdout}${error.stderr}`),
+  );
+  assert.ok(!fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')) || fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length === 0);
 });

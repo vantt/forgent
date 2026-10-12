@@ -52,6 +52,7 @@ export {
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
+import { credentialFaultFamilies } from '../execution/account-rotation.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
@@ -509,7 +510,10 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
         session: opts.session || {},
       },
-      { skipCandidateIndex: fallbackSkipIndex(unitRecord, asgn) },
+      {
+        skipCandidateIndex: fallbackSkipIndex(unitRecord, asgn),
+        excludeFamilies: [...credentialFaultFamilies(unitRecord, { boundBefore: attemptBoundAt(unitRecord, asgn) })],
+      },
     );
 
     if (recomputed.refused) {
@@ -1224,10 +1228,25 @@ function fallbackSkipIndex(unitRecord, asgn) {
   const attempts = unitRecord.bindings?.[`${asgn.role}/${asgn.round}`];
   if (!Array.isArray(attempts)) return -1;
   const at = attempts.findIndex((attempt) => attempt?.assignmentId === asgn.assignmentId);
+  return skipIndexOfAttempt(attempts, at);
+}
+
+// When the runner bound this attempt, from its own persisted record; null when it recorded none.
+function attemptBoundAt(unitRecord, asgn) {
+  const attempts = unitRecord.bindings?.[`${asgn.role}/${asgn.round}`];
+  const bound = Date.parse(attempts?.find((attempt) => attempt?.assignmentId === asgn.assignmentId)?.boundAt);
+  return Number.isFinite(bound) ? bound : -Infinity;
+}
+
+// A retry on another account of the same candidate (recorded as an account rotation) resumes the
+// walk exactly where the attempt it retries did, so the candidate bind() verifies is the same one.
+function skipIndexOfAttempt(attempts, at) {
   if (at <= 0) return -1;
   const previous = attempts[at - 1];
+  if (previous?.outcome !== 'provider-limit') return -1;
+  if (attempts[at]?.fallbackFrom?.kind === 'account-rotation') return skipIndexOfAttempt(attempts, at - 1);
   const index = previous?.binding?.candidateIndex;
-  return previous?.outcome === 'provider-limit' && Number.isInteger(index) && index >= 0 ? index : -1;
+  return Number.isInteger(index) && index >= 0 ? index : -1;
 }
 
 /**
@@ -2040,7 +2059,16 @@ export async function executeAssignment(assignment, opts = {}) {
     runDir: path.resolve(runDir),
     effectiveContract,
     ...(effectivePolicy.persona
-      ? { persona: { value: effectivePolicy.persona, source: effectivePolicy.provenance?.persona?.source ?? null } }
+      ? {
+        persona: {
+          value: effectivePolicy.persona,
+          source: effectivePolicy.provenance?.persona?.source ?? null,
+          // Text pinned by whoever bound the persona; the renderer reads it instead of a file.
+          ...(effectiveAssignment.policy?.personaPin?.name === effectivePolicy.persona
+            ? { pinnedText: effectiveAssignment.policy.personaPin.text }
+            : {}),
+        },
+      }
       : {}),
   });
 

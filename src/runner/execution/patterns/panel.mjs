@@ -1,6 +1,7 @@
 /**
  * Panel collaboration pattern.
- * Runs N independent panel members in parallel, followed by a synthesizer.
+ * Runs N panel members in parallel, followed by a synthesizer. Provider-family spread between
+ * seats is declared as a soft preference (`preferIndependentOf`); bind() owns the choice.
  */
 
 import { roleUnit } from './role-tasks.mjs';
@@ -60,12 +61,15 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
       return existing;
     }
 
-    const independentOf = allPanelistRoles.filter((r) => r !== role);
+    // A different provider family per seat is a preference, not a rule: a panel may have more
+    // seats than the pool has families. Seats are listed in priority order (the first listed
+    // is bound first); bind() alone decides which family each seat gets and never refuses a
+    // seat for sharing one.
     return await runRole({
       role,
       unit: roleUnit(unit, { role, kind, params }),
       readOnly: true,
-      independentOf,
+      preferIndependentOf: allPanelistRoles.filter((r) => r !== role),
     });
   });
 
@@ -91,10 +95,10 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
     // The panelists answer the unit's objective; the synthesizer is told to synthesize their answers.
     unit: roleUnit(unit, { ...synthesizer, params }),
     readOnly: (unit?.writes || []).length === 0,
-    // The synthesizer judges every panelist, so it must not share a provider family with any of
-    // them; the runner turns these role names into the executors that played them and bind()
-    // compares provider families.
-    independentOf: allPanelistRoles,
+    // The synthesizer judges every panelist, so it prefers a provider family none of them used;
+    // the runner turns these role names into the executors that played them and bind() ranks
+    // provider families, falling back to the least used one instead of refusing.
+    preferIndependentOf: allPanelistRoles,
     inputs: memberResults,
   });
 

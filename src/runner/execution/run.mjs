@@ -7,7 +7,8 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
-import { bind, nextCandidate } from './bind.mjs';
+import { bind, nextCandidate, retrySameCandidate, getProviderFamily } from './bind.mjs';
+import { credentialFaultFamilies, inspectAccountRotation, mayRotateAccount } from './account-rotation.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
@@ -38,6 +39,16 @@ function publishUnitSummary(unitDir) {
   catch (error) {
     console.warn(`fgos: could not write derived unit summary for "${path.basename(unitDir)}": ${error.message}`);
   }
+}
+
+/**
+ * `{ personaPin }` for an assignment policy when an override scoped to this very role bound `persona`
+ * with pinned text, else nothing. Matching on role and name keeps one role's pin from reaching another
+ * role that happens to resolve the same persona name from the capability.
+ */
+function pinnedPersonaFor(overrides, role, persona) {
+  const hit = (overrides ?? []).find((o) => o?.personaPin && o.scope?.role === role && o.persona === persona);
+  return hit ? { personaPin: hit.personaPin } : {};
 }
 
 /**
@@ -297,6 +308,9 @@ export async function runUnit(options = {}) {
   for (const attempts of Object.values(unitRecord.bindings)) {
     for (const attempt of attempts) noteRoleExecutor(attempt.role, attempt.binding?.executor);
   }
+  // Provider families whose login failed in this unit and that a seat then walked away from: no
+  // later fallback walk of the unit lands on one (a resumed run rebuilds the set from its attempts).
+  const credentialFaultFamilySet = credentialFaultFamilies(unitRecord);
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
@@ -349,6 +363,9 @@ export async function runUnit(options = {}) {
         preferExecutor: bound.executor,
         preferInvocation: bound.invocation,
         preferPersona: bound.persona,
+        // The persona text a caller pinned for this role when it supplied the override: the prompt
+        // renders that text, never a file read again at dispatch time.
+        ...pinnedPersonaFor(unitRecord.overrides, role, bound.persona),
       },
     };
 
@@ -367,6 +384,7 @@ export async function runUnit(options = {}) {
       },
       isReadOnlyMode: readOnly,
       session,
+      ...(options.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: options.providerCapacityRuntimeDir } : {}),
       // Every role of a blind unit is dispatched blind or refused, never run unblind.
       ...(unit.blind ? { blind: true } : {}),
     });
@@ -381,7 +399,7 @@ export async function runUnit(options = {}) {
   };
 
   // Helper to run a role
-  const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], inputs = [] }) => {
+  const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], preferIndependentOf = [], inputs = [] }) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
     const session = {
       provider: options.session?.provider,
@@ -396,6 +414,7 @@ export async function runUnit(options = {}) {
       role,
       readOnly,
       independentOf: resolveIndependence(independentOf),
+      ...(preferIndependentOf.length > 0 ? { preferIndependentOf: roleLedger.seats(preferIndependentOf) } : {}),
       overrides: unitRecord.overrides || [],
       ...(unit.blind ? { blind: true } : {}),
     };
@@ -441,10 +460,11 @@ export async function runUnit(options = {}) {
       };
     }
 
-    // Out-of-process dispatch, with provider-limit fallback: when the agent stops on a provider
-    // limit, the next candidate of the capability's prefer pool runs in a fresh pane/process and
-    // the limited one is left exactly as it was (its pane stays open). With no candidate left
-    // the outcome stays provider-limit -- no other executor is guessed at.
+    // Out-of-process dispatch, with provider-limit failover: when the agent stops on a provider
+    // limit or a dead credential, the same executor first runs again on another account of its
+    // provider, then the next candidate of the capability's prefer pool runs; each attempt gets a
+    // fresh pane/process and the failed one is left exactly as it was (its pane stays open). With
+    // nothing left the outcome stays provider-limit -- no other executor is guessed at.
     for (;;) {
       const assignmentId = attemptNo === 0 ? `${unitRunId}/${role}/${round}` : `${unitRunId}/${role}/${round}-fb${attemptNo}`;
       const assignmentDir = path.join(unitDir, role, attemptNo === 0 ? String(round) : `${round}-fb${attemptNo}`);
@@ -459,8 +479,11 @@ export async function runUnit(options = {}) {
           transport: bound.transport,
           invocation: bound.invocation,
           fallbackFrom: bound.provenance?.fallbackFrom ?? null,
-          // Where this attempt's candidate walk resumed (-1 = from the start of the pool).
-          skipCandidateIndex: attemptNo > 0 ? (attempts[attemptNo - 1]?.binding?.candidateIndex ?? -1) : -1,
+          // Where this attempt's candidate walk resumed (-1 = from the start of the pool). A retry
+          // on another account of the same candidate resumes exactly where the attempt it retries did.
+          skipCandidateIndex: attemptNo === 0 ? -1
+            : bound.provenance?.fallbackFrom?.kind === 'account-rotation' ? (attempts[attemptNo - 1]?.skipCandidateIndex ?? -1)
+              : (attempts[attemptNo - 1]?.binding?.candidateIndex ?? -1),
           candidateIndex: bound.candidateIndex ?? null,
           boundAt: new Date().toISOString(),
         });
@@ -484,11 +507,29 @@ export async function runUnit(options = {}) {
 
       attempts[attemptNo].outcome = result.outcome;
       attempts[attemptNo].runId = result.runResult?.runId ?? null;
+      const credentialFault = result.outcome === 'provider-limit' && result.runResult?.classification?.failure?.cause === 'credential';
+      if (credentialFault) attempts[attemptNo].failureCause = 'credential';
       persistUnitRecord();
 
       if (result.outcome !== 'provider-limit') return result;
 
-      const next = nextCandidate(bound, ask, bindCtx, 'provider-limit');
+      // A provider failure first goes to another account of the same provider: the same executor
+      // and invocation run again as a new attempt and the lease picks the next ranked account. It
+      // stops when no usable account is left, or after as many retries as the provider has
+      // accounts (never a loop on one account), and only then does the walk leave the provider.
+      let rotationsSpent = 0;
+      for (let at = attemptNo; at > 0 && attempts[at]?.fallbackFrom?.kind === 'account-rotation'; at -= 1) rotationsSpent += 1;
+      const rotation = inspectAccountRotation({ runnerConfig, executorId: bound.executor, runtimeDir: options.providerCapacityRuntimeDir });
+      if (mayRotateAccount(rotation, rotationsSpent)) {
+        bound = retrySameCandidate(bound, { provider: rotation.provider, accountsHealthy: rotation.healthy });
+        attemptNo += 1;
+        continue;
+      }
+
+      if (credentialFault) credentialFaultFamilySet.add(getProviderFamily(runnerConfig, bound.executor).toLowerCase());
+      // The spread is read again now: sibling seats may have changed executors since this seat first bound.
+      const walkAsk = preferIndependentOf.length > 0 ? { ...ask, preferIndependentOf: roleLedger.seats(preferIndependentOf) } : ask;
+      const next = nextCandidate(bound, walkAsk, bindCtx, 'provider-limit', { excludeFamilies: [...credentialFaultFamilySet] });
       if (next.refused || next.mechanism === 'inline') {
         return {
           ...result,
@@ -496,6 +537,7 @@ export async function runUnit(options = {}) {
             from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
             reason: next.refused ? next.refused.reason : 'only-inline-candidate-left',
             detail: next.refused ? next.refused.detail : 'no out-of-process candidate is left to run this role',
+            ...(rotationsSpent > 0 ? { accountRotations: rotationsSpent } : {}),
           },
         };
       }

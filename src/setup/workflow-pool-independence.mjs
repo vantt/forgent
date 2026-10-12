@@ -1,11 +1,14 @@
-// workflow-pool-independence.mjs — doctor check: can each Workflow unit's capability pool supply the
-// distinct provider families its collaboration pattern needs?
+// workflow-pool-independence.mjs — doctor check: can each Workflow unit's capability pool
+// supply the distinct provider families its collaboration pattern requires, and where is it short?
 //
-// A `panel` unit needs its panelists and a synthesizer on provider families that differ from each
-// other; a `reviewed` unit needs every checker on a family different from the producer's. When the
-// capability's `prefer` pool cannot supply that many families, bind() refuses the role as an
-// independence violation at run time, after the earlier roles already ran and were paid for. This
-// check finds that before any run.
+// A `reviewed` unit needs every checker on a family different from the producer's: that is a hard
+// rule. When the capability's `prefer` pool cannot supply a second family, bind() refuses the role
+// as an independence violation at run time, after the producer already ran and was paid for. This
+// check finds that before any run and fails.
+//
+// A `panel` unit only PREFERS a different family per seat: bind() spreads the seats over the pool's
+// families and lets seats share one when families run out, so a short pool is never a failure. It
+// is reported as a note naming the seats that would share, so degraded independence stays visible.
 //
 // The verdict is never recomputed here: each unit is driven through the runner's own pattern code
 // with a role runner that only calls bind() (src/runner/execution/dry-bind.mjs). Nothing is
@@ -96,6 +99,7 @@ export async function checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, 
 
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const problems = [];
+  const sharing = [];
   let evaluated = 0;
   for (const wf of loaded.workflows.values()) {
     for (const step of wf.steps) {
@@ -117,6 +121,10 @@ export async function checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, 
           // A capability with no prefer pool at all is refused the same way for any pattern; that gap
           // belongs to workflow-capabilities-configured and says nothing about independence.
           const refused = roles.filter((r) => r.refused && !NO_POOL_REASONS.has(r.refused.reason));
+          const sharers = roles.filter((r) => r.sharesFamilyWith?.length > 0);
+          if (refused.length === 0 && sharers.length > 0) {
+            sharing.push(`${wf.id}/${step.id}/${u.id} (${patternName}, capability "${template.capability}"): ${sharers.map((r) => `${r.role}=${r.executor} shares a family with ${r.sharesFamilyWith.join(', ')}`).join('; ')}`);
+          }
           if (refused.length === 0) continue;
           const bound = roles.filter((r) => r.executor).map((r) => `${r.role}=${r.executor}`).join(', ');
           problems.push(
@@ -136,11 +144,14 @@ export async function checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, 
       message: `capability prefer pools cannot supply the independent provider families these Workflow units need: ${problems.join(' | ')} -- add a prefer entry on another provider family under runner.capabilities, or choose a pattern that needs fewer`,
     };
   }
+  const sharingNote = sharing.length > 0
+    ? `; panel seats share a provider family because the pool has fewer families than seats (a preference, not a failure; add a prefer entry on another family to spread them): ${sharing.join(' | ')}`
+    : '';
   const unreadableNote = loaded.unreadable.length > 0 ? `; unreadable definitions skipped: ${loaded.unreadable.join(', ')}` : '';
   return {
     passed: true,
     message: evaluated === 0
       ? `no panel or reviewed Workflow unit to evaluate${unreadableNote}`
-      : `every panel/reviewed Workflow unit (${evaluated}) binds all its roles with independent provider families${unreadableNote}`,
+      : `every panel/reviewed Workflow unit (${evaluated}) binds all its roles${sharingNote || ' with independent provider families'}${unreadableNote}`,
   };
 }
