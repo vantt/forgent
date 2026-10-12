@@ -211,12 +211,14 @@ try {
         & fgos ready --json | Out-Null
         Assert-True ($LASTEXITCODE -eq 0) 'fgos ready --json from PowerShell'
 
-        $workflow = (& fgos workflow status 2>&1 | ForEach-Object { "$_" }) -join "`n"
-        Assert-True ($workflow -notmatch 'Cannot find package') "fgos workflow status cannot load a runtime dependency: $workflow"
+        # A verb that loads a runtime dependency (workflow imports the yaml package) must run
+        # from the installed release alone; the verb itself may refuse for want of a run id.
+        $workflow = Invoke-Native 'fgos' @('workflow', 'status') $null
+        Assert-True ($workflow.Text -notmatch 'Cannot find package') "fgos workflow status cannot load a runtime dependency: $($workflow.Text)"
 
         # The runner launcher reaches the Node runner through the release's own .cmd.
-        $runnerOutput = (& fgos-runner --help 2>&1 | ForEach-Object { "$_" }) -join "`n"
-        Assert-True ($runnerOutput -notmatch 'not recognized|entry not found|Cannot find') "fgos-runner launcher: $runnerOutput"
+        $runner = Invoke-Native 'fgos-runner' @('--help') $null
+        Assert-True ($runner.Text -notmatch 'not recognized|entry not found|Cannot find') "fgos-runner launcher: $($runner.Text)"
     } finally {
         Pop-Location
     }
@@ -231,8 +233,8 @@ try {
         & cmd.exe /d /c 'fgos doctor'
         Write-Host "fgos doctor exit code: $LASTEXITCODE"
         # Arguments with cmd metacharacters reach the host unharmed.
-        $echoed = (& cmd.exe /d /c 'fgos version --runtime-json "a b!c"' 2>&1 | ForEach-Object { "$_" }) -join "`n"
-        Write-Host $echoed
+        $echoed = Invoke-Native 'cmd.exe' @('/d', '/c', 'fgos version --runtime-json "a b!c"') $null
+        Write-Host $echoed.Text
     } finally {
         Pop-Location
     }
