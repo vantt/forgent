@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Refresh-ahead in an fgOS-held scratch copy, and write-back of renewed copies"
-status: pending
+status: completed
 priority: P1
 effort: "2d"
 dependencies: []

@@ -1,7 +1,7 @@
 ---
 title: "Provider credential rotation safety: refresh once at the source, write back what a pane renewed"
 description: "A pane that renews a rotating login inside its throwaway home strands the source login; design for a refresh-ahead done in an fgOS-held scratch copy under an account lock, plus a compare-before-write write-back of copies renewed inside panes."
-status: pending
+status: in-review
 priority: P1
 branch: feat/provider-credential-rotation-safety
 tags: [dispatch, provider-capacity, credentials, concurrency, confinement]
