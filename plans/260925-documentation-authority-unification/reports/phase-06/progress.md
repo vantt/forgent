@@ -1,3 +1,40 @@
+# Latest resume state — Host Invocation closure decision
+
+Date: 2026-10-13
+Executor: codex-session:6@2026-10-13
+Session counter: 6
+Documented Host executor sessions: 7 (six prior sessions plus this run)
+Step: 3 / Host Invocation P6 close attempt
+State: owner-decision required; conservation verified, batch remains open
+Blocker: A28 item 4 closure comparison excludes the unchanged 12 reviewed `claims-partial-carry` rows. No author waiver or disposition relabelling is authorized.
+Last green conservation source commit: 5c744a6c2a759828d9c85e4a6480797658eb571f
+Resume HEAD / Lead verdict commit: 168a27c6c704854b4777792e6632302f1616c65a
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 0653419c19e7c37d8d00408ad482cdecbd45a807
+Current turn commit: 5c744a6c2 (accepted boundary verdicts); the final persistence/request/progress commit contains this entry.
+Request: closure-request-host-invocation-partial-carry.md (owner decision; full shown source/primary/restored text and full digests for all twelve exact residual rows)
+Evidence: host-invocation-close-verification.json, host-invocation-close-applied.json, host-invocation-partial-carry-residual.json
+
+Applied the three committed Lead reports in ordinary mode: three source decisions, 18 native identity gaps, 43 machine re-pin references; all 64 notes are verbatim and the report commit is 168a27c6c. Source notes replace the two stale pre-merge prefer-only notes. Re-pins bind to review-3-boundary-repins.md and receipt commit b6cdda81b333a375ebfb72141e962e1feac724f0 with original authorship retained. The old source fence gap now names the exact independently accepted successor fence rather than its containing heading; its native identity is preserved. Every other accepted row and the original three Rings holds are retained.
+
+Host: 431/431 reviewed Judgment source rows (Mirror/Unit-exact/Weak-exact zero): 408 move, 12 partial-carry, 11 supersede; no Host source hold. All 35 Host successor judgments are reviewed. Agent Coordination: no newly pending current source row; three exact original holds and 342 exact exception groups. The candidate-unverified list removes only 43 accepted machine re-pins (531 -> 488); 31 changed-code references remain unverified under A31. Host remains 588 exact full native tuples, with one exact reviewed two-member exception. All 93,839 known IDs and path/anchor/source-digest tuples are equal; zero missing/additional ID and zero identity graft. All candidate-unverified files remain A28-eligible.
+
+Final D against both prior registries: exit 0, zero fatal. Host scoped strict E against both: exit 1, exactly 12 partial-carry, one identical-unit group, 588 candidate-unverified units. Agent scoped strict E against both: exit 1, exactly three held not-reviewed source rows, 342 exception groups, 488 candidate-unverified units. Full source/candidate/hold/exception native identity equality passes. The twelve partial-carry rows, named remainders, restored live anchors and approval pins compare exactly to the prior boundary evidence. **A28 closure equality is false only for these twelve unchanged rows; strict closure and batch closure are not claimed.** No final step-03-report.md is written before the owner's decision. The request includes all required batch accounting, fresh-reader gaps, effort and registry-size risk.
+
+The actual proven compact working registry is persisted byte-equal to scratch (SHA256 d54faf6eec8e785b33fe5902022f446d0fe25989d90e5316707c1da50e849cd9, 59202819 bytes). Its existing native registry commit is 0653419c1 and generation binds it to source commit 5c744a6c2 with no carry-forward required; the old identity chain is not reconstructed. Gap dispositions are the existing native applyDecisions projection. Original compact JSON format/schema is preserved. Open risk for later batches: **56.46 MB; GitHub warns above 50 MB and has a 100 MB hard limit**. No format change.
+
+Preservation green: 74 history witnesses, 867 payloads, five frozen files; zero own allowlist violations with the same eight exemptions; extractor closure, authority statuses and reader links unchanged. Ratchet 995 files / 25 accounted edits / one accounted addition; placement 506/505/one recorded exception with no gaps. Only the unchanged Packaging portal metadata finding. Review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. GitNexus before the verdict commit reported zero symbols/processes and low risk; final request/persistence check is recorded in the verification artifact. No production symbols, gates, checkers, vocabulary, extractor or baseline edited.
+
+Fresh readers under A32 retain the committed key/pilot result: six cells 6/6 counting partials, 25/25 official distinct anchors, zero legacy-authority answers, at most four files before first correct owner. Instruction-only isolation remains UNPROVEN, and the original per-run file cap is not met under whole-run counting. Area gaps: no explicit risk rubric; no area-level DoD; portal/pointer navigation for restored sections; release-manifest ownership outside area; deferred npm-bin clause not reached. F6 remains answered: dropped-010 deferred to Packaging-distribution Step 4, never retired here; FLAGGED-obsolete literal text untouched. Draft alias/link preview unchanged (135 drafts, 4,031 inbound edges; no consumer edits).
+
+Effort: seven documented Host executor sessions; zero new Host rows this session, 64 accepted boundary verdicts applied. Three Host source review rounds total 470 row instances (431 + 33 + 6); no combined Steps 3/4 baseline or token claim. Explained invocation/format obstacles and exact final commands are in verification; no unexplained proof failure remains.
+
+STOP. Next action: owner decides only the twelve digest-bound residual rows in the request (recommended explicit Phase 6 conservation exception while preserving dispositions and cutover blockers, or bounded complete-unit consolidation with new independent review). Resume from this persisted registry and rerun the comparison before claiming closure and writing step-03-report.md. No Step 4 work, promotion, main-checkout write, push, rebase or force-push.
+
+---
+
+# Earlier execution entries (preserved)
+
 # Execution progress
 
 Date: 2026-10-10

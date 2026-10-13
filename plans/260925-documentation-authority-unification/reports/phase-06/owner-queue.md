@@ -281,3 +281,9 @@ Checkpoint needs a separate reviewer: all 431 Judgment/Weak-exact rows, sixteen 
 - Promoted-doc edits are prelogged and fully diffed in accounting. HI-I027 and the 16 restoration groups are explicit checkpoint scope. R2/R3 navigation is Draft while its dated Closed/Implemented-preview execution facts are unchanged.
 - The checkpoint reviewer owns the hidden sensitivity seed and key, the hostile red-team pass and A28's independent 30-unit current-content truth sample. Fresh-reader key is committed before readers start. All those outcomes remain UNPROVEN; more than 10% false in the truth sample still stops for the owner.
 - Packaging's one remaining promotion-header finding is owned by Step 4. Upstream ancestry 3.1.1/releaseVersion/initial-tarball notes remain queued for their owning content batches; not rewritten in this pass.
+
+## Host Invocation partial-carry closure decision
+
+Date asked: 2026-10-13. Status: open; blocks only Step 3 batch closure.
+
+All committed boundary verdicts are accepted and D/native conservation is green. Scoped strict E retains the same 12 reviewed partial carries, outside the three lists named by A28 item 4. The Doer cannot infer a waiver. Decision/options/cost/recommendation/scope and full source/target/restored text with digests are in [closure-request-host-invocation-partial-carry.md](closure-request-host-invocation-partial-carry.md). Recommended: owner explicitly accepts only these digest-bound rows as a Phase 6 conservation residual, preserving their dispositions and cutover blocking status; alternative: authorize bounded complete-unit consolidation followed by independent review. Answer: pending. No gate or checker amendment is proposed. F6 stays answered and deferred to Step 4.
