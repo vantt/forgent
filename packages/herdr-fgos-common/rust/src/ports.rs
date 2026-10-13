@@ -1,4 +1,6 @@
-use crate::fgos::{AfterDeliverRow, DoingRow, FgosError, MergeListSummary, NeedAnswerRow, TriageRow};
+use crate::fgos::{
+    AfterDeliverRow, DoingRow, FgosError, MergeListSummary, NeedAnswerRow, TriageRow,
+};
 
 /// (a) fgOS data source seam (tsk-3t9 D1) — the domain asks for rows
 /// through this trait instead of importing `crate::fgos` directly.

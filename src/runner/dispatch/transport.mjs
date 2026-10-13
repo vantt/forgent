@@ -867,6 +867,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     // test uses to keep a mock round short, and production never sets it.
     transportDeadlines: opts.transportDeadlines,
     trustStore,
+    // The leased account's credential source: a private home derives its trust from that account's own store.
+    trustAccountSource: opts.trustAccountSource ?? null,
     runDir: optsRunDir,
     anchorPaneId,
     dispatchBatchKey,

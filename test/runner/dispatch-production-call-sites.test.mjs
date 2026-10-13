@@ -466,13 +466,15 @@ test('production dispatch attaches confinement attestation to ExecutorResult (R5
   }
 });
 
-test('production dispatch inherits a distinct configured capability anchor', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
+test('production dispatch takes its posture from the requested capability, never from an agent executor\'s own for', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(() => ({ ...HERDR_EXECUTOR, for: ['code:review'] }));
   const mock = mockHerdr(root);
   const cfgPath = path.join(root, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-  cfg.runner.capabilities['generic-fallback'] = { prefer: 'herdr-worker' };
-  cfg.runner.capabilities['code:review'] = { confinement: { mode: 'unconfined' } };
+  // The agent's leftover `for` names a required read-only capability; the
+  // dispatch asks for an unconfined one. The work's capability decides.
+  cfg.runner.capabilities['generic-fallback'] = { prefer: 'herdr-worker', confinement: { mode: 'unconfined' } };
+  cfg.runner.capabilities['code:review'] = { confinement: { mode: 'required', policy: 'host-write-denied' } };
   fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
 
   try {

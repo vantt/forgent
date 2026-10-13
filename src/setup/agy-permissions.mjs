@@ -254,7 +254,8 @@ export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOM
   const geminiAccounts = runner.providers?.gemini?.accounts;
   if (geminiAccounts && typeof geminiAccounts === 'object') {
     for (const [accountId, account] of Object.entries(geminiAccounts)) {
-      const rawPath = account?.credentialSource?.home;
+      // One store for every CLI, or the agy store of an account that keeps one per CLI.
+      const rawPath = (account?.credentialSources ? account.credentialSources.agy : account?.credentialSource)?.home;
       if (typeof rawPath !== 'string' || !rawPath.trim()) continue;
       const resolved = path.resolve(resolveSubHomePath(rawPath.trim(), homeDir));
       if (seenPaths.has(resolved)) continue;

@@ -12,6 +12,7 @@ import {
   validateOverrideConfinementShape,
   ConfinementPolicyError,
 } from "./policies.mjs";
+import { providerCapacityForCommand } from "../provider-capacity.mjs";
 
 /** A refusal that names why a blind dispatch cannot be enforced, before anything launches. */
 function blindRefusal(code, detail) {
@@ -448,7 +449,9 @@ export function buildConfinementRequest({
     backendId: backendId ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
     ...(authorityScope ? { authorityScope } : {}),
     ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
-    ...(providerCapacity ? { providerCapacity } : {}),
+    // The account leased for this launch hands over the login store of the CLI this invocation runs
+    // (an account may keep one per CLI); private-home provisioning, write-back and trust seeding read it.
+    ...(providerCapacity ? { providerCapacity: providerCapacityForCommand(providerCapacity, invocation?.command) } : {}),
   };
 
   return validateConfinementRequest(req);

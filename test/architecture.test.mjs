@@ -359,7 +359,8 @@ test('executeAssignment(...) isReadOnlyMode posture: every real call site codeba
 
 
   const cliSites = sites.filter((s) => s.file === 'src/runner/dispatch/cli.mjs');
-  assert.equal(cliSites.length, 2, `expected exactly two executeAssignment(...) call sites in cli.mjs, found ${cliSites.length}`);
+  // `execute --assignment`, `execute --contract`, and the read-only `probe-account` diagnostic.
+  assert.equal(cliSites.length, 3, `expected exactly three executeAssignment(...) call sites in cli.mjs, found ${cliSites.length}`);
   const runSites = sites.filter((s) => s.file === 'src/runner/execution/run.mjs');
   assert.equal(runSites.length, 1, `expected exactly one executeAssignment(...) call site in run.mjs, found ${runSites.length}`);
 

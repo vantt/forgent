@@ -78,9 +78,9 @@ The dispatch core recognizes exactly two target identities. No other name
 resolves a Run target.
 
 ```txt
-capability   — abstract behavior promise, bound only by
-               runner.capabilities.<capability>.prefer;
-               executor for[] declarations do not bind this selector
+capability   — abstract behavior promise, resolved through
+               runner.capabilities.<capability> (prefer/overrides), then
+               runner.executors.<id>.for[] (kind "tool" executors only)
 executor-id  — explicit concrete implementation override, naming a
                runner.executors.<id> entry directly
 ```

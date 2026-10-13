@@ -101,7 +101,7 @@ pub fn calculate_entropy_score_and_parts(
 
 pub fn read_last_snapshot(root: &Path) -> Option<Value> {
     let records = shard::read_all_json(root, "snapshots").ok()?;
-    records.into_iter().rev().next()
+    records.into_iter().next_back()
 }
 
 pub fn dispatch_entropy(
@@ -122,7 +122,8 @@ pub fn dispatch_entropy(
         }
     }
 
-    let ws = work_source.ok_or_else(|| "work source not available for metrics entropy".to_string())?;
+    let ws =
+        work_source.ok_or_else(|| "work source not available for metrics entropy".to_string())?;
     let calc = calculate_entropy_score_and_parts(&req.root, ws)?;
     let last_snap = read_last_snapshot(&req.root);
 

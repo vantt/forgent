@@ -61,22 +61,26 @@ pub fn derive_outcome(classification: &Value) -> Outcome {
 
     // Rule 1: execution failure
     // execution.status in {failed, cancelled, completion-unknown} and failure.family in {provider, resource, unknown} (or no failure)
-    if exec_status == "failed" || exec_status == "cancelled" || exec_status == "completion-unknown" {
-        if failure_family == Some("provider")
+    if (exec_status == "failed"
+        || exec_status == "cancelled"
+        || exec_status == "completion-unknown")
+        && (failure_family == Some("provider")
             || failure_family == Some("resource")
             || failure_family == Some("unknown")
-            || failure_family.is_none()
-        {
-            return Outcome {
-                category: "infra".to_string(),
-                reason: format!("infra-exec-{}", exec_status),
-            };
-        }
+            || failure_family.is_none())
+    {
+        return Outcome {
+            category: "infra".to_string(),
+            reason: format!("infra-exec-{}", exec_status),
+        };
     }
 
     // Rule 2: policy refusal or contract/policy failure
     // policy.disposition === 'refuse' or failure.family in {contract, policy}
-    if policy_disp == "refuse" || failure_family == Some("contract") || failure_family == Some("policy") {
+    if policy_disp == "refuse"
+        || failure_family == Some("contract")
+        || failure_family == Some("policy")
+    {
         let code = failure_code.unwrap_or("policy-refused");
         return Outcome {
             category: "policy".to_string(),
@@ -125,8 +129,15 @@ pub fn derive_outcome(classification: &Value) -> Outcome {
 
 fn is_classification_valid(c: &serde_json::Map<String, Value>) -> bool {
     const EXECUTION_STATUSES: &[&str] = &["completed", "failed", "cancelled", "completion-unknown"];
-    const ASSESSMENT_VERDICTS: &[&str] = &["pass", "findings", "inconclusive", "blocked", "not-applicable"];
-    const CONFIDENCE_LEVELS: &[&str] = &["verified", "reported", "inferred", "no-evidence", "failed"];
+    const ASSESSMENT_VERDICTS: &[&str] = &[
+        "pass",
+        "findings",
+        "inconclusive",
+        "blocked",
+        "not-applicable",
+    ];
+    const CONFIDENCE_LEVELS: &[&str] =
+        &["verified", "reported", "inferred", "no-evidence", "failed"];
     const POLICY_DISPOSITIONS: &[&str] = &["allow", "refuse", "needs-input", "not-applicable"];
 
     if let Some(e) = c.get("execution").and_then(|v| v.as_object()) {
@@ -264,10 +275,14 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
         .and_then(|s| s.as_str())
         .unwrap_or("no-evidence");
 
-    let legacy_conf = raw
-        .get("confidence")
-        .and_then(|s| s.as_str())
-        .unwrap_or(if legacy_status == "done" { "reported" } else { "failed" });
+    let legacy_conf =
+        raw.get("confidence")
+            .and_then(|s| s.as_str())
+            .unwrap_or(if legacy_status == "done" {
+                "reported"
+            } else {
+                "failed"
+            });
 
     let is_timeout = raw
         .get("runtime")
@@ -303,7 +318,10 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
     map.insert("execution".to_string(), Value::Object(exec_map));
 
     let mut assess_map = serde_json::Map::new();
-    assess_map.insert("verdict".to_string(), Value::String(assess_verdict.to_string()));
+    assess_map.insert(
+        "verdict".to_string(),
+        Value::String(assess_verdict.to_string()),
+    );
     map.insert("assessment".to_string(), Value::Object(assess_map));
 
     let mut conf_map = serde_json::Map::new();
@@ -342,10 +360,10 @@ impl ObservationSource for RunResultSource {
         runs.retain(|o| {
             w.since
                 .as_ref()
-                .map_or(true, |since| o.ts.as_str() >= since.as_str())
+                .is_none_or(|since| o.ts.as_str() >= since.as_str())
                 && w.until
                     .as_ref()
-                    .map_or(true, |until| o.ts.as_str() <= until.as_str())
+                    .is_none_or(|until| o.ts.as_str() <= until.as_str())
         });
         Ok(runs)
     }
@@ -540,7 +558,11 @@ fn scan_assignment_runs(
             scan.skip("unparseable");
             continue;
         }
-        if metadata.modified().ok().is_some_and(|mtime| is_recent(mtime, now)) {
+        if metadata
+            .modified()
+            .ok()
+            .is_some_and(|mtime| is_recent(mtime, now))
+        {
             scan.recent_runs += 1;
         }
         let record: Value = match File::open(&result_path)
@@ -682,10 +704,7 @@ mod tests {
     fn test_run_result_source() {
         let temp_dir = std::env::temp_dir().join(format!("test_run_result_{}", std::process::id()));
         let _ = fs::remove_dir_all(&temp_dir);
-        let asgn_dir = temp_dir
-            .join(".fgos")
-            .join("assignments")
-            .join("asgn_001");
+        let asgn_dir = temp_dir.join(".fgos").join("assignments").join("asgn_001");
         let run_dir = asgn_dir.join("runs").join("01");
         fs::create_dir_all(&run_dir).unwrap();
 
@@ -709,9 +728,7 @@ mod tests {
         .unwrap();
 
         let source = RunResultSource::new();
-        let obs = source
-            .observations(&temp_dir, &Window::default())
-            .unwrap();
+        let obs = source.observations(&temp_dir, &Window::default()).unwrap();
 
         assert_eq!(obs.len(), 1);
         let o = &obs[0];
@@ -729,12 +746,10 @@ mod tests {
 
     #[test]
     fn test_run_result_source_without_classification_and_corrupt_files() {
-        let temp_dir = std::env::temp_dir().join(format!("test_run_result_corrupt_{}", std::process::id()));
+        let temp_dir =
+            std::env::temp_dir().join(format!("test_run_result_corrupt_{}", std::process::id()));
         let _ = fs::remove_dir_all(&temp_dir);
-        let asgn_dir = temp_dir
-            .join(".fgos")
-            .join("assignments")
-            .join("asgn_002");
+        let asgn_dir = temp_dir.join(".fgos").join("assignments").join("asgn_002");
         let run_dir = asgn_dir.join("runs").join("01");
         let run_corrupt = asgn_dir.join("runs").join("02");
         fs::create_dir_all(&run_dir).unwrap();
@@ -762,9 +777,7 @@ mod tests {
         fs::write(run_corrupt.join("result.json"), "NOT JSON").unwrap();
 
         let source = RunResultSource::new();
-        let obs = source
-            .observations(&temp_dir, &Window::default())
-            .unwrap();
+        let obs = source.observations(&temp_dir, &Window::default()).unwrap();
 
         assert_eq!(obs.len(), 1);
         let o = &obs[0];
@@ -778,14 +791,19 @@ mod tests {
     #[test]
     fn test_legacy_derivation_fixture() {
         let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-        let fixture_path = manifest_dir.join("../../../test/fixtures/run-outcome/legacy-derivation.json");
+        let fixture_path =
+            manifest_dir.join("../../../test/fixtures/run-outcome/legacy-derivation.json");
         let content = fs::read_to_string(&fixture_path).expect("read legacy-derivation.json");
-        let entries: Vec<Value> = serde_json::from_str(&content).expect("parse legacy-derivation.json");
+        let entries: Vec<Value> =
+            serde_json::from_str(&content).expect("parse legacy-derivation.json");
 
         assert!(!entries.is_empty(), "fixture entries should not be empty");
 
         for entry in entries {
-            let id = entry.get("id").and_then(|v| v.as_str()).unwrap_or("unknown");
+            let id = entry
+                .get("id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("unknown");
             let record = entry.get("record").expect("entry.record");
             let expected_cat = entry
                 .get("expected")

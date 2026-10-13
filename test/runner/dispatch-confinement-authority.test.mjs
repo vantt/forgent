@@ -697,7 +697,7 @@ test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for
   }
 });
 
-test("MED-3: executor for[] order does not affect capability resolution or required refusal", async () => {
+test("MED-3: a tool executor's for[] order does not affect capability resolution or required refusal", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med3-test-"));
   // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
   // this machine -- see the H1 test above for the full rationale.
@@ -712,6 +712,7 @@ test("MED-3: executor for[] order does not affect capability resolution or requi
       },
       executors: {
         "multi-order-a": {
+          kind: "tool",
           command: "echo",
           adapter: "cli-spawn",
           allowCrossProvider: true,
@@ -728,6 +729,7 @@ test("MED-3: executor for[] order does not affect capability resolution or requi
       },
       executors: {
         "multi-order-b": {
+          kind: "tool",
           command: "echo",
           adapter: "cli-spawn",
           allowCrossProvider: true,
@@ -1005,6 +1007,37 @@ test("herdr-spawn assignment dispatch through executeThroughConfinement threads 
     assert.equal(capturedOpts.assignmentId, "asgn_test", "adapterOpts.assignmentId must be threaded");
     assert.equal(capturedOpts.launchCommandId, "lc-01");
     assert.ok(capturedOpts.preparedInvocationDigest, "adapterOpts.preparedInvocationDigest must be threaded so the receipt cross-check has a digest to compare");
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("the leased account's credential source reaches the herdr-spawn adapter so its private home derives trust from that account", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-trust-account-test-"));
+  try {
+    const credentialSource = { kind: "codex-home", home: path.join(tmp, "leased-codex-home") };
+    const req = buildConfinementRequest({
+      capability: "code:implement",
+      executorId: "herdr-agent",
+      invocation: {
+        command: "codex",
+        args: [],
+        adapter: "herdr-spawn",
+        interactiveMode: { kind: "codex", trustStore: { kind: "codex-toml" } },
+        prompt: "do the work",
+      },
+      providerCapacity: { provider: "openai-codex", accountId: "leased", credentialSource },
+      requirement: { mode: "unconfined" },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, "run"), timeoutMs: 5000, workId: "w1" },
+    });
+
+    let capturedOpts = null;
+    const res = await executeThroughConfinement(req, async (invocation, opts) => {
+      capturedOpts = opts;
+      return { status: 0, stdout: "ok" };
+    });
+    assert.equal(res.status, "completed");
+    assert.deepEqual(capturedOpts.trustAccountSource, credentialSource);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

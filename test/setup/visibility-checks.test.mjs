@@ -293,6 +293,23 @@ test('checkConfinedPaneAccounts passes when every listed credential file exists,
   }
 });
 
+test('checkConfinedPaneAccounts expands ~, $HOME and ${HOME} the way dispatch does', () => {
+  const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-home-'));
+  const savedHome = process.env.HOME;
+  try {
+    fs.mkdirSync(path.join(fakeHome, 'creds'));
+    fs.writeFileSync(path.join(fakeHome, 'creds', 'auth.json'), '{}');
+    process.env.HOME = fakeHome;
+    for (const prefix of ['$HOME', '${HOME}', '~']) {
+      const cfg = { ...paneExecutors(), providers: { openai: { accounts: { acct: { credentialSource: { kind: 'codex-home', home: `${prefix}/creds` } } } } } };
+      assert.equal(checkConfinedPaneAccounts(cfg).passed, true, `${prefix} is the user's home`);
+    }
+  } finally {
+    if (savedHome === undefined) delete process.env.HOME; else process.env.HOME = savedHome;
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  }
+});
+
 test('checkConfinedPaneAccounts has nothing to say when no herdr invocation binds a private home', () => {
   const r = checkConfinedPaneAccounts({ executors: { a: { invocations: [{ id: 'x', adapter: 'herdr-spawn' }] } } });
   assert.equal(r.passed, true);

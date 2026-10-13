@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { bwrapDriver } from './drivers/bwrap.mjs';
+import { resolveConfinementTempRoot } from './cleanup.mjs';
 
 export class ConfinementBackendRegistryError extends Error {
   constructor(message) {
@@ -337,4 +338,20 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
     path: registryPath,
     message: `machine backend registry at ${registryPath} is already up to date`,
   };
+}
+
+/**
+ * Every temp root private homes can live under: the default one plus each registered backend's own
+ * `tempRoot`. An unreadable or malformed registry is reported by its own doctor check; the default root
+ * alone is used meanwhile.
+ */
+export function defaultConfinementTempRoots() {
+  const roots = new Set([resolveConfinementTempRoot()]);
+  try {
+    const registry = loadMachineBackendRegistry();
+    for (const instance of Object.values(registry?.confinementBackends || {})) {
+      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
+    }
+  } catch { /* the default root only */ }
+  return [...roots];
 }

@@ -52,6 +52,7 @@ import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 import { interpretRunResult } from './run-result.mjs';
 import { getProcessStartTime } from './process-identity.mjs';
+import { expandCredentialHome } from './provider-credential-probe.mjs';
 import {
   computeSha256Digest,
   patchCommandRecord,
@@ -669,10 +670,10 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
  * already be trusted by some other route, and the dialog it might still hit
  * is reported by name by the very next step anyway.
  */
-export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
+export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null, accountSource = null }) {
   const projectPath = path.resolve(cwd);
   const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
-  const stores = trustStorePaths({ trustStore, fullEnv, workerEnv });
+  const stores = trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource });
   let firstError = null;
   for (const root of roots) {
     try {
@@ -718,16 +719,26 @@ function seedHookTrust({ round, target, projectPath, repoRoot, rootConfigPath })
  * entry is written. They differ only for a confined worker with a private
  * home: it reads its store from the private CODEX_HOME / HOME, which starts
  * empty, so the entry goes there and the account's own store is never touched.
+ *
+ * `accountSource` is the credential source of the account the capacity layer
+ * leased for this round. A private home carries THAT account's login, so the
+ * decision is read from that account's own store, not from the account the
+ * invocation's static env names: the two differ whenever the capacity layer
+ * picks another account of the same provider, and the static one may never
+ * have been asked about this repo. Without a private home the CLI reads the
+ * invocation's home, so the leased account says nothing about it.
  */
-export function trustStorePaths({ trustStore, fullEnv, workerEnv }) {
+export function trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource = null }) {
   if (trustStore.kind === 'codex-toml') {
-    const real = trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml');
     const own = workerEnv?.CODEX_HOME && workerEnv.CODEX_HOME !== fullEnv.CODEX_HOME;
+    const leased = own && accountSource?.kind === 'codex-home' ? expandCredentialHome(accountSource.home) : null;
+    const real = trustStore.path ?? path.join(leased ?? fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml');
     return { root: real, target: own ? path.join(workerEnv.CODEX_HOME, 'config.toml') : real };
   }
   if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-    const real = trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir());
     const own = workerEnv?.HOME && workerEnv.HOME !== fullEnv.HOME;
+    const leased = own && accountSource?.kind === 'home-files' ? expandCredentialHome(accountSource.home) : null;
+    const real = trustStore.path ?? defaultAgySettingsPath(leased ?? fullEnv.HOME ?? os.homedir());
     return { root: real, target: own ? defaultAgySettingsPath(workerEnv.HOME) : real };
   }
   const real = trustStore.path ?? path.join(os.homedir(), '.claude.json');
@@ -1575,7 +1586,7 @@ function batchTabFor(key, { cwd } = {}) {
 async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, deadlines, sessionEnv, workerHomePath }) {
   const {
     herdrBin, fullEnv, repoRoot, agentKind, agentArgs, delivery, exitCommand,
-    trustStore, paneEnv, cwd, usageLimitPatterns, closeAlways, workId, tier, model,
+    trustStore, trustAccountSource, paneEnv, cwd, usageLimitPatterns, closeAlways, workId, tier, model,
     // A pane already sitting in the caller's own tab -- e.g. one lead's coding
     // panel or fanout batch -- so every sibling round of that same batch lands
     // beside it instead of wherever the operator happens to be focused. Absent
@@ -1709,7 +1720,11 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // the workspace already trusted, so writing to the operator's own store for
   // a directory only the worker will ever see would be pure side effect.
   if (trustStore && !workerHomePath) {
-    seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null });
+    seedWorkspaceTrust({
+      trustStore, round, cwd, repoRoot, fullEnv,
+      workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null,
+      accountSource: trustAccountSource ?? null,
+    });
   }
 
   round.targetName = isConfined ? round.paneId : round.agentName;

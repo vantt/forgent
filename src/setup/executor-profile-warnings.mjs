@@ -56,6 +56,14 @@ export function collectExecutorProfileWarnings(cfg) {
   for (const [executorId, executorEntry] of Object.entries(executors)) {
     const { args, env, command, providerModel } = collectArgsAndEnv(executorEntry);
 
+    if (executorEntry?.kind !== 'tool' && executorEntry?.for !== undefined) {
+      warnings.push({
+        id: `executor.${executorId}.agent-for-inert`,
+        migrateTo: 'the dispatch names its capability (execute <id> --for <capability>); remove "for" from this executor',
+        detail: `executors.${executorId} is an agent executor declaring "for" (${[].concat(executorEntry.for).join(', ')}); dispatch ignores it -- an agent serves any capability, so the work names the one it runs under`,
+      });
+    }
+
     const flags = extractPolicyShapedFlags(args, normalizeProviderFamily(providerModel, command));
     if (flags.length > 0) {
       warnings.push({

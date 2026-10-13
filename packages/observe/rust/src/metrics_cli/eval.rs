@@ -25,8 +25,10 @@ fn filters(args: &[String], record: bool) -> Result<(Option<String>, Option<Stri
             value
         } else {
             i += 1;
-            args.get(i).filter(|s| !s.starts_with("--"))
-                .ok_or_else(|| format!("missing value for {}", name))?.as_str()
+            args.get(i)
+                .filter(|s| !s.starts_with("--"))
+                .ok_or_else(|| format!("missing value for {}", name))?
+                .as_str()
         };
         if value.trim().is_empty() {
             return Err(format!("missing value for {}", name));
@@ -42,12 +44,17 @@ fn filters(args: &[String], record: bool) -> Result<(Option<String>, Option<Stri
 }
 
 pub fn dispatch_eval(req: &ObserveRequest) -> Result<Value, String> {
-    let (action, args) = req.args.split_first()
+    let (action, args) = req
+        .args
+        .split_first()
         .ok_or_else(|| "metrics eval: missing action. Available: record, list".to_string())?;
     match action.as_str() {
         "record" => {
             filters(args, true)?;
-            let stdin = req.stdin.as_deref().filter(|s| !s.is_empty())
+            let stdin = req
+                .stdin
+                .as_deref()
+                .filter(|s| !s.is_empty())
                 .ok_or_else(|| "metrics eval record: required JSON object on stdin".to_string())?;
             let input: EvalInput = serde_json::from_slice(stdin)
                 .map_err(|e| format!("metrics eval record: invalid input JSON: {}", e))?;
@@ -59,6 +66,9 @@ pub fn dispatch_eval(req: &ObserveRequest) -> Result<Value, String> {
             let list = eval_journal::list(&req.root, harness.as_deref(), question.as_deref())?;
             Ok(json!({"ok": true, "evals": list.evals, "invalid": list.invalid}))
         }
-        other => Err(format!("metrics eval: unknown action \"{}\". Available: record, list", other)),
+        other => Err(format!(
+            "metrics eval: unknown action \"{}\". Available: record, list",
+            other
+        )),
     }
 }

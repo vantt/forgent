@@ -689,9 +689,6 @@
               "backend": "bwrap"
             }
           }
-        ],
-        "for": [
-          "advise"
         ]
       },
       "glm": {
@@ -758,10 +755,7 @@
             ]
           }
         ],
-        "providerModel": "z-ai",
-        "for": [
-          "execute"
-        ]
+        "providerModel": "z-ai"
       },
       "gitnexus": {
         "kind": "tool",
@@ -801,10 +795,6 @@
         "description": "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor.",
         "providerModel": "openai",
         "allowCrossProvider": true,
-        "for": [
-          "code:review",
-          "code:debug"
-        ],
         "invocations": [
           {
             "id": "codex-cli-bypass-fgovn",
@@ -862,6 +852,7 @@
               "danger-full-access",
               "-a",
               "never",
+              "--no-daemon",
               "--model",
               "{model}"
             ],
@@ -974,7 +965,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetnu"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           },
           {
             "id": "pi-cli-bwrap-fgovn",
@@ -999,7 +999,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-fgovn"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           },
           {
             "id": "pi-cli-bwrap-tetcu72",
@@ -1024,7 +1033,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetcu72"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1033,9 +1051,6 @@
         "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account). The account a confined (herdr or bwrap) invocation runs as is chosen per provider by the capacity layer from runner.providers.gemini.accounts (mucdong, tetcu72, tetnu), not by the invocation name.",
         "allowCrossProvider": true,
         "providerModel": "gemini",
-        "for": [
-          "advise"
-        ],
         "invocations": [
           {
             "id": "agy-cli-mucdong",
@@ -1205,10 +1220,6 @@
               }
             ]
           }
-        ],
-        "for": [
-          "review",
-          "code:review"
         ]
       },
       "deepseek": {
@@ -1275,9 +1286,6 @@
               }
             ]
           }
-        ],
-        "for": [
-          "execute"
         ]
       },
       "claude-herdr": {
@@ -1375,8 +1383,8 @@
       "openai": {
         "nano": "gpt-5.6-luna",
         "standard": "gpt-5.6-terra",
-        "advanced": "gpt-5.6-terra",
-        "flagship": "gpt-5.6-terra",
+        "advanced": "gpt-5.6-sol",
+        "flagship": "gpt-6.1-sol",
         "frontier": "gpt-6-astra"
       },
       "z-ai": {

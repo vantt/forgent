@@ -178,7 +178,7 @@ fn project_convention_request(
                 "convention {subcommand} does not accept --all or positional paths"
             ));
         }
-        fgos_convention::ConventionOperation::Check if all == !paths.is_empty() => {
+        fgos_convention::ConventionOperation::Check if all != paths.is_empty() => {
             return Err("convention check requires exactly one of --all or explicit paths".into());
         }
         fgos_convention::ConventionOperation::Classify if all || paths.len() != 1 => {

@@ -14,8 +14,7 @@ use std::fs::{self, File};
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
-pub const DOMAIN_ENTRY_STAGES_JSON: &str =
-    include_str!("../../contracts/domain-entry-steps.json");
+pub const DOMAIN_ENTRY_STAGES_JSON: &str = include_str!("../../contracts/domain-entry-steps.json");
 
 pub const FINAL_STATUSES: &[&str] = &[
     "awaiting-approval",
@@ -102,7 +101,8 @@ impl WorkSource {
         let path = state_path?;
         let content = fs::read_to_string(path).ok()?;
         let val: Value = serde_json::from_str(&content).ok()?;
-        if val.get("viewSchemaVersion").and_then(|v| v.as_u64()) != Some(Self::VIEW_SCHEMA_VERSION) {
+        if val.get("viewSchemaVersion").and_then(|v| v.as_u64()) != Some(Self::VIEW_SCHEMA_VERSION)
+        {
             return None;
         }
         Some(val)
@@ -165,7 +165,8 @@ impl WorkSource {
         let learning = Self::collect_learning_data(learnings_map, filter_id);
 
         // 4. Missing outcome nag
-        let missing_outcome_nag = Self::collect_missing_outcome_nag(work_map, outcomes_map, filter_id);
+        let missing_outcome_nag =
+            Self::collect_missing_outcome_nag(work_map, outcomes_map, filter_id);
 
         WorkOutcomesReport {
             outcomes,
@@ -236,7 +237,11 @@ impl WorkSource {
             ts_a.cmp(ts_b)
         });
 
-        let start_idx = if records.len() > 5 { records.len() - 5 } else { 0 };
+        let start_idx = if records.len() > 5 {
+            records.len() - 5
+        } else {
+            0
+        };
         let mut recent: Vec<Value> = records[start_idx..].to_vec();
         recent.reverse();
 
@@ -284,7 +289,11 @@ impl WorkSource {
             ts_a.cmp(ts_b)
         });
 
-        let start_idx = if records.len() > 5 { records.len() - 5 } else { 0 };
+        let start_idx = if records.len() > 5 {
+            records.len() - 5
+        } else {
+            0
+        };
         let mut recent: Vec<Value> = records[start_idx..].to_vec();
         recent.reverse();
 
@@ -337,7 +346,10 @@ impl WorkSource {
         let state = Self::read_state_json(root).unwrap_or(Value::Object(Map::new()));
         let claims = Self::read_active_claims(root);
         let entry_steps = Self::domain_entry_steps();
-        let default_entry = entry_steps.get("coding").cloned().unwrap_or_else(|| "discovery".to_string());
+        let default_entry = entry_steps
+            .get("coding")
+            .cloned()
+            .unwrap_or_else(|| "discovery".to_string());
 
         let work_map = state.get("work").and_then(|v| v.as_object());
         let outcomes_map = state.get("outcomes").and_then(|v| v.as_object());
@@ -352,16 +364,27 @@ impl WorkSource {
 
         if let Some(work) = work_map {
             for (id, item_val) in work {
-                let durable_status = item_val.get("status").and_then(|s| s.as_str()).unwrap_or("");
-                let step = item_val.get("workflowStep").and_then(|s| s.as_str()).unwrap_or("");
-                let domain = item_val.get("domain").and_then(|s| s.as_str()).unwrap_or("coding");
+                let durable_status = item_val
+                    .get("status")
+                    .and_then(|s| s.as_str())
+                    .unwrap_or("");
+                let step = item_val
+                    .get("workflowStep")
+                    .and_then(|s| s.as_str())
+                    .unwrap_or("");
+                let domain = item_val
+                    .get("domain")
+                    .and_then(|s| s.as_str())
+                    .unwrap_or("coding");
 
                 // Overlay active runtime claim
                 let claim = claims.get(id);
-                let claim_is_stale = claim.map(|c| {
-                    let pre_status = c.get("preClaimStatus").and_then(|s| s.as_str());
-                    pre_status.is_some() && pre_status != Some(durable_status)
-                }).unwrap_or(false);
+                let claim_is_stale = claim
+                    .map(|c| {
+                        let pre_status = c.get("preClaimStatus").and_then(|s| s.as_str());
+                        pre_status.is_some() && pre_status != Some(durable_status)
+                    })
+                    .unwrap_or(false);
 
                 let effective_status = if claim.is_some() && !claim_is_stale {
                     "doing"
@@ -656,21 +679,29 @@ impl fgos_observe::contract::WorkObservationSource for WorkSource {
             })
             .collect();
 
-        let settlement = report.settlement.map(|s| fgos_observe::contract::SettlementChannelRecord {
-            count: s.count,
-            by_kind_role: s.by_kind_role,
-            recent: s.recent,
-        });
+        let settlement =
+            report
+                .settlement
+                .map(|s| fgos_observe::contract::SettlementChannelRecord {
+                    count: s.count,
+                    by_kind_role: s.by_kind_role,
+                    recent: s.recent,
+                });
 
-        let learning = report.learning.map(|l| fgos_observe::contract::LearningChannelRecord {
-            count: l.count,
-            recent: l.recent,
-        });
+        let learning = report
+            .learning
+            .map(|l| fgos_observe::contract::LearningChannelRecord {
+                count: l.count,
+                recent: l.recent,
+            });
 
-        let missing_outcome_nag = report.missing_outcome_nag.map(|m| fgos_observe::contract::MissingOutcomeNagRecord {
-            count: m.count,
-            ids: m.ids,
-        });
+        let missing_outcome_nag =
+            report
+                .missing_outcome_nag
+                .map(|m| fgos_observe::contract::MissingOutcomeNagRecord {
+                    count: m.count,
+                    ids: m.ids,
+                });
 
         Ok(fgos_observe::contract::WorkOutcomesRecord {
             outcomes,
@@ -736,7 +767,8 @@ mod tests {
 
     #[test]
     fn test_read_entropy_signals_from_state() {
-        let dir = std::env::temp_dir().join(format!("fgos_test_work_entropy_{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos_test_work_entropy_{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         let fgos_dir = dir.join(".fgos");
         fs::create_dir_all(&fgos_dir).unwrap();
@@ -771,7 +803,8 @@ mod tests {
 
     #[test]
     fn test_state_view_from_an_older_schema_version_is_not_read() {
-        let dir = std::env::temp_dir().join(format!("fgos_test_work_entropy_old_{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos_test_work_entropy_old_{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         let fgos_dir = dir.join(".fgos");
         fs::create_dir_all(&fgos_dir).unwrap();

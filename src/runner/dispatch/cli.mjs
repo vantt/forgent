@@ -26,7 +26,7 @@ class StoreError extends Error {
 }
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
@@ -40,6 +40,11 @@ import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { createCredentialProbe } from './provider-credential-probe.mjs';
+import { runAccountProbe } from './provider-account-probe.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
+import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
+import { createHerdrClient } from './herdr-agent.mjs';
+import { resolveHerdrBin } from './transport.mjs';
 export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
@@ -260,6 +265,65 @@ export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir })
     : [...args.slice(0, existing + 1), ...directories, ...args.slice(existing + 1)];
 }
 
+function resolveRegisteredCapability(cfg, name) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+  if (Object.hasOwn(capabilities, name)) return name;
+  return Object.keys(capabilities).find((capName) => capabilities[capName]?.aliases?.includes?.(name));
+}
+
+/**
+ * The invocation of `executorId` that runs a dispatch for `capabilityName`, or
+ * undefined to keep the executor's default: the invocation the capability's
+ * `prefer` names for this executor, else the first plain cli invocation that
+ * declares no sandbox backend. A confined capability is refused before
+ * spawning (see below).
+ */
+function selectInvocationForCapability(cfg, executorId, executor, capabilityName) {
+  const capability = cfg.capabilities[capabilityName];
+  if (capability.prefer !== undefined) {
+    const pinned = normalizePreferCandidates(capability.prefer, `capabilities.${capabilityName}.prefer`)
+      .find((candidate) => candidate.executor === executorId && candidate.invocation);
+    if (pinned) return pinned.invocation;
+  }
+  const invocations = Array.isArray(executor?.invocations) ? executor.invocations : [];
+  // A native agent runs inside the caller's own session: nothing is spawned,
+  // so there is no invocation to pick and no login to carry. Its confinement
+  // is settled by the in-process branch of executeExecutorCli.
+  if (executor?.agentType && !executor.command && !executor.adapter && !executor.invocations) return undefined;
+  if (capability.confinement?.mode === 'required') {
+    // This door leases no provider account, so a sandboxed worker would start
+    // without its login (or fail writing a refreshed one). Confined read-only
+    // work goes through a Workflow unit, which binds the posture and leases the
+    // account.
+    throw new DispatchError(
+      'posture-needs-assignment',
+      `"${capabilityName}" runs confined (${capability.confinement.policy ?? 'required'}), which this door cannot do: it leases no provider account, so the sandboxed worker would start without its login. ${readOnlyDoors(executorId)}`,
+      { executorId, capability: capabilityName },
+    );
+  }
+  const unconfined = invocations.find((inv) => inv?.via === 'cli'
+    && inv.adapter !== 'herdr-spawn'
+    && !(inv.confinement ?? executor.confinement)?.backend
+    && inv.id);
+  return unconfined?.id;
+}
+
+// The two doors for read-only work. Only a Workflow unit runs sandboxed with
+// the account's login; the inline contract keeps the named provider but its
+// read-only posture is an instruction to the worker, not a sandbox.
+function readOnlyDoors(executorId) {
+  return `Read-only work: a Workflow unit with "writes": [] (\`fgos workflow start --units <file>\`) runs sandboxed with the account's login; to keep this executor, \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only" leases the account but enforces read-only by instruction only, without a sandbox.`;
+}
+
+function describeCapabilityChoices(cfg, executorId) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+  const writes = Object.entries(capabilities)
+    .filter(([, entry]) => entry?.serves?.mutates && entry.confinement?.mode !== 'required')
+    .map(([name]) => `--for ${name}`);
+  const changes = writes.length ? `Work that changes files: ${writes.join(', ')}. ` : '';
+  return `${changes}${readOnlyDoors(executorId)}`;
+}
+
 /**
  * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
  * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
@@ -351,6 +415,9 @@ export async function executeExecutorCli(
     // Names which `via:"cli"` invocation of the executor runs (bind() pins the
     // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.
     invocationId,
+    // The CLI door sets this: an agent executor named without `for` is refused
+    // instead of running under a guessed posture.
+    requireCapability = false,
     // The confinement requirement the caller already resolved (an Assignment's
     // posture). Unset leaves it to the capability/invocation declaration.
     requirement,
@@ -446,6 +513,28 @@ export async function executeExecutorCli(
     resolvedExecutor = resolved.executor;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
+    if (purpose) {
+      // The work names its capability, and the capability owns the posture.
+      const capabilityName = resolveRegisteredCapability(cfg, purpose);
+      if (!capabilityName) {
+        throw new DispatchError(
+          'capability-not-registered',
+          `"${purpose}" is not a registered capability (runner.capabilities)`,
+          { executorId: executorIdArg, capability: purpose },
+        );
+      }
+      invocationId ??= selectInvocationForCapability(cfg, realExecutorId, resolvedExecutor, capabilityName);
+    } else if (requireCapability && resolved.bindingSource === 'executor-id' && resolvedExecutor?.kind === 'agent') {
+      // An agent executor can do any kind of work, so nothing about it says
+      // whether this dispatch reads or writes. Ask the caller instead of
+      // guessing: a wrong guess either blocks a write minutes into the run or
+      // lets a review write.
+      throw new DispatchError(
+        'capability-required',
+        `execute ${executorIdArg} needs --for <capability>: name the kind of work this dispatch does. ${describeCapabilityChoices(cfg, executorIdArg)}`,
+        { executorId: executorIdArg },
+      );
+    }
   }
 
   // Dispatch chokepoint visibility (both branches below): "capability" is
@@ -1041,6 +1130,16 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
     const i = rest.indexOf(name);
     return i !== -1 ? rest[i + 1] : undefined;
   };
+  // Milliseconds flag: absent stays undefined (the config value applies).
+  const positiveIntFlag = (name) => {
+    const raw = flagValue(name);
+    if (raw === undefined) return undefined;
+    const value = Number(raw);
+    if (!/^\d+$/.test(raw) || !Number.isSafeInteger(value) || value <= 0) {
+      throw new StoreError('validation', `${name} must be a positive integer (milliseconds), got ${JSON.stringify(raw)}`);
+    }
+    return value;
+  };
   // R9: "Reject duplicate/conflicting flags ... before launch" -- applies to
   // every `cliOverride` flag (`--executor`/`--model`/`--tier`), not just
   // `--executor`. Returns the first duplicated flag name found, or null.
@@ -1088,9 +1187,12 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       // works) is two-phase: `decide --for <purpose>` resolves the
       // purpose to a real executorId first, then `execute <that id>`
       // dispatches it positionally -- `decide --for` is unaffected by
-      // this, only `execute --for` is refused.
-      if (flagValue('--for')) {
-        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId>`)';
+      // this, only `execute --for` is refused. `execute <executorId> --for
+      // <capability>` is phase two carrying the purpose along: the executor is
+      // already named, and `--for` only states which capability's posture the
+      // dispatch runs under (refused for an executor that does not serve it).
+      if (flagValue('--for') && (!executorId || flagValue('--assignment') || flagValue('--contract'))) {
+        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId> [--for <capability>]`)';
         if (returnResult) throw new StoreError('validation', msg);
         process.stderr.write(`${msg}\n`);
         process.exitCode = 1;
@@ -1187,6 +1289,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
             forceSharedCwd: rest.includes('--force-shared-cwd'),
             providerCredentialProbe: createCredentialProbe(),
+            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;
@@ -1365,6 +1468,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: true,
             forceSharedCwd: rest.includes('--force-shared-cwd'),
             providerCredentialProbe: createCredentialProbe(),
+            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;
@@ -1403,9 +1507,25 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         process.exitCode = 1;
         break;
       }
+      let timeoutMs;
+      let idleTimeoutMs;
+      try {
+        timeoutMs = positiveIntFlag('--timeout-ms');
+        idleTimeoutMs = positiveIntFlag('--idle-timeout-ms');
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stdout.write(`${JSON.stringify({ error: err.message })}\n`);
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+        break;
+      }
       try {
         const executed = await executeExecutorCli(executorId, {
           prompt,
+          for: flagValue('--for'),
+          requireCapability: true,
+          timeoutMs,
+          idleTimeoutMs,
           model: flagValue('--model'),
           tier: flagValue('--tier'),
           carries: flagValue('--carries'),
@@ -1467,6 +1587,68 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       }
       break;
     }
+    case 'probe-account': {
+      // Diagnostic: every CLI of one provider account at the same moment, through the real dispatch door.
+      try {
+        const provider = flagValue('--provider');
+        const accountId = flagValue('--account');
+        if (!provider || !accountId) {
+          throw new StoreError('validation', 'dispatch probe-account requires --provider <provider> --account <accountId>');
+        }
+        const cwd = path.resolve(flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd());
+        const repoRoot = path.resolve(flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+        const assignmentsDir = path.join(fgosDirFromRoot(repoRoot), 'assignments');
+        const fgosDir = fgosDirFromRoot(repoRoot);
+        const invocationFlag = flagValue('--invocation');
+        const herdrBin = resolveHerdrBin();
+        const closedPanes = new Set();
+        const result = await runAccountProbe({
+          cfg: ensureRunnerConfigForDir(repoRoot),
+          provider,
+          accountId,
+          executorId: flagValue('--executor') ?? null,
+          invocationIds: invocationFlag ? invocationFlag.split(',').map((s) => s.trim()).filter(Boolean) : null,
+          repoRoot,
+          timeoutMs: positiveIntFlag('--timeout-ms'),
+          createAssignment: (contract) => claimAssignmentId(() => buildAssignment({
+            options: { assignmentsDir },
+            provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity(fgosDir).id) } },
+          }), assignmentsDir),
+          dispatch: (assignment, { runnerConfig, cliOverride }) => executeAssignment(assignment, {
+            cwd,
+            repoRoot,
+            runnerConfig,
+            cliOverride,
+            isReadOnlyMode: true,
+            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
+          }),
+          closePane: ({ paneId, herdrSession }) => {
+            const closed = createHerdrClient({
+              herdrBin, cwd, env: herdrSession ? { ...process.env, HERDR_SESSION: herdrSession } : process.env,
+            }).paneClose(paneId);
+            if (closed) closedPanes.add(paneId);
+            return closed;
+          },
+        });
+        // A private home kept for a pane this probe just closed is removed now rather than at the next
+        // sweep; every other home is judged exactly as the regular sweep judges it.
+        if (closedPanes.size) {
+          try {
+            reapOrphanedConfinementResources({
+              tempRoot: resolveConfinementTempRoot(),
+              checkPaneOpen: (paneId) => (closedPanes.has(paneId) ? false : null),
+            });
+          } catch { /* the regular sweep removes it later */ }
+        }
+        if (returnResult) return result;
+        process.stdout.write(`${JSON.stringify(result)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
+      break;
+    }
     case 'reconcile': {
       const runDir = executorId ?? flagValue('--run-dir') ?? (typeof positional !== 'undefined' ? positional[1] : undefined);
       if (!runDir) {
@@ -1491,7 +1673,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

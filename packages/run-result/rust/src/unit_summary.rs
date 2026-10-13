@@ -1,7 +1,9 @@
 //! Read the execution owner's unit summaries, never its attempts or workflow events.
 
-use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, UnitSummaryScan, Window};
 use fgos_observe::time::{parse_timestamp_millis, ParsedWindow};
+use fgos_observe::{
+    Observation, ObservationSource, SourceError, Subject, SubjectKind, UnitSummaryScan, Window,
+};
 use serde_json::Value;
 use std::fs::{self, File};
 use std::io::Read;
@@ -29,13 +31,17 @@ fn nullable_string(value: Option<&Value>) -> bool {
 }
 
 fn fallback(value: Option<&Value>) -> bool {
-    value.is_some_and(|value| value.is_null()
-        || (value.is_object()
-            && string(&value["executor"])
-            && string(&value["reason"])
-            && ["invocation", "transport"].iter().all(|key| {
-                value.get(*key).is_none_or(|field| field.is_null() || string(field))
-            })))
+    value.is_some_and(|value| {
+        value.is_null()
+            || (value.is_object()
+                && string(&value["executor"])
+                && string(&value["reason"])
+                && ["invocation", "transport"].iter().all(|key| {
+                    value
+                        .get(*key)
+                        .is_none_or(|field| field.is_null() || string(field))
+                }))
+    })
 }
 
 fn attempt(value: &Value) -> bool {
@@ -43,7 +49,8 @@ fn attempt(value: &Value) -> bool {
         && string(&value["assignmentId"])
         && nullable_string(value.get("runId"))
         && ["executor", "provider", "persona", "model"]
-            .iter().all(|key| nullable_string(value.get(*key)))
+            .iter()
+            .all(|key| nullable_string(value.get(*key)))
         && fallback(value.get("fallbackFrom"))
         && string(&value["outcome"])
 }
@@ -52,11 +59,15 @@ fn stance(value: &Value) -> bool {
     match value["status"].as_str() {
         Some("missing") => true,
         Some("invalid") => string(&value["reason"]),
-        Some("valid") => string(&value["choice"])
-            && value.get("confidence").is_some_and(|confidence| {
-                confidence.is_null()
-                    || confidence.as_f64().is_some_and(|n| n.is_finite() && (0.0..=1.0).contains(&n))
-            }),
+        Some("valid") => {
+            string(&value["choice"])
+                && value.get("confidence").is_some_and(|confidence| {
+                    confidence.is_null()
+                        || confidence
+                            .as_f64()
+                            .is_some_and(|n| n.is_finite() && (0.0..=1.0).contains(&n))
+                })
+        }
         _ => false,
     }
 }
@@ -70,17 +81,27 @@ fn valid_summary(value: &Value, directory_name: &str) -> bool {
         && nullable_string(value.get("capability"))
         && string(&value["outcome"])
         && value["inline"].is_boolean()
-        && value.get("workflow").is_some_and(|link| link.is_null()
-            || ["runId", "stepId", "unitId"].iter().all(|key| string(&link[*key])))
-        && value["stanceOptions"].as_array().is_some_and(|options| options.iter().all(string))
-        && value["seats"].as_array().is_some_and(|seats| seats.iter().all(|seat| {
-            string(&seat["role"])
-                && string(&seat["kind"])
-                && seat["round"].as_u64().is_some_and(|round| round > 0)
-                && attempt(&seat["final"])
-                && stance(&seat["final"]["stance"])
-                && seat["attempts"].as_array().is_some_and(|attempts| attempts.iter().all(attempt))
-        }))
+        && value.get("workflow").is_some_and(|link| {
+            link.is_null()
+                || ["runId", "stepId", "unitId"]
+                    .iter()
+                    .all(|key| string(&link[*key]))
+        })
+        && value["stanceOptions"]
+            .as_array()
+            .is_some_and(|options| options.iter().all(string))
+        && value["seats"].as_array().is_some_and(|seats| {
+            seats.iter().all(|seat| {
+                string(&seat["role"])
+                    && string(&seat["kind"])
+                    && seat["round"].as_u64().is_some_and(|round| round > 0)
+                    && attempt(&seat["final"])
+                    && stance(&seat["final"]["stance"])
+                    && seat["attempts"]
+                        .as_array()
+                        .is_some_and(|attempts| attempts.iter().all(attempt))
+            })
+        })
 }
 
 fn real_directory(path: &Path) -> bool {
@@ -89,7 +110,11 @@ fn real_directory(path: &Path) -> bool {
 
 fn read_summary(path: &Path) -> Result<Value, &'static str> {
     let metadata = fs::symlink_metadata(path).map_err(|err| {
-        if err.kind() == std::io::ErrorKind::NotFound { "missing" } else { "unreadable" }
+        if err.kind() == std::io::ErrorKind::NotFound {
+            "missing"
+        } else {
+            "unreadable"
+        }
     })?;
     if metadata.file_type().is_symlink() {
         return Err("symlink");
@@ -102,7 +127,9 @@ fn read_summary(path: &Path) -> Result<Value, &'static str> {
     }
     let file = File::open(path).map_err(|_| "unreadable")?;
     let mut bytes = Vec::with_capacity(metadata.len() as usize);
-    file.take(MAX_UNIT_SUMMARY_BYTES + 1).read_to_end(&mut bytes).map_err(|_| "unreadable")?;
+    file.take(MAX_UNIT_SUMMARY_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|_| "unreadable")?;
     if bytes.len() as u64 > MAX_UNIT_SUMMARY_BYTES {
         return Err("oversized");
     }
@@ -123,7 +150,8 @@ impl ObservationSource for UnitSummarySource {
 /// Each directory is either observed, missing, unusable, or valid but outside the window.
 pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummaryScan, SourceError> {
     let parsed_window = ParsedWindow::parse(window).map_err(|message| SourceError::ReadFailed {
-        source_id: "unit-summary", message,
+        source_id: "unit-summary",
+        message,
     })?;
     let mut scan = UnitSummaryScan::default();
     let state = root.join(".fgos");
@@ -139,10 +167,17 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
     entries.sort_by_cached_key(|entry| entry.file_name());
     for entry in entries {
         let name = entry.file_name();
-        let Some(name) = name.to_str().filter(|name| name.starts_with("unit-run-") && name.len() > 9) else {
+        let Some(name) = name
+            .to_str()
+            .filter(|name| name.starts_with("unit-run-") && name.len() > 9)
+        else {
             continue;
         };
-        if !entry.file_type().map_err(|err| SourceError::Io("unit-summary", err))?.is_dir() {
+        if !entry
+            .file_type()
+            .map_err(|err| SourceError::Io("unit-summary", err))?
+            .is_dir()
+        {
             continue;
         }
         scan.summary_dirs_seen += 1;
@@ -151,10 +186,15 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
             // The version is checked first because an older contract may not carry the fields this
             // version requires, such as a settlement timestamp.
             if value["contract"]["id"] == "unit-summary"
-                && value["contract"]["version"].as_u64().is_some_and(|version| version != UNIT_SUMMARY_VERSION) {
+                && value["contract"]["version"]
+                    .as_u64()
+                    .is_some_and(|version| version != UNIT_SUMMARY_VERSION)
+            {
                 return Err("unsupported-version");
             }
-            let ts = value["settledAt"].as_str().filter(|ts| !ts.trim().is_empty())
+            let ts = value["settledAt"]
+                .as_str()
+                .filter(|ts| !ts.trim().is_empty())
                 .ok_or("missing-timestamp")?;
             let timestamp = parse_timestamp_millis(ts).ok_or("invalid-timestamp")?;
             if !valid_summary(&value, name) {
@@ -179,10 +219,19 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
             continue;
         }
         scan.observations.push(Observation {
-            ts: value["settledAt"].as_str().expect("validated timestamp").to_owned(),
-            subject: Subject { kind: SubjectKind::Run, id: format!("unit-run:{name}") },
+            ts: value["settledAt"]
+                .as_str()
+                .expect("validated timestamp")
+                .to_owned(),
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: format!("unit-run:{name}"),
+            },
             kind: "unit.settled".to_owned(),
-            attrs: match value { Value::Object(attrs) => attrs, _ => unreachable!() },
+            attrs: match value {
+                Value::Object(attrs) => attrs,
+                _ => unreachable!(),
+            },
             source: "unit-summary",
         });
     }

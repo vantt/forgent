@@ -3,7 +3,7 @@ use fgos_observe::metrics_cli::harness::{
     count_protocols_defined, count_protocols_used, dispatch_harness,
 };
 use std::fs;
-use std::path::{PathBuf};
+use std::path::PathBuf;
 
 struct TempDirGuard(PathBuf);
 impl Drop for TempDirGuard {
@@ -45,7 +45,10 @@ fn test_harness_protocols_defined_and_used() {
     ).unwrap();
 
     // Tier 2: Domain (domains/<domain>/coordination-protocols)
-    let domain_coding = root.join("domains").join("coding").join("coordination-protocols");
+    let domain_coding = root
+        .join("domains")
+        .join("coding")
+        .join("coordination-protocols");
     fs::create_dir_all(&domain_coding).unwrap();
     fs::write(
         domain_coding.join("proto_d1.yaml"),
@@ -60,7 +63,10 @@ fn test_harness_protocols_defined_and_used() {
         "apiVersion: fgos.dev/v1alpha1\nkind: FlowDefinition\nmetadata:\n  id: proto-domain-only\nspec:\n  profile:\n    kind: CoordinationProtocol\n",
     ).unwrap();
 
-    let domain_review = root.join("domains").join("review").join("coordination-protocols");
+    let domain_review = root
+        .join("domains")
+        .join("review")
+        .join("coordination-protocols");
     fs::create_dir_all(&domain_review).unwrap();
     fs::write(
         domain_review.join("proto_r1.json"),
@@ -90,11 +96,12 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         core_dir.join("k8s.yaml"),
         "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  id: k8s-map\n",
-    ).unwrap();
+    )
+    .unwrap();
 
     // Oversized protocol file (> 1 MiB) should be ignored
     let mut big_proto = "apiVersion: fgos.dev/v1alpha1\nkind: FlowDefinition\nmetadata:\n  id: proto-oversized\nspec:\n  profile:\n    kind: CoordinationProtocol\n# ".to_string();
-    big_proto.extend(std::iter::repeat('x').take(1024 * 1024 + 100));
+    big_proto.extend(std::iter::repeat_n('x', 1024 * 1024 + 100));
     fs::write(core_dir.join("oversized.yaml"), big_proto).unwrap();
 
     // Sessions in .fgos/coordination/sessions/*/session.json
@@ -107,7 +114,8 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         s1_dir.join("session.json"),
         r#"{"id":"sess-1","definitionRef":{"id":"proto-shared-1","version":"1.0.0"}}"#,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Session 2: duplicate definitionRef id
     let s2_dir = sessions_dir.join("sess-2");
@@ -115,7 +123,8 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         s2_dir.join("session.json"),
         r#"{"id":"sess-2","definitionRef":{"id":"proto-shared-1","version":"2.0.0"}}"#,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Session 3: another distinct definitionRef id
     let s3_dir = sessions_dir.join("sess-3");
@@ -123,7 +132,8 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         s3_dir.join("session.json"),
         r#"{"id":"sess-3","definitionRef":{"id":"proto-used-2","version":"1.0.0"}}"#,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Session 4: definitionRef is null (agent-led)
     let s4_dir = sessions_dir.join("sess-4");
@@ -131,7 +141,8 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         s4_dir.join("session.json"),
         r#"{"id":"sess-4","definitionRef":null}"#,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Session 5: no definitionRef field
     let s5_dir = sessions_dir.join("sess-5");
@@ -139,7 +150,8 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         s5_dir.join("session.json"),
         r#"{"id":"sess-5","status":"active"}"#,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Session 6: corrupted session.json
     let s6_dir = sessions_dir.join("sess-6");
@@ -147,7 +159,8 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(
         s6_dir.join("session.json"),
         r#"{"id":"sess-6", broken json here"#,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Session 7: session dir without session.json
     let s7_dir = sessions_dir.join("sess-7");
@@ -156,16 +169,22 @@ fn test_harness_protocols_defined_and_used() {
     let s8_dir = sessions_dir.join("sess-8");
     fs::create_dir_all(&s8_dir).unwrap();
     let mut big_session = r#"{"id":"sess-8","definitionRef":{"id":"proto-oversized-session","version":"1.0.0"},"padding":""#.to_string();
-    big_session.extend(std::iter::repeat('x').take(1024 * 1024 + 100));
+    big_session.extend(std::iter::repeat_n('x', 1024 * 1024 + 100));
     big_session.push_str("\"}");
     fs::write(s8_dir.join("session.json"), big_session).unwrap();
 
     // Assert counts via helper functions
     let defined = count_protocols_defined(&root);
-    assert_eq!(defined, 6, "expected 6 unique protocols defined across 3 tiers");
+    assert_eq!(
+        defined, 6,
+        "expected 6 unique protocols defined across 3 tiers"
+    );
 
     let used = count_protocols_used(&root);
-    assert_eq!(used, 2, "expected 2 unique protocols used (excluding null, missing, corrupt)");
+    assert_eq!(
+        used, 2,
+        "expected 2 unique protocols used (excluding null, missing, corrupt)"
+    );
 
     // Assert counts via dispatch_harness end-to-end
     let req = ObserveRequest {

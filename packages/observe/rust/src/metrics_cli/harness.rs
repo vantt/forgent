@@ -95,7 +95,10 @@ pub fn dispatch_harness(
     };
     warnings.extend(case_warns);
 
-    let is_plain_or_cook = case_sec.as_ref().map(|c| c.harness == "plain" || c.harness == "cook-plan").unwrap_or(false);
+    let is_plain_or_cook = case_sec
+        .as_ref()
+        .map(|c| c.harness == "plain" || c.harness == "cook-plan")
+        .unwrap_or(false);
 
     let runs_sec = if is_plain_or_cook {
         Some(json!("n/a (harness plain/cook-plan)"))
@@ -113,8 +116,12 @@ pub fn dispatch_harness(
 
     // Commits section
     let commits_sec = if let Some(cw) = &case_window {
-        let count = count_commits_in_range(&req.root, cw.head_at_open.as_deref(), cw.head_at_close.as_deref())
-            .unwrap_or(0);
+        let count = count_commits_in_range(
+            &req.root,
+            cw.head_at_open.as_deref(),
+            cw.head_at_close.as_deref(),
+        )
+        .unwrap_or(0);
         Some(CommitsSection {
             count,
             head_at_open: cw.head_at_open.clone(),
@@ -131,7 +138,10 @@ pub fn dispatch_harness(
     let complexity_sec = compute_complexity(&req.root);
     // Work section (#1, #2)
     let case_items = case_window.as_ref().map(|cw| cw.items.as_slice());
-    let work_sec = Some(serde_json::to_value(compute_work(&observations, case_items, &window)).map_err(|e| e.to_string())?);
+    let work_sec = Some(
+        serde_json::to_value(compute_work(&observations, case_items, &window))
+            .map_err(|e| e.to_string())?,
+    );
 
     let scorecard = Scorecard {
         case: case_sec,
@@ -199,7 +209,11 @@ fn compute_loc_breakdown(root: &Path) -> LocBreakdown {
 
                 loc.total += line_count;
 
-                if rel_path.starts_with("test/") || rel_path.contains("/test") || rel_path.ends_with(".test.mjs") || rel_path.ends_with(".test.js") {
+                if rel_path.starts_with("test/")
+                    || rel_path.contains("/test")
+                    || rel_path.ends_with(".test.mjs")
+                    || rel_path.ends_with(".test.js")
+                {
                     loc.tests += line_count;
                 } else if rel_path.starts_with("src/runner/") {
                     loc.runner += line_count;
@@ -236,9 +250,7 @@ fn extract_protocol_id_from_file(path: &Path) -> Option<String> {
     std::io::Read::read_to_string(&mut limited, &mut content).ok()?;
 
     let val: serde_yaml::Value = serde_yaml::from_str(&content).ok()?;
-    let id = val.get("metadata")?
-        .get("id")?
-        .as_str()?;
+    let id = val.get("metadata")?.get("id")?.as_str()?;
     let id = id.trim();
     if id.is_empty() {
         return None;
@@ -333,7 +345,9 @@ pub fn count_protocols_used(root: &Path) -> u64 {
             }
             if let Ok(f) = std::fs::File::open(&session_json) {
                 let limited = std::io::Read::take(f, MAX_READ_BYTES);
-                if let Ok(v) = serde_json::from_reader::<_, serde_json::Value>(std::io::BufReader::new(limited)) {
+                if let Ok(v) = serde_json::from_reader::<_, serde_json::Value>(
+                    std::io::BufReader::new(limited),
+                ) {
                     if let Some(dref) = v.get("definitionRef") {
                         if let Some(id) = dref.get("id").and_then(|id| id.as_str()) {
                             let trimmed = id.trim();

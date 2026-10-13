@@ -2,7 +2,6 @@
 
 use crate::contract::{LegacyFrictionSource, ObserveRequest};
 use crate::{friction_cli, metrics_cli};
-use std::sync::Arc;
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -11,6 +10,7 @@ use fgos_host_runtime::{
 use std::borrow::Cow;
 use std::future::Future;
 use std::pin::Pin;
+use std::sync::Arc;
 
 pub const OBSERVE_METRICS_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("observe.metrics"),
@@ -87,13 +87,20 @@ impl OperationProvider for ObserveMetricsProvider {
             let req = request
                 .input
                 .downcast_ref::<ObserveRequest>()
-                .ok_or_else(|| ProviderError::SemanticValidation("input is not ObserveRequest".into()))?;
+                .ok_or_else(|| {
+                    ProviderError::SemanticValidation("input is not ObserveRequest".into())
+                })?;
 
             let work_src_ref: Option<&dyn crate::WorkObservationSource> =
                 self.work_source.as_ref().as_ref().map(|b| b.as_ref());
-            let res_json =
-                metrics_cli::dispatch(req, &self.sources, work_src_ref, self.coverage_scanner, self.unit_summary_scanner)
-                    .map_err(ProviderError::ProviderFailed)?;
+            let res_json = metrics_cli::dispatch(
+                req,
+                &self.sources,
+                work_src_ref,
+                self.coverage_scanner,
+                self.unit_summary_scanner,
+            )
+            .map_err(ProviderError::ProviderFailed)?;
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),
                 Box::new(JsonOutcome(res_json)),
@@ -147,7 +154,9 @@ impl OperationProvider for ObserveFrictionProvider {
             let req = request
                 .input
                 .downcast_ref::<ObserveRequest>()
-                .ok_or_else(|| ProviderError::SemanticValidation("input is not ObserveRequest".into()))?;
+                .ok_or_else(|| {
+                    ProviderError::SemanticValidation("input is not ObserveRequest".into())
+                })?;
             let res_json = friction_cli::dispatch(req, &self.legacy_sources)
                 .map_err(ProviderError::ProviderFailed)?;
             Ok(ProviderOutcome::completed(

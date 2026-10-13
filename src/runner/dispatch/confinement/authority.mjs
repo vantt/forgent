@@ -27,7 +27,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -1115,6 +1115,9 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     requirement: request.requirement,
     backendId: effectiveBackendId,
     effectiveContract: request.context?.effectiveContract ?? request.invocation?.effectiveContract ?? null,
+    // The account whose login the private home carries: herdr-spawn reads its folder-trust decision
+    // from that account's own store. A path, never a credential value.
+    trustAccountSource: request.providerCapacity?.credentialSource ?? null,
   };
 
   if (preparedLaunch) {
@@ -1822,7 +1825,9 @@ export async function finalizeConfinementResources({
             try {
               const parsed = JSON.parse(raw);
               markerDispatchId = parsed?.dispatchId ?? null;
-              markerDigest = computeSha256Digest(parsed);
+              // `credentialKept` is added by a failed removal after the digest was taken; it is not tampering.
+              const { credentialKept: _kept, ...atPrepare } = parsed ?? {};
+              markerDigest = computeSha256Digest(parsed && typeof parsed === 'object' ? atPrepare : parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);
             }
@@ -1834,11 +1839,13 @@ export async function finalizeConfinementResources({
           break;
         }
         try {
-          fs.rmSync(targetPath, { recursive: true, force: true });
+          removeConfinementDir(targetPath);
         } catch (err) {
+          // One resource that cannot go (a home holding an unstaged login) must not leave the other
+          // resources of the dispatch on disk: carry on and report the first failure.
           willClean = false;
-          typedReason = `cleanup-failed: ${err.message}`;
-          break;
+          typedReason ??= `cleanup-failed: ${err.message}`;
+          continue;
         }
         removeEmptyDispatchParent(targetPath, markerDispatchId);
       }

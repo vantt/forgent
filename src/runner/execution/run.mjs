@@ -19,7 +19,8 @@ import { commitUnitWork } from './commit-unit-work.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
 function writeJsonAtomic(file, value) {
@@ -374,6 +375,7 @@ export async function runUnit(options = {}) {
       repoRoot: mainRoot,
       runnerConfig,
       providerCredentialProbe: createCredentialProbe(),
+      providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
       cliOverride: {
         preferExecutor: bound.executor,
         // bind() already chose the invocation that carries bound.transport: the executor's

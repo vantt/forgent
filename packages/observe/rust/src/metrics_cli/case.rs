@@ -6,9 +6,7 @@ use serde_json::json;
 
 pub fn dispatch_case(req: &ObserveRequest) -> Result<serde_json::Value, String> {
     if req.args.is_empty() {
-        return Err(
-            "metrics case: missing sub-action. Available: open, close, list".to_string(),
-        );
+        return Err("metrics case: missing sub-action. Available: open, close, list".to_string());
     }
 
     let action = &req.args[0];
@@ -162,7 +160,9 @@ fn handle_close(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Val
 
     let verdict = match verdict {
         Some(v) => v,
-        None => return Err("missing required option --verdict <usable|fixed|discarded>".to_string()),
+        None => {
+            return Err("missing required option --verdict <usable|fixed|discarded>".to_string())
+        }
     };
 
     match case_journal::close_case(
@@ -179,7 +179,9 @@ fn handle_close(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Val
             "action": "close",
             "case": window
         })),
-        Err(CaseError::NotOpen(n)) | Err(CaseError::AlreadyClosed(n)) | Err(CaseError::NotFound(n)) => {
+        Err(CaseError::NotOpen(n))
+        | Err(CaseError::AlreadyClosed(n))
+        | Err(CaseError::NotFound(n)) => {
             eprintln!("fgos: case \"{}\" is not open or already closed", n);
             std::process::exit(5);
         }

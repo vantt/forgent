@@ -1004,6 +1004,12 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   // a name (or alias) declared in `cfg.capabilities` — replaces the old,
   // narrower `EXECUTOR_PURPOSES` enum (retired) with the SAME curated
   // catalog a tool-registry entry's own `capability` answers to.
+  //
+  // `for` describes `kind: "tool"` executors only. On an agent executor it is
+  // inert: an agent can do any kind of work, so the dispatch names the
+  // capability (`--for`), and `resolveCapabilityDetailsFromHints` never reads
+  // an agent's `for`. Config that still carries one keeps loading; `fgos
+  // doctor` names it (`executor-profile-warnings`) so it can be removed.
   if (executor.for !== undefined) {
     if (!Array.isArray(executor.for) || executor.for.length === 0 || !executor.for.every((f) => typeof f === 'string' && f.trim())) {
       throw new RunnerConfigError(`runner config (${label}) "for" must be a non-empty array of non-empty strings when present.`);

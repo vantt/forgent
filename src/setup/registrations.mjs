@@ -61,9 +61,10 @@ import {
   validateBackendRegistryShape,
   ensureMachineBackendRegistryDefaults,
   loadMachineBackendRegistry,
+  defaultConfinementTempRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -84,9 +85,11 @@ import { resolveTaskSpecPath } from '../runner/paths.mjs';
 import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
+import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
+import { inspectRetainedCredentialCopies } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -1362,6 +1365,52 @@ registerCheck({
   id: 'shell-integration-sourced',
   description: 'shell-integration source line present in detected rc file(s)',
   check: (cwd) => checkShellIntegrationSourced(cwd),
+});
+
+// A release install (no git checkout to source a script from) is reached through
+// one `fgos` launcher written next to `fgctl`, which runs each project's own
+// activated fgos. A source checkout keeps the shell-integration script instead.
+export function checkProjectLauncher({ pathEnv = process.env.PATH, sourceCheckout = integrationScriptPath() !== null } = {}) {
+  if (sourceCheckout) {
+    return { passed: true, message: 'running from a source checkout -- shell integration provides fgos, no launcher needed' };
+  }
+  const status = inspectLauncher({ pathEnv });
+  switch (status.state) {
+    case 'ready':
+      return { passed: true, message: `fgos on PATH is the project launcher at ${status.file}: each project runs its own activated fgos` };
+    case 'stale':
+      return { passed: false, message: `the fgos launcher at ${status.file} is out of date -- run fgos doctor --fix` };
+    case 'foreign':
+      return { passed: false, message: `the fgos found first on PATH (${status.file}) is not the project launcher, so projects may not run their own fgos -- remove it or put the fgctl directory earlier on PATH, then run fgos doctor --fix` };
+    case 'missing':
+      return { passed: false, message: `no fgos on PATH -- run fgos doctor --fix to write the project launcher at ${status.file}` };
+    default:
+      return { passed: false, message: 'neither fgos nor fgctl is on PATH -- add the directory fgctl was installed into (default ~/.local/bin) to PATH, then run fgos doctor --fix' };
+  }
+}
+
+export function fixProjectLauncher({ pathEnv = process.env.PATH } = {}) {
+  const status = inspectLauncher({ pathEnv });
+  if (status.state === 'ready') return { fixed: false, message: 'launcher already current' };
+  if (status.state === 'foreign') {
+    return { fixed: false, message: `left ${status.file} alone: it is not the project launcher; remove it or put the fgctl directory earlier on PATH` };
+  }
+  if (status.state === 'no-fgctl') {
+    return { fixed: false, message: 'neither fgos nor fgctl is on PATH, so there is no directory to write the launcher into; add the fgctl directory to PATH first' };
+  }
+  writeLauncher(status.file);
+  return { fixed: true, message: `wrote the project launcher at ${status.file}` };
+}
+
+registerCheck({
+  id: 'project-fgos-launcher',
+  description: 'a release install has a single fgos on PATH that runs each project\'s own activated fgos',
+  check: () => checkProjectLauncher(),
+});
+
+registerFix({
+  id: 'project-fgos-launcher',
+  fix: () => fixProjectLauncher(),
 });
 
 registerCheck({
@@ -4297,7 +4346,7 @@ export function checkConfinedPaneAccounts(runnerCfg = {}) {
   } catch (err) {
     return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
   }
-  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
+  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^\$HOME(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
   const problems = [];
   const notes = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
@@ -4310,8 +4359,14 @@ export function checkConfinedPaneAccounts(runnerCfg = {}) {
         problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
         continue;
       }
+      // An account that keeps one login per CLI reaches this pane only through the store of the pane's CLI.
+      const cli = commandCli(inv.command ?? executor.command);
       for (const account of accounts) {
-        const source = account.credentialSource;
+        const source = credentialSourceForCli(account, cli);
+        if (!source) {
+          problems.push(`${label}: account "${account.id}" declares no credential source for CLI "${cli}", so a pane leased to it starts logged out`);
+          continue;
+        }
         const home = expandHome(source.home);
         const files = source.kind === 'home-files' ? source.files : ['auth.json'];
         const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
@@ -5220,19 +5275,7 @@ registerFix({
 // stayed on disk forever. Wiring it in here (checked/fixed via `doctor
 // --fix`) and at runner start (loop.mjs) is what actually reclaims it.
 
-export function defaultConfinementTempRoots() {
-  const roots = new Set([resolveConfinementTempRoot()]);
-  try {
-    const registry = loadMachineBackendRegistry();
-    for (const instance of Object.values(registry?.confinementBackends || {})) {
-      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
-    }
-  } catch {
-    // An unreadable/malformed registry is its own check (above); fall back
-    // to the one default root rather than failing this check too.
-  }
-  return [...roots];
-}
+export { defaultConfinementTempRoots };
 
 /** Temp roots we own whose mode is not owner-only: a private home under one
  * holds a copy of an account login, so a group- or world-readable root is a
@@ -5316,6 +5359,8 @@ function countDeadOwnedConfinementDirs(roots) {
           const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
           // A home kept for a left-open pane is awaiting that pane, not orphaned.
           if (marker.paneId) continue;
+          // A home held for its unstaged login is never reaped; credential-copies-retained reports it.
+          if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
           const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
             try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
           })();
@@ -5364,6 +5409,76 @@ registerCheck({
 registerFix({
   id: 'confinement-orphaned-resources-reaped',
   fix: () => fixConfinementOrphanedResourcesReaped(),
+});
+
+// A login copy that outlives its dispatch holds a refresh token that may be the only valid one, so fgOS
+// never deletes it on age alone; this check is how an owner learns one is still there. Read-only, counts
+// and ages by provider/account; a held home is named by its directory. Never a token value.
+const RETAINED_COPY_REPORT_AFTER_MS = 24 * 60 * 60 * 1000;
+
+const formatAge = (ms) => (ms >= 48 * 3600 * 1000 ? `${Math.floor(ms / (24 * 3600 * 1000))}d` : `${Math.max(0, Math.floor(ms / 3600000))}h`);
+
+function summarizeByAccount(items, label) {
+  const groups = new Map();
+  for (const item of items) {
+    const key = `${item.provider}/${item.accountId}`;
+    const group = groups.get(key) ?? { count: 0, oldestMs: 0 };
+    group.count += 1;
+    group.oldestMs = Math.max(group.oldestMs, item.ageMs);
+    groups.set(key, group);
+  }
+  return [...groups].map(([key, g]) => `${key}: ${g.count} ${label}, oldest ${formatAge(g.oldestMs)}`);
+}
+
+export function checkCredentialCopiesRetained({
+  runtimeDir = defaultProviderCapacityRuntimeDir(),
+  roots = defaultConfinementTempRoots(),
+  now = Date.now(),
+  minAgeMs = RETAINED_COPY_REPORT_AFTER_MS,
+} = {}) {
+  const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs });
+  const homes = roots.flatMap((root) => listKeptCredentialHomes(root))
+    .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
+  const held = homes.filter((home) => home.held);
+  const retrying = homes.filter((home) => !home.held);
+  if (copies.length === 0 && homes.length === 0) {
+    return { passed: true, message: 'no login copy is being retained past its dispatch' };
+  }
+  // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
+  // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning.
+  const problems = [
+    ...summarizeByAccount(copies, 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
+    ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
+    ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
+  ];
+  const text = problems.join('; ');
+  return held.length > 0 ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+}
+
+export function fixCredentialCopiesRetained({ roots = defaultConfinementTempRoots(), ...options } = {}) {
+  const total = { settled: 0, held: 0 };
+  for (const root of roots) {
+    const { settled, held } = settleHeldCredentialHomes({ tempRoots: [root], ...options });
+    total.settled += settled;
+    total.held += held;
+  }
+  return {
+    changed: total.settled > 0,
+    message: total.settled + total.held === 0
+      ? 'no held private home to re-check'
+      : `re-checked ${total.settled + total.held} held private home(s): ${total.settled} removed, ${total.held} still held`,
+  };
+}
+
+registerCheck({
+  id: 'credential-copies-retained',
+  description: 'no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied',
+  check: () => checkCredentialCopiesRetained(),
+});
+
+registerFix({
+  id: 'credential-copies-retained',
+  fix: () => fixCredentialCopiesRetained(),
 });
 
 export function checkConfinementBwrapPlatform() {

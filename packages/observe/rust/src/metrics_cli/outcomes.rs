@@ -26,11 +26,15 @@ pub fn dispatch_outcomes(
             id = Some(arg.clone());
             i += 1;
         } else {
-            return Err(format!("unexpected positional argument for metrics outcomes: {}", arg));
+            return Err(format!(
+                "unexpected positional argument for metrics outcomes: {}",
+                arg
+            ));
         }
     }
 
-    let ws = work_source.ok_or_else(|| "work source not available for metrics outcomes".to_string())?;
+    let ws =
+        work_source.ok_or_else(|| "work source not available for metrics outcomes".to_string())?;
     let report = ws
         .read_outcomes_report(&req.root, id.as_deref())
         .map_err(|e| format!("work source error: {}", e))?;

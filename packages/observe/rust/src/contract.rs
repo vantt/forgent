@@ -180,10 +180,7 @@ pub trait WorkObservationSource: Send + Sync {
         filter_id: Option<&str>,
     ) -> Result<WorkOutcomesRecord, SourceError>;
 
-    fn read_entropy_signals(
-        &self,
-        root: &Path,
-    ) -> Result<WorkEntropySignalsRecord, SourceError>;
+    fn read_entropy_signals(&self, root: &Path) -> Result<WorkEntropySignalsRecord, SourceError>;
 }
 
 #[derive(Debug, Clone)]
