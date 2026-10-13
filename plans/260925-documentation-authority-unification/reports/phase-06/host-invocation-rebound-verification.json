@@ -1,0 +1,1263 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:3@2026-10-13",
+  "requestCommit": "d760d8e5e",
+  "contentCommits": [
+    "f1e84afbad9956c919aa5c8a2cf3535bd90371f3",
+    "b69197f88749fc6e1acc14797186f039a19e9793"
+  ],
+  "inventoryCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+  "proofHead": "d760d8e5e0573292a1207913b0edbbafccb645bf",
+  "inScopeTreeBound": true,
+  "counts": {
+    "appliedOk": 417,
+    "committedReworks": 14,
+    "reboundSourceRows": 33,
+    "retainedApprovals": 398,
+    "pendingNativeSuccessors": 35,
+    "candidateUnverified": 588
+  },
+  "gates": [
+    {
+      "label": "D-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/continuation/new-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/continuation/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1165,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22768,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 345,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 446,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1957,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-29",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-31",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-outer-boundary-note",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-32",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#source-inventory"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/continuation/new-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/continuation/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+      ],
+      "exit": 1,
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "12 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "33 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#migration-status-note, docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-3, docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "1 identical source units whose rows name different target owners (e.g. ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "588 candidate conservation units not named by a source decision (e.g. docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 33,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#migration-status-note",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-3",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 1,
+          "examples": [
+            "ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 588,
+          "examples": [
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/continuation/new-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/continuation/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1165,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22768,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 345,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 446,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1957,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-29",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-31",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-outer-boundary-note",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-32",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#source-inventory"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/continuation/new-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/continuation/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+      ],
+      "exit": 1,
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "12 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "33 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#migration-status-note, docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-3, docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "1 identical source units whose rows name different target owners (e.g. ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "588 candidate conservation units not named by a source decision (e.g. docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 33,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#migration-status-note",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-3",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 1,
+          "examples": [
+            "ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 588,
+          "examples": [
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details"
+          ]
+        }
+      ],
+      "stderr": ""
+    }
+  ],
+  "expectedStrictOpens": {
+    "claims-partial-carry": 12,
+    "claims-not-reviewed": 33,
+    "identical-units-multiple-owners": 1,
+    "candidate-blocks-unreferenced": 588
+  },
+  "nativeEquality": {
+    "commit": "b69197f88749fc6e1acc14797186f039a19e9793",
+    "sourceCount": 431,
+    "sourceIdsEqual": true,
+    "pendingIds": [
+      "claim_04f0605dc840e350f63e53d0e1e96843",
+      "claim_080c5cdacf820ed661ab372086ca7e41",
+      "claim_14f599ac6c6af84bcd15a503faaaea03",
+      "claim_2f85030181d51c92cbb5dfd094d20956",
+      "claim_37572a9d192f311dd68474b794f87d5e",
+      "claim_3c202991304027e73ce867fadfd87175",
+      "claim_4862726f445bfdcba1b58996cf47dfd8",
+      "claim_4a49679c5f81a5e86ab79f533fcf3470",
+      "claim_6275bba15f3262cd1adb35973216a47d",
+      "claim_72b068a205f5bdb963a0c90a64a51038",
+      "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "claim_98683c6667ec64317c110eb4fe42da11",
+      "claim_9a5781f0086209a17330035ff0e58638",
+      "claim_a4351841ba59f20ec7938e5b1ea38f66",
+      "claim_ab778e44a43171006f82c08d9939dcf5",
+      "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "claim_aec6fb3d8eed3c772ec8bac9808009d3",
+      "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "claim_b4f3b7bbb0174373a63a66c57c4f3078",
+      "claim_b74991659ee3db4cb630f607d065ce52",
+      "claim_bb1dcfee5986a94c37e667c75bd3af84",
+      "claim_c072318ec582affe5e0e6936961fadc4",
+      "claim_c245c752125bfa748075cb620216e537",
+      "claim_cbdba798349c777e7f15979d300e0142",
+      "claim_d3350f1f59df99f9dfa937d5ea894de4",
+      "claim_d4b9b2583e0b4b598a7610af9ced7d36",
+      "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "claim_fc22ecebfdc6e506475e638d1ba86920",
+      "claim_fd246fe0ad796f0ce1f3448b6ad8ec61"
+    ],
+    "retainedApprovals": 398,
+    "unknownBlocking": 0,
+    "applicationFindings": [],
+    "droppedFindings": [],
+    "candidateCount": 588,
+    "candidateMissing": [],
+    "candidateAdditional": [],
+    "candidateTupleEquality": true,
+    "exceptionGroups": [
+      {
+        "digest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
+        "expected": [
+          "claim_3a3a8368338c8392adbdf48ddbf0285c",
+          "claim_825ecbc106eb49b18701b0d68c204d22"
+        ],
+        "actual": [
+          "claim_3a3a8368338c8392adbdf48ddbf0285c",
+          "claim_825ecbc106eb49b18701b0d68c204d22"
+        ]
+      }
+    ],
+    "exceptionMembershipEqual": true,
+    "priorKnownIds": 93709,
+    "currentKnownIds": 93802,
+    "missingKnownIds": [],
+    "registrySha256": "b1377c30b3d127279d5dbdaf850ab42062fecc48fb3b63a04957303df97af843"
+  },
+  "closedAgentEquality": {
+    "holds": [
+      "claim_bd4897029d5fdbab80b1b7ccee475e12",
+      "claim_d6db58a3090422d42154f240f54c9f5a",
+      "claim_f11410ffab23bcae1d89e8b6cbedf8bc"
+    ],
+    "holdsEqual": true,
+    "reverseCount": 457,
+    "tupleEquality": true,
+    "identityEquality": true,
+    "exceptionGroups": 342,
+    "exceptionDigestEquality": true,
+    "exceptionMembershipEquality": true
+  },
+  "candidateNativeGaps": {
+    "count": 42,
+    "meaning": "Native candidate-only identity-gap rows remain explicitly unverified; no identity graft or approval. All original known IDs remain represented. Source batch scope is the six unchanged legacy files, not these candidate identities.",
+    "rows": [
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/README.md",
+        "unitDigest": "f1f8a5ebd3a525936a1ed758a7a7a3ea02444a3b2bebe20775c51576f6127cd6",
+        "identityFingerprint": "f1f8a5ebd3a525936a1ed758a7a7a3ea02444a3b2bebe20775c51576f6127cd6",
+        "claimId": "claim_5f195bb5005de7b2dde75cc71451d5d9",
+        "sourceAnchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1b3e232799bd6a3154f6432897baa54fe23da2febd76e0d4ac498e0553ebb73a",
+        "claimKind": "navigation",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-6 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "755b9c6b0def2f7434449babc6b4a7126d3c523d4ee28d9a83f01d75e6f9feb6",
+        "identityFingerprint": "755b9c6b0def2f7434449babc6b4a7126d3c523d4ee28d9a83f01d75e6f9feb6",
+        "claimId": "claim_9b9497082bd68acbaef939d9190df0a9",
+        "sourceAnchor": "unheaded-block-13",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "27d69066fb80d541fe3ab60479159fc997277f3f27a20dfe560ca7536fe6981f",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-13 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "755b9c6b0def2f7434449babc6b4a7126d3c523d4ee28d9a83f01d75e6f9feb6",
+        "identityFingerprint": "755b9c6b0def2f7434449babc6b4a7126d3c523d4ee28d9a83f01d75e6f9feb6",
+        "claimId": "claim_8f43ed344d1b2460ce794e05ab809425",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "27d69066fb80d541fe3ab60479159fc997277f3f27a20dfe560ca7536fe6981f",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-15 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "0ce287b8756809ea3c18b2287fb58f1ea620db8278e8fceb4bbcc477007e7235",
+        "identityFingerprint": "0ce287b8756809ea3c18b2287fb58f1ea620db8278e8fceb4bbcc477007e7235",
+        "claimId": "claim_6925bf802bdbd210407d026e428b8b72",
+        "sourceAnchor": "unheaded-block-17",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "501977bc175d1e0e13048966c2b723805846d49d30e35c45d6bb1ad24cd484e9",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-17 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "0ce287b8756809ea3c18b2287fb58f1ea620db8278e8fceb4bbcc477007e7235",
+        "identityFingerprint": "0ce287b8756809ea3c18b2287fb58f1ea620db8278e8fceb4bbcc477007e7235",
+        "claimId": "claim_557f90de973b024da2d6754c5aa62ee0",
+        "sourceAnchor": "unheaded-block-18",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "501977bc175d1e0e13048966c2b723805846d49d30e35c45d6bb1ad24cd484e9",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-18 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "0ce287b8756809ea3c18b2287fb58f1ea620db8278e8fceb4bbcc477007e7235",
+        "identityFingerprint": "0ce287b8756809ea3c18b2287fb58f1ea620db8278e8fceb4bbcc477007e7235",
+        "claimId": "claim_48084655849e9dd2351d85b07a5e48e4",
+        "sourceAnchor": "unheaded-block-19",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "501977bc175d1e0e13048966c2b723805846d49d30e35c45d6bb1ad24cd484e9",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-19 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "61cea60cf6acaedd9e8e1ae4d67bdc0e3779010a7ae6eeb3bdb8fbc1865c642e",
+        "identityFingerprint": "61cea60cf6acaedd9e8e1ae4d67bdc0e3779010a7ae6eeb3bdb8fbc1865c642e",
+        "claimId": "claim_b713aedd62e0409d617985f73dfde828",
+        "sourceAnchor": "unheaded-block-25",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "73cc532be4654bfebcfb7b76bb3f4d982588a7d750677d5826700cef58f12269",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-25 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "b004f162b2d4bac6bd0995d7b356fe68c4447f855983a93968755b678ae9f77c",
+        "identityFingerprint": "b004f162b2d4bac6bd0995d7b356fe68c4447f855983a93968755b678ae9f77c",
+        "claimId": "claim_3218cb3e41f16d2713d112474f6ebbf4",
+        "sourceAnchor": "unheaded-block-32",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "16c81c8d681ed07fcef9b4d4e6c284119c81616f24baeb708615cb5bcf2ab3fc",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-32 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "unitDigest": "be166ececc8d9354bda86ccbaa34d56d71962a2cafdfbbc9f5b123645740524f",
+        "identityFingerprint": "be166ececc8d9354bda86ccbaa34d56d71962a2cafdfbbc9f5b123645740524f",
+        "claimId": "claim_daaf5b8b0359de20df3da8086bd94397",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "15534bd05f54a660f4b2a1f3042ff1da7cd7fe95cb9850ce1f7bbcb82e852f0f",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+        "unitDigest": "071008196679d9aaa3aefd176452248bb95c9c2de071aa55f9faae48d5744929",
+        "identityFingerprint": "071008196679d9aaa3aefd176452248bb95c9c2de071aa55f9faae48d5744929",
+        "claimId": "claim_7e1801dc42e95c99daf563faf5c3b3c9",
+        "sourceAnchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "97a05209c3b50738316eff34a49f29c146da278abbf2b491d651d64fd809e6d0",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+        "unitDigest": "127412e390ac6447748a466adc2676c1b1c209da090262d09b006f59dabc3a37",
+        "identityFingerprint": "127412e390ac6447748a466adc2676c1b1c209da090262d09b006f59dabc3a37",
+        "claimId": "claim_433b8597a4b900735e45f8ba9aaf4ed4",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0a886e066616ecb914a4542dac9aea808e997c89d04a040847b3fe687262bad9",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "unitDigest": "6f29ddede5246c99b02cfb4619c2bd488623cc23dfe408f2d385fe70438c0ef1",
+        "identityFingerprint": "6f29ddede5246c99b02cfb4619c2bd488623cc23dfe408f2d385fe70438c0ef1",
+        "claimId": "claim_a23d9aa57be8381fc9dfbee61d733b6e",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ab2cd0f150f5e1b404324375d0296ae4adbaaef0f80f503bb5e6760e7bc651f9",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "unitDigest": "16f1af7796dde69a87562bf91719fa6581695debc501fdc26520cba9e4e5d57e",
+        "identityFingerprint": "16f1af7796dde69a87562bf91719fa6581695debc501fdc26520cba9e4e5d57e",
+        "claimId": "claim_2742144f65877fea2c48d9e4b8653c93",
+        "sourceAnchor": "unheaded-block-20",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "cef255218a641526c39eb8e981dc29284b0ff9cb7d39a64422155eb1bd6eadb4",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-20 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "unitDigest": "67161e515ed5fff7fa2b79185fc0e888ff915cdc7d949224572e9a0555f0ee95",
+        "identityFingerprint": "67161e515ed5fff7fa2b79185fc0e888ff915cdc7d949224572e9a0555f0ee95",
+        "claimId": "claim_640b3bd2bc608e5e83fa686355fe7d15",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "81e298b1e50a0414fa5fb3d17ae45182a975b64c213fe856c1fac52facc8282c",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "fd39466ef020cb68403212285b915d93eb4bfca1dd2a5f18c94dd833b05d4679",
+        "identityFingerprint": "fd39466ef020cb68403212285b915d93eb4bfca1dd2a5f18c94dd833b05d4679",
+        "claimId": "claim_e9a92b7ca2c6318282b7e70512aeddd7",
+        "sourceAnchor": "unheaded-block-10",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e09cd4e156094cd510ff75feb88557f21804ab9d9fb18e543e0db68de6932b1a",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-10 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "identityFingerprint": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "claimId": "claim_f0e44ef7fbdc36f5a6a890a52d5869de",
+        "sourceAnchor": "unheaded-block-16",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "26a5ba7a3e7e52845c2c5f1c4dd95f9ec18399ebb2b197e915cea44f9b2baa1a",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-16 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "identityFingerprint": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "claimId": "claim_71350f9c1b9d40a92eeb5117c2e8f231",
+        "sourceAnchor": "unheaded-block-19",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "26a5ba7a3e7e52845c2c5f1c4dd95f9ec18399ebb2b197e915cea44f9b2baa1a",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-19 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "identityFingerprint": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "claimId": "claim_f75f6e075326f7bbe4f7d0af84884608",
+        "sourceAnchor": "unheaded-block-21",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "26a5ba7a3e7e52845c2c5f1c4dd95f9ec18399ebb2b197e915cea44f9b2baa1a",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-21 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "identityFingerprint": "50488266f0c326c94d71350c5b7d26207330d0212e87cf47ff8baff568048bc6",
+        "claimId": "claim_a5b1a958f801ffd75cb27652f439c741",
+        "sourceAnchor": "unheaded-block-22",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "26a5ba7a3e7e52845c2c5f1c4dd95f9ec18399ebb2b197e915cea44f9b2baa1a",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-22 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "d5e3889d775bf7249fd66ea2eb510504a5d80d72256cfbbcfcdb00a45ebd32f7",
+        "identityFingerprint": "d5e3889d775bf7249fd66ea2eb510504a5d80d72256cfbbcfcdb00a45ebd32f7",
+        "claimId": "claim_d95264e3412e7d165dfe7d68b50af0a2",
+        "sourceAnchor": "unheaded-block-48",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "76fa03b787a251bc7f984154b1161ee2e7fe877879939a3d3286c21453db7767",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-48 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "1f452b65e6d0231225c4277d5f0f7d0a35da5c08406ff8901bf164d592ce64f8",
+        "identityFingerprint": "1f452b65e6d0231225c4277d5f0f7d0a35da5c08406ff8901bf164d592ce64f8",
+        "claimId": "claim_84ab0157f7434127acd1e82f43243721",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c0ffb475f3aa129f49bd9714f03a2ad3d2c0813d6e8e8cc80ad132cbda8d2ce5",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "d5e3889d775bf7249fd66ea2eb510504a5d80d72256cfbbcfcdb00a45ebd32f7",
+        "identityFingerprint": "d5e3889d775bf7249fd66ea2eb510504a5d80d72256cfbbcfcdb00a45ebd32f7",
+        "claimId": "claim_a4a69b50446cad0ba6456b633597ef9e",
+        "sourceAnchor": "unheaded-block-52",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "76fa03b787a251bc7f984154b1161ee2e7fe877879939a3d3286c21453db7767",
+        "claimKind": "architecture",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-52 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "ee1f467b7680f52ee2335efccc94642fb8db7e441bfff9c735eeb393c69d4aec",
+        "identityFingerprint": "ee1f467b7680f52ee2335efccc94642fb8db7e441bfff9c735eeb393c69d4aec",
+        "claimId": "claim_408937fea1ed6e1ae1345beffbd1aaa0",
+        "sourceAnchor": "unheaded-block-61",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "81d2135fae3fe4ef84de33d7e24ccf3f856763519f4d8479a3a3ed1a6f01c585",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-61 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "unitDigest": "e0de912a5a6aa79bb5c9b535f2a6f1edd15e8ed548a92637d8db8d2fa6a6d369",
+        "identityFingerprint": "e0de912a5a6aa79bb5c9b535f2a6f1edd15e8ed548a92637d8db8d2fa6a6d369",
+        "claimId": "claim_135234a8c66ccd348c9ce868f37f05ed",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f5b1de0d5eaa53842b5bb6719c21de0db22e022799f2f982787c0bdce2609da2",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "unitDigest": "5f4ebf97325f6e5d8f505be9fde05e475fd5a75b3626d78533c6e64a88814cd1",
+        "identityFingerprint": "5f4ebf97325f6e5d8f505be9fde05e475fd5a75b3626d78533c6e64a88814cd1",
+        "claimId": "claim_59231c5eba493ea11b12c2045c876f34",
+        "sourceAnchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "d70e9b520871ae2733f151b08b085a2b9bf65082f64a0c63ce11d3155189033e",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+        "unitDigest": "947af07336f5812cd45298715dfb3b19f9dfcc14f209b7fc777f853c03bb26f0",
+        "identityFingerprint": "947af07336f5812cd45298715dfb3b19f9dfcc14f209b7fc777f853c03bb26f0",
+        "claimId": "claim_2b0a788826eccc8a97a6827996b5ca98",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f87ec64606aa1b87af31c09372ef7956f37217695c9165ec137811c682292d50",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-a39c864c23c9d6a9630df481c67474df7f702cf1",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+        "unitDigest": "f9c3ea170334b0700b4ca239dfec0694d4c362caa9a7bebbb75c8664bb6768b2",
+        "identityFingerprint": "f9c3ea170334b0700b4ca239dfec0694d4c362caa9a7bebbb75c8664bb6768b2",
+        "claimId": "claim_742be92ad2046f453aaec5e3634596d5",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0a133ef1c59e4773b2765c55d064e7553838a35c91ea2a598183d5d5aa6184bb",
+        "claimKind": "unclassified",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+        "unitDigest": "92fe599fcfcb50d31e318e1f2790222997b77c1ab294b2ab38261b7764350547",
+        "identityFingerprint": "92fe599fcfcb50d31e318e1f2790222997b77c1ab294b2ab38261b7764350547",
+        "claimId": "claim_75d9b400aa9f93fcf34c9fe177ea74e8",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5956c0ec6a74389d9d6ac943201ecece133d094e814e785264ab9b0bf291f7db",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-a39c864c23c9d6a9630df481c67474df7f702cf1",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+        "unitDigest": "606310d2d9bd27211e0e57351b62bf3872d85c1dd09928685582ccf0085d7446",
+        "identityFingerprint": "606310d2d9bd27211e0e57351b62bf3872d85c1dd09928685582ccf0085d7446",
+        "claimId": "claim_b2a48713ba384776efbeae0f7cfe8728",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "48b51eefdcf8b34f048c53f85f3cb6961b0db3213ee2036e943ec6d692717f69",
+        "claimKind": "unclassified",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "identityFingerprint": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "claimId": "claim_560aea22017240dd9578c121dbded55c",
+        "sourceAnchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e8d054a3e82d7e85f5c356a9693e792190fc8e864d25871758e10061fbf99531",
+        "claimKind": "unclassified",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "ambiguous match: fingerprint 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units; digest 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "0b9078c237c25404b0d68789838e098e2d9726d829de7e6dd3fdc4ddea575651",
+        "identityFingerprint": "0b9078c237c25404b0d68789838e098e2d9726d829de7e6dd3fdc4ddea575651",
+        "claimId": "claim_e99dbe39eae00d5da28c840b482c76ad",
+        "sourceAnchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9cd327cb0385c90d735a03302b06ea532380be307ea2ba692a21b2ebc86ba59a",
+        "claimKind": "unclassified",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-12 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "identityFingerprint": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "claimId": "claim_9ef11c503c078729747f81b5324d1efc",
+        "sourceAnchor": "unheaded-block-23",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e8d054a3e82d7e85f5c356a9693e792190fc8e864d25871758e10061fbf99531",
+        "claimKind": "unclassified",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "ambiguous match: fingerprint 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units; digest 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "identityFingerprint": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "claimId": "claim_5ae473babdf8dcc4c2c17147899d2609",
+        "sourceAnchor": "unheaded-block-29",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e8d054a3e82d7e85f5c356a9693e792190fc8e864d25871758e10061fbf99531",
+        "claimKind": "unclassified",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "ambiguous match: fingerprint 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units; digest 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "identityFingerprint": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "claimId": "claim_152509d64a5b7c17e430efc86fc01f4a",
+        "sourceAnchor": "unheaded-block-34",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e8d054a3e82d7e85f5c356a9693e792190fc8e864d25871758e10061fbf99531",
+        "claimKind": "unclassified",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "ambiguous match: fingerprint 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units; digest 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "identityFingerprint": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "claimId": "claim_9b60d41d9527df40043d5b0d47c5cd62",
+        "sourceAnchor": "unheaded-block-42",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e8d054a3e82d7e85f5c356a9693e792190fc8e864d25871758e10061fbf99531",
+        "claimKind": "unclassified",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "ambiguous match: fingerprint 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units; digest 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "identityFingerprint": "9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e",
+        "claimId": "claim_857db222f78cb3616d2b18bacc149875",
+        "sourceAnchor": "unheaded-block-47",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e8d054a3e82d7e85f5c356a9693e792190fc8e864d25871758e10061fbf99531",
+        "claimKind": "unclassified",
+        "status": "future",
+        "pairedByAnchor": true,
+        "identityStatus": "identity-gap",
+        "gapReason": "ambiguous match: fingerprint 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units; digest 9ceac5f9e9ad477d1daf17b792b9f78ff8e42dd64885baf06a3e3ab33dc0b89e has 6 possible old units"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "a23362766f1bb065dfa249732655ec87d50ea6ff95bb31009b45fcb4a20d2616",
+        "identityFingerprint": "a23362766f1bb065dfa249732655ec87d50ea6ff95bb31009b45fcb4a20d2616",
+        "claimId": "claim_0233879bb8cd07e57adf391829f89260",
+        "sourceAnchor": "unheaded-block-58",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f900b54f84c8a36a5b0fff4bde9584aac632c4b1058a92f812d564237d9ad05c",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-58 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "29b1f4522a5fde41cbfd938a99df71c67f34f72556dd11bef41cfa41b88f9f11",
+        "identityFingerprint": "29b1f4522a5fde41cbfd938a99df71c67f34f72556dd11bef41cfa41b88f9f11",
+        "claimId": "claim_1b9ef8e17810c3c2da53c0024676faf1",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "438155af8637aa98a7ecf9d30b8ee405b50a574d88b68d30349312518655ef50",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "unitDigest": "6a3f0b845e20d48449c8f2fb2a543b4b1cd2bffaaf35b474100836684ddbc89e",
+        "identityFingerprint": "6a3f0b845e20d48449c8f2fb2a543b4b1cd2bffaaf35b474100836684ddbc89e",
+        "claimId": "claim_2dfa6f8c8efe83bbb9a042b86a2ce472",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3f9f3119c9f3b99a6c2a45fe20e3374eabbb55b08dde883caa9c0840ea6a294b",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-14 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "unitDigest": "cd21531af9affab79ae0116e5b2f570b2caf8c6f44cacc737aeb5509c3620ff5",
+        "identityFingerprint": "cd21531af9affab79ae0116e5b2f570b2caf8c6f44cacc737aeb5509c3620ff5",
+        "claimId": "claim_0f13d281eaae24cf154cf4b6c91d3d45",
+        "sourceAnchor": "unheaded-block-16",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "29ec63ebdd098ec0da0ea585c61c3660d4107da6f1461e70f8f927f3600a4e70",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-16 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "unitDigest": "67bb9b183ed3c81037aa3119d2d99c0c8e159c5646b55f5d4ec701beae47cc72",
+        "identityFingerprint": "67bb9b183ed3c81037aa3119d2d99c0c8e159c5646b55f5d4ec701beae47cc72",
+        "claimId": "claim_8f9a8ef022829591951d53737de1a96b",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "69cf9c077238d78c40bd201688cea9127e1a40aeff7004ebffd6999e620b1ecd",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+        "unitDigest": "e560f63573301046e91c3b2e6f4045c995cb59ddd1bf31e436ccbdbe5d30f628",
+        "identityFingerprint": "e560f63573301046e91c3b2e6f4045c995cb59ddd1bf31e436ccbdbe5d30f628",
+        "claimId": "claim_2ce4e62649e3e07e3c611accb5198532",
+        "sourceAnchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8182aa6148417b07ac97e4a320636fe847dd2ec80c05857d4d6ca2c7d4b89f90",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-11 is not a stable heading anchor"
+      }
+    ]
+  },
+  "preservation": [
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set([...isolate.exactExemptions,...[\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/plan.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"]]),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:exceptions.size,leadCommit:\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",leadPaths:[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"historicalWitnesses\":74,\"historyTreeUnchanged\":true,\"payloadTreeOutside29Unchanged\":true,\"inheritedPhysicalPayloads\":867,\"changedAreaPaths\":29,\"frozenFiles\":5,\"firstParentNonMergeCommits\":265,\"allowlistViolations\":0,\"exactCommitPathExceptions\":8,\"leadCommit\":\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",\"leadPaths\":[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],\"result\":\"pass\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-constitution.mjs",
+        "--no-ledger",
+        "--check-placement"
+      ],
+      "exit": 0,
+      "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 506 files, 505 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-candidate-status.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"counts\": {\n    \"files\": 506,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 112,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 115,\n    \"findings\": 1,\n    \"byType\": {\n      \"missing-promotion-fields\": 1\n    }\n  },\n  \"findings\": [\n    {\n      \"type\": \"missing-promotion-fields\",\n      \"path\": \"docs/platform/packaging-distribution/README.md\",\n      \"message\": \"missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by\"\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as git} from 'node:child_process';const p=\"plans/260925-documentation-authority-unification\",f=p+'/transitional-switchboard.json',before=JSON.parse(git('git',['show','a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2:'+f],{encoding:'utf8'})),after=JSON.parse(fs.readFileSync(f,'utf8'));assert.deepEqual(after.areas.map(a=>[a.area,a.authorityStatus]),before.areas.map(a=>[a.area,a.authorityStatus]));const paths=['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md'],set=new Set;for(const file of paths){const text=fs.readFileSync(file,'utf8');for(const m of text.matchAll(/docs\\/platform\\/[^ )`|>\"]*/g))set.add(m[0]);}const baseline=fs.readFileSync(p+'/reports/phase-06/reader-links-baseline.txt','utf8').trim().split('\\n').filter(Boolean).sort();assert.deepEqual([...set].sort(),baseline);console.log(JSON.stringify({authorityChanges:[],readerLinkChanges:[],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"authorityChanges\":[],\"readerLinkChanges\":[],\"result\":\"pass\"}\n",
+      "stderr": ""
+    }
+  ],
+  "tests": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/check-doc-candidate-status.test.mjs",
+      "test/scripts/check-doc-conservation.test.mjs",
+      "test/scripts/doc-candidate-conservation.test.mjs",
+      "test/scripts/doc-decision-conservation.test.mjs",
+      "test/scripts/doc-decision-review.test.mjs",
+      "test/scripts/doc-review-authorship.test.mjs",
+      "test/scripts/doc-review-format.test.mjs"
+    ],
+    "tests": 155,
+    "pass": 155,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "stdout": "✔ status comes only from the switchboard (1.508019ms)\n✔ a Design status header never changes the computed status (6.306675ms)\n✔ a candidate missing candidateCore fields is reported; a complete one is clean (2.787202ms)\n✔ a headerless candidate is reported (1.981203ms)\n✔ a promoted document needs the governance baseline plus the promotion extras (2.391458ms)\n✔ unresolved relative links and Related paths are reported, resolved ones are not (2.866925ms)\n✔ link and Related extraction helpers (0.331198ms)\n✔ runCli is report-only by default and fatal under --strict (26.158869ms)\n✔ the real switchboard routes every promoted and candidate area entry point (10.850561ms)\n✔ a routed document that matches no placement pattern is reported, and an ambiguous switchboard route is surfaced (2.402254ms)\n✔ strict candidate status includes untracked Markdown but not ignored draft files (12.240735ms)\ngenerate-doc-inventory: identity registry (commit c9c88aad123d4ffea3588ba74ebe8aed4c184c56) is bound to c18673cab5dd95995779a01b4490b18080e95b8a; no carry-forward needed\ngenerate-doc-inventory: wrote plans/260925-documentation-authority-unification/reports/doc-inventory.json and plans/260925-documentation-authority-unification/reports/doc-inventory.md\n✔ row-set conservation rejects a previous claim id that is neither live, gap nor retired (3.57076ms)\n✔ two different target owners on one semantic claim are rejected, one shared owner is accepted (6.880682ms)\n✔ separate noncanonical evidence payload carriers do not compete for semantic ownership (1.609493ms)\n✔ evidence provenance cannot exempt canonical owners or other noncanonical kinds (1.488916ms)\n✔ a claim row without a disposition or with one outside the vocabulary is rejected (0.37488ms)\n✔ a disposition that requires a target owner is rejected without one, for every such disposition (1.081743ms)\n✔ legacy growth reported by the ratchet becomes a conservation finding (5.530176ms)\n✔ checkConservation separates fatal invariants from open data (2.200803ms)\n✔ a registry stays bound to later commits that change nothing in scope, and to none that do (74.73758ms)\n✔ generation and the gates accept a registry bound to an earlier commit with the same in-scope tree (113.562866ms)\n✔ refresh reuses a bound registry and carries identity forward when the in-scope tree changed (117.025014ms)\n✔ gates CLI: open conservation data is reported by default and fatal in strict mode; a lost claim id is always fatal (160.821519ms)\n✔ gates CLI combines repeated decision inputs and rejects a duplicate across inputs (170.164798ms)\n✔ gates CLI rejects each unreadable or empty decision input instead of ignoring later flags (76.764596ms)\n✔ gates CLI names the refresh command with the current commit when the shards are missing (26.540194ms)\n✔ a retired row without a vocabulary disposition is not a recorded removal (0.48186ms)\n✔ a partial-carry row is open data that blocks the cutover, scoped like the other open checks, and a decision for it names the remainder (1.843629ms)\n✔ identical source units that name different owners are reported as open data (0.343648ms)\n✔ the inventory must describe the current tree and the registry on disk (29.018019ms)\n✔ a targetAnchor is checked against the headings of the target document at the inventory commit (25.257059ms)\n✔ gates CLI strict mode refuses to run without its conservation inputs, and a stale inventory is always fatal (156.307395ms)\n✔ a reviewed decision on a registry gap resolves it while a pending decision does not (35.732559ms)\n✔ a registry gap decision overlays the gap row and reports an unknown, repeated or incomplete one (0.347029ms)\n✔ a reviewed decision is bound to its target unit and detects current digest drift (43.233793ms)\n✔ blocking pairs only with unknown-blocking, a file is decided once, and an unknown-blocking gap stays open (0.382391ms)\n✔ a scope that is an option or matches no inventory path is reported (0.159197ms)\n✔ a file decision replaces the proposed disposition, rationale and target owner of its item (0.207693ms)\n✔ each rule violated by a claim decision is reported with its own finding type (0.820184ms)\n✔ a claim decided twice, in one shard or across shards, is reported once as a duplicate (0.168529ms)\n✔ file decisions naming an unknown path or violating the vocabulary are reported (0.22768ms)\n✔ with decisions, a decided owner that is a promoted or candidate platform document counts as a valid target owner (0.210299ms)\n✔ loadDecisionShards reads one file or a directory in name order and rejects malformed input (1.787299ms)\n✔ a scope restricts every open conservation check to rows whose source path is in scope (0.511847ms)\n✔ a scope matches whole path segments and an empty scope changes nothing (0.214641ms)\n✔ checkConservation scopes the open data and leaves the invariants global (0.227708ms)\n✔ candidate units not named by a source decision are open data rather than invariant corruption (4.815366ms)\n✔ legacy source scope checks the target area including unnamed sibling documents, not unrelated areas (0.476238ms)\n✔ candidate self references cannot conceal invented units and a parent anchor does not own unnamed children (0.524963ms)\n✔ previous shards do not acquire new reverse-review obligations implicitly (0.261916ms)\n✔ script-proven exact and mirror rows name only their expanded units, not an entire target area (0.528459ms)\n✔ a committed independently accepted candidate-native-navigation receipt closes only its bound unit (91.406817ms)\n✔ a committed independently accepted structural-frame receipt closes only its bound unit (70.356847ms)\n✔ a committed independently accepted bookkeeping receipt closes only its bound unit (63.235308ms)\n✔ reverse conservation leaves its unit open with an uncommitted receipt (41.921525ms)\n✔ reverse conservation leaves its unit open with an uncommitted review report (51.5001ms)\n✔ reverse conservation leaves its unit open with a non-accepted verdict (62.148895ms)\n✔ reverse conservation leaves its unit open with an unapproved reference (46.021824ms)\n✔ reverse conservation leaves its unit open with a class outside the fixed list (50.408813ms)\n✔ reverse conservation leaves its unit open with a reviewer who authored the receipt in the same session on another date (49.221272ms)\n✔ reverse conservation leaves its unit open with missing row authorship (51.245162ms)\n✔ reverse conservation leaves its unit open with missing receipt session authorship (46.343912ms)\n✔ reverse conservation leaves its unit open with missing shard authorship with the opt-in flag disabled (47.030095ms)\n✔ reverse conservation leaves its unit open with a script pretending to author a classification (49.020871ms)\n✔ reverse conservation leaves its unit open with a reviewer identity different from the report (57.78734ms)\n✔ reverse conservation leaves its unit open with a changed candidate unit (53.46237ms)\n✔ reverse conservation leaves its unit open with a moved unit path (46.030437ms)\n✔ reverse conservation leaves its unit open with a moved unit heading (53.297079ms)\n✔ reverse conservation leaves its unit open with a report for a different class (55.421968ms)\n✔ reverse conservation leaves its unit open with a report for a different shown-text digest (49.967695ms)\n✔ classification proofs read committed receipt bytes, not a later working-tree rewrite (58.374262ms)\n✔ classification report and receipt pins must be ancestors of the inventory commit (51.147029ms)\n✔ the shard loader rejects a non-array classification reference list (48.213243ms)\n✔ heading classification approval is invalidated when the shown section changes without changing its heading identity (65.914765ms)\n✔ a classification receipt does not close a unit with a forged receipt payload (48.526126ms)\n✔ a classification receipt does not close a unit with a stale receipt payload digest (49.675586ms)\n✔ a classification receipt does not close a unit with a stale reviewed payload digest (53.825645ms)\n✔ an ordinary classification receipt cannot replace checkpoint sensitivity review (42.782473ms)\n✔ substantive candidate content closes only after an independently accepted current-code check (64.50003ms)\n✔ substantive candidate content stays open with missing current evidence (48.971015ms)\n✔ substantive candidate content stays open with a stale assessment (56.624815ms)\n✔ substantive candidate content stays open with a false assessment (58.824744ms)\n✔ substantive candidate content stays open with a different reviewed evidence digest (65.001648ms)\n✔ substantive candidate content stays open with a rework verdict (64.534317ms)\n✔ substantive candidate content stays open with an author acting as reviewer (48.843815ms)\n✔ current-code evidence becomes stale when its cited implementation changes (92.337585ms)\n✔ an independently accepted observed command can prove candidate-native behaviour (108.826608ms)\n✔ a failed command is not a true-and-current behaviour proof (77.437703ms)\n✔ independently reviewed historical fenced content closes by provenance bytes rather than current truth (67.678875ms)\n✔ a complete historical paragraph can close when its bytes occur in the provenance blob (60.314731ms)\n✔ history snapshot remains open with canonical document kind (55.362638ms)\n✔ history snapshot remains open with missing provenance pin (54.082747ms)\n✔ history snapshot remains open with different provenance path (55.219112ms)\n✔ history snapshot remains open with different provenance commit (57.320139ms)\n✔ history snapshot remains open with different source blob digest (61.456676ms)\n✔ history snapshot remains open with only a fragment of the full fenced body proven (60.927414ms)\n✔ history snapshot remains open with extra content outside the provenance blob (62.204182ms)\n✔ history snapshot remains open with normalized rather than literal bytes (64.471136ms)\n✔ history snapshot remains open with snapshot metadata instead of historical payload (64.099928ms)\n✔ history snapshot remains open with different independently reviewed evidence digest (62.714874ms)\n✔ history snapshot remains open with uncommitted independent review (59.2932ms)\n✔ history snapshot remains open with non-accepted verdict (73.724837ms)\n✔ history snapshot remains open with pending receipt reference (53.408647ms)\n✔ history snapshot remains open with same author and reviewer session (56.498986ms)\n✔ a snapshot proof is invalidated by a committed provenance change even when payload bytes are unchanged (98.395632ms)\n✔ a later provenance line cannot replace an unpinned snapshot provenance (91.971253ms)\n✔ coverage honors explicit source paths and prefix maps but not target mentions or neighboring prefixes (2.337518ms)\n✔ rebind preserves review only for one digest match and otherwise returns rows to pending (0.57517ms)\n✔ snapshot uses merged decisions in the ledger schema shape and verifies both content and digest (3.966525ms)\n✔ identical text moved under another heading loses review while same-context anchor shifts retain it (0.282228ms)\n✔ coverage excludes canonical and non-authority items and a heading range covers only its rows (0.767299ms)\n✔ review pack contains full source and target units and reverse unmatched candidate blocks (7.156308ms)\n✔ seeded review uses six real text mutations and scores missed defects and false flags (17.583651ms)\n✔ review application binds current digest and keeps rework and hold pending without inventing approval (8.245831ms)\n✔ valid source digest prefixes survive pack and review application with full seen-text bindings (4.258052ms)\n✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (1.2439ms)\n✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (3.868598ms)\n✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (1.659347ms)\n✔ the same reviewer session on another date is still the author session (0.339752ms)\n✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.43979ms)\n✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (2.743737ms)\n✔ review application requires a passing sensitivity result for the exact shown pack (4.031092ms)\n✔ approval cannot attach to target text or heading ancestry changed after the pack (4.109366ms)\n✔ approved rows retain the seen unit binding and their own report across review rounds (3.368985ms)\n✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (3.434314ms)\n✔ committed independent review permits a subsequent pack without passing unproven rows (52.044333ms)\n✔ the same session cannot review itself by changing identity prefix or date (46.754561ms)\n✔ reviewed manual rows require an author and cannot borrow a script identity (37.004526ms)\n✔ an uncommitted or mismatched verdict never approves a manual row (43.864603ms)\n✔ a later edit of a report cannot silently erase or replace an earlier pinned approval (45.021252ms)\n✔ review report pins from outside inventory ancestry cannot certify a row (29.457356ms)\n✔ authorship-required shards cannot omit their author session (31.909946ms)\n✔ escaped table pipes retain the exact reviewer note after parsing (44.884209ms)\n▶ new manual shards cannot disable required authorship or committed review evidence\n  ✔ authorSession remains required when the flag is undefined (2.724866ms)\n  ✔ authoredBy remains required when the flag is undefined (2.452131ms)\n  ✔ reviewReport remains required when the flag is undefined (0.129799ms)\n  ✔ authorSession remains required when the flag is false (2.993704ms)\n  ✔ authoredBy remains required when the flag is false (3.184522ms)\n  ✔ reviewReport remains required when the flag is false (0.164168ms)\n✔ new manual shards cannot disable required authorship or committed review evidence (49.021964ms)\n✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (135.901386ms)\n✔ the public seeded Markdown can be scored without exposing the seed or private selection key (306.273563ms)\n✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (281.592026ms)\n✔ a new shard cannot claim legacy compatibility by deleting author fields (71.867359ms)\n✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (192.5551ms)\n▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  ✔ target-digest (102.155531ms)\n  ✔ source-digest (87.934387ms)\n  ✔ authoredBy (82.249125ms)\n  ✔ authorSession (80.098192ms)\n  ✔ same-session (81.677716ms)\n✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (435.192978ms)\n▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  ✔ checkpoint 3 (169.820487ms)\n  ✔ checkpoint 6 (159.965363ms)\n  ✔ checkpoint 10 (163.104165ms)\n✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (493.443601ms)\nℹ tests 155\nℹ suites 0\nℹ pass 155\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3406.573537\n"
+  },
+  "links": {
+    "checked": 24,
+    "failures": [],
+    "links": [
+      "docs/platform/host-invocation-routing/spec.md",
+      "docs/platform/host-invocation-routing/roadmap.md",
+      "archive/plans/260915-host-invocation-r2-external-process/plan.md",
+      "archive/plans/260918-host-invocation-r3-remote-peer/plan.md",
+      "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral",
+      "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
+      "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rust-host-first-cost",
+      "archive/plans/260929-1501-metrics-friction-rust-native/plan.md",
+      "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-scope",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets",
+      "docs/architect/component-boundary/component-boundary-advisory.md",
+      "docs/platform/host-invocation-routing/roadmap.md#7-phase-d-add-the-next-native-read-route",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+      "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+      "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+      "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree",
+      "docs/platform/host-invocation-routing/spec.md#6-unknowns"
+    ]
+  },
+  "nativeHelperSources": {
+    "host": "import fs from 'node:fs';\nimport * as g from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst root='/home/vantt/projects/forgentX-phase00-documentation-authority-unification',p='plans/260925-documentation-authority-unification',area='docs/platform/host-invocation-routing';\nconst inventory=g.loadInventory('/tmp/phase06/continuation/new-inventory.json',{});\ndelete inventory.consumerEdges;delete inventory.inboundEdges;for(const item of inventory.items){delete item.consumerEdgeIds;delete item.consumers;}global.gc?.();\nconst registry=JSON.parse(fs.readFileSync('/tmp/phase06/continuation/registry.json','utf8')),vocabulary=JSON.parse(fs.readFileSync(root+'/'+p+'/claim-and-disposition-vocabulary.json','utf8'));\nconst shards=[...g.loadDecisionShards(root+'/'+p+'/pilot/decisions'),...g.loadDecisionShards(root+'/'+p+'/ledger/decisions')];\nconst host=shards.filter(s=>s.shard.startsWith('s3-host-invocation-'));\nconst sources=host.flatMap(s=>s.sources),scope=sources;\nconst unitsOf=g.buildConservationUnitLookup(root,inventory.commit);\nconst applied=g.applyDecisions(inventory,shards,{vocabulary,registry,repoRoot:root,unitsOf,targetAnchorsOf:g.buildTargetAnchorLookup(root,inventory.commit),targetUnitDigestOf:g.buildTargetUnitDigestLookup(root,inventory.commit)});\nconst sourceRows=applied.inventory.claimLedger.filter(r=>sources.includes(r.sourcePath));\nconst reverse=g.unreferencedCandidateRows(applied.inventory,shards,{scope,repoRoot:root});\nconst files=applied.inventory.items.filter(i=>i.path.startsWith(area+'/'));\nconst register=JSON.parse(fs.readFileSync(root+'/'+p+'/dropped-claims-register.json','utf8'));\nconst dropped=g.validateDroppedClaims(register,{registry:applied.registry,unitsOf,ledgerClaimIds:new Set(applied.inventory.claimLedger.map(r=>r.claimId))});\nconst result={commit:inventory.commit,applicationFindings:applied.findings,scope,sourceRows,sourceCount:sourceRows.length,pending:sourceRows.filter(r=>r.reviewStatus!=='reviewed').map(r=>r.claimId).sort(),unknownBlocking:sourceRows.filter(r=>r.disposition==='unknown-blocking'),reverse,files,droppedFindings:dropped,sourceIdsEqual:JSON.stringify(sourceRows.map(r=>r.claimId).sort())===JSON.stringify(host.flatMap(s=>s.claims.map(r=>r.claimId)).sort())};\nfs.writeFileSync('/tmp/phase06/continuation/native-proof.json',JSON.stringify(result,null,2)+'\\n');\nconsole.log(JSON.stringify({sourceCount:result.sourceCount,pending:result.pending.length,sourceIdsEqual:result.sourceIdsEqual,unknownBlocking:result.unknownBlocking.length,reverse:reverse.length,applicationFindings:applied.findings.length,droppedFindings:dropped}));\nif(sourceRows.length!==431||!result.sourceIdsEqual||result.unknownBlocking.length||applied.findings.length||dropped.length)process.exitCode=1;\n",
+    "closedAgent": "import fs from 'node:fs';\nimport * as gates from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst root='/home/vantt/projects/forgentX-phase00-documentation-authority-unification';\nconst plan='plans/260925-documentation-authority-unification';\nconst prior=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/closure-fixes-verification.json','utf8'));\nconst scope=[];for(let i=0;i<prior.gates[2].command.length;i++)if(prior.gates[2].command[i]==='--scope')scope.push(prior.gates[2].command[i+1]);\nconst inventory=gates.loadInventory('/tmp/phase06/continuation/new-inventory.json',{});\ndelete inventory.consumerEdges;delete inventory.inboundEdges;for(const item of inventory.items){delete item.consumerEdgeIds;delete item.consumers;}\nif(global.gc)global.gc();\nconst registry=JSON.parse(fs.readFileSync('/tmp/phase06/continuation/registry.json','utf8'));\nconst vocabulary=JSON.parse(fs.readFileSync(root+'/'+plan+'/claim-and-disposition-vocabulary.json','utf8'));\nconst shards=[...gates.loadDecisionShards(root+'/'+plan+'/pilot/decisions'),...gates.loadDecisionShards(root+'/'+plan+'/ledger/decisions')];\nconst merged=gates.applyDecisions(inventory,shards,{vocabulary,registry,repoRoot:root,unitsOf:gates.buildConservationUnitLookup(root,inventory.commit),targetAnchorsOf:gates.buildTargetAnchorLookup(root,inventory.commit),targetUnitDigestOf:gates.buildTargetUnitDigestLookup(root,inventory.commit)});\nconst reverse=gates.unreferencedCandidateRows(merged.inventory,shards,{scope,repoRoot:root});\nconst list=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/candidate-unverified-agent-coordination.json','utf8')).rows;\nconst key=r=>[r.path,r.anchor,r.unitDigest].join('\\0');\nconst listed=new Set(list.map(key)),actual=new Set(reverse.map(key));\nconst missing=list.filter(r=>!actual.has(key(r))),extra=reverse.filter(r=>!listed.has(key(r)));\nconst holds=merged.inventory.claimLedger.filter(r=>gates.pathInScope(r.sourcePath,scope)&&r.reviewStatus!=='reviewed').map(r=>r.claimId).sort();\nconst expectedHolds=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/closure-fixes-applied.json','utf8')).holdsUnchanged.slice().sort();\nconst result={inventoryCommit:inventory.commit,holds,holdsEqual:JSON.stringify(holds)===JSON.stringify(expectedHolds),listedUnits:list.length,actualReverseUnits:reverse.length,listedMissing:missing,additionalReverseUnits:extra,exactEquality:missing.length===0&&extra.length===0,identityEqualityOfListedUnits:list.every(r=>reverse.some(u=>u.claimId===r.claimId&&key(u)===key(r))),applicationFindingTypes:[...new Set(merged.findings.map(f=>f.type))]};\nresult.actualReverseIdentityRows=reverse;result.matchingListedIdentityRows=list.filter(r=>reverse.some(u=>u.claimId===r.claimId&&key(u)===key(r)));\nresult.reverseFileItems=merged.inventory.items.filter(i=>reverse.some(r=>r.path===i.path));result.unreviewedSourceRows=merged.inventory.claimLedger.filter(r=>gates.pathInScope(r.sourcePath,scope)&&r.reviewStatus!=='reviewed');result.currentSourceUnits=result.unreviewedSourceRows.map(r=>({claimId:r.claimId,path:r.sourcePath,anchor:r.sourceAnchor,unit:gates.buildConservationUnitLookup(root,inventory.commit)(r.sourcePath).find(u=>u.anchor===r.sourceAnchor)}));\nconst exceptionFile=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/identical-unit-exceptions.json','utf8'));const grouped=new Map();for(const row of merged.inventory.claimLedger){if(!gates.pathInScope(row.sourcePath,scope)||!row.sourceUnitDigest||!row.targetOwner)continue;const group=grouped.get(row.sourceUnitDigest)||{digest:row.sourceUnitDigest,ids:[],owners:new Set()};group.ids.push(row.claimId);group.owners.add(row.targetOwner);grouped.set(row.sourceUnitDigest,group);}const actualGroups=[...grouped.values()].filter(g=>g.owners.size>1).map(g=>({digest:g.digest,ids:g.ids.sort()})).sort((a,b)=>a.digest.localeCompare(b.digest));const expectedGroups=exceptionFile.groups.map(g=>({digest:g.digest,ids:g.sourceUnits.map(u=>u.claimId).sort()})).sort((a,b)=>a.digest.localeCompare(b.digest));result.exceptionGroups=actualGroups.length;result.exceptionDigestEquality=JSON.stringify(actualGroups.map(g=>g.digest))===JSON.stringify(expectedGroups.map(g=>g.digest));result.exceptionIdEquality=JSON.stringify(actualGroups)===JSON.stringify(expectedGroups);result.exceptionActual=actualGroups;result.exceptionExpected=expectedGroups;fs.writeFileSync('/tmp/phase06/continuation/agent-equality.json',JSON.stringify(result,null,2)+'\\n');\nconsole.log(JSON.stringify({holds:holds.length,holdsEqual:result.holdsEqual,listed:list.length,reverse:reverse.length,missing:missing.length,additional:extra.length,listedIdentityEquality:result.identityEqualityOfListedUnits,exactEquality:result.exactEquality}));\n"
+  },
+  "reproduction": {
+    "baseRegistry": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "scratchRegistry": "/tmp/phase06/continuation/registry.json",
+    "steps": [
+      "Copy baseRegistry to scratchRegistry; do not rebuild or seed identities.",
+      "Native refresh scratchRegistry at f1e84afbad9956c919aa5c8a2cf3535bd90371f3, then at b69197f88749fc6e1acc14797186f039a19e9793.",
+      "Overlay ledger/host-invocation-rebound-successors.json rows onto scratchRegistry.retiredUnits by claimId; retain reviewStatus pending.",
+      "Native refresh at b69197f88749fc6e1acc14797186f039a19e9793 with --json-out /tmp/phase06/continuation/new-inventory.json and --md-out /tmp/phase06/continuation/new-inventory.md. This tree remains bound through the request/report commits.",
+      "Run the four gate argv above and the two captured native helpers. Compare full reverse tuples to the committed candidate list and old known IDs to all live/retired/gap IDs."
+    ],
+    "registrySha256": "b1377c30b3d127279d5dbdaf850ab42062fecc48fb3b63a04957303df97af843"
+  },
+  "digests": {
+    "successors": "cd196e7b55b003611178a3e79a73a0f889ef7a6ef894a63f808b8a8ded7797d3",
+    "accounting": "b6c1340e1fd763675938202439707c50d79751ef1ef6db5e86ed2499bc85d195",
+    "candidateList": "3113e22f5b13c6475a2a9f552274ee15e33d71d78a00ff00590bb0e550476fec"
+  },
+  "limits": [
+    "No new source or successor verdict authored.",
+    "Global strict closure, fresh readers, batch closure and Step 4 remain unstarted.",
+    "The 42 new native candidate-only identity-gap records remain unverified; no guessed binding.",
+    "Owner question about the npm-bin removal promise remains open; accepted fence/owner choices are unchanged.",
+    "The actual working identity registry remains the last closed-batch registry; scratch continuation is reproducible from it and the pending successor ledger."
+  ]
+}

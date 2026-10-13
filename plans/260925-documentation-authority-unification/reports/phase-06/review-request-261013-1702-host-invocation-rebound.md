@@ -12,7 +12,7 @@ The 16 literal restoration approvals and contextual two-member exception are rec
 
 Current route recount from packages/host-runtime/contracts/command-routes.json: 75 selectors, 70 legacy-cli, five native (convention, friction, gate-bypass, metrics, version). The dated R2 merge evidence and September route snapshot retain their historical counts. The retained no-setup sentence has a labelled status note backed by src/cli/command-registry.mjs:1439-1454 and bin/fgos.mjs:3774. HI-I027 keeps never hardcoded; its spec status stays accepted-not-implemented.
 
-Use the ordinary five-column report for this bounded follow-up: Claim | Verdict | Note | Source digest | Target digest. Include Reviewer, Author session matching the original row author, and Review mode: ordinary. Source and target unit digests below are full SHA256; full heading sections are shown so unchanged heading bytes cannot hide changed payloads. Also inspect each changed-text block for the authorized navigation/truth correction. Do not reopen unchanged checkpoint units.
+Use the ordinary five-column report for this bounded follow-up: Claim | Verdict | Note | Source digest | Target digest. Include Reviewer and Review mode: ordinary. Source-decision reports use Author session: codex-session:1@2026-10-11; the separate native-successor report uses Author session: codex-session:3@2026-10-13. These are two tables within this one bounded request, not a new whole-batch review. Source and target unit digests below are full SHA256; full heading sections are shown so unchanged heading bytes cannot hide changed payloads. Also inspect each changed-text block for the authorized navigation/truth correction. Do not reopen unchanged checkpoint units.
 
 Machine sidecar: host-invocation-rebound-accounting.json. It contains full source/previous-target/current-target objects, section payload digests, decisions, original applied notes, every changed unit and complete-file before/after digests. Prior reviewed identities stay auditable. Proof results will be recorded separately in host-invocation-rebound-verification.json and progress.md after the request commit.
 
@@ -6649,3 +6649,9 @@ Unit digest: c5472bc42b8d6e56775d17e7d61cd7684d82b185d7e4f9ba141f83ecb15d4a29
 | Chat adapter implementation | `rg` over `src`, `bin`, `packages`, `apps`, `herdr-dashboard` | No current chat host adapter found. |
 | Targeted tests | `cargo test -p fgos-host-runtime -p fgos --quiet` | Passed on 2026-09-14. |
 `````
+
+## Native conservation list update
+
+The exact candidate-unverified list is refreshed mechanically from the same native reverse output: 588 identity/path/anchor/digest/status tuples, formerly 572. No receipt or truth approval is added. All file statuses are the existing candidate/history statuses. Native comparison has zero missing/additional tuples, exact contextual exception membership, all 431 source IDs present, 33 source rows pending, and zero lost known IDs. Closed Agent Coordination stays exactly three holds, 342 exception groups and 457 reverse tuples. The 35 pending candidate successors are conservation accounting, with no independent acceptance claimed. See candidate-unverified-host-invocation-routing.json and the final verification artifact; this list update does not close the batch.
+
+The native refresh also retains 42 new candidate-only identity-gap records from edited non-stable anchors. These are explicit unverified candidate identities, not lost legacy source IDs or proposed guessed bindings. They remain open in global conservation and are enumerated in the verification artifact. The scoped strict proof covers all six unchanged legacy files; global strict closure is not claimed.
