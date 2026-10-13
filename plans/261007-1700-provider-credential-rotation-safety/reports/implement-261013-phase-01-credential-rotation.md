@@ -63,3 +63,20 @@ Decisions by the Lead applied as given. Review: `code-review-261013-credential-r
 | L3 | No change. | - |
 
 Not done: the review's suggestion of a provider/model argument on the probe call (decision H2 only scopes the entry; the probe still uses the CLI default model, so a store whose default model belongs to another provider can still renew nothing for the dispatched provider, reported as `not-renewed` with cooldown).
+
+## Fix round 2
+
+Review: `code-review-261013-0943-credential-rotation-fix-round-independent.md`; cleanup from `design-critique-261013-0948-credential-rotation-code-organization.md`. Tests are in `provider-credential-renewal.test.mjs` and `provider-credential-probe.test.mjs`.
+
+| Finding | Change |
+|---|---|
+| High: renewed copy deleted when the source read failed | `applyRenewedCredential` returns `apply-deferred` for a source that is unreadable, half-written, an omp store that cannot be opened, or an entry unidentified at apply time; a copy is dropped only on `applied`, `unchanged` (source read, copy not newer) or `unreadable` (copy itself malformed). Scratch moves to `pending/`, leftovers stay, write-back stages (`copyIsNewer` is three-valued) and its status comes from the apply outcome. |
+| Medium: lone entry of another provider | The single-entry shortcut also needs the owner match (Codex has no owner). |
+| Medium: unlock probe unbounded | `withKillTimeout` moved to `provider-credential-probe.mjs` and used by both refresh-ahead and `createCredentialProbe`. |
+| Low: copy without refresh token | Never replaces a source entry that has one. |
+| Low: module header | States the real apply rule. |
+| Cleanup | One `expandCredentialHome` (`provider-credential-probe.mjs`, handles `~`, `${HOME}`, `$HOME`) for probe, renewal and bwrap. The Codex copy in bwrap goes through `copyCredentialFiles`; `provisionSelectedCodexCredential` is now `provisionSelectedCredential`. `SAFE_KEY` dropped: `providerAccountDir` rejects the same ids (tested). |
+
+Left as is: `expandHome` in `src/setup/registrations.mjs` (doctor check) returns the input string for a non-absolute or empty home and never null, so the doctor can name the bad path; sharing the helper would change its messages. A missing Codex home at dispatch now reads "selected credential home is not readable", as `copyCredentialFiles` words it.
+
+Known cost: a write-back whose source entry cannot be identified stages the pane copy only when it holds a refresh token the source does not; an unrenewed copy is dropped as before, so pending copies do not pile up per dispatch.

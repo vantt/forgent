@@ -65,6 +65,8 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 
 ## Validation Log
 
+- Component boundary: confinement now calls the credential renewal module when removing a private home (dependency confinement → provider capacity, for the account lock only); `docs/platform/component-boundary.md` and `docs/specs/confinement-authority.md` §13.2 updated.
+
 ### Session 1 — 2026-10-12 (re-validation against main @ `97ca636f9`)
 
 #### Verification Results
