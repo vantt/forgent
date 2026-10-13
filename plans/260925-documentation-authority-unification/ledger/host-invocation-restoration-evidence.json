@@ -1,0 +1,1719 @@
+{
+  "version": 1,
+  "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+  "authorSession": "codex-session:1@2026-10-11",
+  "groups": [
+    {
+      "id": "dropped-002",
+      "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio…",
+      "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-contract-versioning",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-24",
+            "githubAnchor": "unheaded-block-24",
+            "stableAnchor": "unheaded-block-24",
+            "title": "Unheaded block 24",
+            "startLine": 115,
+            "endLine": 115,
+            "textDigest": "89b1b5c795e9d4d724dff345c759e318932520b3d3aaeb510f32d67d8ff72bb2",
+            "sample": "**Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range intersection — no runtime \"best effort\" ",
+            "identityFingerprint": "e8b96607ea3e82e9f99a0a37cca88f8fd9eff7b659b1ac6b0a2403867b5483cf",
+            "ancestry": [
+              "Host Invocation And Provider Routing Architecture",
+              "5. Core Contracts"
+            ],
+            "text": "**Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range intersection — no runtime \"best effort\" coercion. An incompatible change gets a new operation variant or major contract version per the owning component's policy; adapters may perform an explicit registered upgrade/downgrade transform, recorded in diagnostics — the router never reshapes payloads implicitly."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-43",
+            "githubAnchor": "unheaded-block-43",
+            "stableAnchor": "unheaded-block-43",
+            "title": "Unheaded block 43",
+            "startLine": 186,
+            "endLine": 186,
+            "textDigest": "4d3281f42d394eb17e56917b59855bebeac888336ff53ddc2299a5d34fe70cd0",
+            "sample": "For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never invents one. Read-only does not imply ret",
+            "identityFingerprint": "5571007e7e7371d2ee7e2173d7ee8a9ed80a1028f63c5f5796cf97d918621a4a",
+            "ancestry": [
+              "Host Invocation And Provider Routing Architecture",
+              "8. Failure, Cancellation, Lifecycle, And Human Input"
+            ],
+            "text": "For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never invents one. Read-only does not imply retry-safe when the provider has external effects — the catalog's declared idempotency decides."
+          }
+        }
+      ],
+      "historyPhrase": "**Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the ",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "Exact request/outcome version-pair matching is implemented; host/provider range intersection and registered transforms remain selected design, not an implemented promise here.",
+        "code": [
+          "packages/host-runtime/rust/src/operation_provider_router.rs:108-119",
+          "packages/host-runtime/rust/src/contracts.rs:174-203"
+        ]
+      },
+      "sourceBlob": "87dfcee9223924979f3ae8fe31ea8f6a0fa51f89",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-003",
+      "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te…",
+      "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-41",
+            "githubAnchor": "unheaded-block-41",
+            "stableAnchor": "unheaded-block-41",
+            "title": "Unheaded block 41",
+            "startLine": 175,
+            "endLine": 182,
+            "textDigest": "7de4e5dcb2bcec725d69553ab6c8c92b3a1f3204c3bda25e1210ac8ba1c4dd31",
+            "sample": "```txt\nreceived -> admitted | admission-refused\n         -> selected | selection-refused\n         -> granted | grant-refused\n         -> dispatched\n         -> succeeded | semantic",
+            "identityFingerprint": "de294fb4fa837f5523d51bf793d3cdac1df9989f0ae956c198bbb80fa4450d6a",
+            "ancestry": [
+              "Host Invocation And Provider Routing Architecture",
+              "8. Failure, Cancellation, Lifecycle, And Human Input"
+            ],
+            "text": "```txt\nreceived -> admitted | admission-refused\n         -> selected | selection-refused\n         -> granted | grant-refused\n         -> dispatched\n         -> succeeded | semantic-failed | cancelled | deadline-exceeded\n                       | provider-failed | completion-unknown\n```"
+          }
+        }
+      ],
+      "historyPhrase": "received -> admitted | admission-refused",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "The runtime admits before selection, grants before dispatch and writes a terminal lifecycle record. The retained arrow chain is the design vocabulary, not an assertion that every arrow is a separately persisted state.",
+        "code": [
+          "packages/host-runtime/rust/src/invocation_service.rs:161-234",
+          "packages/host-runtime/rust/src/invocation_service.rs:494-570"
+        ]
+      },
+      "sourceBlob": "87dfcee9223924979f3ae8fe31ea8f6a0fa51f89",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-004",
+      "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp…",
+      "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "restoreAnchor": "restored-physical-placement-layout-tree",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-46",
+            "githubAnchor": "unheaded-block-46",
+            "stableAnchor": "unheaded-block-46",
+            "title": "Unheaded block 46",
+            "startLine": 194,
+            "endLine": 218,
+            "textDigest": "929b1469dbdfbbdfadf002fdd962c3bfd29976b3f19680af12997836a904fde9",
+            "sample": "```txt\nCargo.toml                           # workspace root; herdr-plugin/ excluded in R1\napps/\n  fgos/                              # crate `fgos`, binary `fgos` — thin CLI adapt",
+            "identityFingerprint": "46501f185f6f6881f8bb7f6684709480c507fa466a29670c50574fdb69e74984",
+            "ancestry": [
+              "Host Invocation And Provider Routing Architecture",
+              "9. Physical Placement"
+            ],
+            "text": "```txt\nCargo.toml                           # workspace root; herdr-plugin/ excluded in R1\napps/\n  fgos/                              # crate `fgos`, binary `fgos` — thin CLI adapter\n    src/cli_projector.rs             # argv -> OperationRequest\n    src/cli_presenter.rs             # ProviderOutcome -> fgos.v1 / exit code\n    src/legacy_exec.rs               # CommandRouteDescriptor lookup + Node payload exec\n  gateway/                           # later: thin REST/MCP/remote adapter (repo-layout-vision)\n\npackages/\n  host-runtime/rust/                 # crate `fgos-host-runtime` — the kernel\n    src/contracts.rs                 # OperationId, HostInvocation, OperationRequest, ProviderOutcome, ...\n    src/operation_provider_router.rs\n    src/invocation_service.rs\n    src/authority_gate.rs\n    src/providers/builtin.rs\n    src/remote_host_use_case.rs      # R3\n    src/chat_host_use_case.rs        # later\n    src/registry_linker.rs           # R2\n    src/providers/{external_process,external_wasm}.rs   # R2+\n  distribution/rust/                 # crate `fgos-distribution` — owns distribution.build.show\n  component-protocol/{rust,node}/    # R2: EncodedMessage, framed protocol\n\nbin/fgos.mjs, src/, scripts/, core/ ...   # the Node payload, unmoved (Legacy CLI Transition §2)\n```"
+          }
+        }
+      ],
+      "historyPhrase": "Cargo.toml                           # workspace root; herdr-plugin/ excluded in R1",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename.",
+        "code": [
+          "Cargo.toml:1-17",
+          "packages/host-runtime/rust/src/registry.rs:19-69"
+        ]
+      },
+      "sourceBlob": "87dfcee9223924979f3ae8fe31ea8f6a0fa51f89",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-005",
+      "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option…",
+      "source": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "restoreAnchor": "restored-class-definitions",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-7",
+            "githubAnchor": "unheaded-block-7",
+            "stableAnchor": "unheaded-block-7",
+            "title": "Unheaded block 7",
+            "startLine": 30,
+            "endLine": 30,
+            "textDigest": "ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab",
+            "sample": "**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceabl",
+            "identityFingerprint": "b2af22952c2167b383a43d65d06bfcea5f2fd16bbd5e194026f066a5c86586f1",
+            "ancestry": [
+              "External Provider Protocol",
+              "1. Component Classes"
+            ],
+            "text": "**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceable by default; may expose extension points, but a plugin implementing one does not become the authority owner of the core component. Examples: Work Lifecycle, Host Invocation, authority gating, provider routing, DispatchPlan selection, Assignment/Run/RunResult contracts, init/doctor health."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-8",
+            "githubAnchor": "unheaded-block-8",
+            "stableAnchor": "unheaded-block-8",
+            "title": "Unheaded block 8",
+            "startLine": 32,
+            "endLine": 32,
+            "textDigest": "1b283b4d1bd5d7722387e4254b2191ac227747531e563fddd61cd1116709e465",
+            "sample": "**Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configuration, edition, or environment. Follows",
+            "identityFingerprint": "ffe5c60b3de955e52d9956b33112d720b731bac248d1893ff66c022bf10383ca",
+            "ancestry": [
+              "External Provider Protocol",
+              "1. Component Classes"
+            ],
+            "text": "**Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configuration, edition, or environment. Follows fgOS release discipline, compatibility policy, init/doctor registration, docs, tests. More trustworthy than a user plugin because fgOS ships it, but disabling it must not corrupt core state or block boot. Examples: optional domain packages, optional coordination protocol packs, optional Herdr/dashboard surfaces."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-10",
+            "githubAnchor": "unheaded-block-10",
+            "stableAnchor": "unheaded-block-10",
+            "title": "Unheaded block 10",
+            "startLine": 36,
+            "endLine": 40,
+            "textDigest": "f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29",
+            "sample": "| Component class | Common invocation mechanism | Notes |\n|---|---|---|\n| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically",
+            "identityFingerprint": "b103896701ba97a0b888ceaf2cce79e0a935a152df138f0739d2e55accb2db4b",
+            "ancestry": [
+              "External Provider Protocol",
+              "1. Component Classes"
+            ],
+            "text": "| Component class | Common invocation mechanism | Notes |\n|---|---|---|\n| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically released. |\n| Packaged extension | Built-in, ExternalProcess, or ExternalWasm | fgOS-owned but optional; install/init/doctor aware. |\n| User plugin | ExternalProcess or ExternalWasm | User-owned, independently installed; manifest-linked and capability-gated. |"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-11",
+            "githubAnchor": "unheaded-block-11",
+            "stableAnchor": "unheaded-block-11",
+            "title": "Unheaded block 11",
+            "startLine": 42,
+            "endLine": 42,
+            "textDigest": "242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4",
+            "sample": "This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin.",
+            "identityFingerprint": "81e7dd302187e241845244fd8796763bac8609c0916447f877800504d279a807",
+            "ancestry": [
+              "External Provider Protocol",
+              "1. Component Classes"
+            ],
+            "text": "This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin. Packaging and authority follow component class; runtime calling details follow invocation mechanism."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-12",
+            "githubAnchor": "unheaded-block-12",
+            "stableAnchor": "unheaded-block-12",
+            "title": "Unheaded block 12",
+            "startLine": 46,
+            "endLine": 52,
+            "textDigest": "d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05",
+            "sample": "```rust\nenum Provider {\n    BuiltIn(Arc<dyn OperationProvider>),\n    ExternalProcess(ProcessRpcClient),\n    ExternalWasm(WasmComponent),\n}\n```",
+            "identityFingerprint": "e40d28f9b455614ef14e3cbb2030adb86c6d2875d0bad2aaba9d150983671ca7",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "```rust\nenum Provider {\n    BuiltIn(Arc<dyn OperationProvider>),\n    ExternalProcess(ProcessRpcClient),\n    ExternalWasm(WasmComponent),\n}\n```"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-14",
+            "githubAnchor": "unheaded-block-14",
+            "stableAnchor": "unheaded-block-14",
+            "title": "Unheaded block 14",
+            "startLine": 56,
+            "endLine": 56,
+            "textDigest": "ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d",
+            "sample": "**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the ow",
+            "identityFingerprint": "c3acf07951633a18fa9ff0192baf550e31516681aa932e7320ca7fad70fc86c9",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the owning port and authority boundary. Normal mechanism for core components, and may serve packaged extensions fgOS chooses to compile in."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-15",
+            "githubAnchor": "unheaded-block-15",
+            "stableAnchor": "unheaded-block-15",
+            "title": "Unheaded block 15",
+            "startLine": 58,
+            "endLine": 58,
+            "textDigest": "e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb",
+            "sample": "**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess,",
+            "identityFingerprint": "8384afd0fed63c4a3905a605e9d6125f8ea30da0cbe73d41e707976365832f75",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess, or other OS capabilities. Crash/restart and resource isolation are part of the adapter contract."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-16",
+            "githubAnchor": "unheaded-block-16",
+            "stableAnchor": "unheaded-block-16",
+            "title": "Unheaded block 16",
+            "startLine": 60,
+            "endLine": 60,
+            "textDigest": "4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522",
+            "sample": "**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions ar",
+            "identityFingerprint": "9254c2e6f8470b52be510e62b101eca7d63083ba3f441806c5887e23ae3411f9",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions are explicit capabilities, not ambient access."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-17",
+            "githubAnchor": "unheaded-block-17",
+            "stableAnchor": "unheaded-block-17",
+            "title": "Unheaded block 17",
+            "startLine": 62,
+            "endLine": 62,
+            "textDigest": "f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed",
+            "sample": "Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WAS",
+            "identityFingerprint": "c5e449d709bb09a6789be47634279e77a825a315af3046ff9ca874fc5c729dc1",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WASM boundaries give."
+          }
+        }
+      ],
+      "historyPhrase": "**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally stat",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped.",
+        "code": [
+          "packages/host-runtime/rust/src/contracts.rs:377-393"
+        ]
+      },
+      "sourceBlob": "8f9cff691d411cf3081a254fbad1569ea363fcab",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-006",
+      "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL…",
+      "source": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#same-process-built-ins-versus-runtime-extensions",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "Same-Process Built-Ins Versus Runtime Extensions",
+            "anchor": "same-process-built-ins-versus-runtime-extensions",
+            "githubAnchor": "same-process-built-ins-versus-runtime-extensions",
+            "stableAnchor": "h-a1e6decf2e7c",
+            "startLine": 64,
+            "endLine": 64,
+            "textDigest": "f1565b0ed8c1af0435bce512a1cc4cc653933ca8f467759cc98064b94344973f",
+            "sample": "Same-Process Built-Ins Versus Runtime Extensions",
+            "sectionPayloadDigest": "7ebc9148a52b87a2070d339bd4ac7627768d8c6301ca26961693aa613e448cda",
+            "followingBlockDigest": "7ebc9148a52b87a2070d339bd4ac7627768d8c6301ca26961693aa613e448cda",
+            "identityFingerprint": "e1a78abd3e03ea6f62f84664b9991c68d8ed1ad3bf0adafb2537dc61f30f4f1d",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "### Same-Process Built-Ins Versus Runtime Extensions",
+            "sectionText": "### Same-Process Built-Ins Versus Runtime Extensions\n\nThe router presents one semantic interface without forcing one deployment mechanism on every provider. A built-in provider is the fastest path — no serialization, process startup, context switch, or runtime ABI — appropriate because host and foundation component release atomically. An external extension pays a runtime boundary in exchange for language neutrality, failure isolation, and no-recompile installation: a persistent process is the baseline for OS-capability plugins; WASM is the stronger sandbox for pure/capability-scoped ones. The architecture does not promise both hot replacement and direct function-call performance for the same provider — component class decides release ownership and authority posture, invocation mechanism decides the runtime calling path behind the semantic port."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-18",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-18",
+            "githubAnchor": "unheaded-block-18",
+            "stableAnchor": "unheaded-block-18",
+            "title": "Unheaded block 18",
+            "startLine": 66,
+            "endLine": 66,
+            "textDigest": "7ebc9148a52b87a2070d339bd4ac7627768d8c6301ca26961693aa613e448cda",
+            "sample": "The router presents one semantic interface without forcing one deployment mechanism on every provider. A built-in provider is the fastest path — no serialization, process startup, ",
+            "identityFingerprint": "6b09f64a5ca9508aa355d0de66a153c886797492d98009eee153514739b99531",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms",
+              "Same-Process Built-Ins Versus Runtime Extensions"
+            ],
+            "text": "The router presents one semantic interface without forcing one deployment mechanism on every provider. A built-in provider is the fastest path — no serialization, process startup, context switch, or runtime ABI — appropriate because host and foundation component release atomically. An external extension pays a runtime boundary in exchange for language neutrality, failure isolation, and no-recompile installation: a persistent process is the baseline for OS-capability plugins; WASM is the stronger sandbox for pure/capability-scoped ones. The architecture does not promise both hot replacement and direct function-call performance for the same provider — component class decides release ownership and authority posture, invocation mechanism decides the runtime calling path behind the semantic port."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#cross-process-cost",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "Cross-Process Cost",
+            "anchor": "cross-process-cost",
+            "githubAnchor": "cross-process-cost",
+            "stableAnchor": "h-a87e3760dad6",
+            "startLine": 68,
+            "endLine": 68,
+            "textDigest": "2907e5e6fb1d4da1ae152aadc8feed9a3d50a453c2a9d04e937abffdb4d51f68",
+            "sample": "Cross-Process Cost",
+            "sectionPayloadDigest": "46867e5caee91b2975800b96922e5db4b568e17f7cb9617e250d41144fde6071",
+            "followingBlockDigest": "46867e5caee91b2975800b96922e5db4b568e17f7cb9617e250d41144fde6071",
+            "identityFingerprint": "4dd8f169e67de7eb438a218613553caccfe7921824b4a27800a911ed246226ab",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms"
+            ],
+            "text": "### Cross-Process Cost",
+            "sectionText": "### Cross-Process Cost\n\nCold process startup (runtime init, imports, configuration, protocol negotiation) is materially more expensive than talking to an already-running provider — acceptable for a coarse, infrequent operation, not for thousands of helper-sized calls. A persistent stdio connection or local socket removes repeated startup cost, but serialization, scheduling, and backpressure remain, so ports expose complete use-case operations and batch hot loops behind one request. For a normal one-shot CLI invocation, keeping a plugin process alive beyond the host lifetime adds daemon lifecycle without necessarily saving work; persistence is justified for the remote host, interactive sessions, or one invocation making repeated provider calls."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-19",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-19",
+            "githubAnchor": "unheaded-block-19",
+            "stableAnchor": "unheaded-block-19",
+            "title": "Unheaded block 19",
+            "startLine": 70,
+            "endLine": 70,
+            "textDigest": "46867e5caee91b2975800b96922e5db4b568e17f7cb9617e250d41144fde6071",
+            "sample": "Cold process startup (runtime init, imports, configuration, protocol negotiation) is materially more expensive than talking to an already-running provider — acceptable for a coarse",
+            "identityFingerprint": "a8a38f9a94938746b645a9ea493a3233928578886de36ee82c73fe4ac9477227",
+            "ancestry": [
+              "External Provider Protocol",
+              "2. Invocation Mechanisms",
+              "Cross-Process Cost"
+            ],
+            "text": "Cold process startup (runtime init, imports, configuration, protocol negotiation) is materially more expensive than talking to an already-running provider — acceptable for a coarse, infrequent operation, not for thousands of helper-sized calls. A persistent stdio connection or local socket removes repeated startup cost, but serialization, scheduling, and backpressure remain, so ports expose complete use-case operations and batch hot loops behind one request. For a normal one-shot CLI invocation, keeping a plugin process alive beyond the host lifetime adds daemon lifecycle without necessarily saving work; persistence is justified for the remote host, interactive sessions, or one invocation making repeated provider calls."
+          }
+        }
+      ],
+      "historyPhrase": "### Same-Process Built-Ins Versus Runtime Extensions",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "OperationRequest uses typed input; the process codec is framed JSON-RPC. Cold-start and hot-loop discussion is qualitative design reasoning; no performance measurement is claimed.",
+        "code": [
+          "packages/host-runtime/rust/src/contracts.rs:205-220",
+          "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
+        ]
+      },
+      "sourceBlob": "8f9cff691d411cf3081a254fbad1569ea363fcab",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-007",
+      "title": "Semantic contract stays transport-neutral (a future binary codec or local socket may replace framing)",
+      "source": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-semantic-contract-stays-transport-neutral",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-25",
+            "githubAnchor": "unheaded-block-25",
+            "stableAnchor": "unheaded-block-25",
+            "title": "Unheaded block 25",
+            "startLine": 90,
+            "endLine": 90,
+            "textDigest": "ee1d8bfda872a950a7ae69cc811559730a8f122827e7de8f7427306a7f5503a8",
+            "sample": "The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the operation.",
+            "identityFingerprint": "65a81bcc21a74f9382becb0b15722d78cd0912837a8eaa9c171cd072f3f96b9d",
+            "ancestry": [
+              "External Provider Protocol",
+              "3. Component Protocol"
+            ],
+            "text": "The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the operation."
+          }
+        }
+      ],
+      "historyPhrase": "The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing witho",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "The implemented process codec is length-prefixed JSON-RPC. A binary codec or local socket is retained future transport-neutral design, not implemented functionality.",
+        "code": [
+          "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
+        ]
+      },
+      "sourceBlob": "8f9cff691d411cf3081a254fbad1569ea363fcab",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-008",
+      "title": "Registry linker procedure and its input/output formula (partly carried: the linker exists in code and proofs; the formula and the procedure steps are missing)",
+      "source": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "restoreAnchor": "restored-registry-linker-procedure-and-its-input-output-formula",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-32",
+            "githubAnchor": "unheaded-block-32",
+            "stableAnchor": "unheaded-block-32",
+            "title": "Unheaded block 32",
+            "startLine": 113,
+            "endLine": 113,
+            "textDigest": "abb21d45c93741d8b14028a27fdd2daa3731ac7f1723c40dcc7bc926cc6e7096",
+            "sample": "The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; verifies compatibility, provider presence, a",
+            "identityFingerprint": "5ef5c4e375d1989e1ccbeb0c31cddb85aa306e193f40189b13be7067eb9b961e",
+            "ancestry": [
+              "External Provider Protocol",
+              "4. Plugin Registry Linker"
+            ],
+            "text": "The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; verifies compatibility, provider presence, and integrity policy; resolves IDs, namespace claims, precedence, and explicit replacements; emits a deterministic derived lock/cache for help, introspection, dispatch, init, and doctor; starts a selected provider and uses `describe` only to confirm it matches the accepted manifest."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-33",
+            "githubAnchor": "unheaded-block-33",
+            "stableAnchor": "unheaded-block-33",
+            "title": "Unheaded block 33",
+            "startLine": 115,
+            "endLine": 115,
+            "textDigest": "ac979e91f46e51f32774c8e352945b3f327ea9dd68f683f2453fa8f667655526",
+            "sample": "Its complete input/output physics:",
+            "identityFingerprint": "48204498ae3a6c8f3694f86ce7a91a49b7bce75f613c86f712d4f7ab450b7cc0",
+            "ancestry": [
+              "External Provider Protocol",
+              "4. Plugin Registry Linker"
+            ],
+            "text": "Its complete input/output physics:"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-34",
+            "githubAnchor": "unheaded-block-34",
+            "stableAnchor": "unheaded-block-34",
+            "title": "Unheaded block 34",
+            "startLine": 117,
+            "endLine": 124,
+            "textDigest": "85985ef935d65edf0a8cef9f8d041a4735646902eb0a253c1d1f53bd0a7befb2",
+            "sample": "```txt\nauthored OperationCatalog\n+ built-in provider descriptors\n+ transitional CLI-compatibility bindings\n+ validated external manifest declarations\n+ explicit global/project enab",
+            "identityFingerprint": "d80191ff23b569dcb5a8279b8e04f148d0d7f6328e6302c77a58a89c70118944",
+            "ancestry": [
+              "External Provider Protocol",
+              "4. Plugin Registry Linker"
+            ],
+            "text": "```txt\nauthored OperationCatalog\n+ built-in provider descriptors\n+ transitional CLI-compatibility bindings\n+ validated external manifest declarations\n+ explicit global/project enable-disable-replacement policy\n  -> immutable RegistrySnapshot + source fingerprint\n```"
+          }
+        }
+      ],
+      "historyPhrase": "The registry linker: scans configured global and project plugin locations; parses and validates manifests without runnin",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "The input/output formula and full validation procedure are retained selected design. The cited immutable snapshot constructor validates duplicate bindings; it does not prove every proposed namespace/capability/replacement step is implemented.",
+        "code": [
+          "packages/host-runtime/rust/src/registry.rs:19-69",
+          "packages/host-runtime/rust/src/operation_provider_router.rs:24-40"
+        ]
+      },
+      "sourceBlob": "8f9cff691d411cf3081a254fbad1569ea363fcab",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-009",
+      "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma…",
+      "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-both-adapters-delegate-a-complete-use-case",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-8",
+            "githubAnchor": "unheaded-block-8",
+            "stableAnchor": "unheaded-block-8",
+            "title": "Unheaded block 8",
+            "startLine": 30,
+            "endLine": 30,
+            "textDigest": "cc892a8e450198c14aaeb4b22d695f12db41b95f7b706de5c37dbaede212d091",
+            "sample": "Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a component contract already defines locking, ato",
+            "identityFingerprint": "9c23cd8956799e1293fe6c597f078cefe5b08f56b94a27168dd6356d09d4171c",
+            "ancestry": [
+              "Legacy CLI Transition",
+              "1. Two Distinct Adapters"
+            ],
+            "text": "Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a component contract already defines locking, atomicity, recovery, and authority at that boundary."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-21",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-21",
+            "githubAnchor": "unheaded-block-21",
+            "stableAnchor": "unheaded-block-21",
+            "title": "Unheaded block 21",
+            "startLine": 71,
+            "endLine": 71,
+            "textDigest": "3f4712a04f578e6169c443e429f9b617eec036343e6d96710e29eae2f3fc0e30",
+            "sample": "The router needs operation identity and provider metadata but does not need to parse every host's full input grammar. Metadata separates into: host-visible identity, summary, names",
+            "identityFingerprint": "ad0af73b54052f3368bba75d16aa898f67517a7d93cc7e3766786bfde011e135",
+            "ancestry": [
+              "Legacy CLI Transition",
+              "3. Command Metadata And Parser Ownership"
+            ],
+            "text": "The router needs operation identity and provider metadata but does not need to parse every host's full input grammar. Metadata separates into: host-visible identity, summary, namespace, and provider mapping; host-owned projection from CLI/REST/MCP input to an operation request; provider-owned semantic validation; transitional provider-owned CLI parsing for legacy-cli selectors."
+          }
+        }
+      ],
+      "historyPhrase": "Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy provid",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation.",
+        "code": [
+          "apps/fgos/src/legacy_exec.rs:69-154",
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ]
+      },
+      "sourceBlob": "0b70925148b3a445a8e3b1b3058234919471f731",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-010",
+      "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea…",
+      "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "restoreAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-14",
+            "githubAnchor": "unheaded-block-14",
+            "stableAnchor": "unheaded-block-14",
+            "title": "Unheaded block 14",
+            "startLine": 48,
+            "endLine": 48,
+            "textDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+            "sample": "`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A heade",
+            "identityFingerprint": "c8a5795b94f93a41b3686aba64240c7f23d7b65309f97c387b9102c2488dc2c4",
+            "ancestry": [
+              "Legacy CLI Transition",
+              "2. Legacy Payload Identity, Ownership, And Repair Path"
+            ],
+            "text": "`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path."
+          }
+        }
+      ],
+      "historyPhrase": "`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
+        "code": [
+          "package.json:9-12",
+          "bin/fgos.mjs:1-10"
+        ],
+        "flagged": true
+      },
+      "sourceBlob": "0b70925148b3a445a8e3b1b3058234919471f731",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-011",
+      "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai…",
+      "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-rust-host-first-cost",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-29",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rust-host-first-cost",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-29",
+            "githubAnchor": "unheaded-block-29",
+            "stableAnchor": "unheaded-block-29",
+            "title": "Unheaded block 29",
+            "startLine": 91,
+            "endLine": 91,
+            "textDigest": "513f1751ff49e49804730a3922690dc0231b92adb1c25a55a21d34334693f8d2",
+            "sample": "The cost is temporary: a legacy CLI call pays both the small Rust launcher and Node startup, distribution must ship both runtimes, and compatibility failures can occur before any c",
+            "identityFingerprint": "6c5fc2290ce693b7e73338927edee8fa93f5e40fd2016f79513819898a6bfb52",
+            "ancestry": [
+              "Legacy CLI Transition",
+              "5. Rust Host First: Benefit And Cost"
+            ],
+            "text": "The cost is temporary: a legacy CLI call pays both the small Rust launcher and Node startup, distribution must ship both runtimes, and compatibility failures can occur before any command becomes faster. The architecture only pays off if the first Rust host remains thin and forwards legacy behavior rather than rewriting every parser and use case at once."
+          }
+        }
+      ],
+      "historyPhrase": "The cost is temporary: a legacy CLI call pays both the small Rust launcher and Node startup, distribution must ship both",
+      "history": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "statusNote": {
+        "note": "The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed.",
+        "code": [
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ]
+      },
+      "sourceBlob": "0b70925148b3a445a8e3b1b3058234919471f731",
+      "introducedHistory": "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f docs(architect): split the host-invocation kernel contract and open the rust-host-r1-kernel track\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-012",
+      "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic…",
+      "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "restoreAnchor": "restored-scope",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-2",
+            "target": "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-scope",
+            "description": null,
+            "kind": "architecture",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-2",
+            "githubAnchor": "unheaded-block-2",
+            "stableAnchor": "unheaded-block-2",
+            "title": "Unheaded block 2",
+            "startLine": 15,
+            "endLine": 26,
+            "textDigest": "3eb6efe648980740c062eb5f792200bc14dd24c64c620f7c677ab1657bdf87bd",
+            "sample": "This document discusses only migration options, ordering, transition stages,\ncutover, and rollback. The stable host model, peer CLI/remote host use cases,\nOperation Provider Router",
+            "identityFingerprint": "ec9d01cd8fa1a417182fa245ad4048ae8f403beda75ab581c3f6100f4f67d170",
+            "ancestry": [
+              "Node To Rust Component Migration"
+            ],
+            "text": "This document discusses only migration options, ordering, transition stages,\ncutover, and rollback. The stable host model, peer CLI/remote host use cases,\nOperation Provider Router, provider mechanics, protocols, plugin registry,\nauthority, and technical tradeoffs live in\n[Host Invocation And Provider Routing Architecture](./host-invocation-provider-routing.md).\nComponent ownership, authority boundaries, and the physical placement compass\nfor files/crates/components live in\n[fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md);\nevery native migration slice must read it before choosing where a provider or\ncomponent module lives.\nThe executable work breakdown lives in\n[Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md)."
+          }
+        }
+      ],
+      "historyPhrase": "This document discusses only migration options, ordering, transition stages,",
+      "history": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "statusNote": {
+        "note": "The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement.",
+        "code": [
+          "Cargo.toml:1-17"
+        ]
+      },
+      "sourceBlob": "0dafce9566fbf071a1656fd2d34ec169e1444b7d",
+      "introducedHistory": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-013",
+      "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:…",
+      "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-rejected-options-rationale",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-9",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-9",
+            "githubAnchor": "unheaded-block-9",
+            "stableAnchor": "unheaded-block-9",
+            "title": "Unheaded block 9",
+            "startLine": 69,
+            "endLine": 74,
+            "textDigest": "b69dc6e06127e05da382957893f86dd4b7d1df617ac81a390ab54be86d6f96e8",
+            "sample": "```txt\nlarge Node-thinning refactor\n  -> stable Node component ports\n  -> Rust implementations behind those ports\n  -> replace the outer host last\n```",
+            "identityFingerprint": "70059cbc3417f93314d446a212edaac4e620ffb69b006f25e9f783940e8bc12b",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "2. Options Considered",
+              "Option A: Thin The Entire Node Host First"
+            ],
+            "text": "```txt\nlarge Node-thinning refactor\n  -> stable Node component ports\n  -> Rust implementations behind those ports\n  -> replace the outer host last\n```"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-10",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-10",
+            "githubAnchor": "unheaded-block-10",
+            "stableAnchor": "unheaded-block-10",
+            "title": "Unheaded block 10",
+            "startLine": 76,
+            "endLine": 78,
+            "textDigest": "171ae708c6fc2202db7a8e40126f323b28be5a87e89d1480d33e0a01e6779161",
+            "sample": "This makes each later port explicit, but invests heavily in a composition root\nthat is scheduled for removal. It also delays the final Rust plugin/host seam\nuntil after substantial",
+            "identityFingerprint": "6b5196ddefb26ebc6f0e735702be3839e48de6e8c564c4c9bf1cd81f18eedcbb",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "2. Options Considered",
+              "Option A: Thin The Entire Node Host First"
+            ],
+            "text": "This makes each later port explicit, but invests heavily in a composition root\nthat is scheduled for removal. It also delays the final Rust plugin/host seam\nuntil after substantial Node restructuring."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-13",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-13",
+            "githubAnchor": "unheaded-block-13",
+            "stableAnchor": "unheaded-block-13",
+            "title": "Unheaded block 13",
+            "startLine": 98,
+            "endLine": 101,
+            "textDigest": "0e5aa008176865dcfbdd304a72c8ce99b20083ac1b77c01a5be0712094ce2b01",
+            "sample": "```txt\nreimplement parser + use cases + state + distribution\n  -> switch everything at once\n```",
+            "identityFingerprint": "b217455a789ab151c1468a9cae16127a4ca96b8f9d0ba363e697c0e1b7541901",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "2. Options Considered",
+              "Option C: Big-Bang Rust Rewrite"
+            ],
+            "text": "```txt\nreimplement parser + use cases + state + distribution\n  -> switch everything at once\n```"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-14",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-14",
+            "githubAnchor": "unheaded-block-14",
+            "stableAnchor": "unheaded-block-14",
+            "title": "Unheaded block 14",
+            "startLine": 103,
+            "endLine": 105,
+            "textDigest": "730307ecbac910887cc949eef96ecfa30442233319fa3eb3ed16aac372f7803d",
+            "sample": "This has no safe parity or rollback gradient. It mixes host replacement,\ncomponent redesign, authority movement, and distribution into one release and\nis rejected.",
+            "identityFingerprint": "3258a092bdddf40ad5c6cc59845ed17cd9581b54b8073d3115b5ee7703fea2a5",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "2. Options Considered",
+              "Option C: Big-Bang Rust Rewrite"
+            ],
+            "text": "This has no safe parity or rollback gradient. It mixes host replacement,\ncomponent redesign, authority movement, and distribution into one release and\nis rejected."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#3-why-the-sequence-is-selected",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "3. Why The Sequence Is Selected",
+            "anchor": "3-why-the-sequence-is-selected",
+            "githubAnchor": "3-why-the-sequence-is-selected",
+            "stableAnchor": "h-4b13a0b68d1a",
+            "startLine": 114,
+            "endLine": 114,
+            "textDigest": "d09127beb575abd48c269d7e6fbc9cc67cb9f87b9727998e6a3a2d2a292dc824",
+            "sample": "3. Why The Sequence Is Selected",
+            "sectionPayloadDigest": "ae587e842aac85361b0bbf2cf3d3c4a2011bf163acfd9d29bb7dd95e27d5456e",
+            "followingBlockDigest": "387c2ab2cd3ac6503e58bdd93b7fb0956de8794e642d674356419a0f736b55e6",
+            "identityFingerprint": "c931cb182dc71d6ef93e64cc243cc9f8cf70f71b0524a6d442fad5ceb30fa28e",
+            "ancestry": [
+              "Node To Rust Component Migration"
+            ],
+            "text": "## 3. Why The Sequence Is Selected",
+            "sectionText": "## 3. Why The Sequence Is Selected\n\nThe sequence provides a monotonic migration:\n\n- the final host exists before component replacement begins;\n- each completed slice removes one Node dependency;\n- untouched operations continue on their current execution path;\n- rollback is a release rollback through `fgctl`, not a rebuild of the outer\n  host;\n- external extension work can target the permanent host boundary;\n- Node cleanup follows demonstrated removal rather than forecasted ownership.\n\nIts temporary cost is accepted: legacy operations may start slightly slower\nbecause Rust delegates to Node, and the installed product carries both runtimes\nuntil migration completes. The detailed technical consequences belong to the\nhost architecture document."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-16",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-16",
+            "githubAnchor": "unheaded-block-16",
+            "stableAnchor": "unheaded-block-16",
+            "title": "Unheaded block 16",
+            "startLine": 116,
+            "endLine": 116,
+            "textDigest": "387c2ab2cd3ac6503e58bdd93b7fb0956de8794e642d674356419a0f736b55e6",
+            "sample": "The sequence provides a monotonic migration:",
+            "identityFingerprint": "da9a74610681f28667cfdee95a9f8985e9d347e778babbed45e1f8e4dc1101f0",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "3. Why The Sequence Is Selected"
+            ],
+            "text": "The sequence provides a monotonic migration:"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-17",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-17",
+            "githubAnchor": "unheaded-block-17",
+            "stableAnchor": "unheaded-block-17",
+            "title": "Unheaded block 17",
+            "startLine": 118,
+            "endLine": 124,
+            "textDigest": "14d6dae2683b8069c4fc6b8932f501748151dacb5914d9095cab2f0aa545b662",
+            "sample": "- the final host exists before component replacement begins;\n- each completed slice removes one Node dependency;\n- untouched operations continue on their current execution path;\n- ",
+            "identityFingerprint": "e3584c11c5b691f9ec30977d61b6e91ee4de463be2b8b57ad6116599a644d5ca",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "3. Why The Sequence Is Selected"
+            ],
+            "text": "- the final host exists before component replacement begins;\n- each completed slice removes one Node dependency;\n- untouched operations continue on their current execution path;\n- rollback is a release rollback through `fgctl`, not a rebuild of the outer\n  host;\n- external extension work can target the permanent host boundary;\n- Node cleanup follows demonstrated removal rather than forecasted ownership."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-18",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-18",
+            "githubAnchor": "unheaded-block-18",
+            "stableAnchor": "unheaded-block-18",
+            "title": "Unheaded block 18",
+            "startLine": 126,
+            "endLine": 129,
+            "textDigest": "7c44e976bbdd4a59ff86668499236a855e9f40d0e61bb64894abf1036874e54e",
+            "sample": "Its temporary cost is accepted: legacy operations may start slightly slower\nbecause Rust delegates to Node, and the installed product carries both runtimes\nuntil migration complete",
+            "identityFingerprint": "10bc2d27db856962c13e9600d160984caa0a6602e1d8c7e9945b82efc04700db",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "3. Why The Sequence Is Selected"
+            ],
+            "text": "Its temporary cost is accepted: legacy operations may start slightly slower\nbecause Rust delegates to Node, and the installed product carries both runtimes\nuntil migration completes. The detailed technical consequences belong to the\nhost architecture document."
+          }
+        }
+      ],
+      "historyPhrase": "  -> Rust implementations behind those ports",
+      "history": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "statusNote": {
+        "note": "These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted.",
+        "code": [
+          "apps/fgos/src/legacy_exec.rs:69-154",
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ]
+      },
+      "sourceBlob": "0dafce9566fbf071a1656fd2d34ec169e1444b7d",
+      "introducedHistory": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-014",
+      "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur…",
+      "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-per-component-repeat-procedure",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-44",
+            "githubAnchor": "unheaded-block-44",
+            "stableAnchor": "unheaded-block-44",
+            "title": "Unheaded block 44",
+            "startLine": 305,
+            "endLine": 305,
+            "textDigest": "79c90b13578b11cbdf28fc7face8f0233b2a18f29356d12b4e874c89d706e952",
+            "sample": "For each subsequent component:",
+            "identityFingerprint": "9275ce6e06569588c1caaa00c50d591bb7d206bfa3b5c214fc0b54548e28a813",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "9. Repeat By Component Boundary"
+            ],
+            "text": "For each subsequent component:"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-45",
+            "githubAnchor": "unheaded-block-45",
+            "stableAnchor": "unheaded-block-45",
+            "title": "Unheaded block 45",
+            "startLine": 307,
+            "endLine": 319,
+            "textDigest": "da634aada4e735156922478dd7d6269afa712adda1f8ce1a36e87a02bb483496",
+            "sample": "1. Read\n   [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md)\n   and name responsibility, semantic operations, authority, state, side\n   effec",
+            "identityFingerprint": "6e51defdc06d8002690dd184072424ad55f34d2c5f3b9a7533e6a83ba2335126",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "9. Repeat By Component Boundary"
+            ],
+            "text": "1. Read\n   [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md)\n   and name responsibility, semantic operations, authority, state, side\n   effects, component class, and physical placement.\n2. Select a complete operation/use-case boundary rather than private helpers.\n3. Capture current Node behavior as shared fixtures.\n4. Extract only the Node boundary needed for this migration slice.\n5. Implement the corresponding native Rust provider.\n6. Run both providers against the same semantic fixtures.\n7. Shadow only side-effect-free reads.\n8. Switch the operation from legacy to native after parity proof.\n9. Observe the rollback window.\n10. Remove the Node implementation in a later cleanup change."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-49",
+            "githubAnchor": "unheaded-block-49",
+            "stableAnchor": "unheaded-block-49",
+            "title": "Unheaded block 49",
+            "startLine": 334,
+            "endLine": 334,
+            "textDigest": "3446982a4c242232785d6f1e6e1fc5d9260e9a8c05e0123bf3cccd60f888b482",
+            "sample": "Sequence it internally:",
+            "identityFingerprint": "724c7959fe40073b5e6a5a1c4080b99aefb9765f6361c6f23480334291eb4227",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "10. Migrate Read Models Before Writers"
+            ],
+            "text": "Sequence it internally:"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-50",
+            "githubAnchor": "unheaded-block-50",
+            "stableAnchor": "unheaded-block-50",
+            "title": "Unheaded block 50",
+            "startLine": 336,
+            "endLine": 342,
+            "textDigest": "8d95bdf1308d786d8d237f194b2eedc4dbe591291259a54f76483a3d9efb3f52",
+            "sample": "1. event/schema decode fixtures;\n2. deterministic replay fixtures;\n3. domain/stage projection fixtures;\n4. frontier calculation fixtures;\n5. effective claim overlay;\n6. CLI `ready`",
+            "identityFingerprint": "69da7988887c794240c8e8f61af1935d367fc9b0b860921edd9d45acb167e253",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "10. Migrate Read Models Before Writers"
+            ],
+            "text": "1. event/schema decode fixtures;\n2. deterministic replay fixtures;\n3. domain/stage projection fixtures;\n4. frontier calculation fixtures;\n5. effective claim overlay;\n6. CLI `ready` parity and pagination;\n7. remote semantic parity."
+          }
+        }
+      ],
+      "historyPhrase": "For each subsequent component:",
+      "history": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "statusNote": {
+        "note": "The ten-step sequence is manual migration guidance, not a newly registered automation. Parked is represented distinctly from success in the runtime terminal enum; no provider-side human wait or reinvocation smoke is claimed.",
+        "code": [
+          "packages/host-runtime/rust/src/invocation_service.rs:161-209",
+          "package.json:27-35"
+        ]
+      },
+      "sourceBlob": "0dafce9566fbf071a1656fd2d34ec169e1444b7d",
+      "introducedHistory": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-015",
+      "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a…",
+      "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-rollback-bullets",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-59",
+            "githubAnchor": "unheaded-block-59",
+            "stableAnchor": "unheaded-block-59",
+            "title": "Unheaded block 59",
+            "startLine": 389,
+            "endLine": 395,
+            "textDigest": "685b687d446cbbf7c239bbe9f1137ba487dad43eacfc396a5bf30ffdcd7c336e",
+            "sample": "- Keep legacy and native implementations side by side only for the observation\n  window of their operation.\n- Never delete a Node writer before proving it can read/recover state la",
+            "identityFingerprint": "1b1415aa328ebe150b102cb30e74e195d0af379d8915f1ed67adb3781fbef9d9",
+            "ancestry": [
+              "Node To Rust Component Migration",
+              "13. Rollback Rules"
+            ],
+            "text": "- Keep legacy and native implementations side by side only for the observation\n  window of their operation.\n- Never delete a Node writer before proving it can read/recover state last\n  written by the Rust implementation, or explicitly declaring the cutover\n  irreversible with migration evidence.\n- Remove rollback code per component after its window; do not accumulate a\n  permanent second implementation tree."
+          }
+        }
+      ],
+      "historyPhrase": "- Keep legacy and native implementations side by side only for the observation",
+      "history": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "statusNote": {
+        "note": "The observation-window and writer-recovery obligations remain manual selected policy. Selection reads immutable bindings, not a runtime provider-selection override; this pass does not execute or certify release rollback.",
+        "code": [
+          "packages/host-runtime/rust/src/operation_provider_router.rs:74-119",
+          "packages/host-runtime/rust/src/registry.rs:41-69"
+        ]
+      },
+      "sourceBlob": "0dafce9566fbf071a1656fd2d34ec169e1444b7d",
+      "introducedHistory": "e80ebce697920b46bbfa34fd234e5601c0570562 docs: separate router design from migration steps\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-016",
+      "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version…",
+      "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "restoreAnchor": "restored-p1-compatibility-harness",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#changed-areas",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "Changed areas",
+            "anchor": "changed-areas",
+            "githubAnchor": "changed-areas",
+            "stableAnchor": "h-f33b09edfd17",
+            "startLine": 189,
+            "endLine": 189,
+            "textDigest": "caac82b738261b64a2c0d302c9963504ec792bf38f4726f1eacb242eee52a6cf",
+            "sample": "Changed areas",
+            "sectionPayloadDigest": "6aaf7e020295fddc4c4c42bb09493c296319d41fa1e7c8bb48c3a9d05a69dc19",
+            "followingBlockDigest": "6aaf7e020295fddc4c4c42bb09493c296319d41fa1e7c8bb48c3a9d05a69dc19",
+            "identityFingerprint": "9709c9d495b404b91e5faa0956a6ce876316fb09d6073702821052d3b6b9d874",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness"
+            ],
+            "text": "### Changed areas",
+            "sectionText": "### Changed areas\n\n```txt\ntest/rust-host/\npackages/component-protocol/contracts/\nscripts/export-command-selectors.mjs\nscripts/explain-command-route.mjs\n```"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-19",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-19",
+            "githubAnchor": "unheaded-block-19",
+            "stableAnchor": "unheaded-block-19",
+            "title": "Unheaded block 19",
+            "startLine": 191,
+            "endLine": 196,
+            "textDigest": "6aaf7e020295fddc4c4c42bb09493c296319d41fa1e7c8bb48c3a9d05a69dc19",
+            "sample": "```txt\ntest/rust-host/\npackages/component-protocol/contracts/\nscripts/export-command-selectors.mjs\nscripts/explain-command-route.mjs\n```",
+            "identityFingerprint": "fe044019438f676626c3b52a4ed3ed31a60f7f67f3407ef54496a34faac551e9",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness",
+              "Changed areas"
+            ],
+            "text": "```txt\ntest/rust-host/\npackages/component-protocol/contracts/\nscripts/export-command-selectors.mjs\nscripts/explain-command-route.mjs\n```"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#performance-gates",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "Performance gates",
+            "anchor": "performance-gates",
+            "githubAnchor": "performance-gates",
+            "stableAnchor": "h-ddcc083d3eef",
+            "startLine": 230,
+            "endLine": 230,
+            "textDigest": "0bfc5192d67616e0d34be5a265ae9ee33834fab7c78fc72830d626946ebb9bb8",
+            "sample": "Performance gates",
+            "sectionPayloadDigest": "bf8556795a73adb4c1a6ca91fa2ca1b4a103904ac5238bafd61c5666f0640848",
+            "followingBlockDigest": "bf8556795a73adb4c1a6ca91fa2ca1b4a103904ac5238bafd61c5666f0640848",
+            "identityFingerprint": "e8928008976bf374b10614b90325996b564ac450a71092b46e8f00e2ad200dc3",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness"
+            ],
+            "text": "### Performance gates",
+            "sectionText": "### Performance gates\n\n- Legacy exec overhead: wall time of `fgos <legacy selector>` through the Rust\n  CLI minus direct `node <payload> <selector>` on the same machine, both warm.\n  Threshold placeholder `≤ 25 ms p50 on the reference target` — initial\n  budget, confirm in P0.\n- Native `version` latency budget placeholder `≤ 10 ms p50`.\n- Both become regression gates in P6 (§11 exit gate)."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-22",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-22",
+            "githubAnchor": "unheaded-block-22",
+            "stableAnchor": "unheaded-block-22",
+            "title": "Unheaded block 22",
+            "startLine": 232,
+            "endLine": 237,
+            "textDigest": "bf8556795a73adb4c1a6ca91fa2ca1b4a103904ac5238bafd61c5666f0640848",
+            "sample": "- Legacy exec overhead: wall time of `fgos <legacy selector>` through the Rust\n  CLI minus direct `node <payload> <selector>` on the same machine, both warm.\n  Threshold placeholde",
+            "identityFingerprint": "eface98ada8c87d4adb1b13667d3e3386e0aaf0a30028095b694e698c2d773c5",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness",
+              "Performance gates"
+            ],
+            "text": "- Legacy exec overhead: wall time of `fgos <legacy selector>` through the Rust\n  CLI minus direct `node <payload> <selector>` on the same machine, both warm.\n  Threshold placeholder `≤ 25 ms p50 on the reference target` — initial\n  budget, confirm in P0.\n- Native `version` latency budget placeholder `≤ 10 ms p50`.\n- Both become regression gates in P6 (§11 exit gate)."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 3,
+            "title": "Exit gate and verify",
+            "anchor": "exit-gate-and-verify",
+            "githubAnchor": "exit-gate-and-verify",
+            "stableAnchor": "h-4b7e38014623",
+            "startLine": 239,
+            "endLine": 239,
+            "textDigest": "95a016a8b4081eb8c6f422586455386549c5643e1640ed94fa7da38c41d7ccbe",
+            "sample": "Exit gate and verify",
+            "sectionPayloadDigest": "c423c8c5c0b55b1f50e09dc70133688d7c444a0c2c2b1aafb1d2e16cc45e617d",
+            "followingBlockDigest": "fab9d53bc259ccae6bdeb36a716666f7cd3c14e8df3d567b07947f933cc9d6a7",
+            "identityFingerprint": "fa40932e61ccc03d77c30a102fd9ce6adaf1d68a05495e586b52a5b2541e9929",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness"
+            ],
+            "text": "### Exit gate and verify",
+            "sectionText": "### Exit gate and verify\n\nThe harness fails on every injected difference and passes Node-against-Node.\n\n```sh\nnode --test test/rust-host/envelope-contract.test.mjs\nnode scripts/export-command-selectors.mjs --check\n```"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-23",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-23",
+            "githubAnchor": "unheaded-block-23",
+            "stableAnchor": "unheaded-block-23",
+            "title": "Unheaded block 23",
+            "startLine": 241,
+            "endLine": 241,
+            "textDigest": "fab9d53bc259ccae6bdeb36a716666f7cd3c14e8df3d567b07947f933cc9d6a7",
+            "sample": "The harness fails on every injected difference and passes Node-against-Node.",
+            "identityFingerprint": "ae8583205b9dba7c68e206bd2372f3ff32f7c426dca9f548e008ac3b87b98cde",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness",
+              "Exit gate and verify"
+            ],
+            "text": "The harness fails on every injected difference and passes Node-against-Node."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-24",
+            "target": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+            "description": null,
+            "kind": "contract",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-24",
+            "githubAnchor": "unheaded-block-24",
+            "stableAnchor": "unheaded-block-24",
+            "title": "Unheaded block 24",
+            "startLine": 243,
+            "endLine": 246,
+            "textDigest": "62f3a7411289035ba2df637a2f5af7d050c1095d733c26aff14991c8245486c5",
+            "sample": "```sh\nnode --test test/rust-host/envelope-contract.test.mjs\nnode scripts/export-command-selectors.mjs --check\n```",
+            "identityFingerprint": "8187acb44873da59169355b75f1829babe2e73ebfa4b9f4e853ebe5949fade27",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "6. P1 — Compatibility Harness",
+              "Exit gate and verify"
+            ],
+            "text": "```sh\nnode --test test/rust-host/envelope-contract.test.mjs\nnode scripts/export-command-selectors.mjs --check\n```"
+          }
+        }
+      ],
+      "historyPhrase": "### Changed areas",
+      "history": "c92fe6321a6482d6b04433d6c0aaa87cc8e040b7 docs(architect): add packaging-distribution area, rewrite host-invocation-routing docs\n",
+      "statusNote": {
+        "note": "The source itself labels 25 ms and 10 ms budgets as placeholders to confirm. They are retained unexecuted performance acceptance requirements, UNPROVEN as measurements. package.json names the current test entry; no all-suite pass or injected-difference run is inferred.",
+        "code": [
+          "package.json:27-35",
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ]
+      },
+      "sourceBlob": "8b00cb73d06147f87760411288a0a4e3ec5543a1",
+      "introducedHistory": "c92fe6321a6482d6b04433d6c0aaa87cc8e040b7 docs(architect): add packaging-distribution area, rewrite host-invocation-routing docs\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    },
+    {
+      "id": "dropped-017",
+      "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules…",
+      "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "restoreOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "restoreAnchor": "restored-test-and-review-gates-table",
+      "units": [
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#15-test-and-review-gates",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "15. Test And Review Gates",
+            "anchor": "15-test-and-review-gates",
+            "githubAnchor": "15-test-and-review-gates",
+            "stableAnchor": "h-edd56a0e2c91",
+            "startLine": 582,
+            "endLine": 582,
+            "textDigest": "d847299e78dc5622316f204c135b5945952f6c2171e361c1a2ddf0184c767587",
+            "sample": "15. Test And Review Gates",
+            "sectionPayloadDigest": "144db2efd80ec760d5dd392c13da093a4b6a43c49dc8bd080f65cbdf9a9ad684",
+            "followingBlockDigest": "f74581052989fd529bc484edc87dbe9485c71b0bed53e205806021ea3ff7ebfd",
+            "identityFingerprint": "c83307682048b5b85eb7a595e552e1f72a5c47ab2f23754038e504e1add67d32",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan"
+            ],
+            "text": "## 15. Test And Review Gates",
+            "sectionText": "## 15. Test And Review Gates\n\n| Gate | Required proof |\n|---|---|\n| Per commit | focused tests; Rust format and lint |\n| R1 integration | compatibility inventory, native no-Node proof, `npm test`, workspace tests |\n| R1 release | external install/upgrade/rollback/uninstall via `fgctl`, init/doctor on every target, legacy-exec/`version` p50 latency within the P1 budget |\n| R2 | protocol conformance and fail-closed negative cases |\n| R3 | gateway suite, CLI/remote semantic equality, no CLI/envelope on migrated routes |\n| Future writer | replay, lock, atomicity, recovery, idempotency, mutual exclusion, rollback compatibility |\n\nUse process-spy evidence, not timing, for no-spawn/no-Node claims — the §6/§11\nperformance gates are the one place timing is the proof, and they measure\nwall-clock explicitly rather than inferring it from spawn evidence. Use\nfilesystem snapshots for zero-write claims. Use explicit timestamp\npredicates; never normalize arbitrary differences."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-60",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-60",
+            "githubAnchor": "unheaded-block-60",
+            "stableAnchor": "unheaded-block-60",
+            "title": "Unheaded block 60",
+            "startLine": 584,
+            "endLine": 591,
+            "textDigest": "f74581052989fd529bc484edc87dbe9485c71b0bed53e205806021ea3ff7ebfd",
+            "sample": "| Gate | Required proof |\n|---|---|\n| Per commit | focused tests; Rust format and lint |\n| R1 integration | compatibility inventory, native no-Node proof, `npm test`, workspace tes",
+            "identityFingerprint": "064cfba72d5b35b4cc51cabe6d1d395a7102381853b21b65c7d7cd68826bd4c1",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "15. Test And Review Gates"
+            ],
+            "text": "| Gate | Required proof |\n|---|---|\n| Per commit | focused tests; Rust format and lint |\n| R1 integration | compatibility inventory, native no-Node proof, `npm test`, workspace tests |\n| R1 release | external install/upgrade/rollback/uninstall via `fgctl`, init/doctor on every target, legacy-exec/`version` p50 latency within the P1 budget |\n| R2 | protocol conformance and fail-closed negative cases |\n| R3 | gateway suite, CLI/remote semantic equality, no CLI/envelope on migrated routes |\n| Future writer | replay, lock, atomicity, recovery, idempotency, mutual exclusion, rollback compatibility |"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-61",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-61",
+            "githubAnchor": "unheaded-block-61",
+            "stableAnchor": "unheaded-block-61",
+            "title": "Unheaded block 61",
+            "startLine": 593,
+            "endLine": 597,
+            "textDigest": "1713181ec507039a0a4f939181a45afb69be93422d3da4787a74e54233d25ccb",
+            "sample": "Use process-spy evidence, not timing, for no-spawn/no-Node claims — the §6/§11\nperformance gates are the one place timing is the proof, and they measure\nwall-clock explicitly rathe",
+            "identityFingerprint": "aa8f76cfc7a57aa572b340d75d82dcd14b7eaa533a303b6e0e9825b7170ff91d",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "15. Test And Review Gates"
+            ],
+            "text": "Use process-spy evidence, not timing, for no-spawn/no-Node claims — the §6/§11\nperformance gates are the one place timing is the proof, and they measure\nwall-clock explicitly rather than inferring it from spawn evidence. Use\nfilesystem snapshots for zero-write claims. Use explicit timestamp\npredicates; never normalize arbitrary differences."
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#17-risks-and-controls",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "heading",
+            "level": 2,
+            "title": "17. Risks And Controls",
+            "anchor": "17-risks-and-controls",
+            "githubAnchor": "17-risks-and-controls",
+            "stableAnchor": "h-64f50e70d656",
+            "startLine": 626,
+            "endLine": 626,
+            "textDigest": "3b1b5c1e57f442557d87d76bb68efbd5d6b1e5802258b6c9c179c9ab468888cf",
+            "sample": "17. Risks And Controls",
+            "sectionPayloadDigest": "97e3ab6e301065b6eb629f4d628f80e4f9e90917f9ed055566406a9540a69671",
+            "followingBlockDigest": "97e3ab6e301065b6eb629f4d628f80e4f9e90917f9ed055566406a9540a69671",
+            "identityFingerprint": "4b193a84a4f1b8be85d2533b8efe4b26ebbf4b59bcca7448d650830cbfdab846",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan"
+            ],
+            "text": "## 17. Risks And Controls",
+            "sectionText": "## 17. Risks And Controls\n\n| Risk | Control |\n|---|---|\n| Rust re-parses legacy flags | `args_os`, checked selector, argv corpus |\n| Double envelope | compatibility bytes pass through; semantic outcomes alone reach presenter |\n| Hash drift | Node differential corpus plus golden vectors |\n| Wrong root | installation/caller/project/`.fgos` roots are distinct fixtures |\n| Silent override | immutable exact binding; named replacement only |\n| Capability escalation | admission then least-privilege provider grant |\n| Remote wraps CLI | no-spawn/no-envelope assertions per route |\n| “Ship” without install | distribution is in R1 |\n| `fgos-runner` silently points at a different release | public-entry mapping and single release manifest/pointer proof |\n| checkout-only success hides missing payload | staged-bundle proof before external install |\n| doctor mutates or upgrades unexpectedly | read-only default; named `--fix` scope; explicit upgrade contract |\n| Fake proof component | component advisory gate before package creation |\n| Workspace absorbs Herdr | explicit excludes and independent build proof |\n| Crash becomes success | completion-unknown; idempotency-gated retry only |\n| Diagnostics break output | trace/evidence or explicit diagnostics surface |"
+          }
+        },
+        {
+          "map": {
+            "source": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-65",
+            "target": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+            "description": null,
+            "kind": "verification",
+            "operation": "verbatim restore"
+          },
+          "unit": {
+            "unitKind": "unheaded-block",
+            "anchor": "unheaded-block-65",
+            "githubAnchor": "unheaded-block-65",
+            "stableAnchor": "unheaded-block-65",
+            "title": "Unheaded block 65",
+            "startLine": 628,
+            "endLine": 644,
+            "textDigest": "97e3ab6e301065b6eb629f4d628f80e4f9e90917f9ed055566406a9540a69671",
+            "sample": "| Risk | Control |\n|---|---|\n| Rust re-parses legacy flags | `args_os`, checked selector, argv corpus |\n| Double envelope | compatibility bytes pass through; semantic outcomes alon",
+            "identityFingerprint": "57681741137a150bfa72c88f46f92347ff27b3bac7d5a9ee4cfd40eaa8547950",
+            "ancestry": [
+              "Rust Host And Proof Providers Implementation Plan",
+              "17. Risks And Controls"
+            ],
+            "text": "| Risk | Control |\n|---|---|\n| Rust re-parses legacy flags | `args_os`, checked selector, argv corpus |\n| Double envelope | compatibility bytes pass through; semantic outcomes alone reach presenter |\n| Hash drift | Node differential corpus plus golden vectors |\n| Wrong root | installation/caller/project/`.fgos` roots are distinct fixtures |\n| Silent override | immutable exact binding; named replacement only |\n| Capability escalation | admission then least-privilege provider grant |\n| Remote wraps CLI | no-spawn/no-envelope assertions per route |\n| “Ship” without install | distribution is in R1 |\n| `fgos-runner` silently points at a different release | public-entry mapping and single release manifest/pointer proof |\n| checkout-only success hides missing payload | staged-bundle proof before external install |\n| doctor mutates or upgrades unexpectedly | read-only default; named `--fix` scope; explicit upgrade contract |\n| Fake proof component | component advisory gate before package creation |\n| Workspace absorbs Herdr | explicit excludes and independent build proof |\n| Crash becomes success | completion-unknown; idempotency-gated retry only |\n| Diagnostics break output | trace/evidence or explicit diagnostics surface |"
+          }
+        }
+      ],
+      "historyPhrase": "## 15. Test And Review Gates",
+      "history": "c92fe6321a6482d6b04433d6c0aaa87cc8e040b7 docs(architect): add packaging-distribution area, rewrite host-invocation-routing docs\n",
+      "statusNote": {
+        "note": "This table is a dated proof/acceptance policy, not a claim that the current full Node/Rust/gateway suites or performance gates ran. The real Node suite entry is preserved; checkpoint evidence reports only commands actually exercised.",
+        "code": [
+          "package.json:27-35"
+        ]
+      },
+      "sourceBlob": "8b00cb73d06147f87760411288a0a4e3ec5543a1",
+      "introducedHistory": "c92fe6321a6482d6b04433d6c0aaa87cc8e040b7 docs(architect): add packaging-distribution area, rewrite host-invocation-routing docs\n",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11"
+    }
+  ]
+}
