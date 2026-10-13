@@ -257,3 +257,17 @@ Route only these new accounting items for the independent changed-main-unit chec
 No new archive/delete request, real semantic conflict, physical history move or author-edited promoted document. The imported distribution spec is ratchet-accounted; the two imported packaging candidate files are shown in the merge evidence, not rewritten. Promotion-only notes from `c46785eca` remain deferred. Current carried registry is checksum-pinned but uncommitted until this independent check; the already committed closed registry stays safe.
 
 This stop is not the Step 3 checkpoint. Host Invocation's six unchanged blobs and 431 native units are pinned; content authoring is UNPROVEN and must follow accepted changed-identity accounting, not an automatic ID guess. Next: committed independent successor/disposition decisions for this limited scope, apply exact notes/bindings, both-prior/native proofs and accepted registry persistence, then Step 3 under A28.
+
+## Boundary accepted; Host Invocation checkpoint queue
+
+`c81f2bcf5` accepts the seventeen main-sync identities; exact bindings and notes are applied and the accepted registry is persisted in `83d757f4d`. No accepted sync item remains pending. The report's evidence-line ancestry, releaseVersion meaning and first-install tarball notes remain owed to the owning packaging/root/knowledge content batches; they are not fixed in Host Invocation.
+
+Host Invocation authors 431 source rows pending independent checkpoint review, all sixteen restoration groups at real committed map anchors, and a native-equal list of 572 eligible candidate-unverified units under A28. No new hold is granted. The original three Rings holds and 342 Agent Coordination exceptions remain unchanged.
+
+Flagged source obligation: dropped-010's installed-default npm-bin removal clause is obsolete against package.json:9-12 and bin/fgos.mjs:1-10. The original is retained verbatim; the proposed whole-unit supersede states the actual compatibility boundary and keeps the runner mapping and ownership header. Reviewer must check it; no locked ownership rule changes.
+
+One contextual identical-unit group requires independent confirmation: two documents share the same 2026-09-10 advisory/status/review header, not the same architecture claim. `identical-unit-exceptions-host-invocation-routing.json` pins its two source IDs and digest; each retains its frozen primary owner. No semantic-owner gate exemption is requested.
+
+Archive/delete: only the already A8-approved retired documentation policy, retained verbatim as non-authority history; no deletion. Real semantic conflicts: none newly found. Promoted-area edits: prelogged in promoted-edits.md and shown completely in host-invocation-accounting.json. Owned H findings are zero; the remaining packaging-portal metadata finding belongs to its later batch.
+
+Checkpoint needs a separate reviewer: all 431 Judgment/Weak-exact rows, sixteen T9 confirmations, the contextual metadata group, exact native-list equality, 30 randomly selected current units against code and the reviewer-held sensitivity/red-team checks. Source approvals, truth sample and batch closure remain UNPROVEN; no intermediate Lead stop occurred.

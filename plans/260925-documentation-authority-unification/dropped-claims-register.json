@@ -64,7 +64,21 @@
       "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-contract-versioning",
+        "unitDigest": "8ffc35b01b812e60431405f8d140ef900e24c4d87f05606dafec0dcb6e5f7dec",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/operation_provider_router.rs:108-119",
+          "packages/host-runtime/rust/src/contracts.rs:174-203"
+        ],
+        "statusNote": "Exact request/outcome version-pair matching is implemented; host/provider range intersection and registered transforms remain selected design, not an implemented promise here."
+      }
     },
     {
       "id": "dropped-003",
@@ -96,7 +110,21 @@
       "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+        "unitDigest": "f44c32e72b77048a0e5f38a820961ab9d3e631ce73110f8f46edd7d50806c941",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/invocation_service.rs:161-234",
+          "packages/host-runtime/rust/src/invocation_service.rs:494-570"
+        ],
+        "statusNote": "The runtime admits before selection, grants before dispatch and writes a terminal lifecycle record. The retained arrow chain is the design vocabulary, not an assertion that every arrow is a separately persisted state."
+      }
     },
     {
       "id": "dropped-004",
@@ -128,7 +156,21 @@
       "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-physical-placement-layout-tree",
+        "unitDigest": "b7c268c102bebb54ddfa5eb5e0a30776638dc450e855f71eb63088a47586c1fb",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "Cargo.toml:1-17",
+          "packages/host-runtime/rust/src/registry.rs:19-69"
+        ],
+        "statusNote": "This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename."
+      }
     },
     {
       "id": "dropped-005",
@@ -176,7 +218,20 @@
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (class vs mechanism, ",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-class-definitions",
+        "unitDigest": "6f87a7eebf9ea1c9168ec539fbde7f1e86802905808f17cdf411b0e95de75e52",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/contracts.rs:377-393"
+        ],
+        "statusNote": "The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped."
+      }
     },
     {
       "id": "dropped-006",
@@ -214,7 +269,21 @@
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (protocol placement; ",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+        "unitDigest": "09bad73031f65818132934438abaa9deb202c4d506ea8a0f1d2794b1e87c9a1e",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/contracts.rs:205-220",
+          "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
+        ],
+        "statusNote": "OperationRequest uses typed input; the process codec is framed JSON-RPC. Cold-start and hot-loop discussion is qualitative design reasoning; no performance measurement is claimed."
+      }
     },
     {
       "id": "dropped-007",
@@ -246,7 +315,20 @@
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules'; HI-I021",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-semantic-contract-stays-transport-neutral",
+        "unitDigest": "ae783d1874e8f08378f9ba6fb523ab87b46e20cabc1de311ff702db6d2ca2f6b",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
+        ],
+        "statusNote": "The implemented process codec is length-prefixed JSON-RPC. A binary codec or local socket is retained future transport-neutral design, not implemented functionality."
+      }
     },
     {
       "id": "dropped-008",
@@ -282,7 +364,21 @@
       "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (registry/linker mean Existing carriers of the partly carried topic: spec.md, roadmap.md, architecture/provider-routing.md, verification/r2-external-process-proof.md.",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "anchor": "restored-registry-linker-procedure-and-its-input-output-formula",
+        "unitDigest": "4d243a014e521ec3d00b1941aff46f7aaff78e04a4fa6d756840d1c6ef7d7d17",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/registry.rs:19-69",
+          "packages/host-runtime/rust/src/operation_provider_router.rs:24-40"
+        ],
+        "statusNote": "The input/output formula and full validation procedure are retained selected design. The cited immutable snapshot constructor validates duplicate bindings; it does not prove every proposed namespace/capability/replacement step is implemented."
+      }
     },
     {
       "id": "dropped-009",
@@ -316,7 +412,21 @@
       "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-both-adapters-delegate-a-complete-use-case",
+        "unitDigest": "bee8f7b4f179667157c60c45770840b9db691e7c03ce3914556e097538b46c35",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "apps/fgos/src/legacy_exec.rs:69-154",
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ],
+        "statusNote": "The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation."
+      }
     },
     {
       "id": "dropped-010",
@@ -348,7 +458,23 @@
       "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "package.json:9-12",
+          "bin/fgos.mjs:1-10"
+        ],
+        "statusNote": "FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
+        "flaggedObsolete": true,
+        "ownerQueue": true
+      }
     },
     {
       "id": "dropped-011",
@@ -380,7 +506,20 @@
       "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-rust-host-first-cost",
+        "unitDigest": "ce635b98194d303774b10085ed0267c25296c7bda6a154d34d0cdf3180f182e9",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ],
+        "statusNote": "The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed."
+      }
     },
     {
       "id": "dropped-012",
@@ -412,7 +551,20 @@
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "anchor": "restored-scope",
+        "unitDigest": "8f560ba167735c6e534d25346df656a0c215ecc909f7f29e5068c768e6842626",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "Cargo.toml:1-17"
+        ],
+        "statusNote": "The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement."
+      }
     },
     {
       "id": "dropped-013",
@@ -458,7 +610,21 @@
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-rejected-options-rationale",
+        "unitDigest": "0dcb452da8abf3d78a91a1c882f6086bd7388c8117f462a695ee211ba8a42637",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "apps/fgos/src/legacy_exec.rs:69-154",
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ],
+        "statusNote": "These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted."
+      }
     },
     {
       "id": "dropped-014",
@@ -496,7 +662,21 @@
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-per-component-repeat-procedure",
+        "unitDigest": "c73fb84bd5ff7d0269e399109f5067e14c6cfce10f6bc48094f2c20ecc7e90b8",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/invocation_service.rs:161-209",
+          "package.json:27-35"
+        ],
+        "statusNote": "The ten-step sequence is manual migration guidance, not a newly registered automation. Parked is represented distinctly from success in the runtime terminal enum; no provider-side human wait or reinvocation smoke is claimed."
+      }
     },
     {
       "id": "dropped-015",
@@ -528,7 +708,21 @@
       "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-rollback-bullets",
+        "unitDigest": "69dc68b645856ef1e861ecd4262595c7562de726b88e352deec9aea187b88fc0",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "packages/host-runtime/rust/src/operation_provider_router.rs:74-119",
+          "packages/host-runtime/rust/src/registry.rs:41-69"
+        ],
+        "statusNote": "The observation-window and writer-recovery obligations remain manual selected policy. Selection reads immutable bindings, not a runtime provider-selection override; this pass does not execute or certify release rollback."
+      }
     },
     {
       "id": "dropped-016",
@@ -572,7 +766,21 @@
       "relatedOverclaim": "matrix: 'Outcome, non-goals, settled choices, P0-P9 proof graph, test gates, rollback gates, risk controls, done criteria, remaining choices for target matrix, compatibility window, and preview versus stable' (P0-P9 proof graph, test gates); HI-I029 names veri",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "anchor": "restored-p1-compatibility-harness",
+        "unitDigest": "02610d5ee4372f569658cebaca082fca27d29f30918a4328ed6cbe0a8aa80101",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "package.json:27-35",
+          "apps/fgos/src/legacy_exec.rs:242-253"
+        ],
+        "statusNote": "The source itself labels 25 ms and 10 ms budgets as placeholders to confirm. They are retained unexecuted performance acceptance requirements, UNPROVEN as measurements. package.json names the current test entry; no all-suite pass or injected-difference run is inferred."
+      }
     },
     {
       "id": "dropped-017",
@@ -612,7 +820,20 @@
       "relatedOverclaim": "matrix: 'Outcome, non-goals, settled choices, P0-P9 proof graph, test gates, rollback gates, risk controls, done criteria, remaining choices for target matrix, compatibility window, and preview versus stable' (test gates, risk controls)",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+      "reviewedDisposition": {
+        "decision": "restored",
+        "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "anchor": "restored-test-and-review-gates-table",
+        "unitDigest": "56d15064f93ccee95d727bc4f4508544ff979ef20ec5b4d7a61b0cf1b601177d",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:1@2026-10-11",
+        "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+        "codeEvidence": [
+          "package.json:27-35"
+        ],
+        "statusNote": "This table is a dated proof/acceptance policy, not a claim that the current full Node/Rust/gateway suites or performance gates ran. The real Node suite entry is preserved; checkpoint evidence reports only commands actually exercised."
+      }
     }
   ]
 }

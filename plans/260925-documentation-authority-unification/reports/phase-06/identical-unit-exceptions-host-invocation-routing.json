@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "batch": "Host Invocation Routing",
+  "authoredCommit": "ffab9879172f3143d96b25b87f5bbd2c4d93b718",
+  "authorSession": "codex-session:1@2026-10-11",
+  "reviewStatus": "pending",
+  "groups": [
+    {
+      "digest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
+      "sourceUnits": [
+        {
+          "claimId": "claim_825ecbc106eb49b18701b0d68c204d22",
+          "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
+          "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+          "targetAnchor": "unheaded-block-7"
+        },
+        {
+          "claimId": "claim_3a3a8368338c8392adbdf48ddbf0285c",
+          "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
+          "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+          "targetAnchor": "unheaded-block-7"
+        }
+      ],
+      "rationale": "These are identical September status/date/review provenance headers attached to two different source documents: external process protocol and CLI-only legacy transition. They do not duplicate an architecture or executable policy claim. Each retains its own frozen mapped owner and dated source provenance. No one-owner-per-semanticClaimId exemption is requested; default D remains clean. Independently check this exact two-member set and each surrounding document subject.",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "pending"
+    }
+  ]
+}

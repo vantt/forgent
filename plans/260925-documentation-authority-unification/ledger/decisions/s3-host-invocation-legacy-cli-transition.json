@@ -1,0 +1,728 @@
+{
+  "version": 1,
+  "shard": "s3-host-invocation-legacy-cli-transition",
+  "authorSession": "codex-session:1@2026-10-11",
+  "sources": [
+    "docs/architect/host-invocation-routing/legacy-cli-transition.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "kind": "architecture",
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Full six-source conservation: direct units map to the frozen primary owner or the sixteen explicit restoration groups. No source byte or authority route is retired in this candidate batch.",
+      "targets": [
+        "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_06ed1e74e28e628d68ae28927e3f14cb",
+      "sourceUnitDigest": "882786e83f6fcf97ec9230a8eb8cac4c050823310061348dd3d85cb609dbe329",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "legacy-cli-transition",
+      "targetUnitDigest": "17650430d1e6705ef55bdc80c16ff8269581ffb869203241dd25386a61afee0b",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"# Legacy CLI Transition\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#legacy-cli-transition to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#legacy-cli-transition. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_3a3a8368338c8392adbdf48ddbf0285c",
+      "sourceUnitDigest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-7",
+      "targetUnitDigest": "1f0b6d857df397465035f18ec06d6441ad9e26891510c2112973da61a4f7aac7",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"**Status:** Vision / architecture advisory, not a locked platform law and not an implementation plan. **Date:** 2026-09-10. **Revised:** per [architecture-review-260910-1\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-1 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-7. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_aa86fb103683af614daa5edfc2329ed7",
+      "sourceUnitDigest": "a39ca68b13d94183c8ce77c8b13d3c701147c259894c9974366e7bd37392178d",
+      "claimKind": "contract",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "ecf95f9266001e514430a2f9d52cd9fa15af3ce928736250c6a447b1851a9c90",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"This document depends on the kernel contract in [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — read it first, in particular \"Transitional\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-2 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-8. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_b4f3b7bbb0174373a63a66c57c4f3078",
+      "sourceUnitDigest": "8ab9a5d08768588a2df182c5335647db6e2ca5f25639722119cd7009d2cdfcc0",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "migration-status-note",
+      "targetUnitDigest": "4ea52718f114ddd1de808f2b62beb60f7201687e0b64a1aa873caa96d49dbbf1",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## Migration Status Note\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#migration-status-note to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#migration-status-note. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_2f85030181d51c92cbb5dfd094d20956",
+      "sourceUnitDigest": "f7d94659b67e25dfcd16d65ccb72561343b62d223afedc078e4a53fddea7c335",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-9",
+      "targetUnitDigest": "81e298b1e50a0414fa5fb3d17ae45182a975b64c213fe856c1fac52facc8282c",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "Migration Status Note"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"This document remains a legacy-current source during the 2026-09-14 promotion pass. The promoted platform docs are [architecture/legacy-cli-transition.md](../../platform/\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-3 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-9. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "sourceUnitDigest": "fee7e29c8f6886025098180b705008f43d5a3198943485c0256f5645b9cdc0fd",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "1-two-distinct-adapters",
+      "targetUnitDigest": "91ef5706ccfb37792cda7231b99b6c1857b29f314509b11c0fe66ae6fca7e8a3",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## 1. Two Distinct Adapters\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#1-two-distinct-adapters. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_0780171ae7b22535547b733b282902e4",
+      "sourceUnitDigest": "070eef9281dcde7aac4cd065ac319c4eb601c82df284dce49286419ad23ec684",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-10",
+      "targetUnitDigest": "070eef9281dcde7aac4cd065ac319c4eb601c82df284dce49286419ad23ec684",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "1. Two Distinct Adapters"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Node transition needs two adapters with different contracts. Treating them as one provider would create the false impression that captured CLI output is a semantic result\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-4 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-10. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_f399322c3c707a4363567075654a1189",
+      "sourceUnitDigest": "5160f00257136973584986b26c54a07fa0cf34f86420dd7c3e11a181b8659b6f",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-11",
+      "targetUnitDigest": "5160f00257136973584986b26c54a07fa0cf34f86420dd7c3e11a181b8659b6f",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "1. Two Distinct Adapters"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"**`LegacyCliPassthroughProvider`** — CLI-only. Receives preserved `OsString` argv, inherited stdin, cwd/environment, and signal context; returns pre-rendered stdout/stder\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-5 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-11. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_cbfa23989cabeec1fdde00b4d555b37d",
+      "sourceUnitDigest": "6cc5dd367ae1e6c15741d1f743185ec8923cf018ae77d6d50b78e15973f06bb9",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-12",
+      "targetUnitDigest": "6cc5dd367ae1e6c15741d1f743185ec8923cf018ae77d6d50b78e15973f06bb9",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "1. Two Distinct Adapters"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"**`LegacySemanticProvider`** — receives and returns real versioned semantic contracts (`OperationRequest`/`ProviderOutcome`). Its Node bridge calls an extracted Node use \" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-6 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-12. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_06f923fa3e55bd9e8d8cab01146d573c",
+      "sourceUnitDigest": "0129212aee4b182b40332e56adb2f7d20315646befd1d3eb3ab230e41fe5e914",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-13",
+      "targetUnitDigest": "0129212aee4b182b40332e56adb2f7d20315646befd1d3eb3ab230e41fe5e914",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "1. Two Distinct Adapters"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Capturing stdout/stderr in a supervised child improves CLI cancellation and tracing but remains passthrough presentation; it never becomes the bridge used by a remote hos\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-7 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-13. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_7046eb56f67c02ef82f621a3fa30286c",
+      "sourceUnitDigest": "cc892a8e450198c14aaeb4b22d695f12db41b95f7b706de5c37dbaede212d091",
+      "claimKind": "contract",
+      "kind": "contract",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "2e846bb7bece653d8dfe732613ae538121de99a7781e3ab1060f4036e3366540",
+      "targetAncestry": [
+        "Contract: Component Protocol",
+        "Restored both adapters delegate a complete use case"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a component contract already defines lo\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 to its frozen mapped owner docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-30. The literal restoration contains the complete pinned source span. The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_fb0a3b210d1cddacf4e38452291c338a",
+      "sourceUnitDigest": "6b9eabf20b33d7ceaf04531c961d6da6d91e31fb61ca255f54e0f9f8ecdd1d1d",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-15",
+      "targetUnitDigest": "6b9eabf20b33d7ceaf04531c961d6da6d91e31fb61ca255f54e0f9f8ecdd1d1d",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "1. Two Distinct Adapters"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"The adapters resolve the legacy payload relative to the installed host, never from the caller's cwd, and invoke the Node entry/bridge directly rather than spawning `fgos`\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-9 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-15. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "sourceUnitDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "targetUnitDigest": "82cdc406a102567b6f0e20f0a4a9c0a24c914eaeaa37b9438fb244d990a72571",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## 2. Legacy Payload Identity, Ownership, And Repair Path\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_7671f0c8195aa48b9e95bcc1a9dd9339",
+      "sourceUnitDigest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-16",
+      "targetUnitDigest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Three things are separated that the name `bin/fgos.mjs` currently conflates:\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-10 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-16. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_d132d054cc01b08ffa74ecfd60cc443c",
+      "sourceUnitDigest": "d89c54a1f2bd47a51996e17e91037b4ec1e54551d66250aeaeae67c3506dcc73",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-17",
+      "targetUnitDigest": "d89c54a1f2bd47a51996e17e91037b4ec1e54551d66250aeaeae67c3506dcc73",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"| | Today | After R1 | |---|---|---| | Public name people type | `fgos` → Node | `fgos` → Rust host (workspace shim / PATH) | | Payload identity the Rust host execs | non\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-11 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-17. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_b098afd80d02a32e6c6dd6c0f1e23284",
+      "sourceUnitDigest": "dfa5106e5a2c65608b2fb1bb8b7869265d23a7c499d3288b30249487c34142ce",
+      "claimKind": "decision",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-18",
+      "targetUnitDigest": "118885816abfb7f4aab2be95229d48b5f9d505ee4d781ced7fff9c43ce7dd95e",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imp\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-12 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-18. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+      "sourceUnitDigest": "dd06d97ff0ed979559a570366b424ec49ae1661c6916fa89364ec9f6c1bc3716",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-19",
+      "targetUnitDigest": "c3301ca9cc5d4bc1b53296a7edf3a3afb1726f1280db021c8c3131b554354f95",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-13 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-19. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+      "sourceUnitDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+      "targetAncestry": [
+        "Architecture: Release Boundaries",
+        "Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Supersede the whole dated installed-default npm-bin removal promise with the checked current compatibility boundary: both npm entries remain, fgos-runner stays mapped, and the entry ownership header stays present. package.json:9-12 and bin/fgos.mjs:1-10 are the evidence. The obsolete promise is separately preserved verbatim, not deleted or presented as current, and routed to the owner queue. No locked ownership rule is changed."
+    },
+    {
+      "claimId": "claim_0b85ea8ddcbd3d505edf8b110e3a42ad",
+      "sourceUnitDigest": "005feb9cee3518c306c052f3d406dfcf4897ead42158b9cf86d085b4aa9a1432",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-21",
+      "targetUnitDigest": "005feb9cee3518c306c052f3d406dfcf4897ead42158b9cf86d085b4aa9a1432",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-15 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-21. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_df8ecf59eaba9c13d5ebc60784018f80",
+      "sourceUnitDigest": "faed6966caa51ebd578b4309e97396a7586a5b76331c228ea7e06e1c634dbb49",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-22",
+      "targetUnitDigest": "faed6966caa51ebd578b4309e97396a7586a5b76331c228ea7e06e1c634dbb49",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Every selector has exactly one generated `CommandRouteDescriptor`, derived from the Node command registry plus checked migration annotations. Its minimum fields:\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-16 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-22. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_418ba1eb913f8fb73c2076c098709b9e",
+      "sourceUnitDigest": "82c2e1bac0d754d2cd0cee59032449621aa149c236745c1e73f29ec3797088ab",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-23",
+      "targetUnitDigest": "82c2e1bac0d754d2cd0cee59032449621aa149c236745c1e73f29ec3797088ab",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"```txt selector # canonical command/subcommand selector route_kind # legacy-cli | native operation_id # required only for native semantic routing legacy_payload # require\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-17 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-23. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_7cc93760fbe54867480b91577fcbbf34",
+      "sourceUnitDigest": "cdee5daf3a57d1ab26afa4ab6edbd9564cae928dafec2c1c8a696ded900f32da",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-24",
+      "targetUnitDigest": "cdee5daf3a57d1ab26afa4ab6edbd9564cae928dafec2c1c8a696ded900f32da",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"`legacy-cli` means the Node payload owns argument parsing and behavior; the Rust host must only recognize the checked selector and preserve the remaining `OsString` argv.\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-18 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-24. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_174de09282f33f3be061af276a2f312c",
+      "sourceUnitDigest": "7bff1203d4199d2bf5a8f30d49702196a121cabef40e79c2c87493876e83de1f",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-25",
+      "targetUnitDigest": "7bff1203d4199d2bf5a8f30d49702196a121cabef40e79c2c87493876e83de1f",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"The descriptor is both the routing input and the contributor repair map. A repository-local `scripts/explain-command-route.mjs <selector>` reads the same checked artifact\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-19 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-25. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_19d889291655b99062f6d2a96f4d46e0",
+      "sourceUnitDigest": "f4eba1a374f08d640043dd98dbd0cf896df4390952d99b534d3db1d91f4a3888",
+      "claimKind": "contract",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-26",
+      "targetUnitDigest": "f4eba1a374f08d640043dd98dbd0cf896df4390952d99b534d3db1d91f4a3888",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "2. Legacy Payload Identity, Ownership, And Repair Path"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"**Rollback:** configuration can never replace a built-in provider (kernel contract §7), and there is no runtime provider-selection swap to roll back a native operation. R\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-20 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-26. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_98683c6667ec64317c110eb4fe42da11",
+      "sourceUnitDigest": "1084930371798278160dcbcbd00f50c98b2ae0bbb835aa54e2185cf414701532",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "3-command-metadata-and-parser-ownership",
+      "targetUnitDigest": "ed5b60249ca68e784ca85ffcd4d209b39951a55538d685ce33bed82c0f7308de",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## 3. Command Metadata And Parser Ownership\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#3-command-metadata-and-parser-ownership. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_7f7b3ba83bbde945cdd80d479b9d0b19",
+      "sourceUnitDigest": "3f4712a04f578e6169c443e429f9b617eec036343e6d96710e29eae2f3fc0e30",
+      "claimKind": "architecture",
+      "kind": "contract",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "2d7eb1122a3d9d5be86e94f2a29fd9b1b8bea6ff1a5a8240b1c724593506de9e",
+      "targetAncestry": [
+        "Contract: Component Protocol",
+        "Restored both adapters delegate a complete use case"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"The router needs operation identity and provider metadata but does not need to parse every host's full input grammar. Metadata separates into: host-visible identity, summ\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-21 to its frozen mapped owner docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-31. The literal restoration contains the complete pinned source span. The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_2150505ad7a90a909c876f86d9f5045b",
+      "sourceUnitDigest": "2e1f61975368434cb3d88ff92f9b9d2273920b8ea96a524ce7d84ba4a400db56",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-28",
+      "targetUnitDigest": "2e1f61975368434cb3d88ff92f9b9d2273920b8ea96a524ce7d84ba4a400db56",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "3. Command Metadata And Parser Ownership"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"While a CLI verb is legacy, the Rust CLI recognizes only a checked command selector and forwards every provider-owned `OsString` unchanged. The selector routes under a re\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-22 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-28. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_e9ae0be6b74c4968b45802eb2cf6eb4f",
+      "sourceUnitDigest": "3eb90ced14c221064458c91c8f9e056943c8a444a5f425cf2c139718881b5a0d",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-29",
+      "targetUnitDigest": "3eb90ced14c221064458c91c8f9e056943c8a444a5f425cf2c139718881b5a0d",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "3. Command Metadata And Parser Ownership"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"A deterministic generated command descriptor may bridge the current Node registry into the Rust host during migration. Generated metadata is validated for drift; it is no\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-23 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-29. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_fc3eb11aedf895901962ef5e70f26de4",
+      "sourceUnitDigest": "57513242fdb0616787a7659501ec2149ef3a0a4508c9cb2bc5ef1a9df20f5eaf",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "4-public-presentation-versus-semantic-outcome",
+      "targetUnitDigest": "473968087ec285fd9d193b0923a596d450369f2e7cbb96ec911555b5638d7c59",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## 4. Public Presentation Versus Semantic Outcome\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_87f8a5d0c80c3f928422a7ffbef9e8ee",
+      "sourceUnitDigest": "e7f17313cf29b200e52c2db52e8ec9b8e4c4817230753bff368004d73c705581",
+      "claimKind": "contract",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-30",
+      "targetUnitDigest": "e7f17313cf29b200e52c2db52e8ec9b8e4c4817230753bff368004d73c705581",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "4. Public Presentation Versus Semantic Outcome"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"`fgos.v1` belongs to the CLI presenter, not to the provider protocol. Likewise, HTTP status and MCP tool results belong to the remote presenter.\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-24 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-30. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_b44be17fc9825eab5a9a6822c1473110",
+      "sourceUnitDigest": "9842f2c86633b096fb3d855b79923a9c0646a8b23a28cbe0ecd61b1c22d50db7",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-31",
+      "targetUnitDigest": "9842f2c86633b096fb3d855b79923a9c0646a8b23a28cbe0ecd61b1c22d50db7",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "4. Public Presentation Versus Semantic Outcome"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Native providers return `ProviderOutcome`; the calling presenter wraps it once. Transparent legacy output (from `LegacyCliPassthroughProvider`) is already a public presen\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-25 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-31. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_d3a32297633d7d7cc626d7723dca46c7",
+      "sourceUnitDigest": "4661fe2bffbd3ed3adcc1045f8dc757e4e271e65f77393743c7f75febdfece3f",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-32",
+      "targetUnitDigest": "4661fe2bffbd3ed3adcc1045f8dc757e4e271e65f77393743c7f75febdfece3f",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "4. Public Presentation Versus Semantic Outcome"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Current `fgos.v1` hashes compact `JSON.stringify(data)` bytes but prints the final envelope using two-space pretty JSON. Cross-runtime compatibility tests therefore separ\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-26 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-32. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_9a1f08d0bc4045fde2455e9a8d196a29",
+      "sourceUnitDigest": "c0a85f4f3e27eeba57d5dff78dba55b787570a4c0b86f411a694538811de1fb4",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-33",
+      "targetUnitDigest": "c0a85f4f3e27eeba57d5dff78dba55b787570a4c0b86f411a694538811de1fb4",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "4. Public Presentation Versus Semantic Outcome"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Golden vectors are necessary but not sufficient. A Node-generated differential corpus covers object insertion order, integer limits, negative zero, floating exponent form\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-27 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-33. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_b74991659ee3db4cb630f607d065ce52",
+      "sourceUnitDigest": "51b636bb97780e8be205e1fce45918f81b4e6e9b40b4a5bd008ce4a9d71cd965",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "5-rust-host-first-benefit-and-cost",
+      "targetUnitDigest": "b1af5c5a5d366bb2d0e49df2924aba575c588127657d8dfd5dc8cec3591daae6",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## 5. Rust Host First: Benefit And Cost\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_039865ac614bd07bd3b1f00f89e39441",
+      "sourceUnitDigest": "aa5f1acfc283ff3bf42d5fc63f54a9493aa89c8ede9a6f188a5c33728771508b",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetUnitDigest": "aa5f1acfc283ff3bf42d5fc63f54a9493aa89c8ede9a6f188a5c33728771508b",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "5. Rust Host First: Benefit And Cost"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"Making Rust the host before migrating components places the final composition root, peer host use cases, provider registry, and plugin seam in their permanent runtime imm\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-28 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-34. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_8c44796ac827f6b1287421778b56511c",
+      "sourceUnitDigest": "513f1751ff49e49804730a3922690dc0231b92adb1c25a55a21d34334693f8d2",
+      "claimKind": "architecture",
+      "kind": "contract",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-35",
+      "targetUnitDigest": "eead6c3f51a2d96d9e881dc091e734bebefd4c60f14554b729f8f62324a2cd5b",
+      "targetAncestry": [
+        "Contract: Component Protocol",
+        "Restored rust host first cost"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"The cost is temporary: a legacy CLI call pays both the small Rust launcher and Node startup, distribution must ship both runtimes, and compatibility failures can occur be\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-29 to its frozen mapped owner docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-35. The literal restoration contains the complete pinned source span. The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "sourceUnitDigest": "ded8adca384e6ae2de3bd7fe2c03692191f0bf14248ca807ff434b43e2efeeab",
+      "claimKind": "architecture",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "related-documents",
+      "targetUnitDigest": "954b3dcc8c61cac86072dbe20d9c6aa044d2ddc3387979c743c81bfd69ae9337",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct heading unit \"## Related Documents\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#related-documents to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#related-documents. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    },
+    {
+      "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+      "sourceUnitDigest": "42cc4ac1d11d27794f03b4cb8c1981441babf36f7b6a207ae7d6513e1e90aaa7",
+      "claimKind": "contract",
+      "kind": "architecture",
+      "disposition": "move",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "Related Documents"
+      ],
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Move the complete direct unheaded-block unit \"- [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on. - [External Provider Protocol](./external-prov\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-30 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-36. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval."
+    }
+  ]
+}
