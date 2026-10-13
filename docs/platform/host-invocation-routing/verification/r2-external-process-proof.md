@@ -11,7 +11,6 @@ Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-15
 Related:
-- plans/260915-host-invocation-r2-external-process/plan.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
 - docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
 ```
@@ -84,13 +83,13 @@ Every R2 merge re-ran and passed `cargo test -p fgos-host-runtime -p fgos --quie
 
 ## 7. Non-Gates
 
-Marketplace, publisher trust, signature system, production WASM, and core-provider replacement do not gate R2. These remain future work for R3 or later, per the [R2 execution record](../../../../plans/260915-host-invocation-r2-external-process/plan.md)'s own non-goals.
+Marketplace, publisher trust, signature system, production WASM, and core-provider replacement do not gate R2. These remain future work for R3 or later, per the `R2 execution record` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`)'s own non-goals.
 
 ## 8. Related Files
 
 | Relationship | File |
 | --- | --- |
-| execution record | [../../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../../plans/260915-host-invocation-r2-external-process/plan.md) |
+| execution record | `../../../../plans/260915-host-invocation-r2-external-process/plan.md` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`) |
 | component protocol | [../contracts/component-protocol.md](../contracts/component-protocol.md) |
 | provider manifest | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | implementation alignment | [implementation-alignment.md](implementation-alignment.md) |
