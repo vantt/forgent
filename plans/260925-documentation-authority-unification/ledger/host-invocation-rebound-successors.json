@@ -362,7 +362,7 @@
       "targetOwner": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
       "targetAnchor": "unheaded-block-9",
       "sourceCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216",
-      "successorCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+      "successorCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
       "authoredBy": "codex-session:3@2026-10-13",
       "reviewStatus": "pending",
       "rationale": "Necessary identity accounting for the authorized candidate correction: docs/platform/host-invocation-routing/intent-preservation-ledger.md#unheaded-block-8 is replaced in the same document by #unheaded-block-9. Full old/current text and digests are shown for independent review; this carries the corrected whole unit, preserves its documentation subject, and adds no approval. Navigation destinations and current route/status statements are changed only as the committed checkpoint and owner continuation require.",
@@ -552,7 +552,7 @@
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "unheaded-block-4",
       "sourceCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216",
-      "successorCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+      "successorCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
       "authoredBy": "codex-session:3@2026-10-13",
       "reviewStatus": "pending",
       "rationale": "Necessary identity accounting for the authorized candidate correction: docs/platform/host-invocation-routing/roadmap.md#unheaded-block-3 is replaced in the same document by #unheaded-block-4. Full old/current text and digests are shown for independent review; this carries the corrected whole unit, preserves its documentation subject, and adds no approval. Navigation destinations and current route/status statements are changed only as the committed checkpoint and owner continuation require.",
@@ -934,7 +934,7 @@
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "unheaded-block-11",
       "sourceCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216",
-      "successorCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+      "successorCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
       "authoredBy": "codex-session:3@2026-10-13",
       "reviewStatus": "pending",
       "rationale": "Necessary identity accounting for the authorized candidate correction: docs/platform/host-invocation-routing/spec.md#unheaded-block-10 is replaced in the same document by #unheaded-block-11. Full old/current text and digests are shown for independent review; this carries the corrected whole unit, preserves its documentation subject, and adds no approval. Navigation destinations and current route/status statements are changed only as the committed checkpoint and owner continuation require.",
@@ -1237,7 +1237,7 @@
       "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
       "targetAnchor": "unheaded-block-4",
       "sourceCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216",
-      "successorCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+      "successorCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
       "authoredBy": "codex-session:3@2026-10-13",
       "reviewStatus": "pending",
       "rationale": "Necessary identity accounting for the authorized candidate correction: docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md#unheaded-block-3 is replaced in the same document by #unheaded-block-4. Full old/current text and digests are shown for independent review; this carries the corrected whole unit, preserves its documentation subject, and adds no approval. Navigation destinations and current route/status statements are changed only as the committed checkpoint and owner continuation require.",
@@ -1306,7 +1306,7 @@
       "targetOwner": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "targetAnchor": "unheaded-block-11",
       "sourceCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216",
-      "successorCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+      "successorCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
       "authoredBy": "codex-session:3@2026-10-13",
       "reviewStatus": "pending",
       "rationale": "Necessary identity accounting for the authorized candidate correction: docs/platform/host-invocation-routing/verification/source-preservation-audit.md#unheaded-block-10 is replaced in the same document by #unheaded-block-11. Full old/current text and digests are shown for independent review; this carries the corrected whole unit, preserves its documentation subject, and adds no approval. Navigation destinations and current route/status statements are changed only as the committed checkpoint and owner continuation require.",
@@ -1321,5 +1321,6 @@
         "5. Remaining Unknowns"
       ]
     }
-  ]
+  ],
+  "reboundAtCommit": "744fecf087841e3600c44bb3d07a681a37203ef0"
 }

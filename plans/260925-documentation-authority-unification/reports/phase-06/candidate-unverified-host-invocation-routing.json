@@ -2,7 +2,7 @@
   "version": 1,
   "batch": "Host Invocation Routing",
   "authorization": "A28",
-  "authoredCommit": "b69197f88749fc6e1acc14797186f039a19e9793",
+  "authoredCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
   "meaning": "Conservation is separate from candidate truth; no per-unit reverse receipts or current-truth approvals.",
   "count": 588,
   "rows": [
@@ -4735,7 +4735,7 @@
       "claimId": "claim_4ddd9c152b622116bebefe8fd67b92f8",
       "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
       "anchor": "6-open-items",
-      "unitDigest": "25be5a30c111e9005e326dd59542052c2aed32f25daaeef42c2a2a24032bd487",
+      "unitDigest": "205ed62a0082b39ca6fc19956402fa681e6cd2829d47856be420b6f416c50a4b",
       "fileStatus": {
         "kind": "intent-preservation-ledger",
         "kindCanonical": true,
@@ -4762,10 +4762,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_464aa1500dc32661646d7839e4cca7c6",
+      "claimId": "claim_d398f812ceeffb6b1b9f13ebcfc2ff86",
       "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
       "anchor": "unheaded-block-9",
-      "unitDigest": "6285e4bf68b83ee0e8090de22df3316e6c529bef2f750c8a33e3983c22aae9a5",
+      "unitDigest": "0503621d0d5eee0f4c29ea520e3f0fb2224516a3a1dedc36dde16658525d453d",
       "fileStatus": {
         "kind": "intent-preservation-ledger",
         "kindCanonical": true,
@@ -5065,7 +5065,7 @@
       "claimId": "claim_69a0c2c6d25de1eee6c260a3efef81cf",
       "path": "docs/platform/host-invocation-routing/roadmap.md",
       "anchor": "1-current-baseline",
-      "unitDigest": "e970e9dca56ea3a31b46c058fb5edebfd8a579914da603b6fae70076863bb20b",
+      "unitDigest": "de33fe795a74c819045d5c4c1519b51f2da0469ff46af2e89b90dfec1fac2d40",
       "fileStatus": {
         "kind": "roadmap",
         "kindCanonical": false,
@@ -5092,10 +5092,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_673812eb3044b197429efd54d8e9f738",
+      "claimId": "claim_839df723e7dac45895611ad69e2f85b7",
       "path": "docs/platform/host-invocation-routing/roadmap.md",
       "anchor": "unheaded-block-4",
-      "unitDigest": "470ddd3bc8b62c4b74b260dffc943949e49cad26eb2faa66e9e9c0845c542b38",
+      "unitDigest": "1895bfcae8fb393d6b008fcec3e368c42f7ea6e24bac176ea8374ebfaa80d0dc",
       "fileStatus": {
         "kind": "roadmap",
         "kindCanonical": false,
@@ -5215,7 +5215,7 @@
       "claimId": "claim_966b166cc73a1b5b5a833068bf408d04",
       "path": "docs/platform/host-invocation-routing/roadmap.md",
       "anchor": "31-status-tracker",
-      "unitDigest": "926a6ea7aaba3f7a8536ed7a664d67f8f7f6f44a2ecd8d36ed8cc56f0d27ea9e",
+      "unitDigest": "87be6d10bab6016582d2b2295dd25e06e3b2a92913566a0c8c59e952825d91d3",
       "fileStatus": {
         "kind": "roadmap",
         "kindCanonical": false,
@@ -5227,10 +5227,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ba70b38fbdb240a19cbe94ca36966ae5",
+      "claimId": "claim_db26914f569473135fcab7cd6c0f3a58",
       "path": "docs/platform/host-invocation-routing/roadmap.md",
       "anchor": "unheaded-block-10",
-      "unitDigest": "5a40e37465021536f67f72817ee4336d96f966fa366b76533a52412308a12764",
+      "unitDigest": "8380132b40fff81518b0e6e903a674b85963f2ca0dabc66e1e6218ac088d60b6",
       "fileStatus": {
         "kind": "roadmap",
         "kindCanonical": false,
@@ -6505,7 +6505,7 @@
       "claimId": "claim_f7c25694cf1c273ade0e5e031260a471",
       "path": "docs/platform/host-invocation-routing/spec.md",
       "anchor": "6-unknowns",
-      "unitDigest": "3693814c15ab54d2cd830062e3d1b34afc3052082abb4b0b1301cd4a55e5eee0",
+      "unitDigest": "e2517cc6915051b1ca120db19735c823ed510ad85b570380a819a3c6929c2255",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
@@ -6532,10 +6532,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_1bf3824a9279bff8e0a15b44b8a05161",
+      "claimId": "claim_8c50679c6c10da7f17a22868a6db610c",
       "path": "docs/platform/host-invocation-routing/spec.md",
       "anchor": "unheaded-block-11",
-      "unitDigest": "467ad3ca4c303a0828566f84764aaca4a32ec89b695dcb324a6f8daca798ed2e",
+      "unitDigest": "761661fa605597de44123a7c6ea679369c80196c46704ecf18aaa6529a530086",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
@@ -7195,7 +7195,7 @@
       "claimId": "claim_1487deb6bbb61d481aff3dc950ad192e",
       "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
       "anchor": "2-code-verified-snapshot",
-      "unitDigest": "6a4e39e926e9a483469d9928aee6a8b00a49e979263f22bca62901fb8229cae7",
+      "unitDigest": "879af26e49f84027a68a9370aeae60f25015cef2b28c03ef4be141ed59e78d10",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -7207,10 +7207,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4e3eb7e52945e7808987bc105a27a61c",
+      "claimId": "claim_cb0ac7f58676d2940b901d7ad321c9a8",
       "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
       "anchor": "unheaded-block-4",
-      "unitDigest": "7e25265bed79ca04ec8c529cae7496c2058099935c179c4a050f5519401c198b",
+      "unitDigest": "8325e1fcad29a45d6a9f39f8f4bb409e47285e51a2f7ea1d4198207872742fed",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -8440,7 +8440,7 @@
       "claimId": "claim_56c5165f8efb71e49759c9e649d14de2",
       "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "anchor": "5-remaining-unknowns",
-      "unitDigest": "e6061d3782a5389fe4dc8d3303747751a129c10fd280fdf670851735081763c6",
+      "unitDigest": "2cfcc0b2baf18d87e1d517473c16c6c96e27ca711b16178b6151c92d1f83118d",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -8467,10 +8467,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d6a650daac3afaffa00dd35e94b0c950",
+      "claimId": "claim_7519b704a859a0bd3365f43b604281a0",
       "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "anchor": "unheaded-block-11",
-      "unitDigest": "b8c6c828860673a1d0ca70d074eb36712557197d058308786b62ac19568a02d9",
+      "unitDigest": "87dd11731527c21af8a18a47e4d23c8a179b625b03a29f9d1ec8100f18369b80",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -8485,7 +8485,7 @@
       "claimId": "claim_8f62a952c825814a0085e4a627fc0e40",
       "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "anchor": "6-code-scan-evidence",
-      "unitDigest": "a19b5b00eaf5d563d81cccc0043374f58c5933f2b5990a1d14e53295b547737f",
+      "unitDigest": "efeff8d1d094b751e34dd062f54f8d7e75b168cd5c614750f424b9e1d84f67bd",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
@@ -8497,10 +8497,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_99a0b0508899caf761d2eeb30decfdcc",
+      "claimId": "claim_075a75878b909d0dd445217b66664b3b",
       "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "anchor": "unheaded-block-12",
-      "unitDigest": "c5472bc42b8d6e56775d17e7d61cd7684d82b185d7e4f9ba141f83ecb15d4a29",
+      "unitDigest": "7d134fc2e53808d59e8481618acebd87d0244aa41de45dffcc7d8ee4382ee854",
       "fileStatus": {
         "kind": "verification",
         "kindCanonical": true,
