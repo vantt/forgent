@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:8@2026-10-13",
+  "baselineBlob": "b370c940c369c5de88007fc4ce1347121a850178",
+  "currentBlob": "13d2e172de35a570d148022d4c859cac05223acb",
+  "mainBlob": "13d2e172de35a570d148022d4c859cac05223acb",
+  "boundaryMerge": "77830ba77eb05991d95b005919776ee6254e833b",
+  "immediateMergeResult": "Already up to date",
+  "rowsDecidedLast": 36,
+  "plannedNativeDelta": 5,
+  "staleRowsAllRedecided": true,
+  "sourceDriftShare": 0.08845208845208845,
+  "sourceDriftUnderTenPercent": true,
+  "baselineFilesUnchanged": true
+}
