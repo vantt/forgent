@@ -12,6 +12,7 @@
 // person to clear, exactly as before.
 
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -22,12 +23,38 @@ const OUTPUT_LIMIT = 16 * 1024;
 const QUOTA_PATTERN = /usage limit|quota|rate limit/i;
 export const DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS = 90 * 1000;
 
-const expandHome = (home) => (typeof home === 'string' ? home.replace(/^\$\{HOME\}/, os.homedir()) : null);
+/**
+ * An account's credential home as an absolute path: a leading `~`, `${HOME}` or `$HOME` is the user's home
+ * directory. Null when the value is empty, not a string, or not absolute once expanded.
+ */
+export function expandCredentialHome(home) {
+  if (typeof home !== 'string' || !home.trim()) return null;
+  const expanded = home
+    .replace(/^\$\{HOME\}(?=\/|$)/, os.homedir())
+    .replace(/^\$HOME(?=\/|$)/, os.homedir())
+    .replace(/^~(?=\/|$)/, os.homedir());
+  return path.isAbsolute(expanded) ? expanded : null;
+}
+
+/**
+ * Make a call end on its own even when its runner dies: it runs detached, and the account lock stays held
+ * while it lives. coreutils `timeout` ends it after the limit (and kills it five seconds after that); the
+ * runner's own timer stays as well. Without `timeout` on PATH the plan runs as it is.
+ */
+export function withKillTimeout(plan, timeoutMs, env = process.env) {
+  if (!plan) return plan;
+  const dirs = String(env?.PATH ?? process.env.PATH ?? '').split(path.delimiter).filter(Boolean);
+  const timeoutBin = dirs.map((dir) => path.join(dir, 'timeout')).find((candidate) => {
+    try { fs.accessSync(candidate, fs.constants.X_OK); return fs.statSync(candidate).isFile(); } catch { return false; }
+  });
+  if (!timeoutBin) return plan;
+  return { ...plan, command: timeoutBin, args: ['--kill-after=5', String(Math.max(1, Math.ceil(timeoutMs / 1000))), plan.command, ...plan.args] };
+}
 
 /** The command that makes one call with this credential, or null when the layout is not one fgOS can probe. */
 export function credentialProbeCommand(credentialSource) {
-  const home = expandHome(credentialSource?.home);
-  if (!home || !path.isAbsolute(home)) return null;
+  const home = expandCredentialHome(credentialSource?.home);
+  if (!home) return null;
   if (credentialSource.kind === 'codex-home') {
     return {
       command: 'codex',
@@ -99,7 +126,7 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
 /** A probe function for `probeQuarantinedAccounts`. `spawnFn` is injectable for tests. */
 export function createCredentialProbe({ spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
   return async function probeCredential({ account, onSpawn }) {
-    const plan = credentialProbeCommand(account?.credentialSource);
+    const plan = withKillTimeout(credentialProbeCommand(account?.credentialSource), timeoutMs, env);
     if (!plan) return { ok: false, detail: 'no probe exists for this credential layout' };
     return runCredentialProbe(plan, { spawnFn, timeoutMs, env, onSpawn });
   };

@@ -1710,7 +1710,7 @@ export async function executeAssignment(assignment, opts = {}) {
     // a dispatch shape nothing can actually provision that credential
     // into -- only the confined bwrap driver's own prepare() copies
     // credentialSource into the worker's private home (confinement/drivers/
-    // bwrap.mjs's provisionSelectedCodexCredential), and both cli-spawn and
+    // bwrap.mjs's provisionSelectedCredential), and both cli-spawn and
     // herdr-spawn reach that prepare() through prepareConfinementForLaunch
     // with the same providerCapacity. Narrowly scoped to
     // `confinement.mode: 'required'`: that is the one case where the

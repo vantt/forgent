@@ -929,7 +929,7 @@ test('only the dispatched provider\'s entry is made due in the scratch copy and 
   } finally { w.cleanup(); }
 });
 
-test('a store whose entry cannot be told apart is skipped, and a lone oauth entry is the one', async () => {
+test('a store whose entry cannot be told apart is skipped, and a lone oauth entry is the one only when it belongs to the dispatched provider', async () => {
   const w = workspace();
   try {
     const now = Date.now();
@@ -942,13 +942,13 @@ test('a store whose entry cannot be told apart is skipped, and a lone oauth entr
     assert.deepEqual(await run(), { status: 'skipped', reason: 'entry-unidentified' }, 'no match');
     assert.equal(starts.length, 0);
 
-    writePi(w.home, { 'something-else': { type: 'oauth', access: FAKE.oldAccess, refresh: FAKE.oldRefresh, expires: now + 10 * 60 * 1000 } });
+    writePi(w.home, { 'xai-team': { type: 'oauth', access: FAKE.oldAccess, refresh: FAKE.oldRefresh, expires: now + 10 * 60 * 1000 } });
     const solo = fakeSpawn({
-      behaviour: (dir) => { const doc = readPi(dir); doc['something-else'] = { ...doc['something-else'], refresh: FAKE.newRefresh, expires: now + 6 * HOUR }; writePi(dir, doc); },
+      behaviour: (dir) => { const doc = readPi(dir); doc['xai-team'] = { ...doc['xai-team'], refresh: FAKE.newRefresh, expires: now + 6 * HOUR }; writePi(dir, doc); },
     });
     const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: solo.spawnFn });
     assert.equal(result.status, 'renewed');
-    assert.equal(readPi(w.home)['something-else'].refresh, FAKE.newRefresh);
+    assert.equal(readPi(w.home)['xai-team'].refresh, FAKE.newRefresh);
   } finally { w.cleanup(); }
 });
 
@@ -990,4 +990,158 @@ test('a failed snapshot with node:sqlite present copies the file as it is and sa
     assert.match(captured[0], /credential-snapshot-failed/);
     assert.equal(captured[0].includes(w.home), false);
   } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// A copy is removed only when the source proves it is not newer
+// ---------------------------------------------------------------------------------------------------
+
+const TORN = '{"xai": {"ty';
+const pendingCopies = (w) => {
+  const dir = path.join(w.accountDir, 'pending');
+  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, n)) : [];
+};
+const scratchCopies = (w) => (fs.existsSync(w.accountDir) ? fs.readdirSync(w.accountDir).filter((n) => n.startsWith('scratch-')) : []);
+
+test('a lone oauth entry of another provider is not the dispatched provider\'s: nothing is spawned', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, { 'github-copilot': { type: 'oauth', access: 'a', refresh: 'b', expires: Date.now() - 30 * 24 * HOUR } });
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'skipped', reason: 'entry-unidentified' });
+    assert.equal(starts.length, 0);
+  } finally { w.cleanup(); }
+});
+
+test('a renewal whose source is half-written afterwards keeps the renewed copy in pending and reports it as deferred', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const { spawnFn } = fakeSpawn({
+      layoutName: 'pi',
+      behaviour: (dir) => { renewHome('pi', dir); fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); },
+    });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'failed', reason: 'apply-deferred' });
+    assert.deepEqual(scratchCopies(w), []);
+    const kept = pendingCopies(w);
+    assert.equal(kept.length, 1);
+    assert.equal(readPi(kept[0]).xai.refresh, FAKE.newRefresh);
+    assert.equal(sha(path.join(w.home, 'auth.json')), TORN, 'the source is untouched');
+
+    // The owner's CLI finishes its write; the next holder applies the kept copy.
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const next = fakeSpawn({ layoutName: 'pi' });
+    const again = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: next.spawnFn, cooldownMs: 0 });
+    assert.equal(again.status, 'fresh');
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
+    assert.deepEqual(pendingCopies(w), []);
+  } finally { w.cleanup(); }
+});
+
+test('a renewal whose provider entry vanishes from the source keeps the renewed copy', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const { spawnFn } = fakeSpawn({
+      layoutName: 'pi',
+      behaviour: (dir) => { renewHome('pi', dir); writePi(w.home, { 'github-copilot': { type: 'oauth', access: 'a', refresh: 'b', expires: Date.now() + HOUR } }); },
+    });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'failed', reason: 'apply-deferred' });
+    assert.equal(pendingCopies(w).length, 1);
+  } finally { w.cleanup(); }
+});
+
+test('an omp store that cannot be opened after the call keeps the renewed copy', async () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }]).close();
+    const { spawnFn } = fakeSpawn({
+      layoutName: 'omp',
+      behaviour: (dir) => { renewHome('omp', dir); fs.writeFileSync(path.join(w.home, 'agent.db'), 'not a database'); },
+    });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'failed', reason: 'apply-deferred' });
+    const kept = pendingCopies(w);
+    assert.equal(kept.length, 1);
+    assert.match(readOmpRows(kept[0])[0].data, new RegExp(FAKE.newRefresh));
+  } finally { w.cleanup(); }
+});
+
+test('a leftover copy is kept while the source cannot be read or identified, and removed once the source proves it is not newer', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const copy = path.join(w.accountDir, 'pending', '000000000000001-a');
+    writePi(copy, piDoc(now + 6 * HOUR, { access: FAKE.newAccess, refresh: FAKE.newRefresh }));
+    const apply = () => applyRenewedCredential({ layoutName: 'pi-auth-json', sourceHome: w.home, copyHome: copy, provider: 'xai', requireFuture: false });
+
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
+    assert.deepEqual(apply(), { status: 'apply-deferred', code: 'unreadable-json' });
+    fs.rmSync(path.join(w.home, 'auth.json'));
+    assert.deepEqual(apply(), { status: 'apply-deferred', code: 'unreadable-file' });
+    writePi(w.home, { 'github-copilot': { type: 'oauth', access: 'a', refresh: 'b', expires: now + HOUR } });
+    assert.deepEqual(apply(), { status: 'apply-deferred', code: 'entry-unidentified' });
+
+    writePi(w.home, piDoc(now + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    assert.equal(apply().status, 'unchanged');
+    fs.writeFileSync(path.join(copy, 'auth.json'), TORN);
+    assert.equal(apply().status, 'unreadable', 'a copy that is itself malformed is unusable');
+  } finally { w.cleanup(); }
+});
+
+test('write-back stages a renewed home when the source is half-written, and the leftover stays pending', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
+    const result = writeBackRenewedCredential(dir, JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8')));
+    assert.deepEqual(result, { status: 'staged' });
+    const kept = pendingCopies(w);
+    assert.equal(kept.length, 1);
+    assert.equal(readPi(kept[0]).xai.refresh, FAKE.newRefresh);
+    assert.equal(sha(path.join(w.home, 'auth.json')), TORN);
+  } finally { w.cleanup(); }
+});
+
+test('write-back reports applied only when the copy was applied, and unchanged when it was dropped as not newer', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+    assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'applied' });
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
+    assert.deepEqual(pendingCopies(w), []);
+    assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'unchanged' });
+  } finally { w.cleanup(); }
+});
+
+test('a copy without a refresh token never replaces a source entry that has one', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + HOUR));
+    const original = sha(path.join(w.home, 'auth.json'));
+    const copy = path.join(w.tmp, 'copy');
+    writePi(copy, { xai: { type: 'oauth', access: FAKE.newAccess, expires: Date.now() + 6 * HOUR } });
+    const result = applyRenewedCredential({ layoutName: 'pi-auth-json', sourceHome: w.home, copyHome: copy, provider: 'xai' });
+    assert.equal(result.status, 'unchanged');
+    assert.equal(sha(path.join(w.home, 'auth.json')), original);
+  } finally { w.cleanup(); }
+});
+
+test('a write-back marker with an unsafe provider or account id is refused, not trusted', () => {
+  const w = workspace();
+  try {
+    for (const bad of ['../x', 'a/b', '', '-a', 'a b', undefined, 7]) {
+      assert.equal(credentialWriteBackMarker({ provider: bad, accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir }), null, String(bad));
+      assert.equal(credentialWriteBackMarker({ provider: 'xai', accountId: bad, credentialSource: piSource(w.home), runtimeDir: w.runtimeDir }), null, String(bad));
+    }
+    const good = credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir });
+    for (const bad of ['../x', 'a/b', '']) {
+      const marker = { credentialWriteBack: { ...good, accountId: bad } };
+      assert.deepEqual(writeBackRenewedCredential(w.tmp, marker), { status: 'failed', code: 'invalid-marker' }, bad);
+    }
+  } finally { w.cleanup(); }
 });

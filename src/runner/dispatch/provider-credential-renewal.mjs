@@ -13,12 +13,15 @@
 //                  source, or staged beside it for the next refresh-ahead when the account lock is busy.
 //
 // Applying is always compare-before-write: only an entry whose expiry is strictly later than the source's
-// (and still in the future) replaces it, only that entry changes, and a copy that cannot be read or has an
-// unexpected shape never touches the source. Nothing here prints, logs or returns a token value; results
-// carry fixed codes, and a parser's own message is never passed on because it quotes the input.
+// and whose refresh token is a different one replaces it (a fresh renewal result must also still be in the
+// future), only that entry changes, and a copy that cannot be read, has an unexpected shape or lacks a
+// refresh token the source has never touches the source. A copy is removed only when the source was read
+// and proves the copy is not newer, or when the copy itself is unusable; when the source cannot be read or
+// its entry cannot be identified, the copy is kept for the next holder of the account lock. Nothing here
+// prints, logs or returns a token value; results carry fixed codes, and a parser's own message is never
+// passed on because it quotes the input.
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
@@ -26,7 +29,9 @@ import { createRequire } from 'node:module';
 import { acquireAccountLock, tryAcquireAccountLock, providerAccountDir } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,
+  expandCredentialHome,
   runCredentialProbe,
+  withKillTimeout,
   DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS,
 } from './provider-credential-probe.mjs';
 
@@ -51,8 +56,6 @@ const COOLDOWN_FILE = 'cooldown.json';
 const PENDING_DIR = 'pending';
 const SCRATCH_PREFIX = 'scratch-';
 
-const SAFE_KEY = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/;
-
 const defaultLoadSqlite = () => {
   try {
     return require('node:sqlite');
@@ -67,14 +70,6 @@ const fail = (code) => ({ ok: false, code });
 /** The refresh-ahead window: at least an hour, and always longer than one renewal call plus a margin. */
 export function defaultRefreshAheadThresholdMs(probeTimeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS) {
   return Math.max(DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS, probeTimeoutMs + THRESHOLD_MARGIN_MS);
-}
-
-export function expandCredentialHome(home) {
-  if (typeof home !== 'string' || !home.trim()) return null;
-  const expanded = home
-    .replace(/^\$\{HOME\}(?=\/|$)/, os.homedir())
-    .replace(/^~(?=\/|$)/, os.homedir());
-  return path.isAbsolute(expanded) ? expanded : null;
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -217,15 +212,15 @@ function jwtExpiryMs(token) {
 const toMs = (expires) => (expires < 1e12 ? expires * 1000 : expires);
 
 // The refresh token of an entry, only ever compared in memory, never returned or printed. A store whose
-// refresh field cannot be found yields null, and null on either side counts as "differs" so that the
-// expiry rule alone decides.
+// refresh field cannot be found yields null; null on both sides lets the expiry rule alone decide, while a
+// copy without a refresh token never replaces a source entry that has one.
 function refreshOf(object) {
   for (const name of ['refresh', 'refresh_token', 'refreshToken']) {
     if (typeof object?.[name] === 'string') return object[name];
   }
   return null;
 }
-const refreshDiffers = (a, b) => a === null || b === null || a !== b;
+const refreshDiffers = (copy, source) => (copy === null ? source === null : source === null || copy !== source);
 
 // A copy entry replaces the source's only when its expiry is strictly later and its refresh token is a
 // different one (a copy that still holds the source's own refresh token has renewed nothing: a marked-due
@@ -278,7 +273,10 @@ const piLayout = {
       for (const entry of copyRead.entries) {
         if (key !== undefined && entry.key !== key) continue;
         const current = source.doc[entry.key];
-        if (!isObject(current) || current.type !== 'oauth' || !Number.isFinite(current.expires)) continue;
+        if (!isObject(current) || current.type !== 'oauth' || !Number.isFinite(current.expires)) {
+          if (key !== undefined) throw new Error('entry-unidentified');
+          continue;
+        }
         if (isReplacement(entry, { expiresMs: toMs(current.expires), refresh: refreshOf(current) }, { now, requireFuture })) {
           source.doc[entry.key] = entry.value;
           applied.push(entry.key);
@@ -430,6 +428,7 @@ const ompLayout = {
         for (const entry of copyRead.entries) {
           if (key !== undefined && entry.key !== key) continue;
           const target = current.get(entry.key);
+          if (!target && key !== undefined) throw new Error('entry-unidentified');
           if (!target || !isReplacement(entry, target, { now, requireFuture })) continue;
           if (hasUpdatedAt) {
             db.prepare('UPDATE auth_credentials SET data = ?, updated_at = ? WHERE id = ? AND provider = ?')
@@ -486,12 +485,11 @@ const earliestDue = (entries) => Math.min(...entries.map((entry) => entry.dueMs)
 
 // The one entry that belongs to the dispatched fgOS provider: a store may hold logins of other providers
 // (an abandoned one must not make every dispatch renew, and a renewal of another provider's entry would
-// not give this dispatch a fresh login). A single oauth entry is the one; otherwise the entry whose owner
-// (pi: the key, omp: the row's provider) is the provider id or starts with `<provider>-`; zero or several
-// matches cannot be told apart.
+// not give this dispatch a fresh login). An entry belongs when its owner (pi: the key, omp: the row's
+// provider) is the provider id or starts with `<provider>-`; a Codex login has no owner because its store
+// holds one provider only. Zero or several matches cannot be told apart.
 function selectProviderEntry(entries, provider) {
-  if (entries.length === 1) return { ok: true, entry: entries[0] };
-  const matches = entries.filter((entry) => entry.owner !== null && (entry.owner === provider || entry.owner.startsWith(`${provider}-`)));
+  const matches = entries.filter((entry) => entry.owner === null || entry.owner === provider || entry.owner.startsWith(`${provider}-`));
   return matches.length === 1 ? { ok: true, entry: matches[0] } : fail('entry-unidentified');
 }
 
@@ -499,40 +497,63 @@ function selectProviderEntry(entries, provider) {
 // Apply
 // ---------------------------------------------------------------------------------------------------
 
+// Codes that say the copy itself is unusable (it can never be applied); every other failure code, and every
+// failure to read the source, is a reason that may pass and leaves the copy where it is.
+const COPY_UNUSABLE_CODES = new Set(['unreadable-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
+const SOURCE_SIDE_THROWS = new Set(['unreadable-file', 'unreadable-json', 'unexpected-shape', 'unreadable-db', 'sqlite-unavailable', 'entry-unidentified']);
+
 /**
  * Apply the entry of `copyHome` that is strictly newer than the source's and carries a different refresh
  * token. With `provider`, only that provider's entry is considered (see selectProviderEntry); without it,
  * every entry. `requireFuture` (default true) also demands an expiry still ahead, which is what a fresh
  * renewal result must satisfy; a copy staged earlier is applied with `requireFuture: false`. The caller
- * holds the account lock. Returns `{status: 'applied'|'unchanged', keys}`, or `{status: 'unreadable',
- * code}` when the copy or the source's entry cannot be read, in which case the source is untouched.
- * Throws only when writing the source itself fails.
+ * holds the account lock. Returns `{status, keys}` with `applied`, or `unchanged` when the source was read
+ * and the copy is not newer; or `{status: 'unreadable', code}` when the copy itself is unusable; or
+ * `{status: 'apply-deferred', code}` when the source could not be read, its entry could not be identified,
+ * or the copy could not be read for a reason that may pass. Only `applied`, `unchanged` and `unreadable`
+ * allow the caller to remove the copy; the source is untouched unless `applied`. Throws only when writing
+ * the source itself fails.
  */
 export function applyRenewedCredential({ layoutName, sourceHome, copyHome, provider, requireFuture = true, now = Date.now(), loadSqlite = defaultLoadSqlite }) {
   const layout = LAYOUTS[layoutName];
   if (!layout) return { status: 'unreadable', code: 'unknown-layout' };
   const copy = layout.read(copyHome, { loadSqlite });
-  if (!copy.ok) return { status: 'unreadable', code: copy.code };
+  if (!copy.ok) return { status: COPY_UNUSABLE_CODES.has(copy.code) ? 'unreadable' : 'apply-deferred', code: copy.code };
+  const source = layout.read(sourceHome, { loadSqlite });
+  if (!source.ok) return { status: 'apply-deferred', code: source.code };
   let key;
   if (provider !== undefined) {
-    const source = layout.read(sourceHome, { loadSqlite });
-    if (!source.ok) return { status: 'unreadable', code: source.code };
     const selected = selectProviderEntry(source.entries, provider);
-    if (!selected.ok) return { status: 'unreadable', code: selected.code };
+    if (!selected.ok) return { status: 'apply-deferred', code: selected.code };
     key = selected.entry.key;
   }
-  const keys = layout.apply(sourceHome, copy, { now, loadSqlite, key, requireFuture });
+  let keys;
+  try {
+    keys = layout.apply(sourceHome, copy, { now, loadSqlite, key, requireFuture });
+  } catch (err) {
+    // The source changed between the read above and the write: still a source-side reason, not a verdict
+    // on the copy.
+    if (SOURCE_SIDE_THROWS.has(err?.message)) return { status: 'apply-deferred', code: err.message };
+    throw err;
+  }
   return { status: keys.length > 0 ? 'applied' : 'unchanged', keys };
 }
 
+// Whether the copy holds a login newer than the source's: 'newer', 'not-newer', or 'undetermined' when the
+// source cannot say (it cannot be read, or its entry cannot be identified and the copy holds a refresh token
+// the source does not). Undetermined copies are staged rather than dropped.
 function copyIsNewer({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
-  const source = layout.read(sourceHome, { loadSqlite });
   const copy = layout.read(copyHome, { loadSqlite });
-  if (!source.ok || !copy.ok) return false;
+  if (!copy.ok) return 'not-newer';
+  const source = layout.read(sourceHome, { loadSqlite });
+  if (!source.ok) return 'undetermined';
   const selected = selectProviderEntry(source.entries, provider);
-  if (!selected.ok) return false;
+  if (!selected.ok) {
+    const held = new Set(source.entries.map((entry) => entry.refresh).filter((refresh) => refresh !== null));
+    return copy.entries.some((entry) => entry.refresh !== null && !held.has(entry.refresh)) ? 'undetermined' : 'not-newer';
+  }
   const next = copy.entries.find((entry) => entry.key === selected.entry.key);
-  return next !== undefined && isReplacement(next, selected.entry, { now, requireFuture: false });
+  return next !== undefined && isReplacement(next, selected.entry, { now, requireFuture: false }) ? 'newer' : 'not-newer';
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -554,25 +575,24 @@ function listLeftovers(accountDir) {
 
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
-const DISCARDABLE_CODES = new Set(['unreadable-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
-
 /**
- * Apply (see applyRenewedCredential, without the future-expiry rule) and remove every leftover. A leftover is kept when applying it failed for a reason that may pass
- * (the source is busy, SQLite is unavailable) and removed when it can never be applied.
+ * Apply (see applyRenewedCredential, without the future-expiry rule) and remove every leftover that the
+ * source proves is not newer or that is unusable itself. A leftover is kept when the source could not
+ * answer (unreadable, entry unidentified, busy, SQLite unavailable). Returns `[{dir, status}]`.
  */
 function applyLeftovers({ accountDir, layoutName, provider, sourceHome, now, loadSqlite }) {
   const outcomes = [];
   for (const dir of listLeftovers(accountDir)) {
     let keep = false;
+    let status;
     try {
-      const result = applyRenewedCredential({ layoutName, sourceHome, copyHome: dir, provider, requireFuture: false, now, loadSqlite });
-      // An unidentifiable source entry is a property of the source, not of the copy: keep the copy.
-      keep = result.status === 'unreadable' && !DISCARDABLE_CODES.has(result.code);
-      outcomes.push(result.status);
+      status = applyRenewedCredential({ layoutName, sourceHome, copyHome: dir, provider, requireFuture: false, now, loadSqlite }).status;
+      keep = status === 'apply-deferred';
     } catch {
       keep = true;
-      outcomes.push('failed');
+      status = 'failed';
     }
+    outcomes.push({ dir, status });
     if (!keep) {
       try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* retried by the next holder */ }
     }
@@ -665,19 +685,6 @@ export async function refreshAhead({
   }
 }
 
-// The call must end on its own even when this runner dies: it runs detached, and the account lock stays
-// held while it lives. coreutils `timeout` ends it after the limit (and kills it five seconds after that);
-// the runner's own timer stays as well. Without `timeout` on PATH the plan runs as it is.
-function withKillTimeout(plan, timeoutMs, env = process.env) {
-  if (!plan) return plan;
-  const dirs = String(env?.PATH ?? process.env.PATH ?? '').split(path.delimiter).filter(Boolean);
-  const timeoutBin = dirs.map((dir) => path.join(dir, 'timeout')).find((candidate) => {
-    try { fs.accessSync(candidate, fs.constants.X_OK); return fs.statSync(candidate).isFile(); } catch { return false; }
-  });
-  if (!timeoutBin) return plan;
-  return { ...plan, command: timeoutBin, args: ['--kill-after=5', String(Math.max(1, Math.ceil(timeoutMs / 1000))), plan.command, ...plan.args] };
-}
-
 async function renewInScratch({ layout, layoutName, provider, credentialSource, home, accountDir, key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now }) {
   const scratch = path.join(accountDir, `${SCRATCH_PREFIX}${process.pid}-${now()}`);
   const files = credentialSource.kind === 'codex-home' ? layout.files : credentialSource.files;
@@ -703,6 +710,17 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
   } catch {
     // The scratch copy may be the only good pair: it stays for the next holder of the lock.
     return { status: 'failed', reason: 'apply-failed' };
+  }
+  if (applied.status === 'apply-deferred') {
+    // The source could not say whether the copy is newer: it may hold the only good pair, so it moves to
+    // the pending copies and the next holder of the account lock decides.
+    try {
+      const pendingDir = path.join(accountDir, PENDING_DIR);
+      fs.mkdirSync(pendingDir, { recursive: true, mode: 0o700 });
+      fs.renameSync(scratch, path.join(pendingDir, `${String(now()).padStart(15, '0')}-${crypto.randomBytes(4).toString('hex')}`));
+    } catch { /* the copy stays where it is, and is found there */ }
+    recordFailure(accountDir, 'apply-deferred', now());
+    return { status: 'failed', reason: 'apply-deferred' };
   }
   try { fs.rmSync(scratch, { recursive: true, force: true }); } catch { /* the next holder removes it */ }
 
@@ -734,13 +752,12 @@ export function credentialWriteBackMarker({ provider, accountId, credentialSourc
   const layoutName = credentialLayout(credentialSource);
   const home = expandCredentialHome(credentialSource?.home);
   if (!layoutName || !home || typeof runtimeDir !== 'string' || !path.isAbsolute(runtimeDir)) return null;
-  if (!SAFE_KEY.test(String(provider)) || !SAFE_KEY.test(String(accountId))) return null;
+  if (!providerAccountDir(runtimeDir, provider, accountId)) return null;
   return { provider, accountId, kind: credentialSource.kind, home, layout: layoutName, runtimeDir };
 }
 
 function validWriteBack(value) {
   return isObject(value)
-    && SAFE_KEY.test(String(value.provider)) && SAFE_KEY.test(String(value.accountId))
     && typeof value.home === 'string' && path.isAbsolute(value.home)
     && typeof value.runtimeDir === 'string' && path.isAbsolute(value.runtimeDir)
     && Object.hasOwn(LAYOUTS, value.layout);
@@ -750,7 +767,7 @@ function validWriteBack(value) {
  * Called just before a private home is deleted. When its marker asks for it and the home holds a login
  * newer than the source's, stage a copy beside the source and apply it under the account lock (tried
  * once, never waited for; if busy, the next refresh-ahead applies it). Never throws. Returns
- * `{status: 'none'|'unchanged'|'applied'|'staged'|'failed', code?}`; `code` is a fixed word.
+ * `{status: 'none'|'unchanged'|'applied'|'staged'|'failed', code?}` (`staged`: the copy is kept for the next holder of the account lock, because the lock was busy or the source could not say whether the copy is newer); `code` is a fixed word.
  */
 export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defaultLoadSqlite, now = Date.now, tryLock = tryAcquireAccountLock } = {}) {
   const writeBack = marker?.credentialWriteBack;
@@ -760,7 +777,7 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
   const accountDir = providerAccountDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId);
   if (!accountDir) return { status: 'failed', code: 'invalid-marker' };
   try {
-    if (!copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite })) return { status: 'unchanged' };
+    if (copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite }) === 'not-newer') return { status: 'unchanged' };
 
     const pendingDir = path.join(accountDir, PENDING_DIR);
     const staging = path.join(pendingDir, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
@@ -776,12 +793,14 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
 
     const lock = tryLock({ runtimeDir: writeBack.runtimeDir, provider: writeBack.provider, accountId: writeBack.accountId });
     if (!lock) return { status: 'staged' };
+    let outcomes;
     try {
-      applyLeftovers({ accountDir, layoutName: writeBack.layout, provider: writeBack.provider, sourceHome: writeBack.home, now: now(), loadSqlite });
+      outcomes = applyLeftovers({ accountDir, layoutName: writeBack.layout, provider: writeBack.provider, sourceHome: writeBack.home, now: now(), loadSqlite });
     } finally {
       try { lock.release(); } catch { /* the staged copy is already safe */ }
     }
-    return { status: fs.existsSync(final) ? 'staged' : 'applied' };
+    if (fs.existsSync(final)) return { status: 'staged' };
+    return { status: outcomes.find((outcome) => outcome.dir === final)?.status === 'applied' ? 'applied' : 'unchanged' };
   } catch {
     return { status: 'failed', code: 'write-back-failed' };
   }

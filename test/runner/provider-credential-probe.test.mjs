@@ -1,13 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import {
   createCredentialProbe,
   credentialProbeCommand,
+  expandCredentialHome,
   judgeProbeOutput,
+  withKillTimeout,
 } from '../../src/runner/dispatch/provider-credential-probe.mjs';
 
 const codexSource = { kind: 'codex-home', home: '${HOME}/.codex-test' };
@@ -66,14 +69,14 @@ function fakeSpawn({ output = '', exitCode = 0, never = false } = {}) {
 
 test('the probe runs the planned command with the account home in its environment and answers ok', async () => {
   const { spawnFn, seen } = fakeSpawn({ output: 'OK' });
-  const probe = createCredentialProbe({ spawnFn, env: { PATH: '/usr/bin' } });
+  const probe = createCredentialProbe({ spawnFn, env: { PATH: '/nonexistent-dir' } });
 
   const result = await probe({ account: { credentialSource: piSource } });
 
   assert.deepEqual(result, { ok: true });
   assert.equal(seen[0].command, 'pi');
   assert.equal(seen[0].env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
-  assert.equal(seen[0].env.PATH, '/usr/bin');
+  assert.equal(seen[0].env.PATH, '/nonexistent-dir');
 });
 
 test('the omp call is started with no stdin, because omp waits for end of input on a pipe', async () => {
@@ -130,4 +133,37 @@ test('the probe tells its caller about the child it started', async () => {
   const result = await createCredentialProbe({ spawnFn: wrapped, env: {} })({ account: { credentialSource: piSource }, onSpawn: (child) => pids.push(child.pid) });
   assert.equal(result.ok, true);
   assert.deepEqual(pids, [777]);
+});
+
+test('the unlock probe call is wrapped so it ends on its own, and runs unwrapped when timeout is not on PATH', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-path-'));
+  try {
+    const bin = path.join(dir, 'timeout');
+    fs.writeFileSync(bin, '#!/bin/sh\n', { mode: 0o755 });
+
+    const wrapped = fakeSpawn({ output: 'OK' });
+    const result = await createCredentialProbe({ spawnFn: wrapped.spawnFn, timeoutMs: 90_500, env: { PATH: dir } })({ account: { credentialSource: piSource } });
+    assert.deepEqual(result, { ok: true });
+    assert.equal(wrapped.seen[0].command, bin);
+    assert.deepEqual(wrapped.seen[0].args.slice(0, 3), ['--kill-after=5', '91', 'pi']);
+    assert.equal(wrapped.seen[0].env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
+
+    const bare = fakeSpawn({ output: 'OK' });
+    await createCredentialProbe({ spawnFn: bare.spawnFn, env: { PATH: path.join(dir, 'nowhere') } })({ account: { credentialSource: piSource } });
+    assert.equal(bare.seen[0].command, 'pi');
+    assert.equal(withKillTimeout(null, 1000), null);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('the credential home expands ~, ${HOME} and $HOME, and is null unless absolute', () => {
+  const home = os.homedir();
+  assert.equal(expandCredentialHome('~/.pi/x'), path.join(home, '.pi/x'));
+  assert.equal(expandCredentialHome('${HOME}/.pi/x'), path.join(home, '.pi/x'));
+  assert.equal(expandCredentialHome('$HOME/.pi/x'), path.join(home, '.pi/x'));
+  assert.equal(expandCredentialHome('~'), home);
+  assert.equal(expandCredentialHome('/abs/dir'), '/abs/dir');
+  assert.equal(expandCredentialHome('relative/dir'), null);
+  assert.equal(expandCredentialHome('~other/dir'), null);
+  assert.equal(expandCredentialHome(''), null);
+  assert.equal(expandCredentialHome(undefined), null);
 });
