@@ -66,9 +66,11 @@ test('release assets workflow builds Linux on ubuntu-22.04 and Windows on window
   assert.deepEqual(targetsInWorkflow, RELEASE_TARGETS.map((t) => t.triple).sort());
 });
 
-test('the branch check workflow runs the shared assets workflow on push and publishes nothing', () => {
+test('the check workflow runs the shared assets workflow on main pushes and pull requests and publishes nothing', () => {
   const check = read('.github', 'workflows', 'release-assets-check.yml');
-  assert.match(check, /branches: \[feat\/windows-release\]/);
+  assert.match(check, /push:\s+branches: \[main\]/);
+  assert.match(check, /pull_request:\s+branches: \[main\]/);
+  assert.doesNotMatch(check, /gh release create/);
   assert.match(check, /uses: \.\/\.github\/workflows\/release-assets\.yml/);
 });
 
