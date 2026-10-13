@@ -101,3 +101,44 @@ Both prior-registry D commands pass with **zero fatal**. Scoped strict E contain
 The exact four D/E argv/results are in `a31Followup.gates`; each uses one of `reports/identity-registry.json` and `reports/phase-02-identity-registry.json`, and E uses the frozen scopes plus `--strict`. The authored inventory is regenerated at Receipt commit from the existing registry; native generation confirms no additional carry-forward. Review/conservation tests: `env -u CLAUDE_CODE_SESSION_ID node --test` with seven explicit files in `a31Followup.tests.command`, **155/155 pass**, zero fail/cancel/skip/todo. Historical witnesses 74, payloads 867, five frozen files, ratchet 995 and authority/reader isolation pass; the previous 30 routing findings are unchanged.
 
 **Closing condition is not yet met because the seven source rows lack independent approval.** After Lead commits this one combined report, apply accepted notes/pins only, recalculate the candidate list from native E (the 39 accepted receipts may then close), rerun both priors and full-set equality. Persist the working registry and begin Step 3 only when pending IDs equal exactly the three Rings holds. Working registry SHA256 `50cc0724da93de0a682f620b017f2599eb25d7c6fcf3701212aa451ef0a61f1f` is pinned in the sidecar and remains uncommitted until that condition. No new archive/delete list or promoted-doc edit; no extra stop before this consolidated review request.
+
+## Accepted follow-up closed; additional batch-boundary sync
+
+The previous combined follow-up is complete: independent report `c46785ecad036e2f3298b66c9a76faa6704df21c` accepted all 39 re-pins and seven sources. Notes were copied verbatim, native open sets matched, and the actual working registry was committed in `b6274706947a998388dd0b1a9a1ff721793d04d4`. Agent Coordination is closed on that pinned tree. Do not reopen those 46 verdicts or fix the deferred promotion notes.
+
+Before the next content batch, the phase's batch-boundary sync merged main `c719f0527e4d63b07a1f89f8d0286f664cfa3dec` into this plan branch as `7a58bd7785ee4602b9697a1af199da8c2ce3a845`, without conflicts or a main-checkout write. One native refresh from the committed working registry exposes three new retired table witnesses and fourteen edited, non-stable-anchor identity gaps. All fourteen old text witnesses are independently SHA256-equal to the preceding committed text; none has an exact current text-digest match. No ID graft, guessed successor, approval carry or checker change is used for those fourteen.
+
+**This is the bounded changed-main-unit check required before authoring the next batch, not the Step 3 content checkpoint.** Current shown text, full old witnesses, real current documents/units, native refresh argv, four gate argv/results and preservation outputs are in `review-request-2-main-merge.md.json.batchBoundarySync`. The six Host Invocation source blobs remain unchanged and contain exactly 431 native units; their pins/counts are in `nextBatchSources`. No Host Invocation content or dispositions have been authored.
+
+### Three pending retired successors
+
+Check the literal old/new tables and real heading ancestry in `pendingRetiredSuccessors`. Each proposed successor is the unique table with the same unchanged header and actual ancestry, not a guessed unheaded-block number. These are identity-only, pending supersedes in `ledger/main-sync-successors.json`; canonical area carriage is still owed by the owning content batch. Every path below is `docs/how-to/install-fgos-in-a-project-and-use-doctor.md`.
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_010952b76d92ac41f27b42778c599a19 | pending | Check proposed successor claim_d85a5331d5712b2f5c2ecd9cab60e487 at unheaded-block-29; no prior approval carried. | b6c2c369c73e06e055283ce2748da3eb06e42f9a7f94bbdf821df2feff169933 | 12d9fffb49ffa95c2b9387a90947d874c39868bf5cf11fec20992ec249bacd17 |
+| claim_debb73bdfd789c4586f7d171dc64dc01 | pending | Check proposed successor claim_7a34dfa2ed7fa015dd6062b2414ad26a at unheaded-block-36; no prior approval carried. | a4dab64c7ec2aa8c104e58761561b52d941754bd8c7cebcf374ea813e1aecbbf | 2310ec50fe8ef8887e0fc41f6e0ffcf472f57c2a76bff13a9b010d5958efa5a7 |
+| claim_e952c1c7770ee9f5c9da8cb412e475e7 | pending | Check proposed successor claim_f15fa3b4274c71e0baabf6d0e16e33e3 at unheaded-block-39; no prior approval carried. | 57d8d277bcf3afd0132ff34f9191b73fe210d861e580bd357813120b5bd530d8 | 1211272970d4a8b8f606c6e1dd4b77079a41469f068f296216a6e299ca7f3fc0 |
+
+### Fourteen unmatched edited witnesses
+
+`unmatchedIdentityGaps` records each original claim ID, identity fingerprint, **sourceUnitDigest**, exact committed old text and ancestry, and the empty exact-current-match set. The identity fingerprint is not the text digest. `currentDocuments` supplies the real post-merge text and native units for manual comparison. These witnesses remain in the registry; zero prior IDs are lost.
+
+Scope by original ID:
+
+- `docs/architecture-manifest.json`: `claim_170759e9885c9a17bcb23356a8063850`.
+- `docs/how-to/install-fgos-in-a-project-and-use-doctor.md`: `claim_5dfe8ab48dcbdf38f92a7548d6f6679f`, `claim_534a116c9e62d6453b7f2b8e1d6aeb9f`, `claim_5bf7fd45e158c422bdd8080f3fd24c96`.
+- `docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md`: `claim_de6f569a55cc9a6de51e00e09efc3e57`, `claim_9813f3811a21fdda722f3f72198d1144`.
+- `docs/platform/packaging-distribution/contracts/distribution-pin.md`: `claim_d046608a0e7b08b9d48463cb27c99228`.
+- `docs/platform/packaging-distribution/spec.md`: `claim_5d01983d2cdc848bcabbf8cc119624ca`, `claim_54e5e3a03110b8d9af792eb9f0d5dada`, `claim_db1cd7c52c7c945bd88b12144db8b508`.
+- `docs/specs/distribution.md`: `claim_dd22b8d22c9fea63fe6e8b024609d415`, `claim_0fa72891dd4c13eb5eed4a0f5486045a`, `claim_21873e6da4e2a7d4c433fde0a9952835`, `claim_d295697c0614c7f42bdba836690f1568`.
+
+Lead must identify a real successor/disposition from the changed text, or leave it open with a reason. Do not stamp a target-less generic ok: any accepted binding needs the current claim ID, full text digest and actual ancestry, with the dropped remainder stated if it is partial. Future canonical area disposition is not approved by this identity check. Keep verdict tables in `Claim | Verdict | Note | Source digest | Target digest` order and commit the independent report before any reviewed stamp.
+
+### Observed proof and stop
+
+Both prior-registry D runs have zero fatal. Both scoped strict E runs have zero fatal and the expected open data: three Rings holds, 342 identical-unit exception groups and exactly the same 457 eligible candidate units. Their strict exit is 1 because those explicit opens remain; this is not a global clean/retirement claim. Native membership has zero missing/additional candidates and full tuple/exception/hold equality. The complete known registry ID set grows from 93,186 to 93,211, with zero lost IDs and 25 introduced IDs; changed old witnesses are retained, not deleted.
+
+Preservation passes: 74 historical witnesses, 867 payloads, five frozen files, zero first-parent allowlist violations; ratchet checks 995 legacy files, with 25 accounted edits and one accounted new file; constitution/placement checks 505 files, 504 matches and one recorded exception; authority and reader-link isolation pass. The same 30 inherited/known routing findings remain. No additional accepted code-evidence excerpt changed in this boundary merge; the previously quarantined 134 receipts stay quarantined.
+
+**STOP for the bounded changed-main-unit check.** Current carried registry SHA256 is `e4da80440a29583ba86055bc534cedf2fc5b7565b094b0280dbc37ca6725bbd6`; it remains uncommitted pending this check, while the closed-batch registry is already safely committed in `b62747069`. Manual bindings for the fourteen gaps, independent acceptance of the three successors, and Step 3 checkpoint readiness are **UNPROVEN**. After the committed report: apply only its exact accepted notes/bindings, rerun both-prior D/E and native sets, persist the accepted registry, then author the unchanged 431-unit Host Invocation batch under A28 and stop at its content checkpoint.

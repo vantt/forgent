@@ -247,3 +247,13 @@ Original three Rings holds remain. No new archive/delete, physical history move,
 `c46785eca` accepts all 39 re-pins and seven newly live source bindings; notes and immutable pins are applied. D is zero-fatal against both priors; full native scoped E equals exactly the three Rings holds, 342 exception identity groups and 457 eligible candidate-unverified rows. Agent Coordination is CLOSED after the main sync and its actual working registry is being persisted.
 
 Deferred to promotion only, not fixed now: the optional explicit no-new-CLI-verb sentence, whole-section display for heading-source packs, and explicit section naming in the two audit rationales (report Non-blocking notes). The 134 actually changed-code receipts remain unverified under A31. No new archive/delete, real conflict, physical move, promoted-doc edit, frozen-rule change or main-checkout write. Next: Step 3 sequentially under A28, with its checkpoint review.
+
+## Next-batch sync: bounded changed-identity check
+
+The Agent Coordination closure on `b62747069` remains accepted. Subsequent required batch-boundary merge `7a58bd778` imports newer main without conflict and without writing main. D remains zero-fatal against both priors; scoped E/native sets remain exactly three original Rings holds, 342 exceptions and 457 unverified units. No claim IDs disappear.
+
+Route only these new accounting items for the independent changed-main-unit check: fourteen edited identity gaps with zero exact current text matches, plus three pending installation-guide table successors proved by actual ancestry and unchanged table headers. Original text/digest witnesses and full current text are committed in `review-request-2-main-merge.md.json.batchBoundarySync`; the request appendix lists all seventeen IDs and exact scope. No guessed binding, old approval carry, gate/checker/vocabulary or routing-baseline amendment.
+
+No new archive/delete request, real semantic conflict, physical history move or author-edited promoted document. The imported distribution spec is ratchet-accounted; the two imported packaging candidate files are shown in the merge evidence, not rewritten. Promotion-only notes from `c46785eca` remain deferred. Current carried registry is checksum-pinned but uncommitted until this independent check; the already committed closed registry stays safe.
+
+This stop is not the Step 3 checkpoint. Host Invocation's six unchanged blobs and 431 native units are pinned; content authoring is UNPROVEN and must follow accepted changed-identity accounting, not an automatic ID guess. Next: committed independent successor/disposition decisions for this limited scope, apply exact notes/bindings, both-prior/native proofs and accepted registry persistence, then Step 3 under A28.
