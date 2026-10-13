@@ -117,6 +117,17 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
   let release;
   const gate = new Promise((resolve) => { release = resolve; });
   let n = 0;
+  // A RunResult as the door stores it: what is read is its classification, through runOutcome.
+  const record = (runId, runtime, classification, legacy, extra = {}) => ({
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    // The stored legacy fields must match what the classification projects to, or the record is corrupt.
+    status: legacy,
+    confidence: legacy === 'done' ? 'reported' : legacy,
+    runtime,
+    classification: { policy: { disposition: 'allow' }, delivery: { mode: 'fresh' }, provenance: 'native-v2', ...classification },
+    ...extra,
+  });
   const dispatch = async (assignment, { runnerConfig, cliOverride }) => {
     calls.push({ assignment, runnerConfig, cliOverride });
     if (calls.length === 4) release();
@@ -126,12 +137,22 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
     if (assignment.binding.invocation === 'codex-herdr-static') {
       fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({ paneId: 'p-1', herdrSession: 'fgos-workers' }));
       fs.writeFileSync(path.join(dir, 'herdr-diagnosis.json'), JSON.stringify({ explain: { matchedRule: 'trust_directory', promptText: 'Trust this folder?' } }));
-      return { status: 'failed', runtime, runnerNote: { summary: 'ended as blocked' } };
+      return record(`run_${assignment.assignmentId}`, runtime, {
+        execution: { status: 'failed', exitCode: null },
+        assessment: { verdict: 'not-applicable' },
+        confidence: { level: 'failed', basis: ['captured-stdout'] },
+        failure: { family: 'provider', code: 'blocked' },
+        policy: { disposition: 'needs-input', code: 'blocked' },
+      }, 'failed', { runnerNote: { summary: 'ended as blocked' } });
     }
     fs.writeFileSync(path.join(dir, 'stdout.log'), 'OK\n');
-    return assignment.binding.invocation === 'pi-cli-acct'
-      ? { runtime, classification: { execution: { status: 'completed', exitCode: 0 } } }
-      : { status: 'done', runtime };
+    // pi replied but wrote no result claim: the verdict is inconclusive, the CLI still answered.
+    const verdict = assignment.binding.invocation === 'pi-cli-acct' ? 'inconclusive' : 'pass';
+    return record(`run_${assignment.assignmentId}`, runtime, {
+      execution: { status: 'completed', exitCode: 0 },
+      assessment: { verdict },
+      confidence: { level: verdict === 'pass' ? 'reported' : 'no-evidence', basis: ['captured-stdout'] },
+    }, verdict === 'pass' ? 'done' : 'no-evidence');
   };
   const report = await runAccountProbe({
     cfg, provider: 'openai', accountId: 'acct', repoRoot, timeoutMs: 1000,

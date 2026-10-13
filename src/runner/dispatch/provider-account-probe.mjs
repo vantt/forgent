@@ -18,6 +18,7 @@ import { matchAuthFailureLine } from './provider-auth-failure.mjs';
 import { expandCredentialHome } from './provider-credential-probe.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { providerAccountInventory } from './provider-capacity.mjs';
+import { runOutcome } from './run-result.mjs';
 
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
 export const DEFAULT_ACCOUNT_PROBE_TIMEOUT_MS = 3 * 60 * 1000;
@@ -187,13 +188,13 @@ export function readRunOutcome(runResult, { repoRoot }) {
     runDir ? readText(path.join(runDir, 'stderr.log')).slice(-16 * 1024) : '',
     runResult?.runnerNote?.summary,
   ].filter(Boolean).join('\n');
-  // The CLI answered when the round settled, or when its process ran to a clean exit: a worker that
-  // replied but wrote no result claim is a reporting gap of the round, not a fault of the CLI or account.
-  const execution = runResult?.classification?.execution;
+  // The CLI answered when its execution completed, whatever the verdict: a worker that replied but wrote
+  // no result claim is a reporting gap of the round, not a fault of the CLI or the account.
+  const outcome = runResult ? runOutcome(runResult) : null;
   return {
-    ok: runResult?.status === 'done' || (execution?.status === 'completed' && execution?.exitCode === 0),
+    ok: outcome?.executed === 'completed' && !outcome.failure,
     text,
-    failureCode: runResult?.classification?.failure?.code ?? null,
+    failureCode: outcome?.failure?.code ?? null,
     runDir,
     runId: runResult?.runId ?? null,
     paneId: visibility?.paneId ?? null,
