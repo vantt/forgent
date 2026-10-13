@@ -8,7 +8,7 @@ import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceiptRunFromOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
@@ -332,6 +332,14 @@ test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
   const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
   fs.mkdirSync(asgnDir, { recursive: true });
   fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+
+  // Declare the executor explicitly: with no project config, the runner
+  // bootstraps one from whichever assistant CLI the machine has on PATH, which
+  // a machine without one (a CI runner) cannot satisfy.
+  fs.writeFileSync(
+    path.join(tempDir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: structuredClone(DEFAULT_RUNNER_CONFIG) }, null, 2),
+  );
 
   const decided = await decideExecutorCli(undefined, {
     cwd: tempDir,
