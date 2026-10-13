@@ -1,3 +1,40 @@
+# Latest resume state — Host Invocation closed under A33
+
+Date: 2026-10-13
+Executor: codex-session:7@2026-10-13
+Session counter: 7
+Documented Host executor sessions: 8 (seven prior sessions plus this closure-only run)
+Step: 3 / Host Invocation P6 close
+State: closed for Phase 6 conservation under A28 + A33; strict closure not claimed
+Blocker: none for this batch closure
+Resume HEAD / owner answer / last green conservation proof source: 74b3d92b202cc14bef7f1515d477d68d6cd72ea2
+Previous green conservation source: 5c744a6c2a759828d9c85e4a6480797658eb571f
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 0653419c19e7c37d8d00408ad482cdecbd45a807
+Current turn: this explicit-path report/verification/progress/owner-queue commit; no content or decision-shard edits
+Current batch boundary verdict: 168a27c6c704854b4777792e6632302f1616c65a
+Closure request: 7963b7ca6; owner authorization A33: 74b3d92b2
+Report: step-03-report.md
+Evidence: host-invocation-close-verification.json, A33ClosureVerification entry; reproduction helper sources and actual argv/output preserved there
+
+Resume checks confirmed the authorized worktree/branch, clean porcelain and ancestry from the previous green source. Native refresh used the already persisted working registry directly at the owner-answer commit, bound with no carry-forward. Fresh D against both prior registries exits 0, zero fatal. Both Host scoped strict E runs exit 1 with exactly 12 partial-carry rows, one exact two-member identical-unit exception and 588 candidate-unverified units. Both Agent scoped strict E runs exit 1 with exactly three original held not-reviewed rows, 342 exact exception groups and 488 candidate-unverified units. Full native source/candidate/hold/exception identity equality passes; all 93,839 known IDs and path/anchor/source-digest tuples match, zero missing/additional, no identity graft.
+
+All twelve complete residual sidecar rows compare equal, including source/primary-target/restored text and full digests, unchanged dispositions/remainders/review pins, and live restoration anchors. Sidecar SHA256 is d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49. A33 therefore applies exactly as written: this batch's open set equals holds + identical-unit exceptions + candidate-unverified + exactly its 12 accepted residual rows. Strict E stays red; these are open cutover obligations, never relabelled or waived for promotion.
+
+Host accounting remains 431/431 reviewed Judgment rows: 408 move, 12 partial-carry, 11 supersede; no Host hold, 35/35 reviewed successors. The three boundary Agent rows, 18 gaps and 43 machine re-pins remain independently accepted. No new Host row or approval is authored. Owner queue closure entry is answered by A33; no pending Host review request or new owner question. Three original Rings holds remain parked outside this batch. F6 keeps dropped-010 deferred to Packaging-distribution Step 4; literal FLAGGED retention is unchanged.
+
+Preservation reruns pass: 74 history witnesses, 867 payloads, five frozen files, zero own allowlist violations with eight existing exemptions; extractor closure, area authority statuses and reader links unchanged. Ratchet 995 files / 25 accounted edits / one accounted addition; placement 506/505/one exception, no gaps. Only the unchanged Packaging portal metadata finding remains. Tests with env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. No full-suite, installed-release, gateway or fresh full truth claim.
+
+Working registry remains exactly 59,202,819 bytes, SHA256 d54faf6eec8e785b33fe5902022f446d0fe25989d90e5316707c1da50e849cd9, byte-equal to fresh scratch; already persisted, so no rewrite. Compact format/schema unchanged. The 56.46 MB registry publication/growth risk remains open for later batches. Scratch comparison's over-listed Agent hold category was corrected to the exact committed/native not-reviewed representation before final acceptance; no unexplained failure or gate/checker change.
+
+The report retains A32's six 6/6 cells, 25/25 anchors, zero legacy answers and at most four files to first owner. Instruction-only isolation is UNPROVEN and whole-run file cap was not met under original phase counting. All five area gaps and the accepted key/pilot counting limits are recorded. Alias/link preview stays 135 draft aliases / 4,031 edges, zero consumer edits. Eight documented executor sessions include this zero-row closure run; 470 source review instances over three rounds remain distinct from 431 initial source rows. No combined Steps 3/4 effort baseline or token claim.
+
+STOP. Host Invocation is closed only at the authorized conservation boundary. Next action belongs to a separate turn: Packaging-distribution Step 4 under its own scope, including F6, retained area notes and the registry-size risk. Do not start it here. No Step 4 work, promotion, cutover, push, rebase, force-push, main merge or main-checkout write performed.
+
+---
+
+# Prior resume state (preserved)
+
 # Latest resume state — Host Invocation closure decision
 
 Date: 2026-10-13
