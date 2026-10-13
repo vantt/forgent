@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `fgos dispatch execute <executor> --for <capability>` names the kind of work a dispatch does; the capability, not the executor, sets whether it may change files. `execute <agent>` without `--for` is now refused before spawning with the choices listed, and this door carries writing work only: read-only work goes through `execute --contract <file> --executor <id>`, which leases the account and copies its login into the sandbox. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
+- `fgos dispatch execute <executor> --for <capability>` names the kind of work a dispatch does; the capability, not the executor, sets whether it may change files. `execute <agent>` without `--for` is now refused before spawning with the choices listed, and this door carries writing work only: read-only work runs sandboxed as a Workflow unit with `"writes": []` (`fgos workflow start --units <file>`); `execute --contract <file> --executor <id>` keeps a named provider but enforces read-only by instruction only, without a sandbox. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
 - A `for` list on an agent executor is now ignored (it used to set the posture of every dispatch to that executor); `for` keeps its meaning on `kind: "tool"` executors. `fgos doctor` names each leftover under `executor-profile-warnings` so it can be removed.
 
 ### Changed
