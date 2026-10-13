@@ -14,9 +14,20 @@
       "targetAnchor": "unheaded-block-81",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-preamble from docs/specs/distribution.md#unheaded-block-1, under \"source preamble\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-81. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-preamble from docs/specs/distribution.md#unheaded-block-1, under \"source preamble\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-81. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "YAML front matter of the source (area, updated, sources, decisions, coverage) is carried byte-identical as a body block; in the target it is plain text under the Added-in-candidate note, so it is carried but not parsed as metadata; Block byte-identical (410 chars), digests equal, source lines 1-7 to target spec.md line 461; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cd73c7d7afa6bd9767046774eb05db442c0db18e1e32762566ec4d01e48ed814",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_e7f7734953cc2e9478d81719b046f0cc",
@@ -25,9 +36,20 @@
       "targetAnchor": "unheaded-block-82",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-preamble from docs/specs/distribution.md#unheaded-block-2, under \"source preamble\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-82. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-preamble from docs/specs/distribution.md#unheaded-block-2, under \"source preamble\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-82. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Legacy-status code block (Promoted source, four Promoted-to paths, Last reviewed 2026-09-13) byte-identical; names docs/specs/distribution.md as the legacy file, which stays true because the source is retained; Block byte-identical (580 chars), digests equal, source lines 9-20 to target spec.md line 469; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "03a0da5fd22a7227b1f996d39b3a6f7ae43a1a49bfaf061e1edb11774c09eee2",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_9138d3d0488e16d2eb4a0150ddd3b60f",
@@ -36,9 +58,20 @@
       "targetAnchor": "spec-distribution",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#spec-distribution, under \"Spec: Distribution\", is retained at docs/platform/packaging-distribution/spec.md#spec-distribution. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#spec-distribution, under \"Spec: Distribution\", is retained at docs/platform/packaging-distribution/spec.md#spec-distribution. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H1 to H3, diff is the heading marker only, section payload verbatim, source lines 22-22 to target spec.md line 482; anchor spec-distribution exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "86f1d1773ee8d8e8784f7912f29ba493e083a2764d888ffc06e84715864e91f9",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_67a64ed4e0700ecab3cb28af6962195c",
@@ -47,9 +80,21 @@
       "targetAnchor": "unheaded-block-83",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-3, under \"Spec: Distribution\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-83. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-3, under \"Spec: Distribution\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-83. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (442 chars), digests equal, source lines 24-30 to target spec.md line 484; anchor unheaded-block-83 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "38e7467e63d434cad969f415699ed7a67abeaa8becb100975d091f9ad55a7074",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_906908e36bec4cc1428b304dee46bf65",
@@ -58,9 +103,21 @@
       "targetAnchor": "entry-points-triggers",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#entry-points-triggers, under \"Entry Points & Triggers\", is retained at docs/platform/packaging-distribution/spec.md#entry-points-triggers. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#entry-points-triggers, under \"Entry Points & Triggers\", is retained at docs/platform/packaging-distribution/spec.md#entry-points-triggers. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 32-32 to target spec.md line 492; anchor entry-points-triggers exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "c1564ff77f2717182c3e336ead7ba320e83dce6968c4f25d63f77e13a8363716",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_8a26867c2037ac3caf4e9eaf2f4c9ec1",
@@ -69,9 +126,22 @@
       "targetAnchor": "unheaded-block-84",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-4, under \"Entry Points & Triggers\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-84. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-4, under \"Entry Points & Triggers\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-84. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (1546 chars), digests equal, source lines 34-53 to target spec.md line 494; anchor unheaded-block-84 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "549a25720da16da540b9f09cc50f9674df47eaaab30a9780ba5b3d97cd8de6b4",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Entry Points & Triggers"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
@@ -80,9 +150,21 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#data-dictionary, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#data-dictionary. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Largest heading unit (18391 chars, 8 data-dictionary rows incl. the allowlist row 3 that changed since the pinned blob); heading plus table payload verified identical except the marker; Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 55-55 to target spec.md line 515; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "54ad2226c42e85402eb5b41e2a5602d0937cd5ac7cffd4648d8a8d83200f4ce7",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
@@ -91,9 +173,22 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-5, under \"Data Dictionary\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-85. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "18371-char Data Dictionary table block byte-identical to the current blob content (not the older pinned blob), so the allowlist and fgctl changes are carried as they now read; Block byte-identical (18371 chars), digests equal, source lines 57-73 to target spec.md line 517; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
@@ -102,9 +197,21 @@
       "targetAnchor": "behaviors-operations",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#behaviors-operations, under \"Behaviors & Operations\", is retained at docs/platform/packaging-distribution/spec.md#behaviors-operations. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#behaviors-operations, under \"Behaviors & Operations\", is retained at docs/platform/packaging-distribution/spec.md#behaviors-operations. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading with no direct payload (25 chars, the title only); only depth changes, and its five source children now split between spec.md (Install, Dev checkout) and the contracts file (hooks, Setup, Doctor); Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 75-75 to target spec.md line 535; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_2a9767fa3d005bdcd288d3432e88700d",
@@ -113,9 +220,22 @@
       "targetAnchor": "install",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#install, under \"Install\", is retained at docs/platform/packaging-distribution/spec.md#install. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#install, under \"Install\", is retained at docs/platform/packaging-distribution/spec.md#install. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H3 to H5, diff is the heading marker only, section payload verbatim, source lines 77-77 to target spec.md line 537; anchor install exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b7d85aac05e3f18b60cac3e1be0688b3d4aa516ab673a004c43f09d42acf2f77",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Behaviors & Operations"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_391af7258478be2a89286128fcd86063",
@@ -124,9 +244,23 @@
       "targetAnchor": "unheaded-block-86",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-6, under \"Install\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-86. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-6, under \"Install\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-86. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (2416 chars), digests equal, source lines 79-113 to target spec.md line 539; anchor unheaded-block-86 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ddee3916eeb71a2e1df124e5b3b2737128f48fa21494c2720fd4284db23a9941",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Behaviors & Operations",
+        "Install"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_5b1bf67352e3b6cadd74ac1cfdab901d",
@@ -135,9 +269,22 @@
       "targetAnchor": "dev-checkout-shell-helpers",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#dev-checkout-shell-helpers, under \"Dev checkout shell helpers\", is retained at docs/platform/packaging-distribution/spec.md#dev-checkout-shell-helpers. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#dev-checkout-shell-helpers, under \"Dev checkout shell helpers\", is retained at docs/platform/packaging-distribution/spec.md#dev-checkout-shell-helpers. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H3 to H5, diff is the heading marker only, section payload verbatim, source lines 115-115 to target spec.md line 575; anchor dev-checkout-shell-helpers exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "098dc1daf6dc0682b944b0dcd6b41799b44c5a46ff036b93e1bb19e374a0f565",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Behaviors & Operations"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_e36dc6d7c4cffd08e74b89407c1de2d1",
@@ -146,9 +293,23 @@
       "targetAnchor": "unheaded-block-87",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-7, under \"Dev checkout shell helpers\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-87. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-7, under \"Dev checkout shell helpers\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-87. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (1170 chars), digests equal, source lines 117-134 to target spec.md line 577; anchor unheaded-block-87 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "29db1d0b391ac93fe635489740b466a4285c3c06d6afcc67e40e7a76d841c91c",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Behaviors & Operations",
+        "Dev checkout shell helpers"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_ac8cc5d1152e7a057ffbef1e804079aa",
@@ -157,9 +318,20 @@
       "targetAnchor": "contributor-hooks-setup",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#contributor-hooks-setup, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#contributor-hooks-setup. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#contributor-hooks-setup, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#contributor-hooks-setup. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Parent Behaviors & Operations stays in spec.md while this child sits in the contracts file under a retained-detail H2 with an H5 jump; matches the frozen area-map subdivision, but the rationale does not say the sibling split happened; Heading H3 to H5, diff is the heading marker only, section payload verbatim, source lines 136-136 to target setup-doctor-registry.md line 139; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a3e12eb042aaee43b5266a5eb8f5f10db0476bcc0e5c6d95558a32c2b726f78b",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Retained Distribution Source Detail"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
@@ -168,9 +340,21 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-8, under \"Contributor hooks setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-21. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (1701 chars), digests equal, source lines 138-161 to target setup-doctor-registry.md line 141; anchor unheaded-block-21 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "91a139f1a132bd3ad440efc8beac3a0f0a77e27326dc8f696a43acace808775d",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Retained Distribution Source Detail",
+        "Contributor hooks setup"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
@@ -179,9 +363,20 @@
       "targetAnchor": "setup",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#setup, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#setup. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#setup, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#setup. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Same split as Contributor hooks setup: moved to the contracts file per the frozen area-map subdivision; text identical apart from the heading marker; H2 to H5 jump in the target; Heading H3 to H5, diff is the heading marker only, section payload verbatim, source lines 164-164 to target setup-doctor-registry.md line 166; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5f39cc3a7cf0ac62957915fb55521bf06d8cf55e5938df8ca39cd284a06ce96f",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Retained Distribution Source Detail"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_891db485a75cdb558cf725c3315f3857",
@@ -190,9 +385,21 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-9, under \"Setup\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-22. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (1758 chars), digests equal, source lines 166-192 to target setup-doctor-registry.md line 168; anchor unheaded-block-22 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "124a985f241cc7cc18930c76b9911b2d71a2bcda8ca361d9520aa6560e7e912a",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Retained Distribution Source Detail",
+        "Setup"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
@@ -201,9 +408,20 @@
       "targetAnchor": "doctor",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#doctor, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#doctor. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#doctor, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#doctor. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Same split as Contributor hooks setup: moved to the contracts file per the frozen area-map subdivision; text identical apart from the heading marker; H2 to H5 jump in the target; Heading H3 to H5, diff is the heading marker only, section payload verbatim, source lines 194-194 to target setup-doctor-registry.md line 196; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "46e577d2b998c461b59b0c7cf64e9dc454a144674578ad5cbfeb9d3337e2d2a2",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Retained Distribution Source Detail"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
@@ -212,9 +430,21 @@
       "targetAnchor": "unheaded-block-23",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-10, under \"Doctor\", is retained at docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-23. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/setup-doctor-registry.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (924 chars), digests equal, source lines 196-210 to target setup-doctor-registry.md line 198; anchor unheaded-block-23 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e271eeed7beea24622129fd4d840eb74128cf06b220440793a9ddeaca38c5f5b",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry",
+        "Retained Distribution Source Detail",
+        "Doctor"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_7120b40ec04026fbdb538c6454614709",
@@ -223,9 +453,21 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#actors-access, under \"Actors & Access\", is retained at docs/platform/packaging-distribution/spec.md#actors-access. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#actors-access, under \"Actors & Access\", is retained at docs/platform/packaging-distribution/spec.md#actors-access. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 212-212 to target spec.md line 596; anchor actors-access exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a6d34c55620f48713afb89fa7b97344e4b2041cf0cf93165cf6c3bbe657bc3ea",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_bc11bca870313f227b78bebe0f81d49a",
@@ -234,9 +476,22 @@
       "targetAnchor": "unheaded-block-88",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-11, under \"Actors & Access\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-88. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-11, under \"Actors & Access\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-88. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (607 chars), digests equal, source lines 214-221 to target spec.md line 598; anchor unheaded-block-88 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8a7f8b1ec294e660bb2f226cadfbb2ce6fd85e6d65417ba4122b18bb2fc81825",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Actors & Access"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_7b2641076e23f0d2528c250d4e59cba2",
@@ -245,9 +500,21 @@
       "targetAnchor": "business-rules",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#business-rules, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#business-rules. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#business-rules, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#business-rules. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 223-223 to target spec.md line 607; anchor business-rules exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "675341c756080b8acf77769cafe1a61d87e3a70ef5546c9e3cf7884cb853fce3",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_8930ab9733374cfbb11470da79f610cf",
@@ -256,9 +523,22 @@
       "targetAnchor": "unheaded-block-89",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-12, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-89. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-12, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-89. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (5123 chars), digests equal, source lines 225-287 to target spec.md line 609; anchor unheaded-block-89 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "914e48925f5e42f4270598fcf5322dbfb5b2777fe26e0349a30c6c290ba2f08a",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_7932ee258c8d561f60718b34edc2d44a",
@@ -267,9 +547,22 @@
       "targetAnchor": "unheaded-block-90",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-13, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-90. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-13, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-90. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (2856 chars), digests equal, source lines 289-295 to target spec.md line 673; anchor unheaded-block-90 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cd11cb8c94cd0a27e819aa61df4a4f4fb2e32a83c7e0fd4066e27bc7cd22bb89",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
@@ -278,9 +571,22 @@
       "targetAnchor": "unheaded-block-91",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-14, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-91. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-14, under \"Business Rules\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-91. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (9315 chars), digests equal, source lines 297-320 to target spec.md line 681; anchor unheaded-block-91 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
@@ -289,9 +595,21 @@
       "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh, under \"L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh\", is retained at docs/platform/packaging-distribution/spec.md#l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh, under \"L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh\", is retained at docs/platform/packaging-distribution/spec.md#l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Decision-history section carried verbatim (2026-10-12 and 2026-10-13 owner decisions); kind is specification although text is decision history, which is the file-level default and not blocking; Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 322-322 to target spec.md line 706; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ac304b14f8b735b34c045e37fb6f686838cdfa55774338919cdf258cc85a3850",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_45e83e644c43384e188c16e20172a52c",
@@ -300,9 +618,22 @@
       "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Verbatim payload of the decision-history section incl. both dated entries; claim kind specification is arguable (decision) but not blocking and nothing in the text changed; Block byte-identical (2243 chars), digests equal, source lines 324-325 to target spec.md line 708; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_797fb0be5db3c260c97745cd0894bec8",
@@ -311,9 +642,21 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#edge-cases-settled, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#edge-cases-settled. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#edge-cases-settled, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#edge-cases-settled. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 327-327 to target spec.md line 711; anchor edge-cases-settled exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "27d796445bca33db32cf7b287a079e920f33f612ace58427a56f40ea607b3f66",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
@@ -322,9 +665,22 @@
       "targetAnchor": "unheaded-block-93",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-16, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-93. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-16, under \"Edge Cases Settled\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-93. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (2207 chars), digests equal, source lines 329-361 to target spec.md line 713; anchor unheaded-block-93 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Edge Cases Settled"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_18420261f445f01acf39c262a9ce170c",
@@ -333,9 +689,21 @@
       "targetAnchor": "open-gaps",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#open-gaps, under \"Open Gaps\", is retained at docs/platform/packaging-distribution/spec.md#open-gaps. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#open-gaps, under \"Open Gaps\", is retained at docs/platform/packaging-distribution/spec.md#open-gaps. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 363-363 to target spec.md line 747; anchor open-gaps exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3c9b4fc33a1e34edca18ff8772fa5723ac85887b6ed36b987245a612c5f6e06e",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_4ef3a246eb6f72de0409c2cc711b6f7a",
@@ -344,9 +712,22 @@
       "targetAnchor": "unheaded-block-94",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-17, under \"Open Gaps\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-94. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-17, under \"Open Gaps\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-94. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (329 chars), digests equal, source lines 365-368 to target spec.md line 749; anchor unheaded-block-94 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f2aa140aabef20a5a98af537527987721e90af6779c22a7a854dc6b9f0979b31",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Open Gaps"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_e7c9f593b4b15dfa15ae91707e9a64ec",
@@ -355,9 +736,22 @@
       "targetAnchor": "unheaded-block-95",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-18, under \"Open Gaps\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-95. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-18, under \"Open Gaps\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-95. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (510 chars), digests equal, source lines 370-370 to target spec.md line 754; anchor unheaded-block-95 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "291f58705fa5b9342b82921aa8ab5eb129462c0bb6c7320a817a6a70fbac6e74",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Open Gaps"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_d992e79d0cffb916c68bf73be5dd33d1",
@@ -366,9 +760,21 @@
       "targetAnchor": "visuals",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#visuals, under \"Visuals\", is retained at docs/platform/packaging-distribution/spec.md#visuals. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#visuals, under \"Visuals\", is retained at docs/platform/packaging-distribution/spec.md#visuals. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 372-372 to target spec.md line 756; anchor visuals exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "89ef28e9d464cbb1c6c1edb1b7fd5eaf494a10dc6b24f8af7d5be75ff6bd916d",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_a84463023d9ac4e9ff86edae6ccd1bd4",
@@ -377,9 +783,22 @@
       "targetAnchor": "unheaded-block-96",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-19, under \"Visuals\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-96. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-19, under \"Visuals\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-96. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (64 chars), digests equal, source lines 374-374 to target spec.md line 758; anchor unheaded-block-96 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "84ea69d22b8a2aa754f14016550c25df1336715f9701bbfe4f0108195a852bb7",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Visuals"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_aa28053a8a4b2ff13690fc6a20044b9f",
@@ -388,9 +807,21 @@
       "targetAnchor": "pointers-implementation",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#pointers-implementation, under \"Pointers (implementation)\", is retained at docs/platform/packaging-distribution/spec.md#pointers-implementation. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete heading from docs/specs/distribution.md#pointers-implementation, under \"Pointers (implementation)\", is retained at docs/platform/packaging-distribution/spec.md#pointers-implementation. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 376-376 to target spec.md line 760; anchor pointers-implementation exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "851884c939509226f78c3caadf8509ec1afffbe99c5067cf97630ae6887b01ab",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
       "claimId": "claim_b5695d38282e111f8ed06656b2efa433",
@@ -399,9 +830,22 @@
       "targetAnchor": "unheaded-block-97",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-20, under \"Pointers (implementation)\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-97. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation."
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-20, under \"Pointers (implementation)\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-97. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "reviewNote": "Block byte-identical (2663 chars), digests equal, source lines 378-422 to target spec.md line 762; anchor unheaded-block-97 exists; recomputed digest matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-distribution.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "dafeb397fad0ae82979e931d86c897ed92c0d4769a5e303569c6c82f36da4bb9",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Pointers (implementation)"
+      ],
+      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     }
   ],
   "files": [

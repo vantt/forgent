@@ -15,11 +15,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "a4a861e4a929e4736d0173ccf2771dfa399e00097cadcf6875d30c8598d57cf7",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Packaging-Distribution"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of README.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_4cf4976bad6f53df0e8618ee7920ceeb",
@@ -30,11 +36,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "36f7e1a4a7047962cf25b4027b35acb42753b479c7945aa6abf8c8bd6874e120",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "fgctl And Local fgOS"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of fgctl-and-local-fgos.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_8229cbb77e8af8cef1e15eff787fe701",
@@ -45,11 +57,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "49c8b79cd9a353442793d9d6cfe82424ad1d6b660613801eedd956fa09560661",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Future Constraints"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of future-constraints.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_23765af62d556261268d02ba95660dec",
@@ -60,9 +78,15 @@
       "targetAnchor": "runtime-identity-and-activation",
       "targetUnitDigest": "35e38e606082e6cd88d11569dba34e338d7d11f0344a3abdcd80ca9fe89b9371",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The original top-level runtime-identity heading and complete metadata carrier survive with additive promotion fields. A repeated source heading creates a native ambiguity gap; this real root-heading successor preserves the full old direct payload. No identity is grafted and no approval carries forward.",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Heading unit (H1 plus its metadata section) recomputes at both ends; only the eight metadata lines are added; gap reason in native accounting is the unstable repeated heading anchor, as the rationale says."
     },
     {
       "claimId": "claim_27b1af759fb21ff4f449727ff648a319",
@@ -73,11 +97,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "b9c0f64986bfc20a1c8a2c79c4922b1e4db19e2a687a2275876185a7402ad0fc",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Runtime Identity And Activation"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of runtime-identity-and-activation.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_989ea01c49a7f3b2a8f2ff600f16311a",
@@ -88,11 +118,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "b58066ec6054dca35d4740fe7434f81bc000004c82429fbbecf876c9253ab544",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Code-Panel Rollout Plan: Packaging-Distribution"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of code-panel-rollout-plan.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_1a97ed363d37e80482619047ce6804af",
@@ -103,11 +139,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "8980fe7db4f59777813ca8119f184178e96980c3f53e001ee88ffe67c944c254",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
       "targetAncestry": [
         "Contract: Activation Binding"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Digests recompute; sole removed line is Design status Frozen (V1), carried as Contract design status: Frozen (V1) beside Design status: Candidate, plus the eight added lines; the rest of the body is outside this unit."
     },
     {
       "claimId": "claim_8394482ef76eefc839bff33778acfd97",
@@ -118,11 +160,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "505a2fba8363494082231ca850d2329cd9b265990b04bb8a5c745e6e2345932c",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
       "targetAncestry": [
         "Contract: Distribution Pin"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Digests recompute; sole removed line is Design status Frozen (V1), carried as Contract design status: Frozen (V1) beside Design status: Candidate, plus the eight added lines; the rest of the body is outside this unit."
     },
     {
       "claimId": "claim_f9ee2805fcec7e2f404c119834e9ad0f",
@@ -133,11 +181,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "ec70a9f2370b13a414fe8127403591fa584f371183e4299c81a40e556929db72",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Contract: Instruction Composition And Projection"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of instruction-composition-and-projection.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_37c7a9df001adb3f2920a3d10610118a",
@@ -148,11 +202,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "03896b9afa38fe9a0841344fc4d9b7fa0f44db52f9b6b0d28821aff50f5076ec",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Contract: Projection Ledger"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of projection-ledger.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_bce99d46bf15aee2613d118dda2234ec",
@@ -163,11 +223,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "28cfc4174a87b1d603361d312cf5c03172c5dece24c367db4bb1813341bc0ad2",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
       "targetAncestry": [
         "Contract: Release Manifest"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Digests recompute; sole removed line is Design status Frozen (V1), carried as Contract design status: Frozen (V1) beside Design status: Candidate, plus the eight added lines; the rest of the body is outside this unit."
     },
     {
       "claimId": "claim_4ec3153f52c351599a2a6d552fce87ec",
@@ -178,11 +244,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "b022e0559d190ec4bacc002d8da26237c4ee70beb924db5d7dba660fd8a5c3ab",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Contract: Repository Runtime Layout"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of repository-runtime-layout.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
@@ -193,11 +265,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Contract: Setup Doctor Registry"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of setup-doctor-registry.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_21466306fb5c7d4947c0d640af25c2c9",
@@ -208,11 +286,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "5e7de8fb61407a8497ec83f50fb3e35558695dc5ef0dce8c2a0a666df1311ba1",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Contract: Skill Package Distribution"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of skill-package-distribution.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_4c333d79cc66f71f6db3d88489ed0dc9",
@@ -223,11 +307,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "c9b860344990b95975c3479384c1072d1c6eb66f3ceabab7a0350b60f9b06a0c",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "History: Distribution Baseline"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of distribution-baseline.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_2c5389929a7a813c70e5ef5389a18615",
@@ -238,11 +328,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "61ff449739bb7b14e0da58d3a5e43c3c61c8a4dbaedc0b3845751ab139bab591",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Packaging-Distribution Code-Panel Track Closeout"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of track-closeout.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_58c7acde2b2f3091c28d62fbb9fbb7c7",
@@ -253,11 +349,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "cf5fad7a3844bb38c373e31ee428ca709305246713e4d0292b0f90cb0d3c9c40",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Spec: Packaging-Distribution"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of spec.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_2e34a457bfadf9cae284b1c9e04378f2",
@@ -268,11 +370,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "1b2f5b20290243ba345696310bd7934ebe07c201b337be27bfd4d1d7ac77c34c",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Verification: Implementation Alignment"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of implementation-alignment.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_588beea4a271f0bab9dca09b8ee01721",
@@ -283,11 +391,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "941e3a3deb6ae7ddf24248a0773765c11f3ae0f9a05798b4db30a087c7736bb5",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Verification: Install And Release Proof"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of install-and-release-proof.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_a0df084e87f84a39e95fdc13a6385747",
@@ -298,11 +412,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "46e51dd42c941934f7224151333b7c1eaaeab5645a9d86daaf1d9659484300eb",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Verification: Source Preservation Audit"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of source-preservation-audit.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_4cd511e74e5837a81d29ab9aa456135f",
@@ -313,11 +433,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "1fd8bf579ea5e42ddf71266ca19bb9b63fa33d902bbf20acc4186706ca07a080",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
       "targetAncestry": [
         "Vision: Packaging-Distribution"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Header block of vision.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
     },
     {
       "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
@@ -328,13 +454,19 @@
       "targetAnchor": "unheaded-block-144",
       "targetUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
-        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
-        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
-      ]
+        "13. K\u1ebft qu\u1ea3 gi\u1ea3i quy\u1ebft r\u1ee7i ro v\u00e0 c\u00e1c t\u1ed3n \u0111\u1ecdng m\u1edf (Settled Facts & Deferred Items)",
+        "13.2 Login \u0111\u01b0\u1ee3c gia h\u1ea1n trong private home: b\u1ea3n ch\u00e9p l\u00e0 snapshot, b\u1ea3n m\u1edbi h\u01a1n \u0111\u01b0\u1ee3c ghi ng\u01b0\u1ee3c"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Old unit equals merge-base and first-parent text, target equals upstream (second-parent) text and merge result, so this is a pure main change; pending cap rewritten to redundant-only drop plus torn/ and byte compare, with the old pending-full home hold dropped as main intends."
     },
     {
       "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
@@ -345,12 +477,18 @@
       "targetAnchor": "unheaded-block-92",
       "targetUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
       "targetAncestry": [
-        "Spec: Runner (vòng tự hành)",
+        "Spec: Runner (v\u00f2ng t\u1ef1 h\u00e0nh)",
         "Business Rules"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Same lineage as the Vietnamese twin: old unit equals merge-base and first parent, target equals upstream and merge result; the RUL77 pending-cap sentence is replaced by the redundant-only drop and torn/ rules in main's own diff, nothing plan-side edited."
     },
     {
       "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",
@@ -361,12 +499,18 @@
       "targetAnchor": "unheaded-block-34",
       "targetUnitDigest": "b697cc3bb07baa49db491c86cd4d18e71eec7a2fdeb8777e2bd4ffaba8848088",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 3ea75475d911ca02c9d8b5011dca4f748cc5820f is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-34. No current implementation or intentional retirement is inferred, and no identity is grafted.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 1"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at 3ea75475d and is absent from main's current blob 13d2e172; target unit unheaded-block-34 is byte-identical (digests equal) under Inherited Distribution Source Unit 1, labelled as dated evidence with no current-truth claim, so move is honest."
     },
     {
       "claimId": "claim_f4bd6f64355d526302ac0a49940dd9ed",
@@ -377,12 +521,18 @@
       "targetAnchor": "unheaded-block-36",
       "targetUnitDigest": "3e9bb65b419ff88ea5687f13e0839b8853a576a35cdba1c25f4982edba4b0b0f",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-36. No current implementation or intentional retirement is inferred, and no identity is grafted.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 2"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at f053de033 and is absent from main's current blob 13d2e172; target unit unheaded-block-36 is byte-identical (digests equal) under Inherited Distribution Source Unit 2, labelled as dated evidence with no current-truth claim, so move is honest."
     },
     {
       "claimId": "claim_f4745934a72c880a881c756d98c9a722",
@@ -393,12 +543,18 @@
       "targetAnchor": "unheaded-block-38",
       "targetUnitDigest": "c0329d5c09da5a02921ba0646be0cbf7321f48badb59e9316c2df1d1a1c1985a",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-38. No current implementation or intentional retirement is inferred, and no identity is grafted.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 3"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at f053de033 and is absent from main's current blob 13d2e172; target unit unheaded-block-38 is byte-identical (digests equal) under Inherited Distribution Source Unit 3, labelled as dated evidence with no current-truth claim, so move is honest."
     },
     {
       "claimId": "claim_a288c743a526263c62df6ee0b67fb6e3",
@@ -409,12 +565,18 @@
       "targetAnchor": "unheaded-block-40",
       "targetUnitDigest": "44d8677f8928e78d07314600b104a33bb4ff23e84e92a7aa4077cddee98ae6bc",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-40. No current implementation or intentional retirement is inferred, and no identity is grafted.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 4"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at 0b06824a7 and is absent from main's current blob 13d2e172; target unit unheaded-block-40 is byte-identical (digests equal) under Inherited Distribution Source Unit 4, labelled as dated evidence with no current-truth claim, so move is honest."
     },
     {
       "claimId": "claim_1449f02666e99c92dd8ce3340af8a060",
@@ -425,12 +587,18 @@
       "targetAnchor": "unheaded-block-42",
       "targetUnitDigest": "a51332b21702f71114c85f64f1c049cf198998f20e8e1fe3ae468c0c7b191c5d",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-42. No current implementation or intentional retirement is inferred, and no identity is grafted.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 5"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at 0b06824a7 and is absent from main's current blob 13d2e172; target unit unheaded-block-42 is byte-identical (digests equal) under Inherited Distribution Source Unit 5, labelled as dated evidence with no current-truth claim, so move is honest."
     },
     {
       "claimId": "claim_8eaaa820698633aedf4339ea1f923d89",
@@ -441,11 +609,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "8980fe7db4f59777813ca8119f184178e96980c3f53e001ee88ffe67c944c254",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
       "targetAncestry": [
         "Contract: Activation Binding"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Intermediate header unit from 857ad83f8 recomputes; successor keeps every line and only splits Design status into Candidate plus Contract design status Frozen (V1); shares its target digest with the d173e545-based gap of the same file."
     },
     {
       "claimId": "claim_99600767aa1a793a02dbdc32107693d2",
@@ -456,11 +630,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "505a2fba8363494082231ca850d2329cd9b265990b04bb8a5c745e6e2345932c",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
       "targetAncestry": [
         "Contract: Distribution Pin"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Intermediate header unit from 857ad83f8 recomputes; successor keeps every line and only splits Design status into Candidate plus Contract design status Frozen (V1); shares its target digest with the d173e545-based gap of the same file."
     },
     {
       "claimId": "claim_a4c26f8aae004f1d17d0f5be7e48b585",
@@ -471,11 +651,17 @@
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "28cfc4174a87b1d603361d312cf5c03172c5dece24c367db4bb1813341bc0ad2",
       "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
       "targetAncestry": [
         "Contract: Release Manifest"
-      ]
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewMode": "ordinary",
+      "reviewNote": "Intermediate header unit from 857ad83f8 recomputes; successor keeps every line and only splits Design status into Candidate plus Contract design status Frozen (V1); shares its target digest with the d173e545-based gap of the same file."
     }
   ]
 }
