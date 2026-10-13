@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.2] - 2026-10-13
+
 ### Added
 
 - fgOS runs natively on Windows 10 and later, from PowerShell or `cmd.exe`, with no Git Bash and no WSL. A release now publishes `fgos-<tag>-x86_64-pc-windows-msvc.tar.gz` and `fgctl-<tag>-x86_64-pc-windows-msvc.tar.gz` next to the Linux assets, one `SHA256SUMS` covering all of them, and `install.ps1` next to `install.sh` (same `FGCTL_VERSION`, `FGCTL_INSTALL_DIR`, `FGCTL_ASSET_BASE_URL` and `FGCTL_TARGET`, mandatory checksum check, no administrator rights, nothing added to `PATH` silently). `fgctl init` downloads and activates the Windows target, and writes `.fgos/installation/bin/fgos.cmd` and `fgos-runner.cmd` beside the `sh` launchers so `fgos` resolves from a plain PowerShell session (the old Windows `.cmd` launchers that needed a `sh` on `PATH` are gone); `fgctl verify` reports a missing or edited launcher and `fgctl repair` rewrites them. The `rust-host-target-supported` doctor check now approves `x86_64-pc-windows-msvc`. The Linux asset is now built on `ubuntu-22.04` and the build fails if a shipped binary needs a glibc symbol newer than 2.35, so it no longer prints a loader warning on Ubuntu 22.04. A pre-release is still never "latest": install one with `FGCTL_VERSION`.
