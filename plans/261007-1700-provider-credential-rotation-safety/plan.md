@@ -67,6 +67,8 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 5. Pending cap keeps the 5 newest copies by staging time. When no copy can be judged (no `node:sqlite`, or a pi entry that cannot be identified), five later unrenewed copies can push out the one a pane renewed; still strictly better than before (base deleted it at once). Candidate fix: fingerprint the copied store in the marker at provisioning, drop identical duplicates first, cap after the apply attempt. Not triggered on this machine (Node 24, `node:sqlite` present).
 6. A pending copy whose apply hits an operating-system read error (EACCES, EIO, EMFILE) is deleted as malformed, because `unreadable-file` covers both a missing file and a read error. Split the code. Done 2026-10-13: `missing-file` (proven empty) versus `unreadable-file` (kept).
 7. A home kept because staging failed (`credential-home-kept`) is retried by the reaper without a time or attempt limit, outlives the reaper's age limit, and `fgos doctor --fix` cannot clear it; the finalizer's early stop also leaves that dispatch's other resources on disk. Needs a limit and a doctor check. Done 2026-10-13: five attempts counted in the marker, then held (never deleted by age), the finalizer continues, doctor reports it.
+8. Not fixed, left from before: a `.tmp-*` staging directory left by a crash during staging is skipped by the leftover listing, so nothing reports or removes it, and it may hold a partial copy of a login. Needs a doctor line or a sweep.
+9. The refresh-ahead re-check of held homes looks only under the default confinement temp root; homes under a backend-configured `tempRoot` are re-checked by `fgos doctor --fix` only.
 
 ## Validation Log
 

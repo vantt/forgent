@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { envForSession } from '../worker-session.mjs';
-import { writeBackRenewedCredential } from '../provider-credential-renewal.mjs';
+import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic } from '../provider-credential-renewal.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -111,6 +111,8 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
 export const CREDENTIAL_KEEP_MAX_ATTEMPTS = 5;
 export const CREDENTIAL_HOME_KEPT = 'credential-home-kept';
 export const CREDENTIAL_HOME_HELD = 'credential-home-held';
+/** Two failed attempts closer together than this count as one: a transient fault must not use up the budget. */
+export const CREDENTIAL_KEEP_MIN_INTERVAL_MS = 15 * 60 * 1000;
 
 /**
  * Add fields to the marker of a home this process created. Used for facts only known once the home is
@@ -119,11 +121,9 @@ export const CREDENTIAL_HOME_HELD = 'credential-home-held';
 export function extendOwnershipMarker(dirPath, fields) {
   const marker = readOwnershipMarker(dirPath);
   if (!marker) return false;
-  fs.writeFileSync(
-    path.join(dirPath, OWNERSHIP_MARKER_FILE),
-    JSON.stringify({ ...marker, ...fields }, null, 2),
-    { encoding: 'utf8', mode: 0o600 },
-  );
+  // Temp file and rename: a remover in another process that reads the marker meanwhile sees the old or the
+  // new content, never a half-written one (an unreadable marker would make the home look unowned).
+  writeFileAtomic(path.join(dirPath, OWNERSHIP_MARKER_FILE), JSON.stringify({ ...marker, ...fields }, null, 2));
   return true;
 }
 
@@ -170,12 +170,17 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
  * @param {string} dirPath
  * @param {{stopProcesses?: boolean}} [options] `stopProcesses`: end whatever still runs from inside first
  */
-export function removeConfinementDir(dirPath, { stopProcesses = false } = {}) {
+export function removeConfinementDir(dirPath, { stopProcesses = false, now = Date.now } = {}) {
   if (stopProcesses) stopProcessesInside(dirPath);
   const marker = readOwnershipMarker(dirPath);
+  // A marker that is there but cannot be read does not prove the home holds no login: leave it alone.
+  if (!marker && fs.existsSync(path.join(dirPath, OWNERSHIP_MARKER_FILE))) {
+    throw new Error('ownership-marker-unreadable');
+  }
   if (marker?.credentialWriteBack !== undefined) {
     // A home whose staging already failed the allowed number of times is not retried any more and is
-    // never deleted for being old: `fgos doctor` reports it for the owner to recover by hand.
+    // never deleted for being old: `fgos doctor` reports it, and a later renewal of its account or
+    // `fgos doctor --fix` settles it once that can be shown safe.
     if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) {
       throw new Error(CREDENTIAL_HOME_HELD);
     }
@@ -184,13 +189,19 @@ export function removeConfinementDir(dirPath, { stopProcesses = false } = {}) {
       if (result.keepHome) {
         // The home may hold the only good refresh token and no copy of it is safe yet: leave it and its
         // marker so a later removal retries (up to the bound), and say so with a fixed code (no paths, no
-        // values).
-        const attempts = (marker.credentialKept?.attempts ?? 0) + 1;
-        try {
-          extendOwnershipMarker(dirPath, { credentialKept: { attempts, since: marker.credentialKept?.since ?? new Date().toISOString() } });
-        } catch { /* the home is kept either way; the next removal counts again */ }
-        process.stderr.write(`fgos: credential write-back not done (${result.code}); private home kept for a later retry\n`);
-        throw new Error(attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? CREDENTIAL_HOME_HELD : CREDENTIAL_HOME_KEPT);
+        // values). An attempt close after the last counted one is not counted again.
+        const kept = marker.credentialKept;
+        const at = now();
+        const spaced = !Number.isFinite(kept?.lastCountedAt) || at - kept.lastCountedAt >= CREDENTIAL_KEEP_MIN_INTERVAL_MS;
+        const attempts = (kept?.attempts ?? 0) + (spaced ? 1 : 0);
+        if (spaced) {
+          try {
+            extendOwnershipMarker(dirPath, { credentialKept: { attempts, since: kept?.since ?? new Date(at).toISOString(), lastCountedAt: at } });
+          } catch { /* the home is kept either way; the next removal counts again */ }
+        }
+        const held = attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
+        process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${held ? 'held for the owner' : 'kept for a later retry'}\n`);
+        throw new Error(held ? CREDENTIAL_HOME_HELD : CREDENTIAL_HOME_KEPT);
       }
       process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
     }
@@ -250,15 +261,45 @@ export function listKeptCredentialHomes(tempRoot) {
       const attempts = marker?.credentialKept?.attempts;
       if (!Number.isInteger(attempts) || attempts < 1) continue;
       found.push({
+        dir: cand,
         provider: typeof marker.credentialWriteBack?.provider === 'string' ? marker.credentialWriteBack.provider : 'unknown',
         accountId: typeof marker.credentialWriteBack?.accountId === 'string' ? marker.credentialWriteBack.accountId : 'unknown',
         attempts,
         held: attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS,
         since: marker.credentialKept.since ?? marker.createdAt ?? null,
+        marker,
       });
     }
   }
   return found;
+}
+
+/**
+ * Re-check the held homes under `tempRoots` (optionally only one account's) and remove the ones that can
+ * now be shown safe to remove: the source proves the login in the home is not newer, or it has been
+ * staged beside the source. Every other held home stays exactly as it was; age never removes one.
+ * `lockHeld`: the caller already holds the account lock. Returns `{settled, held}` as counts.
+ */
+export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], provider, accountId, lockHeld = false, loadSqlite, now, tryLock } = {}) {
+  let settled = 0;
+  let held = 0;
+  for (const root of tempRoots) {
+    for (const home of listKeptCredentialHomes(root)) {
+      if (!home.held) continue;
+      if (provider !== undefined && (home.provider !== provider || home.accountId !== accountId)) continue;
+      const result = settleHeldCredentialHome(home.dir, home.marker, { lockHeld, loadSqlite, now, tryLock });
+      if (result.status === 'settled') {
+        try {
+          fs.rmSync(home.dir, { recursive: true, force: true });
+          removeEmptyDispatchParent(home.dir, home.marker.dispatchId);
+          settled += 1;
+          continue;
+        } catch { /* it stays; the next pass retries */ }
+      }
+      held += 1;
+    }
+  }
+  return { settled, held };
 }
 
 /** Whether a herdr pane is still open: true / false, or null when herdr

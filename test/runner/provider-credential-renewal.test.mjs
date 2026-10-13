@@ -24,12 +24,16 @@ import {
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import {
   CREDENTIAL_KEEP_MAX_ATTEMPTS,
+  CREDENTIAL_KEEP_MIN_INTERVAL_MS,
+  removeConfinementDir,
+  settleHeldCredentialHomes,
   OWNERSHIP_MARKER_FILE,
   cleanupConfinementResource,
   extendOwnershipMarker,
   reapOrphanedConfinementResources,
   writeOwnershipMarker,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { finalizeConfinementResources } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
@@ -1285,55 +1289,162 @@ const quietly = (fn) => {
   try { return fn(); } finally { process.stderr.write = realWrite; }
 };
 
+const MIN_GAP = CREDENTIAL_KEEP_MIN_INTERVAL_MS;
+const markerOf = (dir) => JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+const tryRemove = (dir, now) => {
+  try { quietly(() => removeConfinementDir(dir, { now: () => now })); return null; } catch (err) { return err.message; }
+};
+
 test('a home kept because staging failed is retried a bounded number of times, then held and never deleted for age', () => {
   const w = workspace();
   try {
     const dir = privateHomeWithRenewedLogin(w);
     blockStaging(w);
-    const attemptsOf = () => JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8')).credentialKept?.attempts;
+    let clock = Date.now();
     for (let attempt = 1; attempt <= CREDENTIAL_KEEP_MAX_ATTEMPTS; attempt += 1) {
-      const result = quietly(() => cleanupConfinementResource(dir, 'disp_wb'));
-      assert.equal(result.cleaned, false);
-      assert.equal(attemptsOf(), attempt);
+      assert.equal(tryRemove(dir, clock), attempt < CREDENTIAL_KEEP_MAX_ATTEMPTS ? 'credential-home-kept' : 'credential-home-held');
+      assert.equal(markerOf(dir).credentialKept.attempts, attempt);
+      clock += MIN_GAP;
     }
     // Past the bound: staging would now work, but the home is neither retried nor deleted.
     fs.rmSync(path.join(w.accountDir, 'pending'));
     writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
-    const held = cleanupConfinementResource(dir, 'disp_wb');
-    assert.equal(held.cleaned, false);
-    assert.match(held.error, /credential-home-held/);
-    assert.equal(attemptsOf(), CREDENTIAL_KEEP_MAX_ATTEMPTS, 'a held home is not counted again');
+    assert.equal(tryRemove(dir, clock), 'credential-home-held');
+    assert.equal(markerOf(dir).credentialKept.attempts, CREDENTIAL_KEEP_MAX_ATTEMPTS, 'a held home is not counted again');
     assert.equal(readPi(dir).xai.refresh, FAKE.newRefresh, 'the renewed login is still in the home');
 
     // Age never deletes it either: the reaper skips a home whose marker is long past its age limit.
-    const tempRoot = path.join(w.tmp, 'fgos-confinement');
-    const reaped = reapOrphanedConfinementResources({ tempRoot, checkLiveness: () => false, maxAgeMs: 1 });
+    const reaped = reapOrphanedConfinementResources({ tempRoot: path.join(w.tmp, 'fgos-confinement'), checkLiveness: () => false, maxAgeMs: 1 });
     assert.equal(reaped.reaped.length, 0);
     assert.equal(fs.existsSync(dir), true);
     assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'the source was not written by a held home');
   } finally { w.cleanup(); }
 });
 
-test('a home that cannot be removed does not stop the finalizer from removing the dispatch\'s other resources', async () => {
+test('failures closer together than the minimum interval are counted once, and the fifth says held', () => {
+  const w = workspace();
+  const captured = [];
+  const realWrite = process.stderr.write;
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    blockStaging(w);
+    const clock = Date.now();
+    for (let i = 0; i < 4; i += 1) tryRemove(dir, clock + i * 1000);
+    assert.equal(markerOf(dir).credentialKept.attempts, 1, 'a burst of failures is one attempt');
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    for (let i = 1; i <= CREDENTIAL_KEEP_MAX_ATTEMPTS - 1; i += 1) {
+      try { removeConfinementDir(dir, { now: () => clock + i * MIN_GAP }); } catch { /* kept or held */ }
+    }
+    process.stderr.write = realWrite;
+    assert.equal(markerOf(dir).credentialKept.attempts, CREDENTIAL_KEEP_MAX_ATTEMPTS);
+    const lines = captured.join('').trim().split('\n');
+    assert.match(lines.at(-1), /held for the owner/);
+    assert.equal(lines.slice(0, -1).some((line) => /held for the owner/.test(line)), false);
+  } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+test('the marker is rewritten through a rename, and a marker that cannot be read stops the removal', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const marker = path.join(dir, OWNERSHIP_MARKER_FILE);
+    const renamed = [];
+    const realRename = fs.renameSync;
+    fs.renameSync = (from, to) => { renamed.push(to); return realRename(from, to); };
+    try { extendOwnershipMarker(dir, { credentialKept: { attempts: 1 } }); } finally { fs.renameSync = realRename; }
+    assert.deepEqual(renamed, [marker], 'written to a temp file and renamed over the marker');
+    assert.equal(markerOf(dir).credentialKept.attempts, 1);
+    assert.deepEqual(fs.readdirSync(dir).filter((n) => /\.fgos-\d+-/.test(n)), [], 'no temp file is left behind');
+
+    // A torn marker (a writer died half-way) does not prove the home holds no login.
+    fs.writeFileSync(marker, '{"contract": "');
+    assert.throws(() => removeConfinementDir(dir), /ownership-marker-unreadable/);
+    assert.equal(fs.existsSync(path.join(dir, 'auth.json')), true, 'the renewed login is still in the home');
+  } finally { w.cleanup(); }
+});
+
+test('after the driver cleanup kept a home, the finalizer with the prepared digests still removes the other resources and says why', async () => {
   const w = workspace();
   try {
     const kept = privateHomeWithRenewedLogin(w);
-    blockStaging(w);
     const other = path.join(w.tmp, 'fgos-confinement', 'disp_wb', 'scratch');
     fs.mkdirSync(other, { recursive: true });
     writeOwnershipMarker(other, { dispatchId: 'disp_wb' });
+    const digestOf = (dir) => computeSha256Digest(markerOf(dir));
+    const resources = [kept, other].map((dir) => ({ kind: 'temporary-directory', pathRef: dir, ownershipMarkerDigest: digestOf(dir) }));
+    blockStaging(w);
+    // Production order: the driver's cleanup runs first and changes the kept home's marker.
+    assert.equal(quietly(() => cleanupConfinementResource(kept, 'disp_wb')).cleaned, false);
+    assert.ok(markerOf(kept).credentialKept, 'the failed attempt was recorded in the marker');
     const runDir = path.join(w.tmp, 'run');
     fs.mkdirSync(runDir, { recursive: true });
     const result = await quietly(() => finalizeConfinementResources({
-      runDir,
-      launchCommandId: 'launch_1',
-      receipt: { completion: { kind: 'exited' } },
-      descriptor: { resources: [{ kind: 'temporary-directory', pathRef: kept }, { kind: 'temporary-directory', pathRef: other }] },
+      runDir, launchCommandId: 'launch_1', receipt: { completion: { kind: 'exited' } }, descriptor: { resources },
     }));
     assert.equal(result.cleanupState, 'retained');
-    assert.match(result.cleanupResult.reason, /credential-home-kept/);
+    assert.match(result.cleanupResult.reason, /cleanup-failed: credential-home-kept/);
     assert.equal(fs.existsSync(kept), true, 'the home with the unstaged login stays');
     assert.equal(fs.existsSync(other), false, 'the other resource was still removed');
+  } finally { w.cleanup(); }
+});
+
+function heldHome(w, opts) {
+  const dir = privateHomeWithRenewedLogin(w, opts);
+  extendOwnershipMarker(dir, { credentialKept: { attempts: CREDENTIAL_KEEP_MAX_ATTEMPTS, since: new Date(Date.now() - 3 * 24 * HOUR).toISOString(), lastCountedAt: Date.now() - 3 * 24 * HOUR } });
+  return dir;
+}
+const settleAll = (w, extra = {}) => settleHeldCredentialHomes({ tempRoots: [path.join(w.tmp, 'fgos-confinement')], ...extra });
+
+test('a held home is removed once the source proves its login is not newer', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    assert.deepEqual(settleAll(w), { settled: 1, held: 0 });
+    assert.equal(fs.existsSync(dir), false);
+    assert.equal(readPi(w.home).xai.refresh, 'FAKE-NEWER-REFRESH');
+  } finally { w.cleanup(); }
+});
+
+test('a held home whose login can now be staged is staged and applied before the home goes', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    assert.deepEqual(settleAll(w), { settled: 1, held: 0 });
+    assert.equal(fs.existsSync(dir), false);
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh, 'the renewed login reached the source');
+  } finally { w.cleanup(); }
+});
+
+test('a held home stays when the source cannot say and the login still cannot be staged, or the account lock is busy', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    blockStaging(w);
+    assert.deepEqual(settleAll(w), { settled: 0, held: 1 });
+    assert.equal(readPi(dir).xai.refresh, FAKE.newRefresh);
+    fs.rmSync(path.join(w.accountDir, 'pending'));
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    const lock = tryAcquireAccountLock({ runtimeDir: w.runtimeDir, provider: 'xai', accountId: 'acct' });
+    assert.ok(lock);
+    try { assert.deepEqual(settleAll(w), { settled: 0, held: 1 }); } finally { lock.release(); }
+    assert.equal(fs.existsSync(dir), true);
+  } finally { w.cleanup(); }
+});
+
+test('refresh-ahead of the held home\'s account re-checks it under the lock, even while the login is fresh', async () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
+    const result = await refreshAhead({
+      provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn,
+      confinementTempRoots: [path.join(w.tmp, 'fgos-confinement')],
+    });
+    assert.deepEqual(result, { status: 'fresh', reason: 'outside-window' });
+    assert.equal(starts.length, 0);
+    assert.equal(fs.existsSync(dir), false, 'the held home was settled');
   } finally { w.cleanup(); }
 });
 

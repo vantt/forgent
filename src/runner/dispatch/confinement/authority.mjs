@@ -1822,7 +1822,9 @@ export async function finalizeConfinementResources({
             try {
               const parsed = JSON.parse(raw);
               markerDispatchId = parsed?.dispatchId ?? null;
-              markerDigest = computeSha256Digest(parsed);
+              // `credentialKept` is added by a failed removal after the digest was taken; it is not tampering.
+              const { credentialKept: _kept, ...atPrepare } = parsed ?? {};
+              markerDigest = computeSha256Digest(parsed && typeof parsed === 'object' ? atPrepare : parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);
             }

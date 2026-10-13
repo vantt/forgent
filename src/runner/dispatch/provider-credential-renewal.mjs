@@ -102,7 +102,7 @@ function serializeJson(doc, raw) {
   return raw.endsWith('\n') ? `${text}\n` : text;
 }
 
-function writeFileAtomic(file, content) {
+export function writeFileAtomic(file, content) {
   const tmp = path.join(path.dirname(file), `.${path.basename(file)}.fgos-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
   try {
     const fd = fs.openSync(tmp, 'w', 0o600);
@@ -715,6 +715,7 @@ export async function refreshAhead({
   env,
   loadSqlite = defaultLoadSqlite,
   now = Date.now,
+  confinementTempRoots,
 } = {}) {
   try {
     const layoutName = credentialLayout(credentialSource);
@@ -726,16 +727,34 @@ export async function refreshAhead({
     // Only the dispatched provider's entry counts, both for the window and for "was it renewed".
     const entryOf = (read) => selectProviderEntry(read.entries, provider);
     const inWindow = (entry) => entry.dueMs - now() < thresholdMs;
+    // Private homes held after repeated staging failures are looked at again whenever this account is
+    // renewed; the confinement module is loaded on demand because it depends on this one.
+    const settleHeld = async () => {
+      try {
+        const { settleHeldCredentialHomes } = await import('./confinement/cleanup.mjs');
+        settleHeldCredentialHomes({ tempRoots: confinementTempRoots, provider, accountId, lockHeld: true, loadSqlite, now });
+      } catch { /* a held home stays held */ }
+    };
+    const hasHeldHomes = async () => {
+      try {
+        const { listKeptCredentialHomes, resolveConfinementTempRoot } = await import('./confinement/cleanup.mjs');
+        return (confinementTempRoots ?? [resolveConfinementTempRoot()])
+          .some((root) => listKeptCredentialHomes(root).some((h) => h.held && h.provider === provider && h.accountId === accountId));
+      } catch { return false; }
+    };
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
     const beforeEntry = entryOf(before);
     if (!beforeEntry.ok) {
       // Nothing is renewed here, but a copy kept earlier may be identifiable by now.
-      if (hasLeftovers(accountDir)) {
+      if (hasLeftovers(accountDir) || await hasHeldHomes()) {
         let held;
         try { held = await acquireAccountLock({ runtimeDir, provider, accountId, waitMs: lockWaitMs }); } catch { held = null; }
         if (held) {
-          try { applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite }); } finally {
+          try {
+            applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite });
+            await settleHeld();
+          } finally {
             try { held.release(); } catch { /* a release problem must not fail the dispatch */ }
           }
         }
@@ -743,7 +762,7 @@ export async function refreshAhead({
       return { status: 'skipped', reason: beforeEntry.code };
     }
     // A copy renewed in a pane may hold the only good pair even while the source still looks fresh.
-    if (!inWindow(beforeEntry.entry) && !hasLeftovers(accountDir)) return { status: 'fresh', reason: 'outside-window' };
+    if (!inWindow(beforeEntry.entry) && !hasLeftovers(accountDir) && !(await hasHeldHomes())) return { status: 'fresh', reason: 'outside-window' };
 
     let lock;
     try {
@@ -753,6 +772,7 @@ export async function refreshAhead({
     }
     try {
       applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite });
+      await settleHeld();
       const source = layout.read(home, { loadSqlite });
       if (!source.ok) return { status: 'skipped', reason: source.code };
       const entry = entryOf(source);
@@ -847,6 +867,39 @@ function validWriteBack(value) {
     && typeof value.home === 'string' && path.isAbsolute(value.home)
     && typeof value.runtimeDir === 'string' && path.isAbsolute(value.runtimeDir)
     && Object.hasOwn(LAYOUTS, value.layout);
+}
+
+/**
+ * Re-check a private home that was held after repeated staging failures. Under the account lock (taken
+ * here without waiting, unless the caller already holds it with `lockHeld`): when the source is readable
+ * and proves the home's login is not newer, or when the login can now be staged beside the source, the
+ * home is settled and the caller may remove it; when neither can be shown it stays held. Never throws.
+ * Returns `{status: 'settled'|'held', code?}`; `code` is a fixed word.
+ */
+export function settleHeldCredentialHome(homeDir, marker, { loadSqlite = defaultLoadSqlite, now = Date.now, tryLock = tryAcquireAccountLock, lockHeld = false } = {}) {
+  const writeBack = marker?.credentialWriteBack;
+  if (!validWriteBack(writeBack)) return { status: 'held', code: 'invalid-marker' };
+  const layout = LAYOUTS[writeBack.layout];
+  const accountDir = providerAccountDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId);
+  if (!accountDir) return { status: 'held', code: 'invalid-marker' };
+  let lock = null;
+  if (!lockHeld) {
+    lock = tryLock({ runtimeDir: writeBack.runtimeDir, provider: writeBack.provider, accountId: writeBack.accountId });
+    if (!lock) return { status: 'held', code: 'lock-busy' };
+  }
+  try {
+    // The staging step is the write-back's own; the lock is already ours, so it must not try for it again.
+    const result = writeBackRenewedCredential(homeDir, marker, { loadSqlite, now, tryLock: () => null });
+    if (result.status === 'failed') return { status: 'held', code: result.code };
+    if (result.status === 'staged') {
+      applyLeftovers({ accountDir, layoutName: writeBack.layout, provider: writeBack.provider, sourceHome: writeBack.home, now: now(), loadSqlite });
+    }
+    return { status: 'settled' };
+  } catch {
+    return { status: 'held', code: 'write-back-failed' };
+  } finally {
+    try { lock?.release(); } catch { /* the copy is already safe */ }
+  }
 }
 
 /**
