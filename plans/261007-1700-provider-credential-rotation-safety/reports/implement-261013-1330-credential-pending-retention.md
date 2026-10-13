@@ -80,3 +80,15 @@ Source: [code-review-261013-1355-credential-pending-retention-independent.md](co
 ### Final suite
 
 Full suite on the commit that inverts the dependency (cf537bad8): 7269 tests, 7194 pass, 0 fail, 0 cancelled, 10 skipped (`env -u CLAUDE_CODE_SESSION_ID npm test`, exit 0).
+
+## Round three
+
+Source: [code-review-261013-1511-credential-pending-retention-round-2-verification.md](code-review-261013-1511-credential-pending-retention-round-2-verification.md). Run against the code of 06e4e1596, six of the new tests failed (the one that checks the boundary regex is test-side and was red only by the old pattern lacking the backtick).
+
+- **Pending cap loss.** `settleHeldCredentialHome` returns held (`pending-full`) when the account's pending copies are at the cap and the home's login is not proven not-newer, so the cap cannot push out an older copy. Test: five pending copies, the only valid one oldest, a held home with an unreadable source: nothing pushed out, home stays.
+- **fsync.** The staged files and staging directory are synced before the rename, the pending directory after it, before the home may go. Test counts syncs.
+- **Runtime directory.** The hook and `settleHeldCredentialHomes` match the marker's runtime directory. Test with another runtime directory.
+- **Unrecognisable marker.** `{}`, `null`, `[]`, `{"dispatchId":"x"}` and empty content stop the removal. A marker that names a contract (the existing finalizer test's shape) still goes through to the caller's own ownership check; no existing test was changed.
+- **Temp roots.** `defaultConfinementTempRoots` moved to `confinement/backend-registry.mjs` (re-exported from registrations); the three dispatch callers pass it to `createConfinementCredentialRenewal`, read at each use. Test reads the callers' sources. The renewal module still imports nothing from confinement. Plan question 9 closed; questions 10 (duplicate staging after a crash) and 11 (lock taken by every dispatch of an account with an unsettleable held home) recorded, not fixed.
+- Comments that claimed "no path" corrected; the boundary test's pattern now includes the backtick quote.
+- Component boundary: no change.
