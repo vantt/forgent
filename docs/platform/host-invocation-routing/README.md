@@ -10,6 +10,14 @@ Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/architect/host-invocation-routing/**
 Last reviewed: 2026-09-18
+Implementation: Existing dated R1/R2/R3 preview records; candidate carriage and current truth await independent checkpoint review
+Provenance: Six pinned legacy sources and the frozen Host Invocation area map; retained policy is non-authority history
+Writer type: Agent
+Canonical for: Promoted area navigation only; candidate document claims are not promoted by this edit
+Use this when: Finding the host invocation contract, selected migration direction and its proof boundaries
+Do not use this for: Selecting or installing a runtime, certifying current route counts, or treating dated plans as shipped code
+Supersedes: None; legacy source authority remains unchanged during candidate transformation
+Superseded by: None
 Related:
 - docs/platform/host-invocation-routing/vision.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
@@ -49,8 +57,8 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Check preserved legacy intent and dispositions | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | Understand current, legacy-current, planned, and unknown behavior | [spec.md](spec.md) |
 | Plan remaining work after R1/R2/R3 preview proofs | [roadmap.md](roadmap.md) |
-| Review R2 external process provider preview closeout | [../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../plans/260915-host-invocation-r2-external-process/plan.md), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
-| Review R3 remote peer closeout | [../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../plans/260918-host-invocation-r3-remote-peer/plan.md), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
+| Review R2 external process provider preview closeout | `../../../plans/260915-host-invocation-r2-external-process/plan.md` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
+| Review R3 remote peer closeout | `../../../plans/260918-host-invocation-r3-remote-peer/plan.md` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
 | Understand invocation kernel shape | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Understand CLI, remote, and chat peer hosts | [architecture/host-use-cases.md](architecture/host-use-cases.md) |
 | Understand provider selection and authority | [architecture/provider-routing.md](architecture/provider-routing.md) |
@@ -132,3 +140,9 @@ The preservation ledger must be checked after each phase. A detail omitted from 
 | decisions index | [decisions/README.md](decisions/README.md) |
 | platform boundary | [../component-boundary.md](../component-boundary.md) |
 | packaging dependency | [../packaging-distribution/README.md](../packaging-distribution/README.md) |
+
+## 10. Candidate Conservation And Retired Policy
+
+Added in candidate: the [retired documentation migration policy](history/documentation-migration/documentation-standardization-plan.md) is retained verbatim as non-authority history, not as the area's current documentation policy. The source inventory names that carrier.
+
+The candidate restoration notes distinguish literal selected-design text from checked implementation. In particular, contract range intersection and transport alternatives are not certified as implemented; performance budgets are not measurements; the old npm-bin removal clause is flagged rather than replacing the retained compatibility ownership rule. Existing September preview records are dated evidence, not a fresh current-route or release certification. Independent checkpoint conservation and the current-unit truth sample are still pending.
