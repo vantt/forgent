@@ -1,3 +1,43 @@
+# Latest resume state — Packaging-distribution ready for first independent review
+
+Date: 2026-10-14 (session began 2026-10-13)
+Executor: codex-session:9@2026-10-13
+Session counter: 9
+Documented Packaging executor sessions: 2 (one interrupted plus this resume)
+Step: 4 / Packaging-distribution P4
+State: ready-for-review; STOP for independent Lead
+Technical blocker: none. Review, F6 retirement decision and eventual partial-carry closure remain open.
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Main at boundary: 3e30ecd3779a4967b1c2f4ff01a68ae50c38ef83
+Last green D / native proof source: 5ed0b6199dd3f72aa8796dee3614cb668188d630
+Content source: baef3a075899f83d515a28ab66abd6c3d55201c5
+Previous interrupted batch commits: 865795271..baef3a075, including the above main merge (excluded from own rollback).
+This resume commits: 3793e7329 (early progress), 2f6a068bf (four inherited artifact corrections), ff3c69a9c (A28 list / exact exceptions / native accounting), 5ed0b6199 (complete bounded packs). This final request/verification/queue/progress commit completes the checkpoint.
+Request: review-request-261013-2348-packaging-distribution.md
+Pack manifest: packaging-review-packs.json; 22 packs, maximum 243158 bytes, all hashes and unique logical row sets checked.
+Verification: packaging-review-verification.json
+
+All four dirty inherited paths were consistent with actual committed payloads and kept. Exact production parsing confirms 407 source bindings, 31 successors and 21 native heading bindings. Final native accounting preserves the complete 489-new-ID list, correcting the stale pre-final count. Registry format was never changed.
+
+Current source count: 407 (371 architecture + 36 distribution), against planned 402. Class counts: Mirror 0, Unit-exact 0, Weak-exact 293, Judgment 114. Dispositions: 399 move, seven defer-with-owner, one partial-carry; all pending, no source hold. Five inherited displaced distribution gaps are separate from current source counts. Successors: 21 candidate metadata + two main-only + five inherited source + three intermediate Candidate/Frozen metadata gaps. All 31 pending. Twenty-one native stable heading digest changes are shown separately without ID/path/anchor graft. The seven stub units retain Plan C; only they defer. Distribution was decided last at current/main blob 13d2e172de35a570d148022d4c859cac05223acb, compared with unchanged baseline b370c940c369c5de88007fc4ce1347121a850178. All nine source pins still match. The implementation-alignment filename rule keeps the two area-qualified owners after reading both files.
+
+A31 review explicitly includes merge 77830ba77: complete both-parent/result changelog bytes, its combined/conflict resolution, two main spec gap successors and full containing heading changes. Final audit resolves 1917 accepted references in 14 immutable receipt files against all four changed code/test paths: 15 mentions are historical snapshots/frames, zero current code-evidence receipt affected, zero re-pin or truth re-review required. The reviewer still independently checks this machine audit and the conservation rows. Upstream changes are not plan moves.
+
+A28 list: exactly 692 native reverse-open tuples, all eligible Candidate/Draft or history; no truth approval. Two exact identical-unit exception groups retain complete memberships. The explicitly requested Doer truth draw is 30 distinct units from a digest-bound 629-unit non-history body population; seed/method/text/digests committed, no assertion checked by author. Lead may redraw independently and must check every current assertion, report false units/denominators and enforce the 10% threshold.
+
+F6: pending retirement proposal for only the installed-default npm removal/redirection trigger. Current package entries/header and git history prove coexistence, not an intentional retirement. Owner acceptance follows independent Lead review. Existing dropped-010 deferral, Host source approvals and FLAGGED verbatim retention remain unchanged. One Packaging partial carry still blocks eventual A28 closure; A33 is Host-only, no exception is claimed or requested at this checkpoint.
+
+Final D against both prior registries: exit 0, zero fatal. Scoped E against both: expected exit 1, exactly 407 not-reviewed + one partial carry + two exception groups + one unreviewed dropped register + 692 reverse units. Full active registry/inventory tuple equality and old-known conservation pass: 93839 old IDs, 93818 unchanged tuples and exactly 21 shown native heading changes, 94328 current IDs/489 new, zero missing, no identity graft. Host 588 and Agent 488 candidate tuple sets unchanged; three Agent holds and full prior exception/residual memberships unchanged. No self-review or closure claim.
+
+Preservation: zero own allowlist violation with eight existing exemptions; 74 history witnesses/867 payloads/five frozen files; extractor, prior closed area trees, authority statuses and reader links unchanged. Ratchet/placement green, candidate findings zero. Targeted review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. No full suite, installed release or gateway claim.
+
+Exact proven native scratch registry: /tmp/fgos-work/packaging-review/registry.json; duplicate at /tmp/fgos-work/packaging-distribution/content-registry.json. Both 59446367 bytes, SHA256 fa9e1a6c7c37e8d91b5e43e026f37ac4c4de464e24fd3464aec0a3483d3a3031, below 90 MB. Persisted working registry remains 59202819 bytes, SHA256 d54faf6eec8e785b33fe5902022f446d0fe25989d90e5316707c1da50e849cd9. Keep this real native scratch for review; a direct old-base-to-final refresh omits intermediate metadata gap identities. Reproduce only via recorded native authoring pins if scratch is lost, never seed reconstruction or hand graft. Persist accepted registry at eventual batch closure after verdicts and fresh proofs.
+
+STOP. Next action: Lead independently reads the request's 22 full-text/digest packs, judges all 407 source rows/31 native successors/21 heading changes, checks A31 and A28 equality/eligibility, performs or redraws the 30-unit truth sample, and commits ordinary verdicts plus F6 recommendation. Doer then resumes only to apply verbatim committed verdicts or bounded rework. No promotion, Step 5, push, rebase, force-push, main checkout write, gate/checker/vocabulary/extractor/baseline edit. Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging-distribution first review preparation
 
 Date: 2026-10-13
