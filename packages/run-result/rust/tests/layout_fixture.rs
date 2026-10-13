@@ -1,5 +1,7 @@
 use fgos_observe::{ObservationSource, ObserveRequest, Window};
-use fgos_run_result::{scan_coverage, scan_runs, scan_unit_summaries, RunResultSource, MAX_ASSIGNMENT_DEPTH};
+use fgos_run_result::{
+    scan_coverage, scan_runs, scan_unit_summaries, RunResultSource, MAX_ASSIGNMENT_DEPTH,
+};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -92,7 +94,11 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         if let Some(fields) = entry["result"].as_object() {
             record.as_object_mut().unwrap().extend(fields.clone());
         }
-        let dir = root.assignments().join(assignment).join("runs").join(attempt);
+        let dir = root
+            .assignments()
+            .join(assignment)
+            .join("runs")
+            .join(attempt);
         fs::create_dir_all(&dir).unwrap();
         let mut run = json!({
             "runId": entry.get("runId").unwrap_or(&Value::Null),
@@ -167,16 +173,36 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         root: root.0.clone(),
         stdin: None,
     };
-    let coverage =
-        fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
+    let coverage = fgos_observe::metrics_cli::dispatch(
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap();
     assert_eq!(coverage["layoutRule"], expected["layoutRule"]);
     assert_eq!(coverage["observed"], scan.runs.len());
     assert_eq!(coverage["recentRuns"], 17);
     req.sub = "runs".to_string();
-    let runs = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
+    let runs = fgos_observe::metrics_cli::dispatch(
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap();
     assert_eq!(runs["total"], coverage["observed"]);
     req.sub = "harness".to_string();
-    let harness = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
+    let harness = fgos_observe::metrics_cli::dispatch(
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap();
     assert_eq!(harness["runs"]["total"], coverage["observed"]);
     for (id, timestamp) in [
         ("owner-settled", "2026-10-05T11:00:00Z"),
@@ -191,28 +217,54 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         assert_eq!(observation.attrs["status"], "done");
     }
     req.args = vec![
-        "--since".to_string(), "2026-10-05T11:00:00Z".to_string(),
-        "--until".to_string(), "2026-10-05T12:00:00Z".to_string(),
+        "--since".to_string(),
+        "2026-10-05T11:00:00Z".to_string(),
+        "--until".to_string(),
+        "2026-10-05T12:00:00Z".to_string(),
     ];
     req.sub = "runs".to_string();
     let windowed_runs = fgos_observe::metrics_cli::dispatch(
-        &req, &sources, None, scan_coverage, scan_unit_summaries,
-    ).unwrap();
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap();
     assert_eq!(windowed_runs["total"], 2);
     req.sub = "harness".to_string();
     let windowed_harness = fgos_observe::metrics_cli::dispatch(
-        &req, &sources, None, scan_coverage, scan_unit_summaries,
-    ).unwrap();
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap();
     assert_eq!(windowed_harness["runs"]["total"], 2);
     req.sub = "coverage".to_string();
     assert!(fgos_observe::metrics_cli::dispatch(
-        &req, &sources, None, scan_coverage, scan_unit_summaries,
-    ).unwrap_err().contains("unexpected argument for metrics coverage"));
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap_err()
+    .contains("unexpected argument for metrics coverage"));
     req.args.clear();
     let windowed_coverage = fgos_observe::metrics_cli::dispatch(
-        &req, &sources, None, scan_coverage, scan_unit_summaries,
-    ).unwrap();
-    assert_eq!(windowed_coverage["observed"], expected["observedRunIds"].as_array().unwrap().len());
+        &req,
+        &sources,
+        None,
+        scan_coverage,
+        scan_unit_summaries,
+    )
+    .unwrap();
+    assert_eq!(
+        windowed_coverage["observed"],
+        expected["observedRunIds"].as_array().unwrap().len()
+    );
     assert_eq!(windowed_coverage["runDirsSeen"], expected["runDirsSeen"]);
     assert_eq!(windowed_coverage["skipped"], expected["skipped"]);
     // Invalid settlement times are not admitted, so they join no window,
@@ -345,7 +397,10 @@ fn recent_runs_use_result_mtime_and_bound_clock_skew() {
         ("old", now - std::time::Duration::from_secs(120)),
         ("skewed", now + std::time::Duration::from_secs(30)),
         ("far-future", now + std::time::Duration::from_secs(120)),
-        ("year-ahead", now + std::time::Duration::from_secs(365 * 86_400)),
+        (
+            "year-ahead",
+            now + std::time::Duration::from_secs(365 * 86_400),
+        ),
     ] {
         let path = root.result(
             id,
@@ -408,8 +463,19 @@ fn owner_settlement_requires_regular_parseable_metadata_without_changing_results
     let root = FixtureRoot::new();
     let owner_time = "2026-10-05T11:00:00Z";
     let target = root.0.join("outside-run.json");
-    fs::write(&target, serde_json::to_vec(&json!({"settledAt": owner_time})).unwrap()).unwrap();
-    for metadata_kind in ["valid", "invalid", "symlink", "directory", "blank", "started"] {
+    fs::write(
+        &target,
+        serde_json::to_vec(&json!({"settledAt": owner_time})).unwrap(),
+    )
+    .unwrap();
+    for metadata_kind in [
+        "valid",
+        "invalid",
+        "symlink",
+        "directory",
+        "blank",
+        "started",
+    ] {
         for primary in [false, true] {
             let id = format!("{metadata_kind}-{primary}");
             let record = if primary {
@@ -421,16 +487,34 @@ fn owner_settlement_requires_regular_parseable_metadata_without_changing_results
             let result = root.result(&id, "01", &record);
             let run = result.parent().unwrap().join("run.json");
             match metadata_kind {
-                "valid" => fs::write(&run, serde_json::to_vec(&json!({"settledAt": owner_time})).unwrap()).unwrap(),
+                "valid" => fs::write(
+                    &run,
+                    serde_json::to_vec(&json!({"settledAt": owner_time})).unwrap(),
+                )
+                .unwrap(),
                 "invalid" => fs::write(&run, "NOT JSON").unwrap(),
                 "symlink" => std::os::unix::fs::symlink(&target, &run).unwrap(),
                 "directory" => fs::create_dir(&run).unwrap(),
-                "blank" => fs::write(&run, r#"{"settledAt":" ","startedAt":"2026-10-05T11:00:00Z"}"#).unwrap(),
+                "blank" => fs::write(
+                    &run,
+                    r#"{"settledAt":" ","startedAt":"2026-10-05T11:00:00Z"}"#,
+                )
+                .unwrap(),
                 "started" => fs::write(&run, r#"{"startedAt":"2026-10-05T11:00:00Z"}"#).unwrap(),
                 _ => unreachable!(),
             }
-            fs::write(result.parent().unwrap().parent().unwrap().parent().unwrap().join("assignment.json"),
-                r#"{"createdAt":"2026-10-05T11:00:00Z"}"#).unwrap();
+            fs::write(
+                result
+                    .parent()
+                    .unwrap()
+                    .parent()
+                    .unwrap()
+                    .parent()
+                    .unwrap()
+                    .join("assignment.json"),
+                r#"{"createdAt":"2026-10-05T11:00:00Z"}"#,
+            )
+            .unwrap();
         }
     }
     let scan = scan_runs(&root.0).unwrap();
@@ -450,7 +534,10 @@ fn owner_settlement_requires_regular_parseable_metadata_without_changing_results
             assert_eq!(observation.subject.id, "valid-false");
             assert_eq!(observation.ts, owner_time);
         }
-        let result = root.assignments().join(&observation.subject.id).join("runs/01/result.json");
+        let result = root
+            .assignments()
+            .join(&observation.subject.id)
+            .join("runs/01/result.json");
         let record: Value = serde_json::from_slice(&fs::read(result).unwrap()).unwrap();
         if observation.subject.id == "valid-false" {
             assert_eq!(record["settledAt"], Value::Null);
@@ -468,13 +555,29 @@ fn absent_and_malformed_results_have_distinct_accounting() {
     let root = FixtureRoot::new();
     let missing = root.assignments().join("missing/runs/01");
     fs::create_dir_all(&missing).unwrap();
-    fs::write(missing.join("run.json"), r#"{"settledAt":"2026-10-05T11:00:00Z"}"#).unwrap();
+    fs::write(
+        missing.join("run.json"),
+        r#"{"settledAt":"2026-10-05T11:00:00Z"}"#,
+    )
+    .unwrap();
     let malformed = root.result("malformed", "01", &json!({}));
     fs::write(malformed, "NOT JSON").unwrap();
     fs::create_dir_all(root.assignments().join("nonregular/runs/01/result.json")).unwrap();
-    root.result("verbatim", "01", &json!({"runId": " id ", "settledAt": "2026-10-05T10:00:00Z"}));
-    root.result("non-date", "01", &json!({"runId": "non-date", "settledAt": " non-date "}));
-    root.result("blank-id", "01", &json!({"runId": " ", "settledAt": "non-date"}));
+    root.result(
+        "verbatim",
+        "01",
+        &json!({"runId": " id ", "settledAt": "2026-10-05T10:00:00Z"}),
+    );
+    root.result(
+        "non-date",
+        "01",
+        &json!({"runId": "non-date", "settledAt": " non-date "}),
+    );
+    root.result(
+        "blank-id",
+        "01",
+        &json!({"runId": " ", "settledAt": "non-date"}),
+    );
     let scan = scan_runs(&root.0).unwrap();
     assert_eq!(scan.run_dirs_seen, 6);
     assert_eq!(scan.runs.len(), 1);
@@ -491,11 +594,18 @@ fn absent_and_malformed_results_have_distinct_accounting() {
 fn owner_settlement_duplicates_keep_component_lexical_order_before_windowing() {
     let root = FixtureRoot::new();
     let first = root.result("a", "01", &json!({"runId": "shared", "settledAt": " "}));
-    fs::write(first.parent().unwrap().join("run.json"),
-        r#"{"settledAt":"2026-10-05T11:00:00Z"}"#).unwrap();
-    root.result("a-", "01", &json!({
-        "runId": "shared", "settledAt": "2026-10-06T11:00:00Z"
-    }));
+    fs::write(
+        first.parent().unwrap().join("run.json"),
+        r#"{"settledAt":"2026-10-05T11:00:00Z"}"#,
+    )
+    .unwrap();
+    root.result(
+        "a-",
+        "01",
+        &json!({
+            "runId": "shared", "settledAt": "2026-10-06T11:00:00Z"
+        }),
+    );
     let scan = scan_runs(&root.0).unwrap();
     assert_eq!(scan.runs.len(), 1);
     assert_eq!(scan.runs[0].attrs["assignmentId"], "a");
@@ -505,7 +615,10 @@ fn owner_settlement_duplicates_keep_component_lexical_order_before_windowing() {
         since: Some("2026-10-06T00:00:00Z".to_string()),
         until: None,
     };
-    assert!(RunResultSource::new().observations(&root.0, &window).unwrap().is_empty());
+    assert!(RunResultSource::new()
+        .observations(&root.0, &window)
+        .unwrap()
+        .is_empty());
     assert_eq!(scan_coverage(&root.0).unwrap()["observed"], 1);
     assert_accounting(&root.0);
 }
@@ -517,7 +630,11 @@ fn unicode_duplicate_winner_uses_utf8_component_order() {
         ("\u{10000}", "2026-10-05T11:00:00Z"),
         ("\u{e000}", "2026-10-05T10:00:00Z"),
     ] {
-        root.result(name, "01", &json!({"runId": "same", "settledAt": timestamp}));
+        root.result(
+            name,
+            "01",
+            &json!({"runId": "same", "settledAt": timestamp}),
+        );
     }
     let scan = scan_runs(&root.0).unwrap();
     assert_eq!(scan.runs.len(), 1);

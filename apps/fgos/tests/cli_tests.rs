@@ -242,8 +242,7 @@ fn test_native_version_succeeds_with_envelope() {
     )
     .expect("package.json must be valid JSON");
     assert_eq!(parsed["data"]["packageVersion"], package_json["version"]);
-    let routes_path =
-        repo_root().join("packages/host-runtime/contracts/command-routes.json");
+    let routes_path = repo_root().join("packages/host-runtime/contracts/command-routes.json");
     let routes_str =
         fs::read_to_string(&routes_path).expect("command-routes.json must be readable");
     let routes: std::collections::HashMap<String, serde_json::Value> =
@@ -1099,7 +1098,10 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
     let root = std::env::temp_dir().join(format!(
         "fgos-native-discussions-{}-{}",
         std::process::id(),
-        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
     ));
     let assignments = root.join(".fgos/assignments");
     fs::create_dir_all(assignments.join("unit-run-missing")).unwrap();
@@ -1131,16 +1133,31 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
         summary["settledAt"] = timestamp;
         let dir = assignments.join(id);
         fs::create_dir_all(&dir).unwrap();
-        fs::write(dir.join("unit-summary.json"), serde_json::to_vec(&summary).unwrap()).unwrap();
+        fs::write(
+            dir.join("unit-summary.json"),
+            serde_json::to_vec(&summary).unwrap(),
+        )
+        .unwrap();
     }
     let output = Command::new(fgos_bin())
-        .args(["metrics", "discussions", "--since=2026-10-05", "--by=executor", "--dir"])
+        .args([
+            "metrics",
+            "discussions",
+            "--since=2026-10-05",
+            "--by=executor",
+            "--dir",
+        ])
         .arg(&root)
         .current_dir(&root)
         .output()
         .expect("failed to execute native discussions");
     let _ = fs::remove_dir_all(&root);
-    assert_eq!(output.status.code(), Some(0), "{}", String::from_utf8_lossy(&output.stderr));
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
     let envelope: Value = serde_json::from_slice(&output.stdout).expect("native JSON envelope");
     assert_eq!(envelope["contract"], "fgos.v1");
     let report = &envelope["data"];
@@ -1156,6 +1173,9 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
     assert_eq!(report["summaryDirsSeen"], 4);
     assert_eq!(report["summariesMissing"], 1);
     assert_eq!(report["summariesUnusable"], 1);
-    assert_eq!(report["summariesSkippedByReason"], json!({"missing-timestamp": 1}));
+    assert_eq!(
+        report["summariesSkippedByReason"],
+        json!({"missing-timestamp": 1})
+    );
     assert_eq!(report["summariesOutsideWindow"], 1);
 }

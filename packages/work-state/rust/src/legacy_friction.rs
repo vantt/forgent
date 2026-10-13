@@ -104,7 +104,11 @@ impl LegacyFrictionSource for WorkStateLegacyFrictionSource {
                 };
 
                 let event_type = val.get("type").and_then(|t| t.as_str()).unwrap_or("");
-                let ts = val.get("ts").and_then(|t| t.as_str()).unwrap_or("").to_string();
+                let ts = val
+                    .get("ts")
+                    .and_then(|t| t.as_str())
+                    .unwrap_or("")
+                    .to_string();
                 let seq = val.get("seq").and_then(|s| s.as_u64()).unwrap_or(0);
                 let payload = val.get("payload").and_then(|p| p.as_object());
 
@@ -175,8 +179,13 @@ impl LegacyFrictionSource for WorkStateLegacyFrictionSource {
                         });
                     }
                     "work.move" => {
-                        let answer = payload.and_then(|p| p.get("answer")).and_then(|a| a.as_str());
-                        let to = payload.and_then(|p| p.get("to")).and_then(|t| t.as_str()).unwrap_or("");
+                        let answer = payload
+                            .and_then(|p| p.get("answer"))
+                            .and_then(|a| a.as_str());
+                        let to = payload
+                            .and_then(|p| p.get("to"))
+                            .and_then(|t| t.as_str())
+                            .unwrap_or("");
 
                         let kind = if answer.is_some() {
                             Some("answer")
@@ -197,8 +206,12 @@ impl LegacyFrictionSource for WorkStateLegacyFrictionSource {
                     }
                     // `work.stage` is the name a binary from before the rename still writes.
                     "work.step" | "work.stage" => {
-                        let from = payload.and_then(|p| p.get("from")).and_then(|f| f.as_str()).unwrap_or("");
-                        let last_verdict = discovery_verdicts.get(&id).and_then(|v| v.last()).copied();
+                        let from = payload
+                            .and_then(|p| p.get("from"))
+                            .and_then(|f| f.as_str())
+                            .unwrap_or("");
+                        let last_verdict =
+                            discovery_verdicts.get(&id).and_then(|v| v.last()).copied();
 
                         if from == "discovery" && last_verdict != Some(false) {
                             settlements.entry(id).or_default().push(Settlement {
@@ -274,7 +287,8 @@ mod tests {
 
     #[test]
     fn test_legacy_friction_reader() {
-        let tmp = std::env::temp_dir().join(format!("fgos-legacy-fric-test-{}", std::process::id()));
+        let tmp =
+            std::env::temp_dir().join(format!("fgos-legacy-fric-test-{}", std::process::id()));
         let _ = fs::remove_dir_all(&tmp);
         let fgos = tmp.join(".fgos");
         fs::create_dir_all(&fgos).unwrap();
@@ -294,7 +308,10 @@ mod tests {
         assert_eq!(records.len(), 2);
         assert_eq!(records[0].subject_id, "tsk-1");
         assert!(records[0].resolved);
-        assert_eq!(records[0].resolve_reason.as_deref(), Some("done@2026-07-01T10:05:00Z"));
+        assert_eq!(
+            records[0].resolve_reason.as_deref(),
+            Some("done@2026-07-01T10:05:00Z")
+        );
 
         assert_eq!(records[1].subject_id, "tsk-2");
         assert!(!records[1].resolved);

@@ -5,10 +5,10 @@
 
 use crate::case_journal::CaseWindow;
 use crate::contract::Observation;
+use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
-use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CaseSection {
@@ -162,7 +162,11 @@ pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
             let diff_sec = (t1 - t0).max(0);
             let min = (diff_sec as f64) / 60.0;
             if min > 24.0 * 60.0 {
-                warnings.push(format!("case \"{}\" was open for more than 24 hours ({:.1}h)", cw.name, min / 60.0));
+                warnings.push(format!(
+                    "case \"{}\" was open for more than 24 hours ({:.1}h)",
+                    cw.name,
+                    min / 60.0
+                ));
             }
             Some(min)
         } else {
@@ -174,7 +178,11 @@ pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
             let now = now_unix_secs();
             let min = ((now - t0).max(0) as f64) / 60.0;
             if min > 24.0 * 60.0 {
-                warnings.push(format!("case \"{}\" currently open for more than 24 hours ({:.1}h)", cw.name, min / 60.0));
+                warnings.push(format!(
+                    "case \"{}\" currently open for more than 24 hours ({:.1}h)",
+                    cw.name,
+                    min / 60.0
+                ));
             }
             Some(min)
         } else {
@@ -206,25 +214,35 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
         if obs.source != "run-result" || obs.kind != "run.settled" {
             continue;
         }
-        let executor = obs.attrs.get("executor")
+        let executor = obs
+            .attrs
+            .get("executor")
             .and_then(|v| v.as_str())
             .unwrap_or("unknown")
             .to_string();
-        let adapter = obs.attrs.get("adapter")
+        let adapter = obs
+            .attrs
+            .get("adapter")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string());
-        let role = obs.attrs.get("role")
+        let role = obs
+            .attrs
+            .get("role")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string());
 
         let classification = obs.attrs.get("classification").and_then(|v| v.as_object());
 
-        let category = obs.attrs.get("category").and_then(|v| v.as_str()).or_else(|| {
-            classification
-                .and_then(|c| c.get("outcome"))
-                .and_then(|o| o.get("category"))
-                .and_then(|s| s.as_str())
-        });
+        let category = obs
+            .attrs
+            .get("category")
+            .and_then(|v| v.as_str())
+            .or_else(|| {
+                classification
+                    .and_then(|c| c.get("outcome"))
+                    .and_then(|o| o.get("category"))
+                    .and_then(|s| s.as_str())
+            });
         let verdict = classification
             .and_then(|c| c.get("assessment"))
             .and_then(|a| a.get("verdict"))
@@ -250,11 +268,13 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
                     _ => b.unclassified += 1,
                 }
             } else if let Some(cls) = classification {
-                let exec_status = cls.get("execution")
+                let exec_status = cls
+                    .get("execution")
                     .and_then(|e| e.get("status"))
                     .and_then(|s| s.as_str())
                     .unwrap_or("unknown");
-                let policy_disp = cls.get("policy")
+                let policy_disp = cls
+                    .get("policy")
                     .and_then(|p| p.get("disposition"))
                     .and_then(|d| d.as_str())
                     .unwrap_or("allow");
@@ -325,8 +345,13 @@ pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
     // 1. Group observations by session id
     let mut session_obs: HashMap<String, Vec<&Observation>> = HashMap::new();
     for obs in observations {
-        if (obs.source == "coordination" || obs.source == "workflow") && obs.subject.kind == crate::contract::SubjectKind::Session {
-            session_obs.entry(obs.subject.id.clone()).or_default().push(obs);
+        if (obs.source == "coordination" || obs.source == "workflow")
+            && obs.subject.kind == crate::contract::SubjectKind::Session
+        {
+            session_obs
+                .entry(obs.subject.id.clone())
+                .or_default()
+                .push(obs);
         }
     }
 
@@ -357,7 +382,10 @@ pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
         }
 
         // Assignment count
-        let asgn_count = events.iter().filter(|e| e.kind == "session.assignment").count() as f64;
+        let asgn_count = events
+            .iter()
+            .filter(|e| e.kind == "session.assignment")
+            .count() as f64;
         assignments_counts.push(asgn_count);
 
         // Duration: from first result-linked to last result-linked
@@ -377,7 +405,9 @@ pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
                 && e.attrs.get("actorId").and_then(|v| v.as_str()) == Some("fixer")
         });
 
-        let status = terminal_event.and_then(|e| e.attrs.get("status")).and_then(|v| v.as_str());
+        let status = terminal_event
+            .and_then(|e| e.attrs.get("status"))
+            .and_then(|v| v.as_str());
         let is_completed_or_partial = matches!(status, Some("completed") | Some("partial"));
 
         if !has_fixer && is_completed_or_partial {
@@ -414,16 +444,36 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
                 sessions.insert(s.to_string());
             }
 
-            if let Some(inp) = obs.attrs.get("input_tokens").or_else(|| obs.attrs.get("inputTokens")).and_then(|v| v.as_u64()) {
+            if let Some(inp) = obs
+                .attrs
+                .get("input_tokens")
+                .or_else(|| obs.attrs.get("inputTokens"))
+                .and_then(|v| v.as_u64())
+            {
                 sec.input_tokens += inp;
             }
-            if let Some(out) = obs.attrs.get("output_tokens").or_else(|| obs.attrs.get("outputTokens")).and_then(|v| v.as_u64()) {
+            if let Some(out) = obs
+                .attrs
+                .get("output_tokens")
+                .or_else(|| obs.attrs.get("outputTokens"))
+                .and_then(|v| v.as_u64())
+            {
                 sec.output_tokens += out;
             }
-            if let Some(c_create) = obs.attrs.get("cache_creation").or_else(|| obs.attrs.get("cacheCreationInputTokens")).and_then(|v| v.as_u64()) {
+            if let Some(c_create) = obs
+                .attrs
+                .get("cache_creation")
+                .or_else(|| obs.attrs.get("cacheCreationInputTokens"))
+                .and_then(|v| v.as_u64())
+            {
                 sec.cache_creation_input_tokens += c_create;
             }
-            if let Some(c_read) = obs.attrs.get("cache_read").or_else(|| obs.attrs.get("cacheReadInputTokens")).and_then(|v| v.as_u64()) {
+            if let Some(c_read) = obs
+                .attrs
+                .get("cache_read")
+                .or_else(|| obs.attrs.get("cacheReadInputTokens"))
+                .and_then(|v| v.as_u64())
+            {
                 sec.cache_read_input_tokens += c_read;
             }
         } else if obs.source == "run-result" && obs.kind == "run.settled" {
@@ -431,11 +481,26 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
             if let Some(usage) = obs.attrs.get("usage").and_then(|v| v.as_object()) {
                 let usage_source = usage.get("source").and_then(|v| v.as_str());
                 if usage_source != Some("transcript") {
-                    let inp = usage.get("inputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let out = usage.get("outputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let c_create = usage.get("cacheCreationTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let c_read = usage.get("cacheReadTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                    let tot = usage.get("totalTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let inp = usage
+                        .get("inputTokens")
+                        .and_then(|v| v.as_u64())
+                        .unwrap_or(0);
+                    let out = usage
+                        .get("outputTokens")
+                        .and_then(|v| v.as_u64())
+                        .unwrap_or(0);
+                    let c_create = usage
+                        .get("cacheCreationTokens")
+                        .and_then(|v| v.as_u64())
+                        .unwrap_or(0);
+                    let c_read = usage
+                        .get("cacheReadTokens")
+                        .and_then(|v| v.as_u64())
+                        .unwrap_or(0);
+                    let tot = usage
+                        .get("totalTokens")
+                        .and_then(|v| v.as_u64())
+                        .unwrap_or(0);
 
                     sec.input_tokens += inp;
                     sec.output_tokens += out;
@@ -454,7 +519,10 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
         }
     }
     sec.session_count = sessions.len() as u64;
-    sec.total_tokens = sec.input_tokens + sec.output_tokens + sec.cache_creation_input_tokens + sec.cache_read_input_tokens;
+    sec.total_tokens = sec.input_tokens
+        + sec.output_tokens
+        + sec.cache_creation_input_tokens
+        + sec.cache_read_input_tokens;
     sec
 }
 
@@ -466,7 +534,9 @@ pub fn compute_faults(observations: &[Observation]) -> FaultsSection {
     for obs in observations {
         if obs.source == "invocation-faults" && obs.kind == "host.fault" {
             total += 1;
-            let fault_class = obs.attrs.get("faultClass")
+            let fault_class = obs
+                .attrs
+                .get("faultClass")
                 .and_then(|v| v.as_str())
                 .unwrap_or("unknown")
                 .to_string();
@@ -487,7 +557,10 @@ pub fn compute_work(
     let mut work_obs_map: HashMap<String, Vec<&Observation>> = HashMap::new();
     for obs in observations {
         if obs.source == "work" && obs.subject.kind == crate::contract::SubjectKind::Work {
-            work_obs_map.entry(obs.subject.id.clone()).or_default().push(obs);
+            work_obs_map
+                .entry(obs.subject.id.clone())
+                .or_default()
+                .push(obs);
         }
     }
 
@@ -497,7 +570,10 @@ pub fn compute_work(
     let mut evaluated_count = 0u64;
 
     let filter_items = case_items.map(|items| {
-        items.iter().cloned().collect::<std::collections::HashSet<String>>()
+        items
+            .iter()
+            .cloned()
+            .collect::<std::collections::HashSet<String>>()
     });
 
     for (id, obs_list) in &work_obs_map {
@@ -535,16 +611,24 @@ pub fn compute_work(
         // Check if item qualifies:
         // If case_items is specified, item must be in case_items.
         // Otherwise, item must have -> delivered within window.
-        let delivered_move = moves.iter().find(|m| {
-            m.attrs.get("to").and_then(|v| v.as_str()) == Some("delivered")
-        });
+        let delivered_move = moves
+            .iter()
+            .find(|m| m.attrs.get("to").and_then(|v| v.as_str()) == Some("delivered"));
 
         let qualifies = if let Some(items_set) = &filter_items {
             items_set.contains(id)
         } else if let Some(dm) = delivered_move {
             let ts = dm.ts.as_str();
-            let after_since = window.since.as_ref().map(|s| ts >= s.as_str()).unwrap_or(true);
-            let before_until = window.until.as_ref().map(|u| ts <= u.as_str()).unwrap_or(true);
+            let after_since = window
+                .since
+                .as_ref()
+                .map(|s| ts >= s.as_str())
+                .unwrap_or(true);
+            let before_until = window
+                .until
+                .as_ref()
+                .map(|u| ts <= u.as_str())
+                .unwrap_or(true);
             after_since && before_until
         } else {
             false
@@ -555,10 +639,9 @@ pub fn compute_work(
 
             // #1: add -> delivered
             if let Some(dm) = delivered_move {
-                if let (Some(t_add), Some(t_del)) = (
-                    added_ts.and_then(parse_iso_secs),
-                    parse_iso_secs(&dm.ts),
-                ) {
+                if let (Some(t_add), Some(t_del)) =
+                    (added_ts.and_then(parse_iso_secs), parse_iso_secs(&dm.ts))
+                {
                     let diff_hours = ((t_del - t_add).max(0) as f64) / 3600.0;
                     add_to_delivered_hours.push(diff_hours);
                 }
@@ -579,8 +662,16 @@ pub fn compute_work(
                     qualifies
                 } else {
                     let ts = m.ts.as_str();
-                    let after_since = window.since.as_ref().map(|s| ts >= s.as_str()).unwrap_or(true);
-                    let before_until = window.until.as_ref().map(|u| ts <= u.as_str()).unwrap_or(true);
+                    let after_since = window
+                        .since
+                        .as_ref()
+                        .map(|s| ts >= s.as_str())
+                        .unwrap_or(true);
+                    let before_until = window
+                        .until
+                        .as_ref()
+                        .map(|u| ts <= u.as_str())
+                        .unwrap_or(true);
                     after_since && before_until
                 };
 
@@ -589,10 +680,9 @@ pub fn compute_work(
                         prev.attrs.get("to").and_then(|v| v.as_str()) == Some("doing")
                     });
                     if let Some(pd) = prev_doing {
-                        if let (Some(t_start), Some(t_end)) = (
-                            parse_iso_secs(&pd.ts),
-                            parse_iso_secs(&m.ts),
-                        ) {
+                        if let (Some(t_start), Some(t_end)) =
+                            (parse_iso_secs(&pd.ts), parse_iso_secs(&m.ts))
+                        {
                             let diff_hours = ((t_end - t_start).max(0) as f64) / 3600.0;
                             doing_to_approval_hours.push(diff_hours);
                         }
@@ -719,7 +809,10 @@ mod tests {
         // 1. Ok run (verdict: pass)
         obs.push(Observation {
             ts: "2026-09-01T00:00:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r1".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r1".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "claude",
@@ -730,14 +823,18 @@ mod tests {
                     "assessment": { "verdict": "pass" },
                     "policy": { "disposition": "allow" }
                 }
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
         // 2. Exec failed
         obs.push(Observation {
             ts: "2026-09-01T00:01:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r2".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r2".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "claude",
@@ -747,14 +844,18 @@ mod tests {
                     "assessment": { "verdict": "findings" },
                     "policy": { "disposition": "allow" }
                 }
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
         // 3. Verdict fail
         obs.push(Observation {
             ts: "2026-09-01T00:02:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r3".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r3".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "agy",
@@ -763,14 +864,18 @@ mod tests {
                     "assessment": { "verdict": "findings" },
                     "policy": { "disposition": "allow" }
                 }
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
         // 4. Policy refused
         obs.push(Observation {
             ts: "2026-09-01T00:03:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r4".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r4".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "agy",
@@ -779,14 +884,18 @@ mod tests {
                     "assessment": { "verdict": "pass" },
                     "policy": { "disposition": "refuse" }
                 }
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
         // 5. Inconclusive
         obs.push(Observation {
             ts: "2026-09-01T00:04:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r5".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r5".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "claude",
@@ -795,14 +904,18 @@ mod tests {
                     "assessment": { "verdict": "inconclusive" },
                     "policy": { "disposition": "allow" }
                 }
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
         // 6. Blocked
         obs.push(Observation {
             ts: "2026-09-01T00:05:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r6".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r6".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "claude",
@@ -811,18 +924,23 @@ mod tests {
                     "assessment": { "verdict": "blocked" },
                     "policy": { "disposition": "allow" }
                 }
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
         // 7. Unclassified (no classification)
         obs.push(Observation {
             ts: "2026-09-01T00:06:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Run, id: "r7".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: "r7".to_string(),
+            },
             kind: "run.settled".to_string(),
             attrs: serde_json::from_value(json!({
                 "executor": "claude"
-            })).unwrap(),
+            }))
+            .unwrap(),
             source: "run-result",
         });
 
@@ -847,35 +965,51 @@ mod tests {
         // Session 1: completed, no fixer -> firstPass = true
         obs.push(Observation {
             ts: "2026-09-01T10:00:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s1".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s1".to_string(),
+            },
             kind: "session.opened".to_string(),
             attrs: Default::default(),
             source: "coordination",
         });
         obs.push(Observation {
             ts: "2026-09-01T10:05:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s1".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s1".to_string(),
+            },
             kind: "session.assignment".to_string(),
-            attrs: serde_json::from_value(json!({ "actorId": "doer", "assignmentId": "a1" })).unwrap(),
+            attrs: serde_json::from_value(json!({ "actorId": "doer", "assignmentId": "a1" }))
+                .unwrap(),
             source: "coordination",
         });
         obs.push(Observation {
             ts: "2026-09-01T10:10:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s1".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s1".to_string(),
+            },
             kind: "session.result_linked".to_string(),
             attrs: Default::default(),
             source: "coordination",
         });
         obs.push(Observation {
             ts: "2026-09-01T10:20:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s1".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s1".to_string(),
+            },
             kind: "session.result_linked".to_string(),
             attrs: Default::default(),
             source: "coordination",
         });
         obs.push(Observation {
             ts: "2026-09-01T10:25:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s1".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s1".to_string(),
+            },
             kind: "session.closed".to_string(),
             attrs: serde_json::from_value(json!({ "status": "completed" })).unwrap(),
             source: "coordination",
@@ -884,21 +1018,31 @@ mod tests {
         // Session 2: active, has fixer -> firstPass = false
         obs.push(Observation {
             ts: "2026-09-01T11:00:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s2".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s2".to_string(),
+            },
             kind: "session.opened".to_string(),
             attrs: Default::default(),
             source: "coordination",
         });
         obs.push(Observation {
             ts: "2026-09-01T11:01:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s2".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s2".to_string(),
+            },
             kind: "session.assignment".to_string(),
-            attrs: serde_json::from_value(json!({ "actorId": "fixer", "assignmentId": "a2" })).unwrap(),
+            attrs: serde_json::from_value(json!({ "actorId": "fixer", "assignmentId": "a2" }))
+                .unwrap(),
             source: "coordination",
         });
         obs.push(Observation {
             ts: "2026-09-01T11:02:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s2".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s2".to_string(),
+            },
             kind: "session.result_linked".to_string(),
             attrs: Default::default(),
             source: "coordination",
@@ -907,7 +1051,10 @@ mod tests {
         // Session 3: no result-linked -> should be ignored
         obs.push(Observation {
             ts: "2026-09-01T12:00:00Z".to_string(),
-            subject: Subject { kind: SubjectKind::Session, id: "s3".to_string() },
+            subject: Subject {
+                kind: SubjectKind::Session,
+                id: "s3".to_string(),
+            },
             kind: "session.opened".to_string(),
             attrs: Default::default(),
             source: "coordination",
@@ -929,7 +1076,10 @@ mod tests {
         let obs = vec![
             Observation {
                 ts: "2026-09-01T00:00:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Case, id: "c".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Case,
+                    id: "c".to_string(),
+                },
                 kind: "llm.usage".to_string(),
                 attrs: serde_json::from_value(json!({
                     "sessionId": "sess-a",
@@ -937,12 +1087,16 @@ mod tests {
                     "outputTokens": 20,
                     "cacheCreationInputTokens": 10,
                     "cacheReadInputTokens": 5,
-                })).unwrap(),
+                }))
+                .unwrap(),
                 source: "claude-transcripts",
             },
             Observation {
                 ts: "2026-09-01T00:01:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Case, id: "c".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Case,
+                    id: "c".to_string(),
+                },
                 kind: "llm.usage".to_string(),
                 attrs: serde_json::from_value(json!({
                     "sessionId": "sess-a",
@@ -950,12 +1104,16 @@ mod tests {
                     "outputTokens": 40,
                     "cacheCreationInputTokens": 0,
                     "cacheReadInputTokens": 0,
-                })).unwrap(),
+                }))
+                .unwrap(),
                 source: "claude-transcripts",
             },
             Observation {
                 ts: "2026-09-01T00:02:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Case, id: "c".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Case,
+                    id: "c".to_string(),
+                },
                 kind: "llm.usage".to_string(),
                 attrs: serde_json::from_value(json!({
                     "sessionId": "sess-b",
@@ -963,7 +1121,8 @@ mod tests {
                     "outputTokens": 10,
                     "cacheCreationInputTokens": 0,
                     "cacheReadInputTokens": 0,
-                })).unwrap(),
+                }))
+                .unwrap(),
                 source: "claude-transcripts",
             },
         ];
@@ -983,29 +1142,41 @@ mod tests {
         let obs = vec![
             Observation {
                 ts: "2026-09-01T00:00:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Case, id: "h".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Case,
+                    id: "h".to_string(),
+                },
                 kind: "host.fault".to_string(),
                 attrs: serde_json::from_value(json!({
                     "faultClass": "unknown-verb"
-                })).unwrap(),
+                }))
+                .unwrap(),
                 source: "invocation-faults",
             },
             Observation {
                 ts: "2026-09-01T00:01:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Case, id: "h".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Case,
+                    id: "h".to_string(),
+                },
                 kind: "host.fault".to_string(),
                 attrs: serde_json::from_value(json!({
                     "faultClass": "unknown-verb"
-                })).unwrap(),
+                }))
+                .unwrap(),
                 source: "invocation-faults",
             },
             Observation {
                 ts: "2026-09-01T00:02:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Case, id: "h".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Case,
+                    id: "h".to_string(),
+                },
                 kind: "host.fault".to_string(),
                 attrs: serde_json::from_value(json!({
                     "faultClass": "requires-existing-store"
-                })).unwrap(),
+                }))
+                .unwrap(),
                 source: "invocation-faults",
             },
         ];
@@ -1021,58 +1192,90 @@ mod tests {
         let obs = vec![
             Observation {
                 ts: "2026-09-01T10:00:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.added".to_string(),
                 attrs: serde_json::from_value(json!({})).unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T10:05:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.moved".to_string(),
-                attrs: serde_json::from_value(json!({ "from": "todo", "to": "awaiting-human" })).unwrap(),
+                attrs: serde_json::from_value(json!({ "from": "todo", "to": "awaiting-human" }))
+                    .unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T10:05:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.asked".to_string(),
                 attrs: serde_json::from_value(json!({ "ask": "?" })).unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T10:10:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.moved".to_string(),
-                attrs: serde_json::from_value(json!({ "from": "awaiting-human", "to": "doing" })).unwrap(),
+                attrs: serde_json::from_value(json!({ "from": "awaiting-human", "to": "doing" }))
+                    .unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T10:10:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.answered".to_string(),
                 attrs: serde_json::from_value(json!({ "answer": "!" })).unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T10:20:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.gate-approved".to_string(),
                 attrs: serde_json::from_value(json!({ "gate": "validateApprove" })).unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T10:30:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.moved".to_string(),
-                attrs: serde_json::from_value(json!({ "from": "doing", "to": "awaiting-approval" })).unwrap(),
+                attrs: serde_json::from_value(
+                    json!({ "from": "doing", "to": "awaiting-approval" }),
+                )
+                .unwrap(),
                 source: "work",
             },
             Observation {
                 ts: "2026-09-01T11:00:00Z".to_string(),
-                subject: Subject { kind: SubjectKind::Work, id: "tsk-1".to_string() },
+                subject: Subject {
+                    kind: SubjectKind::Work,
+                    id: "tsk-1".to_string(),
+                },
                 kind: "work.moved".to_string(),
-                attrs: serde_json::from_value(json!({ "from": "awaiting-approval", "to": "delivered" })).unwrap(),
+                attrs: serde_json::from_value(
+                    json!({ "from": "awaiting-approval", "to": "delivered" }),
+                )
+                .unwrap(),
                 source: "work",
             },
         ];

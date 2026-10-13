@@ -14,15 +14,22 @@ pub fn dispatch_discussions(
     let mut i = 0;
     while i < req.args.len() {
         let arg = &req.args[i];
-        let (flag, inline) = arg.split_once('=').map_or((arg.as_str(), None), |(flag, value)| (flag, Some(value)));
+        let (flag, inline) = arg
+            .split_once('=')
+            .map_or((arg.as_str(), None), |(flag, value)| (flag, Some(value)));
         if !matches!(flag, "--since" | "--until" | "--by" | "--dir") {
-            return Err(format!("unexpected argument for metrics discussions: {arg}"));
+            return Err(format!(
+                "unexpected argument for metrics discussions: {arg}"
+            ));
         }
         let value = if let Some(value) = inline {
             i += 1;
             value
         } else {
-            let value = req.args.get(i + 1).filter(|value| !value.starts_with("--"))
+            let value = req
+                .args
+                .get(i + 1)
+                .filter(|value| !value.starts_with("--"))
                 .ok_or_else(|| format!("missing value for {flag}"))?;
             i += 2;
             value.as_str()
@@ -34,8 +41,12 @@ pub fn dispatch_discussions(
             "--since" => window.since = Some(value.to_owned()),
             "--until" => window.until = Some(value.to_owned()),
             "--by" if matches!(value, "workflow" | "executor" | "persona") => by = value.to_owned(),
-            "--by" => return Err(format!("invalid --by value \"{value}\". Allowed: workflow, executor, persona")),
-            "--dir" => {}, // The native request already resolves the root.
+            "--by" => {
+                return Err(format!(
+                    "invalid --by value \"{value}\". Allowed: workflow, executor, persona"
+                ))
+            }
+            "--dir" => {} // The native request already resolves the root.
             _ => unreachable!(),
         }
     }
@@ -106,7 +117,9 @@ impl Totals {
     fn output(mut self) -> Value {
         self.durations.sort_by(f64::total_cmp);
         let n = self.durations.len();
-        let median = if n == 0 { None } else if n % 2 == 1 {
+        let median = if n == 0 {
+            None
+        } else if n % 2 == 1 {
             Some(self.durations[n / 2])
         } else {
             Some((self.durations[n / 2 - 1] + self.durations[n / 2]) / 2.0)
@@ -142,7 +155,6 @@ fn group_key(value: &Value, key: &str) -> String {
     value[key].as_str().unwrap_or("unknown").to_owned()
 }
 
-
 /// All final panelist seats (not synthesizers or fallback attempts) are voters.
 /// Missing/invalid votes stay in the denominator and remain explicit counts:
 /// the threshold is a passive signal, not proof that missing voters dissented.
@@ -161,8 +173,14 @@ fn agreement(unit: &Map<String, Value>) -> Value {
             match stance["status"].as_str() {
                 Some("valid") => {
                     let choice = stance["choice"].as_str();
-                    if let Some(choice) = choice.filter(|choice| *choice == "other"
-                        || options.is_some_and(|options| options.iter().any(|option| option.as_str() == Some(*choice)))) {
+                    if let Some(choice) = choice.filter(|choice| {
+                        *choice == "other"
+                            || options.is_some_and(|options| {
+                                options
+                                    .iter()
+                                    .any(|option| option.as_str() == Some(*choice))
+                            })
+                    }) {
                         *stances.entry(choice.to_owned()).or_default() += 1;
                     } else {
                         invalid += 1;
@@ -190,15 +208,27 @@ fn agreement(unit: &Map<String, Value>) -> Value {
 
 /// Group unit reliability separately from all dispatched attempts and final seats.
 /// A group counts each participating unit once; executor/persona groups can overlap.
-fn compute_discussions(observations: &[Observation], by: &str, window: &Window, parsed_window: &ParsedWindow) -> Value {
-    let mut units = observations.iter().filter_map(|observation| {
-        if observation.source != "unit-summary" || observation.kind != "unit.settled" {
-            return None;
-        }
-        let timestamp = parse_timestamp_millis(&observation.ts)?;
-        parsed_window.contains(timestamp).then_some((timestamp, observation))
-    }).collect::<Vec<_>>();
-    units.sort_by(|(a_ts, a), (b_ts, b)| a_ts.cmp(b_ts).then_with(|| a.subject.id.cmp(&b.subject.id)));
+fn compute_discussions(
+    observations: &[Observation],
+    by: &str,
+    window: &Window,
+    parsed_window: &ParsedWindow,
+) -> Value {
+    let mut units = observations
+        .iter()
+        .filter_map(|observation| {
+            if observation.source != "unit-summary" || observation.kind != "unit.settled" {
+                return None;
+            }
+            let timestamp = parse_timestamp_millis(&observation.ts)?;
+            parsed_window
+                .contains(timestamp)
+                .then_some((timestamp, observation))
+        })
+        .collect::<Vec<_>>();
+    units.sort_by(|(a_ts, a), (b_ts, b)| {
+        a_ts.cmp(b_ts).then_with(|| a.subject.id.cmp(&b.subject.id))
+    });
     let mut seen = BTreeSet::new();
     let mut overall = Totals::default();
     let mut groups = BTreeMap::<String, Totals>::new();
@@ -208,7 +238,10 @@ fn compute_discussions(observations: &[Observation], by: &str, window: &Window, 
             continue;
         }
         let unit = &observation.attrs;
-        let workflow_key = unit["workflow"]["runId"].as_str().unwrap_or("unlinked").to_owned();
+        let workflow_key = unit["workflow"]["runId"]
+            .as_str()
+            .unwrap_or("unlinked")
+            .to_owned();
         let mut participating = BTreeSet::new();
         if by == "workflow" {
             participating.insert(workflow_key.clone());
@@ -220,14 +253,22 @@ fn compute_discussions(observations: &[Observation], by: &str, window: &Window, 
             for seat in seats {
                 local.seat(seat);
                 overall.seat(seat);
-                let key = if by == "workflow" { workflow_key.clone() } else { group_key(&seat["final"], by) };
+                let key = if by == "workflow" {
+                    workflow_key.clone()
+                } else {
+                    group_key(&seat["final"], by)
+                };
                 participating.insert(key.clone());
                 groups.entry(key).or_default().seat(seat);
                 if let Some(attempts) = seat["attempts"].as_array() {
                     for attempt in attempts {
                         local.attempt(attempt);
                         overall.attempt(attempt);
-                        let key = if by == "workflow" { workflow_key.clone() } else { group_key(attempt, by) };
+                        let key = if by == "workflow" {
+                            workflow_key.clone()
+                        } else {
+                            group_key(attempt, by)
+                        };
                         participating.insert(key.clone());
                         groups.entry(key).or_default().attempt(attempt);
                     }
@@ -238,12 +279,26 @@ fn compute_discussions(observations: &[Observation], by: &str, window: &Window, 
             groups.entry(key).or_default().unit(unit);
         }
         let mut output = local.output();
-        for key in ["unitRunId", "workflow", "pattern", "capability", "outcome", "startedAt", "settledAt", "inline", "stanceOptions", "seats"] {
+        for key in [
+            "unitRunId",
+            "workflow",
+            "pattern",
+            "capability",
+            "outcome",
+            "startedAt",
+            "settledAt",
+            "inline",
+            "stanceOptions",
+            "seats",
+        ] {
             // `seats` count remains numeric; owner-selected details get a distinct key.
             output[if key == "seats" { "seatDetails" } else { key }] = unit[key].clone();
         }
         if let Value::Object(measurement) = agreement(unit) {
-            output.as_object_mut().expect("unit metrics object").extend(measurement);
+            output
+                .as_object_mut()
+                .expect("unit metrics object")
+                .extend(measurement);
         }
         individual.push(output);
     }
@@ -273,10 +328,18 @@ mod tests {
             "unitRunId": id, "workflow": null, "pattern": "panel", "capability": null,
             "outcome": "pass", "startedAt": null, "settledAt": ts,
             "inline": false, "stanceOptions": [], "seats": []
-        }) else { unreachable!() };
+        }) else {
+            unreachable!()
+        };
         Observation {
-            ts: ts.to_owned(), subject: Subject { kind: SubjectKind::Run, id: format!("unit-run:{id}") },
-            kind: "unit.settled".into(), attrs, source: "unit-summary",
+            ts: ts.to_owned(),
+            subject: Subject {
+                kind: SubjectKind::Run,
+                id: format!("unit-run:{id}"),
+            },
+            kind: "unit.settled".into(),
+            attrs,
+            source: "unit-summary",
         }
     }
 
@@ -291,7 +354,9 @@ mod tests {
             }},
         })).collect();
         seats.push(json!({"role": "synthesizer", "kind": "synthesizer", "final": {"stance": {"status": "missing"}}}));
-        let Value::Object(unit) = json!({"stanceOptions": ["a", "b", "c"], "seats": seats}) else { unreachable!() };
+        let Value::Object(unit) = json!({"stanceOptions": ["a", "b", "c"], "seats": seats}) else {
+            unreachable!()
+        };
         unit
     }
 
@@ -333,10 +398,23 @@ mod tests {
     #[test]
     fn quorum_needs_two_valid_votes_and_more_than_half_the_voting_seats() {
         for (valid, voters, expected) in [
-            (0, 0, false), (1, 1, false), (2, 2, true), (2, 3, true), (1, 3, false),
-            (2, 4, false), (3, 4, true), (2, 5, false), (3, 5, true), (3, 7, false), (4, 7, true),
+            (0, 0, false),
+            (1, 1, false),
+            (2, 2, true),
+            (2, 3, true),
+            (1, 3, false),
+            (2, 4, false),
+            (3, 4, true),
+            (2, 5, false),
+            (3, 5, true),
+            (3, 7, false),
+            (4, 7, true),
         ] {
-            assert_eq!(has_quorum(valid, voters), expected, "{valid} valid of {voters} seats");
+            assert_eq!(
+                has_quorum(valid, voters),
+                expected,
+                "{valid} valid of {voters} seats"
+            );
         }
     }
 
@@ -350,14 +428,32 @@ mod tests {
             observation("equal-negative", "2026-10-04T19:00:00-05:00"),
             observation("after", "2026-10-04T23:30:00-02:00"),
         ];
-        let window = Window { since: Some("2026-10-05T00:00:00Z".into()), until: Some("2026-10-05T00:00:00.000Z".into()) };
+        let window = Window {
+            since: Some("2026-10-05T00:00:00Z".into()),
+            until: Some("2026-10-05T00:00:00.000Z".into()),
+        };
         let parsed = ParsedWindow::parse(&window).unwrap();
         let report = compute_discussions(&observations, "workflow", &window, &parsed);
         assert_eq!(report["totals"]["unitRuns"], 2);
-        assert!(report["units"].as_array().unwrap().iter().all(|unit| unit["unitRunId"].as_str().unwrap().starts_with("equal-")));
-        let window = Window { since: Some("2026-10-05".into()), until: None };
-        let report = compute_discussions(&observations, "workflow", &window, &ParsedWindow::parse(&window).unwrap());
+        assert!(report["units"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|unit| unit["unitRunId"].as_str().unwrap().starts_with("equal-")));
+        let window = Window {
+            since: Some("2026-10-05".into()),
+            until: None,
+        };
+        let report = compute_discussions(
+            &observations,
+            "workflow",
+            &window,
+            &ParsedWindow::parse(&window).unwrap(),
+        );
         assert_eq!(report["totals"]["unitRuns"], 3);
-        assert_eq!(report["units"].as_array().unwrap().last().unwrap()["unitRunId"], "after");
+        assert_eq!(
+            report["units"].as_array().unwrap().last().unwrap()["unitRunId"],
+            "after"
+        );
     }
 }

@@ -25,13 +25,19 @@ pub fn dispatch_runs(
             }
             let val = &req.args[i + 1];
             if val != "executor" && val != "adapter" && val != "role" {
-                return Err(format!("invalid --by value \"{}\". Allowed: executor, adapter, role", val));
+                return Err(format!(
+                    "invalid --by value \"{}\". Allowed: executor, adapter, role",
+                    val
+                ));
             }
             by_filter = Some(val.clone());
             i += 2;
         } else if let Some(val) = arg.strip_prefix("--by=") {
             if val != "executor" && val != "adapter" && val != "role" {
-                return Err(format!("invalid --by value \"{}\". Allowed: executor, adapter, role", val));
+                return Err(format!(
+                    "invalid --by value \"{}\". Allowed: executor, adapter, role",
+                    val
+                ));
             }
             by_filter = Some(val.to_string());
             i += 1;
@@ -99,7 +105,9 @@ pub fn dispatch_runs(
 
     if let Some(by) = by_filter {
         match by.as_str() {
-            "executor" => Ok(serde_json::to_value(&runs_sec.by_executor).map_err(|e| e.to_string())?),
+            "executor" => {
+                Ok(serde_json::to_value(&runs_sec.by_executor).map_err(|e| e.to_string())?)
+            }
             "adapter" => Ok(serde_json::to_value(&runs_sec.by_adapter).map_err(|e| e.to_string())?),
             "role" => Ok(serde_json::to_value(&runs_sec.by_role).map_err(|e| e.to_string())?),
             _ => unreachable!(),

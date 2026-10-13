@@ -222,7 +222,6 @@ mod tests {
         );
     }
 
-
     fn regex_lite_like_check(s: &str) -> bool {
         // Expected: YYYY-MM-DDTHH:mm:ss.sssZ (24 chars)
         if s.len() != 24 {

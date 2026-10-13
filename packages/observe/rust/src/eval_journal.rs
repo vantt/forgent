@@ -83,12 +83,17 @@ fn validate_fields(
             return Err("score criterion must not be empty".into());
         }
         if !(0..=2).contains(score) {
-            return Err(format!("score for \"{}\" must be an integer in 0..2 (got {})", criterion, score));
+            return Err(format!(
+                "score for \"{}\" must be an integer in 0..2 (got {})",
+                criterion, score
+            ));
         }
     }
     if rubric == "discussion-quality.v1"
         && (scores.len() != DISCUSSION_QUALITY_CRITERIA.len()
-            || DISCUSSION_QUALITY_CRITERIA.iter().any(|key| !scores.contains_key(*key)))
+            || DISCUSSION_QUALITY_CRITERIA
+                .iter()
+                .any(|key| !scores.contains_key(*key)))
     {
         return Err("discussion-quality.v1 scores must contain exactly its five criteria".into());
     }
@@ -100,9 +105,14 @@ fn validate_fields(
 
 pub fn validate_input(input: &EvalInput) -> Result<(), String> {
     validate_fields(
-        &[("evalId", &input.eval_id), ("harness", &input.harness),
-          ("question", &input.question), ("setup", &input.setup),
-          ("rubric", &input.rubric), ("judge", &input.judge)],
+        &[
+            ("evalId", &input.eval_id),
+            ("harness", &input.harness),
+            ("question", &input.question),
+            ("setup", &input.setup),
+            ("rubric", &input.rubric),
+            ("judge", &input.judge),
+        ],
         &input.scores,
         &input.run_refs,
         &input.rubric,
@@ -114,9 +124,15 @@ fn validate_record(record: &EvalRecord) -> Result<(), String> {
         return Err("expected eval envelope v=1, type=eval".into());
     }
     validate_fields(
-        &[("ts", &record.ts), ("evalId", &record.eval_id),
-          ("harness", &record.harness), ("question", &record.question),
-          ("setup", &record.setup), ("rubric", &record.rubric), ("judge", &record.judge)],
+        &[
+            ("ts", &record.ts),
+            ("evalId", &record.eval_id),
+            ("harness", &record.harness),
+            ("question", &record.question),
+            ("setup", &record.setup),
+            ("rubric", &record.rubric),
+            ("judge", &record.judge),
+        ],
         &record.scores,
         &record.run_refs,
         &record.rubric,
@@ -139,7 +155,12 @@ fn eval_store_exists(root: &Path, create: bool) -> Result<bool, String> {
         }
         match fs::symlink_metadata(&path) {
             Ok(metadata) if metadata.file_type().is_dir() => {}
-            Ok(_) => return Err(format!("eval store component must be a real directory: {}", path.display())),
+            Ok(_) => {
+                return Err(format!(
+                    "eval store component must be a real directory: {}",
+                    path.display()
+                ))
+            }
             Err(e) if !create && e.kind() == std::io::ErrorKind::NotFound => return Ok(false),
             Err(e) => return Err(e.to_string()),
         }
@@ -152,7 +173,10 @@ fn eval_store_exists(root: &Path, create: bool) -> Result<bool, String> {
 fn open_append_shard(path: &Path) -> Result<fs::File, std::io::Error> {
     match fs::symlink_metadata(path) {
         Ok(metadata) if !metadata.file_type().is_file() => {
-            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "eval shard must be a regular file, not a symlink"));
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "eval shard must be a regular file, not a symlink",
+            ));
         }
         Ok(_) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
@@ -167,15 +191,28 @@ fn open_append_shard(path: &Path) -> Result<fs::File, std::io::Error> {
         // raced FIFO from hanging before descriptor verification.
         options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
     }
-    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd",
-              target_os = "openbsd", target_os = "netbsd", target_os = "dragonfly"))]
+    #[cfg(any(
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        target_os = "dragonfly"
+    ))]
     {
         use std::os::unix::fs::OpenOptionsExt;
         options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
     }
-    #[cfg(not(any(target_os = "linux", target_os = "android", target_os = "macos",
-                  target_os = "ios", target_os = "freebsd", target_os = "openbsd",
-                  target_os = "netbsd", target_os = "dragonfly")))]
+    #[cfg(not(any(
+        target_os = "linux",
+        target_os = "android",
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        target_os = "dragonfly"
+    )))]
     {
         // Without an atomic no-follow open, only a newly created shard is safe.
         // Existing shards fail closed rather than follow a raced link.
@@ -183,14 +220,20 @@ fn open_append_shard(path: &Path) -> Result<fs::File, std::io::Error> {
     }
     let file = options.open(path)?;
     if !file.metadata()?.is_file() {
-        return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "eval shard descriptor must be a regular file"));
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "eval shard descriptor must be a regular file",
+        ));
     }
     Ok(file)
 }
 
 /// Retain at most cap+1 bytes, draining an overflowing logical line in place.
 /// Returns None at EOF, or whether the returned logical line exceeded the cap.
-fn read_bounded_line(reader: &mut impl BufRead, line: &mut Vec<u8>) -> std::io::Result<Option<bool>> {
+fn read_bounded_line(
+    reader: &mut impl BufRead,
+    line: &mut Vec<u8>,
+) -> std::io::Result<Option<bool>> {
     line.clear();
     let mut seen = false;
     let mut overflow = false;
@@ -220,7 +263,8 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     let mut components = Path::new(&writer_id).components();
     if writer_id.contains(['/', '\\'])
         || !matches!(components.next(), Some(std::path::Component::Normal(_)))
-        || components.next().is_some() {
+        || components.next().is_some()
+    {
         return Err("eval writer identifier must be a single filename component".into());
     }
     let record = EvalRecord {
@@ -248,14 +292,22 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     // Check every shard under the same lock as append. Invalid tracked records
     // may conceal an identity, so fail closed until the store is repaired.
     let existing = list(root, None, None)?;
-    if existing.evals.iter().any(|eval| eval.eval_id == record.eval_id) {
+    if existing
+        .evals
+        .iter()
+        .any(|eval| eval.eval_id == record.eval_id)
+    {
         return Err(format!("duplicate evalId: {}", record.eval_id));
     }
     if !existing.invalid.is_empty() {
         return Err(invalid_store_error(&existing.invalid));
     }
     let path = shard::shard_path(root, "evals").map_err(|e| e.to_string())?;
-    if path != root.join(".fgos/observe/evals").join(format!("{}.jsonl", writer_id)) {
+    if path
+        != root
+            .join(".fgos/observe/evals")
+            .join(format!("{}.jsonl", writer_id))
+    {
         return Err("eval writer shard path changed during record".into());
     }
     let mut file = open_append_shard(&path).map_err(|e| e.to_string())?;
@@ -284,7 +336,11 @@ fn invalid_store_error(invalid: &[InvalidEvalLine]) -> String {
 }
 
 /// Reads all shards, validates before filtering, and reports each invalid line.
-pub fn list(root: &Path, harness: Option<&str>, question: Option<&str>) -> Result<EvalList, String> {
+pub fn list(
+    root: &Path,
+    harness: Option<&str>,
+    question: Option<&str>,
+) -> Result<EvalList, String> {
     let dir = root.join(".fgos/observe/evals");
     let mut result = EvalList::default();
     if !eval_store_exists(root, false)? {
@@ -306,7 +362,11 @@ pub fn list(root: &Path, harness: Option<&str>, question: Option<&str>) -> Resul
             paths.push(path);
         } else {
             result.invalid.push(InvalidEvalLine {
-                file: path.strip_prefix(root).unwrap_or(&path).to_string_lossy().into_owned(),
+                file: path
+                    .strip_prefix(root)
+                    .unwrap_or(&path)
+                    .to_string_lossy()
+                    .into_owned(),
                 line: 0,
                 error: "eval shard must be a regular file, not a symlink".into(),
             });
@@ -319,7 +379,9 @@ pub fn list(root: &Path, harness: Option<&str>, question: Option<&str>) -> Resul
         let mut reader = BufReader::new(file);
         let mut line = Vec::new();
         let mut line_number = 0;
-        while let Some(overflow) = read_bounded_line(&mut reader, &mut line).map_err(|e| e.to_string())? {
+        while let Some(overflow) =
+            read_bounded_line(&mut reader, &mut line).map_err(|e| e.to_string())?
+        {
             line_number += 1;
             let parsed = if overflow {
                 Err("eval line exceeds 1 MiB limit".into())
@@ -328,31 +390,45 @@ pub fn list(root: &Path, harness: Option<&str>, question: Option<&str>) -> Resul
             } else {
                 serde_json::from_slice::<EvalRecord>(&line)
                     .map_err(|e| e.to_string())
-                    .and_then(|record| { validate_record(&record)?; Ok(record) })
+                    .and_then(|record| {
+                        validate_record(&record)?;
+                        Ok(record)
+                    })
             };
             match parsed {
                 Ok(record) => {
                     if !seen_ids.insert(record.eval_id.clone()) {
                         result.invalid.push(InvalidEvalLine {
-                            file: path.strip_prefix(root).unwrap_or(&path).to_string_lossy().into_owned(),
+                            file: path
+                                .strip_prefix(root)
+                                .unwrap_or(&path)
+                                .to_string_lossy()
+                                .into_owned(),
                             line: line_number,
                             error: format!("duplicate evalId: {}", record.eval_id),
                         });
                         continue;
                     }
                     if harness.is_none_or(|h| record.harness == h)
-                        && question.is_none_or(|q| record.question == q) {
+                        && question.is_none_or(|q| record.question == q)
+                    {
                         result.evals.push(record);
                     }
                 }
                 Err(error) => result.invalid.push(InvalidEvalLine {
-                    file: path.strip_prefix(root).unwrap_or(&path).to_string_lossy().into_owned(),
+                    file: path
+                        .strip_prefix(root)
+                        .unwrap_or(&path)
+                        .to_string_lossy()
+                        .into_owned(),
                     line: line_number,
                     error,
                 }),
             }
         }
     }
-    result.evals.sort_by(|a, b| a.ts.cmp(&b.ts).then_with(|| a.eval_id.cmp(&b.eval_id)));
+    result
+        .evals
+        .sort_by(|a, b| a.ts.cmp(&b.ts).then_with(|| a.eval_id.cmp(&b.eval_id)));
     Ok(result)
 }

@@ -16,7 +16,8 @@ pub fn build_metrics_sources() -> Vec<Box<dyn ObservationSource>> {
 }
 
 #[allow(dead_code)]
-pub fn build_work_observation_source() -> Option<Box<dyn fgos_observe::contract::WorkObservationSource>> {
+pub fn build_work_observation_source(
+) -> Option<Box<dyn fgos_observe::contract::WorkObservationSource>> {
     Some(Box::new(WorkSource::new()))
 }
 

@@ -3,20 +3,31 @@
 pub mod case;
 pub mod coverage;
 pub mod discussions;
-pub mod eval;
 pub mod entropy;
+pub mod eval;
 pub mod faults;
 pub mod harness;
 pub mod outcomes;
 pub mod runs;
 pub mod snapshot;
 
-use crate::contract::{ObservationSource, ObserveRequest, UnitSummaryScanner, WorkObservationSource};
+use crate::contract::{
+    ObservationSource, ObserveRequest, UnitSummaryScanner, WorkObservationSource,
+};
 use serde_json::json;
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
-    "ping", "case", "harness", "faults", "runs", "coverage", "discussions", "eval",
-    "outcomes", "entropy", "snapshot",
+    "ping",
+    "case",
+    "harness",
+    "faults",
+    "runs",
+    "coverage",
+    "discussions",
+    "eval",
+    "outcomes",
+    "entropy",
+    "snapshot",
 ];
 
 pub fn dispatch(
@@ -29,7 +40,10 @@ pub fn dispatch(
     match req.sub.as_str() {
         "ping" => {
             let stdin_bytes = req.stdin.as_ref().map(|b| b.len());
-            let stdin_text = req.stdin.as_ref().and_then(|b| String::from_utf8(b.clone()).ok());
+            let stdin_text = req
+                .stdin
+                .as_ref()
+                .and_then(|b| String::from_utf8(b.clone()).ok());
             Ok(json!({
                 "ok": true,
                 "root": req.root.to_string_lossy(),

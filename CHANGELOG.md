@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Confined Codex accounts now fail closed when `auth.json` is a symlink that resolves outside the Codex home, or when the configured `home` is a relative path; the dispatch stops before the worker starts. Both used to be accepted (the symlink was followed, a relative home was resolved against the working directory).
+
+### Fixed
+
+- A rotating provider login (pi, omp and Codex accounts) no longer gets stranded when a confined pane renews it inside its throwaway private home, which used up the source's single-use refresh token and made the next renewal anywhere fail with `invalid_grant`. A dispatch opted in with `providerCredentialRenew` now renews a login that is close to expiry once, in a scratch copy fgOS holds under a per-account lock, and applies the new entry to the real store before the private home is built; a login renewed inside a pane is written back when its home is removed, only when it is newer, entry by entry. The real store is never made to look expired and a failed renewal leaves it untouched. Without the opt-in provisioning and removal are as before.
+- A confined omp account's `agent.db` is now copied into the private home as a consistent SQLite snapshot (write-ahead log included) instead of a raw file, whether or not a dispatch opted in. The lazy-probe unlock now also covers omp accounts (the xai account), which it could not probe before.
+- A confined home whose login was renewed inside it is no longer deleted when the copy cannot be read for a reason that may pass (for example `node:sqlite` is unavailable): it is staged beside the account, and if staging fails the home is kept for a later retry. Staged copies are capped at five per account.
+
+## [v0.2.0-rc.3] - 2026-10-13
+
+### Fixed
+- `fgos doctor` and `fgos version` no longer print `fatal: not a git repository` when run from a release install (one set up by `fgctl init`, which is not a git checkout). The version check asked git about the install directory and let git's error through; the command result was already correct, only the stray line was wrong.
+
 ## [v0.2.0-rc.2] - 2026-10-13
 
 ### Added

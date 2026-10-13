@@ -8,7 +8,7 @@ import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceiptRunFromOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
@@ -332,6 +332,14 @@ test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
   const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
   fs.mkdirSync(asgnDir, { recursive: true });
   fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
+
+  // Declare the executor explicitly: with no project config, the runner
+  // bootstraps one from whichever assistant CLI the machine has on PATH, which
+  // a machine without one (a CI runner) cannot satisfy.
+  fs.writeFileSync(
+    path.join(tempDir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: structuredClone(DEFAULT_RUNNER_CONFIG) }, null, 2),
+  );
 
   const decided = await decideExecutorCli(undefined, {
     cwd: tempDir,
@@ -1318,6 +1326,80 @@ test('Step 2: a fallback candidate WITH a confined invocation is dispatched thro
   assert.equal(fs.existsSync(codexConfinedExecutor.argvCapturePath), true, 'the CONFINED invocation must be the one that actually spawned');
   assert.equal(fs.existsSync(codexUnconfinedExecutor.argvCapturePath), false, 'the unconfined default invocation on the same executor must never spawn once confinement is required');
   assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the quarantined primary must never spawn');
+});
+
+test('with a renewal function, a confined launch renews the login of the account actually provisioned, the executor-fallback account included', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+  const calls = [];
+  const assignment = buildAssignment({ work: { id: 'tsk-renew-fallback-account', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' });
+
+  await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+    providerCredentialRenew: async (request) => { calls.push(request); return { status: 'fresh', reason: 'outside-window' }; },
+  });
+
+  assert.equal(calls.length, 1, 'renewed once, before the private home is built');
+  assert.equal(calls[0].provider, 'openai-codex', 'the fallback account, not the quarantined primary');
+  assert.equal(calls[0].accountId, 'codex-acct');
+  assert.equal(calls[0].runtimeDir, runtimeDir);
+  assert.deepEqual(calls[0].credentialSource, { kind: 'codex-home', home: path.join(tempDir, 'codex-home') });
+});
+
+test('a renewal that did not leave the login fresh is reported on stderr by code; a quiet outcome is not', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+  const outcomes = [{ status: 'failed', reason: 'probe-failed' }, { status: 'fresh', reason: 'outside-window' }, { status: 'skipped', reason: 'unsupported-layout' }];
+  const lines = [];
+  const realWrite = process.stderr.write;
+  try {
+    for (const [index, outcome] of outcomes.entries()) {
+      process.stderr.write = (chunk) => { lines.push(String(chunk)); return true; };
+      await executeAssignment(
+        buildAssignment({ work: { id: `tsk-renew-report-${index}`, status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+        {
+          cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir,
+          cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+          providerCredentialRenew: async () => outcome,
+        },
+      );
+      process.stderr.write = realWrite;
+    }
+  } finally { process.stderr.write = realWrite; }
+  const reported = lines.filter((l) => l.includes('credential refresh-ahead'));
+  assert.equal(reported.length, 1);
+  assert.match(reported[0], /openai-codex\/codex-acct: failed \(probe-failed\)/);
+});
+
+test('a renewal function that throws never fails the dispatch, and an unconfined launch never calls it', async () => {
+  const tempDir = mkTempDir();
+  const confined = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+  const throwing = await executeAssignment(
+    buildAssignment({ work: { id: 'tsk-renew-throws', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+    {
+      cwd: tempDir, repoRoot: tempDir, runnerConfig: confined.runnerConfig, providerCapacityRuntimeDir: confined.runtimeDir,
+      cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+      providerCredentialRenew: async () => { throw new Error('renewal exploded'); },
+    },
+  );
+  assert.notEqual(throwing.classification?.failure?.code, 'provider-capacity-refused');
+  assert.equal(fs.existsSync(confined.codexConfinedExecutor.argvCapturePath), true, 'the launch went on');
+
+  const unconfinedDir = mkTempDir();
+  const unconfined = buildFallbackFixture(unconfinedDir, { primaryQuarantined: false, fallbackQuarantined: false });
+  let called = 0;
+  await executeAssignment(
+    buildAssignment({ work: { id: 'tsk-renew-unconfined', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+    {
+      cwd: unconfinedDir, repoRoot: unconfinedDir, runnerConfig: unconfined.runnerConfig, providerCapacityRuntimeDir: unconfined.runtimeDir,
+      providerCredentialRenew: async () => { called += 1; return { status: 'fresh' }; },
+    },
+  );
+  assert.equal(called, 0, 'no login is copied into an unconfined launch, so nothing is renewed for it');
 });
 
 test('Phase B: a resumed Run that already committed a fallback rehydrates the fallback, never recompiles the refused primary', async () => {

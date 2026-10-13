@@ -613,7 +613,7 @@ test('provider capacity: selected missing credential fails closed before spawn',
         },
         context: { cwd: tmp, runDir: tmp },
       }, { id: 'bwrap', type: 'bwrap', config: {} }),
-      /selected Codex credential auth\.json is missing/,
+      /selected credential home is not readable/,
     );
     assert.equal(fs.existsSync(privateHomeHost), false, 'allocated private home must be cleaned up on provisioning failure');
   } finally {

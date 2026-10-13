@@ -11,19 +11,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, markResourceRetained } from '../cleanup.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir, markResourceRetained } from '../cleanup.mjs';
+import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-credential-renewal.mjs';
+import { expandCredentialHome } from '../../provider-credential-probe.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
-
-function expandCredentialHome(home) {
-  if (typeof home !== 'string' || !home.trim()) return null;
-  return home
-    .replace(/^\$\{HOME\}(?=\/|$)/, process.env.HOME || '')
-    .replace(/^~(?=\/|$)/, process.env.HOME || '');
-}
 
 function credentialError(message) {
   const err = new Error(message);
@@ -35,46 +30,26 @@ function credentialError(message) {
  * Copies an explicit allow-list of files from an account's real home into the
  * private home, at the same relative paths. Nothing outside the list is
  * copied and the real home is never mounted. Fails closed: a missing, escaping
- * or non-regular entry aborts before the worker is spawned.
+ * or non-regular entry aborts before the worker is spawned. A SQLite store
+ * (`agent.db`) is copied as a consistent snapshot, not as a raw file.
  */
 function copyHomeFiles(privateHomeTarget, sourceHome, files) {
-  let realHome;
-  try {
-    realHome = fs.realpathSync(sourceHome);
-  } catch (err) {
-    throw credentialError(`selected credential home is not readable: ${err.message}`);
-  }
-  for (const rel of files) {
-    if (typeof rel !== 'string' || !rel.trim() || path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) {
-      throw credentialError(`credential file ${JSON.stringify(rel)} must be a relative path without "..".`);
-    }
-    let realSource;
-    try {
-      realSource = fs.realpathSync(path.join(realHome, rel));
-    } catch {
-      throw credentialError(`selected credential file "${rel}" is missing`);
-    }
-    if (!realSource.startsWith(realHome + path.sep) || !fs.statSync(realSource).isFile()) {
-      throw credentialError(`selected credential file "${rel}" is not a regular file inside the credential home`);
-    }
-    const destination = path.join(privateHomeTarget, rel);
-    try {
-      ensurePrivateDir(path.dirname(destination), { root: privateHomeTarget });
-      fs.copyFileSync(realSource, destination);
-      // Credentials stay owner-only; a listed helper binary keeps its exec bit.
-      fs.chmodSync(destination, fs.statSync(realSource).mode & 0o100 ? 0o700 : 0o600);
-    } catch (copyErr) {
-      throw credentialError(`selected credential file "${rel}" could not be copied: ${copyErr.message}`);
-    }
-  }
+  copyCredentialFiles(privateHomeTarget, sourceHome, files, {
+    makeError: credentialError,
+    ensureDir: (dir) => ensurePrivateDir(dir, { root: privateHomeTarget }),
+  });
 }
 
-function provisionSelectedCodexCredential(privateHomeTarget, request) {
+/**
+ * Copies the selected account's credential files into the private home: the listed files of a home-files
+ * source, or a Codex home's `auth.json`. Returns false when the request selects no credential.
+ */
+function provisionSelectedCredential(privateHomeTarget, request) {
   const source = request?.providerCapacity?.credentialSource;
   if (!source) return false;
   const home = expandCredentialHome(source.home);
   if (source.kind === 'home-files') {
-    if (!home || !path.isAbsolute(home) || !Array.isArray(source.files) || source.files.length === 0) {
+    if (!home || !Array.isArray(source.files) || source.files.length === 0) {
       throw credentialError('selected home-files credential needs an absolute "home" and a non-empty "files" list');
     }
     copyHomeFiles(privateHomeTarget, home, source.files);
@@ -83,18 +58,26 @@ function provisionSelectedCodexCredential(privateHomeTarget, request) {
   if (source.kind !== 'codex-home') {
     throw credentialError(`unsupported provider credential source kind "${source.kind}"`);
   }
-  const authCandidate = home ? path.join(home, 'auth.json') : null;
-  if (!authCandidate || !fs.existsSync(authCandidate)) {
-    throw credentialError('selected Codex credential auth.json is missing');
-  }
-  try {
-    const authCopy = path.join(privateHomeTarget, 'auth.json');
-    fs.copyFileSync(authCandidate, authCopy);
-    fs.chmodSync(authCopy, 0o600);
-  } catch (copyErr) {
-    throw credentialError(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
-  }
+  if (!home) throw credentialError('selected Codex credential needs an absolute "home"');
+  copyHomeFiles(privateHomeTarget, home, ['auth.json']);
   return true;
+}
+
+/**
+ * When the dispatch opted in to credential renewal, the ownership marker records which account login this
+ * home was copied from, so removing the home can write a login renewed inside it back to its source.
+ * Only names and paths go into the marker, never a credential value.
+ */
+function recordCredentialWriteBack(privateHomeTarget, request) {
+  const capacity = request?.providerCapacity;
+  if (!capacity?.credentialWriteBack) return;
+  const credentialWriteBack = credentialWriteBackMarker({
+    provider: capacity.provider,
+    accountId: capacity.accountId,
+    credentialSource: capacity.credentialSource,
+    runtimeDir: capacity.credentialWriteBack.runtimeDir,
+  });
+  if (credentialWriteBack) extendOwnershipMarker(privateHomeTarget, { credentialWriteBack });
 }
 
 const ALLOWED_BWRAP_CONFIG_KEYS = Object.freeze([
@@ -493,7 +476,9 @@ export function prepareBwrapSync(plan, request, backend) {
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
-          credentialProvisioned = provisionSelectedCodexCredential(res.hostTarget, request) || credentialProvisioned;
+          const provisioned = provisionSelectedCredential(res.hostTarget, request);
+          credentialProvisioned = provisioned || credentialProvisioned;
+          if (provisioned) recordCredentialWriteBack(res.hostTarget, request);
         }
       }
 

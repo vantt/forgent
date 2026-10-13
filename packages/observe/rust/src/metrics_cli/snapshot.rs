@@ -31,7 +31,8 @@ pub fn dispatch_snapshot(
         }
     }
 
-    let ws = work_source.ok_or_else(|| "work source not available for metrics snapshot".to_string())?;
+    let ws =
+        work_source.ok_or_else(|| "work source not available for metrics snapshot".to_string())?;
     let entropy_calc = calculate_entropy_score_and_parts(&req.root, ws)?;
     let now = chrono_now_iso();
 
@@ -70,7 +71,8 @@ pub fn dispatch_snapshot(
 
     let line = serde_json::to_string(&record).map_err(|e| e.to_string())?;
     writeln!(file, "{}", line).map_err(|e| format!("cannot write snapshot: {}", e))?;
-    file.sync_all().map_err(|e| format!("cannot sync snapshot: {}", e))?;
+    file.sync_all()
+        .map_err(|e| format!("cannot sync snapshot: {}", e))?;
 
     Ok(json!({
         "ok": true,

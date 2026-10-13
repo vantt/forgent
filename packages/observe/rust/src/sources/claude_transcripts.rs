@@ -1,9 +1,9 @@
 //! Claude Code transcripts observation source (Lane A2 - Phase F2).
 
 use crate::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
+use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 use serde::Deserialize;
 use serde_json::Value;
-use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 
 #[derive(Deserialize)]
 struct FastLine<'a> {
@@ -274,10 +274,7 @@ impl ObservationSource for ClaudeTranscriptsSource {
                         .unwrap_or("")
                         .to_string();
 
-                    let model = msg
-                        .model
-                        .unwrap_or("unknown")
-                        .to_string();
+                    let model = msg.model.unwrap_or("unknown").to_string();
 
                     let input_tokens = usage.input_tokens.unwrap_or(0);
                     let output_tokens = usage.output_tokens.unwrap_or(0);
@@ -325,7 +322,8 @@ mod tests {
 
     #[test]
     fn test_claude_transcripts_dedupe_and_filter() {
-        let temp_dir = std::env::temp_dir().join(format!("test_claude_transcripts_{}", std::process::id()));
+        let temp_dir =
+            std::env::temp_dir().join(format!("test_claude_transcripts_{}", std::process::id()));
         let _ = fs::remove_dir_all(&temp_dir);
         let home_dir = temp_dir.join("home");
         let project_root = temp_dir.join("project");
@@ -380,17 +378,39 @@ mod tests {
 
         // Init real git repo in project_root and add a real external worktree
         let _ = Command::new("git").arg("init").arg(&project_root).output();
-        let _ = Command::new("git").arg("-C").arg(&project_root).args(["config", "user.email", "test@test.com"]).output();
-        let _ = Command::new("git").arg("-C").arg(&project_root).args(["config", "user.name", "Test"]).output();
+        let _ = Command::new("git")
+            .arg("-C")
+            .arg(&project_root)
+            .args(["config", "user.email", "test@test.com"])
+            .output();
+        let _ = Command::new("git")
+            .arg("-C")
+            .arg(&project_root)
+            .args(["config", "user.name", "Test"])
+            .output();
         fs::write(project_root.join("README.md"), "# Project").unwrap();
-        let _ = Command::new("git").arg("-C").arg(&project_root).args(["add", "."]).output();
-        let _ = Command::new("git").arg("-C").arg(&project_root).args(["commit", "-m", "init"]).output();
+        let _ = Command::new("git")
+            .arg("-C")
+            .arg(&project_root)
+            .args(["add", "."])
+            .output();
+        let _ = Command::new("git")
+            .arg("-C")
+            .arg(&project_root)
+            .args(["commit", "-m", "init"])
+            .output();
 
         let external_wt = temp_dir.join("project-phase00-docs");
         let wt_output = Command::new("git")
             .arg("-C")
             .arg(&project_root)
-            .args(["worktree", "add", external_wt.to_str().unwrap(), "-b", "docs-branch"])
+            .args([
+                "worktree",
+                "add",
+                external_wt.to_str().unwrap(),
+                "-b",
+                "docs-branch",
+            ])
             .output()
             .expect("git worktree add");
         assert!(wt_output.status.success(), "worktree add must succeed");
@@ -426,13 +446,13 @@ mod tests {
         fs::write(wt_dir.join("wt-session.jsonl"), wt_content).unwrap();
 
         // 3. Fake unrelated directory transcript with msg_3 (should be ignored by directory selection and cwd filter)
-        let fake_content = format!(
-            r#"{{"sessionId":"s3","cwd":"/unrelated","timestamp":"2026-09-29T10:10:00Z","message":{{"id":"msg_3","model":"claude-3-5-sonnet","usage":{{"input_tokens":500,"output_tokens":500,"cache_read_input_tokens":0,"cache_creation_input_tokens":0}}}}}}"#
-        );
+        let fake_content = r#"{"sessionId":"s3","cwd":"/unrelated","timestamp":"2026-09-29T10:10:00Z","message":{"id":"msg_3","model":"claude-3-5-sonnet","usage":{"input_tokens":500,"output_tokens":500,"cache_read_input_tokens":0,"cache_creation_input_tokens":0}}}"#.to_string();
         fs::write(fake_dir.join("fake-session.jsonl"), fake_content).unwrap();
 
         let source = ClaudeTranscriptsSource::new();
-        let obs = source.observations(&project_root, &Window::default()).unwrap();
+        let obs = source
+            .observations(&project_root, &Window::default())
+            .unwrap();
 
         let _ = fs::remove_dir_all(&temp_dir);
 
@@ -440,8 +460,12 @@ mod tests {
         // 1. External worktree msg_2 is included.
         // 2. Duplicate msg_1 across root and worktree is deduplicated (only 1 occurrence).
         // 3. Unrelated prefix fake_dir msg_3 is excluded.
-        assert_eq!(obs.len(), 2, "Expected exactly 2 observations (msg_1 and msg_2)");
+        assert_eq!(
+            obs.len(),
+            2,
+            "Expected exactly 2 observations (msg_1 and msg_2)"
+        );
         assert_eq!(obs[0].attrs.get("input_tokens").unwrap(), 100);
         assert_eq!(obs[1].attrs.get("input_tokens").unwrap(), 150);
-}
     }
+}

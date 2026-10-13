@@ -443,11 +443,18 @@ function isGenerationHeld(current) {
   const holderPid = Number.isInteger(current.record.holder?.pid) && current.record.holder.pid > 0
     ? current.record.holder.pid
     : null;
-  if (holderPid === null) return false;
-  return resolveHolderLiveness(
+  if (holderPid !== null && resolveHolderLiveness(
     { pid: holderPid, processStartTime: current.record.holder.processStartTime },
     isPidAlive(holderPid),
-  ) === 'held';
+  ) === 'held') return true;
+  // A holder that recorded a child it started (a renewal call that spends a single-use refresh token)
+  // keeps the lock while that child still runs, even when the holder itself has died: reclaiming then
+  // would let a second renewal redeem the same token.
+  const child = current.record.child;
+  if (Number.isInteger(child?.pid) && child.pid > 0) {
+    return resolveHolderLiveness({ pid: child.pid, processStartTime: child.processStartTime }, isPidAlive(child.pid)) === 'held';
+  }
+  return false;
 }
 
 // S3 round 2 follow-up #2 (found by Lead's own real-load reproduction,
@@ -514,6 +521,37 @@ function acquireGenerationLock(lockDir, holder, deadline) {
   }
 }
 
+// One attempt to take the lock: the epoch won, or null when a live holder has it. Loses a race for the
+// epoch number to a contender and re-decides, exactly like acquireGenerationLock, but never waits.
+function tryAcquireGenerationLock(lockDir, holder) {
+  fs.mkdirSync(lockDir, { recursive: true });
+  for (;;) {
+    const current = currentGeneration(lockDir);
+    if (isGenerationHeld(current)) return null;
+    const nextEpoch = (current?.epoch ?? 0) + 1;
+    const targetPath = path.join(lockDir, generationFileName(nextEpoch));
+    const tmpPath = writeFsyncedTemp(lockDir, JSON.stringify({ holder, acquiredAt: new Date().toISOString() }));
+    try {
+      fs.linkSync(tmpPath, targetPath);
+    } catch (err) {
+      removeBestEffort(tmpPath);
+      if (err.code !== 'EEXIST') throw err;
+      continue;
+    }
+    removeBestEffort(tmpPath);
+    return nextEpoch;
+  }
+}
+
+// Atomic replace of the held record with the child pid added, same discipline as the release.
+function recordGenerationChild(lockDir, epoch, child) {
+  const filePath = path.join(lockDir, generationFileName(epoch));
+  const record = parseGenerationFile(filePath);
+  if (record === null) return;
+  const tmpPath = writeFsyncedTemp(lockDir, JSON.stringify({ ...record, child }));
+  fs.renameSync(tmpPath, filePath);
+}
+
 function releaseGenerationLock(lockDir, epoch) {
   const filePath = path.join(lockDir, generationFileName(epoch));
   const record = parseGenerationFile(filePath);
@@ -543,6 +581,77 @@ export function withFileLock(lockDir, fn, { waitMs = 30_000 } = {}) {
     return fn();
   } finally {
     releaseGenerationLock(lockDir, epoch);
+  }
+}
+
+// The account lock: one per provider account, separate from the state lock above, so a renewal call that
+// takes minutes never holds up leasing or quarantine. Everything about one account that must not be
+// touched by two processes at once lives under its directory: the lock, the copies of a login renewed
+// somewhere else and waiting to be applied, a scratch home while a renewal runs, the failure cooldown.
+const ACCOUNT_LOCK_POLL_MS = 20;
+
+function accountKeyIsSafe(value) {
+  return typeof value === 'string' && /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(value);
+}
+
+/** The directory that holds everything about one account's login; null for an unsafe provider or account id. */
+export function providerAccountDir(runtimeDir = defaultProviderCapacityRuntimeDir(), provider, accountId) {
+  if (!accountKeyIsSafe(provider) || !accountKeyIsSafe(accountId)) return null;
+  return path.join(runtimeDir, 'account-locks', provider, accountId);
+}
+
+function accountLockHandle(lockDir, epoch) {
+  let released = false;
+  return {
+    dir: path.dirname(lockDir),
+    /** Record the child process this holder started, so a dead holder with a live child is not reclaimed. */
+    recordChild(pid) {
+      if (!Number.isInteger(pid) || pid <= 0) return;
+      recordGenerationChild(lockDir, epoch, { pid, processStartTime: getProcessStartTime(pid) });
+    },
+    release() {
+      if (released) return;
+      released = true;
+      releaseGenerationLock(lockDir, epoch);
+    },
+  };
+}
+
+function accountLockDirFor(runtimeDir, provider, accountId) {
+  const dir = providerAccountDir(runtimeDir, provider, accountId);
+  if (dir === null) throw new ProviderCapacityConfigError(`provider-capacity account lock refused: unsafe provider/account ${JSON.stringify(provider)}/${JSON.stringify(accountId)}`);
+  return path.join(dir, 'lock');
+}
+
+/**
+ * Take the account lock without waiting. Returns a handle `{dir, recordChild, release}`, or null when a
+ * live holder has it. For callers that must not wait (a removal that has to finish).
+ */
+export function tryAcquireAccountLock({ runtimeDir, provider, accountId } = {}) {
+  const lockDir = accountLockDirFor(runtimeDir, provider, accountId);
+  const epoch = tryAcquireGenerationLock(lockDir, { pid: process.pid, processStartTime: getProcessStartTime(process.pid) });
+  return epoch === null ? null : accountLockHandle(lockDir, epoch);
+}
+
+/**
+ * Take the account lock, waiting with timers (never blocking the event loop: panel seats run in one
+ * process and may share an account). Throws ProviderCapacityLockError when a live holder keeps it past `waitMs`.
+ */
+export async function acquireAccountLock({ runtimeDir, provider, accountId, waitMs = 30_000 } = {}) {
+  const lockDir = accountLockDirFor(runtimeDir, provider, accountId);
+  const deadline = Date.now() + waitMs;
+  const holder = { pid: process.pid, processStartTime: getProcessStartTime(process.pid) };
+  for (;;) {
+    const epoch = tryAcquireGenerationLock(lockDir, holder);
+    if (epoch !== null) return accountLockHandle(lockDir, epoch);
+    const current = currentGeneration(lockDir);
+    if (Date.now() > deadline) {
+      throw new ProviderCapacityLockError(
+        `provider-capacity account lock at "${lockDir}" is still held by a live process after waiting.`,
+        { lockPath: lockDir, holderPid: current?.record?.holder?.pid ?? null },
+      );
+    }
+    await new Promise((resolve) => { setTimeout(resolve, ACCOUNT_LOCK_POLL_MS); });
   }
 }
 
@@ -778,6 +887,7 @@ export const DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS = 30 * 60 * 1000;
  */
 export async function probeQuarantinedAccounts({
   runnerConfig, provider, runtimeDir, probe, now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS,
+  accountLockWaitMs = 120_000,
 } = {}) {
   if (typeof probe !== 'function' || !provider) return [];
   const accounts = providerAccountInventory(runnerConfig)[provider]?.accounts;
@@ -806,10 +916,17 @@ export async function probeQuarantinedAccounts({
   const tried = [];
   for (const { accountId, quarantinedAt } of claimed) {
     let result;
+    // The call may renew the login in the account's own home; a renewal made by fgOS elsewhere must not
+    // run at the same time, so the call holds the account lock.
+    let accountLock = null;
     try {
-      result = await probe({ provider, accountId, account: accounts[accountId] });
+      accountLock = await acquireAccountLock({ runtimeDir, provider, accountId, waitMs: accountLockWaitMs });
+      // The probe reports its child so that a dead holder with a live child keeps the lock.
+      result = await probe({ provider, accountId, account: accounts[accountId], onSpawn: (child) => accountLock.recordChild(child?.pid) });
     } catch (err) {
       result = { ok: false, detail: err?.message ?? String(err) };
+    } finally {
+      try { accountLock?.release(); } catch { /* a release problem must not turn a probe answer into a failure */ }
     }
     const ok = result?.ok === true;
     const detail = result?.detail ? String(result.detail).slice(0, 300) : null;

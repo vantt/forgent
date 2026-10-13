@@ -5,7 +5,9 @@ name: Release assets check
 
 on:
   push:
-    branches: [feat/windows-release]
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
