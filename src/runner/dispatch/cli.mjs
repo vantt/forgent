@@ -26,7 +26,7 @@ class StoreError extends Error {
 }
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS, normalizePreferCandidates } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, resolveCapabilityDetailsFromHints } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
@@ -447,6 +447,35 @@ export async function executeExecutorCli(
     resolvedExecutor = resolved.executor;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
+    // A caller naming both the executor and the capability states the posture
+    // of the work itself, overriding the strictest-first inference from the
+    // executor's own `for`. It may only name a capability the executor is
+    // declared to serve, so config stays the place that says which postures an
+    // executor accepts.
+    if (purpose) {
+      const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+      const capabilityName = Object.hasOwn(capabilities, purpose)
+        ? purpose
+        : Object.keys(capabilities).find((name) => capabilities[name]?.aliases?.includes?.(purpose));
+      if (!capabilityName) {
+        throw new DispatchError(
+          'capability-not-served',
+          `"${purpose}" is not a registered capability (runner.capabilities)`,
+          { executorId: executorIdArg, capability: purpose },
+        );
+      }
+      const declared = Array.isArray(resolvedExecutor?.for) && resolvedExecutor.for.includes(capabilityName);
+      const prefer = capabilities[capabilityName].prefer;
+      const preferred = prefer !== undefined
+        && normalizePreferCandidates(prefer, `capabilities.${capabilityName}.prefer`).some((candidate) => candidate.executor === realExecutorId);
+      if (!declared && !preferred) {
+        throw new DispatchError(
+          'capability-not-served',
+          `executor "${realExecutorId}" does not serve capability "${capabilityName}" -- add it to executors.${realExecutorId}.for or capabilities.${capabilityName}.prefer`,
+          { executorId: realExecutorId, capability: capabilityName },
+        );
+      }
+    }
   }
 
   // Dispatch chokepoint visibility (both branches below): "capability" is
@@ -1042,6 +1071,16 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
     const i = rest.indexOf(name);
     return i !== -1 ? rest[i + 1] : undefined;
   };
+  // Milliseconds flag: absent stays undefined (the config value applies).
+  const positiveIntFlag = (name) => {
+    const raw = flagValue(name);
+    if (raw === undefined) return undefined;
+    const value = Number(raw);
+    if (!/^\d+$/.test(raw) || !Number.isSafeInteger(value) || value <= 0) {
+      throw new StoreError('validation', `${name} must be a positive integer (milliseconds), got ${JSON.stringify(raw)}`);
+    }
+    return value;
+  };
   // R9: "Reject duplicate/conflicting flags ... before launch" -- applies to
   // every `cliOverride` flag (`--executor`/`--model`/`--tier`), not just
   // `--executor`. Returns the first duplicated flag name found, or null.
@@ -1089,9 +1128,12 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       // works) is two-phase: `decide --for <purpose>` resolves the
       // purpose to a real executorId first, then `execute <that id>`
       // dispatches it positionally -- `decide --for` is unaffected by
-      // this, only `execute --for` is refused.
-      if (flagValue('--for')) {
-        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId>`)';
+      // this, only `execute --for` is refused. `execute <executorId> --for
+      // <capability>` is phase two carrying the purpose along: the executor is
+      // already named, and `--for` only states which capability's posture the
+      // dispatch runs under (refused for an executor that does not serve it).
+      if (flagValue('--for') && (!executorId || flagValue('--assignment') || flagValue('--contract'))) {
+        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId> [--for <capability>]`)';
         if (returnResult) throw new StoreError('validation', msg);
         process.stderr.write(`${msg}\n`);
         process.exitCode = 1;
@@ -1406,9 +1448,24 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         process.exitCode = 1;
         break;
       }
+      let timeoutMs;
+      let idleTimeoutMs;
+      try {
+        timeoutMs = positiveIntFlag('--timeout-ms');
+        idleTimeoutMs = positiveIntFlag('--idle-timeout-ms');
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stdout.write(`${JSON.stringify({ error: err.message })}\n`);
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+        break;
+      }
       try {
         const executed = await executeExecutorCli(executorId, {
           prompt,
+          for: flagValue('--for'),
+          timeoutMs,
+          idleTimeoutMs,
           model: flagValue('--model'),
           tier: flagValue('--tier'),
           carries: flagValue('--carries'),
@@ -1494,7 +1551,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

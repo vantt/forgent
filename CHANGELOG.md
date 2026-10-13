@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `fgos dispatch execute <executor> --for <capability>` runs the dispatch under that capability's confinement instead of the strictest one the executor declares, so writing work can go to an executor that also serves read-only review (`execute openai --for execute`). The executor must declare the capability; anything else is refused before spawning. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
+
 ### Changed
 
 - Confined Codex accounts now fail closed when `auth.json` is a symlink that resolves outside the Codex home, or when the configured `home` is a relative path; the dispatch stops before the worker starts. Both used to be accepted (the symlink was followed, a relative home was resolved against the working directory).

@@ -119,7 +119,9 @@ verbose test runner's own line-by-line pass output:
 node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1 | grep -E --line-buffered '\[DONE\]|\[BLOCKED\]|Error|FAIL|✗|^\{'
 ```
 
-When dispatching a worktree-backed item with explicit directory flags, pass `--cwd <worktree path>` (so the spawned executor runs in the worktree) and `--repo-root "$root"` (so config loads from main) as two separate flags — never pass `$root` as `--dir`/`--cwd` alone.
+When dispatching a worktree-backed item with explicit directory flags, pass `--cwd <worktree path>` (so the spawned executor runs in the worktree) and `--repo-root "$root"` (so state and locks stay on main) as two separate flags — never pass `$root` as `--dir`/`--cwd` alone. Runner config is read from the worktree's own `.fgos/config.json` when it has one, so a worktree branch behind main dispatches with its older executors and model tiers until it catches up.
+
+Pass `--for <CAPABILITY>` on `execute` when the executor serves more than one capability and the work's posture matters — above all when the work writes files. Without it the posture is inferred from the executor's own `for` list, strictest first, so an executor that also serves a read-only review capability runs write-denied. `--for` must name a capability the executor declares in `for` (or one whose `prefer` names it); anything else is refused before spawning. `--timeout-ms <ms>` and `--idle-timeout-ms <ms>` override the configured `runner.timeoutMs`/`runner.idleTimeoutMs` for that one call.
 
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
 built from a file via `$(cat ...)`, the worktree-isolation guard may

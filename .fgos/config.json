@@ -803,7 +803,8 @@
         "allowCrossProvider": true,
         "for": [
           "code:review",
-          "code:debug"
+          "code:debug",
+          "execute"
         ],
         "invocations": [
           {
