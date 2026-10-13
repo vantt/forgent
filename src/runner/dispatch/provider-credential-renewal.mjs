@@ -55,7 +55,8 @@ const LOCK_MARGIN_MS = 30 * 1000;
 const COOLDOWN_FILE = 'cooldown.json';
 const PENDING_DIR = 'pending';
 const SCRATCH_PREFIX = 'scratch-';
-const MAX_PENDING_COPIES = 5;
+export const MAX_PENDING_COPIES = 5;
+const TORN_DIR = 'torn';
 
 const defaultLoadSqlite = () => {
   try {
@@ -397,6 +398,9 @@ function ompEntries(db) {
 const ompLayout = {
   name: 'omp-agent-db',
   files: ['agent.db'],
+  // Written beside the store while it is open (write-ahead log, or rollback journal in another mode); a login
+  // renewed after the last checkpoint lives only here. The shared-memory index (`-shm`) carries no data.
+  sidecars: ['agent.db-wal', 'agent.db-journal'],
   read(home, { loadSqlite }) {
     const file = path.join(home, 'agent.db');
     try {
@@ -459,12 +463,15 @@ const ompLayout = {
     const destination = path.join(stagingDir, 'agent.db');
     if (snapshotSqliteFile(path.join(copyHome, 'agent.db'), destination, { loadSqlite })) return;
     // No snapshot (the module is unavailable, or the file cannot be opened): the files as they are, write-ahead
-    // log included. The pane's processes are already stopped, so nothing is writing to them.
-    for (const suffix of ['', '-wal', '-shm']) {
+    // log and rollback journal included. The pane's processes are already stopped, so nothing is writing to them.
+    for (const suffix of ['', '-wal', '-journal', '-shm']) {
       const from = path.join(copyHome, `agent.db${suffix}`);
-      if (!fs.existsSync(from)) {
-        if (suffix === '') throw new Error('stage-failed');
-        continue;
+      try {
+        fs.statSync(from);
+      } catch (err) {
+        // Only a file that is not there is skipped; one that cannot be looked at fails the staging.
+        if (err?.code === 'ENOENT' && suffix !== '') continue;
+        throw new Error('stage-failed');
       }
       fs.copyFileSync(from, `${destination}${suffix}`);
       fs.chmodSync(`${destination}${suffix}`, 0o600);
@@ -566,7 +573,45 @@ const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpe
 // be read for a reason that may pass, or the source cannot say (it cannot be read, or its entry cannot be
 // identified and the copy holds a refresh token the source does not). Undetermined copies are staged
 // rather than dropped.
-function copyIsNewer({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
+// The non-empty sidecar files of a layout in `dir`, by name: `{found: [[name, bytes]], unreadable}`. A zero-byte
+// file, or one that is not there (ENOENT), counts as absent; any other read error (permissions, I/O, a
+// directory) means nothing can be said about it, and callers must not conclude anything from a copy like that.
+function sidecarBytes(layout, dir) {
+  const found = [];
+  let unreadable = false;
+  for (const name of layout.sidecars ?? []) {
+    try {
+      const bytes = fs.readFileSync(path.join(dir, name));
+      if (bytes.length > 0) found.push([name, bytes]);
+    } catch (err) {
+      if (err?.code !== 'ENOENT') unreadable = true;
+    }
+  }
+  return { found, unreadable };
+}
+
+function filesIdentical(layout, sourceHome, copyHome) {
+  // A login renewed after the last checkpoint sits in the log or journal, not in the main file: a copy or a
+  // source with one (or one that cannot be read) cannot be shown identical by its main file alone.
+  const sides = [sidecarBytes(layout, copyHome), sidecarBytes(layout, sourceHome)];
+  if (sides.some((side) => side.unreadable || side.found.length > 0)) return false;
+  try {
+    return layout.files.every((name) => {
+      const a = path.join(sourceHome, name);
+      const b = path.join(copyHome, name);
+      return fs.statSync(a).size === fs.statSync(b).size && fs.readFileSync(a).equals(fs.readFileSync(b));
+    });
+  } catch { return false; }
+}
+
+// A copy whose files are byte for byte the source's renewed nothing, whatever can or cannot be parsed, so
+// it cannot be newer; any other copy that nothing can judge stays undetermined.
+function copyIsNewer(args) {
+  const verdict = judgeCopy(args);
+  return verdict === 'undetermined' && filesIdentical(args.layout, args.sourceHome, args.copyHome) ? 'not-newer' : verdict;
+}
+
+function judgeCopy({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
   const copy = layout.read(copyHome, { loadSqlite });
   if (!copy.ok) {
     if (COPY_MALFORMED_CODES.has(copy.code)) return 'not-newer';
@@ -603,6 +648,31 @@ function listLeftovers(accountDir) {
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
 /**
+ * Accounts whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, count}]`. Nothing is
+ * dropped to get back under the limit unless it is a redundant duplicate, so an account can stay over it.
+ */
+export function inspectPendingCopiesOverLimit({ runtimeDir }) {
+  const found = [];
+  const root = path.join(runtimeDir, 'account-locks');
+  const subdirs = (dir) => {
+    try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; }
+  };
+  for (const provider of subdirs(root)) {
+    for (const accountId of subdirs(path.join(root, provider))) {
+      const accountDir = path.join(root, provider, accountId);
+      // An account with one login store per CLI keeps each store's pending copies under stores/<cli>.
+      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
+      for (const storeDir of storeDirs) {
+        let count = 0;
+        try { count = fs.readdirSync(path.join(storeDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { /* none */ }
+        if (count > MAX_PENDING_COPIES) found.push({ provider, accountId, count });
+      }
+    }
+  }
+  return found;
+}
+
+/**
  * Login copies an account is holding for its next renewal: staged `pending/` copies (their name starts
  * with the staging time) and scratch homes a dead runner left (age by modification time). Read-only;
  * names, kinds and ages only. Only copies at least `minAgeMs` old are listed: a younger one is simply
@@ -619,14 +689,15 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
       const accountDir = path.join(root, provider, accountId);
       // An account with one login store per CLI keeps each store's copies under stores/<cli>.
       const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
-      for (const dir of storeDirs.flatMap(listLeftovers)) {
+      const tornIn = (dir) => { try { return fs.readdirSync(path.join(dir, TORN_DIR)).filter((n) => !n.startsWith('.')).map((n) => path.join(dir, TORN_DIR, n)); } catch { return []; } };
+      for (const dir of storeDirs.flatMap((storeDir) => [...listLeftovers(storeDir), ...tornIn(storeDir)])) {
         const name = path.basename(dir);
         const staged = /^(\d{15})-/.exec(name);
         let at;
         if (staged) at = Number(staged[1]);
         else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
         const ageMs = now - at;
-        if (ageMs >= minAgeMs) found.push({ provider, accountId, kind: staged ? 'pending' : 'scratch', ageMs });
+        if (ageMs >= minAgeMs || path.basename(path.dirname(dir)) === TORN_DIR) found.push({ provider, accountId, kind: path.basename(path.dirname(dir)) === TORN_DIR ? 'torn' : staged ? 'pending' : 'scratch', ageMs });
       }
     }
   }
@@ -643,23 +714,56 @@ function syncTree(dir) {
   syncPath(dir);
 }
 
-function pendingCount(accountDir) {
-  try { return fs.readdirSync(path.join(accountDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { return 0; }
+/**
+ * An in-memory fingerprint of the logins a copy holds (entry key, refresh token, expiry), or null when the
+ * copy cannot be read. Two copies with the same fingerprint carry the same logins, so one of them is
+ * redundant. Never written anywhere and never printed.
+ */
+function copyFingerprint(layout, dir, loadSqlite) {
+  const read = layout.read(dir, { loadSqlite });
+  if (!read.ok) return rawFingerprint(layout, dir);
+  const parts = read.entries.map((entry) => `${entry.key}\u0000${entry.refresh ?? ''}\u0000${entry.expiresMs}`).sort();
+  return crypto.createHash('sha256').update(parts.join('\u0001')).digest('hex');
+}
+
+// A copy that cannot be parsed (no `node:sqlite`, a database that will not open) is compared by the bytes of
+// its store files; null when a file is missing. In memory only.
+function rawFingerprint(layout, dir) {
+  try {
+    const hash = crypto.createHash('sha256');
+    for (const name of layout.files) hash.update(name).update('\u0000').update(fs.readFileSync(path.join(dir, name))).update('\u0001');
+    const sidecars = sidecarBytes(layout, dir);
+    if (sidecars.unreadable) return null;
+    for (const [name, bytes] of sidecars.found) hash.update(name).update('\u0000').update(bytes).update('\u0001');
+    return `raw:${hash.digest('hex')}`;
+  } catch { return null; }
 }
 
 /**
- * Keep the newest MAX_PENDING_COPIES pending copies of an account (names sort by staging time) and drop the
- * rest, so an account whose entry can never be identified does not grow without bound. One stderr line
- * with the count; never a path or a value.
+ * Keep the pending copies of an account within MAX_PENDING_COPIES by dropping redundant ones only: a copy
+ * whose logins are identical to those of another pending copy (the newest of each identical group stays).
+ * Called under the account lock after the pending copies were applied, so what is still here is what the
+ * source could not judge. When the limit is still exceeded afterwards nothing is removed: a copy that may
+ * hold the only valid login is never dropped to make room, and `fgos doctor` reports the account. One
+ * stderr line with the count; never a path or a value.
  */
-function capPendingCopies(accountDir) {
+function capPendingCopies(accountDir, layout, loadSqlite) {
   const pendingDir = path.join(accountDir, PENDING_DIR);
   let names;
   try { names = fs.readdirSync(pendingDir).filter((n) => !n.startsWith('.')).sort(); } catch { return; }
-  const surplus = names.slice(0, Math.max(0, names.length - MAX_PENDING_COPIES));
+  let surplus = names.length - MAX_PENDING_COPIES;
+  if (surplus <= 0) return;
+  const seen = new Set();
+  const redundant = [];
+  for (const name of [...names].reverse()) {
+    const fingerprint = copyFingerprint(layout, path.join(pendingDir, name), loadSqlite);
+    if (fingerprint === null) continue;
+    if (seen.has(fingerprint)) redundant.push(name); else seen.add(fingerprint);
+  }
   let dropped = 0;
-  for (const name of surplus) {
-    try { fs.rmSync(path.join(pendingDir, name), { recursive: true, force: true }); dropped += 1; } catch { /* the next cap retries */ }
+  for (const name of redundant.reverse()) {
+    if (surplus <= 0) break;
+    try { fs.rmSync(path.join(pendingDir, name), { recursive: true, force: true }); dropped += 1; surplus -= 1; } catch { /* the next cap retries */ }
   }
   if (dropped > 0) process.stderr.write(`fgos: credential-pending-dropped (${dropped})\n`);
 }
@@ -686,6 +790,7 @@ function applyLeftovers({ accountDir, layoutName, provider, sourceHome, now, loa
       try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* retried by the next holder */ }
     }
   }
+  capPendingCopies(accountDir, LAYOUTS[layoutName], loadSqlite);
   return outcomes;
 }
 
@@ -831,10 +936,22 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
       const pendingDir = path.join(accountDir, PENDING_DIR);
       fs.mkdirSync(pendingDir, { recursive: true, mode: 0o700 });
       fs.renameSync(scratch, path.join(pendingDir, `${String(now()).padStart(15, '0')}-${crypto.randomBytes(4).toString('hex')}`));
-      capPendingCopies(accountDir);
+      capPendingCopies(accountDir, layout, loadSqlite);
     } catch { /* the copy stays where it is, and is found there */ }
     recordFailure(accountDir, 'apply-deferred', now());
     return { status: 'failed', reason: 'apply-deferred' };
+  }
+  if (applied.status === 'unreadable' && applied.code === 'unreadable-json') {
+    // The CLI's store write was cut off (pi truncates and rewrites its file in place): the half-written
+    // file may hold part of a renewed login, so it is kept for hand recovery, outside the copies that are
+    // applied or dropped automatically, and reported by `fgos doctor`.
+    try {
+      const tornDir = path.join(accountDir, TORN_DIR);
+      fs.mkdirSync(tornDir, { recursive: true, mode: 0o700 });
+      fs.renameSync(scratch, path.join(tornDir, `${String(now()).padStart(15, '0')}-${crypto.randomBytes(4).toString('hex')}`));
+    } catch { /* the scratch copy stays where it is, and is found there */ }
+    recordFailure(accountDir, 'torn-copy', now());
+    return { status: 'failed', reason: 'torn-copy-kept' };
   }
   try { fs.rmSync(scratch, { recursive: true, force: true }); } catch { /* the next holder removes it */ }
 
@@ -898,12 +1015,6 @@ export function settleHeldCredentialHome(homeDir, marker, { loadSqlite = default
     if (!lock) return { status: 'held', code: 'lock-busy' };
   }
   try {
-    // A copy that would only be staged (nothing proves it is not newer) must not push an older pending copy
-    // out through the cap: with the pending copies full it stays in its home, which stays held.
-    if (pendingCount(accountDir) >= MAX_PENDING_COPIES
-      && copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite }) !== 'not-newer') {
-      return { status: 'held', code: 'pending-full' };
-    }
     // The staging step is the write-back's own; the lock is already ours, so it must not try for it again.
     const result = writeBackRenewedCredential(homeDir, marker, { loadSqlite, now, tryLock: () => null });
     if (result.status === 'failed') return { status: 'held', code: result.code };
@@ -952,7 +1063,6 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
       return { status: 'failed', code: err?.message === 'sqlite-unavailable' ? 'sqlite-unavailable' : 'stage-failed', keepHome: true };
     }
     safe = true;
-    capPendingCopies(accountDir);
 
     const lock = tryLock({ runtimeDir: writeBack.runtimeDir, provider: writeBack.provider, accountId: writeBack.accountId });
     if (!lock) return { status: 'staged' };

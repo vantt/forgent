@@ -116,3 +116,43 @@ test('the fix re-checks held homes: one whose login is gone is removed, one that
     assert.equal(fs.existsSync(stuck), true);
   } finally { w.cleanup(); }
 });
+
+test('an account with more pending copies than the limit is reported, even when they are young', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    for (let i = 0; i < 6; i += 1) addPending(w, 'xai', 'acct', now - i * 1000);
+    addPending(w, 'codex', 'other', now - 1000);
+    const result = run(w, now);
+    assert.equal(result.passed, true, 'a warning, not a failure');
+    assert.match(result.message, /^warning: /);
+    assert.match(result.message, /xai\/acct: 6 pending login copies waiting, over the limit of 5 \(the limit drops only copies identical to another/);
+    assert.equal(result.message.includes('codex/other'), false);
+    assert.equal(result.message.includes(FAKE_TOKEN), false);
+  } finally { w.cleanup(); }
+});
+
+test('a half-written copy kept for hand recovery is reported as such', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'auth.json'), `{"refresh": "${FAKE_TOKEN}`);
+    const result = run(w, now);
+    assert.equal(result.passed, true);
+    assert.match(result.message, /xai\/acct: 1 half-written login copy\(ies\) kept for hand recovery \(never applied or dropped automatically\), oldest 3d/);
+    assert.equal(result.message.includes(FAKE_TOKEN), false);
+  } finally { w.cleanup(); }
+});
+
+test('a half-written copy is reported at any age', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 1000).padStart(15, '0')}-abcd`);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'auth.json'), '{"refresh"');
+    assert.match(run(w, now).message, /xai\/acct: 1 half-written login copy\(ies\) kept for hand recovery/);
+  } finally { w.cleanup(); }
+});

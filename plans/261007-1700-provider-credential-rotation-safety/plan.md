@@ -1,7 +1,7 @@
 ---
 title: "Provider credential rotation safety: refresh once at the source, write back what a pane renewed"
 description: "A pane that renews a rotating login inside its throwaway home strands the source login; design for a refresh-ahead done in an fgOS-held scratch copy under an account lock, plus a compare-before-write write-back of copies renewed inside panes."
-status: in-review
+status: in-progress
 priority: P1
 branch: feat/provider-credential-rotation-safety
 tags: [dispatch, provider-capacity, credentials, concurrency, confinement]
@@ -41,6 +41,7 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 | # | Phase | Depends on | Exit |
 |---|---|---|---|
 | 01 | [Refresh-ahead and write-back](phase-01-refresh-ahead-and-write-back.md) | none open (see Constraints) | Behaviour proven by tests and one real scratch renewal; spec moved to its owners |
+| 02 | [Pending-copy safety and read-only follow-ups](phase-02-pending-copy-safety.md) | 01 | Pending copies never lost to the limit; sync, single-read and half-written-copy rules proven by tests; open questions 1, 4, 5, 10-13 answered |
 
 ## Constraints
 
@@ -60,19 +61,22 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 
 ## Open questions
 
-1. Does xAI, or OpenAI for Codex, revoke the whole token chain on reuse of an old refresh token? Decides how bad a lost race is, not whether the design is needed. Not to be tested on a real account. Docs research 2026-10-13 ([report](reports/research-261013-1221-refresh-token-reuse-revocation.md)): neither provider documents family revocation. OpenAI (maintainer, openai/codex#10332): an old refresh token still works for about an hour, then fails permanently with 401 `refresh_token_reused`; Codex re-reads `auth.json` before refreshing and adopts a newer pair. xAI: single use, `invalid_grant: Refresh token has been revoked`, no grace window seen, nothing documented. Whether a replay also kills the newer token stays unknown for both, so the design keeps assuming the worst case (a lost race can force a full re-login).
+1. Does xAI, or OpenAI for Codex, revoke the whole token chain on reuse of an old refresh token? Decides how bad a lost race is, not whether the design is needed. Not to be tested on a real account. Docs research 2026-10-13 ([report](reports/research-261013-1221-refresh-token-reuse-revocation.md)): neither provider documents family revocation. OpenAI (maintainer, openai/codex#10332): an old refresh token still works for about an hour, then fails permanently with 401 `refresh_token_reused`; Codex re-reads `auth.json` before refreshing and adopts a newer pair. xAI: single use, `invalid_grant: Refresh token has been revoked`, no grace window seen, nothing documented. Whether a replay also kills the newer token stays unknown for both, so the design keeps assuming the worst case (a lost race can force a full re-login). Decided 2026-10-13 (owner): not tested on a real account; stays open as a documented risk.
 2. ~~Does the agy (Gemini) login rotate at all?~~ Answered 2026-10-13: no, the refresh token stays the same across a renewal (see the measurement table). Nothing to do.
 3. ~~Should `fgos doctor` report a pending copy that stays unidentified (its entry cannot be matched to the source), since it holds a refresh token silently?~~ Answered 2026-10-13: yes, check `credential-copies-retained` (pending/scratch copies older than a day, and held homes; counts and ages only).
-4. Should a torn scratch copy (a probe killed at its time limit mid-write) be kept for hand recovery instead of deleted as unreadable? Depends on whether pi and omp write their stores atomically.
-5. Pending cap keeps the 5 newest copies by staging time. When no copy can be judged (no `node:sqlite`, or a pi entry that cannot be identified), five later unrenewed copies can push out the one a pane renewed; still strictly better than before (base deleted it at once). Candidate fix: fingerprint the copied store in the marker at provisioning, drop identical duplicates first, cap after the apply attempt. Not triggered on this machine (Node 24, `node:sqlite` present).
+4. ~~Should a torn scratch copy (a probe killed at its time limit mid-write) be kept for hand recovery instead of deleted as unreadable?~~ Answered 2026-10-13 by reading the installed CLIs: pi does NOT write its store atomically (the `@earendil-works/pi-coding-agent` package, `core/auth-storage.js:66` and `:140` in its built output: `writeFileSync(this.authPath, next, ...)` truncates and rewrites in place, under a `proper-lockfile` lock that fgOS does not take); omp commits row updates through SQLite (the `omp` binary holds `INSERT INTO auth_credentials` and `UPDATE auth_credentials` statements and `PRAGMA journal_mode` / `wal_checkpoint`, so a cut-off leaves the old row, never a torn one). So a pi scratch copy cut off mid-write can be half a login: such a copy is now kept under `torn/` for hand recovery (never applied or dropped automatically, reported by the doctor check). Phase 02.
+5. ~~Pending cap keeps the 5 newest copies.~~ Answered 2026-10-13 (phase 02): the cap now runs only under the account lock after the apply attempt and drops only copies whose logins are identical to another pending copy's (fingerprint compared in memory); when it still cannot get under five it drops nothing and `fgos doctor` reports the account.
 6. A pending copy whose apply hits an operating-system read error (EACCES, EIO, EMFILE) is deleted as malformed, because `unreadable-file` covers both a missing file and a read error. Split the code. Done 2026-10-13: `missing-file` (proven empty) versus `unreadable-file` (kept).
 7. A home kept because staging failed (`credential-home-kept`) is retried by the reaper without a time or attempt limit, outlives the reaper's age limit, and `fgos doctor --fix` cannot clear it; the finalizer's early stop also leaves that dispatch's other resources on disk. Needs a limit and a doctor check. Done 2026-10-13: five attempts counted in the marker, then held (never deleted by age), the finalizer continues, doctor reports it.
 8. Not fixed, left from before: a `.tmp-*` staging directory left by a crash during staging is skipped by the leftover listing, so nothing reports or removes it, and it may hold a partial copy of a login. Needs a doctor line or a sweep.
 9. Reopened 2026-10-13 with a narrower scope: refresh-ahead, doctor, `--fix` and the reaper now search the default temp root plus each registered backend's own `tempRoot`, but a home allocated under a backend's separate `privateHomeRoot` (`resources.mjs`: `privateHomeRoot || tempRoot || default`) is in none of them, so a held home there is never reported or re-checked (it is never deleted either). This machine configures no `privateHomeRoot`. Not fixed.
-10. A crash between staging a copy and removing its home leaves both; a later settle stages the same login again, so identical copies can press on the pending cap (see question 5; fingerprinting the staged store would cover it). Not fixed.
-11. A held home that cannot be settled makes every dispatch of its account take the account lock once to try; acceptable while doctor fails on it. Not fixed.
-12. The test that the staged copy is synced counts all syncs (`>= 3`), and taking the account lock adds two, so it does not guard each sync alone. Better: stub the lock and check the exact paths synced. Not fixed.
-13. The held-home guard and the write-back each read the source, so a source that flips from readable to torn between the two reads (the owner's own CLI writes it without the account lock) can still let a copy be staged and the cap drop the oldest copy. Better than before, but the decision should be made once. Not fixed.
+10. ~~A crash between staging a copy and removing its home leaves both; a later settle stages the same login again.~~ Answered 2026-10-13 (phase 02): the duplicates are the first thing the cap drops.
+11. Decided 2026-10-13 (owner): accepted as is. A held home that cannot be settled costs every dispatch of its account one lock attempt; `fgos doctor` already fails on such a home.
+12. ~~The staged-copy sync test counted all syncs.~~ Answered 2026-10-13 (phase 02): the test stubs the lock and checks the staged file, the staging directory and the pending directory each; removing any one sync turns it red.
+13. ~~The held-home guard and the write-back each read the source.~~ Answered 2026-10-13 (phase 02): the guard is gone; nothing is dropped to make room, so no read decides a drop. Test: the source flips between two reads and the only valid pending copy survives.
+14. A scratch home a dead runner left, and a pane home whose store was cut off mid-write, are still removed when their JSON cannot be read; only the probe's own scratch copy goes to `torn/`. Small risk, not fixed.
+15. The real size of an omp `agent.db` was not measured (no real store was opened), so the disk cost of copies kept without `node:sqlite` is unknown.
+16. What omp writes next to `agent.db` on each run (write-ahead log, or a rollback journal) and how large a real `agent.db` is were not measured (no real store was opened). The tests use fake bytes for the log and journal, not a real hot journal.
 
 ## Validation Log
 

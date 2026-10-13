@@ -89,7 +89,7 @@ import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
-import { inspectRetainedCredentialCopies } from '../runner/dispatch/provider-credential-renewal.mjs';
+import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -5441,13 +5441,16 @@ export function checkCredentialCopiesRetained({
     .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
   const held = homes.filter((home) => home.held);
   const retrying = homes.filter((home) => !home.held);
-  if (copies.length === 0 && homes.length === 0) {
+  const overLimit = inspectPendingCopiesOverLimit({ runtimeDir });
+  if (copies.length === 0 && homes.length === 0 && overLimit.length === 0) {
     return { passed: true, message: 'no login copy is being retained past its dispatch' };
   }
   // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
   // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning.
   const problems = [
-    ...summarizeByAccount(copies, 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
+    ...overLimit.map((a) => `${a.provider}/${a.accountId}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`),
+    ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn'), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
+    ...summarizeByAccount(copies.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
     ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
   ];

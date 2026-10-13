@@ -17,6 +17,8 @@ import {
   readCredentialExpiry,
   refreshAhead,
   writeBackRenewedCredential,
+  inspectRetainedCredentialCopies,
+  inspectPendingCopiesOverLimit,
 } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import {
   providerAccountDir,
@@ -1413,33 +1415,26 @@ function heldHome(w, opts) {
 }
 const settleAll = (w, extra = {}) => settleHeldCredentialHomes({ tempRoots: [path.join(w.tmp, 'fgos-confinement')], ...extra });
 
-test('a held home whose login would only be staged stays held when the pending copies are full', () => {
-  const w = workspace();
-  try {
-    const dir = heldHome(w);
-    const pending = path.join(w.accountDir, 'pending');
-    const names = ['1', '2', '3', '4', '5'].map((n) => path.join(pending, `00000000000000${n}-a`));
-    names.forEach((copy, i) => writePi(copy, piDoc(Date.now() + 6 * HOUR, i === 0 ? { access: FAKE.newAccess, refresh: FAKE.newRefresh } : { access: `FAKE-STALE-${i}`, refresh: `FAKE-STALE-REFRESH-${i}` })));
-    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the source cannot say whether the home's login is newer
-    assert.deepEqual(settleAll(w), { settled: 0, held: 1 });
-    assert.equal(fs.existsSync(dir), true, 'the home stays');
-    assert.equal(fs.readdirSync(pending).length, 5, 'nothing was pushed out');
-    assert.equal(readPi(names[0]).xai.refresh, FAKE.newRefresh, 'the oldest copy, the only valid one, is still there');
-  } finally { w.cleanup(); }
-});
 
-test('staging a login syncs the files and the pending directory before the home may go', () => {
+test('staging a login syncs the staged file, its directory and the pending directory, each on its own', () => {
   const w = workspace();
   try {
     const dir = privateHomeWithRenewedLogin(w);
     fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
-    let syncs = 0;
+    const opened = new Map();
+    const synced = [];
+    const realOpen = fs.openSync;
     const realSync = fs.fsyncSync;
-    fs.fsyncSync = (fd) => { syncs += 1; return realSync(fd); };
+    fs.openSync = (file, ...rest) => { const fd = realOpen(file, ...rest); opened.set(fd, String(file)); return fd; };
+    fs.fsyncSync = (fd) => { synced.push(opened.get(fd)); return realSync(fd); };
     let result;
-    try { result = writeBackRenewedCredential(dir, markerOf(dir)); } finally { fs.fsyncSync = realSync; }
+    // The lock is busy, so no lock bookkeeping adds syncs of its own.
+    try { result = writeBackRenewedCredential(dir, markerOf(dir), { tryLock: () => null }); } finally { fs.openSync = realOpen; fs.fsyncSync = realSync; }
     assert.equal(result.status, 'staged');
-    assert.ok(syncs >= 3, `the staged file, the staging directory and the pending directory were synced (${syncs})`);
+    const pendingDir = path.join(w.accountDir, 'pending');
+    assert.equal(synced.filter((f) => /\/\.tmp-[^/]+\/auth\.json$/.test(f)).length, 1, 'the staged file');
+    assert.equal(synced.filter((f) => /\/\.tmp-[^/]+$/.test(f)).length, 1, 'the staging directory');
+    assert.equal(synced.filter((f) => f === pendingDir).length, 1, 'the pending directory');
   } finally { w.cleanup(); }
 });
 
@@ -1566,29 +1561,291 @@ test('refresh-ahead of the held home\'s account re-checks it under the lock, eve
 // Pending copies stay bounded and are cleared when they can be identified
 // ---------------------------------------------------------------------------------------------------
 
-test('at most five pending copies are kept per account, the newest, with one count-only stderr line per drop', () => {
+const pendingNames = (w) => fs.readdirSync(path.join(w.accountDir, 'pending')).filter((n) => !n.startsWith('.')).sort();
+
+test('staging while the account lock is busy never drops a pending copy, however many there are', () => {
   const w = workspace();
   const captured = [];
   const realWrite = process.stderr.write;
   try {
     const dir = privateHomeWithRenewedLogin(w);
-    const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+    const marker = markerOf(dir);
     fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
     let clock = 1_000_000;
-    const tick = () => { clock += 1000; return clock; };
-    const tryLock = () => null; // the lock is busy: every copy stays staged
     process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
     for (let i = 0; i < 7; i += 1) {
-      const stagedAt = tick();
-      assert.deepEqual(writeBackRenewedCredential(dir, marker, { tryLock, now: () => stagedAt }), { status: 'staged' });
+      clock += 1000;
+      const stagedAt = clock;
+      assert.deepEqual(writeBackRenewedCredential(dir, marker, { tryLock: () => null, now: () => stagedAt }), { status: 'staged' });
     }
     process.stderr.write = realWrite;
-    const names = fs.readdirSync(path.join(w.accountDir, 'pending')).sort();
-    assert.equal(names.length, 5);
-    assert.deepEqual(names.map((n) => Number(n.slice(0, 15))), [3, 4, 5, 6, 7].map((n) => 1_000_000 + n * 1000), 'the newest five');
-    assert.deepEqual(captured, ['fgos: credential-pending-dropped (1)\n', 'fgos: credential-pending-dropped (1)\n']);
+    assert.equal(pendingNames(w).length, 7);
+    assert.deepEqual(captured, []);
   } finally { process.stderr.write = realWrite; w.cleanup(); }
 });
+
+test('over the limit, identical copies are dropped first, under the lock and after the apply attempt', () => {
+  const w = workspace();
+  const captured = [];
+  const realWrite = process.stderr.write;
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const marker = markerOf(dir);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the source cannot judge any copy
+    let clock = 1_000_000;
+    for (let i = 0; i < 7; i += 1) { clock += 1000; const at = clock; writeBackRenewedCredential(dir, marker, { tryLock: () => null, now: () => at }); }
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    clock += 1000;
+    const at = clock;
+    assert.deepEqual(writeBackRenewedCredential(dir, marker, { now: () => at }), { status: 'staged' });
+    process.stderr.write = realWrite;
+    const names = pendingNames(w);
+    assert.equal(names.length, 5, 'eight identical copies are cut to the limit');
+    assert.equal(names.at(-1).slice(0, 15), String(at).padStart(15, '0'), 'the newest stays');
+    assert.deepEqual(captured, ['fgos: credential-pending-dropped (3)\n']);
+    assert.equal(readPi(path.join(w.accountDir, 'pending', names[0])).xai.refresh, FAKE.newRefresh);
+  } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+function fillPendingWithOnlyValidOldest(w) {
+  const pending = path.join(w.accountDir, 'pending');
+  const names = ['1', '2', '3', '4', '5'].map((n) => path.join(pending, `00000000000000${n}-a`));
+  names.forEach((copy, i) => writePi(copy, piDoc(Date.now() + 6 * HOUR, i === 0
+    ? { access: 'FAKE-ONLY-VALID-ACCESS', refresh: 'FAKE-ONLY-VALID-REFRESH' }
+    : { access: `FAKE-STALE-${i}`, refresh: `FAKE-STALE-REFRESH-${i}` })));
+  return names;
+}
+
+test('a normal write-back into full pending copies keeps the oldest, the only valid one, and nothing is dropped', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // nothing can be judged
+    const names = fillPendingWithOnlyValidOldest(w);
+    assert.equal(writeBackRenewedCredential(dir, markerOf(dir)).status, 'staged');
+    assert.equal(pendingNames(w).length, 6, 'the limit gives way: no copy could be shown redundant');
+    assert.equal(readPi(names[0]).xai.refresh, 'FAKE-ONLY-VALID-REFRESH');
+  } finally { w.cleanup(); }
+});
+
+test('a held home settled into full pending copies, with the source flipping between two reads, still drops nothing', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    const names = fillPendingWithOnlyValidOldest(w);
+    const sourceFile = path.join(w.home, 'auth.json');
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    const good = fs.readFileSync(sourceFile, 'utf8');
+    let reads = 0;
+    const realRead = fs.readFileSync;
+    fs.readFileSync = (file, ...rest) => {
+      if (file === sourceFile) { reads += 1; return reads === 1 ? good : TORN; }
+      return realRead(file, ...rest);
+    };
+    try { settleAll(w); } finally { fs.readFileSync = realRead; }
+    assert.equal(readPi(names[0]).xai.refresh, 'FAKE-ONLY-VALID-REFRESH', 'the only valid copy survives');
+    assert.ok(pendingNames(w).length >= 5);
+  } finally { w.cleanup(); }
+});
+
+test('without node:sqlite, a pane home whose store is byte for byte the source\'s is not staged, however many dispatches ran', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    for (let i = 0; i < 12; i += 1) {
+      const dir = path.join(w.tmp, 'fgos-confinement', `disp_same_${i}`, 'home');
+      fs.mkdirSync(dir, { recursive: true });
+      writeOwnershipMarker(dir, { dispatchId: `disp_same_${i}` });
+      copyCredentialFiles(dir, w.home, ['agent.db'], { loadSqlite: () => null });
+      extendOwnershipMarker(dir, { credentialWriteBack: credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }) });
+      assert.deepEqual(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }), { status: 'unchanged' });
+    }
+    assert.deepEqual(fs.existsSync(path.join(w.accountDir, 'pending')) ? pendingNames(w) : [], []);
+  } finally { w.cleanup(); }
+});
+
+test('copies that cannot be parsed are compared by their bytes: an identical one is dropped over the limit, a different one never is', () => {
+  const w = workspace();
+  try {
+    const dir = privateOmpHomeWithRenewedLogin(w);
+    const pending = path.join(w.accountDir, 'pending');
+    const bytes = ['SAME', 'SAME', 'DIFF-1', 'DIFF-2', 'DIFF-3', 'DIFF-4', 'DIFF-5'];
+    bytes.forEach((content, i) => {
+      const copy = path.join(pending, `00000000000000${i + 1}-a`);
+      fs.mkdirSync(copy, { recursive: true });
+      fs.writeFileSync(path.join(copy, 'agent.db'), content);
+    });
+    // Seven copies plus the one staged now is eight; nothing parses without node:sqlite.
+    assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+    const left = pendingNames(w);
+    assert.equal(left.length, 7, 'only the byte-identical copy went');
+    assert.equal(left.includes('000000000000001-a'), false, 'the older of the identical pair');
+    assert.equal(left.includes('000000000000002-a'), true, 'the newest of the pair stays');
+    for (const n of [3, 4, 5, 6, 7]) assert.equal(left.includes(`00000000000000${n}-a`), true, `the different copy ${n} stays`);
+  } finally { w.cleanup(); }
+});
+
+// An omp pane killed before a checkpoint leaves its renewed login only in the write-ahead log, beside a main file
+// that still equals the source's.
+function ompPaneHome(w, dispatchId, wal) {
+  const dir = path.join(w.tmp, 'fgos-confinement', dispatchId, 'home');
+  fs.mkdirSync(dir, { recursive: true });
+  writeOwnershipMarker(dir, { dispatchId });
+  copyCredentialFiles(dir, w.home, ['agent.db'], { loadSqlite: () => null });
+  extendOwnershipMarker(dir, { credentialWriteBack: credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }) });
+  if (wal !== undefined) fs.writeFileSync(path.join(dir, 'agent.db-wal'), wal);
+  return dir;
+}
+
+test('without node:sqlite, a store equal to the source\'s but with a non-empty write-ahead log is staged, and an empty log counts as none', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    const withLog = ompPaneHome(w, 'disp_wal', 'FAKE-WAL-BYTES');
+    assert.equal(writeBackRenewedCredential(withLog, markerOf(withLog), { loadSqlite: () => null }).status, 'staged');
+    const staged = pendingNames(w);
+    assert.equal(staged.length, 1);
+    assert.equal(fs.readFileSync(path.join(w.accountDir, 'pending', staged[0], 'agent.db-wal'), 'utf8'), 'FAKE-WAL-BYTES', 'the log was kept with it');
+
+    const emptyLog = ompPaneHome(w, 'disp_empty_wal', '');
+    assert.deepEqual(writeBackRenewedCredential(emptyLog, markerOf(emptyLog), { loadSqlite: () => null }), { status: 'unchanged' });
+    const noLog = ompPaneHome(w, 'disp_no_wal');
+    assert.deepEqual(writeBackRenewedCredential(noLog, markerOf(noLog), { loadSqlite: () => null }), { status: 'unchanged' });
+    assert.equal(pendingNames(w).length, 1);
+  } finally { w.cleanup(); }
+});
+
+test('unparsable pending copies are identical only when the write-ahead log is identical too', () => {
+  const run = (specs) => {
+    const w = workspace();
+    try {
+      const dir = privateOmpHomeWithRenewedLogin(w);
+      const pending = path.join(w.accountDir, 'pending');
+      specs.forEach(({ db, wal }, i) => {
+        const copy = path.join(pending, `00000000000000${i + 1}-a`);
+        fs.mkdirSync(copy, { recursive: true });
+        fs.writeFileSync(path.join(copy, 'agent.db'), db);
+        if (wal !== undefined) fs.writeFileSync(path.join(copy, 'agent.db-wal'), wal);
+      });
+      assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+      return pendingNames(w).length;
+    } finally { w.cleanup(); }
+  };
+  const padding = ['D1', 'D2', 'D3', 'D4', 'D5'].map((db) => ({ db }));
+  assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME', wal: 'W2' }, ...padding]), 8, 'same main file, different logs: both stay');
+  assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME', wal: 'W1' }, ...padding]), 7, 'identical in both: one goes');
+  assert.equal(run([{ db: 'SAME', wal: '' }, { db: 'SAME' }, ...padding]), 7, 'an empty log is no log');
+  assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME' }, ...padding]), 8, 'a log against none: both stay');
+});
+
+// Files beside a store: bytes, or the marker DIR for a directory of that name (a read error that is not
+// "no such file", whoever runs the test).
+function putSidecar(dir, name, content) {
+  const target = path.join(dir, name);
+  if (content === 'DIR') fs.mkdirSync(target, { recursive: true });
+  else fs.writeFileSync(target, content);
+}
+
+test('a sidecar that cannot be read is never taken for an absent one: the copy is not judged identical and is kept', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    for (const name of ['agent.db-wal', 'agent.db-journal']) {
+      const dir = ompPaneHome(w, `disp_unreadable_${name}`);
+      putSidecar(dir, name, 'DIR');
+      const result = writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null });
+      assert.deepEqual(result, { status: 'failed', code: 'stage-failed', keepHome: true }, name);
+      assert.equal(fs.existsSync(dir), true);
+    }
+    if (typeof process.getuid === 'function' && process.getuid() !== 0) {
+      const dir = ompPaneHome(w, 'disp_unreadable_mode', 'FAKE-WAL-BYTES');
+      fs.chmodSync(path.join(dir, 'agent.db-wal'), 0o000);
+      const result = writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null });
+      assert.equal(result.keepHome, true, 'a log that cannot be read keeps the home');
+    }
+  } finally { w.cleanup(); }
+});
+
+test('pending copies with a sidecar that cannot be read are never taken for identical', () => {
+  const run = (sidecar) => {
+    const w = workspace();
+    try {
+      const dir = privateOmpHomeWithRenewedLogin(w);
+      const pending = path.join(w.accountDir, 'pending');
+      ['SAME', 'SAME', 'D1', 'D2', 'D3', 'D4', 'D5'].forEach((db, i) => {
+        const copy = path.join(pending, `00000000000000${i + 1}-a`);
+        fs.mkdirSync(copy, { recursive: true });
+        fs.writeFileSync(path.join(copy, 'agent.db'), db);
+        if (i < 2) putSidecar(copy, sidecar, 'DIR');
+      });
+      assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+      return pendingNames(w).length;
+    } finally { w.cleanup(); }
+  };
+  assert.equal(run('agent.db-wal'), 8);
+  assert.equal(run('agent.db-journal'), 8);
+});
+
+test('a rollback journal counts like a write-ahead log, and the shared-memory index counts for nothing', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    const withJournal = ompPaneHome(w, 'disp_journal');
+    putSidecar(withJournal, 'agent.db-journal', 'FAKE-JOURNAL-BYTES');
+    assert.equal(writeBackRenewedCredential(withJournal, markerOf(withJournal), { loadSqlite: () => null }).status, 'staged');
+    const staged = pendingNames(w);
+    assert.equal(staged.length, 1);
+    assert.equal(fs.readFileSync(path.join(w.accountDir, 'pending', staged[0], 'agent.db-journal'), 'utf8'), 'FAKE-JOURNAL-BYTES', 'staging keeps the journal');
+
+    const withIndex = ompPaneHome(w, 'disp_shm');
+    putSidecar(withIndex, 'agent.db-shm', 'FAKE-SHM-BYTES');
+    assert.deepEqual(writeBackRenewedCredential(withIndex, markerOf(withIndex), { loadSqlite: () => null }), { status: 'unchanged' }, 'an index file changes nothing');
+    assert.equal(pendingNames(w).length, 1);
+  } finally { w.cleanup(); }
+});
+
+test('pending copies differ by journal but not by shared-memory index', () => {
+  const run = (specs) => {
+    const w = workspace();
+    try {
+      const dir = privateOmpHomeWithRenewedLogin(w);
+      const pending = path.join(w.accountDir, 'pending');
+      specs.forEach(({ db, files }, i) => {
+        const copy = path.join(pending, `00000000000000${i + 1}-a`);
+        fs.mkdirSync(copy, { recursive: true });
+        fs.writeFileSync(path.join(copy, 'agent.db'), db);
+        for (const [name, content] of Object.entries(files ?? {})) putSidecar(copy, name, content);
+      });
+      assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+      return pendingNames(w).length;
+    } finally { w.cleanup(); }
+  };
+  const padding = ['D1', 'D2', 'D3', 'D4', 'D5'].map((db) => ({ db }));
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-journal': 'J1' } }, { db: 'SAME', files: { 'agent.db-journal': 'J2' } }, ...padding]), 8, 'different journals: both stay');
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-journal': 'J1' } }, { db: 'SAME', files: { 'agent.db-journal': 'J1' } }, ...padding]), 7, 'same journal: one goes');
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-shm': 'S1' } }, { db: 'SAME', files: { 'agent.db-shm': 'S2' } }, ...padding]), 7, 'different index files: still identical');
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-shm': 'S1' } }, { db: 'SAME' }, ...padding]), 7, 'an index file against none: still identical');
+});
+
+test('a half-written copy left by a probe is kept for hand recovery, outside the copies applied or dropped automatically', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const { spawnFn } = fakeSpawn({ layoutName: 'pi', behaviour: (dir) => fs.writeFileSync(path.join(dir, 'auth.json'), TORN) });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'failed', reason: 'torn-copy-kept' });
+    const tornDir = path.join(w.accountDir, 'torn');
+    const kept = fs.readdirSync(tornDir);
+    assert.equal(kept.length, 1);
+    assert.equal(fs.readFileSync(path.join(tornDir, kept[0], 'auth.json'), 'utf8'), TORN, 'the half-written file is untouched');
+    assert.deepEqual(scratchCopies(w), []);
+    assert.deepEqual(inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir }).map((c) => c.kind), ['torn']);
+    // A later renewal of the account neither applies nor drops it.
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: fakeSpawn({ layoutName: 'pi' }).spawnFn, cooldownMs: 0 });
+    assert.equal(fs.readdirSync(tornDir).length, 1);
+  } finally { w.cleanup(); }
+});
+
 
 test('a refresh-ahead that skips because the entry is unidentified still clears the leftovers it can identify', async () => {
   const w = workspace();
@@ -1650,4 +1907,21 @@ test('a relative Codex home fails provisioning closed', async () => {
   const err = await prepareCodexHome('relative/codex-home', 'disp_codex_rel');
   assert.equal(err?.code, 'credential-provisioning');
   assert.match(err.message, /needs an absolute "home"/);
+});
+
+test('retained-copy inspection reports torn and over-limit pending copies kept per CLI store', () => {
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-per-cli-retained-'));
+  try {
+    const storeDir = path.join(runtimeDir, 'account-locks', 'openai', 'acct', 'stores', 'codex');
+    fs.mkdirSync(path.join(storeDir, 'torn', 'scratch-1'), { recursive: true });
+    for (let i = 0; i < 6; i += 1) {
+      fs.mkdirSync(path.join(storeDir, 'pending', `${String(1000 + i).padStart(15, '0')}-copy`), { recursive: true });
+    }
+    const kinds = inspectRetainedCredentialCopies({ runtimeDir, now: Date.now() }).map((c) => c.kind);
+    assert.ok(kinds.includes('torn'), 'a torn copy under stores/<cli> is reported');
+    assert.equal(kinds.filter((k) => k === 'pending').length, 6, 'pending copies under stores/<cli> are listed');
+    assert.deepEqual(inspectPendingCopiesOverLimit({ runtimeDir }), [{ provider: 'openai', accountId: 'acct', count: 6 }]);
+  } finally {
+    fs.rmSync(runtimeDir, { recursive: true, force: true });
+  }
 });
