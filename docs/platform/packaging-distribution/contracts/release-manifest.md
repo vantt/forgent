@@ -4,7 +4,8 @@
 Document type: Contract
 Audience: Maintainer, release engineer, implementation agent
 Purpose: Describe the fgOS release manifest contract used by packaging-distribution
-Design status: Frozen (V1)
+Design status: Candidate
+Contract design status: Frozen (V1)
 Implementation status: Implemented
 Canonical: Yes, after review
 Owner: Packaging-distribution

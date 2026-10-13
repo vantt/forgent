@@ -4,7 +4,8 @@
 Document type: Contract
 Audience: Maintainer, implementation agent, reviewer
 Purpose: Describe the tracked project runtime pin for packaging-distribution
-Design status: Frozen (V1)
+Design status: Candidate
+Contract design status: Frozen (V1)
 Implementation status: Implemented
 Canonical: Yes, after review
 Owner: Packaging-distribution

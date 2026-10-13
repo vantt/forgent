@@ -4,7 +4,8 @@
 Document type: Contract
 Audience: Maintainer, implementation agent, reviewer
 Purpose: Describe workspace activation records for project-local fgOS runtime selection
-Design status: Frozen (V1)
+Design status: Candidate
+Contract design status: Frozen (V1)
 Implementation status: Implemented
 Canonical: Yes, after review
 Owner: Packaging-distribution
