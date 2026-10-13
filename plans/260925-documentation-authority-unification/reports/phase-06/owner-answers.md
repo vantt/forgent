@@ -169,3 +169,8 @@ A32 (owner-decided 2026-10-13): fresh readers for the Host Invocation batch.
 3. Readers run on the final Host Invocation text, after the pending rework request is reviewed.
 
 F6 (owner-decided 2026-10-13): dropped-010 is deferred, not retired. The installed-default npm `bin.fgos` removal stays an open obligation owned by the Packaging-distribution batch (Step 4), which decides restore or retirement there. The FLAGGED-obsolete verbatim retention in `architecture/release-boundaries.md` stands until then.
+
+A33 (owner-decided 2026-10-13): option A of `closure-request-host-invocation-partial-carry.md` (commit `7963b7ca6`).
+1. The Host Invocation Phase 6 closure comparison accepts exactly the 12 `partial-carry` claim IDs listed in that request, bound to their source and primary-target unit digests and to `host-invocation-partial-carry-residual.json` (SHA256 d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49), in addition to holds, identical-unit exceptions and the candidate-unverified list.
+2. The 12 dispositions, remainders and review pins stay unchanged. Strict E stays red for them; they remain cutover obligations. Any digest drift drops the acceptance for that row.
+3. This applies to this batch only. It changes no gate or checker and approves no promotion, cutover or main write. A later batch with partial carries asks again.
