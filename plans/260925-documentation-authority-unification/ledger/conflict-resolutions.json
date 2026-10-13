@@ -13260,6 +13260,19 @@
         "Full source-row mapping in batch-agent-coordination.json; manual approval pending",
         "Independent group review pending"
       ]
+    },
+    {
+      "kind": "semantic",
+      "key": "name-collision:implementation-alignment.md",
+      "resolution": "Different areas, different documents. Host Invocation owns its kernel/provider/route implementation alignment; Packaging-distribution owns install/activation/doctor/projection implementation alignment. Keep both documents; neither supersedes the other by basename or title.",
+      "rule": "Qualify implementation-alignment.md by its area owner. No cross-area semantic identity is inferred from the shared filename.",
+      "evidence": [
+        "Current native inventory reports no unresolved semantic group for these two area-qualified paths; this named rule records the planned legacy filename collision, not a new conflict waiver.",
+        "Full document read at 77830ba77eb05991d95b005919776ee6254e833b: docs/platform/host-invocation-routing/verification/implementation-alignment.md SHA256 59a4ee0383c26af63e9430b8440bd8c22a81a1de0dfc32efb7ba82dc8d9689e7",
+        "Current candidate docs/platform/host-invocation-routing/verification/implementation-alignment.md SHA256 59a4ee0383c26af63e9430b8440bd8c22a81a1de0dfc32efb7ba82dc8d9689e7",
+        "Full document read at 77830ba77eb05991d95b005919776ee6254e833b: docs/platform/packaging-distribution/verification/implementation-alignment.md SHA256 87b955ac215ad60f5408e1068be6c2d05f08973be178b8089fbafbd01375e4ba",
+        "Current candidate docs/platform/packaging-distribution/verification/implementation-alignment.md SHA256 662bdb61e82b094049e0f924a370060377fc15a7edc85ee6f8427df3ec8f5ab1"
+      ]
     }
   ]
 }

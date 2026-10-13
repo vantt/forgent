@@ -1,0 +1,436 @@
+{
+  "version": 1,
+  "shard": "s4-packaging-distribution-successors.json",
+  "authorSession": "codex-session:8@2026-10-13",
+  "authorshipRequired": true,
+  "sources": [],
+  "claims": [],
+  "registryGaps": [
+    {
+      "claimId": "claim_6934307be98d9cdea6e510ddf32e9230",
+      "sourcePath": "docs/platform/packaging-distribution/README.md",
+      "sourceUnitDigest": "65a1f77d19ddcd460144081bd63987bc9bb6c390ff3da2cb85c6f660f08b10f3",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/README.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "a4a861e4a929e4736d0173ccf2771dfa399e00097cadcf6875d30c8598d57cf7",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Packaging-Distribution"
+      ]
+    },
+    {
+      "claimId": "claim_4cf4976bad6f53df0e8618ee7920ceeb",
+      "sourcePath": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "sourceUnitDigest": "0a73d46dc2ec658162fd56f2482109eff547a8201433650918ac4e3176163ed7",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "36f7e1a4a7047962cf25b4027b35acb42753b479c7945aa6abf8c8bd6874e120",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "fgctl And Local fgOS"
+      ]
+    },
+    {
+      "claimId": "claim_8229cbb77e8af8cef1e15eff787fe701",
+      "sourcePath": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "sourceUnitDigest": "36da57ee19a49e0412128670b1e7b508fec8fea0abbad09aeb692c42009569fd",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "49c8b79cd9a353442793d9d6cfe82424ad1d6b660613801eedd956fa09560661",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Future Constraints"
+      ]
+    },
+    {
+      "claimId": "claim_23765af62d556261268d02ba95660dec",
+      "sourcePath": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "sourceUnitDigest": "5160277988f7f7d1958d3be62d6603e06f0568917b10f4e361f70f999d6a7de2",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "runtime-identity-and-activation",
+      "targetUnitDigest": "35e38e606082e6cd88d11569dba34e338d7d11f0344a3abdcd80ca9fe89b9371",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The original top-level runtime-identity heading and complete metadata carrier survive with additive promotion fields. A repeated source heading creates a native ambiguity gap; this real root-heading successor preserves the full old direct payload. No identity is grafted and no approval carries forward.",
+      "targetAncestry": []
+    },
+    {
+      "claimId": "claim_27b1af759fb21ff4f449727ff648a319",
+      "sourcePath": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "sourceUnitDigest": "26c9a93b0da5c221efdefdbac1b93115c2af4cc63dca66a4fd79433c59a29676",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "b9c0f64986bfc20a1c8a2c79c4922b1e4db19e2a687a2275876185a7402ad0fc",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Runtime Identity And Activation"
+      ]
+    },
+    {
+      "claimId": "claim_989ea01c49a7f3b2a8f2ff600f16311a",
+      "sourcePath": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "sourceUnitDigest": "0273545035079a0f24266d0a6ecd37eaf91fb1b1b6ca7c672e01b71423c2064d",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "b58066ec6054dca35d4740fe7434f81bc000004c82429fbbecf876c9253ab544",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Code-Panel Rollout Plan: Packaging-Distribution"
+      ]
+    },
+    {
+      "claimId": "claim_1a97ed363d37e80482619047ce6804af",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "sourceUnitDigest": "a337eb6cc4e4c626c1f367772346f9ae376284ffc17347b55e838028c267598c",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "feb1ffbbcdc358cd3c725515910cbc9c1d75a7fa40e3ac950a795c3d596a61a9",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Activation Binding"
+      ]
+    },
+    {
+      "claimId": "claim_8394482ef76eefc839bff33778acfd97",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "sourceUnitDigest": "42fa7effb0ee73bb173fd1a5d18d6659035063ccf4a4f3bf0118c6951994abd8",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "4c1c662a71f24326115932c1feb1872d829ee4b09b426bcfb45f85a9f736d7d5",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Distribution Pin"
+      ]
+    },
+    {
+      "claimId": "claim_f9ee2805fcec7e2f404c119834e9ad0f",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "sourceUnitDigest": "da2e69f8d04b67e6396e405d58650e3353cf2f3adb9f01b647ba6f0ca6624354",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "ec70a9f2370b13a414fe8127403591fa584f371183e4299c81a40e556929db72",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Instruction Composition And Projection"
+      ]
+    },
+    {
+      "claimId": "claim_37c7a9df001adb3f2920a3d10610118a",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "sourceUnitDigest": "3b9c089db34db5c66dd23e970df258f96b8524b2d43a698ed6cdd1aecd7e82b8",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "03896b9afa38fe9a0841344fc4d9b7fa0f44db52f9b6b0d28821aff50f5076ec",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Projection Ledger"
+      ]
+    },
+    {
+      "claimId": "claim_bce99d46bf15aee2613d118dda2234ec",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "sourceUnitDigest": "2b506883ee695794426621d57980149cb1c26200cd05abe27abe038573da3af1",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "ea2d47cd7df1f38d2e62d41f5a7ae009c009b92d67889c1b74841d2335a79560",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Release Manifest"
+      ]
+    },
+    {
+      "claimId": "claim_4ec3153f52c351599a2a6d552fce87ec",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "sourceUnitDigest": "e716698f66a87e3fb71378f81faad4b1a656958242ced545eeb12083e2715834",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "b022e0559d190ec4bacc002d8da26237c4ee70beb924db5d7dba660fd8a5c3ab",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Repository Runtime Layout"
+      ]
+    },
+    {
+      "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "sourceUnitDigest": "f6c6c784a81f337c34461ff81132cfe442b1cf534f96d275612240a110767791",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Setup Doctor Registry"
+      ]
+    },
+    {
+      "claimId": "claim_21466306fb5c7d4947c0d640af25c2c9",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "sourceUnitDigest": "4f49246492954130984df9e0a38e42ab47aca5787fb4ccd70f8d5c99b4a424b4",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "5e7de8fb61407a8497ec83f50fb3e35558695dc5ef0dce8c2a0a666df1311ba1",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Contract: Skill Package Distribution"
+      ]
+    },
+    {
+      "claimId": "claim_4c333d79cc66f71f6db3d88489ed0dc9",
+      "sourcePath": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "sourceUnitDigest": "9a898d9d66f10617774d9324a69ee6dc6d43d8e93d9c0cad36d36015a5a35f73",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "c9b860344990b95975c3479384c1072d1c6eb66f3ceabab7a0350b60f9b06a0c",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "History: Distribution Baseline"
+      ]
+    },
+    {
+      "claimId": "claim_2c5389929a7a813c70e5ef5389a18615",
+      "sourcePath": "docs/platform/packaging-distribution/reports/track-closeout.md",
+      "sourceUnitDigest": "be2620934f3ee7e4976851cf9b31d829045630099f03bbb19dff212f0a6037d8",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/reports/track-closeout.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "61ff449739bb7b14e0da58d3a5e43c3c61c8a4dbaedc0b3845751ab139bab591",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Packaging-Distribution Code-Panel Track Closeout"
+      ]
+    },
+    {
+      "claimId": "claim_58c7acde2b2f3091c28d62fbb9fbb7c7",
+      "sourcePath": "docs/platform/packaging-distribution/spec.md",
+      "sourceUnitDigest": "3453e5dd049f71715da5c85a72a4e879425c71f77f2fb6f7b239d96f94a41bfd",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "cf5fad7a3844bb38c373e31ee428ca709305246713e4d0292b0f90cb0d3c9c40",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution"
+      ]
+    },
+    {
+      "claimId": "claim_2e34a457bfadf9cae284b1c9e04378f2",
+      "sourcePath": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+      "sourceUnitDigest": "93ddc6f7bfd0f885189f86668e5bac0a8d9eea34cb76491db859e2a1083faa66",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/verification/implementation-alignment.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "1b2f5b20290243ba345696310bd7934ebe07c201b337be27bfd4d1d7ac77c34c",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Verification: Implementation Alignment"
+      ]
+    },
+    {
+      "claimId": "claim_588beea4a271f0bab9dca09b8ee01721",
+      "sourcePath": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "sourceUnitDigest": "b6e89a7676b7bbbf945c7dfc722cf20dd1fb9b85dea6ed0e5f308265591ee539",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "941e3a3deb6ae7ddf24248a0773765c11f3ae0f9a05798b4db30a087c7736bb5",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Verification: Install And Release Proof"
+      ]
+    },
+    {
+      "claimId": "claim_a0df084e87f84a39e95fdc13a6385747",
+      "sourcePath": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+      "sourceUnitDigest": "cff68b5ff2528e0b651d3bd1afa64ea73c8ed7b1566195447f2021ab1066cbc2",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/verification/source-preservation-audit.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "46e51dd42c941934f7224151333b7c1eaaeab5645a9d86daaf1d9659484300eb",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Verification: Source Preservation Audit"
+      ]
+    },
+    {
+      "claimId": "claim_4cd511e74e5837a81d29ab9aa456135f",
+      "sourcePath": "docs/platform/packaging-distribution/vision.md",
+      "sourceUnitDigest": "3e974d562bfb8ae3454f394192aa0654edf4f06bcf25edd517a52a62b56f6c5d",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/vision.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "1fd8bf579ea5e42ddf71266ca19bb9b63fa33d902bbf20acc4186706ca07a080",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "targetAncestry": [
+        "Vision: Packaging-Distribution"
+      ]
+    },
+    {
+      "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "sourcePath": "docs/specs/confinement-authority.md",
+      "sourceUnitDigest": "f99e0d4d9f055f630281cd3e3aead0de52d35fd8fa152c8d429bf0af333ca246",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/confinement-authority.md",
+      "targetAnchor": "unheaded-block-144",
+      "targetUnitDigest": "12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
+      ]
+    },
+    {
+      "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceUnitDigest": "95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/runner.md",
+      "targetAnchor": "unheaded-block-92",
+      "targetUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "A31 main-only text change has this native same-file successor from the upstream diff. Conservation proposal only; no code truth review or identity graft.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Business Rules"
+      ]
+    },
+    {
+      "claimId": "claim_c2aa4371cc420cd24793da9c23497e42",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "b697cc3bb07baa49db491c86cd4d18e71eec7a2fdeb8777e2bd4ffaba8848088",
+      "disposition": "move",
+      "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "targetAnchor": "unheaded-block-34",
+      "targetUnitDigest": "b697cc3bb07baa49db491c86cd4d18e71eec7a2fdeb8777e2bd4ffaba8848088",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 3ea75475d911ca02c9d8b5011dca4f748cc5820f is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-34. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "targetAncestry": [
+        "History: Distribution Baseline",
+        "Inherited Distribution Source Unit 1"
+      ]
+    },
+    {
+      "claimId": "claim_f4bd6f64355d526302ac0a49940dd9ed",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "3e9bb65b419ff88ea5687f13e0839b8853a576a35cdba1c25f4982edba4b0b0f",
+      "disposition": "move",
+      "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "targetAnchor": "unheaded-block-36",
+      "targetUnitDigest": "3e9bb65b419ff88ea5687f13e0839b8853a576a35cdba1c25f4982edba4b0b0f",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-36. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "targetAncestry": [
+        "History: Distribution Baseline",
+        "Inherited Distribution Source Unit 2"
+      ]
+    },
+    {
+      "claimId": "claim_f4745934a72c880a881c756d98c9a722",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "c0329d5c09da5a02921ba0646be0cbf7321f48badb59e9316c2df1d1a1c1985a",
+      "disposition": "move",
+      "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "targetAnchor": "unheaded-block-38",
+      "targetUnitDigest": "c0329d5c09da5a02921ba0646be0cbf7321f48badb59e9316c2df1d1a1c1985a",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-38. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "targetAncestry": [
+        "History: Distribution Baseline",
+        "Inherited Distribution Source Unit 3"
+      ]
+    },
+    {
+      "claimId": "claim_a288c743a526263c62df6ee0b67fb6e3",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "44d8677f8928e78d07314600b104a33bb4ff23e84e92a7aa4077cddee98ae6bc",
+      "disposition": "move",
+      "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "targetAnchor": "unheaded-block-40",
+      "targetUnitDigest": "44d8677f8928e78d07314600b104a33bb4ff23e84e92a7aa4077cddee98ae6bc",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-40. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "targetAncestry": [
+        "History: Distribution Baseline",
+        "Inherited Distribution Source Unit 4"
+      ]
+    },
+    {
+      "claimId": "claim_1449f02666e99c92dd8ce3340af8a060",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceUnitDigest": "a51332b21702f71114c85f64f1c049cf198998f20e8e1fe3ae468c0c7b191c5d",
+      "disposition": "move",
+      "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "targetAnchor": "unheaded-block-42",
+      "targetUnitDigest": "a51332b21702f71114c85f64f1c049cf198998f20e8e1fe3ae468c0c7b191c5d",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-42. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "targetAncestry": [
+        "History: Distribution Baseline",
+        "Inherited Distribution Source Unit 5"
+      ]
+    }
+  ]
+}

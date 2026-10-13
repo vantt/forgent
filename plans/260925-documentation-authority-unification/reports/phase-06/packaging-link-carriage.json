@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:8@2026-10-13",
+  "changes": [
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md)",
+      "after": "[docs/platform/packaging-distribution/README.md](README.md)",
+      "destination": "docs/platform/packaging-distribution/README.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md)",
+      "after": "[docs/platform/packaging-distribution/README.md](README.md)",
+      "destination": "docs/platform/packaging-distribution/README.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)",
+      "after": "[Runtime Identity And Activation](architecture/runtime-identity-and-activation.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md)",
+      "after": "[docs/platform/packaging-distribution/README.md](README.md)",
+      "destination": "docs/platform/packaging-distribution/README.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Promoted Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)",
+      "after": "[Promoted Runtime Identity And Activation](architecture/runtime-identity-and-activation.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Promoted Future Constraints](../../platform/packaging-distribution/architecture/future-constraints.md)",
+      "after": "[Promoted Future Constraints](architecture/future-constraints.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/future-constraints.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Distribution Baseline And Scattered Spec Fragments](./history/distribution-baseline.md)",
+      "after": "[Distribution Baseline And Scattered Spec Fragments](../../architect/packaging-distribution/history/distribution-baseline.md)",
+      "destination": "docs/architect/packaging-distribution/history/distribution-baseline.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Promoted Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)",
+      "after": "[Promoted Runtime Identity And Activation](architecture/runtime-identity-and-activation.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Promoted Future Constraints](../../platform/packaging-distribution/architecture/future-constraints.md)",
+      "after": "[Promoted Future Constraints](architecture/future-constraints.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/future-constraints.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "target": "docs/platform/packaging-distribution/README.md",
+      "before": "[Distribution Baseline And Scattered Spec Fragments](./history/distribution-baseline.md)",
+      "after": "[Distribution Baseline And Scattered Spec Fragments](../../architect/packaging-distribution/history/distribution-baseline.md)",
+      "destination": "docs/architect/packaging-distribution/history/distribution-baseline.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "before": "[docs/platform/packaging-distribution/architecture/future-constraints.md](../../platform/packaging-distribution/architecture/future-constraints.md)",
+      "after": "[docs/platform/packaging-distribution/architecture/future-constraints.md](future-constraints.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/future-constraints.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "before": "[docs/platform/packaging-distribution/architecture/future-constraints.md](../../platform/packaging-distribution/architecture/future-constraints.md)",
+      "after": "[docs/platform/packaging-distribution/architecture/future-constraints.md](future-constraints.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/future-constraints.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[runtime-identity-and-activation.md](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)",
+      "after": "[runtime-identity-and-activation.md](runtime-identity-and-activation.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[repository-runtime-layout.md](../../platform/packaging-distribution/contracts/repository-runtime-layout.md)",
+      "after": "[repository-runtime-layout.md](../contracts/repository-runtime-layout.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[release-manifest.md](../../platform/packaging-distribution/contracts/release-manifest.md)",
+      "after": "[release-manifest.md](../contracts/release-manifest.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/release-manifest.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[activation-binding.md](../../platform/packaging-distribution/contracts/activation-binding.md)",
+      "after": "[activation-binding.md](../contracts/activation-binding.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/activation-binding.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[distribution-pin.md](../../platform/packaging-distribution/contracts/distribution-pin.md)",
+      "after": "[distribution-pin.md](../contracts/distribution-pin.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/distribution-pin.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[fgctl-and-local-fgos.md](../../platform/packaging-distribution/architecture/fgctl-and-local-fgos.md)",
+      "after": "[fgctl-and-local-fgos.md](fgctl-and-local-fgos.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[runtime identity architecture](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)",
+      "after": "[runtime identity architecture](runtime-identity-and-activation.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[repository layout](../../platform/packaging-distribution/contracts/repository-runtime-layout.md)",
+      "after": "[repository layout](../contracts/repository-runtime-layout.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[activation binding](../../platform/packaging-distribution/contracts/activation-binding.md)",
+      "after": "[activation binding](../contracts/activation-binding.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/activation-binding.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[distribution pin](../../platform/packaging-distribution/contracts/distribution-pin.md)",
+      "after": "[distribution pin](../contracts/distribution-pin.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/distribution-pin.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "before": "[release manifest](../../platform/packaging-distribution/contracts/release-manifest.md)",
+      "after": "[release manifest](../contracts/release-manifest.md)",
+      "destination": "docs/platform/packaging-distribution/contracts/release-manifest.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "before": "[Legacy CLI Transition](../host-invocation-routing/legacy-cli-transition.md)",
+      "after": "[Legacy CLI Transition](../../../architect/host-invocation-routing/legacy-cli-transition.md)",
+      "destination": "docs/architect/host-invocation-routing/legacy-cli-transition.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "before": "[docs/platform/packaging-distribution/history/distribution-baseline.md](../../../platform/packaging-distribution/history/distribution-baseline.md)",
+      "after": "[docs/platform/packaging-distribution/history/distribution-baseline.md](distribution-baseline.md)",
+      "destination": "docs/platform/packaging-distribution/history/distribution-baseline.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md)",
+      "after": "[docs/platform/packaging-distribution/README.md](README.md)",
+      "destination": "docs/platform/packaging-distribution/README.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[source-preservation-audit.md](../../platform/packaging-distribution/verification/source-preservation-audit.md)",
+      "after": "[source-preservation-audit.md](verification/source-preservation-audit.md)",
+      "destination": "docs/platform/packaging-distribution/verification/source-preservation-audit.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)",
+      "after": "[Runtime Identity And Activation](architecture/runtime-identity-and-activation.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[Future Constraints](../../platform/packaging-distribution/architecture/future-constraints.md)",
+      "after": "[Future Constraints](architecture/future-constraints.md)",
+      "destination": "docs/platform/packaging-distribution/architecture/future-constraints.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[docs/architect/workspace-topology.md](../workspace-topology.md)",
+      "after": "[docs/architect/workspace-topology.md](../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[docs/platform/packaging-distribution/](../../platform/packaging-distribution/README.md)",
+      "after": "[docs/platform/packaging-distribution/](README.md)",
+      "destination": "docs/platform/packaging-distribution/README.md"
+    },
+    {
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "before": "[Workspace Topology Architecture](../workspace-topology.md)",
+      "after": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+      "destination": "docs/architect/workspace-topology.md"
+    }
+  ],
+  "meaningRule": "Only heading depth and relative-link spelling change. Cross-area candidate destinations stay code paths until the link pass."
+}

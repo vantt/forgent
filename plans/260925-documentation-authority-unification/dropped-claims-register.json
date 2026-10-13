@@ -30,7 +30,17 @@
       "relatedOverclaim": "docs/platform/host-invocation-routing/intent-preservation-ledger.md:81 (HI-I027) states '`dev:<rev>` and staged release use same mechanism' with status 'implemented preview'; Plan C reports the dev path is not implemented in code. Not verified in this record.",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
-      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition: before cutover, 'restore after cutover via Plan C (draft, unscheduled)'; if Plan C lands first, a pointer at the restored anchor."
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition: before cutover, 'restore after cutover via Plan C (draft, unscheduled)'; if Plan C lands first, a pointer at the restored anchor.",
+      "reviewedDisposition": {
+        "decision": "defer-with-owner",
+        "owner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
+        "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "stubAnchor": "dev-source-activation-restoration-stub",
+        "authoredBy": "codex-session:8@2026-10-13",
+        "reviewStatus": "pending",
+        "sourceCommit": "77830ba77eb05991d95b005919776ee6254e833b",
+        "reviewNote": "Pending independent review of seven exact native source units and the labelled stub. No reviewer identity or reviewed date authored."
+      }
     },
     {
       "id": "dropped-002",
