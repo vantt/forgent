@@ -21,7 +21,7 @@ import { workDispatchContext } from './work-dispatch.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
 import { executeAssignment, isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
 import { createCredentialProbe } from './dispatch/provider-credential-probe.mjs';
-import { createCredentialRenewal } from './dispatch/provider-credential-renewal.mjs';
+import { createConfinementCredentialRenewal } from './dispatch/confinement/cleanup.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { detectTrunk } from './worktree.mjs';
@@ -2216,7 +2216,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     const runResult = await executeAssignment(assignment, {
       ...(work ? workDispatchContext({ work, stage: assignment.stage, cwd: opts.cwd }) : {}),
       providerCredentialProbe: createCredentialProbe(),
-      providerCredentialRenew: createCredentialRenewal(),
+      providerCredentialRenew: createConfinementCredentialRenewal(),
       ...opts,
     });
     const interpreted = interpretAssignmentRunResult({

@@ -25,6 +25,7 @@ import {
 import {
   CREDENTIAL_KEEP_MAX_ATTEMPTS,
   CREDENTIAL_KEEP_MIN_INTERVAL_MS,
+  createConfinementCredentialRenewal,
   removeConfinementDir,
   settleHeldCredentialHomes,
   OWNERSHIP_MARKER_FILE,
@@ -1449,16 +1450,43 @@ test('a held home stays when the source cannot say and the login still cannot be
   } finally { w.cleanup(); }
 });
 
+test('refresh-ahead calls the injected held-home hook only while it holds the account lock', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR));
+    const { spawnFn } = fakeSpawn({ layoutName: 'pi' });
+    let settledUnderLock = null;
+    const heldHomes = {
+      has: () => true,
+      settle: () => {
+        // Taking the lock again from here fails exactly when the caller already holds it.
+        const again = tryAcquireAccountLock({ runtimeDir: w.runtimeDir, provider: 'xai', accountId: 'acct' });
+        settledUnderLock = again === null;
+        again?.release();
+      },
+    };
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn, heldHomes });
+    assert.deepEqual(result, { status: 'fresh', reason: 'outside-window' });
+    assert.equal(settledUnderLock, true);
+  } finally { w.cleanup(); }
+});
+
+test('no provider module reaches into confinement, by a static or a dynamic import', () => {
+  const dir = path.join(path.dirname(new URL(import.meta.url).pathname), '../../src/runner/dispatch');
+  const offenders = fs.readdirSync(dir)
+    .filter((name) => /^provider-.*\.mjs$/.test(name))
+    .filter((name) => /(?:from\s*|import\s*\(\s*|import\s+)['"][^'"]*confinement\//.test(fs.readFileSync(path.join(dir, name), 'utf8')));
+  assert.deepEqual(offenders, []);
+});
+
 test('refresh-ahead of the held home\'s account re-checks it under the lock, even while the login is fresh', async () => {
   const w = workspace();
   try {
     const dir = heldHome(w);
     writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
     const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
-    const result = await refreshAhead({
-      provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn,
-      confinementTempRoots: [path.join(w.tmp, 'fgos-confinement')],
-    });
+    const renew = createConfinementCredentialRenewal({ tempRoots: [path.join(w.tmp, 'fgos-confinement')], spawnFn });
+    const result = await renew({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir });
     assert.deepEqual(result, { status: 'fresh', reason: 'outside-window' });
     assert.equal(starts.length, 0);
     assert.equal(fs.existsSync(dir), false, 'the held home was settled');

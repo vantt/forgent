@@ -715,7 +715,7 @@ export async function refreshAhead({
   env,
   loadSqlite = defaultLoadSqlite,
   now = Date.now,
-  confinementTempRoots,
+  heldHomes = { has: () => false, settle: () => {} },
 } = {}) {
   try {
     const layoutName = credentialLayout(credentialSource);
@@ -728,20 +728,10 @@ export async function refreshAhead({
     const entryOf = (read) => selectProviderEntry(read.entries, provider);
     const inWindow = (entry) => entry.dueMs - now() < thresholdMs;
     // Private homes held after repeated staging failures are looked at again whenever this account is
-    // renewed; the confinement module is loaded on demand because it depends on this one.
-    const settleHeld = async () => {
-      try {
-        const { settleHeldCredentialHomes } = await import('./confinement/cleanup.mjs');
-        settleHeldCredentialHomes({ tempRoots: confinementTempRoots, provider, accountId, lockHeld: true, loadSqlite, now });
-      } catch { /* a held home stays held */ }
-    };
-    const hasHeldHomes = async () => {
-      try {
-        const { listKeptCredentialHomes, resolveConfinementTempRoot } = await import('./confinement/cleanup.mjs');
-        return (confinementTempRoots ?? [resolveConfinementTempRoot()])
-          .some((root) => listKeptCredentialHomes(root).some((h) => h.held && h.provider === provider && h.accountId === accountId));
-      } catch { return false; }
-    };
+    // renewed. Where they live is the confinement side's knowledge, so it is handed in: `has` says whether
+    // the account has one, `settle` re-checks them and is only called while this function holds the lock.
+    const hasHeldHomes = async () => { try { return Boolean(await heldHomes.has({ provider, accountId })); } catch { return false; } };
+    const settleHeld = async () => { try { await heldHomes.settle({ provider, accountId, loadSqlite, now }); } catch { /* a held home stays held */ } };
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
     const beforeEntry = entryOf(before);

@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { envForSession } from '../worker-session.mjs';
-import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic } from '../provider-credential-renewal.mjs';
+import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic, createCredentialRenewal } from '../provider-credential-renewal.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -440,4 +440,20 @@ export function reapOrphanedConfinementResources({
   }
 
   return { reaped, skipped };
+}
+
+/**
+ * The renewal function a dispatch is opted in with, wired to this module's held homes: refresh-ahead of an
+ * account re-checks that account's held homes under the account lock it already holds. Every dispatch
+ * caller passes this one (the renewal module itself knows nothing of confinement).
+ */
+export function createConfinementCredentialRenewal({ tempRoots, ...options } = {}) {
+  const roots = () => tempRoots ?? [resolveConfinementTempRoot()];
+  return createCredentialRenewal({
+    ...options,
+    heldHomes: {
+      has: ({ provider, accountId }) => roots().some((root) => listKeptCredentialHomes(root).some((h) => h.held && h.provider === provider && h.accountId === accountId)),
+      settle: ({ provider, accountId, loadSqlite, now }) => settleHeldCredentialHomes({ tempRoots: roots(), provider, accountId, lockHeld: true, loadSqlite, now }),
+    },
+  });
 }

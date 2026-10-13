@@ -40,7 +40,7 @@ import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { createCredentialProbe } from './provider-credential-probe.mjs';
-import { createCredentialRenewal } from './provider-credential-renewal.mjs';
+import { createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
 export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
@@ -1188,7 +1188,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
             forceSharedCwd: rest.includes('--force-shared-cwd'),
             providerCredentialProbe: createCredentialProbe(),
-            providerCredentialRenew: createCredentialRenewal(),
+            providerCredentialRenew: createConfinementCredentialRenewal(),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;
@@ -1367,7 +1367,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: true,
             forceSharedCwd: rest.includes('--force-shared-cwd'),
             providerCredentialProbe: createCredentialProbe(),
-            providerCredentialRenew: createCredentialRenewal(),
+            providerCredentialRenew: createConfinementCredentialRenewal(),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;

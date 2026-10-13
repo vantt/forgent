@@ -70,3 +70,9 @@ Source: [code-review-261013-1355-credential-pending-retention-independent.md](co
 
 - Refresh-ahead looks only under the default confinement temp root (injected in tests); homes under a backend-configured temp root are re-checked by the doctor fix only (plan open question 9).
 - No real accounts or real OS read errors.
+
+### Round two, addendum: dependency direction and test 16
+
+- A guard that refused removal for any marker `readOwnershipMarker` rejected broke the existing finalizer test whose marker parses but is not ours. Production code fixed: only a marker that is not valid JSON stops the removal. Test unchanged; a new test shows a really changed marker still gives `ownership-marker-mismatch`.
+- Refresh-ahead no longer imports confinement. It takes an injected `heldHomes` hook (`has`, `settle`) and calls `settle` only while holding the account lock. `createConfinementCredentialRenewal` (`confinement/cleanup.mjs`) builds that hook and is what `dispatch/cli.mjs`, `operation-choice.mjs` and `execution/run.mjs` now pass (they no longer call `createCredentialRenewal` directly). Tests: the hook is called under the lock; no `src/runner/dispatch/provider-*.mjs` has a static or dynamic import of `confinement/` (the pre-change renewal file had 2 matches, so the test is red there).
+- Component boundary: No component-boundary change. The row in `docs/platform/component-boundary.md` (confinement depends on credential renewal, which depends on provider capacity for the account lock) is again exactly true.
