@@ -212,7 +212,7 @@ test('an unknown layout, a missing store and malformed JSON give fixed codes tha
   const w = workspace();
   try {
     assert.deepEqual(readCredentialExpiry('mystery', w.home), { ok: false, code: 'unknown-layout' });
-    assert.deepEqual(readCredentialExpiry('pi-auth-json', w.home), { ok: false, code: 'unreadable-file' });
+    assert.deepEqual(readCredentialExpiry('pi-auth-json', w.home), { ok: false, code: 'missing-file' });
     fs.writeFileSync(path.join(w.home, 'auth.json'), `{"xai": {"access": "${FAKE.oldAccess}", `);
     const bad = readCredentialExpiry('pi-auth-json', w.home);
     assert.deepEqual(bad, { ok: false, code: 'unreadable-json' });
@@ -1081,7 +1081,7 @@ test('a leftover copy is kept while the source cannot be read or identified, and
     fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
     assert.deepEqual(apply(), { status: 'apply-deferred', code: 'unreadable-json' });
     fs.rmSync(path.join(w.home, 'auth.json'));
-    assert.deepEqual(apply(), { status: 'apply-deferred', code: 'unreadable-file' });
+    assert.deepEqual(apply(), { status: 'apply-deferred', code: 'missing-file' });
     writePi(w.home, { 'github-copilot': { type: 'oauth', access: 'a', refresh: 'b', expires: now + HOUR } });
     assert.deepEqual(apply(), { status: 'apply-deferred', code: 'entry-unidentified' });
 
@@ -1089,6 +1089,23 @@ test('a leftover copy is kept while the source cannot be read or identified, and
     assert.equal(apply().status, 'unchanged');
     fs.writeFileSync(path.join(copy, 'auth.json'), TORN);
     assert.equal(apply().status, 'unreadable', 'a copy that is itself malformed is unusable');
+  } finally { w.cleanup(); }
+});
+
+test('a copy whose store hits an operating-system read error is kept; only a copy with no store is unusable', () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + HOUR));
+    const apply = (copy) => applyRenewedCredential({ layoutName: 'pi-auth-json', sourceHome: w.home, copyHome: copy, provider: 'xai', requireFuture: false });
+
+    // Reading a directory as the store fails with EISDIR, an error that is not "no such file".
+    const unreadable = path.join(w.tmp, 'copy-unreadable');
+    fs.mkdirSync(path.join(unreadable, 'auth.json'), { recursive: true });
+    assert.deepEqual(apply(unreadable), { status: 'apply-deferred', code: 'unreadable-file' });
+
+    const empty = path.join(w.tmp, 'copy-empty');
+    fs.mkdirSync(empty, { recursive: true });
+    assert.deepEqual(apply(empty), { status: 'unreadable', code: 'missing-file' });
   } finally { w.cleanup(); }
 });
 

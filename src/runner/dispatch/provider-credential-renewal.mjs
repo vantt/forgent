@@ -81,8 +81,9 @@ function readJsonFile(file) {
   let raw;
   try {
     raw = fs.readFileSync(file, 'utf8');
-  } catch {
-    return fail('unreadable-file');
+  } catch (err) {
+    // Only a file that is not there is proven empty; any other read error (EACCES, EIO, EMFILE) may pass.
+    return fail(err?.code === 'ENOENT' ? 'missing-file' : 'unreadable-file');
   }
   try {
     return { ok: true, raw, doc: JSON.parse(raw) };
@@ -398,7 +399,11 @@ const ompLayout = {
   files: ['agent.db'],
   read(home, { loadSqlite }) {
     const file = path.join(home, 'agent.db');
-    if (!fs.existsSync(file)) return fail('unreadable-file');
+    try {
+      fs.statSync(file);
+    } catch (err) {
+      return fail(err?.code === 'ENOENT' ? 'missing-file' : 'unreadable-file');
+    }
     try {
       const entries = withDatabase(file, { loadSqlite, readOnly: true }, ompEntries);
       return entries.length > 0 ? { ok: true, entries } : fail('unexpected-shape');
@@ -481,7 +486,7 @@ export function credentialLayout(source) {
 
 /**
  * Read the expiry entries of a credential home. `{ok: true, entries: [{key, expiresMs, dueMs}]}` or
- * `{ok: false, code}` with a fixed code (`unreadable-file`, `unreadable-json`, `unreadable-db`,
+ * `{ok: false, code}` with a fixed code (`missing-file`, `unreadable-file`, `unreadable-json`, `unreadable-db`,
  * `unexpected-shape`, `sqlite-unavailable`, `unknown-layout`); values are never part of the result.
  */
 export function readCredentialExpiry(layoutName, home, { loadSqlite = defaultLoadSqlite } = {}) {
@@ -510,8 +515,9 @@ function selectProviderEntry(entries, provider) {
 
 // Codes that say the copy itself is unusable (it can never be applied); every other failure code, and every
 // failure to read the source, is a reason that may pass and leaves the copy where it is.
-const COPY_UNUSABLE_CODES = new Set(['unreadable-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
-const SOURCE_SIDE_THROWS = new Set(['unreadable-file', 'unreadable-json', 'unexpected-shape', 'unreadable-db', 'sqlite-unavailable', 'entry-unidentified']);
+// `unreadable-file` is an operating-system read error and is deliberately absent: it may pass.
+const COPY_UNUSABLE_CODES = new Set(['missing-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
+const SOURCE_SIDE_THROWS = new Set(['missing-file', 'unreadable-file', 'unreadable-json', 'unexpected-shape', 'unreadable-db', 'sqlite-unavailable', 'entry-unidentified']);
 
 /**
  * Apply the entry of `copyHome` that is strictly newer than the source's and carries a different refresh
@@ -550,9 +556,10 @@ export function applyRenewedCredential({ layoutName, sourceHome, copyHome, provi
   return { status: keys.length > 0 ? 'applied' : 'unchanged', keys };
 }
 
-// Codes that prove a copy holds nothing usable: its JSON is corrupt, or it parses to no usable entry. A
-// read error or a database that cannot be opened may pass, so such a copy is not proven malformed.
-const COPY_MALFORMED_CODES = new Set(['unreadable-json', 'unexpected-shape', 'unknown-layout']);
+// Codes that prove a copy holds nothing usable: its store file is not there, its JSON is corrupt, or it
+// parses to no usable entry. A read error or a database that cannot be opened may pass, so such a copy is
+// not proven malformed.
+const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
 
 // Whether the copy holds a login newer than the source's: 'newer', 'not-newer' (the source was read and
 // proves it, or the copy is proven malformed), or 'undetermined' when nothing proves it: the copy cannot
@@ -563,9 +570,7 @@ function copyIsNewer({ layout, provider, sourceHome, copyHome, now, loadSqlite }
   const copy = layout.read(copyHome, { loadSqlite });
   if (!copy.ok) {
     if (COPY_MALFORMED_CODES.has(copy.code)) return 'not-newer';
-    // A store file that is not there holds nothing to keep; one that is there but unreadable may pass.
-    const storeFile = path.join(copyHome, layout.name === ompLayout.name ? 'agent.db' : 'auth.json');
-    return copy.code === 'unreadable-file' && !fs.existsSync(storeFile) ? 'not-newer' : 'undetermined';
+    return 'undetermined';
   }
   const source = layout.read(sourceHome, { loadSqlite });
   if (!source.ok) return 'undetermined';
