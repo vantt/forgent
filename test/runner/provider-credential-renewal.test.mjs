@@ -17,6 +17,7 @@ import {
   readCredentialExpiry,
   refreshAhead,
   writeBackRenewedCredential,
+  inspectRetainedCredentialCopies,
 } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import {
   providerAccountDir,
@@ -1413,33 +1414,26 @@ function heldHome(w, opts) {
 }
 const settleAll = (w, extra = {}) => settleHeldCredentialHomes({ tempRoots: [path.join(w.tmp, 'fgos-confinement')], ...extra });
 
-test('a held home whose login would only be staged stays held when the pending copies are full', () => {
-  const w = workspace();
-  try {
-    const dir = heldHome(w);
-    const pending = path.join(w.accountDir, 'pending');
-    const names = ['1', '2', '3', '4', '5'].map((n) => path.join(pending, `00000000000000${n}-a`));
-    names.forEach((copy, i) => writePi(copy, piDoc(Date.now() + 6 * HOUR, i === 0 ? { access: FAKE.newAccess, refresh: FAKE.newRefresh } : { access: `FAKE-STALE-${i}`, refresh: `FAKE-STALE-REFRESH-${i}` })));
-    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the source cannot say whether the home's login is newer
-    assert.deepEqual(settleAll(w), { settled: 0, held: 1 });
-    assert.equal(fs.existsSync(dir), true, 'the home stays');
-    assert.equal(fs.readdirSync(pending).length, 5, 'nothing was pushed out');
-    assert.equal(readPi(names[0]).xai.refresh, FAKE.newRefresh, 'the oldest copy, the only valid one, is still there');
-  } finally { w.cleanup(); }
-});
 
-test('staging a login syncs the files and the pending directory before the home may go', () => {
+test('staging a login syncs the staged file, its directory and the pending directory, each on its own', () => {
   const w = workspace();
   try {
     const dir = privateHomeWithRenewedLogin(w);
     fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
-    let syncs = 0;
+    const opened = new Map();
+    const synced = [];
+    const realOpen = fs.openSync;
     const realSync = fs.fsyncSync;
-    fs.fsyncSync = (fd) => { syncs += 1; return realSync(fd); };
+    fs.openSync = (file, ...rest) => { const fd = realOpen(file, ...rest); opened.set(fd, String(file)); return fd; };
+    fs.fsyncSync = (fd) => { synced.push(opened.get(fd)); return realSync(fd); };
     let result;
-    try { result = writeBackRenewedCredential(dir, markerOf(dir)); } finally { fs.fsyncSync = realSync; }
+    // The lock is busy, so no lock bookkeeping adds syncs of its own.
+    try { result = writeBackRenewedCredential(dir, markerOf(dir), { tryLock: () => null }); } finally { fs.openSync = realOpen; fs.fsyncSync = realSync; }
     assert.equal(result.status, 'staged');
-    assert.ok(syncs >= 3, `the staged file, the staging directory and the pending directory were synced (${syncs})`);
+    const pendingDir = path.join(w.accountDir, 'pending');
+    assert.equal(synced.filter((f) => /\/\.tmp-[^/]+\/auth\.json$/.test(f)).length, 1, 'the staged file');
+    assert.equal(synced.filter((f) => /\/\.tmp-[^/]+$/.test(f)).length, 1, 'the staging directory');
+    assert.equal(synced.filter((f) => f === pendingDir).length, 1, 'the pending directory');
   } finally { w.cleanup(); }
 });
 
@@ -1566,29 +1560,112 @@ test('refresh-ahead of the held home\'s account re-checks it under the lock, eve
 // Pending copies stay bounded and are cleared when they can be identified
 // ---------------------------------------------------------------------------------------------------
 
-test('at most five pending copies are kept per account, the newest, with one count-only stderr line per drop', () => {
+const pendingNames = (w) => fs.readdirSync(path.join(w.accountDir, 'pending')).filter((n) => !n.startsWith('.')).sort();
+
+test('staging while the account lock is busy never drops a pending copy, however many there are', () => {
   const w = workspace();
   const captured = [];
   const realWrite = process.stderr.write;
   try {
     const dir = privateHomeWithRenewedLogin(w);
-    const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+    const marker = markerOf(dir);
     fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
     let clock = 1_000_000;
-    const tick = () => { clock += 1000; return clock; };
-    const tryLock = () => null; // the lock is busy: every copy stays staged
     process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
     for (let i = 0; i < 7; i += 1) {
-      const stagedAt = tick();
-      assert.deepEqual(writeBackRenewedCredential(dir, marker, { tryLock, now: () => stagedAt }), { status: 'staged' });
+      clock += 1000;
+      const stagedAt = clock;
+      assert.deepEqual(writeBackRenewedCredential(dir, marker, { tryLock: () => null, now: () => stagedAt }), { status: 'staged' });
     }
     process.stderr.write = realWrite;
-    const names = fs.readdirSync(path.join(w.accountDir, 'pending')).sort();
-    assert.equal(names.length, 5);
-    assert.deepEqual(names.map((n) => Number(n.slice(0, 15))), [3, 4, 5, 6, 7].map((n) => 1_000_000 + n * 1000), 'the newest five');
-    assert.deepEqual(captured, ['fgos: credential-pending-dropped (1)\n', 'fgos: credential-pending-dropped (1)\n']);
+    assert.equal(pendingNames(w).length, 7);
+    assert.deepEqual(captured, []);
   } finally { process.stderr.write = realWrite; w.cleanup(); }
 });
+
+test('over the limit, identical copies are dropped first, under the lock and after the apply attempt', () => {
+  const w = workspace();
+  const captured = [];
+  const realWrite = process.stderr.write;
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const marker = markerOf(dir);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the source cannot judge any copy
+    let clock = 1_000_000;
+    for (let i = 0; i < 7; i += 1) { clock += 1000; const at = clock; writeBackRenewedCredential(dir, marker, { tryLock: () => null, now: () => at }); }
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    clock += 1000;
+    const at = clock;
+    assert.deepEqual(writeBackRenewedCredential(dir, marker, { now: () => at }), { status: 'staged' });
+    process.stderr.write = realWrite;
+    const names = pendingNames(w);
+    assert.equal(names.length, 5, 'eight identical copies are cut to the limit');
+    assert.equal(names.at(-1).slice(0, 15), String(at).padStart(15, '0'), 'the newest stays');
+    assert.deepEqual(captured, ['fgos: credential-pending-dropped (3)\n']);
+    assert.equal(readPi(path.join(w.accountDir, 'pending', names[0])).xai.refresh, FAKE.newRefresh);
+  } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+function fillPendingWithOnlyValidOldest(w) {
+  const pending = path.join(w.accountDir, 'pending');
+  const names = ['1', '2', '3', '4', '5'].map((n) => path.join(pending, `00000000000000${n}-a`));
+  names.forEach((copy, i) => writePi(copy, piDoc(Date.now() + 6 * HOUR, i === 0
+    ? { access: 'FAKE-ONLY-VALID-ACCESS', refresh: 'FAKE-ONLY-VALID-REFRESH' }
+    : { access: `FAKE-STALE-${i}`, refresh: `FAKE-STALE-REFRESH-${i}` })));
+  return names;
+}
+
+test('a normal write-back into full pending copies keeps the oldest, the only valid one, and nothing is dropped', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // nothing can be judged
+    const names = fillPendingWithOnlyValidOldest(w);
+    assert.equal(writeBackRenewedCredential(dir, markerOf(dir)).status, 'staged');
+    assert.equal(pendingNames(w).length, 6, 'the limit gives way: no copy could be shown redundant');
+    assert.equal(readPi(names[0]).xai.refresh, 'FAKE-ONLY-VALID-REFRESH');
+  } finally { w.cleanup(); }
+});
+
+test('a held home settled into full pending copies, with the source flipping between two reads, still drops nothing', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    const names = fillPendingWithOnlyValidOldest(w);
+    const sourceFile = path.join(w.home, 'auth.json');
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    const good = fs.readFileSync(sourceFile, 'utf8');
+    let reads = 0;
+    const realRead = fs.readFileSync;
+    fs.readFileSync = (file, ...rest) => {
+      if (file === sourceFile) { reads += 1; return reads === 1 ? good : TORN; }
+      return realRead(file, ...rest);
+    };
+    try { settleAll(w); } finally { fs.readFileSync = realRead; }
+    assert.equal(readPi(names[0]).xai.refresh, 'FAKE-ONLY-VALID-REFRESH', 'the only valid copy survives');
+    assert.ok(pendingNames(w).length >= 5);
+  } finally { w.cleanup(); }
+});
+
+test('a half-written copy left by a probe is kept for hand recovery, outside the copies applied or dropped automatically', async () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const { spawnFn } = fakeSpawn({ layoutName: 'pi', behaviour: (dir) => fs.writeFileSync(path.join(dir, 'auth.json'), TORN) });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'failed', reason: 'torn-copy-kept' });
+    const tornDir = path.join(w.accountDir, 'torn');
+    const kept = fs.readdirSync(tornDir);
+    assert.equal(kept.length, 1);
+    assert.equal(fs.readFileSync(path.join(tornDir, kept[0], 'auth.json'), 'utf8'), TORN, 'the half-written file is untouched');
+    assert.deepEqual(scratchCopies(w), []);
+    assert.deepEqual(inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir }).map((c) => c.kind), ['torn']);
+    // A later renewal of the account neither applies nor drops it.
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn: fakeSpawn({ layoutName: 'pi' }).spawnFn, cooldownMs: 0 });
+    assert.equal(fs.readdirSync(tornDir).length, 1);
+  } finally { w.cleanup(); }
+});
+
 
 test('a refresh-ahead that skips because the entry is unidentified still clears the leftovers it can identify', async () => {
   const w = workspace();
