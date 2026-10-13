@@ -10,37 +10,64 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 ## Install
 
-Recommended — installs the `fgctl` binary for your machine from the
-[latest GitHub release](https://github.com/vantt/forgent/releases), no
-clone, no npm, no Rust toolchain required:
+fgOS is in alpha. The current alpha is
+[`v0.2.0-rc.2`](https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.2), a
+GitHub pre-release. A pre-release is never "latest", so an alpha is installed by
+naming its tag in `FGCTL_VERSION`. Nothing needs a clone, npm or a Rust
+toolchain: the installer puts one small binary, `fgctl`, on your machine, and
+`fgctl init` downloads and checks the rest.
+
+### Alpha quick start: Linux (x86_64)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
+curl -fsSL https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.sh \
+  | FGCTL_VERSION=v0.2.0-rc.2 sh
+cd your-project                      # an existing git repository
+FGCTL_VERSION=v0.2.0-rc.2 fgctl init
+.fgos/installation/bin/fgos setup    # once per project: config defaults and hooks
+.fgos/installation/bin/fgos doctor
 ```
 
-`install.sh` installs the latest release; a pre-release is never "latest", so
-install one with `FGCTL_VERSION=<tag>` (for example `v0.2.0-rc.1`):
+`install.sh` puts `fgctl` in `~/.local/bin` (or `FGCTL_INSTALL_DIR`); add that
+directory to `PATH` if the installer says it is missing. The Linux build runs on
+glibc 2.35 and later (Ubuntu 22.04 and newer).
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | FGCTL_VERSION=v0.2.0-rc.1 sh
-```
+### Alpha quick start: Windows 10 or later (x86_64)
 
-On Windows 10 or later, use `install.ps1` from PowerShell (no Git Bash, no WSL,
-no administrator rights). It installs `fgctl.exe` into `%LOCALAPPDATA%\fgos\bin`
-(or `FGCTL_INSTALL_DIR`), checks the download against the release's `SHA256SUMS`,
-changes nothing on your `PATH` and prints the commands that would. Like
-`install.sh`, it installs the latest non-prerelease, so a pre-release needs
-`FGCTL_VERSION` (releases from `v0.2.0-rc.2` on carry the Windows assets):
+Open PowerShell (no Git Bash, no WSL, no administrator rights):
 
 ```powershell
 $env:FGCTL_VERSION = 'v0.2.0-rc.2'
 irm https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.ps1 | iex
+$env:Path = "$env:LOCALAPPDATA\fgos\bin;$env:Path"    # this session only
+cd your-project                      # an existing git repository
 fgctl init
+.\.fgos\installation\bin\fgos.cmd setup
+.\.fgos\installation\bin\fgos.cmd doctor
 ```
 
-After `fgctl init`, put the project's launcher directory on `PATH` (or call it by
-path) and run `fgos` from PowerShell or `cmd.exe`:
-`.fgos\installation\bin\fgos.cmd doctor`.
+`install.ps1` installs `fgctl.exe` into `%LOCALAPPDATA%\fgos\bin` (or
+`FGCTL_INSTALL_DIR`), checks the download against the release's `SHA256SUMS` and
+changes nothing on your `PATH`: the `$env:Path` line above covers the current
+session, and the installer prints the command to make it permanent. `fgctl init`
+needs `curl.exe`, which ships with Windows 10 1803 and later. After `fgctl init`,
+put `.fgos\installation\bin` on `PATH` (or call `fgos.cmd` by path); it runs from
+PowerShell and `cmd.exe` alike. `fgctl init` must run inside a git repository, as on Linux.
+
+macOS and Windows on ARM are not supported in this alpha.
+
+### Stable releases and other options
+
+Once a release is not a pre-release, `install.sh` installs it by default, with no
+`FGCTL_VERSION`:
+
+```bash
+curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
+```
+
+and on Windows `irm https://github.com/vantt/forgent/releases/latest/download/install.ps1 | iex`.
+Until the first release newer than `v0.1.0` is stable, "latest" is `v0.1.0`,
+which predates the Windows assets.
 
 Then initialize your project from inside its git repository. A plain
 `fgctl init` uses the release the project's committed `.fgos/distribution.json`
@@ -54,7 +81,7 @@ fgctl init
 To pick a different release:
 
 ```bash
-FGCTL_VERSION=v0.2.0-rc.1 fgctl init         # an exact tag; needed for pre-releases
+FGCTL_VERSION=v0.2.0-rc.2 fgctl init         # an exact tag; needed for pre-releases
 FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a local build, build dir, or URL
 fgctl init --from <path-or-URL>              # same as FGCTL_FROM
 ```
