@@ -622,3 +622,33 @@ Exact blocker: the initial `git status --porcelain` is nonempty. The phase file'
 No checkpoint verdicts applied (0 of 417); no reworks authored (0 of 14); no candidate or decision shard changed. D against both prior registries, scoped strict E and native equality were not rerun. No new Lead review request exists. The current pending request remains `review-request-261013-1311-host-invocation-checkpoint.md`, with Lead review at `aaa3ab962`. F6 remains an owner question; accepted F3/F4 are untouched.
 
 Next action: reconcile the pre-existing generated inventory parts with the committed manifest, preserve any needed inputs in permitted scratch and establish a clean tree before resuming. Then apply the 417 committed ok verdicts with the original checkpoint pack and committed sensitivity key/verdicts, perform only the requested reworks and rebind without approval carry, commit one bounded shown-text Lead request, rerun both-prior D/scoped strict E/native equality and stop at that request. Do not start fresh readers, close the batch, merge main or start Step 4. This session commits only this blocker record under the owner's failure/stop instruction.
+
+## Checkpoint continuation stopped on mismatched inventory pin
+
+Date: 2026-10-13. Executor: codex-session:2@2026-10-13. Step: Host Invocation checkpoint continuation. State: rework; stopped under the owner's failure instruction.
+
+Resume worktree and branch verified: `/home/vantt/projects/forgentX-phase00-documentation-authority-unification`, `plan/260925-documentation-authority-unification`. Starting HEAD: `dbc7b5a2aa8d0b52d791bb492bce105e256ba10a`; porcelain was clean, generated inventory parts were already excluded, and HEAD descends from the last green checkpoint `76353c58eb885becc550d734fde5d7c2709cce33`. B0: `dbe5c432852837ea01e6025b35868bcb7271495d`. SYNC: `7a58bd7785ee4602b9697a1af199da8c2ce3a845`. Lead checkpoint report remains committed at `aaa3ab9629eebdd0af50b044b24fbea813f540c4`.
+
+Resume preservation passes: 74 historical witnesses, 867 inherited physical payloads, five frozen files, zero first-parent allowlist violations with the existing eight exact commit/path exemptions; extractor closure unchanged. Ratchet: 995 files, 25 accounted edits and one accounted addition. Constitution/placement: 506 files, 505 matched, one existing exception. Candidate status: only the unchanged Packaging portal metadata finding, zero Host findings. Authority statuses and reader-link sets unchanged. No tests were run or claimed.
+
+Native inventory refresh at starting HEAD reports the existing working registry bound, with no carry-forward. Resume non-strict D against `reports/identity-registry.json` exits 0 with zero fatal findings. The second prior-registry D, scoped strict E and native full-set equality were not rerun before the stop; no complete continuation proof is claimed. Scratch evidence: `/tmp/phase06/continuation/resume-preservation.json`, `/tmp/phase06/continuation/resume-D.json`, and `/tmp/phase06/continuation-inventory.json` with its generated parts. Scratch is reproducible and is not committed.
+
+Exact failure: `propose-doc-decisions.mjs --apply-review` exits 1 with `review pack commit or shard changed`. The author incorrectly supplied the newly refreshed inventory pinned at `dbc7b5a2aa8d0b52d791bb492bce105e256ba10a` to the immutable checkpoint application. That API requires its inventory commit to equal the shown pack commit `76353c58eb885becc550d734fde5d7c2709cce33`. This is an invocation error, not a missing review, sensitivity failure, changed shard or checker defect. The command failed before writing the shard; byte comparison with the pre-command shard passes. The existing committed inventory manifest and locally excluded parts already contain the correct checkpoint pin (verified in part-0001).
+
+Counts: 0 of 417 ok verdicts applied; 0 of 14 reworks authored. No candidate, decision, registry, dropped-claim register, review evidence, gate, checker, vocabulary, extractor or baseline changed. Only this progress record is committed. No new bounded Lead request exists; the pending original request remains `review-request-261013-1311-host-invocation-checkpoint.md`. F3/F4 remain accepted and untouched; F6 remains an owner question. Batch closure, fresh readers and Step 4 remain unstarted.
+
+Next action: resume with a clean tree and use the immutable checkpoint inventory for application (use the refreshed inventory only for subsequent conservation proofs):
+
+```sh
+node scripts/propose-doc-decisions.mjs \
+  --apply-review plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json \
+  --inventory plans/260925-documentation-authority-unification/reports/doc-inventory.json \
+  --verdicts plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md \
+  --reviewer reviewer:claude-session:4df9e88c@2026-10-13 \
+  --review-pack plans/260925-documentation-authority-unification/reports/phase-06/review-pack-261013-1528-host-invocation-checkpoint.md.json \
+  --seed-key plans/260925-documentation-authority-unification/reports/phase-06/sensitivity-3-checkpoint-host-invocation/seed-key.json \
+  --seed-verdicts plans/260925-documentation-authority-unification/reports/phase-06/sensitivity-3-checkpoint-host-invocation/seed-verdicts.md \
+  --out /tmp/phase06/continuation/applied-shard.json
+```
+
+Then copy notes verbatim, perform only the owner-named reworks, rebind all changed rows without approval carry, commit one shown-text/digest request limited to those rows and changes, rerun D against both prior registries, scoped strict E and native equality, record proofs and stop at that request. Do not run fresh readers, close the batch, merge main or start Step 4.
