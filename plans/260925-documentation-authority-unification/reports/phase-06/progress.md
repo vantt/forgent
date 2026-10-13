@@ -1,3 +1,21 @@
+# Latest resume state — Packaging-distribution first review preparation
+
+Date: 2026-10-13
+Executor: codex-session:9@2026-10-13
+Step: 4 / Packaging-distribution P4
+State: resumed; completing interrupted authoring before first independent review
+Resume HEAD: baef3a075
+Previous interrupted author: codex-session:8@2026-10-13
+Previous batch commits: 865795271..baef3a075; SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Main merged at boundary: 3e30ecd3779a4967b1c2f4ff01a68ae50c38ef83
+Blocker: none established; four inherited dirty artifacts are being checked against committed native text and bindings.
+
+The Lead explicitly authorizes resuming these four dirty paths. Keep consistent corrections; restore only those paths if inconsistent. Three contract metadata successors correct Candidate document status while preserving Frozen (V1) contract design; all proposals remain pending. The merge conflict resolution and every merge-created conservation row belong to A31 independent review scope. Source accounting currently reports 407 native rows (371 architecture + 36 current distribution), versus 402 planned; five inherited source gaps require separate conservation accounting. Verify before the request.
+
+Next: finish native binding/equality, D against both prior registries, scoped E, A28 candidate-unverified list and 30-unit truth sample for Lead, F6 restore/retirement proposal retaining FLAGGED text, bounded full-text/digest packs and one review request. STOP for Lead review. No self-review, promotion, Step 5, push, rebase or main-checkout write. Registry ceiling 90 MB, unchanged format. Earlier progress follows intact.
+
+---
+
 # Latest resume state — Host Invocation closed under A33
 
 Date: 2026-10-13
