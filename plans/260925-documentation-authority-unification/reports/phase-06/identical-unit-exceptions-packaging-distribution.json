@@ -29,7 +29,12 @@
         "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md"
       ],
       "reason": "Identical short source heading or unit occurs in different source contexts. Complete source section payloads remain at the explicit contextual owners; no owner or approval is inferred from the short digest alone.",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-candidate-unverified.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewNote": "Both source units recompute to the same digest, and both target units at `history/documentation-migration/{migration-map,rewrite-plan}.md` (unheaded-block-7 and -16) match it. It is the same target-tree code block, under \"2. Target Area Shape\" / \"4. Proposed Target Shape\", and each copy sits in its own source document's section. Two owners are legitimate (different source contexts)."
     },
     {
       "digest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
@@ -56,7 +61,12 @@
         "docs/platform/packaging-distribution/spec.md"
       ],
       "reason": "Identical short source heading or unit occurs in different source contexts. Complete source section payloads remain at the explicit contextual owners; no owner or approval is inferred from the short digest alone.",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-14",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-candidate-unverified.md",
+      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
+      "reviewNote": "Both are the sentence \"Use this rule to decide whether a detail belongs in packaging/distribution:\" under \"Boundary Rule\". Targets are `README.md#unheaded-block-39` and `spec.md#unheaded-block-60`, which mirror the source documents (README, and scope-map via spec.md under \"Historical Document Split\"). Digests verified at source and target."
     }
   ]
 }

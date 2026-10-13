@@ -5166,20 +5166,10 @@
       "targetAnchor": "6-workspaceactivationbinding",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:10@2026-10-14",
       "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#6-workspaceactivationbinding. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading depth only (2 to 4) and payload byte-identical to source; parent 6. WorkspaceActivationBinding unchanged; digests recompute from committed files",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "af026389acc476c217dd34e67292fe2ab3a06c89ccbe09e95f77a5f342e9e2f1",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
       "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
@@ -5487,21 +5477,10 @@
       "targetAnchor": "unheaded-block-25",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:10@2026-10-14",
       "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Block text byte-identical to source under \"6. WorkspaceActivationBinding\"; target contracts/activation-binding.md#unheaded-block-25 exists, digest recomputed from committed file, target anchor unique in shard",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-03.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "a1e7ae9c98f45bb7c6b136fec8f222dffea7be454b7288a802983db5a7e43599",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "6. WorkspaceActivationBinding"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
       "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
@@ -5533,21 +5512,10 @@
       "targetAnchor": "unheaded-block-27",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:10@2026-10-14",
       "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Unheaded block under \"6. WorkspaceActivationBinding\" in the source, byte-equal in contracts/activation-binding.md (4 lines, starts \"In that context the candidate may run preflight ch\"); ancestry named in rationale is correct; no links in the unit so the relative-link clause is vacuous but not false.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-13",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-source-architecture-04.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0",
-      "targetAncestry": [
-        "Contract: Activation Binding",
-        "Retained Runtime Identity And Activation Source Detail",
-        "6. WorkspaceActivationBinding"
-      ],
-      "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+      "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
       "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
