@@ -178,4 +178,6 @@ The executable work breakdown lives in
 [Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md).
 ````
 
+## Source-relative Navigation Mappings
+
 Added in candidate — source-relative link destinations: the literal restored excerpts retain their original link bytes. `./host-invocation-provider-routing.md` maps to [the area spec](../spec.md); `./rust-cli-and-proof-components-plan.md` maps to [the area roadmap](../roadmap.md); `../component-boundary/component-boundary-advisory.md` maps to [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md). These are navigation mappings, not revised restored text.
