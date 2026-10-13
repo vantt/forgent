@@ -41,7 +41,9 @@ pub struct WebDashboardSettings {
 
 impl Default for WebDashboardSettings {
     fn default() -> Self {
-        WebDashboardSettings { static_serving: true }
+        WebDashboardSettings {
+            static_serving: true,
+        }
     }
 }
 
@@ -168,13 +170,15 @@ mod tests {
 
     #[test]
     fn web_dashboard_settings_explicit_false_is_honored() {
-        let got = parse_web_dashboard_settings(Some(r#"{"herdrWebDashboard":{"staticServing":false}}"#));
+        let got =
+            parse_web_dashboard_settings(Some(r#"{"herdrWebDashboard":{"staticServing":false}}"#));
         assert!(!got.static_serving);
     }
 
     #[test]
     fn web_dashboard_settings_explicit_true_round_trips() {
-        let got = parse_web_dashboard_settings(Some(r#"{"herdrWebDashboard":{"staticServing":true}}"#));
+        let got =
+            parse_web_dashboard_settings(Some(r#"{"herdrWebDashboard":{"staticServing":true}}"#));
         assert!(got.static_serving);
     }
 

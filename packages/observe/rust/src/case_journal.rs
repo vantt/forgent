@@ -227,7 +227,6 @@ fn append_record(root: &Path, record: &CaseRecord) -> Result<(), CaseError> {
     let shard_file_path = shard::shard_path(root, "cases")?;
     let mut file = OpenOptions::new()
         .create(true)
-        .write(true)
         .append(true)
         .open(&shard_file_path)?;
 
@@ -255,7 +254,11 @@ pub fn open_case(
     } else {
         std::env::current_dir()?.join(root)
     };
-    let abs_root_str = abs_root.canonicalize().unwrap_or(abs_root).to_string_lossy().to_string();
+    let abs_root_str = abs_root
+        .canonicalize()
+        .unwrap_or(abs_root)
+        .to_string_lossy()
+        .to_string();
 
     // Critical: check & append must occur within the store lock
     let _lock_guard = acquire_store_lock(root)?;
@@ -399,7 +402,11 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
     fn create_test_dir(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("fgos-test-case-journal-{}-{}", name, std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-test-case-journal-{}-{}",
+            name,
+            std::process::id()
+        ));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir

@@ -154,7 +154,10 @@ pub struct MergeTreeNode {
 /// blocked_on_sync.len()` before the tree existed; every id in those three
 /// buckets is a node somewhere in `tree`, so this is the same count).
 pub fn merge_tree_node_count(nodes: &[MergeTreeNode]) -> usize {
-    nodes.iter().map(|n| 1 + merge_tree_node_count(&n.children)).sum()
+    nodes
+        .iter()
+        .map(|n| 1 + merge_tree_node_count(&n.children))
+        .sum()
 }
 
 /// tsk-59b: total RENDERED LINE count across the whole tree — one line per
@@ -265,7 +268,10 @@ pub fn parse_doing(json: &str) -> Result<Vec<DoingRow>, serde_json::Error> {
         .into_iter()
         .filter(|(_, item)| {
             matches!(item.park_reason.as_deref(), None | Some("natural-finish"))
-                && matches!(item.status_category.as_deref(), Some("in-progress") | Some("review"))
+                && matches!(
+                    item.status_category.as_deref(),
+                    Some("in-progress") | Some("review")
+                )
         })
         .map(|(id, item)| DoingRow {
             id,
@@ -387,7 +393,11 @@ fn is_confined(path: &Path, root: &Path) -> bool {
 /// Resolves fgos binary via tier 0 (workspace shim `<root>/.fgos/installation/bin/fgos` if present, executable,
 /// and confined under the installation root) with fallback to `<root>/bin/fgos.mjs` (run via node).
 pub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
-    let tier_zero = root.join(".fgos").join("installation").join("bin").join("fgos");
+    let tier_zero = root
+        .join(".fgos")
+        .join("installation")
+        .join("bin")
+        .join("fgos");
     let install_root = root.join(".fgos").join("installation");
     if is_executable(&tier_zero) && is_confined(&tier_zero, &install_root) {
         return Ok(tier_zero);
@@ -396,7 +406,12 @@ pub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
 }
 
 pub fn is_tier_zero(root: &Path, resolved: &Path) -> bool {
-    resolved == root.join(".fgos").join("installation").join("bin").join("fgos")
+    resolved
+        == root
+            .join(".fgos")
+            .join("installation")
+            .join("bin")
+            .join("fgos")
 }
 
 fn run_fgos(root: &Path, args: &[&str]) -> Result<String, FgosError> {
@@ -762,7 +777,11 @@ mod tests {
     fn parse_doing_filters_by_park_reason_and_status_category() {
         let rows = parse_doing(STATUS_MEMBERSHIP_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
-        assert_eq!(ids.len(), 2, "only doing/awaiting-approval belong in the in-process pane");
+        assert_eq!(
+            ids.len(),
+            2,
+            "only doing/awaiting-approval belong in the in-process pane"
+        );
         assert!(ids.contains(&"tsk-doing"));
         assert!(ids.contains(&"tsk-awaiting-approval"));
         assert!(!ids.contains(&"tsk-blocked"));
@@ -778,7 +797,9 @@ mod tests {
         let rows = parse_need_answer(STATUS_MEMBERSHIP_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         assert_eq!(ids, vec!["tsk-awaiting-human", "tsk-blocked"]);
-        assert!(rows.iter().all(|r| r.status == "blocked" || r.status == "awaiting-human"));
+        assert!(rows
+            .iter()
+            .all(|r| r.status == "blocked" || r.status == "awaiting-human"));
     }
 
     /// tsk-1pg D1: real shape from `.fgos/` — `tsk-mvp-test-1` (`status:
@@ -820,8 +841,8 @@ mod tests {
 
     #[test]
     fn need_answer_survives_missing_stage() {
-        let need_answer =
-            parse_need_answer(MISSING_STAGE_FIXTURE).expect("stage-less item must not fail the whole map's parse");
+        let need_answer = parse_need_answer(MISSING_STAGE_FIXTURE)
+            .expect("stage-less item must not fail the whole map's parse");
         let ids: Vec<&str> = need_answer.iter().map(|r| r.id.as_str()).collect();
         assert_eq!(ids, vec!["tsk-awaiting-human"]);
 
@@ -832,9 +853,12 @@ mod tests {
 
         // D1: a stage-less `doing` row defaults to "executing", matching
         // the JS engine's own `item.stage ?? 'executing'` convention.
-        let doing =
-            parse_doing(MISSING_STAGE_FIXTURE).expect("stage-less item must not fail the whole map's parse");
-        let row = doing.iter().find(|r| r.id == "tsk-no-stage-doing").expect("row present");
+        let doing = parse_doing(MISSING_STAGE_FIXTURE)
+            .expect("stage-less item must not fail the whole map's parse");
+        let row = doing
+            .iter()
+            .find(|r| r.id == "tsk-no-stage-doing")
+            .expect("row present");
         assert_eq!(row.stage, "executing");
     }
 
@@ -876,7 +900,9 @@ mod tests {
         let rows = parse_after_deliver(AFTER_DELIVER_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         assert_eq!(ids, vec!["tsk-cleanup", "tsk-retro"]);
-        assert!(rows.iter().all(|r| r.status == "retrospective" || r.status == "cleanup"));
+        assert!(rows
+            .iter()
+            .all(|r| r.status == "retrospective" || r.status == "cleanup"));
     }
 
     /// tsk-417 D3: real `fgos merge list --json` response shape, captured
@@ -927,7 +953,10 @@ mod tests {
     #[test]
     fn fetch_merge_list_mirrors_fgos_merge_list_json() {
         let summary = parse_merge_list(MERGE_LIST_FIXTURE).expect("fixture should parse");
-        assert_eq!(summary.ready, vec!["tsk-2ig".to_string(), "tsk-3c7".to_string()]);
+        assert_eq!(
+            summary.ready,
+            vec!["tsk-2ig".to_string(), "tsk-3c7".to_string()]
+        );
         assert_eq!(summary.waiting, vec!["tsk-blocked-dep".to_string()]);
         assert_eq!(summary.blocked_on_sync, vec!["tsk-stale-root".to_string()]);
     }
@@ -981,7 +1010,11 @@ mod tests {
 
     #[test]
     fn resolve_fgos_resolves_tier_0_when_present_and_executable() {
-        let root = std::env::temp_dir().join(format!("fgos-resolve-test-t0-{}-{}", std::process::id(), line!()));
+        let root = std::env::temp_dir().join(format!(
+            "fgos-resolve-test-t0-{}-{}",
+            std::process::id(),
+            line!()
+        ));
         let _ = std::fs::remove_dir_all(&root);
         let bin_dir = root.join(".fgos").join("installation").join("bin");
         std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
@@ -1004,7 +1037,11 @@ mod tests {
 
     #[test]
     fn resolve_fgos_falls_back_when_tier_0_is_absent() {
-        let root = std::env::temp_dir().join(format!("fgos-resolve-test-fallback-{}-{}", std::process::id(), line!()));
+        let root = std::env::temp_dir().join(format!(
+            "fgos-resolve-test-fallback-{}-{}",
+            std::process::id(),
+            line!()
+        ));
         let _ = std::fs::remove_dir_all(&root);
         let resolved = resolve_fgos(&root).expect("resolve_fgos");
         assert_eq!(resolved, root.join("bin/fgos.mjs"));
@@ -1015,7 +1052,11 @@ mod tests {
     #[cfg(unix)]
     fn resolve_fgos_falls_back_when_tier_0_is_not_executable() {
         use std::os::unix::fs::PermissionsExt;
-        let root = std::env::temp_dir().join(format!("fgos-resolve-test-noexec-{}-{}", std::process::id(), line!()));
+        let root = std::env::temp_dir().join(format!(
+            "fgos-resolve-test-noexec-{}-{}",
+            std::process::id(),
+            line!()
+        ));
         let _ = std::fs::remove_dir_all(&root);
         let bin_dir = root.join(".fgos").join("installation").join("bin");
         std::fs::create_dir_all(&bin_dir).expect("create_dir_all");

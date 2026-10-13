@@ -5,8 +5,7 @@ use std::path::Path;
 #[test]
 fn test_observe_golden_fixtures() {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let fixture_root = Path::new(manifest_dir)
-        .join("../../../test/fixtures/observe");
+    let fixture_root = Path::new(manifest_dir).join("../../../test/fixtures/observe");
 
     assert!(
         fixture_root.join(".fgos").exists(),
@@ -15,9 +14,13 @@ fn test_observe_golden_fixtures() {
     );
 
     // 1. Assert cases shard can be read and materialized
-    let case_records = read_all_case_records(&fixture_root)
-        .expect("should read case records from golden fixture");
-    assert_eq!(case_records.len(), 2, "expected 2 case records (open + close)");
+    let case_records =
+        read_all_case_records(&fixture_root).expect("should read case records from golden fixture");
+    assert_eq!(
+        case_records.len(),
+        2,
+        "expected 2 case records (open + close)"
+    );
 
     let materialized = materialize_cases(&case_records);
     assert_eq!(materialized.len(), 1, "expected 1 materialized case");
@@ -42,9 +45,18 @@ fn test_observe_golden_fixtures() {
         .iter()
         .filter_map(|r| r.get("type").and_then(|t| t.as_str()))
         .collect();
-    assert!(types.contains(&"migration"), "fixture must contain migration record");
-    assert!(types.contains(&"friction-recorded"), "fixture must contain friction-recorded record");
-    assert!(types.contains(&"friction-resolved"), "fixture must contain friction-resolved record");
+    assert!(
+        types.contains(&"migration"),
+        "fixture must contain migration record"
+    );
+    assert!(
+        types.contains(&"friction-recorded"),
+        "fixture must contain friction-recorded record"
+    );
+    assert!(
+        types.contains(&"friction-resolved"),
+        "fixture must contain friction-resolved record"
+    );
 
     // 3. Assert snapshots shard can be read
     let snapshot_records = read_all_json(&fixture_root, "snapshots")

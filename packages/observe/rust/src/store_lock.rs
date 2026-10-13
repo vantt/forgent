@@ -155,7 +155,11 @@ pub fn acquire_store_lock(root: &Path) -> Result<StoreLockGuard, ObserveLockErro
                 let pid = std::process::id();
                 let start_time = get_process_start_time(pid);
                 let ts = format_iso_now();
-                let content = LockContent { pid, start_time, ts };
+                let content = LockContent {
+                    pid,
+                    start_time,
+                    ts,
+                };
                 let json = serde_json::to_string(&content)?;
                 file.write_all(json.as_bytes())
                     .map_err(|e| ObserveLockError::Io {

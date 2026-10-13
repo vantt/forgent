@@ -61,8 +61,7 @@ pub fn dispatch(
             let producer = get_flag(&req.args, "--producer")
                 .ok_or_else(|| "missing required flag --producer".to_string())?;
 
-            let attempts = get_flag(&req.args, "--attempts")
-                .and_then(|a| a.parse::<u32>().ok());
+            let attempts = get_flag(&req.args, "--attempts").and_then(|a| a.parse::<u32>().ok());
             let doc_type = get_flag(&req.args, "--doc-type");
 
             let detail = if has_flag(&req.args, "--detail-stdin") {
@@ -117,21 +116,16 @@ pub fn dispatch(
             )
         }
         "show" => {
-            let subject_str = get_flag(&req.args, "--subject").or_else(|| {
-                req.args
-                    .iter()
-                    .find(|a| !a.starts_with('-'))
-                    .cloned()
-            });
+            let subject_str = get_flag(&req.args, "--subject")
+                .or_else(|| req.args.iter().find(|a| !a.starts_with('-')).cloned());
 
-            let subject_str = subject_str
-                .ok_or_else(|| "missing subject argument for show".to_string())?;
+            let subject_str =
+                subject_str.ok_or_else(|| "missing subject argument for show".to_string())?;
 
             friction::show(&req.root, &subject_str)
         }
         "rank" => {
-            let limit = get_flag(&req.args, "--limit")
-                .and_then(|l| l.parse::<usize>().ok());
+            let limit = get_flag(&req.args, "--limit").and_then(|l| l.parse::<usize>().ok());
 
             friction::rank(&req.root, limit)
         }

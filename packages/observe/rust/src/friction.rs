@@ -116,10 +116,7 @@ fn append_line(path: &Path, line: &str) -> Result<(), std::io::Error> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(path)?;
+    let mut file = OpenOptions::new().create(true).append(true).open(path)?;
     writeln!(file, "{}", line)?;
     file.sync_all()?;
     Ok(())
@@ -423,8 +420,12 @@ pub fn list(
 
 /// Shows friction history and current status for a single subject.
 pub fn show(root: &Path, subject_str: &str) -> Result<Value, String> {
-    let subject = Subject::parse(subject_str)
-        .ok_or_else(|| format!("invalid subject \"{}\". Expected format kind:id", subject_str))?;
+    let subject = Subject::parse(subject_str).ok_or_else(|| {
+        format!(
+            "invalid subject \"{}\". Expected format kind:id",
+            subject_str
+        )
+    })?;
 
     let all = read_all_json(root, "friction").map_err(|e| e.to_string())?;
     let mut recorded = Vec::new();
@@ -774,7 +775,14 @@ mod tests {
         assert!(record(&tmp, input_doctype, &[]).is_err());
 
         // Invalid resolve reason
-        assert!(resolve(&tmp, Subject::parse("work:tsk-bad").unwrap(), "bad-reason", "user", &[]).is_err());
+        assert!(resolve(
+            &tmp,
+            Subject::parse("work:tsk-bad").unwrap(),
+            "bad-reason",
+            "user",
+            &[]
+        )
+        .is_err());
 
         let _ = fs::remove_dir_all(&tmp);
     }

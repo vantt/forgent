@@ -40,9 +40,9 @@ pub fn dispatch_faults(req: &ObserveRequest) -> Result<serde_json::Value, String
                 return Err("missing value for --limit".to_string());
             }
             let lim_str = &req.args[i + 1];
-            let n = lim_str.parse::<usize>().map_err(|_| {
-                "faults --limit requires a positive integer value".to_string()
-            })?;
+            let n = lim_str
+                .parse::<usize>()
+                .map_err(|_| "faults --limit requires a positive integer value".to_string())?;
             if n == 0 {
                 return Err("faults --limit requires a positive integer value".to_string());
             }
@@ -70,7 +70,9 @@ pub fn dispatch_faults(req: &ObserveRequest) -> Result<serde_json::Value, String
     let mut by_class: BTreeMap<String, u64> = BTreeMap::new();
 
     for o in obs {
-        let cls = o.attrs.get("faultClass")
+        let cls = o
+            .attrs
+            .get("faultClass")
             .and_then(|v| v.as_str())
             .unwrap_or("unknown")
             .to_string();

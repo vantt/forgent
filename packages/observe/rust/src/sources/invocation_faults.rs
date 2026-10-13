@@ -28,7 +28,10 @@ impl ObservationSource for InvocationFaultsSource {
     }
 
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
-        let log_path = root.join(".fgos").join("logs").join("invocation-faults.jsonl");
+        let log_path = root
+            .join(".fgos")
+            .join("logs")
+            .join("invocation-faults.jsonl");
         if !log_path.exists() {
             return Ok(Vec::new());
         }
@@ -119,6 +122,9 @@ mod tests {
         };
         let obs = src.observations(&tmp, &w).unwrap();
         assert_eq!(obs.len(), 1);
-        assert_eq!(obs[0].attrs.get("faultClass").unwrap().as_str().unwrap(), "unknown-verb");
+        assert_eq!(
+            obs[0].attrs.get("faultClass").unwrap().as_str().unwrap(),
+            "unknown-verb"
+        );
     }
 }
