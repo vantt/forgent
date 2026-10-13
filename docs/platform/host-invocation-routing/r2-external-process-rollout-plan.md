@@ -11,14 +11,13 @@ Owner: Host invocation
 Source type: Redirect after plan/docs boundary cleanup
 Last reviewed: 2026-09-18
 Related:
-- plans/260915-host-invocation-r2-external-process/plan.md
 - docs/platform/host-invocation-routing/verification/r2-external-process-proof.md
 ```
 
 The R2 rollout plan is an execution record, not a platform contract. Its
 canonical location is now:
 
-[../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../plans/260915-host-invocation-r2-external-process/plan.md)
+`../../../plans/260915-host-invocation-r2-external-process/plan.md` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`)
 
 The platform proof record remains:
 
