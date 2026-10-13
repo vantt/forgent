@@ -64,6 +64,9 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 2. Does the agy (Gemini) login rotate at all? Left as today until read.
 3. Should `fgos doctor` report a pending copy that stays unidentified (its entry cannot be matched to the source), since it holds a refresh token silently?
 4. Should a torn scratch copy (a probe killed at its time limit mid-write) be kept for hand recovery instead of deleted as unreadable? Depends on whether pi and omp write their stores atomically.
+5. Pending cap keeps the 5 newest copies by staging time. When no copy can be judged (no `node:sqlite`, or a pi entry that cannot be identified), five later unrenewed copies can push out the one a pane renewed; still strictly better than before (base deleted it at once). Candidate fix: fingerprint the copied store in the marker at provisioning, drop identical duplicates first, cap after the apply attempt. Not triggered on this machine (Node 24, `node:sqlite` present).
+6. A pending copy whose apply hits an operating-system read error (EACCES, EIO, EMFILE) is deleted as malformed, because `unreadable-file` covers both a missing file and a read error. Split the code.
+7. A home kept because staging failed (`credential-home-kept`) is retried by the reaper without a time or attempt limit, outlives the reaper's age limit, and `fgos doctor --fix` cannot clear it; the finalizer's early stop also leaves that dispatch's other resources on disk. Needs a limit and a doctor check.
 
 ## Validation Log
 
