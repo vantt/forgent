@@ -11,12 +11,8 @@
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
       "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "architecture/dispatch-control-plane.md#dispatch-control-plane: Title/metadata block; related links and design status verified, no current-state overclaim.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      "reviewStatus": "pending",
+      "pendingReason": "A31 cited code changed; receipt retained as history and current unit is candidate-unverified under A28."
     },
     {
       "claimId": "claim_2c5053dfab8da99024c23c4c9f0c5015",
