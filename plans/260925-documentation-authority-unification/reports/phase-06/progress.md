@@ -1,3 +1,34 @@
+# Latest resume state — Packaging three-rationale follow-up ready for review
+
+Date: 2026-10-14
+Executor: codex-session:11@2026-10-14
+Session counter: 11
+Documented Packaging executor sessions: 4 (one interrupted plus three resumes)
+Step: 4 / Packaging-distribution P4 rationale-only rework
+State: ready-for-review; STOP for independent Lead
+Resume HEAD / independent report: d57231686ec1533d4de36507e814c2484da31f72
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Last green D/native proof source: 478c54d67c4721d495687a88408780f82235f793
+This turn commits: 478c54d67c4721d495687a88408780f82235f793 (12 bound source approvals and three rationale-only edits); final request/verification/progress explicit-path commit completes this checkpoint.
+Request: review-request-261014-1300-packaging-rationale-followup.md
+Verification/application evidence: review-request-261014-1300-packaging-rationale-followup.json
+Technical blockers: none within this scope. F6 is still an owner decision outside this request.
+
+Applied all 26 ok verdicts from review-4-packaging-followup.md at d57231686 verbatim and bound to that report: 12 source approvals through unchanged --apply-review, 14 truth/native/A28 evidence acceptances recorded in verification without invented truth or registry approval. Only the three named rework rationales change, naming the prepended Retained dated design — status note and/or appended Status note as applicable. Every other field of those three rows is unchanged; pending and approval-free. All other 392 previously reviewed source objects and all non-submitted rows remain equal to the report-commit objects. Full documentation/native text unchanged; no unit-28 wording edit beyond authorized scope.
+
+Fresh D against both priors exits 0 with zero fatal. Scoped strict E against both exits 1 as expected: exactly 3 pending source rows + 1 partial carry + 2 identical-unit groups + 1 dropped-001 register pending + 692 eligible reverse units. No strict closure. Native equality passes: all 94,333 immediate-prior known ID/path/anchor/digest tuples retained and equal, zero new/missing ID or changed tuple this turn; active registry/inventory tuples equal. Historical known-ID comparisons also pass. Source rows: 407, 404 reviewed, 3 pending; 31 reviewed successors and 21 reviewed prior heading bindings unchanged. Agent 488 and Host 588 candidate tuple sets exact. Exception memberships, Agent holds and Host residuals unchanged.
+
+Resume A-H and final preservation/ratchet/placement/candidate checks pass, zero own allowlist violations with the same eight exemptions. Review/apply tests with env -u CLAUDE_CODE_SESSION_ID: 29/29 pass, zero fail/cancel/skip/todo. Content diff from the Lead report commit is exactly one architecture decision shard; source/target trees, extractor, prior receipts, 74 witness/867 payload/five frozen-file evidence and all other decision data preserved. GitNexus before content commit reports documentation/data-only changes, low risk and zero affected execution processes. No production symbol edit or full-suite/installed-release/gateway claim.
+
+Native scratch: /tmp/fgos-work/packaging-rationale/registry.json, 59450050 bytes, SHA256 ff3b8e1ced4306cdb94dfcc943de16f2312c0d36b31889b8347aa96ce8bfa4e3, below the 90 MB stop line. Immediate-prior native registry retained at resume-registry.json; original carry source retained at registry-before.json. No seed reconstruction, identity graft or registry format change. Persisted working registry remains byte-unchanged at SHA256 d54faf6eec8e785b33fe5902022f446d0fe25989d90e5316707c1da50e849cd9; no batch closure publication.
+
+F6/dropped-010 proposal, entire dropped register and FLAGGED retention byte-unchanged. Owner approval pending; no new question requested. Historical truth sample remains 3/30 false (10%), with Lead's prior population-digest limitation retained. The three pending rows are claim_e4bf9b812f0b787bcf56246677865361, claim_3673677485dd4449067c9e5074623e1a and claim_107a23bb29dcf6db15e2471d7e77590b.
+
+STOP. Next action: independent Lead reviews only the three rationale rows in the full-text/full-digest request and commits ordinary verdicts. No batch closure, Step 5, promotion, push, rebase or main merge/write. Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging bounded follow-up ready for review
 
 Date: 2026-10-14
