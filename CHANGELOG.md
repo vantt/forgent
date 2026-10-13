@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A confined omp account's `agent.db` is now copied into the private home as a consistent SQLite snapshot (write-ahead log included) instead of a raw file, whether or not a dispatch opted in. The lazy-probe unlock now also covers omp accounts (the xai account), which it could not probe before.
 - A confined home whose login was renewed inside it is no longer deleted when the copy cannot be read for a reason that may pass (for example `node:sqlite` is unavailable): it is staged beside the account, and if staging fails the home is kept for a later retry. Staged copies are capped at five per account.
 
+## [v0.2.0-rc.4] - 2026-10-13
+
+### Added
+- `fgos` now runs each project's own activated release from any directory on a release install. `fgos doctor --fix` (which `fgctl init` already runs) writes one small `fgos` launcher next to `fgctl` that walks up to the nearest `.fgos/installation/bin/fgos` and runs it, so there is no absolute path to type and no rc file is touched (`fgos.cmd` on Windows). It never overwrites a different `fgos` found first on `PATH`; `doctor` names it instead. New `doctor` check: `project-fgos-launcher`.
+
 ## [v0.2.0-rc.3] - 2026-10-13
 
 ### Fixed
