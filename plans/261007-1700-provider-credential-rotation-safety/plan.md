@@ -76,6 +76,7 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 13. ~~The held-home guard and the write-back each read the source.~~ Answered 2026-10-13 (phase 02): the guard is gone; nothing is dropped to make room, so no read decides a drop. Test: the source flips between two reads and the only valid pending copy survives.
 14. A scratch home a dead runner left, and a pane home whose store was cut off mid-write, are still removed when their JSON cannot be read; only the probe's own scratch copy goes to `torn/`. Small risk, not fixed.
 15. The real size of an omp `agent.db` was not measured (no real store was opened), so the disk cost of copies kept without `node:sqlite` is unknown.
+16. What omp writes next to `agent.db` on each run (write-ahead log, or a rollback journal) and how large a real `agent.db` is were not measured (no real store was opened). The tests use fake bytes for the log and journal, not a real hot journal.
 
 ## Validation Log
 

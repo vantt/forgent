@@ -46,3 +46,11 @@ Full suite on c72f7f0ac (the later commit changes only plans and reports): 7291 
 ## Round three: write-ahead log
 
 The byte comparison and the raw fingerprint looked only at `agent.db`, while an omp store copied without `node:sqlite` also carries `agent.db-wal`, where a login renewed before a checkpoint lives. The omp layout now names that sidecar: a copy or source with a non-empty one is never judged identical by its main file, and the raw fingerprint includes it (a zero-byte log counts as none). Two new tests fail against c28d1ce17.
+
+## Round four: journal and unreadable sidecars
+
+Source: [code-review-261013-1813-credential-phase-02-wal-sidecar-verification.md](code-review-261013-1813-credential-phase-02-wal-sidecar-verification.md). Four new tests fail against 2a56240b1.
+
+- A sidecar that cannot be read other than as missing (permissions, I/O, a directory) was taken for an absent one, so a copy with an unreadable log could be judged identical and its home removed, or deduped away in the pending copies. Now only ENOENT means absent: such a copy is not judged identical, and its fingerprint is null, so it is never dropped. Tests use a directory named like the sidecar (works for any user) and, for a non-root user, mode 000.
+- `agent.db-journal` joins the omp sidecars; the staging without `node:sqlite` copies it and fails the staging (home kept) when a sidecar cannot be looked at. `-shm` stays out: it is neither hashed nor does it change any verdict (tests both ways).
+- Not done: a real SQLite hot journal and a real WAL left by a killed process; the tests write fake bytes. Plan question 16 records it.
