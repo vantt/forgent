@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:8@2026-10-13",
+  "resumeCommit": "d173e545903370353525315ea69fc5fc71e1fe7e",
+  "SYNC": "77830ba77eb05991d95b005919776ee6254e833b",
+  "main": "3e30ecd3779a4967b1c2f4ff01a68ae50c38ef83",
+  "resumeChecks": [
+    {
+      "command": [
+        "node",
+        "scripts/generate-doc-inventory.mjs",
+        "--refresh",
+        "--commit",
+        "HEAD",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-distribution/registry.json",
+        "--json-out",
+        "/tmp/fgos-work/packaging-distribution/inventory.json",
+        "--md-out",
+        "/tmp/fgos-work/packaging-distribution/inventory.md"
+      ],
+      "exit": 0,
+      "stdout": "generate-doc-inventory: identity registry (commit 0653419c19e7c37d8d00408ad482cdecbd45a807) is bound to d173e545903370353525315ea69fc5fc71e1fe7e; no carry-forward needed\ngenerate-doc-inventory: wrote ../../../../tmp/fgos-work/packaging-distribution/inventory.json and ../../../../tmp/fgos-work/packaging-distribution/inventory.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/packaging-distribution/inventory.json",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-distribution/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": []
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/fgos-work/packaging-distribution/inventory.json",
+        "--identity-registry",
+        "/tmp/fgos-work/packaging-distribution/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": []
+    },
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set([...isolate.exactExemptions,...[\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/plan.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"]]),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:exceptions.size,leadCommit:\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",leadPaths:[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"historicalWitnesses\":74,\"historyTreeUnchanged\":true,\"payloadTreeOutside29Unchanged\":true,\"inheritedPhysicalPayloads\":867,\"changedAreaPaths\":29,\"frozenFiles\":5,\"firstParentNonMergeCommits\":283,\"allowlistViolations\":0,\"exactCommitPathExceptions\":8,\"leadCommit\":\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",\"leadPaths\":[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],\"result\":\"pass\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-constitution.mjs",
+        "--no-ledger",
+        "--check-placement"
+      ],
+      "exit": 0,
+      "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 506 files, 505 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-candidate-status.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"counts\": {\n    \"files\": 506,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 112,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 115,\n    \"findings\": 1,\n    \"byType\": {\n      \"missing-promotion-fields\": 1\n    }\n  },\n  \"findings\": [\n    {\n      \"type\": \"missing-promotion-fields\",\n      \"path\": \"docs/platform/packaging-distribution/README.md\",\n      \"message\": \"missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by\"\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as git} from 'node:child_process';const p=\"plans/260925-documentation-authority-unification\",f=p+'/transitional-switchboard.json',before=JSON.parse(git('git',['show','a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2:'+f],{encoding:'utf8'})),after=JSON.parse(fs.readFileSync(f,'utf8'));assert.deepEqual(after.areas.map(a=>[a.area,a.authorityStatus]),before.areas.map(a=>[a.area,a.authorityStatus]));const paths=['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md'],set=new Set;for(const file of paths){const text=fs.readFileSync(file,'utf8');for(const m of text.matchAll(/docs\\/platform\\/[^ )`|>\"]*/g))set.add(m[0]);}const baseline=fs.readFileSync(p+'/reports/phase-06/reader-links-baseline.txt','utf8').trim().split('\\n').filter(Boolean).sort();assert.deepEqual([...set].sort(),baseline);console.log(JSON.stringify({authorityChanges:[],readerLinkChanges:[],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"authorityChanges\":[],\"readerLinkChanges\":[],\"result\":\"pass\"}\n",
+      "stderr": ""
+    }
+  ],
+  "mergeRefresh": {
+    "command": [
+      "node",
+      "scripts/generate-doc-inventory.mjs",
+      "--refresh",
+      "--commit",
+      "HEAD",
+      "--identity-registry",
+      "/tmp/fgos-work/packaging-distribution/registry.json",
+      "--json-out",
+      "/tmp/fgos-work/packaging-distribution/inventory.json",
+      "--md-out",
+      "/tmp/fgos-work/packaging-distribution/inventory.md"
+    ],
+    "exit": 0,
+    "stdout": "generate-doc-inventory: carried identity registry forward from 0653419c19e7c37d8d00408ad482cdecbd45a807 to 77830ba77eb05991d95b005919776ee6254e833b (4379 documents, 86340 units); commit ../../../../tmp/fgos-work/packaging-distribution/registry.json\ngenerate-doc-inventory: wrote ../../../../tmp/fgos-work/packaging-distribution/inventory.json and ../../../../tmp/fgos-work/packaging-distribution/inventory.md\n",
+    "stderr": ""
+  },
+  "deferredUnits": 7,
+  "counts": {
+    "planned": 402,
+    "native": 407,
+    "architect": 371,
+    "distribution": 36
+  },
+  "limits": "No source baseline, checker, vocabulary or extractor edits."
+}

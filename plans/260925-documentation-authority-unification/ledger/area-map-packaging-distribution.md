@@ -18,3 +18,26 @@ Source pin: `fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7`. Placement design only; n
 ## Retiring and retained roots
 
 Legacy source paths stay intact until the reviewed atomic cutover. This map authorizes no deletion.
+
+## Bounded carriage subdivisions
+
+Frozen at `77830ba77eb05991d95b005919776ee6254e833b` before carriage. The original file defaults are retained except the explicit subdivisions below. Historical documentation planning is preserved separately from runtime contracts. No live mechanism is retired. Machine row-level mapping: `reports/phase-06/packaging-distribution-placement.json`.
+
+| Source | Target and heading | Constitution kind | Operation | Scope and evidence |
+|---|---|---|---|---|
+| `docs/architect/packaging-distribution/migration-map.md` | `docs/platform/packaging-distribution/history/documentation-migration/migration-map.md` | history | move | Historical documentation rewrite instructions retained in full; runtime assertions remain dated input, never current proof. |
+| `docs/architect/packaging-distribution/rewrite-plan.md` | `docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md` | history | move | Historical documentation rewrite instructions retained in full; runtime assertions remain dated input, never current proof. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#3-roots-and-on-disk-shape` | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#5-releasemanifest` | `docs/platform/packaging-distribution/contracts/release-manifest.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#release-tree-canonicalization` | `docs/platform/packaging-distribution/contracts/release-manifest.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding` | `docs/platform/packaging-distribution/contracts/activation-binding.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#7-invocation-lease` | `docs/platform/packaging-distribution/contracts/activation-binding.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#8-pin` | `docs/platform/packaging-distribution/contracts/distribution-pin.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#9-projectionledger` | `docs/platform/packaging-distribution/contracts/projection-ledger.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#10-migrationjournal` | `docs/platform/packaging-distribution/contracts/activation-binding.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#existing-project-adoption` | `docs/platform/packaging-distribution/contracts/activation-binding.md` (retained source detail) | contract | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#12-command-authority-matrix` | `docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md` (retained source detail) | architecture | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/architect/packaging-distribution/runtime-identity-and-activation.md#13-fgctl-form-and-v1-acquisition-sources` | `docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md` (retained source detail) | architecture | move | Whole direct units; original design status retained; not a truth approval. |
+| `docs/specs/distribution.md#contributor-hooks-setup` | `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` (retained source detail) | contract | move | Distribution source is decided last at current blob. |
+| `docs/specs/distribution.md#setup` | `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` (retained source detail) | contract | move | Distribution source is decided last at current blob. |
+| `docs/specs/distribution.md#doctor` | `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` (retained source detail) | contract | move | Distribution source is decided last at current blob. |

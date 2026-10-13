@@ -1,0 +1,3313 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:8@2026-10-13",
+  "frozenAt": "77830ba77eb05991d95b005919776ee6254e833b",
+  "nativeRows": 407,
+  "plannedRows": 402,
+  "distributionNativeRows": 36,
+  "sources": [
+    {
+      "path": "docs/architect/packaging-distribution/future-constraints.md",
+      "blob": "690c7e63a7a4c53efc62d678fa076bd9533736ed",
+      "baselineBlob": "690c7e63a7a4c53efc62d678fa076bd9533736ed"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "blob": "c6bbdd30d60f39702cae14ecd61466025e22e7d3",
+      "baselineBlob": "c6bbdd30d60f39702cae14ecd61466025e22e7d3"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/migration-map.md",
+      "blob": "c5edca5674db61597039adc791e55f2bfa710530",
+      "baselineBlob": "c5edca5674db61597039adc791e55f2bfa710530"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/README.md",
+      "blob": "d21d72df42e8f6ce1d92a5772dce80251afb6a78",
+      "baselineBlob": "d21d72df42e8f6ce1d92a5772dce80251afb6a78"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "blob": "9ceb3ec594ddf7658e410f3826f9f8276ec635b6",
+      "baselineBlob": "9ceb3ec594ddf7658e410f3826f9f8276ec635b6"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "blob": "de10278a05a8bbc7d67ee11bd3a87aa93a318564",
+      "baselineBlob": "de10278a05a8bbc7d67ee11bd3a87aa93a318564"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/scope-map.md",
+      "blob": "599e7368b9682820c97e9af179316628093aac33",
+      "baselineBlob": "599e7368b9682820c97e9af179316628093aac33"
+    },
+    {
+      "path": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "blob": "23b407d86769f35f2e343f758a6ef61bd7d4337d",
+      "baselineBlob": "23b407d86769f35f2e343f758a6ef61bd7d4337d"
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "blob": "13d2e172de35a570d148022d4c859cac05223acb",
+      "baselineBlob": "b370c940c369c5de88007fc4ce1347121a850178"
+    }
+  ],
+  "rows": [
+    {
+      "claimId": "claim_27e88f0348e205e3800328dff2bf9061",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "future-constraints-shared-gateway-adapter-and-substrate",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_02283779e0828c43f11139529404231e",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 3,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b1c428598d2f02ff69ef3c6fe7f6345b",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 12,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_294af275b28f9bbcede3b42d5858d0d3",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 16,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_101052db6c60001d74122e568758c30a",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 19,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7349dee181086a8889af917bb6b34196",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "1-shared-web-and-gateway-position",
+      "startLine": 24,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_61d87e58aa1f317992fc9279e58197fa",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 26,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_23d7ea7dbf4bb36aacee798f2ed2afa8",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 28,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0f38e57c49703eea9defcedf36a8467b",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 36,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ae2e1d413776093cdcdee8787202fda0",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "2-project-runtime-adapter-constraint",
+      "startLine": 40,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2b05b0bc92d72837c5fabfa34dc2de6f",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 42,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_13f44d0aa220389c03ce84abe8a56d53",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 45,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6bd2974a2417e8c27088a66979b60cc5",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 51,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5d90a1feae61211f6c8d6c22577614a0",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 54,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9c255ee1a5b4f4fd88ebc4cb224bd889",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 56,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6e6df06f2ba8134cd8a65460e9dec9a0",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 64,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e2cf1dbd193a055e031951b2b931bb66",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "3-future-gateway-safety-constraints",
+      "startLine": 67,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_cf3a62367037c9ea82b4701c6462c178",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 69,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0345aacec405a2868c247d584a87d925",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 71,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3f73e2eaeabcfe79f138f9fc31308540",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 78,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_582717eba2da7d03c720e4451e8bbca7",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "4-mcp-global-substrate-constraint",
+      "startLine": 81,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ca623bb1c675ca22f8979437a1e7db12",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-17",
+      "startLine": 83,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d0646b1e392a6ad37ab4d93bbf150982",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-18",
+      "startLine": 86,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_12ced85b7437512af0a6650507afc92d",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-19",
+      "startLine": 88,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4c5b960a29bec725c83bb0d682f740e2",
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "unheaded-block-20",
+      "startLine": 94,
+      "target": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_31ad2b5118fa2f5ace74f6dc554cd54b",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "distribution-baseline-and-scattered-spec-fragments",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a8db4d1b5dee758669f089389cd7fdaf",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 3,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fd5a0e99e27fa9f786e6861f57d33907",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 12,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_265c931798febc6fc1eff10dbffd13e7",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 17,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e17289163c81b219c4eb604fd50727e1",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 24,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9cc23a4e3a0a14631502a466a4341df9",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "1-current-nodenpm-baseline",
+      "startLine": 28,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3bb8f3aec9f267a2db60ebeb966dfa0b",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 30,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9f5d6528d7519e6856953762748dedb5",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 32,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c3059ade1c9c15a9a5a5268d6b011c94",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 48,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_42ad1d453cfc144a2c2717309e55a5a5",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "2-scattered-spec-fragments-to-preserve",
+      "startLine": 52,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fa5d0541444cc70c8e09a197c4e0505e",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 54,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8b6be9b844fa6b37a6f9dedcf80845ee",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "3-old-design-pressure-from-tsk-1fp",
+      "startLine": 67,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_205b50bfd33a8a17877e6aaf20ab6372",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 69,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_19c80241aea6abfb334f5ebdafeee572",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 71,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b10987f227e013b90578a2d5f8fca2f4",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 87,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9b9c366b2db85db4bdc5067f991e1d2b",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 89,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_141829aa3102f8c97858ee0217555cfe",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "4-old-install-contexts",
+      "startLine": 95,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_16fdbcc0b795aa246bd317179c48885d",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 97,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_00ec43135ad1ac52be4eac73e450e950",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 99,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ad9c394ce043f976b7025bdadc5f495e",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "5-source-hygiene-note",
+      "startLine": 105,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_328989472b0ebbd9ff35577218f2284e",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 107,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fb8c37dfa23cde8e5c8877ce9e520074",
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 112,
+      "target": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7eae8db77f76d88c28dc86e31ece8996",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_355aaeb0bfa71a047c253e01d7e1709f",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "1-purpose",
+      "startLine": 11,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_60ea350db0ddad715074cc5eeb0050a1",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 13,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e93cf8612efe92fededd0b8070224dfd",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 15,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d72a100492f18718d1b6e81d5eb0812f",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 23,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c3ebf296b49de9b0fe3b6dbfa4568398",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "2-target-area-shape",
+      "startLine": 25,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_414f97e4358721e8cbac9e6798abeda4",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 27,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ab4b19d23e0abc5c6104dfdd2e9cb8f8",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "3-authority-classes",
+      "startLine": 48,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_419a8439df25e5ec3af635a1c64a6f6d",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 50,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_05977e0730d9681e87696e687b549e80",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "4-document-migration-map",
+      "startLine": 60,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ee33f64bbb15393fc1bc09bd9cc1504d",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 62,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_262b818674af9b66095f1bf540cdd70e",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "5-implementation-evidence-map",
+      "startLine": 78,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0719457a9ecdeec3daf0ea81cb0ab8ba",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 80,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_97d7c4d19dc98e1c239b829208625353",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "6-implementation-alignment-seed",
+      "startLine": 92,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fafa463b71e843920600d3d14698dc86",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 94,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c0eafc4309c1b8f27dcc1bd6f26a60d6",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 96,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_93f9a84ce873c4214d4e392b527ea339",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "7-rewrite-work-order",
+      "startLine": 110,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0a9db0be179a39219a375f6bcf119f0a",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 112,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_66f57725dcc2753e251b1eaf605a1e4e",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "8-open-questions-before-canonical-rewrite",
+      "startLine": 120,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ca1ad4dad8240e78f75cd1cb0aac20fd",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 122,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7b67919a2df9c0f80b481c9c2132a10c",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "9-promotion-checklist",
+      "startLine": 130,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2fd6a08fc74c3d64e45e764f6c5bc94c",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 132,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_25602637994eeb21f8f8e7b927fcf5e0",
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 134,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3e74e0d8a854fb7ae0bffd1272066a17",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "packaging-and-distribution-architecture",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c0514f347e48db6c5d4c3dec86d7f7a1",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 3,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_671262f92d51b9bb15bc07008a4adc5c",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 12,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5599dc639537d309ffa99990c18a50d1",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 17,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_87a79a1055917fe0ccc476f20b00bacb",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 22,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c0cd0b1b3afe001a8f92d3421621dff1",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 27,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6741229cfdc5d39ced167646c763cffa",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "1-historical-read-order",
+      "startLine": 35,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_180db2a5b2592775ada69d493e5e04f2",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 37,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_eb7642e47d0ae2c722553f41a0313065",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 41,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c7ca681b20d38642b7df57b79289d6e5",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 53,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5766225be2d76d6239e116a664aec7cf",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "2-historical-supersession-table",
+      "startLine": 57,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_37a8691bba650ed4cd9d98314b6a2b1a",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 59,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b8f77a61e158f2e2d0415b1bad9a1134",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "3-boundary-rule",
+      "startLine": 67,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f3dd063ca7c7f474e8da47a41a50383f",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 69,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bfdccc161efc745d832eb3bf7b6154a1",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 71,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_1b30715275684d16118b9373a00ca0cc",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 77,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_160a74067f855695f01d618db867f6fc",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 79,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_51bb85bbe9c18ac836770ed6a9d46fea",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "4-vocabulary",
+      "startLine": 85,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_40f219141e05c4af2cdf0a25a5841c94",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 87,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_59e13b2acbe865701b281dab235a030c",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "5-historical-design-position",
+      "startLine": 103,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3469a1790d794aebbe6b19a1eecdace1",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 105,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_62dbba9d00bfd8726135dd30b61cf286",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 107,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_655aebe301e25232a80c6f34bba289b8",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-17",
+      "startLine": 130,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7006be8edfb8423940048f9129644ab4",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "6-do-not-collapse-these-boundaries",
+      "startLine": 134,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_de7ed92c2420583f2268f423ab1d0878",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-18",
+      "startLine": 136,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7393eb2f3380f370829bfa756f1e2b82",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "7-historical-delivery-spine",
+      "startLine": 147,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6c527e7d02ccf2752d2cb49f81f326ba",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-19",
+      "startLine": 149,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_55c38fbd29f3d4b8ba98ee27cb69bbf9",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-20",
+      "startLine": 152,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_78250c7517d445de50ab460d48234055",
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "unheaded-block-21",
+      "startLine": 162,
+      "target": "docs/platform/packaging-distribution/README.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8f5afad9e717a19652425afa6e16fc9d",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_1f134034b57f352e603ef002af320b71",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "1-goal",
+      "startLine": 11,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_13d82a154f9fe90af9f5624c92634ca1",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 13,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_483dbe615cc89f83790c18d274dc92f5",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 15,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d8d5954d604bc36692cf5fc8adc789ca",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 21,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b0f561cd80e4caa5e6cc8e7b7f89dada",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "2-scan-result",
+      "startLine": 23,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_622289cbc75e51c53041b6289d29e192",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "21-primary-source-documents",
+      "startLine": 25,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_46af52bc2582bbc9495d29b7c9b655f8",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 27,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e930d787920c42d8d279926bc4492f42",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "22-related-implementation-surface-found-in-code-scan",
+      "startLine": 40,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_af1b6feffda6b7400be80a9355618310",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 42,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_84583eb258ce4940aa6ea139e175c59c",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "3-documentation-standard-gap",
+      "startLine": 52,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4206bf10c55bad6c3a0e701ed2ccec35",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 54,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_453db5f9994d258e7b38277377a6151f",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 56,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ed9ea6a584842b2f07921e96bb9ea75d",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 58,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5c33a4d69bd90bbe87b610c1a3cd3ddf",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 62,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_883af464f949ae92e66a6c549900f30d",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "4-proposed-target-shape",
+      "startLine": 64,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0a86c2af3fd40af225beb40de5f19808",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 66,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_08a5ed2ccd07b58d50fe49a256d1833d",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 68,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4c3f85a8fc5aab46a172b633c141c034",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 70,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4aa91c9c0611e4d3ea19926a3e8fc2dd",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 72,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6d64221408bc0725ec87d1647ee1f99e",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 93,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6f07746f61ac8a7a89a8bf924fe8444a",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 95,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_15562bd4682b6d4a51390e92f4b28c37",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "5-rewrite-method",
+      "startLine": 102,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3915f8ed8fe94d513d2f5bd03067ab71",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "51-phase-1---freeze-inventory",
+      "startLine": 104,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_97ce92c5ce6bfd7c04ae6eff4955bfa0",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-17",
+      "startLine": 106,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_1db2433383b8bb2b37892501e3c16f23",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-18",
+      "startLine": 108,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4d6f6ef0095d4a62e1428407509de3b9",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-19",
+      "startLine": 113,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9baf5a6a983c11dc335a8fb6f7473d9f",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "52-phase-2---decide-authority-model",
+      "startLine": 115,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9898058e8fe7decfbf7714019c031d0a",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-20",
+      "startLine": 117,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d60c0e57eb3df0251ecf21ad6ba00bfe",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-21",
+      "startLine": 119,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_34ac4116422aad2956fdd30d5a2b5aea",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "53-phase-3---write-the-area-portal",
+      "startLine": 126,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a4bb17a0f57f5fbbc44aa16ad9b09929",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-22",
+      "startLine": 128,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_82531f9634a2abcecf3755c46241a735",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-23",
+      "startLine": 130,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7e32df91fcd3785a1ceb440081624afc",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-24",
+      "startLine": 136,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_63934a917c05036698f405bf42f5f9a7",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "54-phase-4---rewrite-the-spec",
+      "startLine": 138,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_61951e61b419c33495016cac2396fc5b",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-25",
+      "startLine": 140,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e36c9e6e9215161abb92ca2337fa3fe2",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-26",
+      "startLine": 142,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3540f7146aa866c1f9c71c65aca3e1ad",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-27",
+      "startLine": 144,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_28561227790a581f54803e46466497c4",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-28",
+      "startLine": 152,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2b1d1f638a3f25da7f1d9aec5253a374",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "55-phase-5---promote-architecture",
+      "startLine": 154,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6ca3299025b2c1ec4b39a8c181b383d3",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-29",
+      "startLine": 156,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_56859340e32ce85be9cac1710b30cef8",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-30",
+      "startLine": 158,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4b688f7d2f46862d1542d3c8d75f51a4",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-31",
+      "startLine": 162,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_db296bf5efcdc48dac0f95093431713c",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "56-phase-6---extract-contracts",
+      "startLine": 164,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4f5c94dd20c7026eee33adcf9d2e032e",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-32",
+      "startLine": 166,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_635aaf1ea472ec0c1e6aa32e40f8b09f",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-33",
+      "startLine": 168,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0a677ec340f984b7a7e75d8c7137c470",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-34",
+      "startLine": 175,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_13bc4b4a4d533217a63de272c54d0cd8",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "57-phase-7---build-verification-view",
+      "startLine": 177,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ebe3db9ec14c6de6f7dab9d849feae46",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-35",
+      "startLine": 179,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bbe56c35676706cc06e9abd8774393e2",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-36",
+      "startLine": 181,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fdef24cd5487a3e14d537eb3e4f9dbee",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-37",
+      "startLine": 187,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ebecd97d292c1fd5df89f82ce12f0a8c",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "58-phase-8---redirect-and-retire-legacy-docs",
+      "startLine": 189,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_876987f1fb75a47edcb4d0ad20d8fbc9",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-38",
+      "startLine": 191,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fa209d9a17c117bf49b23a089f8872e6",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-39",
+      "startLine": 193,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_66e562a123e15dd39fd23c667f584927",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "6-recommended-document-structure",
+      "startLine": 198,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_075a4fba8b091b1849c20ca68b73161d",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-40",
+      "startLine": 200,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_cffe3c3a7c729e5082259d64b836163f",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-41",
+      "startLine": 202,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_83e0514232a558d384664270171578c3",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-42",
+      "startLine": 213,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_169cb10cb1ae6e6645a948300a3f4063",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-43",
+      "startLine": 215,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_60a428b6d8acf5e3682c0f3f0974f040",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-44",
+      "startLine": 225,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a9a6c2182dff9ff356bc5800987dc6e7",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "7-open-decisions",
+      "startLine": 227,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4e6d8ea4db0848ee75a72fe670b38a08",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-45",
+      "startLine": 229,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_40efa8c328a27bf90a90be847f1e0ce4",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "8-non-negotiable-rules-for-the-rewrite",
+      "startLine": 237,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_13d3d6c0ae0606b2ac069f34faebb757",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-46",
+      "startLine": 239,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_35cf33a00e8a54b906e9b69850014755",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "9-first-concrete-next-step",
+      "startLine": 246,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7a394bc533b63f4bcb608aae3da9a585",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-47",
+      "startLine": 248,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_30069b0c5b66150c0afd7909cdedb51d",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-48",
+      "startLine": 250,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e311b370638ba6122de019bf1f6e7642",
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "unheaded-block-49",
+      "startLine": 258,
+      "target": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f3d6f2172d4780ee47f3a2f7a44b2ec8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "runtime-identity-and-activation",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b6c7e0cf73c35dad866f2dd1d7a2a3e2",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 3,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a8c8bb05d3b2183c26cfb7f502c66ac3",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 16,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_26dac21a6c44a07abe3ff6c726462bca",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 25,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e7c16bc6110144f3672d8e3263df7c4b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 31,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a194d0ab7320ba24239af2947b286713",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "how-to-use-this-document",
+      "startLine": 35,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6f1dc76a5f99b9f747725aef60bd5d12",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 37,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_821b6180ae535904a105ff8c47fe5dff",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 40,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "historical-decisions-promoted-or-tracked",
+      "startLine": 55,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_12d5dbb269ca537c8e1923d57274a43f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 57,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_66b58ad141eda076944d47edf360f2e1",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "1-core-position",
+      "startLine": 78,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b3a8dbb74fb0731a881627328e2e80fa",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 80,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_aaf3be3d5306a121c46039453a59cbd6",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 83,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c37dcdbe6ae24c4921c70633185cd44c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 94,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_abc2a0de9c412207cb045053290a4e89",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "2-runtime-lifecycle",
+      "startLine": 99,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_74c5730141447c8e8ba33ab0cf2d3d66",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 101,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6057d124ab44d29d90945fa60f209319",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 103,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_659b692c5498f117fc6aeb1a67380a0d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 113,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7d62eb2a58328da0a2a9901c3a79533c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 116,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_730ffda554a0b85dda9cf5813e028e29",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "3-roots-and-on-disk-shape",
+      "startLine": 123,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a2ffbcf3bf179c454c210a649e55c3e8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 125,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_734e7078568afb68a70dd0e07119dea1",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 129,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4ecf15f45c6d4ae5224b0c4fc9924184",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-17",
+      "startLine": 177,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2dec8131bea8fca857c017c1744f5f87",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-18",
+      "startLine": 179,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_78fb7962a13f38faf373501503aad531",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-19",
+      "startLine": 195,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_67ea7318ee5a0c7394b3ab1f8adcc403",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-20",
+      "startLine": 199,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bce7f3242b78cb8e82985d7c5adde2f3",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-21",
+      "startLine": 211,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b9832e31175255738a4f2dac93d22f61",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-22",
+      "startLine": 216,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_32fe7ef12d653275e441c6fd15ea6a1d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-23",
+      "startLine": 218,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a0b5501fc16d1899fa7113404c4d9592",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-24",
+      "startLine": 231,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b75456d68668096b7f0c16a1a127cea3",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-25",
+      "startLine": 233,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f52782c280bebce5da6b93525468767b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-26",
+      "startLine": 241,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_94279ae6161753a909f28f600f659a71",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-27",
+      "startLine": 245,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5a3a18f32e281545d12940271cb4e89f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-28",
+      "startLine": 250,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_701258f4566c7c5081bace1eb5cde015",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-29",
+      "startLine": 255,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f64d078d07273a7fb7a4ea60cb70e7cc",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-30",
+      "startLine": 258,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e4b4c1384a54c958cf7388473616a465",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-31",
+      "startLine": 266,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9e084ca046f9dabf12285656ff43d26e",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-32",
+      "startLine": 272,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3b8bf6d3bc131881bdb9631412ad5ee9",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-33",
+      "startLine": 277,
+      "target": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7f687034c5f8c915c95d7c932ba0cbd6",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "4-record-types",
+      "startLine": 282,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0372b73a7a1a072a8835ecde7be7d1df",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-34",
+      "startLine": 284,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2a086421fe8b46ed8c0a7c2741704dac",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-35",
+      "startLine": 287,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "5-releasemanifest",
+      "startLine": 295,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-36",
+      "startLine": 297,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_34af5eabebda68848f5a4f158e81702f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-37",
+      "startLine": 300,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c809de74f3631def7b3b3098a6290c9a",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-38",
+      "startLine": 306,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4ece2063c9e19d3693005ab4de9f86a1",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-39",
+      "startLine": 313,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ef427cea4a40a9001dcf5f004d5cda64",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-40",
+      "startLine": 316,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-41",
+      "startLine": 369,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "release-tree-canonicalization",
+      "startLine": 371,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e53e994efd41de413243c7feb18609f5",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-42",
+      "startLine": 373,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-43",
+      "startLine": 375,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4486d8c871bc7cace22f5877da298119",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-44",
+      "startLine": 390,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_53faf89f35a824288c56245cbe2ad881",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-45",
+      "startLine": 392,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4181e74c1b213526e0047eb5d8a3d2ac",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-46",
+      "startLine": 402,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-47",
+      "startLine": 412,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-48",
+      "startLine": 417,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-49",
+      "startLine": 420,
+      "target": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e4bf9b812f0b787bcf56246677865361",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "6-workspaceactivationbinding",
+      "startLine": 431,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-50",
+      "startLine": 433,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b1302fab2b069f48ae2cc5e5ae9353f7",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-51",
+      "startLine": 438,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4b867492e168a488b4d812642f2aad61",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-52",
+      "startLine": 464,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_dcd34697ac5ac6857e5216f7d3798a0d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-53",
+      "startLine": 468,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_25d3080e64bc69696f28d89967456930",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-54",
+      "startLine": 475,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-55",
+      "startLine": 478,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2d797473f60376ca54f9086ff0856496",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-56",
+      "startLine": 485,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f44d55f008d91c249201a984ce908b79",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-57",
+      "startLine": 489,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5802544189befbf7e8e93082025a321f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-58",
+      "startLine": 493,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-59",
+      "startLine": 497,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d1fbe2ed17042364fd3798e8f1acb938",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-60",
+      "startLine": 499,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_655efd23210f4e37ebb981dab1d3572d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-61",
+      "startLine": 510,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ba307bc371864f9cec89f991fef61744",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-62",
+      "startLine": 521,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3673677485dd4449067c9e5074623e1a",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-63",
+      "startLine": 526,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-64",
+      "startLine": 529,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-65",
+      "startLine": 535,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "7-invocation-lease",
+      "startLine": 540,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9b88f0158d85f69a82792e4b47f72022",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-66",
+      "startLine": 542,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-67",
+      "startLine": 545,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-68",
+      "startLine": 554,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-69",
+      "startLine": 557,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-70",
+      "startLine": 559,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-71",
+      "startLine": 564,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3ef278de1f3aec5f3020e1aa0b5ce269",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-72",
+      "startLine": 569,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_566ba6b6f52ab7360edd78e376c925ba",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-73",
+      "startLine": 573,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_902e921806fa75a30ff3879ae1f85761",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-74",
+      "startLine": 596,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_13dd8473351e86bde28b379f9fbeb00f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-75",
+      "startLine": 617,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-76",
+      "startLine": 627,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-77",
+      "startLine": 631,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_52a973f8470cb1944a340ed858f04efb",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "8-pin",
+      "startLine": 635,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_971cf3ac708840a6682762c1ff359bfe",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-78",
+      "startLine": 637,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_91a834dde03fb4d5de522e8f2ee4e264",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-79",
+      "startLine": 640,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_727d725b6c684525ce31433b6c80a82c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-80",
+      "startLine": 644,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_caf633f259ab9311fc2a6b59369e8e4c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-81",
+      "startLine": 647,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c79ecbfd6d9fcef835494ec27d9b430d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-82",
+      "startLine": 662,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fdba65f9b9568b8b056ca62b641ba27a",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-83",
+      "startLine": 664,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c55b087169bb5b95e77d2392f847dd59",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-84",
+      "startLine": 668,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fe64609bae7caa081faaaf50124b3467",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-85",
+      "startLine": 671,
+      "target": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a9d41dca59b552f4bc5f85b11b18a34b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "9-projectionledger",
+      "startLine": 675,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9ee6b8fd89b75b07fe2d38f8221b6fcb",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-86",
+      "startLine": 677,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6924b8ba3475c1cbddca353b6e956109",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-87",
+      "startLine": 680,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_83056288e77252541c6691aa5cc02180",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-88",
+      "startLine": 689,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_68cb4be049108f3fa0787389fcad5d70",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-89",
+      "startLine": 692,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9828d5c2a7dc5da98fffde8f3709234a",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-90",
+      "startLine": 696,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c255b948236f12ef2e1822baee4aeffe",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-91",
+      "startLine": 698,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9645945ba0efdae80d19b702eae7e664",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-92",
+      "startLine": 705,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bc5aa4f672c86bdabd7b9c71ecb07d5e",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-93",
+      "startLine": 707,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c9b0a6af3e0c8e794470d4f769ee8237",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-94",
+      "startLine": 713,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f0fad11fa4e6246168b9b1eaf533dc47",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-95",
+      "startLine": 715,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7a855153147bff66d84b5c0867a0a0ec",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-96",
+      "startLine": 731,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f3266d83b74f1e5c4424ded4f2035d62",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-97",
+      "startLine": 737,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_aa041e3cbcf57f2fc4953023e15560e9",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-98",
+      "startLine": 739,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6f9551b510fce99e4d9c0be74cea033e",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-99",
+      "startLine": 760,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c0012a8de299b47450ea5d16a61dda21",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-100",
+      "startLine": 769,
+      "target": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d42eb384f05d935d19cf9891bb5c5df9",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "10-migrationjournal",
+      "startLine": 774,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-101",
+      "startLine": 776,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-102",
+      "startLine": 778,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_181a82457153d16a123d8c3378c30c98",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-103",
+      "startLine": 780,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c6869299794e7b0b8faebb525521af54",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-104",
+      "startLine": 794,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-105",
+      "startLine": 797,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-106",
+      "startLine": 799,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_491998778e598a5385e78b541e33bff8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-107",
+      "startLine": 805,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-108",
+      "startLine": 812,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5a5a447d501facb835101fcf15cf5f9d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-109",
+      "startLine": 815,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0d7b6c7bb749583718df925f63a8ba7f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-110",
+      "startLine": 819,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-111",
+      "startLine": 830,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-112",
+      "startLine": 832,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3a0164aced10388208f0c748829bf990",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-113",
+      "startLine": 846,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-114",
+      "startLine": 852,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_093f54d48d2e2a3efc8f0c865ba57b66",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "existing-project-adoption",
+      "startLine": 856,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6ed197b95e7f9801fa8298694177e5d0",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-115",
+      "startLine": 858,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a144f2fd3dd53acd12feeb7e72607de9",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-116",
+      "startLine": 864,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-117",
+      "startLine": 866,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-118",
+      "startLine": 870,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-119",
+      "startLine": 872,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a5d4be2b9bafbb6afe85aa62070351e0",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-120",
+      "startLine": 876,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b0de344d5a30b83c57e0ff1b963c4c43",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-121",
+      "startLine": 880,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_89796d37e2377576e2e7202f34b08ea8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-122",
+      "startLine": 892,
+      "target": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "dev-source-activation",
+      "startLine": 895,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_c95bf4f07595cb9b849208efc61e76fb",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-123",
+      "startLine": 897,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_865a8350c10fa2d9cc73ba3edb8b0520",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-124",
+      "startLine": 900,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_3b0ea2eb26b63bcfe3c447bcce51d96c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-125",
+      "startLine": 902,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_3b558cb40f932564057bd64e5d7e024b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-126",
+      "startLine": 909,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_b4018a4e982ca86c1f265cfe32a05494",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-127",
+      "startLine": 918,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": true
+    },
+    {
+      "claimId": "claim_bc6c80a5dbb5b49aa616db0b538022ba",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "11-drift-repair-rollback-and-quarantine",
+      "startLine": 922,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_822b8a0d68b2d83e3d093e45be2e77e8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-128",
+      "startLine": 924,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_28574a962da3d238b368e94888838811",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-129",
+      "startLine": 933,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c528c54251a8a068ed907a33f2231af0",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-130",
+      "startLine": 935,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9951c6bd4ccb66c41b615e5738a97d03",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-131",
+      "startLine": 947,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_96f22a8e9502051138cfd569f9d1284d",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-132",
+      "startLine": 955,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_94cacafd8c1528537a1a34e34c0d9a5a",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-133",
+      "startLine": 958,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_758a0cbdf10b65b416cb9d69f5a335f2",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-134",
+      "startLine": 966,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_50f9705e563bfc2722ba75dba06b2b55",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-135",
+      "startLine": 969,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d00aa510f8e3a7395320c9636c3a5528",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "12-command-authority-matrix",
+      "startLine": 977,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9afc188be58ad9bb817c25a40707a574",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-136",
+      "startLine": 979,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f41b8ecfd7a8e422b2ee9ab94407e848",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "13-fgctl-form-and-v1-acquisition-sources",
+      "startLine": 989,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8c209d52a1b27656139fcbd400ba677c",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-137",
+      "startLine": 991,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e3c3cc72883c4d057f257cc8ea1e6908",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-138",
+      "startLine": 995,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_49c16dccd9a1f81a789161cd67643de6",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-139",
+      "startLine": 997,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5323e007ef39ce0e524fb9fd7f3be011",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-140",
+      "startLine": 1002,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_052b867553ecf9809d2eaf538e329b64",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-141",
+      "startLine": 1005,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b6c26b956749fd793c8ac8f97b1d999b",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-142",
+      "startLine": 1012,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ffa872bb8b06a4e29d59df40a732bf31",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-143",
+      "startLine": 1015,
+      "target": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d7a9ea523826eba629da2b4c3cdc61b3",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "14-walking-skeleton",
+      "startLine": 1020,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c0afc8b40e3422d6dbd55aad9f6388bf",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-144",
+      "startLine": 1022,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2e94447a40d78f539424a7213cc35f89",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-145",
+      "startLine": 1024,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a24422208854df7ad9c53b0a7f663e96",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-146",
+      "startLine": 1053,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8c70ec6a92ebfe58cf460e88ce313aa8",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "15-open-decisions",
+      "startLine": 1058,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b19d5177a72889440523f68acc63caaa",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-147",
+      "startLine": 1060,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f293bbd03855e7b0ecb113520bd185b7",
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-148",
+      "startLine": 1065,
+      "target": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0036613efcab070084f6d6a219f0787d",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "packaging-distribution-scope-map",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_125cef1cef30d1dea90c511b9f6283e0",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 3,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c2e23dcc565a90df0c229c276f49cda6",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 15,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_1b386ff42da1ea6faffd434fd4600efe",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 21,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6f29738146b71d6c8fe18454fa54170d",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 27,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e6e67bbd91d38440145b2cac743c3983",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 32,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_3483ab5f8b28bfbeaca48258d6128c1c",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "1-concern-map",
+      "startLine": 35,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9e77c50e995716e7f23813013c466c3d",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 37,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0126dcd017d4604b384236e046fadd82",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "2-historical-document-split",
+      "startLine": 55,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b43688fff7d34b97772efcb6d81018bf",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 57,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_73ffcd717dc2650f8713bb90547198d4",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 60,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9881ddf76dc1db230f605f5ea5af6bc3",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 90,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7c93e9a44c1e8eb580ebb1c28fbc9d3f",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "3-boundary-rule",
+      "startLine": 97,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_32e7f978ade53ffcc2e0d133ea0add0b",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 99,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0d5683e5cddc8d54df2796cbb0cffad8",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 101,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_04e662788ab02accc67a57eda408fa7c",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 107,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_85042d69edd2c1710bf4a9a5321cafe8",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 109,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a9679b20b8c65b854853c43ac50534ef",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 115,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_18896f5dc88690abd1dea714b43da23f",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "4-historical-architecture-position",
+      "startLine": 132,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_fd4ef508d9b08945c7592b9cff52303e",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 134,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_099829ace5237fb150e7e2112ec87508",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 136,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d6c0ad62259e8ebcf4ad364e7e0a0972",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-17",
+      "startLine": 157,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8946f48631858996b29154c5a81920ca",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-18",
+      "startLine": 159,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_dd97ded8ab424ffd24d50cbafc620757",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-19",
+      "startLine": 166,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_6fa26e8fdaaf86bd7e75de5bf28bfea9",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "5-activation-boundary",
+      "startLine": 170,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_075bcdb88bc8989bf347f84bcf8b6bb8",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-20",
+      "startLine": 172,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_707c20d97af0d6e733b8defcf4d62394",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-21",
+      "startLine": 174,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_80e603db238925ca6f81c14d52b10436",
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "unheaded-block-22",
+      "startLine": 183,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "workspace-runtime-model",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_da41a9786ba80d8a51c540a03d4dc2c6",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 3,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d6701453661c34a2331f9d9bd12ef843",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 14,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d897f2b8b6a0fc956ef2232d1d7b90c3",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 20,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_0acb3fce7151b23ecb8e2f00e867edb3",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 23,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_249083eda8db1792917b6bc5239e48dd",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 26,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ffe2d79ceecc8d5f4c380c2ecbaa86ed",
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 28,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_c87924f5a8b4ef3683e8133768ec69b9",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-1",
+      "startLine": 1,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e7f7734953cc2e9478d81719b046f0cc",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-2",
+      "startLine": 9,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_9138d3d0488e16d2eb4a0150ddd3b60f",
+      "source": "docs/specs/distribution.md",
+      "anchor": "spec-distribution",
+      "startLine": 22,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_67a64ed4e0700ecab3cb28af6962195c",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-3",
+      "startLine": 24,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_906908e36bec4cc1428b304dee46bf65",
+      "source": "docs/specs/distribution.md",
+      "anchor": "entry-points-triggers",
+      "startLine": 32,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8a26867c2037ac3caf4e9eaf2f4c9ec1",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-4",
+      "startLine": 34,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "source": "docs/specs/distribution.md",
+      "anchor": "data-dictionary",
+      "startLine": 55,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-5",
+      "startLine": 57,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
+      "source": "docs/specs/distribution.md",
+      "anchor": "behaviors-operations",
+      "startLine": 75,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2a9767fa3d005bdcd288d3432e88700d",
+      "source": "docs/specs/distribution.md",
+      "anchor": "install",
+      "startLine": 77,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_391af7258478be2a89286128fcd86063",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-6",
+      "startLine": 79,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5b1bf67352e3b6cadd74ac1cfdab901d",
+      "source": "docs/specs/distribution.md",
+      "anchor": "dev-checkout-shell-helpers",
+      "startLine": 115,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e36dc6d7c4cffd08e74b89407c1de2d1",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-7",
+      "startLine": 117,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_ac8cc5d1152e7a057ffbef1e804079aa",
+      "source": "docs/specs/distribution.md",
+      "anchor": "contributor-hooks-setup",
+      "startLine": 136,
+      "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_5c58459a3d4fb3c94d3d177ae5ff71ad",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-8",
+      "startLine": 138,
+      "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_2cca265eea57df2daf94c3b3876393f3",
+      "source": "docs/specs/distribution.md",
+      "anchor": "setup",
+      "startLine": 164,
+      "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_891db485a75cdb558cf725c3315f3857",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-9",
+      "startLine": 166,
+      "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_40d8d8f06aaedbc16cdcc4f8603e6d09",
+      "source": "docs/specs/distribution.md",
+      "anchor": "doctor",
+      "startLine": 194,
+      "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_1b418e3e2ee62a83adc1420a4967de62",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-10",
+      "startLine": 196,
+      "target": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7120b40ec04026fbdb538c6454614709",
+      "source": "docs/specs/distribution.md",
+      "anchor": "actors-access",
+      "startLine": 212,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bc11bca870313f227b78bebe0f81d49a",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-11",
+      "startLine": 214,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7b2641076e23f0d2528c250d4e59cba2",
+      "source": "docs/specs/distribution.md",
+      "anchor": "business-rules",
+      "startLine": 223,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8930ab9733374cfbb11470da79f610cf",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-12",
+      "startLine": 225,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_7932ee258c8d561f60718b34edc2d44a",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-13",
+      "startLine": 289,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-14",
+      "startLine": 297,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
+      "source": "docs/specs/distribution.md",
+      "anchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
+      "startLine": 322,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_45e83e644c43384e188c16e20172a52c",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-15",
+      "startLine": 324,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_797fb0be5db3c260c97745cd0894bec8",
+      "source": "docs/specs/distribution.md",
+      "anchor": "edge-cases-settled",
+      "startLine": 327,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-16",
+      "startLine": 329,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_18420261f445f01acf39c262a9ce170c",
+      "source": "docs/specs/distribution.md",
+      "anchor": "open-gaps",
+      "startLine": 363,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_4ef3a246eb6f72de0409c2cc711b6f7a",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-17",
+      "startLine": 365,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_e7c9f593b4b15dfa15ae91707e9a64ec",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-18",
+      "startLine": 370,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_d992e79d0cffb916c68bf73be5dd33d1",
+      "source": "docs/specs/distribution.md",
+      "anchor": "visuals",
+      "startLine": 372,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_a84463023d9ac4e9ff86edae6ccd1bd4",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-19",
+      "startLine": 374,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_aa28053a8a4b2ff13690fc6a20044b9f",
+      "source": "docs/specs/distribution.md",
+      "anchor": "pointers-implementation",
+      "startLine": 376,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    },
+    {
+      "claimId": "claim_b5695d38282e111f8ed06656b2efa433",
+      "source": "docs/specs/distribution.md",
+      "anchor": "unheaded-block-20",
+      "startLine": 378,
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "defer": false
+    }
+  ]
+}

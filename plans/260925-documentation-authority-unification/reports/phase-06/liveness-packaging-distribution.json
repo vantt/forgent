@@ -1,0 +1,1494 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:8@2026-10-13",
+  "commit": "77830ba77eb05991d95b005919776ee6254e833b",
+  "searchRoots": [
+    "src/",
+    "packages/",
+    "apps/",
+    "bin/",
+    "core/skills/",
+    "domains/",
+    "scripts/",
+    "docs/specs/",
+    "AGENTS.md"
+  ],
+  "method": "Literal source-path and distinctive section-title reference scan, followed by conservative current-default placement. Concept-level runtime obligations are retained, never retired by an empty search.",
+  "sections": [
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "future-constraints-shared-gateway-adapter-and-substrate",
+      "title": "Future Constraints: Shared Gateway, Adapter, And Substrate",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5749,
+          "text": "    \"docs/architect/packaging-distribution/future-constraints.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "1-shared-web-and-gateway-position",
+      "title": "1. Shared Web And Gateway Position",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5749,
+          "text": "    \"docs/architect/packaging-distribution/future-constraints.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "2-project-runtime-adapter-constraint",
+      "title": "2. Project Runtime Adapter Constraint",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5749,
+          "text": "    \"docs/architect/packaging-distribution/future-constraints.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "3-future-gateway-safety-constraints",
+      "title": "3. Future Gateway Safety Constraints",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5749,
+          "text": "    \"docs/architect/packaging-distribution/future-constraints.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/future-constraints.md",
+      "anchor": "4-mcp-global-substrate-constraint",
+      "title": "4. MCP / Global Substrate Constraint",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5749,
+          "text": "    \"docs/architect/packaging-distribution/future-constraints.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "distribution-baseline-and-scattered-spec-fragments",
+      "title": "Distribution Baseline And Scattered Spec Fragments",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5755,
+          "text": "    \"docs/architect/packaging-distribution/history/distribution-baseline.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "1-current-nodenpm-baseline",
+      "title": "1. Current Node/npm Baseline",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5755,
+          "text": "    \"docs/architect/packaging-distribution/history/distribution-baseline.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "2-scattered-spec-fragments-to-preserve",
+      "title": "2. Scattered Spec Fragments To Preserve",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5755,
+          "text": "    \"docs/architect/packaging-distribution/history/distribution-baseline.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "3-old-design-pressure-from-tsk-1fp",
+      "title": "3. Old Design Pressure From `tsk-1fp`",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5755,
+          "text": "    \"docs/architect/packaging-distribution/history/distribution-baseline.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "4-old-install-contexts",
+      "title": "4. Old Install Contexts",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5755,
+          "text": "    \"docs/architect/packaging-distribution/history/distribution-baseline.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+      "anchor": "5-source-hygiene-note",
+      "title": "5. Source Hygiene Note",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5755,
+          "text": "    \"docs/architect/packaging-distribution/history/distribution-baseline.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "1-purpose",
+      "title": "1. Purpose",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "2-target-area-shape",
+      "title": "2. Target Area Shape",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "3-authority-classes",
+      "title": "3. Authority Classes",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "4-document-migration-map",
+      "title": "4. Document Migration Map",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "5-implementation-evidence-map",
+      "title": "5. Implementation Evidence Map",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "6-implementation-alignment-seed",
+      "title": "6. Implementation Alignment Seed",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "7-rewrite-work-order",
+      "title": "7. Rewrite Work Order",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "8-open-questions-before-canonical-rewrite",
+      "title": "8. Open Questions Before Canonical Rewrite",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/migration-map.md",
+      "anchor": "9-promotion-checklist",
+      "title": "9. Promotion Checklist",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5761,
+          "text": "    \"docs/architect/packaging-distribution/migration-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "packaging-and-distribution-architecture",
+      "title": "Packaging And Distribution Architecture",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "1-historical-read-order",
+      "title": "1. Historical Read Order",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "2-historical-supersession-table",
+      "title": "2. Historical Supersession Table",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "3-boundary-rule",
+      "title": "3. Boundary Rule",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "4-vocabulary",
+      "title": "4. Vocabulary",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "5-historical-design-position",
+      "title": "5. Historical Design Position",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "6-do-not-collapse-these-boundaries",
+      "title": "6. Do Not Collapse These Boundaries",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/README.md",
+      "anchor": "7-historical-delivery-spine",
+      "title": "7. Historical Delivery Spine",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5743,
+          "text": "    \"docs/architect/packaging-distribution/README.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "1-goal",
+      "title": "1. Goal",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "2-scan-result",
+      "title": "2. Scan Result",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "21-primary-source-documents",
+      "title": "2.1 Primary Source Documents",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "22-related-implementation-surface-found-in-code-scan",
+      "title": "2.2 Related Implementation Surface Found In Code Scan",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "3-documentation-standard-gap",
+      "title": "3. Documentation Standard Gap",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "4-proposed-target-shape",
+      "title": "4. Proposed Target Shape",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "5-rewrite-method",
+      "title": "5. Rewrite Method",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "51-phase-1---freeze-inventory",
+      "title": "5.1 Phase 1 - Freeze Inventory",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "52-phase-2---decide-authority-model",
+      "title": "5.2 Phase 2 - Decide Authority Model",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "53-phase-3---write-the-area-portal",
+      "title": "5.3 Phase 3 - Write The Area Portal",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "54-phase-4---rewrite-the-spec",
+      "title": "5.4 Phase 4 - Rewrite The Spec",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "55-phase-5---promote-architecture",
+      "title": "5.5 Phase 5 - Promote Architecture",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "56-phase-6---extract-contracts",
+      "title": "5.6 Phase 6 - Extract Contracts",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "57-phase-7---build-verification-view",
+      "title": "5.7 Phase 7 - Build Verification View",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "58-phase-8---redirect-and-retire-legacy-docs",
+      "title": "5.8 Phase 8 - Redirect And Retire Legacy Docs",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "6-recommended-document-structure",
+      "title": "6. Recommended Document Structure",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "7-open-decisions",
+      "title": "7. Open Decisions",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "8-non-negotiable-rules-for-the-rewrite",
+      "title": "8. Non-Negotiable Rules For The Rewrite",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/rewrite-plan.md",
+      "anchor": "9-first-concrete-next-step",
+      "title": "9. First Concrete Next Step",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5767,
+          "text": "    \"docs/architect/packaging-distribution/rewrite-plan.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "No live implementation is retired here. Migration/rewrite procedures record the previous documentation rewrite, not operating runtime contracts."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "runtime-identity-and-activation",
+      "title": "Runtime Identity And Activation",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "how-to-use-this-document",
+      "title": "How To Use This Document",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "historical-decisions-promoted-or-tracked",
+      "title": "Historical Decisions Promoted Or Tracked",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "1-core-position",
+      "title": "1. Core Position",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "2-runtime-lifecycle",
+      "title": "2. Runtime Lifecycle",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "3-roots-and-on-disk-shape",
+      "title": "3. Roots And On-Disk Shape",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "4-record-types",
+      "title": "4. Record Types",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "5-releasemanifest",
+      "title": "5. ReleaseManifest",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "release-tree-canonicalization",
+      "title": "Release Tree Canonicalization",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        },
+        {
+          "path": "scripts/build-rust-distribution.mjs",
+          "line": 48,
+          "text": " * Classifies an entry path according to \u00a75 Release Tree Canonicalization."
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "6-workspaceactivationbinding",
+      "title": "6. WorkspaceActivationBinding",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "7-invocation-lease",
+      "title": "7. Invocation Lease",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "8-pin",
+      "title": "8. Pin",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "9-projectionledger",
+      "title": "9. ProjectionLedger",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "10-migrationjournal",
+      "title": "10. MigrationJournal",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "existing-project-adoption",
+      "title": "Existing Project Adoption",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "dev-source-activation",
+      "title": "Dev / Source Activation",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "11-drift-repair-rollback-and-quarantine",
+      "title": "11. Drift, Repair, Rollback, And Quarantine",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "12-command-authority-matrix",
+      "title": "12. Command Authority Matrix",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "13-fgctl-form-and-v1-acquisition-sources",
+      "title": "13. `fgctl` Form And V1 Acquisition Sources",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "14-walking-skeleton",
+      "title": "14. Walking Skeleton",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "anchor": "15-open-decisions",
+      "title": "15. Open Decisions",
+      "references": [
+        {
+          "path": "packages/distribution/rust/src/canonical.rs",
+          "line": 3,
+          "text": "//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/verify.rs",
+          "line": 3,
+          "text": "//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "line": 5,
+          "text": "//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a73, \u00a76, \u00a714."
+        },
+        {
+          "path": "packages/distribution/rust/src/manifest.rs",
+          "line": 4,
+          "text": "//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` \u00a75."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5773,
+          "text": "    \"docs/architect/packaging-distribution/runtime-identity-and-activation.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "packaging-distribution-scope-map",
+      "title": "Packaging Distribution Scope Map",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5779,
+          "text": "    \"docs/architect/packaging-distribution/scope-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "1-concern-map",
+      "title": "1. Concern Map",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5779,
+          "text": "    \"docs/architect/packaging-distribution/scope-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "2-historical-document-split",
+      "title": "2. Historical Document Split",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5779,
+          "text": "    \"docs/architect/packaging-distribution/scope-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "3-boundary-rule",
+      "title": "3. Boundary Rule",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5779,
+          "text": "    \"docs/architect/packaging-distribution/scope-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "4-historical-architecture-position",
+      "title": "4. Historical Architecture Position",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5779,
+          "text": "    \"docs/architect/packaging-distribution/scope-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/scope-map.md",
+      "anchor": "5-activation-boundary",
+      "title": "5. Activation Boundary",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5779,
+          "text": "    \"docs/architect/packaging-distribution/scope-map.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    },
+    {
+      "source": "docs/architect/packaging-distribution/workspace-runtime-model.md",
+      "anchor": "workspace-runtime-model",
+      "title": "Workspace Runtime Model",
+      "references": [
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5785,
+          "text": "    \"docs/architect/packaging-distribution/workspace-runtime-model.md\": {"
+        }
+      ],
+      "classification": "current-by-reference",
+      "reason": "Runtime design, constraints and boundary statements remain at their area owners; no truth verdict is authored."
+    }
+  ]
+}
