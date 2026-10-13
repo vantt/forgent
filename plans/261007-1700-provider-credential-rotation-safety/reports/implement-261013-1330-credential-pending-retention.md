@@ -92,3 +92,5 @@ Source: [code-review-261013-1511-credential-pending-retention-round-2-verificati
 - **Temp roots.** `defaultConfinementTempRoots` moved to `confinement/backend-registry.mjs` (re-exported from registrations); the three dispatch callers pass it to `createConfinementCredentialRenewal`, read at each use. Test reads the callers' sources. The renewal module still imports nothing from confinement. Plan question 9 closed; questions 10 (duplicate staging after a crash) and 11 (lock taken by every dispatch of an account with an unsettleable held home) recorded, not fixed.
 - Comments that claimed "no path" corrected; the boundary test's pattern now includes the backtick quote.
 - Component boundary: no change.
+
+Full suite on f7fd8ae49 (the report commits after it change no code): 7274 tests, 7199 pass, 0 fail, 0 cancelled, 10 skipped (exit 0).
