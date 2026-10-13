@@ -21,10 +21,20 @@
       "targetAnchor": "future-constraints-shared-gateway-adapter-and-substrate",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/future-constraints.md#future-constraints-shared-gateway-adapter-and-substrate, under \"Future Constraints: Shared Gateway, Adapter, And Substrate\", is retained at docs/platform/packaging-distribution/architecture/future-constraints.md#future-constraints-shared-gateway-adapter-and-substrate. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/future-constraints.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Rationale says only heading depth changes, but the section payload also has 2 relative link destination rewrites (H1 to H3 plus links resolving to the same file); add the link-rewrite statement to the rationale, text itself is carried."
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 2 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d863752f9a2e603603e399c4dc7f7dae9de1a7f5b2dc9b1c627cfae188cc24be",
+      "targetAncestry": [
+        "Future Constraints",
+        "Retained Future Constraints Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_02283779e0828c43f11139529404231e",
@@ -601,10 +611,20 @@
       "targetAnchor": "distribution-baseline-and-scattered-spec-fragments",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/history/distribution-baseline.md#distribution-baseline-and-scattered-spec-fragments, under \"Distribution Baseline And Scattered Spec Fragments\", is retained at docs/platform/packaging-distribution/history/distribution-baseline.md#distribution-baseline-and-scattered-spec-fragments. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. This remains dated source context, with no current runtime truth claim.",
-      "reviewNote": "Rationale says only heading depth changes, but the section payload also has 1 relative link destination rewrites (H1 to H3 plus links resolving to the same file); add the link-rewrite statement to the rationale, text itself is carried."
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 1 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cd639ea9673971d04f7780ecd0a823917af0f7431ad6ea9cba3a69c9fabad214",
+      "targetAncestry": [
+        "History: Distribution Baseline",
+        "Retained Distribution Baseline Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_a8db4d1b5dee758669f089389cd7fdaf",
@@ -1627,10 +1647,20 @@
       "targetAnchor": "packaging-and-distribution-architecture",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#packaging-and-distribution-architecture, under \"Packaging And Distribution Architecture\", is retained at docs/platform/packaging-distribution/README.md#packaging-and-distribution-architecture. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Rationale says only heading depth changes, but the section payload also has 3 relative link destination rewrites (H1 to H3 plus links resolving to the same file); add the link-rewrite statement to the rationale, text itself is carried."
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 3 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7162f8e811cea27ac4ffa4a795009a8f98d96b10999e321a82d62d33f59270f8",
+      "targetAncestry": [
+        "Packaging-Distribution",
+        "Retained Readme Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_c0514f347e48db6c5d4c3dec86d7f7a1",
@@ -1754,10 +1784,21 @@
       "targetAnchor": "1-historical-read-order",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#1-historical-read-order, under \"1. Historical Read Order\", is retained at docs/platform/packaging-distribution/README.md#1-historical-read-order. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Text and link destinations conserved, but rationale says only heading depth changes while the section payload has relative links rewritten; add the link rewrite to the rationale."
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 5 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "3eec93e722cb187e30a087567678012796959fb0762a1b99d9ede0eced1ce364",
+      "targetAncestry": [
+        "Packaging-Distribution",
+        "Retained Readme Source Detail",
+        "Packaging And Distribution Architecture"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_180db2a5b2592775ada69d493e5e04f2",
@@ -1838,10 +1879,21 @@
       "targetAnchor": "2-historical-supersession-table",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/README.md#2-historical-supersession-table, under \"2. Historical Supersession Table\", is retained at docs/platform/packaging-distribution/README.md#2-historical-supersession-table. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/README.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Text and link destinations conserved, but rationale says only heading depth changes while the section payload has relative links rewritten; add the link rewrite to the rationale."
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 4 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7a121f1faaa77b183e3e2d5b187d1ae7a2d65980bfa7a3a4ead0088e25ef938e",
+      "targetAncestry": [
+        "Packaging-Distribution",
+        "Retained Readme Source Detail",
+        "Packaging And Distribution Architecture"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_37a8691bba650ed4cd9d98314b6a2b1a",
@@ -3856,10 +3908,20 @@
       "targetAnchor": "runtime-identity-and-activation-1",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#runtime-identity-and-activation, under \"Runtime Identity And Activation\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#runtime-identity-and-activation-1. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading text and payload carried and digests recompute, but rationale says Only heading depth changes while the payload relative links were also rewritten (diff shows it) - add the link rewrite to the rationale; link destinations were checked and resolve to the same files"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 6 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "54660ce11d518179ea925df6d69831e3c4f990e5e40ed35de69ce4b5c5c672cd",
+      "targetAncestry": [
+        "Runtime Identity And Activation",
+        "Retained Runtime Identity And Activation Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_b6c7e0cf73c35dad866f2dd1d7a2a3e2",
@@ -3960,10 +4022,21 @@
       "targetAnchor": "how-to-use-this-document",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#how-to-use-this-document, under \"How To Use This Document\", is retained at docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md#how-to-use-this-document. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the architecture/runtime-identity-and-activation.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading text and payload carried and digests recompute, but rationale says Only heading depth changes while the payload relative links were also rewritten (diff shows it) - add the link rewrite to the rationale; link destinations were checked and resolve to the same files"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 6 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "af9d7395f28979e64969c6ed6a2c53b35d1de02b1d879d4649c16bd5d841329f",
+      "targetAncestry": [
+        "Runtime Identity And Activation",
+        "Retained Runtime Identity And Activation Source Detail",
+        "Runtime Identity And Activation"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_6f1dc76a5f99b9f747725aef60bd5d12",
@@ -4281,10 +4354,20 @@
       "targetAnchor": "3-roots-and-on-disk-shape",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#3-roots-and-on-disk-shape, under \"3. Roots And On-Disk Shape\", is retained at docs/platform/packaging-distribution/contracts/repository-runtime-layout.md#3-roots-and-on-disk-shape. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the contracts/repository-runtime-layout.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading text and payload carried and digests recompute, but rationale says Only heading depth changes while the payload relative links were also rewritten (diff shows it) - add the link rewrite to the rationale; link destinations were checked and resolve to the same files"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 2 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8663234273000c940a8a87fcb1ecec9558e979f5135b38d28a91f7ad61474f1a",
+      "targetAncestry": [
+        "Contract: Repository Runtime Layout",
+        "Retained Runtime Identity And Activation Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_a2ffbcf3bf179c454c210a649e55c3e8",
@@ -4801,10 +4884,20 @@
       "targetAnchor": "5-releasemanifest",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#5-releasemanifest, under \"5. ReleaseManifest\", is retained at docs/platform/packaging-distribution/contracts/release-manifest.md#5-releasemanifest. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the contracts/release-manifest.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "Heading text and payload carried and digests recompute, but rationale says Only heading depth changes while the payload relative links were also rewritten (diff shows it) - add the link rewrite to the rationale; link destinations were checked and resolve to the same files"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 1 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee",
+      "targetAncestry": [
+        "Contract: Release Manifest",
+        "Retained Runtime Identity And Activation Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
@@ -5168,7 +5261,7 @@
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:10@2026-10-14",
-      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#6-workspaceactivationbinding. Only heading depth changes; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
+      "rationale": "The complete heading from docs/architect/packaging-distribution/runtime-identity-and-activation.md#6-workspaceactivationbinding, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#6-workspaceactivationbinding. Heading depth changes; the target also adds the labelled Retained dated design — status note (2026-10-14) before the bootstrap-context permission and the labelled Status note (2026-10-14) after the candidate permission paragraph; the direct section payload follows the original source order. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
       "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
@@ -5479,7 +5572,7 @@
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:10@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-63, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-25. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target prepends the labelled Retained dated design — status note (2026-10-14), identifying the bootstrap-context permission as source design and static preflight as current behavior. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
       "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
@@ -5514,7 +5607,7 @@
       "disposition": "move",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:10@2026-10-14",
-      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
+      "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-65, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-27. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The target appends the labelled Status note (2026-10-14), identifying the candidate permission as retained dated design, static preflight and the unimplemented environment-variable bootstrap context, while retaining the must-not obligation. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
       "reviewNote": "Stored digest has no target match; independent re-review required."
     },
     {
@@ -7701,10 +7794,20 @@
       "targetAnchor": "packaging-distribution-scope-map",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#packaging-distribution-scope-map, under \"Packaging Distribution Scope Map\", is retained at docs/platform/packaging-distribution/spec.md#packaging-distribution-scope-map. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "text conserved and digests recomputed, but rationale says only heading depth changes while the section payload also has relative links rewritten (destinations verified equal and existing); rationale must name the link rewrite"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 2 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "5ed2f9d1174332ae7c94a4760f7b93b006433d24fe88195bfc8b8642cc393d7d",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Scope Map Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_125cef1cef30d1dea90c511b9f6283e0",
@@ -7875,10 +7978,21 @@
       "targetAnchor": "2-historical-document-split",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/scope-map.md#2-historical-document-split, under \"2. Historical Document Split\", is retained at docs/platform/packaging-distribution/spec.md#2-historical-document-split. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "text conserved and digests recomputed, but rationale says only heading depth changes while the section payload also has relative links rewritten (destinations verified equal and existing); rationale must name the link rewrite"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 3 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "697dcb0fc77b4574bc4785abc062489f7b8d7ed3fcc636d2f93d67873d5434a7",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Scope Map Source Detail",
+        "Packaging Distribution Scope Map"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_b43688fff7d34b97772efcb6d81018bf",
@@ -8340,10 +8454,20 @@
       "targetAnchor": "workspace-runtime-model",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
       "rationale": "The complete heading from docs/architect/packaging-distribution/workspace-runtime-model.md#workspace-runtime-model, under \"Workspace Runtime Model\", is retained at docs/platform/packaging-distribution/spec.md#workspace-runtime-model. Heading depth and relative-link destinations change; rewritten links resolve to the same files; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
-      "reviewNote": "text conserved and digests recomputed, but rationale says only heading depth changes while the section payload also has relative links rewritten (destinations verified equal and existing); rationale must name the link rewrite"
+      "reviewNote": "Verbatim carry: section equals source after heading-depth shift and link normalisation; 3 relative link(s) rewritten, each resolving to the same file and fragment; shard row differs from 09fdd6746 only in rationale and reviewNote; corrected rationale names the link rewrite and is true; anchors check ok",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bb51245f797ae2ff9c26ec3eeda2eec25bae525e30543a9a658a47dd84109dd6",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Workspace Runtime Model Source Detail"
+      ],
+      "reviewReportCommit": "d57231686ec1533d4de36507e814c2484da31f72"
     },
     {
       "claimId": "claim_da41a9786ba80d8a51c540a03d4dc2c6",
