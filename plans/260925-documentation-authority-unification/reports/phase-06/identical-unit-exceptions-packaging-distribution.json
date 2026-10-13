@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "batch": "packaging-distribution",
+  "authorSession": "codex-session:8@2026-10-13",
+  "commit": "baef3a075899f83d515a28ab66abd6c3d55201c5",
+  "groups": [
+    {
+      "digest": "6d8e01ea29ff241ff6513af7ed38927634132cb1d1595da92c6de676281b847c",
+      "sourceUnits": [
+        {
+          "claimId": "claim_414f97e4358721e8cbac9e6798abeda4",
+          "path": "docs/architect/packaging-distribution/migration-map.md",
+          "anchor": "unheaded-block-5",
+          "unitDigest": "6d8e01ea29ff241ff6513af7ed38927634132cb1d1595da92c6de676281b847c",
+          "targetOwner": "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+          "targetAnchor": "unheaded-block-7"
+        },
+        {
+          "claimId": "claim_4aa91c9c0611e4d3ea19926a3e8fc2dd",
+          "path": "docs/architect/packaging-distribution/rewrite-plan.md",
+          "anchor": "unheaded-block-14",
+          "unitDigest": "6d8e01ea29ff241ff6513af7ed38927634132cb1d1595da92c6de676281b847c",
+          "targetOwner": "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md",
+          "targetAnchor": "unheaded-block-16"
+        }
+      ],
+      "owners": [
+        "docs/platform/packaging-distribution/history/documentation-migration/migration-map.md",
+        "docs/platform/packaging-distribution/history/documentation-migration/rewrite-plan.md"
+      ],
+      "reason": "Identical short source heading or unit occurs in different source contexts. Complete source section payloads remain at the explicit contextual owners; no owner or approval is inferred from the short digest alone.",
+      "reviewStatus": "pending"
+    },
+    {
+      "digest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
+      "sourceUnits": [
+        {
+          "claimId": "claim_f3dd063ca7c7f474e8da47a41a50383f",
+          "path": "docs/architect/packaging-distribution/README.md",
+          "anchor": "unheaded-block-10",
+          "unitDigest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
+          "targetOwner": "docs/platform/packaging-distribution/README.md",
+          "targetAnchor": "unheaded-block-39"
+        },
+        {
+          "claimId": "claim_32e7f978ade53ffcc2e0d133ea0add0b",
+          "path": "docs/architect/packaging-distribution/scope-map.md",
+          "anchor": "unheaded-block-10",
+          "unitDigest": "0a60f4e2b6313ac8efb1e1923ff5e4010b74da93e88909aa00aa045b8e0a498d",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "unheaded-block-60"
+        }
+      ],
+      "owners": [
+        "docs/platform/packaging-distribution/README.md",
+        "docs/platform/packaging-distribution/spec.md"
+      ],
+      "reason": "Identical short source heading or unit occurs in different source contexts. Complete source section payloads remain at the explicit contextual owners; no owner or approval is inferred from the short digest alone.",
+      "reviewStatus": "pending"
+    }
+  ]
+}
