@@ -1106,15 +1106,35 @@ test('write-back stages a renewed home when the source is half-written, and the 
   } finally { w.cleanup(); }
 });
 
-test('write-back reports applied only when the copy was applied, and unchanged when it was dropped as not newer', () => {
+test('write-back reports applied or unchanged from the staged copy\'s own outcome when the lock is free', () => {
   const w = workspace();
   try {
     const dir = privateHomeWithRenewedLogin(w);
     const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
-    assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'applied' });
+    // The source is torn while the copy is judged, so the copy is staged; it is repaired before the staged
+    // copy is applied. An older source takes the copy; a newer one makes the copy a leftover to drop.
+    const run = (repaired) => {
+      let locked = 0;
+      fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
+      const tryLock = (args) => {
+        locked += 1;
+        writePi(w.home, repaired);
+        return tryAcquireAccountLock(args);
+      };
+      return { result: writeBackRenewedCredential(dir, marker, { tryLock }), locked };
+    };
+
+    const applied = run(piDoc(Date.now() + 10 * 60 * 1000));
+    assert.equal(applied.locked, 1, 'the copy was staged and then applied under the lock');
+    assert.deepEqual(applied.result, { status: 'applied' });
     assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
     assert.deepEqual(pendingCopies(w), []);
-    assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'unchanged' });
+
+    const dropped = run(piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    assert.equal(dropped.locked, 1);
+    assert.deepEqual(dropped.result, { status: 'unchanged' });
+    assert.equal(readPi(w.home).xai.refresh, 'FAKE-NEWER-REFRESH');
+    assert.deepEqual(pendingCopies(w), []);
   } finally { w.cleanup(); }
 });
 
@@ -1144,4 +1164,184 @@ test('a write-back marker with an unsafe provider or account id is refused, not 
       assert.deepEqual(writeBackRenewedCredential(w.tmp, marker), { status: 'failed', code: 'invalid-marker' }, bad);
     }
   } finally { w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// A copy that cannot be read for a reason that may pass is kept, never dropped
+// ---------------------------------------------------------------------------------------------------
+
+function privateOmpHomeWithRenewedLogin(w, dispatchId = 'disp_omp_keep') {
+  const holder = writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true });
+  const dir = path.join(w.tmp, 'fgos-confinement', dispatchId, 'home');
+  fs.mkdirSync(dir, { recursive: true });
+  writeOwnershipMarker(dir, { dispatchId });
+  copyCredentialFiles(dir, w.home, ['agent.db']);
+  extendOwnershipMarker(dir, { credentialWriteBack: credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }) });
+  renewHome('omp', dir);
+  holder.close();
+  return dir;
+}
+
+test('an omp copy that cannot be read because node:sqlite is unavailable is staged, not dropped', () => {
+  const w = workspace();
+  try {
+    const dir = privateOmpHomeWithRenewedLogin(w);
+    const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+    const result = writeBackRenewedCredential(dir, marker, { loadSqlite: () => null });
+    assert.deepEqual(result, { status: 'staged' });
+    const kept = pendingCopies(w);
+    assert.equal(kept.length, 1);
+    // Read back with the module available: the staged files hold the renewed login.
+    assert.match(readOmpRows(kept[0])[0].data, new RegExp(FAKE.newRefresh));
+  } finally { w.cleanup(); }
+});
+
+test('a copy that parses but holds no usable entry, or is corrupt, is still dropped as proven malformed', () => {
+  const w = workspace();
+  try {
+    writePi(w.home, piDoc(Date.now() + HOUR));
+    const dir = path.join(w.tmp, 'h');
+    copyCredentialFiles(dir, w.home, ['auth.json']);
+    const marker = { credentialWriteBack: credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir }) };
+    fs.writeFileSync(path.join(dir, 'auth.json'), '[]');
+    assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'unchanged' });
+    fs.writeFileSync(path.join(dir, 'auth.json'), TORN);
+    assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'unchanged' });
+    assert.deepEqual(pendingCopies(w), []);
+  } finally { w.cleanup(); }
+});
+
+test('a copy that cannot be read for a reason that may pass is staged, not treated as not newer', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+    fs.chmodSync(path.join(dir, 'auth.json'), 0o000);
+    if (process.getuid?.() === 0) { fs.chmodSync(path.join(dir, 'auth.json'), 0o600); return; } // root reads anything
+    const result = writeBackRenewedCredential(dir, marker);
+    fs.chmodSync(path.join(dir, 'auth.json'), 0o600);
+    assert.equal(result.status, 'failed', 'staging reads the same file and fails too');
+    assert.equal(result.keepHome, true);
+  } finally { w.cleanup(); }
+});
+
+test('when staging fails the private home and its marker are kept, with one fixed-code stderr line', () => {
+  const w = workspace();
+  const captured = [];
+  const realWrite = process.stderr.write;
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the copy cannot be judged, so it must be staged
+    // A file where the pending directory belongs makes staging impossible.
+    fs.mkdirSync(w.accountDir, { recursive: true });
+    fs.writeFileSync(path.join(w.accountDir, 'pending'), 'not a directory');
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    const result = cleanupConfinementResource(dir, 'disp_wb');
+    process.stderr.write = realWrite;
+    assert.equal(result.cleaned, false);
+    assert.equal(fs.existsSync(path.join(dir, 'auth.json')), true, 'the renewed login is still in the home');
+    assert.equal(fs.existsSync(path.join(dir, OWNERSHIP_MARKER_FILE)), true);
+    const text = captured.join('');
+    assert.equal(text.trim().split('\n').length, 1);
+    assert.match(text, /credential write-back not done \((write-back-failed|stage-failed)\); private home kept/);
+    assert.equal(FAKE_FRAGMENTS.some((f) => text.includes(f)), false);
+    assert.equal(text.includes(w.tmp), false, 'no path in the line');
+
+    // Once staging can work again, a later removal (the reaper's) takes the login and removes the home.
+    fs.rmSync(path.join(w.accountDir, 'pending'));
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    assert.equal(cleanupConfinementResource(dir, 'disp_wb').cleaned, true);
+    assert.equal(fs.existsSync(dir), false);
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
+  } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Pending copies stay bounded and are cleared when they can be identified
+// ---------------------------------------------------------------------------------------------------
+
+test('at most five pending copies are kept per account, the newest, with one count-only stderr line per drop', () => {
+  const w = workspace();
+  const captured = [];
+  const realWrite = process.stderr.write;
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const marker = JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8'));
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
+    let clock = 1_000_000;
+    const tick = () => { clock += 1000; return clock; };
+    const tryLock = () => null; // the lock is busy: every copy stays staged
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    for (let i = 0; i < 7; i += 1) {
+      const stagedAt = tick();
+      assert.deepEqual(writeBackRenewedCredential(dir, marker, { tryLock, now: () => stagedAt }), { status: 'staged' });
+    }
+    process.stderr.write = realWrite;
+    const names = fs.readdirSync(path.join(w.accountDir, 'pending')).sort();
+    assert.equal(names.length, 5);
+    assert.deepEqual(names.map((n) => Number(n.slice(0, 15))), [3, 4, 5, 6, 7].map((n) => 1_000_000 + n * 1000), 'the newest five');
+    assert.deepEqual(captured, ['fgos: credential-pending-dropped (1)\n', 'fgos: credential-pending-dropped (1)\n']);
+  } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+test('a refresh-ahead that skips because the entry is unidentified still clears the leftovers it can identify', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    // The source holds no entry of the dispatched provider, so the run is skipped; one leftover is a
+    // copy of a login the source already superseded and another cannot be told apart yet.
+    writePi(w.home, { 'github-copilot': { type: 'oauth', access: 'a', refresh: 'b', expires: now + HOUR } });
+    const copy = path.join(w.accountDir, 'pending', '000000000000001-a');
+    fs.mkdirSync(copy, { recursive: true });
+    fs.writeFileSync(path.join(copy, 'auth.json'), TORN); // proven malformed: nothing to keep
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
+    const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(result, { status: 'skipped', reason: 'entry-unidentified' });
+    assert.equal(starts.length, 0);
+    assert.deepEqual(pendingCopies(w), [], 'the malformed leftover was cleared on the skipped run');
+  } finally { w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Codex provisioning fails closed
+// ---------------------------------------------------------------------------------------------------
+
+async function prepareCodexHome(codexHome, dispatchId) {
+  const tempRoot = path.join(os.tmpdir(), `fgos-codex-prov-${process.pid}`);
+  const resources = resolveConfinementResources({ dispatchId, context: {}, grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }], backendConfig: { tempRoot } });
+  const plan = { contract: 'confinement-plan.v1', dispatchId, decision: 'execute', coverage: {}, resources };
+  const request = {
+    dispatchId,
+    executorId: 'codex-bwrap',
+    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+    providerCapacity: { provider: 'openai', accountId: 'acct', credentialSource: { kind: 'codex-home', home: codexHome } },
+    context: { cwd: os.tmpdir(), runDir: os.tmpdir() },
+  };
+  try {
+    const prepared = await prepareBwrap(plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
+    await prepared.cleanup();
+    return null;
+  } catch (err) {
+    return err;
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
+test('a Codex auth.json that is a symlink leaving the home fails provisioning closed', async () => {
+  const w = workspace();
+  try {
+    const outside = path.join(w.tmp, 'outside.json');
+    fs.writeFileSync(outside, JSON.stringify(codexDoc(Date.now() + HOUR, Date.now())));
+    fs.symlinkSync(outside, path.join(w.home, 'auth.json'));
+    const err = await prepareCodexHome(w.home, 'disp_codex_link');
+    assert.equal(err?.code, 'credential-provisioning');
+    assert.match(err.message, /not a regular file inside the credential home/);
+  } finally { w.cleanup(); }
+});
+
+test('a relative Codex home fails provisioning closed', async () => {
+  const err = await prepareCodexHome('relative/codex-home', 'disp_codex_rel');
+  assert.equal(err?.code, 'credential-provisioning');
+  assert.match(err.message, /needs an absolute "home"/);
 });

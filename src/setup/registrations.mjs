@@ -4297,7 +4297,7 @@ export function checkConfinedPaneAccounts(runnerCfg = {}) {
   } catch (err) {
     return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
   }
-  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
+  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^\$HOME(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
   const problems = [];
   const notes = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {

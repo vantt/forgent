@@ -55,6 +55,7 @@ const LOCK_MARGIN_MS = 30 * 1000;
 const COOLDOWN_FILE = 'cooldown.json';
 const PENDING_DIR = 'pending';
 const SCRATCH_PREFIX = 'scratch-';
+const MAX_PENDING_COPIES = 5;
 
 const defaultLoadSqlite = () => {
   try {
@@ -450,8 +451,18 @@ const ompLayout = {
     });
   },
   stage(copyHome, stagingDir, { loadSqlite }) {
-    if (!snapshotSqliteFile(path.join(copyHome, 'agent.db'), path.join(stagingDir, 'agent.db'), { loadSqlite })) {
-      throw new Error('sqlite-unavailable');
+    const destination = path.join(stagingDir, 'agent.db');
+    if (snapshotSqliteFile(path.join(copyHome, 'agent.db'), destination, { loadSqlite })) return;
+    // No snapshot (the module is unavailable, or the file cannot be opened): the files as they are, write-ahead
+    // log included. The pane's processes are already stopped, so nothing is writing to them.
+    for (const suffix of ['', '-wal', '-shm']) {
+      const from = path.join(copyHome, `agent.db${suffix}`);
+      if (!fs.existsSync(from)) {
+        if (suffix === '') throw new Error('stage-failed');
+        continue;
+      }
+      fs.copyFileSync(from, `${destination}${suffix}`);
+      fs.chmodSync(`${destination}${suffix}`, 0o600);
     }
   },
 };
@@ -539,12 +550,23 @@ export function applyRenewedCredential({ layoutName, sourceHome, copyHome, provi
   return { status: keys.length > 0 ? 'applied' : 'unchanged', keys };
 }
 
-// Whether the copy holds a login newer than the source's: 'newer', 'not-newer', or 'undetermined' when the
-// source cannot say (it cannot be read, or its entry cannot be identified and the copy holds a refresh token
-// the source does not). Undetermined copies are staged rather than dropped.
+// Codes that prove a copy holds nothing usable: its JSON is corrupt, or it parses to no usable entry. A
+// read error or a database that cannot be opened may pass, so such a copy is not proven malformed.
+const COPY_MALFORMED_CODES = new Set(['unreadable-json', 'unexpected-shape', 'unknown-layout']);
+
+// Whether the copy holds a login newer than the source's: 'newer', 'not-newer' (the source was read and
+// proves it, or the copy is proven malformed), or 'undetermined' when nothing proves it: the copy cannot
+// be read for a reason that may pass, or the source cannot say (it cannot be read, or its entry cannot be
+// identified and the copy holds a refresh token the source does not). Undetermined copies are staged
+// rather than dropped.
 function copyIsNewer({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
   const copy = layout.read(copyHome, { loadSqlite });
-  if (!copy.ok) return 'not-newer';
+  if (!copy.ok) {
+    if (COPY_MALFORMED_CODES.has(copy.code)) return 'not-newer';
+    // A store file that is not there holds nothing to keep; one that is there but unreadable may pass.
+    const storeFile = path.join(copyHome, layout.name === ompLayout.name ? 'agent.db' : 'auth.json');
+    return copy.code === 'unreadable-file' && !fs.existsSync(storeFile) ? 'not-newer' : 'undetermined';
+  }
   const source = layout.read(sourceHome, { loadSqlite });
   if (!source.ok) return 'undetermined';
   const selected = selectProviderEntry(source.entries, provider);
@@ -574,6 +596,23 @@ function listLeftovers(accountDir) {
 }
 
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
+
+/**
+ * Keep the newest MAX_PENDING_COPIES pending copies of an account (names sort by staging time) and drop the
+ * rest, so an account whose entry can never be identified does not grow without bound. One stderr line
+ * with the count; never a path or a value.
+ */
+function capPendingCopies(accountDir) {
+  const pendingDir = path.join(accountDir, PENDING_DIR);
+  let names;
+  try { names = fs.readdirSync(pendingDir).filter((n) => !n.startsWith('.')).sort(); } catch { return; }
+  const surplus = names.slice(0, Math.max(0, names.length - MAX_PENDING_COPIES));
+  let dropped = 0;
+  for (const name of surplus) {
+    try { fs.rmSync(path.join(pendingDir, name), { recursive: true, force: true }); dropped += 1; } catch { /* the next cap retries */ }
+  }
+  if (dropped > 0) process.stderr.write(`fgos: credential-pending-dropped (${dropped})\n`);
+}
 
 /**
  * Apply (see applyRenewedCredential, without the future-expiry rule) and remove every leftover that the
@@ -656,7 +695,19 @@ export async function refreshAhead({
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
     const beforeEntry = entryOf(before);
-    if (!beforeEntry.ok) return { status: 'skipped', reason: beforeEntry.code };
+    if (!beforeEntry.ok) {
+      // Nothing is renewed here, but a copy kept earlier may be identifiable by now.
+      if (hasLeftovers(accountDir)) {
+        let held;
+        try { held = await acquireAccountLock({ runtimeDir, provider, accountId, waitMs: lockWaitMs }); } catch { held = null; }
+        if (held) {
+          try { applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite }); } finally {
+            try { held.release(); } catch { /* a release problem must not fail the dispatch */ }
+          }
+        }
+      }
+      return { status: 'skipped', reason: beforeEntry.code };
+    }
     // A copy renewed in a pane may hold the only good pair even while the source still looks fresh.
     if (!inWindow(beforeEntry.entry) && !hasLeftovers(accountDir)) return { status: 'fresh', reason: 'outside-window' };
 
@@ -718,6 +769,7 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
       const pendingDir = path.join(accountDir, PENDING_DIR);
       fs.mkdirSync(pendingDir, { recursive: true, mode: 0o700 });
       fs.renameSync(scratch, path.join(pendingDir, `${String(now()).padStart(15, '0')}-${crypto.randomBytes(4).toString('hex')}`));
+      capPendingCopies(accountDir);
     } catch { /* the copy stays where it is, and is found there */ }
     recordFailure(accountDir, 'apply-deferred', now());
     return { status: 'failed', reason: 'apply-deferred' };
@@ -767,7 +819,7 @@ function validWriteBack(value) {
  * Called just before a private home is deleted. When its marker asks for it and the home holds a login
  * newer than the source's, stage a copy beside the source and apply it under the account lock (tried
  * once, never waited for; if busy, the next refresh-ahead applies it). Never throws. Returns
- * `{status: 'none'|'unchanged'|'applied'|'staged'|'failed', code?}` (`staged`: the copy is kept for the next holder of the account lock, because the lock was busy or the source could not say whether the copy is newer); `code` is a fixed word.
+ * `{status: 'none'|'unchanged'|'applied'|'staged'|'failed', code?, keepHome?}` (`keepHome`: no copy is safe in the pending copies yet and the home may hold the only good pair, so it must not be removed; `staged`: the copy is kept for the next holder of the account lock, because the lock was busy or the source could not say whether the copy is newer); `code` is a fixed word.
  */
 export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defaultLoadSqlite, now = Date.now, tryLock = tryAcquireAccountLock } = {}) {
   const writeBack = marker?.credentialWriteBack;
@@ -776,6 +828,9 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
   const layout = LAYOUTS[writeBack.layout];
   const accountDir = providerAccountDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId);
   if (!accountDir) return { status: 'failed', code: 'invalid-marker' };
+  // Until a copy is safe in pending/, the private home may hold the only good pair: a failure before that
+  // says `keepHome`, and the caller must not remove it.
+  let safe = false;
   try {
     if (copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite }) === 'not-newer') return { status: 'unchanged' };
 
@@ -788,8 +843,10 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
       fs.renameSync(staging, final);
     } catch (err) {
       try { fs.rmSync(staging, { recursive: true, force: true }); } catch { /* nothing left to do */ }
-      return { status: 'failed', code: err?.message === 'sqlite-unavailable' ? 'sqlite-unavailable' : 'stage-failed' };
+      return { status: 'failed', code: err?.message === 'sqlite-unavailable' ? 'sqlite-unavailable' : 'stage-failed', keepHome: true };
     }
+    safe = true;
+    capPendingCopies(accountDir);
 
     const lock = tryLock({ runtimeDir: writeBack.runtimeDir, provider: writeBack.provider, accountId: writeBack.accountId });
     if (!lock) return { status: 'staged' };
@@ -802,6 +859,6 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
     if (fs.existsSync(final)) return { status: 'staged' };
     return { status: outcomes.find((outcome) => outcome.dir === final)?.status === 'applied' ? 'applied' : 'unchanged' };
   } catch {
-    return { status: 'failed', code: 'write-back-failed' };
+    return safe ? { status: 'failed', code: 'write-back-failed' } : { status: 'failed', code: 'write-back-failed', keepHome: true };
   }
 }

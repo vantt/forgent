@@ -80,3 +80,18 @@ Review: `code-review-261013-0943-credential-rotation-fix-round-independent.md`; 
 Left as is: `expandHome` in `src/setup/registrations.mjs` (doctor check) returns the input string for a non-absolute or empty home and never null, so the doctor can name the bad path; sharing the helper would change its messages. A missing Codex home at dispatch now reads "selected credential home is not readable", as `copyCredentialFiles` words it.
 
 Known cost: a write-back whose source entry cannot be identified stages the pane copy only when it holds a refresh token the source does not; an unrenewed copy is dropped as before, so pending copies do not pile up per dispatch.
+
+## Fix round 3
+
+Review: `code-review-261013-1010-credential-rotation-fix-round-2-verification.md`. Tests are in `provider-credential-renewal.test.mjs` and `visibility-checks.test.mjs`.
+
+| Finding | Change |
+|---|---|
+| Medium: write-back dropped a copy that could not be read for a reason that may pass | `copyIsNewer` returns `not-newer` only for a copy proven malformed (corrupt JSON, no usable entry, or no store file); `node:sqlite` unavailable, an unopenable database or a read error is `undetermined` and the copy is staged. omp staging falls back to a plain copy of `agent.db` plus `-wal`/`-shm` when no snapshot can be taken. If staging fails, `writeBackRenewedCredential` returns `keepHome` and `removeConfinementDir` writes one fixed-code stderr line and throws, so the home and its marker stay for the reaper to retry. |
+| Low: pending copies grew without bound | Capped at five per account (newest by staging time); a drop writes `credential-pending-dropped (N)`. A refresh-ahead that skips on an unidentified entry now applies the leftovers first, under the account lock. |
+| Low: Codex provisioning narrower | Kept (fail closed for an `auth.json` symlink leaving the home and for a relative home); CHANGELOG line, confinement spec sentence and a test for each. |
+| Low: phantom write-back status test | Rewritten: the source is torn while the copy is judged and repaired inside the lock seam, so the `applied` and `unchanged` outcomes come from the staged copy. |
+| Low: doctor `expandHome` lacked `$HOME` | Added, still returning the input for empty or non-absolute values; test in `visibility-checks.test.mjs`. |
+| Low: component-boundary row | Names the provisioning call (bwrap driver) and the removal call (cleanup). The runner spec's apply and write-back items now match the code. |
+
+Known cost left: a pending copy whose entry never becomes identifiable stays until the cap pushes it out, so the newest five survive and older ones are dropped with the stderr line.

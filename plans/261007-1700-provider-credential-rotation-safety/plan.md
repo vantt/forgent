@@ -62,6 +62,8 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 
 1. Does xAI, or OpenAI for Codex, revoke the whole token chain on reuse of an old refresh token? Decides how bad a lost race is, not whether the design is needed. Not to be tested on a real account.
 2. Does the agy (Gemini) login rotate at all? Left as today until read.
+3. Should `fgos doctor` report a pending copy that stays unidentified (its entry cannot be matched to the source), since it holds a refresh token silently?
+4. Should a torn scratch copy (a probe killed at its time limit mid-write) be kept for hand recovery instead of deleted as unreadable? Depends on whether pi and omp write their stores atomically.
 
 ## Validation Log
 

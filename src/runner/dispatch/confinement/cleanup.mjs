@@ -158,7 +158,8 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
  * finalizer of a settled dispatch and the orphan reaper), so a login renewed inside a private home is
  * offered to its source before the home is gone, whichever path gets there. A home whose marker does not
  * ask for write-back is removed exactly as before; a write-back problem is reported by a fixed code on
- * stderr and never stops the removal.
+ * stderr and never stops the removal, except that a home whose renewed login could not be staged is kept
+ * (the call throws `credential-home-kept`) so a later removal retries.
  *
  * @param {string} dirPath
  * @param {{stopProcesses?: boolean}} [options] `stopProcesses`: end whatever still runs from inside first
@@ -168,7 +169,15 @@ export function removeConfinementDir(dirPath, { stopProcesses = false } = {}) {
   const marker = readOwnershipMarker(dirPath);
   if (marker?.credentialWriteBack !== undefined) {
     const result = writeBackRenewedCredential(dirPath, marker);
-    if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
+    if (result.status === 'failed') {
+      if (result.keepHome) {
+        // The home may hold the only good refresh token and no copy of it is safe yet: leave it and its
+        // marker so the reaper retries, and say so with a fixed code (no paths, no values).
+        process.stderr.write(`fgos: credential write-back not done (${result.code}); private home kept for a later retry\n`);
+        throw new Error('credential-home-kept');
+      }
+      process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
+    }
   }
   fs.rmSync(dirPath, { recursive: true, force: true });
 }
