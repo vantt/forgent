@@ -1,3 +1,22 @@
+# Latest resume state — Packaging verdict application and bounded truth rework
+
+Date: 2026-10-14
+Executor: codex-session:10@2026-10-14
+Session counter: 10
+Step: 4 / Packaging-distribution P4 rework
+State: rework; applying committed independent review 09fdd6746
+Resume HEAD: 09fdd6746; clean worktree and authorized branch verified.
+Last green conservation source: 5ed0b6199dd3f72aa8796dee3614cb668188d630
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Blocker: none established within authorized work. F6 remains an owner decision outside this turn.
+
+Apply 395 source ok verdicts verbatim through unchanged --apply-review and 31 successor / 21 native heading verdicts through their existing representations. Rework only the 12 link-rewrite rationales and add labelled sentence-local status notes for truth sample units 2, 26, 28 under A19. Preserve dropped-010, its register entry and FLAGGED retention byte-for-byte. Refresh native scratch, rerun both-prior D/scoped E and full native equality, then commit one bounded follow-up request and STOP. No closure, Step 5, promotion, main merge or push.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging-distribution ready for first independent review
 
 Date: 2026-10-14 (session began 2026-10-13)
