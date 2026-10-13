@@ -70,14 +70,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-contract-versioning",
         "unitDigest": "8ffc35b01b812e60431405f8d140ef900e24c4d87f05606dafec0dcb6e5f7dec",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/operation_provider_router.rs:108-119",
           "packages/host-runtime/rust/src/contracts.rs:174-203"
         ],
-        "statusNote": "Exact request/outcome version-pair matching is implemented; host/provider range intersection and registered transforms remain selected design, not an implemented promise here."
+        "statusNote": "Exact request/outcome version-pair matching is implemented; host/provider range intersection and registered transforms remain selected design, not an implemented promise here.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal in component-protocol.md. Status says exact version-pair matching only; range intersection and transforms are selected design. operation_provider_router.rs:108-119 does exact request/outcome version compare; contracts.rs:174-203 is ContractRef with id and version.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -116,14 +121,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
         "unitDigest": "f44c32e72b77048a0e5f38a820961ab9d3e631ce73110f8f46edd7d50806c941",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/invocation_service.rs:161-234",
           "packages/host-runtime/rust/src/invocation_service.rs:494-570"
         ],
-        "statusNote": "The runtime admits before selection, grants before dispatch and writes a terminal lifecycle record. The retained arrow chain is the design vocabulary, not an assertion that every arrow is a separately persisted state."
+        "statusNote": "The runtime admits before selection, grants before dispatch and writes a terminal lifecycle record. The retained arrow chain is the design vocabulary, not an assertion that every arrow is a separately persisted state.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal arrow chain. Status says the chain is vocabulary, not separately persisted states. invocation_service.rs:161-234 has the terminal enum incl. Parked and the lifecycle record; 494-570 shows received and admit. Nit: the select stage (line 586) and grant stage (line 642) that back the admits-before-selection and grants-before-dispatch sentence sit just past the cited range; consider extending to 494-660.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -162,14 +172,19 @@
         "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
         "anchor": "restored-physical-placement-layout-tree",
         "unitDigest": "b7c268c102bebb54ddfa5eb5e0a30776638dc450e855f71eb63088a47586c1fb",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "Cargo.toml:1-17",
           "packages/host-runtime/rust/src/registry.rs:19-69"
         ],
-        "statusNote": "This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename."
+        "statusNote": "This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Marked illustrative, not a directory listing. Cargo.toml:1-17 shows members apps/fgos, packages/host-runtime/rust and the apps/fgos-gateway exclude; registry.rs:19-69 is build_snapshot (not registry_linker.rs). Claims match.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -224,13 +239,18 @@
         "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
         "anchor": "restored-class-definitions",
         "unitDigest": "6f87a7eebf9ea1c9168ec539fbde7f1e86802905808f17cdf411b0e95de75e52",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/contracts.rs:377-393"
         ],
-        "statusNote": "The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped."
+        "statusNote": "The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "All 9 literal. Qualified as design policy; contracts.rs:377-393 ProviderDescriptor has open Cow string component_class and mechanism, which is exactly what the note says.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -275,14 +295,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
         "unitDigest": "09bad73031f65818132934438abaa9deb202c4d506ea8a0f1d2794b1e87c9a1e",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/contracts.rs:205-220",
           "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
         ],
-        "statusNote": "OperationRequest uses typed input; the process codec is framed JSON-RPC. Cold-start and hot-loop discussion is qualitative design reasoning; no performance measurement is claimed."
+        "statusNote": "OperationRequest uses typed input; the process codec is framed JSON-RPC. Cold-start and hot-loop discussion is qualitative design reasoning; no performance measurement is claimed.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. Note says typed input plus framed JSON-RPC and no performance measurement. contracts.rs:205-220 OperationRequest has Box dyn Any input; frame_codec.rs:1-16 is the 4-byte length-prefixed JSON-RPC codec.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -321,13 +346,18 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-semantic-contract-stays-transport-neutral",
         "unitDigest": "ae783d1874e8f08378f9ba6fb523ab87b46e20cabc1de311ff702db6d2ca2f6b",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
         ],
-        "statusNote": "The implemented process codec is length-prefixed JSON-RPC. A binary codec or local socket is retained future transport-neutral design, not implemented functionality."
+        "statusNote": "The implemented process codec is length-prefixed JSON-RPC. A binary codec or local socket is retained future transport-neutral design, not implemented functionality.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. Binary codec or socket labelled future design; frame_codec.rs:1-16 confirms only the length-prefixed JSON-RPC codec exists.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -370,14 +400,19 @@
         "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
         "anchor": "restored-registry-linker-procedure-and-its-input-output-formula",
         "unitDigest": "4d243a014e521ec3d00b1941aff46f7aaff78e04a4fa6d756840d1c6ef7d7d17",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/registry.rs:19-69",
           "packages/host-runtime/rust/src/operation_provider_router.rs:24-40"
         ],
-        "statusNote": "The input/output formula and full validation procedure are retained selected design. The cited immutable snapshot constructor validates duplicate bindings; it does not prove every proposed namespace/capability/replacement step is implemented."
+        "statusNote": "The input/output formula and full validation procedure are retained selected design. The cited immutable snapshot constructor validates duplicate bindings; it does not prove every proposed namespace/capability/replacement step is implemented.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. Note says only duplicate-binding validation is implemented; registry.rs:19-69 does exactly that (panic on duplicate bindings, replacement pair exempt) and operation_provider_router.rs:24-40 shows RouterPolicy as an unused placeholder and SelectionInput.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -418,14 +453,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-both-adapters-delegate-a-complete-use-case",
         "unitDigest": "bee8f7b4f179667157c60c45770840b9db691e7c03ce3914556e097538b46c35",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "apps/fgos/src/legacy_exec.rs:69-154",
           "apps/fgos/src/legacy_exec.rs:242-253"
         ],
-        "statusNote": "The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation."
+        "statusNote": "The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. legacy_exec.rs:69-154 resolves the payload through the manifest and verify_legacy_node; 242-253 spawns node with the forwarded args and inherited stdio. Note claims no more than that.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -464,7 +504,7 @@
         "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
         "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
         "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
@@ -473,7 +513,12 @@
         ],
         "statusNote": "FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
         "flaggedObsolete": true,
-        "ownerQueue": true
+        "ownerQueue": true,
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Verified: package.json:9-12 still has bin.fgos (bin/fgos.mjs) and bin.fgos-runner; bin/fgos.mjs lines 3-10 carry the ownership header and say global npm bin.fgos and node bin/fgos.mjs remain compatibility channels. AGENTS.md section on the legacy-node boundary says the same. So the clause is obsolete as a current statement. Keeping it byte-literal in a fenced block, headed with a FLAGGED checked status (retained as dated design, not the current contract, no locked rule changed) is the right call: it preserves the claim, does not assert it, and the owner can accept or retire it independently. Recommend recording the supersede link to the checked note in the register decision as the author did; do not delete or rewrite the clause. Nit: the restored text lives in architecture/release-boundaries.md while its source is legacy-cli-transition.md; the register owner was chosen that way and is consistent across register and evidence, so acceptable.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -512,13 +557,18 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-rust-host-first-cost",
         "unitDigest": "ce635b98194d303774b10085ed0267c25296c7bda6a154d34d0cdf3180f182e9",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "apps/fgos/src/legacy_exec.rs:242-253"
         ],
-        "statusNote": "The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed."
+        "statusNote": "The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. legacy_exec.rs:242-253 Command::new node from the Rust adapter supports the structural two-runtime cost; no latency claim made.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -557,13 +607,18 @@
         "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
         "anchor": "restored-scope",
         "unitDigest": "8f560ba167735c6e534d25346df656a0c215ecc909f7f29e5068c768e6842626",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "Cargo.toml:1-17"
         ],
-        "statusNote": "The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement."
+        "statusNote": "The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. Marked engineering guidance not a gate; Cargo.toml:1-17 is the real current placement.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -616,14 +671,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-rejected-options-rationale",
         "unitDigest": "0dcb452da8abf3d78a91a1c882f6086bd7388c8117f462a695ee211ba8a42637",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "apps/fgos/src/legacy_exec.rs:69-154",
           "apps/fgos/src/legacy_exec.rs:242-253"
         ],
-        "statusNote": "These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted."
+        "statusNote": "These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "All 8 literal. Marked dated reasoning, not measurement; cites are consistent with manifest-owned CLI delegation and make no big-bang claim.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -668,14 +728,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-per-component-repeat-procedure",
         "unitDigest": "c73fb84bd5ff7d0269e399109f5067e14c6cfce10f6bc48094f2c20ecc7e90b8",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/invocation_service.rs:161-209",
           "package.json:27-35"
         ],
-        "statusNote": "The ten-step sequence is manual migration guidance, not a newly registered automation. Parked is represented distinctly from success in the runtime terminal enum; no provider-side human wait or reinvocation smoke is claimed."
+        "statusNote": "The ten-step sequence is manual migration guidance, not a newly registered automation. Parked is represented distinctly from success in the runtime terminal enum; no provider-side human wait or reinvocation smoke is claimed.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. Ten-step list called manual guidance, not registered automation. invocation_service.rs:161-209 shows Parked distinct from Succeeded; package.json:27-35 is the real scripts block.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -714,14 +779,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-rollback-bullets",
         "unitDigest": "69dc68b645856ef1e861ecd4262595c7562de726b88e352deec9aea187b88fc0",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "packages/host-runtime/rust/src/operation_provider_router.rs:74-119",
           "packages/host-runtime/rust/src/registry.rs:41-69"
         ],
-        "statusNote": "The observation-window and writer-recovery obligations remain manual selected policy. Selection reads immutable bindings, not a runtime provider-selection override; this pass does not execute or certify release rollback."
+        "statusNote": "The observation-window and writer-recovery obligations remain manual selected policy. Selection reads immutable bindings, not a runtime provider-selection override; this pass does not execute or certify release rollback.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "Literal. Called manual selected policy, not executed rollback; operation_provider_router.rs:74-119 select reads snapshot bindings with no override and registry.rs:41-69 builds the snapshot.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -772,14 +842,19 @@
         "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
         "anchor": "restored-p1-compatibility-harness",
         "unitDigest": "02610d5ee4372f569658cebaca082fca27d29f30918a4328ed6cbe0a8aa80101",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "package.json:27-35",
           "apps/fgos/src/legacy_exec.rs:242-253"
         ],
-        "statusNote": "The source itself labels 25 ms and 10 ms budgets as placeholders to confirm. They are retained unexecuted performance acceptance requirements, UNPROVEN as measurements. package.json names the current test entry; no all-suite pass or injected-difference run is inferred."
+        "statusNote": "The source itself labels 25 ms and 10 ms budgets as placeholders to confirm. They are retained unexecuted performance acceptance requirements, UNPROVEN as measurements. package.json names the current test entry; no all-suite pass or injected-difference run is inferred.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "All 7 literal. 25 ms and 10 ms budgets stated as source placeholders, UNPROVEN as measurements, not inferred from any run. package.json test script and legacy_exec.rs:242-253 exist as cited.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     },
     {
@@ -826,13 +901,18 @@
         "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
         "anchor": "restored-test-and-review-gates-table",
         "unitDigest": "56d15064f93ccee95d727bc4f4508544ff979ef20ec5b4d7a61b0cf1b601177d",
-        "reviewStatus": "pending",
+        "reviewStatus": "reviewed",
         "authoredBy": "codex-session:1@2026-10-11",
         "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
         "codeEvidence": [
           "package.json:27-35"
         ],
-        "statusNote": "This table is a dated proof/acceptance policy, not a claim that the current full Node/Rust/gateway suites or performance gates ran. The real Node suite entry is preserved; checkpoint evidence reports only commands actually exercised."
+        "statusNote": "This table is a dated proof/acceptance policy, not a claim that the current full Node/Rust/gateway suites or performance gates ran. The real Node suite entry is preserved; checkpoint evidence reports only commands actually exercised.",
+        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewedAt": "2026-10-13",
+        "reviewNote": "All 5 literal. Stated as dated acceptance policy, no suite claimed run. package.json:27-35 contains the real test entry.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
       }
     }
   ]

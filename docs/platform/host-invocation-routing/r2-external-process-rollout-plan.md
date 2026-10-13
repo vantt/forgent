@@ -15,9 +15,9 @@ Related:
 ```
 
 The R2 rollout plan is historical execution material, not a current platform
-contract. Its previously recorded location is unavailable in this checkout:
+contract. Its archived execution record is available here:
 
-`../../../plans/260915-host-invocation-r2-external-process/plan.md` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`)
+[../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../archive/plans/260915-host-invocation-r2-external-process/plan.md)
 
 The platform proof record remains:
 

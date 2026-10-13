@@ -57,10 +57,11 @@ Added in candidate: the following is the pinned September design/migration sourc
 
 This document depends on the kernel contract in [Host Invocation And Provider Routing](../spec.md) — read it first for `OperationId`, `OperationRequest`, `ProviderOutcome`, `ProviderDescriptor`, `OperationProvider`, `RegistrySnapshot`, the Router, and `InvocationService`. This document covers everything specific to a provider that lives outside a statically linked Rust crate: component classes (who owns/releases it), invocation mechanisms (how it is reached), the wire protocol, and the plugin registry linker that turns manifests into a `RegistrySnapshot`.
 
-#### Migration Status Note
+#### Historical Migration Status Note
 
-This document remains a legacy-current source during the 2026-09-14 promotion
-pass. The promoted platform docs are
+Added in candidate: superseded migration bookkeeping. The legacy source was
+legacy-current during the 2026-09-14 promotion pass. That dated status applies
+to the legacy input, not this candidate. The recorded platform destinations are
 [architecture/external-provider-protocol.md](external-provider-protocol.md),
 [contracts/component-protocol.md](../contracts/component-protocol.md),
 and [contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md).
@@ -79,7 +80,7 @@ invocation mechanism -> how the selected provider is invoked at runtime
 A `ProviderDescriptor` therefore declares both: component class (core, packaged extension, or user plugin) and invocation mechanism (built-in, legacy node, external process, or external WASM).
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-005 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/release-boundaries.md#restored-class-definitions`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-005 restoration](release-boundaries.md#restored-class-definitions).
 
 
 
@@ -90,7 +91,7 @@ Added in candidate: this retained source detail is carried verbatim in `the drop
 #### 2. Invocation Mechanisms
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-005 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/release-boundaries.md#restored-class-definitions`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-005 restoration](release-boundaries.md#restored-class-definitions).
 
 
 This enum covers semantic providers and is an illustrative host-implementation detail, not the public ABI (the transitional `LegacyCliPassthrough` binding is CLI-only and lives outside this set — see [Legacy CLI Transition](legacy-cli-transition.md)).
@@ -100,16 +101,16 @@ This enum covers semantic providers and is an illustrative host-implementation d
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-006 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost).
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-006 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost).
 
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-006 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-006 restoration](../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost).
 
 
 #### 3. Component Protocol
@@ -131,7 +132,7 @@ One connection obeys these lifecycle rules:
 - a one-shot CLI may own one process for its lifetime; a gateway may pool or persist connections under the adapter's health/restart policy.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-007 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-007 restoration](../contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral).
 
 
 `EncodedMessage` is the wire representation used only at this boundary — never inside the kernel:
@@ -156,7 +157,7 @@ A `manifest.yaml` provider declaration declares at least: plugin ID, version, pu
 **Registry** names only the host's derived runtime index (and its lock/cache), never another authored file. Discovery scans `manifest.yaml`, validates by `kind`, then links accepted claims into the provider registry.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-008 restoration` (historical reference unavailable: `docs/architect/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-008 restoration](../verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula).
 
 
 

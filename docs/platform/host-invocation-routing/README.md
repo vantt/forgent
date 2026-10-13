@@ -57,8 +57,8 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Check preserved legacy intent and dispositions | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | Understand current, legacy-current, planned, and unknown behavior | [spec.md](spec.md) |
 | Plan remaining work after R1/R2/R3 preview proofs | [roadmap.md](roadmap.md) |
-| Review R2 external process provider preview closeout | `../../../plans/260915-host-invocation-r2-external-process/plan.md` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
-| Review R3 remote peer closeout | `../../../plans/260918-host-invocation-r3-remote-peer/plan.md` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
+| Review R2 external process provider preview closeout | [../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../archive/plans/260915-host-invocation-r2-external-process/plan.md), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
+| Review R3 remote peer closeout | [../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
 | Understand invocation kernel shape | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Understand CLI, remote, and chat peer hosts | [architecture/host-use-cases.md](architecture/host-use-cases.md) |
 | Understand provider selection and authority | [architecture/provider-routing.md](architecture/provider-routing.md) |

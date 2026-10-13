@@ -18,6 +18,8 @@ Related:
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
 ```
 
+Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+
 ## 1. Current Baseline
 
 The codebase has a Rust-host preview installed/default slice.
@@ -30,7 +32,7 @@ release-owner decision.
 | --- | --- |
 | [apps/fgos](../../../apps/fgos/) | Rust CLI host code exists. |
 | [packages/host-runtime/rust](../../../packages/host-runtime/rust/) | Host runtime crate implements kernel contracts, router, registry, authority gate, providers, and invocation service. |
-| [packages/host-runtime/contracts/command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) | Current route matrix has 73 selectors: 71 `legacy-cli`, two native. |
+| [packages/host-runtime/contracts/command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) | Current route matrix has 75 selectors: 70 `legacy-cli`, five native. |
 | [apps/fgos/src/cli_projector.rs](../../../apps/fgos/src/cli_projector.rs) | Native CLI routes project `version` to `distribution.build.show` and `gate-bypass` to `work.gate-bypass.show`. |
 | [packages/distribution/rust/src/lib.rs](../../../packages/distribution/rust/src/lib.rs) | `distribution.build.show` provider exists. |
 | `cargo test -p fgos-host-runtime -p fgos --quiet` | Passed on 2026-09-14 during code scan and local Phase A proof refresh. |
@@ -82,19 +84,19 @@ closed on 2026-09-18, proving native remote peer invocation for
 `distribution.build.show` (`GET /v1/runtime` in `apps/fgos-gateway/src/gateway.rs`)
 without `VerbGateway`, CLI shelling, or `fgos.v1` envelope parsing. All other
 gateway routes remain on `VerbGateway` per the
-`R3 execution record` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`).
+[R3 execution record](../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md).
 
 ### 3.1 Status Tracker
 
 | Front | Status | What is done | What remains |
 | --- | --- | --- | --- |
 | R1 Rust CLI host | `implemented preview` | Installed/default preview proof shows external `fgos` enters the Rust host; `version` and `gate-bypass` are native routes. | Stable/default graduation remains a release-owner decision. |
-| Route matrix | `current partial` | 73 selectors are described: 71 `legacy-cli`, two native. | Migrate additional selectors only at complete operation/use-case boundaries. |
+| Route matrix | `current partial` | 75 selectors are described: 70 `legacy-cli`, five native. | Migrate additional selectors only at complete operation/use-case boundaries. |
 | Invocation kernel | `current partial` | `OperationRequest`, `ProviderOutcome`, router, registry snapshot, two-stage authority, and `InvocationService` are proven for the current Rust slice. | Declared replacement resolution, broader native providers, and future host kinds still need proof. |
 | R2 external process provider | `implemented preview` | `fixture.echo.echo` proves manifest discovery, derived registry/linker, frame codec, supervisor, and router integration. | Production provider ecosystem work: marketplace/signatures, WASM, persisted cache/lock, non-fixture shipped providers. |
 | R3 remote peer | `implemented preview` | `GET /v1/runtime` invokes `distribution.build.show` through the shared kernel without `VerbGateway`, CLI shelling, or `fgos.v1` parsing. | Every other gateway route remains legacy; future remote-route migrations are separate work. |
 | Chat host | `planned` | No current adapter or contract is claimed. | Define admission, interruption, parking, presentation, and proof contract. |
-| Legacy Node retirement | `blocked by migration/release gates` | Node is still the compatibility payload for 71 selectors. | Requires zero `legacy-cli` routes, release policy closure, and packaging rollback/fallback agreement. |
+| Legacy Node retirement | `blocked by migration/release gates` | Node is still the compatibility payload for 70 selectors. | Requires zero `legacy-cli` routes, release policy closure, and packaging rollback/fallback agreement. |
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -103,7 +105,7 @@ Goal: make the current Rust-host code slice mechanically verifiable as the host-
 Host-invocation tasks:
 
 - Keep [command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) as the route matrix source of truth.
-- Verify the matrix count in tests: 73 selectors, 71 `legacy-cli`, two native routes: `version -> distribution.build.show` and `gate-bypass -> work.gate-bypass.show`.
+- Verify the matrix count in tests: 75 selectors, 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`.
 - Ensure every route has owner path and compatibility tests.
 - Keep native `version` proof: no Node child process, valid `fgos.v1` presentation, `distribution.build.show` typed provider output.
 - Keep legacy passthrough proof: one Node child process, manifest-based legacy payload resolution, recursion guard, one lifecycle record.
@@ -223,7 +225,7 @@ Closed 2026-09-15 (all sub-tasks above done via R2-P0 through R2-P5). Done when:
 
 Goal: prove a project-local remote host is a peer of CLI for at least one native operation.
 
-Detailed rollout plan: `R3 execution record` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`).
+Detailed rollout plan: [R3 execution record](../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md).
 
 Current status: Closed as implemented preview on 2026-09-18 (R3-P0 through
 R3-P5). `GET /v1/runtime` (`distribution.build.show`) is wired directly to
@@ -294,7 +296,7 @@ Done when:
 
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
-| 1 | Keep preview proof green: route matrix stays at 73 selectors / 71 `legacy-cli` / two native until a new migration intentionally changes it. | Host invocation | No |
+| 1 | Keep preview proof green: route matrix stays at 75 selectors / 70 `legacy-cli` / five native until a new migration intentionally changes it. | Host invocation | No |
 | 2 | Decide whether the next frontier is another native read route, another remote read route, or the chat-host contract. Do not treat R2/R3 closeout as whole-component migration. | Host invocation | No, unless the chosen route touches release/runtime selection. |
 | 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
 | 4 | For external providers, choose whether to harden the preview mechanism (persisted cache/lock, shipped provider packaging, marketplace/signatures, WASM) before accepting non-fixture providers. | Host invocation plus Packaging-Distribution where artifacts ship | Maybe |
@@ -306,8 +308,8 @@ Done when:
 | area portal | [README.md](README.md) |
 | spec | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
-| R2 execution record | `../../../plans/260915-host-invocation-r2-external-process/plan.md` (historical plan unavailable in this checkout: `plans/260915-host-invocation-r2-external-process/plan.md`) |
-| R3 execution record | `../../../plans/260918-host-invocation-r3-remote-peer/plan.md` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`) |
+| R2 execution record | [../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../archive/plans/260915-host-invocation-r2-external-process/plan.md) |
+| R3 execution record | [../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | R1 proof | [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) |
 | R2 proof | [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
 | R3 proof | [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
@@ -335,10 +337,11 @@ rollback. Semantic contracts, provider lifecycle, authority, framing, registry
 rules, compatibility modes, and technical trade-offs are owned by the
 architecture document and are intentionally not redefined here.
 
-#### Migration Status Note
+#### Historical Migration Status Note
 
-This document remains a legacy-current execution-plan source during the
-2026-09-14 promotion pass. The promoted platform docs are
+Added in candidate: superseded migration bookkeeping. The legacy execution-plan source was
+legacy-current during the 2026-09-14 promotion pass. That dated status applies
+to the legacy input, not this candidate. The recorded platform destinations are
 [architecture/release-boundaries.md](architecture/release-boundaries.md),
 [verification/compatibility-harness.md](verification/compatibility-harness.md),
 [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md),
@@ -404,6 +407,8 @@ init` and `fgos doctor --fix` never select or download a release
 (`runtime-identity-and-activation.md` §12, Command Authority Matrix). There is
 no `setup` verb — see the P0 deliverable on inventorying `fgos setup` callers
 (§5).
+
+Added in candidate — checked status (2026-10-13): the preceding no-setup sentence is retained historical design wording. `setup` still exists as a legacy compatibility command (`src/cli/command-registry.mjs:1439-1441`, `bin/fgos.mjs:3774`); its compatibility window has not been retired. This note supersedes that sentence as a present-status assertion.
 
 Record decisions 1, 5, and 6 in the packaging stream
 (`docs/architect/packaging-distribution/`), which owns install/activation;
@@ -507,11 +512,11 @@ npm test
 #### 6. P1 — Compatibility Harness
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-016 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-016 restoration](contracts/component-protocol.md#restored-p1-compatibility-harness).
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-016 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-016 restoration](contracts/component-protocol.md#restored-p1-compatibility-harness).
 
 
 ##### Steps
@@ -548,12 +553,12 @@ Added in candidate: this retained source detail is carried verbatim in `the drop
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-016 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-016 restoration](contracts/component-protocol.md#restored-p1-compatibility-harness).
 
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-016 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-016 restoration](contracts/component-protocol.md#restored-p1-compatibility-harness).
 
 
 
@@ -892,11 +897,11 @@ cargo test --workspace
 ```
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-017 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-017 restoration](verification/compatibility-harness.md#restored-test-and-review-gates-table).
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-017 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-017 restoration](verification/compatibility-harness.md#restored-test-and-review-gates-table).
 
 
 
@@ -929,7 +934,7 @@ cross-version recovery is proven or the cutover is explicitly irreversible.
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-017 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-017 restoration](verification/compatibility-harness.md#restored-test-and-review-gates-table).
 
 
 #### 18. Definition Of Done

@@ -16,6 +16,8 @@ Related:
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
 ```
 
+Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+
 ## 1. Claim
 
 The native kernel has exactly one semantic input/output boundary: `OperationRequest` enters and `ProviderOutcome` or `ProviderError` exits. `InvocationService` owns admission, router call, selected-provider grant, invocation, failure normalization, lifecycle recording, and presenter handoff.
@@ -34,7 +36,7 @@ The native kernel has exactly one semantic input/output boundary: `OperationRequ
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | Native routes use `OperationRequest` to `ProviderOutcome`. | `implemented preview` | [../../../../packages/host-runtime/rust/src/contracts.rs](../../../../packages/host-runtime/rust/src/contracts.rs), [../../../../packages/host-runtime/rust/src/invocation_service.rs](../../../../packages/host-runtime/rust/src/invocation_service.rs), [../../../../apps/fgos/src/cli_projector.rs](../../../../apps/fgos/src/cli_projector.rs), [../../../../apps/fgos-gateway/src/remote_invocation.rs](../../../../apps/fgos-gateway/src/remote_invocation.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | Proven for `distribution.build.show`, `work.gate-bypass.show`, and the R2 fixture operation. Additional operations need their own route/provider proof. |
-| Legacy CLI routes bypass the kernel. | `implemented preview` | [legacy-cli-transition.md](legacy-cli-transition.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Current route matrix still has 71 `legacy-cli` selectors; keep bypass behavior until each selector migrates. |
+| Legacy CLI routes bypass the kernel. | `implemented preview` | [legacy-cli-transition.md](legacy-cli-transition.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Current route matrix still has 70 `legacy-cli` selectors; keep bypass behavior until each selector migrates. |
 | No component-boundary change. | `current` | [component-boundary.md](../../component-boundary.md) | No action for documentation migration. |
 
 ## 4. Related Files

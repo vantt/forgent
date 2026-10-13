@@ -15,6 +15,8 @@ Related:
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
 ```
 
+Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+
 ## 1. Required Proof
 
 R1 preview installed/default proof is done when the installed product entry is
@@ -31,7 +33,7 @@ supported for 30 calendar days after preview release publication.
 | --- | --- |
 | Rust host binary source under [../../../../apps/fgos/](../../../../apps/fgos/) | `implemented preview` |
 | Host runtime crate under [../../../../packages/host-runtime/rust/](../../../../packages/host-runtime/rust/) | `implemented preview` |
-| Command route matrix in [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json) | `current partial`: 73 selectors total, 71 `legacy-cli`, two native |
+| Command route matrix in [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json) | `current partial`: 75 selectors total, 70 `legacy-cli`, five native |
 | Native selectors | `current partial`: `version -> distribution.build.show`; local native read proof: `gate-bypass -> work.gate-bypass.show` |
 | Production native descriptors beyond `distribution.build.show` | `current partial`: `gate-bypass -> work.gate-bypass.show`; `test.fixture.echo` is a test fixture |
 | Installed/default runtime claim for preview public posture | `implemented preview`: release `v0.1.0` was published on 2026-09-18 with `fgctl`, `fgos`, `SHA256SUMS`, and `install.sh` assets; external installs default `fgos` through the Rust host; public docs may state Rust host is the default installed runtime. |

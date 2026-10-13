@@ -15,9 +15,9 @@ Related:
 ```
 
 The R3 rollout plan is historical execution material, not a current platform
-contract. Its previously recorded location is unavailable in this checkout:
+contract. Its archived execution record is available here:
 
-`../../../plans/260918-host-invocation-r3-remote-peer/plan.md` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`)
+[../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md)
 
 The platform proof record remains:
 

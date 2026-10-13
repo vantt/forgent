@@ -25,7 +25,7 @@ R3 proves at least one production gateway route as a true peer invocation: remot
 - **Operation id:** `distribution.build.show`
 - **Status:** Implemented preview (R3-P2 route wired, R3-P3 proof verified).
 - **Full frozen fields** (auth, request projection, response shape, error
-  mapping, deadline/disconnect, rationale): `R3 execution record §6 R3-P0` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`).
+  mapping, deadline/disconnect, rationale): [R3 execution record §6 R3-P0](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md).
 
 ### 1.2 Adapter Status (R3-P1, 2026-09-18)
 
@@ -100,7 +100,7 @@ Migrating any remaining routes is strictly out of R3 scope. Writes stay out of t
 
 | Relationship | File |
 | --- | --- |
-| execution record | `../../../../plans/260918-host-invocation-r3-remote-peer/plan.md` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`) |
+| execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | host use cases | [../architecture/host-use-cases.md](../architecture/host-use-cases.md) |
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
 | source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |

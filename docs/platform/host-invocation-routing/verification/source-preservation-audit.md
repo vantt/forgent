@@ -16,6 +16,8 @@ Related:
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
 ```
 
+Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+
 ## 1. Audit Result
 
 Every old host-invocation source named by the migration plan is classified in [../history/source-inventory.md](../history/source-inventory.md), and every settled design or migration claim found during this pass has a row in [../intent-preservation-ledger.md](../intent-preservation-ledger.md).
@@ -61,20 +63,20 @@ After the code scan, some former unknowns became code-verified current snapshots
 
 | Unknown | Kind | Why it is unknown | Where tracked |
 | --- | --- | --- | --- |
-| Current R1 route matrix. | Code-verified current snapshot | `packages/host-runtime/contracts/command-routes.json` contains 73 selectors: 71 `legacy-cli`, two native routes: `version -> distribution.build.show` and `gate-bypass -> work.gate-bypass.show`. | [r1-rust-host-proof.md](r1-rust-host-proof.md), [../spec.md](../spec.md#6-unknowns) |
+| Current R1 route matrix. | Code-verified current snapshot | `packages/host-runtime/contracts/command-routes.json` contains 75 selectors: 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`. | [r1-rust-host-proof.md](r1-rust-host-proof.md), [../spec.md](../spec.md#6-unknowns) |
 | Preview versus stable public contract split. | Product / release decision | The old plan names it as a remaining decision before R1, and code presence cannot decide public release posture. | [../architecture/release-boundaries.md](../architecture/release-boundaries.md), [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
 | Legacy compatibility support window. | Product / support decision | The support duration affects rollback and Node-removal policy, and was not settled in the source docs. | [compatibility-harness.md](compatibility-harness.md), [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
 | Production native descriptors beyond `distribution.build.show`. | Code-verified current snapshot | `gate-bypass -> work.gate-bypass.show` is the second production native route; `test.fixture.echo` is a host-runtime test fixture. | [../spec.md](../spec.md#6-unknowns), [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |
 | `gate-bypass` component ownership. | Code-verified local native proof | Code location is clear: read semantics live in `src/state/gate-bypass.mjs`, setup/doctor readiness lives in `src/setup/registrations.mjs`, and CLI grammar lives in `src/cli/command-registry.mjs`. Native migration uses existing work/state read ownership with no new component-boundary change. | [../roadmap.md](../roadmap.md#7-phase-d-add-the-next-native-read-route), [implementation-alignment.md](implementation-alignment.md) |
 | First external provider preview set and conformance fixture set. | Closed preview proof | R2 selected `fixture.echo.echo` and proved manifest, linker, frame codec, supervisor, and integration behavior. | [r2-external-process-proof.md](r2-external-process-proof.md), [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
-| First production remote peer route. | Closed preview proof | R3 selected `GET /v1/runtime` -> `distribution.build.show` and proved direct `InvocationService` invocation without `VerbGateway` or `fgos.v1` parsing. | [r3-remote-peer-proof.md](r3-remote-peer-proof.md), `../../../../plans/260918-host-invocation-r3-remote-peer/plan.md` (historical plan unavailable in this checkout: `plans/260918-host-invocation-r3-remote-peer/plan.md`) |
+| First production remote peer route. | Closed preview proof | R3 selected `GET /v1/runtime` -> `distribution.build.show` and proved direct `InvocationService` invocation without `VerbGateway` or `fgos.v1` parsing. | [r3-remote-peer-proof.md](r3-remote-peer-proof.md), [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | Chat host admission, interruption, presentation, and lifecycle semantics. | Future host contract decision | Scan found no current chat host adapter implementation. | [../architecture/host-use-cases.md](../architecture/host-use-cases.md), [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
 
 ## 6. Code Scan Evidence
 
 | Check | Evidence | Result |
 | --- | --- | --- |
-| Route matrix count | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json) | 73 selectors: 71 `legacy-cli`, two native. |
+| Route matrix count | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json) | 75 selectors: 70 `legacy-cli`, five native. |
 | Native production operations | [../../../../apps/fgos/src/cli_projector.rs](../../../../apps/fgos/src/cli_projector.rs), [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/work-state/rust/src/lib.rs](../../../../packages/work-state/rust/src/lib.rs) | `version` projects to `distribution.build.show`; `gate-bypass` projects to `work.gate-bypass.show`. |
 | Rust host/runtime proof | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../packages/host-runtime/rust/src/invocation_service.rs](../../../../packages/host-runtime/rust/src/invocation_service.rs) | Current partial code path exists. |
 | External provider implementation | [../../../../packages/host-runtime/rust/src/providers/external_process/](../../../../packages/host-runtime/rust/src/providers/external_process/), [r2-external-process-proof.md](r2-external-process-proof.md) | R2 preview path implemented with fixture proof; production ecosystem hardening remains future. |

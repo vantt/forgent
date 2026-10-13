@@ -15,6 +15,8 @@ Related:
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
 ```
 
+Added in candidate — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+
 ## 1. Contract
 
 Every selector has exactly one generated `CommandRouteDescriptor`.
@@ -41,7 +43,7 @@ Minimum fields:
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Current snapshot has 73 selectors: 71 `legacy-cli`, two native. Keep drift tests current as selectors move. |
+| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Current snapshot has 75 selectors: 70 `legacy-cli`, five native. Keep drift tests current as selectors move. |
 | `legacy-cli` preserves provider-owned argv. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Full compatibility-vector cleanup remains future, but manifest-owned legacy CLI lane is proven for preview. |
 
 ## 4. Related Files

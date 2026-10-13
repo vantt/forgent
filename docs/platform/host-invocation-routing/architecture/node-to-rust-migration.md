@@ -39,7 +39,7 @@ The old source's near-thin, partly-thin, and not-thin command lists are preserve
 | Rust host first is selected. | `implemented preview` | [source migration §2](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs) | Preview Rust host exists and is the installed/default preview entry. Stable/default graduation remains a release-owner decision. |
 | Read models before writers. | `current partial` | [source migration §10](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers), [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/work-state/rust/src/lib.rs](../../../../packages/work-state/rust/src/lib.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | `version`, `gate-bypass`, and remote `/runtime` are read proofs. Future read routes should migrate before writes. |
 | Writer migration has atomicity/replay/mutual-exclusion gates. | `planned` | [source migration §11](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components) | Future writer proof. |
-| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../../specs/observe.md), [packages/observe/rust](../../../../packages/observe/rust), `plans/260929-1501-metrics-friction-rust-native` (historical plan unavailable in this checkout: `plans/260929-1501-metrics-friction-rust-native/plan.md`) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |
+| Observe is first component fully in Rust. | `implemented complete` | [Observe Spec](../../../specs/observe.md), [packages/observe/rust](../../../../packages/observe/rust), [plans/260929-1501-metrics-friction-rust-native](../../../../archive/plans/260929-1501-metrics-friction-rust-native/plan.md) | Observe migrated completely into Rust native without Node fallback; covers metrics and friction writers with native routing and writer shards. |
 
 ## 5. Related Files
 
@@ -68,13 +68,14 @@ component at a time with native Rust providers.
 **Source:** Product-owner planning and follow-up component-boundary discussion.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-012 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/release-boundaries.md#restored-scope`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-012 restoration](release-boundaries.md#restored-scope).
 
 
-#### Migration Status Note
+#### Historical Migration Status Note
 
-This document remains a legacy-current source during the 2026-09-14 promotion
-pass. The promoted platform docs are
+Added in candidate: superseded migration bookkeeping. The legacy source was
+legacy-current during the 2026-09-14 promotion pass. That dated status applies
+to the legacy input, not this candidate. The recorded platform destinations are
 [architecture/node-to-rust-migration.md](node-to-rust-migration.md),
 [architecture/release-boundaries.md](release-boundaries.md),
 [verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md),
@@ -113,7 +114,7 @@ provider binding change together.
 ##### Option A: Thin The Entire Node Host First
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-013 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rejected-options-rationale`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-013 restoration](../contracts/component-protocol.md#restored-rejected-options-rationale).
 
 
 
@@ -136,7 +137,7 @@ component is actually migrated. See
 ##### Option C: Big-Bang Rust Rewrite
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-013 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rejected-options-rationale`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-013 restoration](../contracts/component-protocol.md#restored-rejected-options-rationale).
 
 
 
@@ -148,11 +149,11 @@ straight to the Node payload by default, not an immediate rewrite of all Node
 semantics.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-013 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rejected-options-rationale`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-013 restoration](../contracts/component-protocol.md#restored-rejected-options-rationale).
 
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-013 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rejected-options-rationale`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-013 restoration](../contracts/component-protocol.md#restored-rejected-options-rationale).
 
 
 
@@ -332,7 +333,7 @@ model migration. It is a good later read-side slice after `version` and
 #### 9. Repeat By Component Boundary
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-014 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-per-component-repeat-procedure`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-014 restoration](../contracts/component-protocol.md#restored-per-component-repeat-procedure).
 
 
 
@@ -350,7 +351,7 @@ The next meaningful proof after the small operations should be a Work Lifecycle
 read-side component, potentially the dependencies needed by `ready`.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-014 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-per-component-repeat-procedure`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-014 restoration](../contracts/component-protocol.md#restored-per-component-repeat-procedure).
 
 
 
@@ -400,7 +401,7 @@ Node payload during the operation's observation window, so a release rollback
 restores the legacy path without restoring the old outer executable by hand.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-015 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rollback-bullets`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-015 restoration](../contracts/component-protocol.md#restored-rollback-bullets).
 
 
 #### 14. Verification Gates

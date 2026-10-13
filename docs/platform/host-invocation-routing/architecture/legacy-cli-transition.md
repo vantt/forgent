@@ -57,10 +57,11 @@ Added in candidate: the following is the pinned September design/migration sourc
 
 This document depends on the kernel contract in [Host Invocation And Provider Routing](../spec.md) — read it first, in particular "Transitional CLI Lane" under §4 and `CommandRouteDescriptor` in the §3 name table. The kernel has exactly one input (`OperationRequest`) and one output (`ProviderOutcome`); everything in this document is CLI-adapter-local scaffolding that disappears once Node migration completes. Nothing here introduces a second kernel input or output type — the legacy lane never reaches the Router or `InvocationService` at all (see §1 below).
 
-#### Migration Status Note
+#### Historical Migration Status Note
 
-This document remains a legacy-current source during the 2026-09-14 promotion
-pass. The promoted platform docs are
+Added in candidate: superseded migration bookkeeping. The legacy source was
+legacy-current during the 2026-09-14 promotion pass. That dated status applies
+to the legacy input, not this candidate. The recorded platform destinations are
 [architecture/legacy-cli-transition.md](legacy-cli-transition.md),
 [contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md),
 [contracts/legacy-payload.md](../contracts/legacy-payload.md),
@@ -79,7 +80,7 @@ Node transition needs two adapters with different contracts. Treating them as on
 Capturing stdout/stderr in a supervised child improves CLI cancellation and tracing but remains passthrough presentation; it never becomes the bridge used by a remote host.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-009 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-009 restoration](../contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case).
 
 
 The adapters resolve the legacy payload relative to the installed host, never from the caller's cwd, and invoke the Node entry/bridge directly rather than spawning `fgos` recursively. The CLI parent forwards termination consistently; Unix signal equivalence and Windows process-tree behavior are explicit target-specific compatibility tests, not an undocumented `exit.code()` guess.
@@ -98,8 +99,9 @@ Three things are separated that the name `bin/fgos.mjs` currently conflates:
 
 The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: "."`, `entry: "bin/fgos.mjs"`, `entries.fgos: "target/release/fgos"`; a staged release declares `root: "libexec/legacy-node"`, `entries.fgos: "bin/fgos"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) §5).
 
+Added in candidate — checked resolver status (2026-10-13): the preceding activation-binding paragraph is retained selected design. `apps/fgos/src/legacy_exec.rs:69-154` selects the release root from explicit release/dev environment bindings or executable-relative manifest discovery, then verifies the manifest and confined entry. The target identity status in spec.md remains `accepted-not-implemented`; checked resolver behavior does not certify the entire target contract. The ownership rule remains never from PATH, never from caller cwd, never as an alternate package-manager bin entry, and never hardcoded.
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-010 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-010 restoration](release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea).
 
 
 **Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of "where is `fgos`?": the shell function's tier-1 (`scripts/fgos-shell-integration.sh`), Herdr's three `Command::new("node")` sites (`fgos.rs`, `gateway.rs`, `main.rs`), the dispatch CLI path (`src/runner/dispatch/cli.mjs`), the iron-law footprint matcher (`src/evolve/iron-law.mjs`), the doctor reachability check (`src/setup/registrations.mjs`), the plugin-skill fallback (`core/skills/_shared/fgos-cli-fallback.md` — the single source the ~20 `.agents`/`plugins` copies render from), and `package.json` `bin`. The fix is not a substitution: add one **tier 0 = workspace shim `.fgos/installation/bin/fgos`** to the single resolver each runtime already has (`src/setup/bin-discovery.mjs` for Node, the shell function for shells, one `resolve_fgos` for Herdr) and make the nine sites use it, with the old `node bin/fgos.mjs` path kept only as the fallback for a project that has not run `fgctl init`. The ~75 Node tests that spawn `bin/fgos.mjs` directly stay as they are — they test the Node payload's behavior with the Node payload. Comments are not callers.
@@ -124,7 +126,7 @@ The descriptor is both the routing input and the contributor repair map. A repos
 #### 3. Command Metadata And Parser Ownership
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-009 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-009 restoration](../contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case).
 
 
 While a CLI verb is legacy, the Rust CLI recognizes only a checked command selector and forwards every provider-owned `OsString` unchanged. The selector routes under a reserved, CLI-only compatibility contract; it does not mint an implementation-shaped `legacy.<verb>` semantic `OperationId`. When a command becomes native, its option grammar and typed request conversion move together and its projection points at the component-owned operation — this avoids two independent parsers accepting subtly different inputs.
@@ -146,7 +148,7 @@ Golden vectors are necessary but not sufficient. A Node-generated differential c
 Making Rust the host before migrating components places the final composition root, peer host use cases, provider registry, and plugin seam in their permanent runtime immediately. Every native migration then removes a `LegacyNode` edge instead of building more infrastructure into a temporary Node host.
 
 
-Added in candidate: this retained source detail is carried verbatim in `the dropped-011 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rust-host-first-cost`).
+Added in candidate: this retained source detail is carried verbatim in [the dropped-011 restoration](../contracts/component-protocol.md#restored-rust-host-first-cost).
 
 
 #### Related Documents

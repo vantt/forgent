@@ -3,7 +3,7 @@
   "batch": "Host Invocation Routing",
   "authoredCommit": "ffab9879172f3143d96b25b87f5bbd2c4d93b718",
   "authorSession": "codex-session:1@2026-10-11",
-  "reviewStatus": "pending",
+  "reviewStatus": "reviewed",
   "groups": [
     {
       "digest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
@@ -27,7 +27,12 @@
       ],
       "rationale": "These are identical September status/date/review provenance headers attached to two different source documents: external process protocol and CLI-only legacy transition. They do not duplicate an architecture or executable policy claim. Each retains its own frozen mapped owner and dated source provenance. No one-owner-per-semanticClaimId exemption is requested; default D remains clean. Independently check this exact two-member set and each surrounding document subject.",
       "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "pending"
+      "reviewStatus": "reviewed",
+      "reviewNote": "Exact set verified: claim_825ecbc1... (external-provider-protocol.md unheaded-block-1) and claim_3a3a8368... (legacy-cli-transition.md unheaded-block-1). Recomputed sha256 of lines 3-5 of both legacy files at 83d757f4d equals ab6730b9...; the digest occurs in exactly two bindings and two byteChecks in accounting, and exactly twice each in working-identity-registry.json and doc-inventory part-0002 (these two docs only). The other four sources have different blocks (provider-routing adds a Source line, the rest use other headers). Each target block sits under its own document title heading (external-provider-protocol.md and legacy-cli-transition.md architecture docs, both at line 54-56 under Retained selected source material, unheaded-block-7). It is metadata provenance for two different subjects, not a duplicated semantic claim; no canonical semantic-owner exemption is requested.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13"
     }
-  ]
+  ],
+  "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+  "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
 }

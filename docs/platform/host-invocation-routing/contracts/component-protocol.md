@@ -314,3 +314,5 @@ node --test test/rust-host/envelope-contract.test.mjs
 node scripts/export-command-selectors.mjs --check
 ```
 ````
+
+Added in candidate — source-relative link destination: the literal restored excerpt retains `../component-boundary/component-boundary-advisory.md`; its live destination is [the retained component-boundary advisory](../../../architect/component-boundary/component-boundary-advisory.md). This navigation mapping does not revise the restored text.
