@@ -101,10 +101,10 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-1",
-      "targetUnitDigest": "feb1ffbbcdc358cd3c725515910cbc9c1d75a7fa40e3ac950a795c3d596a61a9",
+      "targetUnitDigest": "8980fe7db4f59777813ca8119f184178e96980c3f53e001ee88ffe67c944c254",
       "authoredBy": "codex-session:8@2026-10-13",
       "reviewStatus": "pending",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
       "targetAncestry": [
         "Contract: Activation Binding"
       ]
@@ -116,10 +116,10 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
       "targetAnchor": "unheaded-block-1",
-      "targetUnitDigest": "4c1c662a71f24326115932c1feb1872d829ee4b09b426bcfb45f85a9f736d7d5",
+      "targetUnitDigest": "505a2fba8363494082231ca850d2329cd9b265990b04bb8a5c745e6e2345932c",
       "authoredBy": "codex-session:8@2026-10-13",
       "reviewStatus": "pending",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
       "targetAncestry": [
         "Contract: Distribution Pin"
       ]
@@ -161,10 +161,10 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
       "targetAnchor": "unheaded-block-1",
-      "targetUnitDigest": "ea2d47cd7df1f38d2e62d41f5a7ae009c009b92d67889c1b74841d2335a79560",
+      "targetUnitDigest": "28cfc4174a87b1d603361d312cf5c03172c5dece24c367db4bb1813341bc0ad2",
       "authoredBy": "codex-session:8@2026-10-13",
       "reviewStatus": "pending",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
       "targetAncestry": [
         "Contract: Release Manifest"
       ]
@@ -430,6 +430,51 @@
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 5"
+      ]
+    },
+    {
+      "claimId": "claim_8eaaa820698633aedf4339ea1f923d89",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "sourceUnitDigest": "feb1ffbbcdc358cd3c725515910cbc9c1d75a7fa40e3ac950a795c3d596a61a9",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "8980fe7db4f59777813ca8119f184178e96980c3f53e001ee88ffe67c944c254",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
+      "targetAncestry": [
+        "Contract: Activation Binding"
+      ]
+    },
+    {
+      "claimId": "claim_99600767aa1a793a02dbdc32107693d2",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "sourceUnitDigest": "4c1c662a71f24326115932c1feb1872d829ee4b09b426bcfb45f85a9f736d7d5",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "505a2fba8363494082231ca850d2329cd9b265990b04bb8a5c745e6e2345932c",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
+      "targetAncestry": [
+        "Contract: Distribution Pin"
+      ]
+    },
+    {
+      "claimId": "claim_a4c26f8aae004f1d17d0f5be7e48b585",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "sourceUnitDigest": "ea2d47cd7df1f38d2e62d41f5a7ae009c009b92d67889c1b74841d2335a79560",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-1",
+      "targetUnitDigest": "28cfc4174a87b1d603361d312cf5c03172c5dece24c367db4bb1813341bc0ad2",
+      "authoredBy": "codex-session:8@2026-10-13",
+      "reviewStatus": "pending",
+      "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
+      "targetAncestry": [
+        "Contract: Release Manifest"
       ]
     }
   ]
