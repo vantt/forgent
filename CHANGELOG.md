@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.4] - 2026-10-13
+
 ### Added
 - `fgos` now runs each project's own activated release from any directory on a release install. `fgos doctor --fix` (which `fgctl init` already runs) writes one small `fgos` launcher next to `fgctl` that walks up to the nearest `.fgos/installation/bin/fgos` and runs it, so there is no absolute path to type and no rc file is touched (`fgos.cmd` on Windows). It never overwrites a different `fgos` found first on `PATH`; `doctor` names it instead. New `doctor` check: `project-fgos-launcher`.
 
