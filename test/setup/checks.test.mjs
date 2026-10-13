@@ -61,6 +61,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'main-checkout-hook-wired',
       'node-version-and-git',
       'shell-integration-sourced',
+      'project-fgos-launcher',
       'tool-registry-configured',
       'config-awareness',
       'provider-capacity-state',

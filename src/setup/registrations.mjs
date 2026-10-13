@@ -84,6 +84,7 @@ import { resolveTaskSpecPath } from '../runner/paths.mjs';
 import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
+import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
@@ -1362,6 +1363,52 @@ registerCheck({
   id: 'shell-integration-sourced',
   description: 'shell-integration source line present in detected rc file(s)',
   check: (cwd) => checkShellIntegrationSourced(cwd),
+});
+
+// A release install (no git checkout to source a script from) is reached through
+// one `fgos` launcher written next to `fgctl`, which runs each project's own
+// activated fgos. A source checkout keeps the shell-integration script instead.
+export function checkProjectLauncher({ pathEnv = process.env.PATH, sourceCheckout = integrationScriptPath() !== null } = {}) {
+  if (sourceCheckout) {
+    return { passed: true, message: 'running from a source checkout -- shell integration provides fgos, no launcher needed' };
+  }
+  const status = inspectLauncher({ pathEnv });
+  switch (status.state) {
+    case 'ready':
+      return { passed: true, message: `fgos on PATH is the project launcher at ${status.file}: each project runs its own activated fgos` };
+    case 'stale':
+      return { passed: false, message: `the fgos launcher at ${status.file} is out of date -- run fgos doctor --fix` };
+    case 'foreign':
+      return { passed: false, message: `the fgos found first on PATH (${status.file}) is not the project launcher, so projects may not run their own fgos -- remove it or put the fgctl directory earlier on PATH, then run fgos doctor --fix` };
+    case 'missing':
+      return { passed: false, message: `no fgos on PATH -- run fgos doctor --fix to write the project launcher at ${status.file}` };
+    default:
+      return { passed: false, message: 'neither fgos nor fgctl is on PATH -- add the directory fgctl was installed into (default ~/.local/bin) to PATH, then run fgos doctor --fix' };
+  }
+}
+
+export function fixProjectLauncher({ pathEnv = process.env.PATH } = {}) {
+  const status = inspectLauncher({ pathEnv });
+  if (status.state === 'ready') return { fixed: false, message: 'launcher already current' };
+  if (status.state === 'foreign') {
+    return { fixed: false, message: `left ${status.file} alone: it is not the project launcher; remove it or put the fgctl directory earlier on PATH` };
+  }
+  if (status.state === 'no-fgctl') {
+    return { fixed: false, message: 'neither fgos nor fgctl is on PATH, so there is no directory to write the launcher into; add the fgctl directory to PATH first' };
+  }
+  writeLauncher(status.file);
+  return { fixed: true, message: `wrote the project launcher at ${status.file}` };
+}
+
+registerCheck({
+  id: 'project-fgos-launcher',
+  description: 'a release install has a single fgos on PATH that runs each project\'s own activated fgos',
+  check: () => checkProjectLauncher(),
+});
+
+registerFix({
+  id: 'project-fgos-launcher',
+  fix: () => fixProjectLauncher(),
 });
 
 registerCheck({

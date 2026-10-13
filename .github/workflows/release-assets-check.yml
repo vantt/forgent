@@ -66,3 +66,4 @@ jobs:
           test/rust-host/release-tree.test.mjs
           test/scripts/release-packaging.test.mjs
           test/setup/curl-check.test.mjs
+          test/setup/project-launcher.test.mjs
