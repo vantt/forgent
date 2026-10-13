@@ -89,8 +89,12 @@ Source: [code-review-261013-1511-credential-pending-retention-round-2-verificati
 - **fsync.** The staged files and staging directory are synced before the rename, the pending directory after it, before the home may go. Test counts syncs.
 - **Runtime directory.** The hook and `settleHeldCredentialHomes` match the marker's runtime directory. Test with another runtime directory.
 - **Unrecognisable marker.** `{}`, `null`, `[]`, `{"dispatchId":"x"}` and empty content stop the removal. A marker that names a contract (the existing finalizer test's shape) still goes through to the caller's own ownership check; no existing test was changed.
-- **Temp roots.** `defaultConfinementTempRoots` moved to `confinement/backend-registry.mjs` (re-exported from registrations); the three dispatch callers pass it to `createConfinementCredentialRenewal`, read at each use. Test reads the callers' sources. The renewal module still imports nothing from confinement. Plan question 9 closed; questions 10 (duplicate staging after a crash) and 11 (lock taken by every dispatch of an account with an unsettleable held home) recorded, not fixed.
+- **Temp roots.** `defaultConfinementTempRoots` moved to `confinement/backend-registry.mjs` (re-exported from registrations); the three dispatch callers pass it to `createConfinementCredentialRenewal`, read at each use. Test reads the callers' sources. The renewal module still imports nothing from confinement. Plan question 9 was closed here and later reopened for homes under a backend's separate `privateHomeRoot`, which no search covers; questions 10 (duplicate staging after a crash) and 11 (lock taken by every dispatch of an account with an unsettleable held home) recorded, not fixed.
 - Comments that claimed "no path" corrected; the boundary test's pattern now includes the backtick quote.
 - Component boundary: no change.
 
 Full suite on f7fd8ae49 (the report commits after it change no code): 7274 tests, 7199 pass, 0 fail, 0 cancelled, 10 skipped (exit 0).
+
+### Follow-up notes from the round-three review
+
+- The runner.md rule and section 13.2 now both state the round-three rules and that `privateHomeRoot` homes are outside the searched roots. Plan questions 12 (the fsync test counts every sync, including the lock's) and 13 (guard and write-back read the source twice) are recorded, not fixed.
