@@ -17,6 +17,14 @@ Related:
 - docs/platform/packaging-distribution/contracts/skill-package-distribution.md
 - docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md
 - docs/platform/packaging-distribution/contracts/repository-runtime-layout.md
+Implementation: Original section-specific implementation statements retained; carriage is pending independent review
+Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
+Writer type: Human + agent coauthor
+Canonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review
+Use this when: Reading this area topic and its retained design details
+Do not use this for: Claiming a truth review or an authority cutover from carriage alone
+Supersedes: No authority transition in this carriage pass
+Superseded by: None recorded
 ```
 
 Status: DONE. P1-P9 are merged, the panel branch has merged to `main`, and
