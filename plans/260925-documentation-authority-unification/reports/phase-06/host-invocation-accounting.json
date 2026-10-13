@@ -20183,5 +20183,27 @@
       "stdout": "{\"authorityChanges\":[],\"readerLinkChanges\":[],\"result\":\"pass\"}\n",
       "stderr": ""
     }
-  ]
+  ],
+  "checkpointAggregation": {
+    "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+    "replacedPaths": [
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-documentation-standardization-plan.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-external-provider-protocol.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-host-invocation-provider-routing.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-legacy-cli-transition.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-node-to-rust-component-migration.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-rust-cli-and-proof-components-plan.json"
+    ],
+    "rowCount": 431,
+    "unchangedRowsSha256": "26e526fe8628e2d64a5d9fc1a67ac131cd35f31603457b7929034df1caffb74d",
+    "byteEqualControlPool": 174,
+    "reason": "One six-source content batch, one native checkpoint pack. Per-source splitting left the retired-policy pack unseedable; no old controls, decision changes or tool changes are used.",
+    "nativeCommand": [
+      "node",
+      "--expose-gc",
+      "/tmp/phase06/verify-host-invocation.mjs"
+    ],
+    "nativeStdout": "{\"sourceCount\":431,\"pending\":431,\"sourceIdsEqual\":true,\"unknownBlocking\":0,\"reverse\":572,\"applicationFindings\":0,\"droppedFindings\":[]}\n",
+    "defaultD": []
+  }
 }
