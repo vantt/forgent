@@ -1413,6 +1413,70 @@ function heldHome(w, opts) {
 }
 const settleAll = (w, extra = {}) => settleHeldCredentialHomes({ tempRoots: [path.join(w.tmp, 'fgos-confinement')], ...extra });
 
+test('a held home whose login would only be staged stays held when the pending copies are full', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    const pending = path.join(w.accountDir, 'pending');
+    const names = ['1', '2', '3', '4', '5'].map((n) => path.join(pending, `00000000000000${n}-a`));
+    names.forEach((copy, i) => writePi(copy, piDoc(Date.now() + 6 * HOUR, i === 0 ? { access: FAKE.newAccess, refresh: FAKE.newRefresh } : { access: `FAKE-STALE-${i}`, refresh: `FAKE-STALE-REFRESH-${i}` })));
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the source cannot say whether the home's login is newer
+    assert.deepEqual(settleAll(w), { settled: 0, held: 1 });
+    assert.equal(fs.existsSync(dir), true, 'the home stays');
+    assert.equal(fs.readdirSync(pending).length, 5, 'nothing was pushed out');
+    assert.equal(readPi(names[0]).xai.refresh, FAKE.newRefresh, 'the oldest copy, the only valid one, is still there');
+  } finally { w.cleanup(); }
+});
+
+test('staging a login syncs the files and the pending directory before the home may go', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
+    let syncs = 0;
+    const realSync = fs.fsyncSync;
+    fs.fsyncSync = (fd) => { syncs += 1; return realSync(fd); };
+    let result;
+    try { result = writeBackRenewedCredential(dir, markerOf(dir)); } finally { fs.fsyncSync = realSync; }
+    assert.equal(result.status, 'staged');
+    assert.ok(syncs >= 3, `the staged file, the staging directory and the pending directory were synced (${syncs})`);
+  } finally { w.cleanup(); }
+});
+
+test('only the held homes of the lock-holding runtime directory are settled', () => {
+  const w = workspace();
+  try {
+    const dir = heldHome(w);
+    writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
+    assert.deepEqual(settleAll(w, { provider: 'xai', accountId: 'acct', runtimeDir: path.join(w.tmp, 'another-runtime') }), { settled: 0, held: 0 });
+    assert.equal(fs.existsSync(dir), true);
+    assert.deepEqual(settleAll(w, { provider: 'xai', accountId: 'acct', runtimeDir: w.runtimeDir }), { settled: 1, held: 0 });
+  } finally { w.cleanup(); }
+});
+
+test('a marker file that is no fgOS marker at all stops the removal; one that names a contract is the caller\'s question', () => {
+  const w = workspace();
+  try {
+    for (const content of ['{}', 'null', '{"dispatchId":"x"}', '[]', '']) {
+      const dir = privateHomeWithRenewedLogin(w);
+      fs.writeFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), content);
+      assert.throws(() => removeConfinementDir(dir), /ownership-marker-unreadable/, JSON.stringify(content));
+      assert.equal(fs.existsSync(path.join(dir, 'auth.json')), true);
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  } finally { w.cleanup(); }
+});
+
+test('every dispatch caller hands the renewal the configured temp roots', () => {
+  const root = path.join(path.dirname(new URL(import.meta.url).pathname), '../../src/runner');
+  for (const file of ['dispatch/cli.mjs', 'operation-choice.mjs', 'execution/run.mjs']) {
+    const text = fs.readFileSync(path.join(root, file), 'utf8');
+    const calls = text.match(/createConfinementCredentialRenewal\(/g) ?? [];
+    const wired = text.match(/createConfinementCredentialRenewal\(\{ tempRoots: defaultConfinementTempRoots \}\)/g) ?? [];
+    assert.ok(calls.length > 0 && calls.length === wired.length, file);
+  }
+});
+
 test('a held home is removed once the source proves its login is not newer', () => {
   const w = workspace();
   try {
@@ -1471,11 +1535,16 @@ test('refresh-ahead calls the injected held-home hook only while it holds the ac
   } finally { w.cleanup(); }
 });
 
+const IMPORT_INTO_CONFINEMENT = /(?:from\s*|import\s*\(\s*|import\s+)['"`][^'"`]*confinement\//;
+
 test('no provider module reaches into confinement, by a static or a dynamic import', () => {
+  for (const sample of ["import x from './confinement/a.mjs'", "await import('./confinement/a.mjs')", 'await import(`./confinement/a.mjs`)']) {
+    assert.match(sample, IMPORT_INTO_CONFINEMENT);
+  }
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), '../../src/runner/dispatch');
   const offenders = fs.readdirSync(dir)
     .filter((name) => /^provider-.*\.mjs$/.test(name))
-    .filter((name) => /(?:from\s*|import\s*\(\s*|import\s+)['"][^'"]*confinement\//.test(fs.readFileSync(path.join(dir, name), 'utf8')));
+    .filter((name) => IMPORT_INTO_CONFINEMENT.test(fs.readFileSync(path.join(dir, name), 'utf8')));
   assert.deepEqual(offenders, []);
 });
 
@@ -1485,7 +1554,7 @@ test('refresh-ahead of the held home\'s account re-checks it under the lock, eve
     const dir = heldHome(w);
     writePi(w.home, piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
     const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
-    const renew = createConfinementCredentialRenewal({ tempRoots: [path.join(w.tmp, 'fgos-confinement')], spawnFn });
+    const renew = createConfinementCredentialRenewal({ tempRoots: () => [path.join(w.tmp, 'fgos-confinement')], spawnFn });
     const result = await renew({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir });
     assert.deepEqual(result, { status: 'fresh', reason: 'outside-window' });
     assert.equal(starts.length, 0);

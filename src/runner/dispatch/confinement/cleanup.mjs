@@ -158,10 +158,16 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
   try { fs.rmdirSync(parent); } catch { /* still in use */ }
 }
 
-function markerIsTorn(dirPath) {
+// A marker file that is not recognisable as a marker of any fgOS contract (not JSON, not an object, no
+// contract name). Such a file proves nothing about whether the home holds a login. One that names a
+// contract but is not this module's own is the caller's ownership question.
+function markerIsUnrecognisable(dirPath) {
   let raw;
   try { raw = fs.readFileSync(path.join(dirPath, OWNERSHIP_MARKER_FILE), 'utf8'); } catch { return false; }
-  try { JSON.parse(raw); return false; } catch { return true; }
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) || typeof parsed.contract !== 'string';
+  } catch { return true; }
 }
 
 /**
@@ -179,9 +185,9 @@ function markerIsTorn(dirPath) {
 export function removeConfinementDir(dirPath, { stopProcesses = false, now = Date.now } = {}) {
   if (stopProcesses) stopProcessesInside(dirPath);
   const marker = readOwnershipMarker(dirPath);
-  // A marker that is there but is not even valid JSON (a writer died half-way) does not prove the home
-  // holds no login: leave it alone. One that parses but is not ours is the caller's ownership question.
-  if (!marker && markerIsTorn(dirPath)) {
+  // A marker file that is there but cannot be recognised (a writer died half-way, or it holds something
+  // else) does not prove the home holds no login: leave it alone.
+  if (!marker && markerIsUnrecognisable(dirPath)) {
     throw new Error('ownership-marker-unreadable');
   }
   if (marker?.credentialWriteBack !== undefined) {
@@ -247,7 +253,7 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
 
 /**
  * Private homes under `tempRoot` that were kept because their renewed login could not be staged
- * (`credentialKept` in the marker). Read-only; names, counts and times only, never a path or a value.
+ * (`credentialKept` in the marker). Read-only; names, counts, times and the home directory, never a value.
  * `held` homes have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried.
  */
 export function listKeptCredentialHomes(tempRoot) {
@@ -287,13 +293,14 @@ export function listKeptCredentialHomes(tempRoot) {
  * staged beside the source. Every other held home stays exactly as it was; age never removes one.
  * `lockHeld`: the caller already holds the account lock. Returns `{settled, held}` as counts.
  */
-export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], provider, accountId, lockHeld = false, loadSqlite, now, tryLock } = {}) {
+export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], provider, accountId, runtimeDir, lockHeld = false, loadSqlite, now, tryLock } = {}) {
   let settled = 0;
   let held = 0;
   for (const root of tempRoots) {
     for (const home of listKeptCredentialHomes(root)) {
       if (!home.held) continue;
       if (provider !== undefined && (home.provider !== provider || home.accountId !== accountId)) continue;
+      if (runtimeDir !== undefined && home.marker.credentialWriteBack?.runtimeDir !== runtimeDir) continue;
       const result = settleHeldCredentialHome(home.dir, home.marker, { lockHeld, loadSqlite, now, tryLock });
       if (result.status === 'settled') {
         try {
@@ -448,12 +455,15 @@ export function reapOrphanedConfinementResources({
  * caller passes this one (the renewal module itself knows nothing of confinement).
  */
 export function createConfinementCredentialRenewal({ tempRoots, ...options } = {}) {
-  const roots = () => tempRoots ?? [resolveConfinementTempRoot()];
+  // `tempRoots`: an array, or a function returning one (read at each use, so a registry change is seen).
+  const roots = () => (typeof tempRoots === 'function' ? tempRoots() : tempRoots) ?? [resolveConfinementTempRoot()];
+  const ofAccount = (home, provider, accountId, runtimeDir) => home.held && home.provider === provider && home.accountId === accountId
+    && home.marker.credentialWriteBack?.runtimeDir === runtimeDir;
   return createCredentialRenewal({
     ...options,
     heldHomes: {
-      has: ({ provider, accountId }) => roots().some((root) => listKeptCredentialHomes(root).some((h) => h.held && h.provider === provider && h.accountId === accountId)),
-      settle: ({ provider, accountId, loadSqlite, now }) => settleHeldCredentialHomes({ tempRoots: roots(), provider, accountId, lockHeld: true, loadSqlite, now }),
+      has: ({ provider, accountId, runtimeDir }) => roots().some((root) => listKeptCredentialHomes(root).some((h) => ofAccount(h, provider, accountId, runtimeDir))),
+      settle: ({ provider, accountId, runtimeDir, loadSqlite, now }) => settleHeldCredentialHomes({ tempRoots: roots(), provider, accountId, runtimeDir, lockHeld: true, loadSqlite, now }),
     },
   });
 }

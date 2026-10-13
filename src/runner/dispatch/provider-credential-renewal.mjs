@@ -631,6 +631,20 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
   return found;
 }
 
+function syncPath(target) {
+  const fd = fs.openSync(target, 'r');
+  try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
+}
+
+function syncTree(dir) {
+  for (const name of fs.readdirSync(dir)) syncPath(path.join(dir, name));
+  syncPath(dir);
+}
+
+function pendingCount(accountDir) {
+  try { return fs.readdirSync(path.join(accountDir, PENDING_DIR)).filter((n) => !n.startsWith('.')).length; } catch { return 0; }
+}
+
 /**
  * Keep the newest MAX_PENDING_COPIES pending copies of an account (names sort by staging time) and drop the
  * rest, so an account whose entry can never be identified does not grow without bound. One stderr line
@@ -730,8 +744,8 @@ export async function refreshAhead({
     // Private homes held after repeated staging failures are looked at again whenever this account is
     // renewed. Where they live is the confinement side's knowledge, so it is handed in: `has` says whether
     // the account has one, `settle` re-checks them and is only called while this function holds the lock.
-    const hasHeldHomes = async () => { try { return Boolean(await heldHomes.has({ provider, accountId })); } catch { return false; } };
-    const settleHeld = async () => { try { await heldHomes.settle({ provider, accountId, loadSqlite, now }); } catch { /* a held home stays held */ } };
+    const hasHeldHomes = async () => { try { return Boolean(await heldHomes.has({ provider, accountId, runtimeDir })); } catch { return false; } };
+    const settleHeld = async () => { try { await heldHomes.settle({ provider, accountId, runtimeDir, loadSqlite, now }); } catch { /* a held home stays held */ } };
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
     const beforeEntry = entryOf(before);
@@ -878,6 +892,12 @@ export function settleHeldCredentialHome(homeDir, marker, { loadSqlite = default
     if (!lock) return { status: 'held', code: 'lock-busy' };
   }
   try {
+    // A copy that would only be staged (nothing proves it is not newer) must not push an older pending copy
+    // out through the cap: with the pending copies full it stays in its home, which stays held.
+    if (pendingCount(accountDir) >= MAX_PENDING_COPIES
+      && copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite }) !== 'not-newer') {
+      return { status: 'held', code: 'pending-full' };
+    }
     // The staging step is the write-back's own; the lock is already ours, so it must not try for it again.
     const result = writeBackRenewedCredential(homeDir, marker, { loadSqlite, now, tryLock: () => null });
     if (result.status === 'failed') return { status: 'held', code: result.code };
@@ -917,7 +937,10 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
     const final = path.join(pendingDir, `${String(now()).padStart(15, '0')}-${path.basename(staging).slice(5)}`);
     try {
       layout.stage(homeDir, staging, { loadSqlite });
+      // On disk before the rename, and the rename on disk before the home may go.
+      syncTree(staging);
       fs.renameSync(staging, final);
+      syncPath(pendingDir);
     } catch (err) {
       try { fs.rmSync(staging, { recursive: true, force: true }); } catch { /* nothing left to do */ }
       return { status: 'failed', code: err?.message === 'sqlite-unavailable' ? 'sqlite-unavailable' : 'stage-failed', keepHome: true };

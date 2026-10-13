@@ -61,6 +61,7 @@ import {
   validateBackendRegistryShape,
   ensureMachineBackendRegistryDefaults,
   loadMachineBackendRegistry,
+  defaultConfinementTempRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
@@ -5268,19 +5269,7 @@ registerFix({
 // stayed on disk forever. Wiring it in here (checked/fixed via `doctor
 // --fix`) and at runner start (loop.mjs) is what actually reclaims it.
 
-export function defaultConfinementTempRoots() {
-  const roots = new Set([resolveConfinementTempRoot()]);
-  try {
-    const registry = loadMachineBackendRegistry();
-    for (const instance of Object.values(registry?.confinementBackends || {})) {
-      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
-    }
-  } catch {
-    // An unreadable/malformed registry is its own check (above); fall back
-    // to the one default root rather than failing this check too.
-  }
-  return [...roots];
-}
+export { defaultConfinementTempRoots };
 
 /** Temp roots we own whose mode is not owner-only: a private home under one
  * holds a copy of an account login, so a group- or world-readable root is a
@@ -5418,7 +5407,7 @@ registerFix({
 
 // A login copy that outlives its dispatch holds a refresh token that may be the only valid one, so fgOS
 // never deletes it on age alone; this check is how an owner learns one is still there. Read-only, counts
-// and ages by provider/account only: no path, no value.
+// and ages by provider/account; a held home is named by its directory. Never a token value.
 const RETAINED_COPY_REPORT_AFTER_MS = 24 * 60 * 60 * 1000;
 
 const formatAge = (ms) => (ms >= 48 * 3600 * 1000 ? `${Math.floor(ms / (24 * 3600 * 1000))}d` : `${Math.max(0, Math.floor(ms / 3600000))}h`);

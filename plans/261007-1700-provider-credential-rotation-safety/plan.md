@@ -68,7 +68,9 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 6. A pending copy whose apply hits an operating-system read error (EACCES, EIO, EMFILE) is deleted as malformed, because `unreadable-file` covers both a missing file and a read error. Split the code. Done 2026-10-13: `missing-file` (proven empty) versus `unreadable-file` (kept).
 7. A home kept because staging failed (`credential-home-kept`) is retried by the reaper without a time or attempt limit, outlives the reaper's age limit, and `fgos doctor --fix` cannot clear it; the finalizer's early stop also leaves that dispatch's other resources on disk. Needs a limit and a doctor check. Done 2026-10-13: five attempts counted in the marker, then held (never deleted by age), the finalizer continues, doctor reports it.
 8. Not fixed, left from before: a `.tmp-*` staging directory left by a crash during staging is skipped by the leftover listing, so nothing reports or removes it, and it may hold a partial copy of a login. Needs a doctor line or a sweep.
-9. The refresh-ahead re-check of held homes looks only under the default confinement temp root; homes under a backend-configured `tempRoot` are re-checked by `fgos doctor --fix` only.
+9. ~~The refresh-ahead re-check of held homes looks only under the default confinement temp root.~~ Closed 2026-10-13: the dispatch callers pass the same set of temp roots as doctor (default plus each registered backend's own), through the injected hook.
+10. A crash between staging a copy and removing its home leaves both; a later settle stages the same login again, so identical copies can press on the pending cap (see question 5; fingerprinting the staged store would cover it). Not fixed.
+11. A held home that cannot be settled makes every dispatch of its account take the account lock once to try; acceptable while doctor fails on it. Not fixed.
 
 ## Validation Log
 
