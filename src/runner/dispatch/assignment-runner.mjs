@@ -118,6 +118,8 @@ import {
 import {
   acquireProviderAccountLease,
   classifyProviderCapacityFault,
+  commandCli,
+  credentialSourceForCli,
   defaultProviderCapacityRuntimeDir,
   hasProviderAccounts,
   probeQuarantinedAccounts,
@@ -167,6 +169,23 @@ function resolveExecutorCommandFallback(entry, executorId) {
     if (cli?.command) return cli.command;
   }
   return executorId;
+}
+
+/**
+ * The CLIs a launch of `executorId` may run, before the invocation is settled: the pinned invocation's CLI
+ * when the caller pinned one, else the CLIs of the executor's `cli` invocations in declaration order (the
+ * first is the one an unpinned launch takes). Used to pick an account's per-CLI login store for the lazy
+ * probe and for refresh-ahead; the launch itself takes the store of the command it really runs.
+ */
+function launchCandidateClis(cfg, executorId, pinnedInvocationId) {
+  const entry = cfg?.executors?.[executorId] ?? cfg?.executor;
+  const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
+  if (pinnedInvocationId) {
+    const pinned = invocations.find((inv) => inv.id === pinnedInvocationId);
+    if (pinned?.command) return [commandCli(pinned.command)];
+  }
+  const commands = invocations.length > 0 ? invocations.map((inv) => inv.command) : [entry?.command];
+  return [...new Set(commands.map(commandCli).filter(Boolean))];
 }
 
 function resolveProviderFamilyForExecutor(entry, executorId) {
@@ -1684,6 +1703,7 @@ export async function executeAssignment(assignment, opts = {}) {
           provider: providerCapacityProvider,
           runtimeDir: opts.providerCapacityRuntimeDir,
           probe: opts.providerCredentialProbe,
+          cli: launchCandidateClis(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null)[0] ?? null,
         });
       } catch { /* the selection below reports what is unusable */ }
     }
@@ -1697,6 +1717,8 @@ export async function executeAssignment(assignment, opts = {}) {
         runtimeDir: opts.providerCapacityRuntimeDir,
         runIsDead: opts.providerCapacityRunIsDead,
         isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
+        // A pinned invocation names its CLI now: only an account with a login store for it is leased.
+        cli: hasExplicitInvocationPin ? (launchCandidateClis(cfg, resolvedExecutorId, opts.cliOverride.preferInvocation)[0] ?? null) : null,
       });
     } catch (err) {
       providerCapacitySelection = {
@@ -2200,19 +2222,28 @@ export async function executeAssignment(assignment, opts = {}) {
   let providerCapacityForLaunch = providerCapacitySelection;
   if (typeof opts.providerCredentialRenew === 'function' && providerCapacitySelection?.status === 'selected' && mayCopyCredential) {
     const credentialRuntimeDir = opts.providerCapacityRuntimeDir ?? defaultProviderCapacityRuntimeDir();
-    try {
-      const renewal = await opts.providerCredentialRenew({
-        provider: providerCapacitySelection.provider,
-        accountId: providerCapacitySelection.accountId,
-        credentialSource: providerCapacitySelection.credentialSource,
-        runtimeDir: credentialRuntimeDir,
-      });
-      // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
-      const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');
-      if (renewal && !quiet) {
-        process.stderr.write(`fgos: credential refresh-ahead for ${providerCapacitySelection.provider}/${providerCapacitySelection.accountId}: ${renewal.status} (${renewal.reason})\n`);
-      }
-    } catch { /* the launch goes on with the login as it is */ }
+    // An account with one login store per CLI renews the store of each CLI this launch may still run (the
+    // invocation is settled later); a single-store account renews its one store, as before.
+    const renewSources = providerCapacitySelection.credentialSources
+      ? launchCandidateClis(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null)
+        .map((cli) => credentialSourceForCli(providerCapacitySelection, cli)).filter(Boolean)
+      : [providerCapacitySelection.credentialSource];
+    for (const credentialSource of renewSources) {
+      try {
+        const renewal = await opts.providerCredentialRenew({
+          provider: providerCapacitySelection.provider,
+          accountId: providerCapacitySelection.accountId,
+          credentialSource,
+          runtimeDir: credentialRuntimeDir,
+        });
+        // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
+        const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');
+        if (renewal && !quiet) {
+          const store = credentialSource?.cli ? ` (${credentialSource.cli})` : '';
+          process.stderr.write(`fgos: credential refresh-ahead for ${providerCapacitySelection.provider}/${providerCapacitySelection.accountId}${store}: ${renewal.status} (${renewal.reason})\n`);
+        }
+      } catch { /* the launch goes on with the login as it is */ }
+    }
     providerCapacityForLaunch = { ...providerCapacitySelection, credentialWriteBack: { runtimeDir: credentialRuntimeDir } };
   }
 

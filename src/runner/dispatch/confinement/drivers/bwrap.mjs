@@ -45,8 +45,16 @@ function copyHomeFiles(privateHomeTarget, sourceHome, files) {
  * source, or a Codex home's `auth.json`. Returns false when the request selects no credential.
  */
 function provisionSelectedCredential(privateHomeTarget, request) {
-  const source = request?.providerCapacity?.credentialSource;
-  if (!source) return false;
+  const capacity = request?.providerCapacity;
+  const source = capacity?.credentialSource;
+  if (!source) {
+    // An account that keeps one login per CLI and declares none for the CLI being launched has nothing
+    // this home could log in with: refuse before the worker starts logged out.
+    if (capacity?.credentialSources) {
+      throw credentialError(`account "${capacity.accountId}" declares no credential source for CLI "${capacity.credentialCli ?? 'unknown'}"`);
+    }
+    return false;
+  }
   const home = expandCredentialHome(source.home);
   if (source.kind === 'home-files') {
     if (!home || !Array.isArray(source.files) || source.files.length === 0) {

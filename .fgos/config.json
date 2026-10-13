@@ -965,7 +965,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetnu"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           },
           {
             "id": "pi-cli-bwrap-fgovn",
@@ -990,7 +999,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-fgovn"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           },
           {
             "id": "pi-cli-bwrap-tetcu72",
@@ -1015,7 +1033,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetcu72"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ]
       },

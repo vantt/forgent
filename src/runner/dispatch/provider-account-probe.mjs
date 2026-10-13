@@ -17,7 +17,7 @@ import path from 'node:path';
 import { matchAuthFailureLine } from './provider-auth-failure.mjs';
 import { expandCredentialHome } from './provider-credential-probe.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { providerAccountInventory } from './provider-capacity.mjs';
+import { accountCredentialSources, commandCli, credentialSourceForCli, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
 
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
@@ -30,7 +30,7 @@ const TIMEOUT_PATTERN = /time[sd]?[-_ ]?out/i;
 
 /** Which CLI an invocation runs, by the basename of its command. */
 function cliOf(invocation) {
-  return path.basename(String(invocation?.command ?? '')).toLowerCase();
+  return commandCli(invocation?.command) ?? '';
 }
 
 /** The CLI a credential layout logs in, the same layouts the unlock probe names. */
@@ -46,9 +46,10 @@ const CREDENTIAL_ENV = ['CODEX_HOME', 'PI_CODING_AGENT_DIR', 'HOME'];
 
 /**
  * The invocations of `provider`'s executors that run as `accountId`, each with how the account reaches it:
- * - `lease`: a confined invocation with a private home whose CLI the account's credential layout logs in;
- *   the capacity layer copies that account's login into the home, exactly as a real dispatch does;
- * - `env`: the invocation's own credential env names the account's home;
+ * - `lease`: a confined invocation with a private home whose CLI the account has a login store for (its
+ *   per-CLI store, or the one store whose layout that CLI logs in); the capacity layer copies that store
+ *   into the home, exactly as a real dispatch does;
+ * - `env`: the invocation's own credential env names one of the account's store homes;
  * - `name`: the invocation id ends with `-<accountId>` (config convention `<bin>-<mode>-<account>`),
  *   for a CLI that keeps its own login of the same account in its own directory.
  * Only `via: "cli"` invocations; `executorId` narrows to one executor.
@@ -56,9 +57,10 @@ const CREDENTIAL_ENV = ['CODEX_HOME', 'PI_CODING_AGENT_DIR', 'HOME'];
 export function accountInvocations(cfg, { provider, accountId, executorId = null } = {}) {
   const family = normalizeProviderFamily(provider);
   const account = providerAccountInventory(cfg)?.[family]?.accounts?.[accountId] ?? null;
-  const source = account?.credentialSource ?? null;
-  const home = expandCredentialHome(source?.home);
-  const leasedCli = cliForCredential(source);
+  const homes = new Set(accountCredentialSources(account).map((source) => expandCredentialHome(source.home)).filter(Boolean));
+  // An account with one store per CLI logs in exactly the CLIs it names; a single store logs in the CLI
+  // its layout belongs to.
+  const leases = (cli) => (account?.credentialSources ? Boolean(credentialSourceForCli(account, cli)) : cli === cliForCredential(account?.credentialSource));
   const found = [];
   for (const [id, executor] of Object.entries(cfg?.executors ?? {})) {
     if (executorId && id !== executorId) continue;
@@ -68,8 +70,8 @@ export function accountInvocations(cfg, { provider, accountId, executorId = null
       const confined = Boolean((inv.confinement ?? executor.confinement)?.backend);
       const privateHome = (inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home');
       let via = null;
-      if (confined && privateHome && leasedCli && cliOf(inv) === leasedCli) via = 'lease';
-      else if (home && CREDENTIAL_ENV.some((key) => expandCredentialHome(inv.env?.[key]) === home)) via = 'env';
+      if (confined && privateHome && account && leases(cliOf(inv))) via = 'lease';
+      else if (CREDENTIAL_ENV.some((key) => homes.has(expandCredentialHome(inv.env?.[key])))) via = 'env';
       else if (inv.id.endsWith(`-${accountId}`)) via = 'name';
       if (via) found.push({ executorId: id, invocationId: inv.id, cli: cliOf(inv), adapter: inv.adapter ?? 'cli-spawn', confined, via });
     }

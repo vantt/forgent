@@ -26,7 +26,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 
-import { acquireAccountLock, tryAcquireAccountLock, providerAccountDir } from './provider-capacity.mjs';
+import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,
   expandCredentialHome,
@@ -617,7 +617,9 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
   for (const provider of subdirs(root)) {
     for (const accountId of subdirs(path.join(root, provider))) {
       const accountDir = path.join(root, provider, accountId);
-      for (const dir of listLeftovers(accountDir)) {
+      // An account with one login store per CLI keeps each store's copies under stores/<cli>.
+      const storeDirs = [accountDir, ...subdirs(path.join(accountDir, 'stores')).map((cli) => path.join(accountDir, 'stores', cli))];
+      for (const dir of storeDirs.flatMap(listLeftovers)) {
         const name = path.basename(dir);
         const staged = /^(\d{15})-/.exec(name);
         let at;
@@ -734,7 +736,9 @@ export async function refreshAhead({
   try {
     const layoutName = credentialLayout(credentialSource);
     const home = expandCredentialHome(credentialSource?.home);
-    const accountDir = providerAccountDir(runtimeDir, provider, accountId);
+    // The copies of this store wait in its own directory: a per-CLI store of an account is kept apart from
+    // the account's other stores; the account lock below stays one per account.
+    const accountDir = credentialStoreDir(runtimeDir, provider, accountId, credentialSource?.cli ?? null);
     if (!layoutName || !home || !accountDir) return { status: 'skipped', reason: 'unsupported-layout' };
     const layout = LAYOUTS[layoutName];
 
@@ -862,15 +866,17 @@ export function credentialWriteBackMarker({ provider, accountId, credentialSourc
   const layoutName = credentialLayout(credentialSource);
   const home = expandCredentialHome(credentialSource?.home);
   if (!layoutName || !home || typeof runtimeDir !== 'string' || !path.isAbsolute(runtimeDir)) return null;
-  if (!providerAccountDir(runtimeDir, provider, accountId)) return null;
-  return { provider, accountId, kind: credentialSource.kind, home, layout: layoutName, runtimeDir };
+  const store = credentialSource.cli ?? null;
+  if (!credentialStoreDir(runtimeDir, provider, accountId, store)) return null;
+  return { provider, accountId, kind: credentialSource.kind, home, layout: layoutName, runtimeDir, ...(store ? { store } : {}) };
 }
 
 function validWriteBack(value) {
   return isObject(value)
     && typeof value.home === 'string' && path.isAbsolute(value.home)
     && typeof value.runtimeDir === 'string' && path.isAbsolute(value.runtimeDir)
-    && Object.hasOwn(LAYOUTS, value.layout);
+    && Object.hasOwn(LAYOUTS, value.layout)
+    && (value.store === undefined || typeof value.store === 'string');
 }
 
 /**
@@ -884,7 +890,7 @@ export function settleHeldCredentialHome(homeDir, marker, { loadSqlite = default
   const writeBack = marker?.credentialWriteBack;
   if (!validWriteBack(writeBack)) return { status: 'held', code: 'invalid-marker' };
   const layout = LAYOUTS[writeBack.layout];
-  const accountDir = providerAccountDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId);
+  const accountDir = credentialStoreDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId, writeBack.store ?? null);
   if (!accountDir) return { status: 'held', code: 'invalid-marker' };
   let lock = null;
   if (!lockHeld) {
@@ -923,7 +929,7 @@ export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defau
   if (writeBack === undefined) return { status: 'none' };
   if (!validWriteBack(writeBack)) return { status: 'failed', code: 'invalid-marker' };
   const layout = LAYOUTS[writeBack.layout];
-  const accountDir = providerAccountDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId);
+  const accountDir = credentialStoreDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId, writeBack.store ?? null);
   if (!accountDir) return { status: 'failed', code: 'invalid-marker' };
   // Until a copy is safe in pending/, the private home may hold the only good pair: a failure before that
   // says `keepHome`, and the caller must not remove it.

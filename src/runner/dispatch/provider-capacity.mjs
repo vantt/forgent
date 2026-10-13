@@ -22,7 +22,7 @@ const FORBIDDEN_ACCOUNT_KEYS = Object.freeze([
 ]);
 
 const PROVIDER_ENTRY_KEYS = Object.freeze(['accounts']);
-const ACCOUNT_ENTRY_KEYS = Object.freeze(['label', 'credentialSource']);
+const ACCOUNT_ENTRY_KEYS = Object.freeze(['label', 'credentialSource', 'credentialSources']);
 const CREDENTIAL_SOURCE_KEYS = Object.freeze(['kind', 'home', 'files']);
 const CREDENTIAL_SOURCE_KINDS = Object.freeze(['codex-home', 'home-files']);
 
@@ -126,40 +126,30 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
       if (account.label !== undefined && (typeof account.label !== 'string' || !account.label.trim())) {
         throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.label) must be a non-empty string when present.`);
       }
-      const credentialSource = account.credentialSource;
-      if (!isPlainObject(credentialSource)) {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource) must be an object.`);
+      const where = `${sourceLabel}.providers.${provider}.accounts.${accountId}`;
+      const hasSingle = account.credentialSource !== undefined;
+      const hasPerCli = account.credentialSources !== undefined;
+      if (hasSingle === hasPerCli) {
+        throw new ProviderCapacityConfigError(
+          `runner config (${where}) must declare exactly one of "credentialSource" (one login store for every CLI) or "credentialSources" (one login store per CLI, keyed by the CLI command name).`,
+        );
       }
-      for (const key of Object.keys(credentialSource)) {
-        if (!CREDENTIAL_SOURCE_KEYS.includes(key)) {
-          throw new ProviderCapacityConfigError(
-            `runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource) contains unknown key "${key}". Allowed keys: ${CREDENTIAL_SOURCE_KEYS.join(', ')}.`,
-          );
+      const entry = { id: accountId, label: account.label ?? accountId };
+      if (hasSingle) {
+        entry.credentialSource = normalizeCredentialSource(account.credentialSource, `${where}.credentialSource`);
+      } else {
+        if (!isPlainObject(account.credentialSources) || Object.keys(account.credentialSources).length === 0) {
+          throw new ProviderCapacityConfigError(`runner config (${where}.credentialSources) must be a non-empty object mapping a CLI command name (codex, pi, omp, agy, ...) to a credential source.`);
+        }
+        entry.credentialSources = {};
+        for (const [cli, source] of Object.entries(account.credentialSources)) {
+          if (!CLI_KEY.test(cli)) {
+            throw new ProviderCapacityConfigError(`runner config (${where}.credentialSources) key ${JSON.stringify(cli)} must be a CLI command name (lower-case letters, digits, "-" or "_").`);
+          }
+          entry.credentialSources[cli] = { ...normalizeCredentialSource(source, `${where}.credentialSources.${cli}`), cli };
         }
       }
-      if (!CREDENTIAL_SOURCE_KINDS.includes(credentialSource.kind)) {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.kind) must be one of ${CREDENTIAL_SOURCE_KINDS.join(', ')}.`);
-      }
-      if (typeof credentialSource.home !== 'string' || !credentialSource.home.trim()) {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.home) must be a non-empty string.`);
-      }
-      if (credentialSource.kind === 'home-files') {
-        const files = credentialSource.files;
-        if (!Array.isArray(files) || files.length === 0 || files.some((f) => typeof f !== 'string' || !f.trim() || path.isAbsolute(f) || f.split(/[\\/]/).includes('..'))) {
-          throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.files) must be a non-empty list of relative paths without "..".`);
-        }
-      } else if (credentialSource.files !== undefined) {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.files) is only valid for kind "home-files".`);
-      }
-      normalized[canonicalProvider].accounts[accountId] = {
-        id: accountId,
-        label: account.label ?? accountId,
-        credentialSource: {
-          kind: credentialSource.kind,
-          home: credentialSource.home,
-          ...(credentialSource.kind === 'home-files' ? { files: [...credentialSource.files] } : {}),
-        },
-      };
+      normalized[canonicalProvider].accounts[accountId] = entry;
     }
   }
   return Object.freeze(normalized);
@@ -169,6 +159,76 @@ function validateAccountId(accountId, label) {
   if (typeof accountId !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(accountId)) {
     throw new ProviderCapacityConfigError(`runner config (${label}) account id must be a non-empty safe key, got ${JSON.stringify(accountId)}.`);
   }
+}
+
+const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
+
+function normalizeCredentialSource(credentialSource, label) {
+  if (!isPlainObject(credentialSource)) {
+    throw new ProviderCapacityConfigError(`runner config (${label}) must be an object.`);
+  }
+  for (const key of Object.keys(credentialSource)) {
+    if (!CREDENTIAL_SOURCE_KEYS.includes(key)) {
+      throw new ProviderCapacityConfigError(
+        `runner config (${label}) contains unknown key "${key}". Allowed keys: ${CREDENTIAL_SOURCE_KEYS.join(', ')}.`,
+      );
+    }
+  }
+  if (!CREDENTIAL_SOURCE_KINDS.includes(credentialSource.kind)) {
+    throw new ProviderCapacityConfigError(`runner config (${label}.kind) must be one of ${CREDENTIAL_SOURCE_KINDS.join(', ')}.`);
+  }
+  if (typeof credentialSource.home !== 'string' || !credentialSource.home.trim()) {
+    throw new ProviderCapacityConfigError(`runner config (${label}.home) must be a non-empty string.`);
+  }
+  if (credentialSource.kind === 'home-files') {
+    const files = credentialSource.files;
+    if (!Array.isArray(files) || files.length === 0 || files.some((f) => typeof f !== 'string' || !f.trim() || path.isAbsolute(f) || f.split(/[\\/]/).includes('..'))) {
+      throw new ProviderCapacityConfigError(`runner config (${label}.files) must be a non-empty list of relative paths without "..".`);
+    }
+  } else if (credentialSource.files !== undefined) {
+    throw new ProviderCapacityConfigError(`runner config (${label}.files) is only valid for kind "home-files".`);
+  }
+  return {
+    kind: credentialSource.kind,
+    home: credentialSource.home,
+    ...(credentialSource.kind === 'home-files' ? { files: [...credentialSource.files] } : {}),
+  };
+}
+
+/** The CLI an invocation runs: the basename of its command, lower-cased; null when there is none. */
+export function commandCli(command) {
+  const name = path.basename(String(command ?? '')).toLowerCase();
+  return name || null;
+}
+
+/**
+ * The login store of `account` (an inventory entry, or a capacity selection that carries one) that the
+ * CLI `cli` reads. An account with one `credentialSource` gives it to every CLI; an account with
+ * `credentialSources` gives the CLI's own entry, or null when it declares none for that CLI. A per-CLI entry
+ * carries its key as `cli`, which also names where its renewal copies are kept.
+ */
+export function credentialSourceForCli(account, cli) {
+  if (!account) return null;
+  if (account.credentialSources) return (cli && account.credentialSources[cli]) || null;
+  return account.credentialSource ?? null;
+}
+
+/** Every login store an account declares, the single one or each per-CLI one. */
+export function accountCredentialSources(account) {
+  if (!account) return [];
+  if (account.credentialSources) return Object.values(account.credentialSources);
+  return account.credentialSource ? [account.credentialSource] : [];
+}
+
+/**
+ * A capacity selection made ready for the invocation that is actually launched: an account with one store
+ * per CLI hands over the store of `command`'s CLI as `credentialSource` (null when it declares none, which
+ * the private-home provisioning refuses). A single-store selection is returned unchanged.
+ */
+export function providerCapacityForCommand(selection, command) {
+  if (!selection?.credentialSources) return selection;
+  const cli = commandCli(command);
+  return { ...selection, credentialCli: cli, credentialSource: credentialSourceForCli(selection, cli) };
 }
 
 export function providerAccountInventory(runnerConfig) {
@@ -600,6 +660,19 @@ export function providerAccountDir(runtimeDir = defaultProviderCapacityRuntimeDi
   return path.join(runtimeDir, 'account-locks', provider, accountId);
 }
 
+/**
+ * Where the copies of one login store wait (`pending/`, scratch homes, the failure cooldown): the account
+ * directory for an account with one store; `stores/<cli>` under it for a store of an account that keeps one
+ * per CLI, so a copy of the pi store is never applied to the Codex store. The account lock stays one per
+ * account. Null for an unsafe id or CLI key.
+ */
+export function credentialStoreDir(runtimeDir, provider, accountId, cli = null) {
+  const accountDir = providerAccountDir(runtimeDir, provider, accountId);
+  if (!accountDir || cli === null || cli === undefined) return accountDir;
+  if (!accountKeyIsSafe(cli)) return null;
+  return path.join(accountDir, 'stores', cli);
+}
+
 function accountLockHandle(lockDir, epoch) {
   let released = false;
   return {
@@ -755,14 +828,21 @@ export function rankProviderAccounts({ provider, inventory, state, assignmentId,
 
 export function acquireProviderAccountLease({
   runnerConfig, provider, assignmentId, runId, seed, runtimeDir, runIsDead, isRunWorkerAlive,
+  // The CLI the launch is known to run, when the caller knows it (a pinned invocation): only an account
+  // that declares a login store for that CLI is leased. Null leaves every account eligible.
+  cli = null,
   now = new Date(),
   // How long to wait for the state lock before throwing
   // ProviderCapacityLockError; omitted keeps withFileLock's own default.
   lockWaitMs,
 } = {}) {
   if (!provider || !runId) return null;
-  const inventory = providerAccountInventory(runnerConfig);
-  if (!inventory[provider] || Object.keys(inventory[provider].accounts).length === 0) return null;
+  const fullInventory = providerAccountInventory(runnerConfig);
+  if (!fullInventory[provider] || Object.keys(fullInventory[provider].accounts).length === 0) return null;
+  const inventory = cli ? inventoryServingCli(fullInventory, provider, cli) : fullInventory;
+  if (Object.keys(inventory[provider].accounts).length === 0) {
+    return { status: 'refused', provider, reason: 'provider-capacity.no-account-for-cli', cli };
+  }
   const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
   return withFileLock(lockDir, () => {
     const state = readState(statePath);
@@ -797,9 +877,21 @@ export function acquireProviderAccountLease({
       accountLabel: account.label,
       selectedAt,
       lease: { runId, assignmentId: assignmentId ?? null, pid: process.pid },
-      credentialSource: account.credentialSource,
+      // An account with one store per CLI carries all of them; the launch takes the one of the CLI it
+      // actually runs (providerCapacityForCommand). `credentialSource` is the store of `cli` when known.
+      credentialSource: credentialSourceForCli(account, cli),
+      ...(account.credentialSources ? { credentialSources: account.credentialSources } : {}),
     };
   }, { waitMs: lockWaitMs });
+}
+
+/** The provider's inventory narrowed to the accounts that declare a login store for `cli`. */
+function inventoryServingCli(inventory, provider, cli) {
+  const accounts = {};
+  for (const [id, account] of Object.entries(inventory[provider].accounts)) {
+    if (credentialSourceForCli(account, cli)) accounts[id] = account;
+  }
+  return { ...inventory, [provider]: { ...inventory[provider], accounts } };
 }
 
 export function releaseProviderAccountLease({ provider, accountId, runId, runtimeDir } = {}) {
@@ -886,7 +978,9 @@ export const DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS = 30 * 60 * 1000;
  * @returns {Promise<Array<{accountId: string, unlocked: boolean, detail: string|null}>>} what was tried
  */
 export async function probeQuarantinedAccounts({
-  runnerConfig, provider, runtimeDir, probe, now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS,
+  // `cli`: the CLI the dispatch is expected to run; an account with one store per CLI is probed through
+  // that CLI's store (the probe receives it), so the call checks the login the dispatch would use.
+  runnerConfig, provider, runtimeDir, probe, cli = null, now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS,
   accountLockWaitMs = 120_000,
 } = {}) {
   if (typeof probe !== 'function' || !provider) return [];
@@ -922,7 +1016,7 @@ export async function probeQuarantinedAccounts({
     try {
       accountLock = await acquireAccountLock({ runtimeDir, provider, accountId, waitMs: accountLockWaitMs });
       // The probe reports its child so that a dead holder with a live child keeps the lock.
-      result = await probe({ provider, accountId, account: accounts[accountId], onSpawn: (child) => accountLock.recordChild(child?.pid) });
+      result = await probe({ provider, accountId, account: accounts[accountId], cli, onSpawn: (child) => accountLock.recordChild(child?.pid) });
     } catch (err) {
       result = { ok: false, detail: err?.message ?? String(err) };
     } finally {

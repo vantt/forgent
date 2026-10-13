@@ -17,6 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { accountCredentialSources, credentialSourceForCli } from './provider-capacity.mjs';
 
 const PROMPT = 'Reply with the single word OK.';
 const OUTPUT_LIMIT = 16 * 1024;
@@ -125,8 +126,11 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
 
 /** A probe function for `probeQuarantinedAccounts`. `spawnFn` is injectable for tests. */
 export function createCredentialProbe({ spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
-  return async function probeCredential({ account, onSpawn }) {
-    const plan = withKillTimeout(credentialProbeCommand(account?.credentialSource), timeoutMs, env);
+  return async function probeCredential({ account, cli = null, onSpawn }) {
+    // An account with one store per CLI is probed through the store of the CLI the dispatch runs; when
+    // that CLI is not known (or has no store), through the first store it declares.
+    const source = credentialSourceForCli(account, cli) ?? accountCredentialSources(account)[0] ?? null;
+    const plan = withKillTimeout(credentialProbeCommand(source), timeoutMs, env);
     if (!plan) return { ok: false, detail: 'no probe exists for this credential layout' };
     return runCredentialProbe(plan, { spawnFn, timeoutMs, env, onSpawn });
   };

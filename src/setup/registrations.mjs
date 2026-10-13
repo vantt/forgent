@@ -87,7 +87,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory, commandCli, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
@@ -4359,8 +4359,14 @@ export function checkConfinedPaneAccounts(runnerCfg = {}) {
         problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
         continue;
       }
+      // An account that keeps one login per CLI reaches this pane only through the store of the pane's CLI.
+      const cli = commandCli(inv.command ?? executor.command);
       for (const account of accounts) {
-        const source = account.credentialSource;
+        const source = credentialSourceForCli(account, cli);
+        if (!source) {
+          problems.push(`${label}: account "${account.id}" declares no credential source for CLI "${cli}", so a pane leased to it starts logged out`);
+          continue;
+        }
         const home = expandHome(source.home);
         const files = source.kind === 'home-files' ? source.files : ['auth.json'];
         const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
