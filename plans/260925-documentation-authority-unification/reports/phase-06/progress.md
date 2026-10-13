@@ -586,3 +586,39 @@ Two unavailable-plan redirect rewrites distinguish Draft candidate navigation fr
 - Boundary tests rerun with `env -u CLAUDE_CODE_SESSION_ID node --test` and the seven explicit files recorded in accounting: 155 passed, zero failed/cancelled/skipped/todo. Read-only route smoke reports `version -> native distribution.build.show`. No full npm/Rust/gateway suite or installation claim.
 - Pre-reader key `fresh-reader-key-261013-1543-host-invocation-checkpoint.md` is prepared before any reader runs; nine actual cited anchors checked, zero missing. The owner starts independent readers; this author does not substitute for them.
 - UNPROVEN until committed independent checkpoint evidence: all source/restoration approvals, the metadata exception acceptance, the 30-random-current-unit truth sample, sensitivity score, red-team and fresh-reader scores, batch closure and new promotion. Stop now at the authorized Step 3 checkpoint. After the report is committed, apply its exact notes and bound verdicts, rerun both-prior D/E and native equality, persist the actual registry at closure, then Step 4.
+
+## Resume blocked by pre-existing untracked inventory parts
+
+Date: 2026-10-13. Step: Host Invocation checkpoint continuation. State: rework, blocked at resume precondition.
+
+Worktree and branch verified: `/home/vantt/projects/forgentX-phase00-documentation-authority-unification`, `plan/260925-documentation-authority-unification`. Starting HEAD is `aaa3ab9629eebdd0af50b044b24fbea813f540c4`, the committed Lead checkpoint review. Last recorded green conservation/checkpoint tree remains `76353c58eb885becc550d734fde5d7c2709cce33`; no new conservation proof is claimed. B0 remains `dbe5c432852837ea01e6025b35868bcb7271495d`; latest recorded boundary sync remains `7a58bd7785ee4602b9697a1af199da8c2ce3a845`.
+
+Exact blocker: the initial `git status --porcelain` is nonempty. The phase file's Session rules require listing the files and stopping when previous-session partial work is present. The following 23 untracked files existed before any mutation in this session and are preserved untouched:
+
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0001.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0002.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0003.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0004.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0005.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0006.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0007.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0008.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0009.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0010.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0011.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0012.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0013.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0014.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0015.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0016.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0017.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0018.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0019.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0020.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0021.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0022.jsonl`
+- `plans/260925-documentation-authority-unification/reports/doc-inventory.parts/part-0023.jsonl`
+
+No checkpoint verdicts applied (0 of 417); no reworks authored (0 of 14); no candidate or decision shard changed. D against both prior registries, scoped strict E and native equality were not rerun. No new Lead review request exists. The current pending request remains `review-request-261013-1311-host-invocation-checkpoint.md`, with Lead review at `aaa3ab962`. F6 remains an owner question; accepted F3/F4 are untouched.
+
+Next action: reconcile the pre-existing generated inventory parts with the committed manifest, preserve any needed inputs in permitted scratch and establish a clean tree before resuming. Then apply the 417 committed ok verdicts with the original checkpoint pack and committed sensitivity key/verdicts, perform only the requested reworks and rebind without approval carry, commit one bounded shown-text Lead request, rerun both-prior D/scoped strict E/native equality and stop at that request. Do not start fresh readers, close the batch, merge main or start Step 4. This session commits only this blocker record under the owner's failure/stop instruction.
