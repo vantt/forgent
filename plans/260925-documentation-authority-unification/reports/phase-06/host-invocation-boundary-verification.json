@@ -1,0 +1,1197 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:5@2026-10-13",
+  "resumeCommit": "2b445a90693c6d5e9861a916be3279482f171a18",
+  "B0": "dbe5c432852837ea01e6025b35868bcb7271495d",
+  "SYNC": "0653419c19e7c37d8d00408ad482cdecbd45a807",
+  "mainPin": "5ebbffc94da1ca6448f392dd37235020834509e1",
+  "proofCommit": "5ea7c41d3ce5fbca4c175ccae6f5e7637693306b",
+  "commits": [
+    "63af2a5f9",
+    "0653419c1",
+    "b6cdda81b",
+    "5ea7c41d3"
+  ],
+  "counts": {
+    "hostSource": 431,
+    "byClass": {
+      "Mirror": 0,
+      "Unit-exact": 0,
+      "Weak-exact": 0,
+      "Judgment": 431
+    },
+    "sourceDisposition": {
+      "move": 408,
+      "partial-carry": 12,
+      "supersede": 11
+    },
+    "sourceReviewed": 431,
+    "hostSuccessorsReviewed": 35,
+    "followupAppliedSource": 6,
+    "followupAppliedSuccessors": 5,
+    "changedTextAccepted": 14,
+    "sourceRebindings": 2,
+    "newCurrentSourceSuccessors": 1,
+    "nativeGapRows": 18,
+    "newRetiredUnits": 0,
+    "pendingMachineRepinReferences": 43,
+    "codeChangedUnverifiedReferences": 31,
+    "hostCandidateUnverified": 588,
+    "agentCandidateUnverified": 531,
+    "aliasEntries": 135,
+    "inboundEdges": 4031
+  },
+  "notes": [
+    {
+      "report": "review-3-followup-source.md",
+      "rows": 6,
+      "notesVerbatim": true
+    },
+    {
+      "report": "review-3-followup-successors.md",
+      "rows": 5,
+      "notesVerbatim": true
+    }
+  ],
+  "gates": [
+    {
+      "label": "D-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/close-host/final-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/close-host/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1165,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22459,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22750,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22459,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 345,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2031,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/close-host/final-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/close-host/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+      ],
+      "exit": 1,
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "12 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "1 identical source units whose rows name different target owners (e.g. ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "588 candidate conservation units not named by a source decision (e.g. docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 1,
+          "examples": [
+            "ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 588,
+          "examples": [
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/close-host/final-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/close-host/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1165,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22459,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22750,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22459,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 345,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 2031,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatch-control-plane",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-2",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#implementation-and-design-status",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-3",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-4"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/close-host/final-inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/close-host/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+      ],
+      "exit": 1,
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "12 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "1 identical source units whose rows name different target owners (e.g. ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "588 candidate conservation units not named by a source decision (e.g. docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 1,
+          "examples": [
+            "ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 588,
+          "examples": [
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details"
+          ]
+        }
+      ],
+      "stderr": ""
+    }
+  ],
+  "scopedStrictExpectedOpen": {
+    "claims-partial-carry": 12,
+    "identical-units-multiple-owners": 1,
+    "candidate-blocks-unreferenced": 588
+  },
+  "strictClosureClaimed": false,
+  "strictClosureResidual": "12 independently reviewed partial carries are still strict open data beyond holds/identical-unit exceptions/candidate-unverified. They are preserved, not relabelled or silently waived; final batch closure is not claimed.",
+  "partialCarryRows": [
+    {
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "sourcePath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "sourceAnchor": "1-component-classes",
+      "sourceUnitDigest": "a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "1-component-classes",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** \u2014 required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** \u2014 owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "sourcePath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "sourceAnchor": "2-invocation-mechanisms",
+      "sourceUnitDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "2-invocation-mechanisms",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** \u2014 a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** \u2014 an independently installed, language-neutral plugin reached through persistent framed RPC (\u00a73). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** \u2014 a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
+    },
+    {
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "sourcePath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "sourceAnchor": "3-component-protocol",
+      "sourceUnitDigest": "4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "3-component-protocol",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "sourcePath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "sourceAnchor": "4-plugin-registry-linker",
+      "sourceUnitDigest": "f26fe2980e00f599ee3395a67dd57972d0ef8371bf0219fde39bb7f44b353a4c",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "4-plugin-registry-linker",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker is retained verbatim at docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32 (claim_08172f75766eb1d002d4cba2669f9bbd; The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; veri); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33 (claim_7e15be77fb7c4bff223728491df3e212; Its complete input/output physics:); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34 (claim_0f401249972ad0ce465e24e0932a2834; ```txt authored OperationCatalog + built-in provider descriptors + transitional CLI-compatibility bindings + validated external manifest dec).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "sourcePath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "sourceAnchor": "5-core-contracts",
+      "sourceUnitDigest": "5e7c2c60dfed54dc9ebb433881669fc2e31db27fbf1cf90aef988969b14fd6e3",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "5-core-contracts",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24 (claim_bbaec409dcbaee8f33968727aa0abed5; **Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range ).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "sourcePath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "sourceAnchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "sourceUnitDigest": "7a639345a5670ebb3cd24fd27a72fb08467d57f4667517fbd47f51d35b9bb224",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41 (claim_75c780a31188a0fa1e19d03ccbd3b6b1; ```txt received -> admitted | admission-refused -> selected | selection-refused -> granted | grant-refused -> dis); docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43 (claim_e365a92a236aa909b9148185aa8f0801; For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never i).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "sourcePath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "sourceAnchor": "9-physical-placement",
+      "sourceUnitDigest": "26dedcce46fdb8fba749ce8ecb56418bbc45624ad00c28a2a355647221c73a35",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "9-physical-placement",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "sourceAnchor": "1-two-distinct-adapters",
+      "sourceUnitDigest": "fee7e29c8f6886025098180b705008f43d5a3198943485c0256f5645b9cdc0fd",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "1-two-distinct-adapters",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 (claim_7046eb56f67c02ef82f621a3fa30286c; Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a compone).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "sourceAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "sourceUnitDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "sourcePath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "sourceAnchor": "9-repeat-by-component-boundary",
+      "sourceUnitDigest": "d1c2fad49a5087903461482aaa9dbb0b96c53baa6db717e0546f8b185552307f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "9-repeat-by-component-boundary",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44 (claim_9f2283b25ef4be9f0e68b4381f1ce08e; For each subsequent component:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45 (claim_abc80009ab1bf59c40a645089fbc82fd; 1. Read [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md) and name responsibility, semantic ope).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "sourcePath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "sourceAnchor": "10-migrate-read-models-before-writers",
+      "sourceUnitDigest": "225088240c21859fc36ee71b02c32151f4f19e37a2a17e8539b159561d58f15c",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "10-migrate-read-models-before-writers",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49 (claim_99bf6932b3f44681c138edf8384d652b; Sequence it internally:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50 (claim_056d11e86ef88989c436bc14a24997a1; 1. event/schema decode fixtures; 2. deterministic replay fixtures; 3. domain/stage projection fixtures; 4. frontier calculation fixtures; 5.).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    },
+    {
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "sourcePath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "sourceAnchor": "13-rollback-rules",
+      "sourceUnitDigest": "30245265d7fc653884caff4a90018addd38af26a0e29f35223b0f4fcd4ecdd20",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "13-rollback-rules",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef).",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
+    }
+  ],
+  "nativeEquality": {
+    "hostSourceIds": true,
+    "hostCandidateTuples": true,
+    "hostExceptionMembership": true,
+    "hostHolds": 0,
+    "agentCandidateTuples": true,
+    "agentExceptionGroups": 342,
+    "agentExceptionMembership": true,
+    "agentOriginalHolds": [
+      "claim_d6db58a3090422d42154f240f54c9f5a",
+      "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+      "claim_bd4897029d5fdbab80b1b7ccee475e12"
+    ],
+    "pendingSourceIds": [
+      "claim_ebe7d2366429303cb74938b60f5cf2fb",
+      "claim_ab182560a5142f22e010e35a97b115dc",
+      "claim_a5297db7dd5392e3acf511564f7cb642"
+    ],
+    "allUnreviewedSourceIdsExactlyExpected": true,
+    "knownIdsBefore": 93809,
+    "knownIdsAfter": 93839,
+    "missingKnownIds": [],
+    "nativeSuccessorReplacements": [
+      {
+        "oldClaimId": "claim_d52f4222d940558ef34a2d7c0f174628",
+        "currentTuple": {
+          "claimId": "claim_17cfc7bffb3bf03d2ce7fda1e43c9aa9",
+          "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+          "anchor": "unheaded-block-10",
+          "unitDigest": "1d6df4038cd801c79a791a0ccca5621ce632a7f8b33a07983cc7d4220e79b05c"
+        },
+        "reason": "Native fresh unit replaces old identity gap; full current tuple matches the shown gap successor."
+      }
+    ]
+  },
+  "persistedWorkingRegistry": {
+    "commit": "0653419c19e7c37d8d00408ad482cdecbd45a807",
+    "sha256": "6b5470d5016be887eed421f1baf1ef4aef1b2858dd231aec0aa49c056cac165b",
+    "scratchByteEqual": true
+  },
+  "repinMachineProof": {
+    "rows": 43,
+    "citations": 66,
+    "shiftedRanges": 57,
+    "allExcerptsByteEqual": true,
+    "allOtherFieldsEqual": true,
+    "allNewBlobsPinnedToMerge": true,
+    "independentLeadVerificationPending": true
+  },
+  "preservation": [
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set([...isolate.exactExemptions,...[\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/plan.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"]]),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:exceptions.size,leadCommit:\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",leadPaths:[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"historicalWitnesses\":74,\"historyTreeUnchanged\":true,\"payloadTreeOutside29Unchanged\":true,\"inheritedPhysicalPayloads\":867,\"changedAreaPaths\":29,\"frozenFiles\":5,\"firstParentNonMergeCommits\":277,\"allowlistViolations\":0,\"exactCommitPathExceptions\":8,\"leadCommit\":\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",\"leadPaths\":[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],\"result\":\"pass\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-constitution.mjs",
+        "--no-ledger",
+        "--check-placement"
+      ],
+      "exit": 0,
+      "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 506 files, 505 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-candidate-status.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"counts\": {\n    \"files\": 506,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 112,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 115,\n    \"findings\": 1,\n    \"byType\": {\n      \"missing-promotion-fields\": 1\n    }\n  },\n  \"findings\": [\n    {\n      \"type\": \"missing-promotion-fields\",\n      \"path\": \"docs/platform/packaging-distribution/README.md\",\n      \"message\": \"missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by\"\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as git} from 'node:child_process';const p=\"plans/260925-documentation-authority-unification\",f=p+'/transitional-switchboard.json',before=JSON.parse(git('git',['show','a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2:'+f],{encoding:'utf8'})),after=JSON.parse(fs.readFileSync(f,'utf8'));assert.deepEqual(after.areas.map(a=>[a.area,a.authorityStatus]),before.areas.map(a=>[a.area,a.authorityStatus]));const paths=['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md'],set=new Set;for(const file of paths){const text=fs.readFileSync(file,'utf8');for(const m of text.matchAll(/docs\\/platform\\/[^ )`|>\"]*/g))set.add(m[0]);}const baseline=fs.readFileSync(p+'/reports/phase-06/reader-links-baseline.txt','utf8').trim().split('\\n').filter(Boolean).sort();assert.deepEqual([...set].sort(),baseline);console.log(JSON.stringify({authorityChanges:[],readerLinkChanges:[],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"authorityChanges\":[],\"readerLinkChanges\":[],\"result\":\"pass\"}\n",
+      "stderr": ""
+    }
+  ],
+  "tests": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/doc-review-format.test.mjs",
+      "test/scripts/doc-decision-review.test.mjs"
+    ],
+    "tests": 29,
+    "pass": 29,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "stdout": "\u2714 review pack contains full source and target units and reverse unmatched candidate blocks (4.153925ms)\n\u2714 seeded review uses six real text mutations and scores missed defects and false flags (16.067944ms)\n\u2714 review application binds current digest and keeps rework and hold pending without inventing approval (7.173413ms)\n\u2714 valid source digest prefixes survive pack and review application with full seen-text bindings (3.055508ms)\n\u2714 verdict table names the reviewer and requires an explicit verdict and own note for each row (0.942125ms)\n\u2714 unknown dispositions remain blocking after a hold verdict and pass decision validation (3.018272ms)\n\u2714 unknown dispositions remain blocking after a rework verdict and pass decision validation (1.475903ms)\n\u2714 the same reviewer session on another date is still the author session (0.35031ms)\n\u2714 pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.418533ms)\n\u2714 a public seeded pack does not expose its replay inputs or retain original mutated digests (2.291925ms)\n\u2714 review application requires a passing sensitivity result for the exact shown pack (2.470933ms)\n\u2714 approval cannot attach to target text or heading ancestry changed after the pack (2.977917ms)\n\u2714 approved rows retain the seen unit binding and their own report across review rounds (2.502525ms)\n\u2714 sensitivity controls must belong to the bound batch even when the sensitivity score passes (2.352106ms)\n\u2714 reviewers receive full text and a unified diff in Markdown with safely nested fences (164.542204ms)\n\u2714 the public seeded Markdown can be scored without exposing the seed or private selection key (385.267689ms)\n\u2714 script-proven carries supply batch sensitivity controls without reopening accepted decisions (431.593975ms)\n\u2714 a new shard cannot claim legacy compatibility by deleting author fields (106.06026ms)\n\u2714 ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (279.261983ms)\n\u25b6 ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  \u2714 target-digest (123.027618ms)\n  \u2714 source-digest (105.493528ms)\n  \u2714 authoredBy (114.111102ms)\n  \u2714 authorSession (113.727315ms)\n  \u2714 same-session (108.848395ms)\n\u2714 ordinary reviews cannot approve a changed digest, an unauthored row or their own session (566.469827ms)\n\u25b6 checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  \u2714 checkpoint 3 (220.268603ms)\n  \u2714 checkpoint 6 (219.006643ms)\n  \u2714 checkpoint 10 (221.979656ms)\n\u2714 checkpoint reports cannot use the ordinary channel to omit sensitivity proof (661.951625ms)\n\u2139 tests 29\n\u2139 suites 0\n\u2139 pass 29\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 2719.445995\n"
+  },
+  "draftAliasAnchors": [
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#4-plugin-registry-linker",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#5-namespace-rules",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#external-provider-protocol",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#historical-migration-status-note",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#related-documents",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#1-two-distinct-adapters",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#3-command-metadata-and-parser-ownership",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#historical-migration-status-note",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#legacy-cli-transition",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#related-documents",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#1-migration-question",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#11-migrate-state-writing-components",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#12-remove-node",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#13-rollback-rules",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#14-verification-gates",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#15-remaining-migration-decisions",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#2-options-considered",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#4-current-migration-readiness",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#6-release-r2-external-process-provider-preview",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#7-release-r3-production-remote-host",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#8-migrate-the-next-small-read-only-proof",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#9-repeat-by-component-boundary",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#gate-bypass",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#historical-migration-status-note",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#near-thin-candidates",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#node-to-rust-component-migration",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#not-thin-candidates",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-a-thin-the-entire-node-host-first",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-b-rust-host-first-node-as-legacy-provider",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-c-big-bang-rust-rewrite",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#partly-thin-candidates",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#selected-option",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#why-ready-is-not-a-first-proof",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-p1-compatibility-harness",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md#preserved-retired-policy",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#1-outcome",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#10-p5-native-version",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#11-p6-distribution-and-installed-entry-cutover",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#12-p7-external-process-provider-preview",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#13-p8-production-remote-native-route",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#14-p9-next-native-read",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#16-commit-and-rollback-slices",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#18-definition-of-done",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#2-non-goals",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#3-decisions-required-before-r1-execution",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#4-delivery-graph",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#5-p0-lock-release-inputs-and-baseline-inventory",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#6-p1-compatibility-harness",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#7-p2-rust-workspace-and-generated-inputs",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#8-p3-invocation-kernel-vertical-slice",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#9-p4-cli-adapter-legacy-exec",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#coverage-floor",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#deliverables",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#deliverables-1",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#deliverables-2",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#deliverables-3",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify-1",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify-2",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify-3",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify-4",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify-5",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#exit-gate-and-verify-6",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#historical-migration-status-note",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#rust-host-and-proof-providers-implementation-plan",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#scout-evidence",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-1",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-2",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-3",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-4",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-5",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-6",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#steps-7",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#target-areas",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/roadmap.md#verify",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#1-architecture-name",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#10-release-boundaries",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#11-open-questions",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#2-problem-and-scope",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#3-canonical-names",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#4-peer-host-use-cases",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#5-core-contracts",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#6-router-pure-and-invocationservice-pipeline",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#7-authority-two-stage",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#8-failure-cancellation-lifecycle-and-human-input",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#9-physical-placement",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#historical-migration-status-note",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#host-invocation-and-provider-routing-architecture",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/spec.md#related-documents",
+      "exit": 0
+    },
+    {
+      "ref": "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-test-and-review-gates-table",
+      "exit": 0
+    }
+  ],
+  "freshReaders": {
+    "authority": "A32",
+    "report": "fresh-reader-261013-1850-host-invocation-checkpoint.md",
+    "result": "pass under committed key and pilot",
+    "cells": "six cells 6/6, partials count correct",
+    "officialDistinctAnchors": 25,
+    "badAnchors": 0,
+    "filesBeforeFirstCorrectOwnerAtMost": 4,
+    "isolation": "UNPROVEN instruction-only",
+    "batchReportNotes": [
+      "No explicit risk rubric.",
+      "No area-level definition of done.",
+      "Restored-section navigation depends on portal and pointers.",
+      "Release manifest is owned outside this area.",
+      "Deferred npm-bin clause not reached."
+    ]
+  },
+  "resolvedObstacles": [
+    "Initial resume D inventory registry digest mismatch after approval overlay: regenerate from exact overlaid registry.",
+    "Main merge conflict: import exact main capability block into plan shape.",
+    "Four legacy-root digests: account imported main bytes in existing ratchet exceptions.",
+    "Old code-fence source ID became a native gap: preserve old gap and separately decide current native source ID.",
+    "One new reverse tuple uses native new ID, matched by full tuple to the shown same-file gap successor.",
+    "Draft aliases map 32 native block targets to containing browser headings; 102 distinct headings pass official checker."
+  ],
+  "blockers": [],
+  "pendingReview": "review-request-3-host-invocation-boundary.md",
+  "limits": [
+    "Lead A31 conflict/conservation and machine re-pin verdicts pending.",
+    "No final batch closure/report; strict partial carries remain explicit.",
+    "No Step 4, promotion, push or main-checkout writes.",
+    "No code-truth re-review or full-suite claim."
+  ],
+  "gapDigestProof": {
+    "rows": 18,
+    "oldUnitDigestsMatch": true,
+    "currentNativeSuccessorTuplesMatch": true
+  },
+  "artifactDigests": {
+    "review-request-3-host-invocation-boundary.md": "f16b4da2cb44b553a142b2ee0d4312afeb9afad7c12a073750881b54976baec4",
+    "host-invocation-boundary-accounting.json": "acda2089767a94f29e41934d24f5f679b7d0aae3fb761a7e1c8170c539edc5ae",
+    "host-invocation-boundary-code-evidence.json": "bb58b5bd0d367129e98a145a7667f8a5c09d2e0e8f84c8abf6a1267fee7e912a",
+    "draft-alias-host-invocation-routing.json": "1504f6a08d526da773a6e1cf666f488547197f4433a1d8ec979551b178bae17e",
+    "link-rewrite-preview-host-invocation-routing.json": "17e6671743b80c2c2112cd26d7bcbd6bd3497ce29b70393a27bd3a1c4bbfa9e9",
+    "working-identity-registry.json": "6b5470d5016be887eed421f1baf1ef4aef1b2858dd231aec0aa49c056cac165b"
+  },
+  "gitnexus": {
+    "lastSuccessfulOwnScope": "documentation/data only, zero symbols, zero affected processes, low risk",
+    "finalAttempt": "detect_changes called before final commit; transport closed",
+    "fallback": "git diff --name-only and diff --check confirm only explicit plan documentation/data paths, no production symbols"
+  }
+}

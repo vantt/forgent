@@ -2,7 +2,7 @@
   "version": 1,
   "draft": true,
   "commit": "2b445a90693c6d5e9861a916be3279482f171a18",
-  "description": "Reviewed-row draft only; alias-table.json stays empty. Split document aliases use the area portal; anchor aliases use reviewed carriers and retain partial remainder accounting.",
+  "description": "Reviewed-row draft only; alias-table.json stays empty. Split document aliases use the area portal; anchor aliases use reviewed carriers and retain partial remainder accounting. Browser targets use an actual containing heading; decisionBindings retain each reviewed native unit anchor.",
   "entries": [
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
@@ -17,7 +17,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#host-invocation-documentation-standardization-plan",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -27,7 +27,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#migration-status-note",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -37,7 +37,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#1-goal",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -47,7 +47,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#2-non-goals",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -57,7 +57,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#3-hard-migration-rules",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -67,7 +67,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#4-source-inventory",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -77,7 +77,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#41-host-invocation-sources",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -87,7 +87,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#42-cross-area-sources",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -97,7 +97,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#43-agent-coordination-reference-pattern",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -107,7 +107,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#5-target-structure",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -117,7 +117,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#6-required-preservation-ledger",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -127,7 +127,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#7-target-document-responsibilities",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -137,7 +137,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#8-migration-phases",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -147,7 +147,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#81-phase-0-freeze-the-baseline",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -157,7 +157,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#82-phase-1-create-skeleton-without-rewriting-meaning",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -167,7 +167,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#83-phase-2-promote-current-legacy-current-state",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -177,7 +177,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#84-phase-3-promote-architecture",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -187,7 +187,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#85-phase-4-extract-contracts",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -197,7 +197,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#86-phase-5-verification-and-implementation-alignment",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -207,7 +207,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#87-phase-6-redirect-or-retain-legacy-docs",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -217,7 +217,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#9-agent-coordination-follow-up",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -227,7 +227,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#10-review-checklist",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -237,7 +237,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#11-open-questions",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -247,7 +247,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#12-related-files",
       "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
-      "toAnchor": "unheaded-block-3",
+      "toAnchor": "preserved-retired-policy",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -307,7 +307,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#same-process-built-ins-versus-runtime-extensions",
       "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "toAnchor": "unheaded-block-19",
+      "toAnchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -317,7 +317,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#cross-process-cost",
       "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "toAnchor": "unheaded-block-21",
+      "toAnchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -697,7 +697,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#3-why-the-sequence-is-selected",
       "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "toAnchor": "unheaded-block-43",
+      "toAnchor": "restored-rejected-options-rationale",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -1007,7 +1007,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#changed-areas",
       "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "toAnchor": "unheaded-block-61",
+      "toAnchor": "restored-p1-compatibility-harness",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -1037,7 +1037,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#performance-gates",
       "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "toAnchor": "unheaded-block-63",
+      "toAnchor": "restored-p1-compatibility-harness",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -1047,7 +1047,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify",
       "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
-      "toAnchor": "unheaded-block-65",
+      "toAnchor": "restored-p1-compatibility-harness",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -1317,7 +1317,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#15-test-and-review-gates",
       "toOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
-      "toAnchor": "unheaded-block-16",
+      "toAnchor": "restored-test-and-review-gates-table",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -1337,7 +1337,7 @@
     {
       "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#17-risks-and-controls",
       "toOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
-      "toAnchor": "unheaded-block-19",
+      "toAnchor": "restored-test-and-review-gates-table",
       "kind": "redirected",
       "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
       "immutableRefs": [],
@@ -1364,122 +1364,170 @@
     {
       "aliasId": "host-invocation-draft-002",
       "claimId": "claim_c44d8d3021e241465f869930b4b9aab8",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-003",
       "claimId": "claim_f1124cdad699ecc79bea44387b3d1953",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-004",
       "claimId": "claim_d4b8fa94edeb5c1f1df6948f9652f819",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-005",
       "claimId": "claim_15c6c55960df29c5a8e1aff46af62c34",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-006",
       "claimId": "claim_d16ed0ed7a63031dcdebf0d705ca122a",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-007",
       "claimId": "claim_3681cacef3fd5234588449fbe99aa07e",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-008",
       "claimId": "claim_68bfb6dfefbd11ba5955e8e23833f5d8",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-009",
       "claimId": "claim_869d9a19087da4c0ebcb53f60e90f093",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-010",
       "claimId": "claim_d015081f55b1b80d41cabc07d9e7de36",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-011",
       "claimId": "claim_1b04e29307da7c5596121a0895c8f8c2",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-012",
       "claimId": "claim_04976d896f4a24cd9d965c15445f7cc2",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-013",
       "claimId": "claim_a568c446726169176a2b3eb4c108480c",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-014",
       "claimId": "claim_ffe45ab21be39799cc8b27234fa44898",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-015",
       "claimId": "claim_8f953d9d90d0d2a7a425be559ab4756a",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-016",
       "claimId": "claim_a42ff22029685836bd1978fd836502c6",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-017",
       "claimId": "claim_47d77b46afdd231a2ea178d16add7e0b",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-018",
       "claimId": "claim_9ac9d9e7d56a60bc49add3df2411df46",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-019",
       "claimId": "claim_aab75422b06f2493a911b76279b4d071",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-020",
       "claimId": "claim_effef075c0b501ca23d2eea59acd3fe8",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-021",
       "claimId": "claim_c520da3db22e42efe9335409c782b678",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-022",
       "claimId": "claim_fc28821592f1f50afa79682457bca275",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-023",
       "claimId": "claim_ae32c505d4e0cd37ba53ed4b44c43889",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-024",
       "claimId": "claim_149c34df047e6308a6797355af2ce23c",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-025",
       "claimId": "claim_f8a729a966cef8804807fdc0fad3e4f3",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-3",
+      "browserHeadingAnchor": "preserved-retired-policy"
     },
     {
       "aliasId": "host-invocation-draft-026",
@@ -1499,22 +1547,26 @@
     {
       "aliasId": "host-invocation-draft-029",
       "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** \u2014 required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** \u2014 owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)."
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)."
     },
     {
       "aliasId": "host-invocation-draft-030",
       "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** \u2014 a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** \u2014 an independently installed, language-neutral plugin reached through persistent framed RPC (\u00a73). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** \u2014 a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)."
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)."
     },
     {
       "aliasId": "host-invocation-draft-031",
       "claimId": "claim_6ac894a939b9efb6725758fd6c4eb039",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-19",
+      "browserHeadingAnchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost"
     },
     {
       "aliasId": "host-invocation-draft-032",
       "claimId": "claim_d03d06ad4a63b00a87a934ab594587c9",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-21",
+      "browserHeadingAnchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost"
     },
     {
       "aliasId": "host-invocation-draft-033",
@@ -1704,7 +1756,9 @@
     {
       "aliasId": "host-invocation-draft-070",
       "claimId": "claim_5b0f65a4cc7366113339fc3a47d9eded",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-43",
+      "browserHeadingAnchor": "restored-rejected-options-rationale"
     },
     {
       "aliasId": "host-invocation-draft-071",
@@ -1859,7 +1913,9 @@
     {
       "aliasId": "host-invocation-draft-101",
       "claimId": "claim_89e8b193eb339f06478bf6998576080c",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-61",
+      "browserHeadingAnchor": "restored-p1-compatibility-harness"
     },
     {
       "aliasId": "host-invocation-draft-102",
@@ -1874,12 +1930,16 @@
     {
       "aliasId": "host-invocation-draft-104",
       "claimId": "claim_5c200f279a9c0fcf20b7df169781b026",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-63",
+      "browserHeadingAnchor": "restored-p1-compatibility-harness"
     },
     {
       "aliasId": "host-invocation-draft-105",
       "claimId": "claim_dce9740dd9f04988dc3d1ffc4c1069d5",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-65",
+      "browserHeadingAnchor": "restored-p1-compatibility-harness"
     },
     {
       "aliasId": "host-invocation-draft-106",
@@ -2014,7 +2074,9 @@
     {
       "aliasId": "host-invocation-draft-132",
       "claimId": "claim_ca69fde84ef390b737cc841f2e0722f8",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-16",
+      "browserHeadingAnchor": "restored-test-and-review-gates-table"
     },
     {
       "aliasId": "host-invocation-draft-133",
@@ -2024,7 +2086,9 @@
     {
       "aliasId": "host-invocation-draft-134",
       "claimId": "claim_245edf82638eebaa26df985249540c8c",
-      "remainder": null
+      "remainder": null,
+      "reviewedNativeTargetAnchor": "unheaded-block-19",
+      "browserHeadingAnchor": "restored-test-and-review-gates-table"
     },
     {
       "aliasId": "host-invocation-draft-135",

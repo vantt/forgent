@@ -34,7 +34,7 @@
     },
     {
       "id": "dropped-002",
-      "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio…",
+      "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -87,7 +87,7 @@
     },
     {
       "id": "dropped-003",
-      "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te…",
+      "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -138,7 +138,7 @@
     },
     {
       "id": "dropped-004",
-      "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp…",
+      "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -189,7 +189,7 @@
     },
     {
       "id": "dropped-005",
-      "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option…",
+      "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -255,7 +255,7 @@
     },
     {
       "id": "dropped-006",
-      "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL…",
+      "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -417,7 +417,7 @@
     },
     {
       "id": "dropped-009",
-      "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma…",
+      "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -470,7 +470,7 @@
     },
     {
       "id": "dropped-010",
-      "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea…",
+      "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -513,7 +513,7 @@
         ],
         "statusNote": "FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
         "flaggedObsolete": true,
-        "ownerQueue": true,
+        "ownerQueue": false,
         "reviewer": "owner",
         "reviewedAt": "2026-10-13",
         "reviewNote": "F6: dropped-010 is deferred, not retired. The installed-default npm bin.fgos removal stays an open obligation owned by the Packaging-distribution batch (Step 4), which decides restore or retirement there. The FLAGGED-obsolete verbatim retention in architecture/release-boundaries.md stands until then.",
@@ -527,12 +527,13 @@
           "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee"
         },
         "deferralOwnerAnswer": "F6",
-        "deferralReason": "Owner F6: installed-default npm bin.fgos removal remains an open obligation. Packaging-distribution decides restore or retirement; FLAGGED-obsolete verbatim retention stands until then."
+        "deferralReason": "Owner F6: installed-default npm bin.fgos removal remains an open obligation. Packaging-distribution decides restore or retirement; FLAGGED-obsolete verbatim retention stands until then.",
+        "deferredToStep": 4
       }
     },
     {
       "id": "dropped-011",
-      "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai…",
+      "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -582,7 +583,7 @@
     },
     {
       "id": "dropped-012",
-      "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic…",
+      "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -632,7 +633,7 @@
     },
     {
       "id": "dropped-013",
-      "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:…",
+      "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -697,7 +698,7 @@
     },
     {
       "id": "dropped-014",
-      "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur…",
+      "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -754,7 +755,7 @@
     },
     {
       "id": "dropped-015",
-      "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a…",
+      "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -805,7 +806,7 @@
     },
     {
       "id": "dropped-016",
-      "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version…",
+      "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
@@ -868,7 +869,7 @@
     },
     {
       "id": "dropped-017",
-      "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules…",
+      "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules\u2026",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
