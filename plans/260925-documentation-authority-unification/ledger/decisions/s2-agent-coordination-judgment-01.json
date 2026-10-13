@@ -1052,69 +1052,6 @@
       "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     },
     {
-      "claimId": "claim_df9081c32c8fb9275a5e0a8996e01efe",
-      "sourceUnitDigest": "ce850006e07a5a253fbca16e7417825e44b567d6d87e1106bd3376cdb45900d3",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "literal-snapshot",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#baseline-ux-audit -> PLAT:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot: Source units whose target is the history literal snapshot are the protocol-id table, the FlowDefinition ownership lists and run/show rows; retired engine text carried verbatim, with the live parts rewritten in current units.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
-      "targetAncestry": [
-        "Historical File: Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
-    },
-    {
-      "claimId": "claim_a0473f79a54d2bff51ea91e6846a0062",
-      "sourceUnitDigest": "bbf6c87f8842d15f726d859c60dd9987dcb6d96aa8e5e272b620839ffd94d068",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "vocabulary-evaluation",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#vocabulary-evaluation is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#vocabulary-evaluation. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#vocabulary-evaluation -> PLAT:architecture/group-thinking-trigger-surface.md#vocabulary-evaluation: Source unit is carried in the matching current section (identical or with only retired-id/phrasing edits) and that section is true against core/skills/fgos-panel/SKILL.md except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "bbf6c87f8842d15f726d859c60dd9987dcb6d96aa8e5e272b620839ffd94d068",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
-    },
-    {
-      "claimId": "claim_18aca2d03e9336200b9db73ba433fbf8",
-      "sourceUnitDigest": "59158dee80eedd4941c7c05a6eac61d94b1d08dd9bc2d8cf353d61a56a13c8ac",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "literal-snapshot",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#surface-taxonomy is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#surface-taxonomy -> PLAT:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot: Source units whose target is the history literal snapshot are the protocol-id table, the FlowDefinition ownership lists and run/show rows; retired engine text carried verbatim, with the live parts rewritten in current units.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
-      "targetAncestry": [
-        "Historical File: Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
-    },
-    {
       "claimId": "claim_45847a80488e1bf956ba46ead00f167c",
       "sourceUnitDigest": "aa231bdb676e030f4801dd7a5c7e97d2fb8c1ff79edf037f14836275460d1657",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
@@ -1209,27 +1146,6 @@
       "authoredBy": "codex-session:1@2026-10-10",
       "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#forbidden-coupling is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
       "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#forbidden-coupling -> PLAT:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot: Source units whose target is the history literal snapshot are the protocol-id table, the FlowDefinition ownership lists and run/show rows; retired engine text carried verbatim, with the live parts rewritten in current units.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
-      "targetAncestry": [
-        "Historical File: Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
-    },
-    {
-      "claimId": "claim_98315bb0cc5de0f9692bb7652d6a8b28",
-      "sourceUnitDigest": "6d7c8be42aa35bb53f7192db0f762f23b75982519110434018e0340114512926",
-      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "literal-snapshot",
-      "claimKind": "architecture",
-      "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#entry-point-choice is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#entry-point-choice -> PLAT:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot: Source units whose target is the history literal snapshot are the protocol-id table, the FlowDefinition ownership lists and run/show rows; retired engine text carried verbatim, with the live parts rewritten in current units.",
       "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
       "reviewedAt": "2026-10-10",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",

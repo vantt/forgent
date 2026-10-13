@@ -1,5 +1,7 @@
 # Independent check request: post-closure main merge
 
+> Current request: the A31 combined follow-up at the end of this file. The original conflict/52 conservation identities are accepted by cf5c64ce6; the older broad scope below is historical evidence, not a request to repeat that review.
+
 Status: READY FOR REVIEW; Step 3 has not started. Author session: codex-session:1@2026-10-11.
 
 ## Pins and boundary
@@ -63,3 +65,39 @@ Only the three existing legacy-root ratchet entries for the architect trigger su
 ## Required next action
 
 Lead independently reviews and commits the merge report(s) covering the records above. Doer then applies only accepted bindings/notes, reruns both prior-registry D/E and full native identity equality, and commits the reviewed working registry. Only after those proofs pass may Step 3 begin under A28. Until then: **STOP, ready for the main-merge review**. No archive/delete decision or main-checkout write is requested.
+
+## A31 combined follow-up: current review scope
+
+READY FOR REVIEW. The original 52-row conservation review is accepted at `cf5c64ce64263143158540283f7bf5c794e89386` and all notes are applied verbatim. Do not repeat the historical broad main-merge scope above. Review only the **39 evidence-only re-pins and seven newly live legacy-source IDs** below. Code truth is not being re-reviewed; all 134 actually changed-code receipts remain candidate-unverified under A31. No current document text, carriage, gate, checker, baseline, vocabulary or main checkout changes.
+
+### Receipt pin and machine check
+
+Receipt commit: `a1fd2136a16dce642cc202a10b585efcf040fd3b`. Receipt path: `plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json`. Original receipt: `2269f2d2790f5bcef0a9ea4838cf27954619feda:plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json`. Author session: `codex-session:1@2026-10-11`; every receipt retains its original authoredBy and every non-pin field.
+
+`node /tmp/phase06/verify-code-evidence-repin.mjs` passes **39/39** (nine unchanged line ranges, 30 shifted; 51 changed citations). It reads both committed receipt artifacts, compares every old/new cited excerpt byte-for-byte, checks every new blob against the merge tree, and restores only evidence commit/blob/ranges before deep-equality checking all other fields. The complete replayable source and result are committed in `review-request-2-main-merge.md.json.a31Followup.repinVerification`; Lead should independently reproduce the comparison. No new shard ref is marked reviewed before that independent report.
+
+The 39-row Class-column template is in `a31Followup.classificationTemplateMarkdown` (all pending). Required columns: `Claim | Class | Verdict | Unit digest | Shown text digest | Note | Evidence digest`. The evidence digest is SHA256(JSON.stringify(currentEvidence)) of the newly pinned receipt. Independent report header: Reviewer, Author session `codex-session:1@2026-10-11`, Receipt commit `a1fd2136a16dce642cc202a10b585efcf040fd3b`, Review mode ordinary. Use the matching current IDs and copy a machine-verified own note; no seed/sensitivity proof for this ordinary check.
+
+### Seven current legacy-source identities outside candidate-unverified
+
+All **496** actual reverse-open candidate units are eligible under A28; there are zero ineligible reverse units. However, the seven newly live claims below are primary legacy source obligations, not reverse candidate units. The accepted 52 rows reviewed their old identities/gaps/retirements; they do not approve these new IDs. They are authored pending in `plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge-pending.json`, with two full-digest-equal moves and five proposed whole-unit supersedes. They are not newly granted holds or silently approved.
+
+Complete shown source/target text, digests, ancestry and proposed rationale: `a31Followup.newPendingLegacySourcePairs`. Lead checks conservation, including the explicit replacement of the old routing/pack/coordination wording by the candidate contract, not implementation truth. Rework any binding that does not carry or supersede the whole claim; do not stamp a narrower target ok. Current source path for all seven: `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md`.
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_550a2c60d3f044caa3540341697a88a7 | pending | New live main identity; proposed supersede to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision; check the complete shown source/target and whole-claim conservation. | f36f565d7adbf19091e7de525bca211dd6f45f7fa10caf704f11c6f211c6c67a | cdb22d6a5f42ae3a58e87493b0d7828e1f364ce9b0ddc43835a91f94264e988b |
+| claim_3996ecc3d148fff06ead0332614567d3 | pending | New live main identity; proposed supersede to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit; check the complete shown source/target and whole-claim conservation. | 9d2872c42475ac943dd19feb5f488a3fbb862771f1b3f7af4e6279002cd576a9 | 4ca30eb078631d99f2559bb221ecd5f6ac3f302c67c4ec61232c20b0e1fe91d4 |
+| claim_7cac83d6593ca533fed2df39bd60c46c | pending | New live main identity; proposed supersede to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit; check the complete shown source/target and whole-claim conservation. | 3c495e4af0b84afab995afc2de9b6ada30c65f7557cb2e6f4934f0b5a034024a | 4ca30eb078631d99f2559bb221ecd5f6ac3f302c67c4ec61232c20b0e1fe91d4 |
+| claim_0893be1de04c49bd33bdfc9a98df6d89 | pending | New live main identity; proposed move to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7; check the complete shown source/target and whole-claim conservation. | 2f3aed1c2c86a1e39301d385bcc233d7b4d1f2a6f7d316b655356e3d6ba26b00 | 2f3aed1c2c86a1e39301d385bcc233d7b4d1f2a6f7d316b655356e3d6ba26b00 |
+| claim_58560c392f9b61dd94d592f0cb4a75d8 | pending | New live main identity; proposed move to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8; check the complete shown source/target and whole-claim conservation. | b7c8760c894fef840cef9630c446a32f9ebcd8b838d6b82676968f2eb3d5a0e7 | b7c8760c894fef840cef9630c446a32f9ebcd8b838d6b82676968f2eb3d5a0e7 |
+| claim_8f632c41e8a069dbfdfa1ea31994f14e | pending | New live main identity; proposed supersede to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#entry-point-choice; check the complete shown source/target and whole-claim conservation. | 3baa56c939fd599e8a11bed83f1905ea7ceb71f256dd85baefef70c0a29b3e29 | f9a3e8adf40d2ed782b6be16bcfe024b92a46769b35b36c03a3c5cfa984b0b96 |
+| claim_cb0fc46cc04ed129b871f1c2a44fcb61 | pending | New live main identity; proposed supersede to docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; check the complete shown source/target and whole-claim conservation. | f460307c43635265a3b8a96c354440c606355d99b4d27a9da6d079a4bff00c1a | bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c |
+
+### Current proof and exact next step
+
+Both prior-registry D commands pass with **zero fatal**. Scoped strict E contains only **10 not-reviewed IDs = three original Rings holds + these seven pending sources**, **342 exact exception groups**, and **496 reverse-open candidates**. Native comparison proves all 496 claim-ID/path/anchor/digest tuples equal the committed list (zero missing/additional), all 342 exception digests/source-ID memberships equal, and no change in any of the registry's 93,186 identity tuples. All 134 changed-code receipts and all 39 pending re-pins are listed; the original 683-row receipt artifact remains byte-identical. The twenty upstream-only identity successors do not choose a target area; Step 3 still owns that disposition. Old retired rows 216/226 stay unchanged, with new-digest rows added.
+
+The exact four D/E argv/results are in `a31Followup.gates`; each uses one of `reports/identity-registry.json` and `reports/phase-02-identity-registry.json`, and E uses the frozen scopes plus `--strict`. The authored inventory is regenerated at Receipt commit from the existing registry; native generation confirms no additional carry-forward. Review/conservation tests: `env -u CLAUDE_CODE_SESSION_ID node --test` with seven explicit files in `a31Followup.tests.command`, **155/155 pass**, zero fail/cancel/skip/todo. Historical witnesses 74, payloads 867, five frozen files, ratchet 995 and authority/reader isolation pass; the previous 30 routing findings are unchanged.
+
+**Closing condition is not yet met because the seven source rows lack independent approval.** After Lead commits this one combined report, apply accepted notes/pins only, recalculate the candidate list from native E (the 39 accepted receipts may then close), rerun both priors and full-set equality. Persist the working registry and begin Step 3 only when pending IDs equal exactly the three Rings holds. Working registry SHA256 `50cc0724da93de0a682f620b017f2599eb25d7c6fcf3701212aa451ef0a61f1f` is pinned in the sidecar and remains uncommitted until that condition. No new archive/delete list or promoted-doc edit; no extra stop before this consolidated review request.

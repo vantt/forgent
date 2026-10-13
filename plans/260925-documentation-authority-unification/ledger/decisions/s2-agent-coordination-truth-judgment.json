@@ -328,48 +328,6 @@
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
     },
     {
-      "claimId": "claim_d35b6e91b3f5abf104b920867227983a",
-      "sourceUnitDigest": "609e73cbfce9865141695d741ef33286d25c956a5292e8e5ad6d66da145d40d8",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "decision",
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#decision -> architecture/group-thinking-trigger-surface.md#decision (supersede): old claim moved or superseded into decision (lines 25-25): current text is true and keeps the live obligation or retires the stale part honestly; check: matches core/skills/fgos-panel/SKILL.md route steps 2-5: fgos-panel selects a preset, starts the Workflow via fgos workflow start or delegates to fgos-group-thinking, whose description calls it the ex",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d21b6a420482159f0629dbd531d081ec01e9b92af10e26a2393a949fb741cb56",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_0881c8bf668b25e998c72da9945388e1",
-      "sourceUnitDigest": "6a7d218e193279e511ee45717207a8852112c5724cd21dbcba70df8ad5a270e6",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "happy-path-routing",
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#happy-path-routing -> architecture/group-thinking-trigger-surface.md#happy-path-routing (supersede): old claim moved or superseded into happy-path-routing (lines 85-85): current text is true and keeps the live obligation or retires the stale part honestly; check: routes agree with SKILL.md and core/workflows/architecture-advisory.yaml (synthesis unit has minCheckers reviewer and red-team); never routing advisory coding questions to the mutating route matches S",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
       "claimId": "claim_660a8e15bd11b32c2fed2719430cdbf2",
       "sourceUnitDigest": "4ad24e97b5c892a7ff758a0aec6ea75dbe616ac3025d20072c1186d50e6c781f",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
@@ -385,28 +343,6 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface",
-        "Alternatives Considered"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_417cf9aada765f0bdf7295be8172de0e",
-      "sourceUnitDigest": "1d06849d2a7e6b6ad61a611d199c54733f774625716a6706d3bca63b1402da40",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "b-add-fgos-panel",
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#b-add-fgos-panel -> architecture/group-thinking-trigger-surface.md#b-add-fgos-panel (supersede): old claim moved or superseded into b-add-fgos-panel (lines 148-148): current text is true and keeps the live obligation or retires the stale part honestly; check: fgos-panel exists and is the intent-first selector; selection is not implementation permission per SKILL.md:12 and :61-64",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Alternatives Considered"
@@ -2681,69 +2617,6 @@
       "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
     },
     {
-      "claimId": "claim_fa748a54bc379a2394a5a019d60e0dd8",
-      "sourceUnitDigest": "39cb102a2b3342b49245148eceeb2b939aa4b7348676d552535b2379a88e9dd1",
-      "claimKind": "contract",
-      "disposition": "supersede",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-4 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "decision",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#unheaded-block-4 -> architecture/group-thinking-trigger-surface.md#decision (supersede): old claim moved or superseded into decision (lines 25-25): current text is true and keeps the live obligation or retires the stale part honestly; check: matches core/skills/fgos-panel/SKILL.md route steps 2-5: fgos-panel selects a preset, starts the Workflow via fgos workflow start or delegates to fgos-group-thinking, whose description calls it the ex",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d21b6a420482159f0629dbd531d081ec01e9b92af10e26a2393a949fb741cb56",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_74a136f7f6f4ebc88c335b6d44786d34",
-      "sourceUnitDigest": "dd83b82fc221b6803b108dc3fe64f88d7fc786114728a1ff2a7d21d674f2ec05",
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-5 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "baseline-ux-audit",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#unheaded-block-5 -> architecture/group-thinking-trigger-surface.md#baseline-ux-audit (supersede): old claim moved or superseded into baseline-ux-audit (lines 36-36): current text is true and keeps the live obligation or retires the stale part honestly; check: explicitly dated pre-introduction audit; fgos-code-panel is absent from core/skills, .agents/skills and plugins (only fgos-panel and fgos-architecture-panel exist) and fgos-run exists, so the historic",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "ca979479d9955a9dddc83b879203053bbdd76e459421382bfb993bfe85dbfe3e",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_cca91dc76231ef2ebdcf3e5a78abd275",
-      "sourceUnitDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
-      "claimKind": "architecture",
-      "disposition": "supersede",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "happy-path-routing",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#unheaded-block-11 -> architecture/group-thinking-trigger-surface.md#happy-path-routing (supersede): old claim moved or superseded into happy-path-routing (lines 85-85): current text is true and keeps the live obligation or retires the stale part honestly; check: routes agree with SKILL.md and core/workflows/architecture-advisory.yaml (synthesis unit has minCheckers reviewer and red-team); never routing advisory coding questions to the mutating route matches S",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
       "claimId": "claim_92b8f4c6b79700a469ef0a7194d216b2",
       "sourceUnitDigest": "27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9",
       "claimKind": "contract",
@@ -2759,28 +2632,6 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f",
-      "targetAncestry": [
-        "Group Thinking Trigger Surface",
-        "Alternatives Considered"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
-    },
-    {
-      "claimId": "claim_119c0b4692416fe71932029c5de677f4",
-      "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
-      "claimKind": "contract",
-      "disposition": "supersede",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
-      "targetAnchor": "b-add-fgos-panel",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:architecture/group-thinking-trigger-surface.md#unheaded-block-21 -> architecture/group-thinking-trigger-surface.md#b-add-fgos-panel (supersede): old claim moved or superseded into b-add-fgos-panel (lines 148-148): current text is true and keeps the live obligation or retires the stale part honestly; check: fgos-panel exists and is the intent-first selector; selection is not implementation permission per SKILL.md:12 and :61-64",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Alternatives Considered"

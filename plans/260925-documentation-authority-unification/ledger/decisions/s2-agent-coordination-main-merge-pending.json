@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-main-merge-pending",
+  "authorSession": "codex-session:1@2026-10-11",
+  "sources": [
+    "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_550a2c60d3f044caa3540341697a88a7",
+      "sourceUnitDigest": "f36f565d7adbf19091e7de525bca211dd6f45f7fa10caf704f11c6f211c6c67a",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "decision",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+    },
+    {
+      "claimId": "claim_3996ecc3d148fff06ead0332614567d3",
+      "sourceUnitDigest": "9d2872c42475ac943dd19feb5f488a3fbb862771f1b3f7af4e6279002cd576a9",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "baseline-ux-audit",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+    },
+    {
+      "claimId": "claim_7cac83d6593ca533fed2df39bd60c46c",
+      "sourceUnitDigest": "3c495e4af0b84afab995afc2de9b6ada30c65f7557cb2e6f4934f0b5a034024a",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "baseline-ux-audit",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+    },
+    {
+      "claimId": "claim_0893be1de04c49bd33bdfc9a98df6d89",
+      "sourceUnitDigest": "2f3aed1c2c86a1e39301d385bcc233d7b4d1f2a6f7d316b655356e3d6ba26b00",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The complete imported main unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7 has exactly the same native text digest as docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7; this is proposed verbatim conservation, not a code-truth or promotion approval."
+    },
+    {
+      "claimId": "claim_58560c392f9b61dd94d592f0cb4a75d8",
+      "sourceUnitDigest": "b7c8760c894fef840cef9630c446a32f9ebcd8b838d6b82676968f2eb3d5a0e7",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The complete imported main unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8 has exactly the same native text digest as docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8; this is proposed verbatim conservation, not a code-truth or promotion approval."
+    },
+    {
+      "claimId": "claim_8f632c41e8a069dbfdfa1ea31994f14e",
+      "sourceUnitDigest": "3baa56c939fd599e8a11bed83f1905ea7ceb71f256dd85baefef70c0a29b3e29",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "entry-point-choice",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#entry-point-choice is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+    },
+    {
+      "claimId": "claim_cb0fc46cc04ed129b871f1c2a44fcb61",
+      "sourceUnitDigest": "f460307c43635265a3b8a96c354440c606355d99b4d27a9da6d079a4bff00c1a",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "b-add-fgos-advise",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+    }
+  ]
+}

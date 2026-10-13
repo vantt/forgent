@@ -223,3 +223,21 @@ Agent Coordination closure `ce575996f` remains proven on its pre-merge tree. Aut
 Lead action: review `review-request-2-main-merge.md` and its complete JSON sidecar: 329 changed native anchor/text/ancestry records, 29 gaps, 13 retirements, 37 invariant findings (28 named claim IDs), 173 receipt code-input changes and the full post-merge reverse identity sets. D is 37-fatal with both priors; E has 501 reverse-open, with 17 old-list missing and 198 additional rows. No alias guessing, approval carry or list expansion hides this difference.
 
 Three Rings holds remain. No archive/delete or new history move; no owner authorization to write main is requested. Logged document delta: the imported seven docs paths and the confined conflict resolution. No gate/checker/baseline/vocabulary change. Native refreshed registry stays uncommitted, pinned by SHA256 in the request, until Lead's committed merge review. Only after reviewed bindings, both-prior D/E and full-set equality pass will it be committed and Step 3 start. Post-merge conservation and candidate truth remain UNPROVEN.
+
+## A31: one combined re-pin and new-source check
+
+Resolved: conflict resolution and all 52 conservation rows in `cf5c64ce6`, notes applied verbatim. D is zero-fatal with both priors. The 134 actually changed-code receipt rows stay byte-unchanged and all their current identities are candidate-unverified. The 39 byte-identical excerpt re-pins are committed alone at `a1fd2136a`, not marked independently approved; nine keep lines and 30 shift lines. Old retired rows 216/226 are preserved; only the explicitly reviewed row 246 changes, plus new-digest rows. Twenty upstream identity-successor decisions do not choose a target area; Step 3 still owns that work.
+
+Lead action: the A31 follow-up in `review-request-2-main-merge.md` and `a31Followup` in its JSON sidecar. Machine-check all 39 receipts against their committed originals, then conservation-check these seven newly live primary legacy IDs, which the old 52-ID report did not approve:
+
+- claim_550a2c60d3f044caa3540341697a88a7
+- claim_3996ecc3d148fff06ead0332614567d3
+- claim_7cac83d6593ca533fed2df39bd60c46c
+- claim_0893be1de04c49bd33bdfc9a98df6d89
+- claim_58560c392f9b61dd94d592f0cb4a75d8
+- claim_8f632c41e8a069dbfdfa1ea31994f14e
+- claim_cb0fc46cc04ed129b871f1c2a44fcb61
+
+Two full-digest-equal moves and five supersedes are proposed pending, with complete current shown text/digests and no approval carried from old IDs. These are source obligations, not eligible candidate reverse units; no new owner holds are granted. All 496 actual reverse units qualify under A28 and exactly equal the list, with zero missing/additional and all 342 exception identity groups equal.
+
+Original three Rings holds remain. No new archive/delete, physical history move, real-content conflict, promoted/current-doc edit, gate/checker/baseline/vocabulary change or main-checkout write. Step 3 and final post-merge closure remain UNPROVEN until the seven new source rows are independently accepted; the working registry is deliberately uncommitted and checksum-pinned meanwhile. One combined report only, then approved bindings, both-prior proofs, registry persistence and Step 3.

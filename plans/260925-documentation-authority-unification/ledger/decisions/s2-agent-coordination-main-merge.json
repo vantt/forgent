@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "shard": "s2-agent-coordination-main-merge",
+  "authorSession": "codex-session:1@2026-10-11",
+  "sources": [
+    "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_119c0b4692416fe71932029c5de677f4",
+      "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "b-add-fgos-advise",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Supersede (retarget only; source unchanged). Live claim on arch \"Selected. It gives natural requests one memorable entrypoint...\" (6bea20cb, still byte-equal, now arch#unheaded-block-18). Its target heading was renamed by main 09fe3ab32; change targetAnchor b-add-fgos-panel to P:architecture/group-thinking-trigger-surface.md#b-add-fgos-advise (current claim_4cf046ca), targetUnitDigest 255adc34 to the digest shown. One fix clears both the decision-target-anchor-missing and the retained-claim finding. Findings: decision-target-anchor-missing, retained-claim-target-anchor-missing.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Alternatives Considered"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_014f0a1be5c823ca15a3e1d3a097c3c4",
+      "sourceUnitDigest": "644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e",
+      "claimKind": "contract",
+      "disposition": "move",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-12 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-11. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "unheaded-block-9",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Move (retarget only; digest-equal). Source arch block (now unheaded-block-9) is unchanged; platform text moved from block-11 to P:architecture/group-thinking-trigger-surface.md#unheaded-block-9 (current claim_3b6d77f7) because main/merge removed earlier blocks. Same digest as recorded (644f9cab...), so only targetAnchor unheaded-block-11 changes. Findings: decision-target-drift.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Clarification Rules"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_18e8ea8f02a61e1406cf4017733bd0c0",
+      "sourceUnitDigest": "c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-13 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-12. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "unheaded-block-10",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Move (retarget only; digest-equal). Source unchanged (arch now unheaded-block-10); target block-12 is now P:architecture/group-thinking-trigger-surface.md#unheaded-block-10 (current claim_daa4fb61), digest c7cefec2... unchanged. Findings: decision-target-drift.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Clarification Rules"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_18fb16d85bf883f7f18a1b2f55f28c50",
+      "sourceUnitDigest": "a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-14 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-13. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "unheaded-block-11",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Move (retarget only; digest-equal). Source unchanged (arch now unheaded-block-11); target block-13 is now P:architecture/group-thinking-trigger-surface.md#unheaded-block-11 (current claim_f5f3f0cb), digest a01d8d42... unchanged. Findings: decision-target-drift.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Clarification Rules"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_49355bf7a0675fc3526ffa2f3624bde3",
+      "sourceUnitDigest": "bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-15 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-14. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "unheaded-block-12",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Move (retarget only; digest-equal). Source unchanged (arch now unheaded-block-12); target block-14 is now P:architecture/group-thinking-trigger-surface.md#unheaded-block-12 (current claim_06ac7e80), digest bef4e1da... unchanged. Findings: decision-target-drift.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Clarification Rules"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_df9081c32c8fb9275a5e0a8996e01efe",
+      "sourceUnitDigest": "8afed7dba0277972af82032d6b9134addbfa4572782715989ebb5cf73ce90a61",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "Move (update sourceUnitDigest only). Live claim on arch heading \"Baseline UX Audit\". Heading text is unchanged and verbatim in the snapshot; its unit digest covers the section, and main 09fe3ab32 edited the section, so the digest moved from ce850006 to the one shown (claim is paired to arch#baseline-ux-audit in the refreshed registry). Target P:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot unchanged. Findings: decision-digest-stale.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
+      "targetAncestry": [
+        "Historical File: Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_a0473f79a54d2bff51ea91e6846a0062",
+      "sourceUnitDigest": "4d882a49090a1666d87212e0bcce9df02d6490f7f0506c4224fef93b21e8bd70",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "vocabulary-evaluation",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#vocabulary-evaluation is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#vocabulary-evaluation. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "reviewNote": "Move (update source and target digests). Arch heading \"Vocabulary Evaluation\": section digest bbf6c87f becomes the one shown (main 09fe3ab32 one-cell edit). Platform heading P:architecture/group-thinking-trigger-surface.md#vocabulary-evaluation (current claim_86c90758) changed identically (digest equal to the arch one), so the verbatim move still holds; targetUnitDigest bbf6c87f becomes the same value. Findings: decision-digest-stale, decision-target-drift.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4d882a49090a1666d87212e0bcce9df02d6490f7f0506c4224fef93b21e8bd70",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_18aca2d03e9336200b9db73ba433fbf8",
+      "sourceUnitDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#surface-taxonomy is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "Move (update sourceUnitDigest only). Arch heading \"Surface Taxonomy\": section now holds the pointer paragraph (main 09fe3ab32), digest 59158dee becomes the one shown; heading text verbatim in the snapshot; target P:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot unchanged. Findings: decision-digest-stale.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
+      "targetAncestry": [
+        "Historical File: Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_98315bb0cc5de0f9692bb7652d6a8b28",
+      "sourceUnitDigest": "9c844be479fc8360543de828d76c18183487a1cc7787dd7d28aed8e2b27725d7",
+      "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "literal-snapshot",
+      "claimKind": "architecture",
+      "disposition": "move",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "This exact dated source unit docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#entry-point-choice is retained verbatim in its own complete historical snapshot; its original metadata, obsolete interface or dated context is not silently asserted by the corrected current docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md. This is a unit-specific version/provenance retention, not retirement of the whole surviving subject. Current live/design sections and their changed text receive a separate independent check. The engine-only retirement reference is 2180b4e72; no previous approval carries.",
+      "reviewNote": "Move (update sourceUnitDigest only). Arch heading \"Entry Point Choice\": section edited by main 09fe3ab32 (table rows retargeted to fgos-advise), digest 6d7c8be4 becomes the one shown; heading text verbatim in the snapshot; target P:history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot unchanged. Findings: decision-digest-stale.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
+      "targetAncestry": [
+        "Historical File: Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    },
+    {
+      "claimId": "claim_d35b6e91b3f5abf104b920867227983a",
+      "sourceUnitDigest": "aa14ced9dc34a13b6ab81c02aa59c9b59ba5d9cb9eb78292ab8d36fc451a270a",
+      "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "targetAnchor": "decision",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:1@2026-10-11",
+      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "reviewNote": "Supersede (update source and target digests). Arch heading \"Decision\": digest 609e73cb becomes the one shown (main 09fe3ab32 rename plus sentence rewrite). Platform P:architecture/group-thinking-trigger-surface.md#decision (current claim_c72c1aea) also changed (d21b6a42 to the digest shown); platform differs from arch by the plan's own wording, which is why supersede was chosen originally and still applies. Findings: decision-digest-stale, decision-target-drift.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+      "reviewedAt": "2026-10-12",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cdb22d6a5f42ae3a58e87493b0d7828e1f364ce9b0ddc43835a91f94264e988b",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+    }
+  ],
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md"
+}
