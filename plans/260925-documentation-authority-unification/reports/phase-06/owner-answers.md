@@ -162,3 +162,10 @@ A31 (owner-decided in the recovery session): main merges at batch boundaries; me
 3. Independent review covers only (a) the merge conflict resolution and (b) the conservation rows the merge created: D findings, new retired units and new gaps. For files changed only by main, the reviewer checks main's diff as the successor or supersede target, not code truth.
 4. Units still reverse-open after these steps go to the candidate-unverified list when their file is eligible under A28; any other unit is collected for Lead.
 5. Then rerun D and scoped strict E against both prior registries, compare the full identity set, commit the working registry and start Step 3. The same rule applies to later main merges, made only at batch boundaries.
+
+A32 (owner-decided 2026-10-13): fresh readers for the Host Invocation batch.
+1. Lead spawns two new subagents as fresh readers. Each reads only `docs/platform/host-invocation-routing/` and never sees `reports/phase-06/fresh-reader-key-261013-1543-host-invocation-checkpoint.md`.
+2. Lead scores against that key with the `reports/phase-05/pilot-b-fresh-reader-key.md` rule: each scenario at least 5/6, zero wrong anchors, at most eight files read.
+3. Readers run on the final Host Invocation text, after the pending rework request is reviewed.
+
+F6 (owner-decided 2026-10-13): dropped-010 is deferred, not retired. The installed-default npm `bin.fgos` removal stays an open obligation owned by the Packaging-distribution batch (Step 4), which decides restore or retirement there. The FLAGGED-obsolete verbatim retention in `architecture/release-boundaries.md` stands until then.
