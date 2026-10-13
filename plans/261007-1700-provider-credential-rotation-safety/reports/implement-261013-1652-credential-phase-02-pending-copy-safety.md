@@ -40,3 +40,5 @@ Source: [code-review-261013-1739-credential-phase-02-pending-copy-safety.md](cod
 - **Doctor wording.** The over-limit line now says the copies are waiting and that the limit drops only copies identical to another; it no longer claims none could be shown redundant.
 - **Half-written copies** are reported at any age.
 - **Scope of `torn/`:** RUL75 and section 13.2 say it covers the probe's scratch copy only. Plan questions 14 (other cut-off stores still deleted) and 15 (real `agent.db` size not measured) added.
+
+Full suite on c72f7f0ac (the later commit changes only plans and reports): 7291 tests, 7216 pass, 0 fail, 0 cancelled, 10 skipped (exit 0).
