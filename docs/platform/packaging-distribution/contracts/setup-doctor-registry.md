@@ -131,3 +131,82 @@ Doctor/fix paths may repair environment readiness. They must not silently select
 ## 8. Open Follow-Up
 
 The exact list of registered checks/fixes changes over time. This contract should avoid carrying a stale giant list; generated registry reports or verification docs should carry snapshots when needed.
+
+## Retained Distribution Source Detail
+
+Added in candidate — complete source units from `docs/specs/distribution.md` at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, implementation rules and recorded gaps are retained; current assertions remain subject to the independent truth sample.
+
+##### Contributor hooks setup
+
+- **Blocked when:** never — this is an explicit command a contributor runs
+  themselves; it always runs when invoked.
+- **What changes:** running the setup command wires up this repository's
+  pre-commit hook for the person who just cloned it. It is never triggered
+  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)
+  — a contributor runs it once, by hand, after cloning.
+- **Side effects:** none beyond the local git config change; nothing is
+  installed and no network access happens.
+- **Afterwards:** the contributor's local clone has the pre-commit hook
+  wired up, identically to what used to happen automatically. Someone who
+  never runs this command simply does not get the local hook — this is a
+  one-time manual step for contributors, not a requirement for installing
+  or running `fgos` itself.
+- In fgOS source checkouts, the hook refuses newly staged root files outside
+  its own allowlist, including linked worktrees and `fgw/*` branches. Existing
+  root modifications/deletions remain permitted. Allowlist changes must land
+  separately on main before root additions use them; the index cannot authorize
+  itself. Merge commits skip only this root guard, never existing data-loss
+  guards. `main-checkout-hook-wired` diagnoses wiring using the existing check.
+- In fgOS source checkouts, the hook sends newly staged, copied, or renamed
+  Markdown files directly under `plans/reports/` and `plans/journals/` to the
+  native Convention checker. Violations and unavailable, old, or failed hosts
+  emit warnings only; the hook never blocks the commit for Convention results.
+  Nested evidence and per-plan `reports/` directories are outside this scope.
+
+##### Setup
+
+- **Blocked when:** never — running `fgos setup` always attempts its work;
+  a shell profile that does not exist is simply skipped rather than
+  refused.
+- **What changes:** for every shell profile the caller actually has (bash's
+  and/or zsh's, whichever exist), the shell helper's source line is added
+  if not already present — never duplicated on a repeat run. The local
+  project config file is also brought up to date: any setting present in
+  the current default schema but missing from the caller's file is added,
+  without ever changing a setting the caller already customized; a config
+  file that already has every current default is left untouched. The same
+  fill-missing-only treatment is applied to the **global** config file
+  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the
+  same default schema the project-local file gets, or fills in any missing
+  key, every time it runs, regardless of which project it's run from;
+  a value the caller already customized at the global level is never
+  overwritten.
+- **Side effects:** the caller's own shell profile file(s), local project
+  config file, and global config file (`~/.fgos/config.json`) may be
+  modified; nothing outside the caller's own environment is touched, and
+  no network access happens.
+- **Afterwards:** the caller sees exactly what changed — which profile
+  file(s) gained the source line (or already had it), which project config
+  settings were newly added (or that none were needed), and which global
+  config settings were newly added (or that none were needed, or that the
+  global file was just created). Nothing is done silently; running `fgos
+  setup` again when everything is already current reports that plainly,
+  without repeating any change.
+
+##### Doctor
+
+- **Blocked when:** never — `fgos doctor` always runs every check and
+  reports the result; it never fails the invocation itself, only reports
+  individual checks as passing or not. Exit stays 0 because `fgctl
+  init|upgrade|repair` run it as their tail and mark the install degraded on
+  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.
+- **What changes:** nothing — this is a read-only diagnostic. It never
+  writes a config file, never modifies a shell profile, and never installs
+  anything, even when a check reports a problem (`config-not-stale`
+  failing on a missing config file reports that plainly rather than
+  creating one).
+- **Side effects:** none.
+- **Afterwards:** the caller sees each named check (Data Dictionary #7) and
+  whether it passed, including enough detail to know what to do next (e.g.
+  which config settings are missing, or that `fgos setup` has not been run
+  yet).
