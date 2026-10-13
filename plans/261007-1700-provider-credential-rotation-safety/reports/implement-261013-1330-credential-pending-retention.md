@@ -50,3 +50,23 @@ Run by the lead on the branch tip after that fix (`npm test`, session variable u
 - The pending copy name is the zero-padded epoch in milliseconds, so the age the check derives from it is right.
 - Open for the reviewer: a pending copy older than a day makes the doctor check fail although waiting for the next
   renewal is a normal state, so the check can be noisy; the one-day threshold is fixed, not configurable.
+
+## Round two: independent review findings
+
+Source: [code-review-261013-1355-credential-pending-retention-independent.md](code-review-261013-1355-credential-pending-retention-independent.md). Each fix below has a test shown red with that one change reverted (the new tests for M3 exercise functions that did not exist).
+
+- **M1, marker written atomically.** `extendOwnershipMarker` (`confinement/cleanup.mjs`) now writes through `writeFileAtomic` (exported from the renewal module). A marker that exists but cannot be parsed makes `removeConfinementDir` throw `ownership-marker-unreadable` instead of deleting the home. Test: "the marker is rewritten through a rename, and a marker that cannot be read stops the removal".
+- **M2, digest ignores `credentialKept`.** `finalizeConfinementResources` (`confinement/authority.mjs`) compares the marker digest without that field. Test: "after the driver cleanup kept a home, the finalizer with the prepared digests still removes the other resources and says why" uses real digests in production order; the reason is `cleanup-failed: credential-home-kept`.
+- **M3, a way out of held.** `settleHeldCredentialHome` (renewal module) and `settleHeldCredentialHomes` (cleanup module): under the account lock, a held home is removed only if the source proves its login is not newer, or the login is staged and applied; otherwise it stays held. Called by refresh-ahead of that account (also when the login is still fresh) and by the new fix registered for `credential-copies-retained`. Tests: not-newer removes; stageable stages, applies, then removes; unjudgeable source plus blocked staging, or a busy lock, keeps; refresh-ahead settles a held home; the fix removes one and keeps one.
+  - Nuance: with an unreadable source but working staging, the login is safe in the pending copies, so the home is removed. The reviewer's "keep" case is covered with staging blocked.
+- **Doctor severity.** Pending or scratch copies older than a day give `passed: true` with a `warning:` prefix; a held home fails, names its home directory and says what `fgos doctor --fix` does; advice differs by kind.
+- **L1.** The attempt that reaches the bound prints "held for the owner".
+- **L2.** Failures less than 15 minutes after the last counted one do not increase the count (`lastCountedAt` in the marker; injected clock in tests).
+- **L3.** Not fixed; recorded as plan open question 8.
+- **(b).** Test through `checkConfinementOrphanedResourcesReaped` with a dead-owner held home (not counted) versus a retrying home (counted).
+- Docs: RUL75, section 13.2, CHANGELOG, distribution.md rows 7 and 7b (only the new id and glosses were inserted; both rows kept).
+
+### Not verified in round two
+
+- Refresh-ahead looks only under the default confinement temp root (injected in tests); homes under a backend-configured temp root are re-checked by the doctor fix only (plan open question 9).
+- No real accounts or real OS read errors.

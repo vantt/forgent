@@ -17,11 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A confined omp account's `agent.db` is now copied into the private home as a consistent SQLite snapshot (write-ahead log included) instead of a raw file, whether or not a dispatch opted in. The lazy-probe unlock now also covers omp accounts (the xai account), which it could not probe before.
 - A confined home whose login was renewed inside it is no longer deleted when the copy cannot be read for a reason that may pass (for example `node:sqlite` is unavailable): it is staged beside the account, and if staging fails the home is kept for a later retry. Staged copies are capped at five per account.
 - A renewed login copy that hits an operating-system read error (permissions, I/O) is now kept for a later renewal instead of being deleted as malformed; only a copy with no store file is dropped. A private home kept because its login could not be staged is retried five times, then held (never deleted for age), and the finalizer no longer stops at it: the dispatch's other resources are still removed.
-- A private home held after repeated staging failures is no longer counted as an orphan that `fgos doctor --fix` would reap.
+- A private home held after repeated staging failures is no longer counted as an orphan that `fgos doctor --fix` would reap. Such a home is re-checked when its account is next renewed and by `fgos doctor --fix`, and removed only once its login is shown applied or obsolete; failed removals less than 15 minutes apart count once, and the ownership marker is written atomically.
 
 ### Added
 
-- `fgos doctor` check `credential-copies-retained`: reports login copies still waiting for a renewal after a day and private homes held after repeated staging failures, by provider/account and age (counts only; never a path or a token), since each may hold the only valid refresh token.
+- `fgos doctor` check `credential-copies-retained`: reports login copies still waiting for a renewal after a day (a warning) and private homes held after repeated staging failures (a failure, naming the home), by provider/account and age and never with a token value, since each may hold the only valid refresh token. `fgos doctor --fix` re-checks held homes.
 
 ## [v0.2.0-rc.4] - 2026-10-13
 

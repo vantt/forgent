@@ -63,7 +63,7 @@ import {
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, listKeptCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -5449,21 +5449,41 @@ export function checkCredentialCopiesRetained({
   if (copies.length === 0 && homes.length === 0) {
     return { passed: true, message: 'no login copy is being retained past its dispatch' };
   }
+  // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
+  // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning.
   const problems = [
-    ...summarizeByAccount(copies, 'pending login copy(ies) waiting for a renewal'),
-    ...summarizeByAccount(held, 'private home(s) held after repeated staging failures (never deleted automatically)'),
+    ...summarizeByAccount(copies, 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
+    ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
     ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
   ];
-  const advice = copies.length > 0 || held.length > 0
-    ? ' -- each holds a refresh token that may be the only valid one; run a dispatch for that account so the next renewal applies it, or recover the login by hand'
-    : '';
-  return { passed: held.length === 0 && copies.length === 0, message: `${problems.join('; ')}${advice}` };
+  const text = problems.join('; ');
+  return held.length > 0 ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+}
+
+export function fixCredentialCopiesRetained({ roots = defaultConfinementTempRoots(), ...options } = {}) {
+  const total = { settled: 0, held: 0 };
+  for (const root of roots) {
+    const { settled, held } = settleHeldCredentialHomes({ tempRoots: [root], ...options });
+    total.settled += settled;
+    total.held += held;
+  }
+  return {
+    changed: total.settled > 0,
+    message: total.settled + total.held === 0
+      ? 'no held private home to re-check'
+      : `re-checked ${total.settled + total.held} held private home(s): ${total.settled} removed, ${total.held} still held`,
+  };
 }
 
 registerCheck({
   id: 'credential-copies-retained',
   description: 'no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied',
   check: () => checkCredentialCopiesRetained(),
+});
+
+registerFix({
+  id: 'credential-copies-retained',
+  fix: () => fixCredentialCopiesRetained(),
 });
 
 export function checkConfinementBwrapPlatform() {
