@@ -50,3 +50,128 @@ Related:
 | R3 proof | [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) |
 | compatibility harness | [../verification/compatibility-harness.md](../verification/compatibility-harness.md) |
 | source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+
+## Restored physical placement layout tree
+
+Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/host-invocation-provider-routing.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.
+
+**Checked status:** This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename.
+
+**Code evidence:** `Cargo.toml:1-17`; `packages/host-runtime/rust/src/registry.rs:19-69`.
+
+````md
+```txt
+Cargo.toml                           # workspace root; herdr-plugin/ excluded in R1
+apps/
+  fgos/                              # crate `fgos`, binary `fgos` — thin CLI adapter
+    src/cli_projector.rs             # argv -> OperationRequest
+    src/cli_presenter.rs             # ProviderOutcome -> fgos.v1 / exit code
+    src/legacy_exec.rs               # CommandRouteDescriptor lookup + Node payload exec
+  gateway/                           # later: thin REST/MCP/remote adapter (repo-layout-vision)
+
+packages/
+  host-runtime/rust/                 # crate `fgos-host-runtime` — the kernel
+    src/contracts.rs                 # OperationId, HostInvocation, OperationRequest, ProviderOutcome, ...
+    src/operation_provider_router.rs
+    src/invocation_service.rs
+    src/authority_gate.rs
+    src/providers/builtin.rs
+    src/remote_host_use_case.rs      # R3
+    src/chat_host_use_case.rs        # later
+    src/registry_linker.rs           # R2
+    src/providers/{external_process,external_wasm}.rs   # R2+
+  distribution/rust/                 # crate `fgos-distribution` — owns distribution.build.show
+  component-protocol/{rust,node}/    # R2: EncodedMessage, framed protocol
+
+bin/fgos.mjs, src/, scripts/, core/ ...   # the Node payload, unmoved (Legacy CLI Transition §2)
+```
+````
+
+## Restored class definitions
+
+Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/external-provider-protocol.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.
+
+**Checked status:** The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped.
+
+**Code evidence:** `packages/host-runtime/rust/src/contracts.rs:377-393`.
+
+````md
+**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceable by default; may expose extension points, but a plugin implementing one does not become the authority owner of the core component. Examples: Work Lifecycle, Host Invocation, authority gating, provider routing, DispatchPlan selection, Assignment/Run/RunResult contracts, init/doctor health.
+````
+
+````md
+**Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configuration, edition, or environment. Follows fgOS release discipline, compatibility policy, init/doctor registration, docs, tests. More trustworthy than a user plugin because fgOS ships it, but disabling it must not corrupt core state or block boot. Examples: optional domain packages, optional coordination protocol packs, optional Herdr/dashboard surfaces.
+````
+
+````md
+| Component class | Common invocation mechanism | Notes |
+|---|---|---|
+| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically released. |
+| Packaged extension | Built-in, ExternalProcess, or ExternalWasm | fgOS-owned but optional; install/init/doctor aware. |
+| User plugin | ExternalProcess or ExternalWasm | User-owned, independently installed; manifest-linked and capability-gated. |
+````
+
+````md
+This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin. Packaging and authority follow component class; runtime calling details follow invocation mechanism.
+````
+
+````md
+```rust
+enum Provider {
+    BuiltIn(Arc<dyn OperationProvider>),
+    ExternalProcess(ProcessRpcClient),
+    ExternalWasm(WasmComponent),
+}
+```
+````
+
+````md
+**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the owning port and authority boundary. Normal mechanism for core components, and may serve packaged extensions fgOS chooses to compile in.
+````
+
+````md
+**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess, or other OS capabilities. Crash/restart and resource isolation are part of the adapter contract.
+````
+
+````md
+**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions are explicit capabilities, not ambient access.
+````
+
+````md
+Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WASM boundaries give.
+````
+
+## Restored package json bin fgos removed pointed at workspace shim at default flip bin fgos runner stays ownership hea
+
+Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.
+
+**Checked status:** FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.
+
+**Code evidence:** `package.json:9-12`; `bin/fgos.mjs:1-10`.
+
+````md
+`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.
+````
+
+## Restored scope
+
+Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/node-to-rust-component-migration.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim.
+
+**Checked status:** The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement.
+
+**Code evidence:** `Cargo.toml:1-17`.
+
+````md
+This document discusses only migration options, ordering, transition stages,
+cutover, and rollback. The stable host model, peer CLI/remote host use cases,
+Operation Provider Router, provider mechanics, protocols, plugin registry,
+authority, and technical tradeoffs live in
+[Host Invocation And Provider Routing Architecture](./host-invocation-provider-routing.md).
+Component ownership, authority boundaries, and the physical placement compass
+for files/crates/components live in
+[fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md);
+every native migration slice must read it before choosing where a provider or
+component module lives.
+The executable work breakdown lives in
+[Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md).
+````
