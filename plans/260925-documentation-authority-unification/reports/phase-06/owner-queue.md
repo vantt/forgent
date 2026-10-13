@@ -241,3 +241,9 @@ Lead action: the A31 follow-up in `review-request-2-main-merge.md` and `a31Follo
 Two full-digest-equal moves and five supersedes are proposed pending, with complete current shown text/digests and no approval carried from old IDs. These are source obligations, not eligible candidate reverse units; no new owner holds are granted. All 496 actual reverse units qualify under A28 and exactly equal the list, with zero missing/additional and all 342 exception identity groups equal.
 
 Original three Rings holds remain. No new archive/delete, physical history move, real-content conflict, promoted/current-doc edit, gate/checker/baseline/vocabulary change or main-checkout write. Step 3 and final post-merge closure remain UNPROVEN until the seven new source rows are independently accepted; the working registry is deliberately uncommitted and checksum-pinned meanwhile. One combined report only, then approved bindings, both-prior proofs, registry persistence and Step 3.
+
+## Main-sync check accepted; no blocking follow-up
+
+`c46785eca` accepts all 39 re-pins and seven newly live source bindings; notes and immutable pins are applied. D is zero-fatal against both priors; full native scoped E equals exactly the three Rings holds, 342 exception identity groups and 457 eligible candidate-unverified rows. Agent Coordination is CLOSED after the main sync and its actual working registry is being persisted.
+
+Deferred to promotion only, not fixed now: the optional explicit no-new-CLI-verb sentence, whole-section display for heading-source packs, and explicit section naming in the two audit rationales (report Non-blocking notes). The 134 actually changed-code receipts remain unverified under A31. No new archive/delete, real conflict, physical move, promoted-doc edit, frozen-rule change or main-checkout write. Next: Step 3 sequentially under A28, with its checkpoint review.

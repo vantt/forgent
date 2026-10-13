@@ -2,9 +2,9 @@
   "version": 1,
   "batch": "agent-coordination",
   "authorization": "A28/A31",
-  "authoredCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-  "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set. All eligible content remains unverified until the A28 batch sample/promotion review. Includes 134 receipts with changed code and 39 byte-equal re-pins awaiting an independently committed machine review; their original receipts remain unchanged.",
-  "count": 496,
+  "authoredCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
+  "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
+  "count": 457,
   "rows": [
     {
       "claimId": "claim_fd8bcb5566a563b9e7304c1786c5f373",
@@ -116,66 +116,6 @@
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "5cad062cf07ace795aaffb222b30bc310244b292e211708a9effee5d90892e98",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_e134b71a09a0a8fd7c62eef87959daf4",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-14",
-      "unitDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_c7c1506a1c8d6e7bfe85935c0868d924",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-15",
-      "unitDigest": "76d215590439cb81c3b2cf2c436f9232b4e67a3670186038b25c43c774f80d0b",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_95d630cee33a4aee7d6a44e1e0a3c4a9",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-16",
-      "unitDigest": "35ebb378e8d447d5f996404dad8eec4626b4f00311d2221a450ee6eb418c21ad",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_7731fbd40c6c0d51f94c7e55b93c0925",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-17",
-      "unitDigest": "eaec6dc020fab8b2c62e171dce457ad67da1e92ed6d7310280c9a18593db508e",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -431,36 +371,6 @@
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "unheaded-block-20",
       "unitDigest": "3d50fb225e2c762e81ebf3ce66cc27a877d7a3f372660184ab6235eecebd4477",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_4ec4e0906acc7fb09ca51129030e7230",
-      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
-      "anchor": "unheaded-block-14",
-      "unitDigest": "dda2de3ff221e2646b7a686c931fe6dfeb234cfd913cd8a7487bf437415f7785",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_c38104d8972032b3b20db9bca5321871",
-      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
-      "anchor": "unheaded-block-15",
-      "unitDigest": "f058552f4b52d313e8f86aca9c70ac756a42145757a31ba6b58099f5945534be",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -832,70 +742,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3c55901c64cdf2f99a36062302427fcb",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "2-identity-and-existing-reality",
-      "unitDigest": "40e8420ecedfdc8389c27e6a3e7b8446da8062301b6a306fd601f59de579c8fd",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_edf9b5d6a4118579e66fcdedf2a0e66a",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-6",
-      "unitDigest": "36446e8234df1d9b71b5689bee83d41fa25dd3ef34eb8e6ea79c31641a74b4ad",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_c4ccebca77d2e1f1240fb4a3588803bd",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-7",
-      "unitDigest": "92cf91fdafe6f647dcb2221e43f4ce687a88415b3a75437899771b413d16bcd6",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_b96fca80beff1423d12f5644b5118a8f",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "4-recovery-choice",
       "unitDigest": "4d4b34182c1b63b2f3f050cd4111b2fba219a7857e41f102b59856b454809d00",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_67592e838ebefa5d77fb98b4af14e367",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "6-local-concurrency-and-durability",
-      "unitDigest": "b54abb5801b4e539ddd8dc29f1135d06a751a9833cd45a7fd27e72aff7b63cd6",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -937,40 +787,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_eb8aa75ad4ff996ab1f5f477c6bbb630",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-32",
-      "unitDigest": "fdec51c73bc036c0e680a60d482fb1ecc9e81e0b092639d33b9e5974833f1ad4",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_abd6501a89d2a8c792735eeda9550306",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "unheaded-block-33",
       "unitDigest": "a14c802a8c352309fd3079bcab98c31477502e299dc4d0b24e1097d1efdb0e85",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_260feeee6a60be662bdda8b9b7666412",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-34",
-      "unitDigest": "716b58c5f151140195596e7539a793527c003faf50948f0fb0193233398f1d92",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -1372,40 +1192,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6b9d77ea4dcd08cde0c9003939ebc000",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "27ed3816193e24b624b27dc8db157ce4b0becb3b6647ae1604414ea1e44b35e1",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_b54ea02037ae7c1a9d9a416d32a8f605",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "implementation-and-design-status",
       "unitDigest": "a00fc58404877c13a6aab83779a6fb62e5dbdfe91a024c3f9c9f0cb981427ffa",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_d375b290e2ac560a3ea02781d5715e7b",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-3",
-      "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
       "fileStatus": {
         "kind": "contract",
         "kindCanonical": true,
@@ -1432,160 +1222,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c7d3e8ef6acdffb1b08e61d5b5bd4d9a",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-7",
-      "unitDigest": "8305af07b5cc1dfb4abafe35643b56651fee378610fe1722422cafde6213fb65",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_456ad50a7253122ec3610059e0779e03",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-8",
-      "unitDigest": "9fe7fb81663c9b4a1776063cb5507a962b567dfeb4abfc56cf9568bfb82f9e09",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_59f6314467565caef24f13c7338a59be",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-15",
-      "unitDigest": "fdf16c7b6c6e97fb86f217bd1c120f4eaaaa2b7b3f94eafe45b19952f6240c21",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_041ac1009b965096340a81e9c4503cdc",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-16",
-      "unitDigest": "de49f21a79c2e1210ce53e02a812a1543bebc2c44330ee9bb80b3ac90c957f5c",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_da2ae48948793578312ac28653ea94a1",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-17",
-      "unitDigest": "fd7534633ff32b3b169a69223159dae4a84f85f6e60e7a5c47e9f582678c63e2",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_322d2c6df8da103a227d25767f5db2dd",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-18",
-      "unitDigest": "92b7fc3962d8526dffe7d9828551775e3475c88042d386d34e125d9ef0bf663e",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_1566bd6207fd7d92e2df1af41f8d6282",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-19",
-      "unitDigest": "56204f37d31709c9f12dae208cf709ee21a707c9d8c79bc959832227fcbe079a",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_92334b1c898f23a57c6d60f3c737f4d9",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-20",
-      "unitDigest": "1aa07833512c49fad7980356d992800a57bf2bac63398a662f1b5b595e3bf3d5",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_2d967da655fb640e62cbbc74cc394b89",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-21",
-      "unitDigest": "9251008d29a480cf3aa8ff30eb72389256c4963c7e7677e1f075f55256f0c0de",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_ce9cf7041e0794dd190740863312964a",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-22",
-      "unitDigest": "5e464682f0c67ba75942629eaf249ac37f2273e88fdf76b79c6e3510fd684698",
       "fileStatus": {
         "kind": "contract",
         "kindCanonical": true,
@@ -2426,96 +2066,6 @@
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "unheaded-block-7",
       "unitDigest": "29ea138a6e7de9c59a912c5aacdab53150c7969bd9fc5eda44bf67a02fdf7355",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_9e78656a9656a956d8d18436eb513951",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot",
-      "unitDigest": "0f92ff45e3f725fe4903ac850e30385d1199d6278c8a8ec2afd54232cce813bd",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_25a8cfce7bd6938196e6b4ef2e4c02d9",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "71a2d0b002b69d549be7a107e175e1dd8c54903c28734e84dbf75218eb5319de",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_9950fd6826b0086a4413fdb3d1834075",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "context",
-      "unitDigest": "c91b14b9a4ae7b59bba753d6cb386d9d883a3ddd59a3abcd0da593e34d1c6029",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_a8344e1a43226394f04114d9f4270ce2",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "unheaded-block-3",
-      "unitDigest": "0e13876e4a761e17e1a93c5a254d556e8dddabefcd233e548e78bbf825030604",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_5a220e0966cb9c6872f42b471150726b",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "decision",
-      "unitDigest": "5622c06276f32ad74efed999035410c8d752835bbe3f671d5ac3368f4555384c",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_1a0fd8e46885b7343da2f7c6cae17f2d",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "unheaded-block-5",
-      "unitDigest": "997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
@@ -5902,21 +5452,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c080b888b647a84ccf899f6d715b0832",
-      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "anchor": "unheaded-block-24",
-      "unitDigest": "9dd0abd09deade74c19beda55a72aa00dee88305e83b66fc6ef2f6e9b3c568fc",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_8fb492a981f290167a6570db53670957",
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "anchor": "unheaded-block-28",
@@ -5936,36 +5471,6 @@
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "anchor": "unheaded-block-29",
       "unitDigest": "afc662ebf617322b58edb31a6400643547ef07484a3264a20fae72f96eaec484",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_2c7ca6512f1870baa15c6be84b52c0eb",
-      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "anchor": "unheaded-block-33",
-      "unitDigest": "ceff29b5e89f139a1e246e71440ba41ad5e6b3d46d1297c8cedbdd671ceb3d56",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_1c0c3cdd5486263d84af20ce969ece4c",
-      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "anchor": "unheaded-block-36",
-      "unitDigest": "ced47404abe27dcf3984b8d1b62c02e37787e2654eeb7af864d3272a2b9284e0",
       "fileStatus": {
         "kind": "proposal",
         "kindCanonical": false,
@@ -6607,70 +6112,10 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4b558ff641410c3268750f6261d1fc44",
-      "path": "docs/platform/agent-coordination/vision.md",
-      "anchor": "unheaded-block-16",
-      "unitDigest": "39b03335c44fcb778cf7ee00cf3266ebf92a333145f6ef7c5b976630bb945445",
-      "fileStatus": {
-        "kind": "vision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
       "claimId": "claim_ec65cf3925cb637f4aafe92848838fce",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-17",
       "unitDigest": "34d84522e6e64aa803135298efed9746a108d59ca182a2312879f46b95090dd1",
-      "fileStatus": {
-        "kind": "vision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_013abd94027531328ddccf8b8ea8a056",
-      "path": "docs/platform/agent-coordination/vision.md",
-      "anchor": "unheaded-block-28",
-      "unitDigest": "9f86c10b3db679c6b1e77b8adbe126822d323fa1b106dcf3b90a6d8bf4e1a68f",
-      "fileStatus": {
-        "kind": "vision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_0605d63a7150fccffd52a88a25b08b36",
-      "path": "docs/platform/agent-coordination/vision.md",
-      "anchor": "v-006-planning-is-pluggable-and-composable",
-      "unitDigest": "eac723e36bcb6926e0680aaf014a1403ef242dd5daf271173e8c1421d30c6f0c",
-      "fileStatus": {
-        "kind": "vision",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_a2a8446112a1203bd413ab67e787ac52",
-      "path": "docs/platform/agent-coordination/vision.md",
-      "anchor": "unheaded-block-31",
-      "unitDigest": "196b1ff54d776e4ff08ce7f645dbdf2224eb15fdb01bbb16f6d10c42526b2b67",
       "fileStatus": {
         "kind": "vision",
         "kindCanonical": true,
@@ -6881,36 +6326,6 @@
       "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "anchor": "unheaded-block-25",
       "unitDigest": "66410c957b7b60c796d4f3d8c325dca7117da1a5179ba6fee375feb139454c8c",
-      "fileStatus": {
-        "kind": "vocabulary",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_6bfeb31815aec16a77273fcc7d7a2af4",
-      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "anchor": "stance",
-      "unitDigest": "880c39ba956eea4e56074fa44cb88a6c771452f58d9bfa0404834d63f40ee470",
-      "fileStatus": {
-        "kind": "vocabulary",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Candidate",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_58b4cd24ec90b542b6099676b59ee117",
-      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "anchor": "unheaded-block-26",
-      "unitDigest": "fa955fd843b1e5476c55fa41c58ce988c9a2ed21d12405880b77767052038fdf",
       "fileStatus": {
         "kind": "vocabulary",
         "kindCanonical": true,

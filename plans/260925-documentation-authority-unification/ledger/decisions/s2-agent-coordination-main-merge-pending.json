@@ -13,9 +13,19 @@
       "targetAnchor": "decision",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#decision is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried.",
+      "reviewNote": "Decision carries fgos-advise owning routing and handing a named Workflow or preset to fgos-group-thinking; the old execution-door and pack wording is replaced by not a current protocol-pack gate; no private execution path is carried.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cdb22d6a5f42ae3a58e87493b0d7828e1f364ce9b0ddc43835a91f94264e988b",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     },
     {
       "claimId": "claim_3996ecc3d148fff06ead0332614567d3",
@@ -24,9 +34,19 @@
       "targetAnchor": "baseline-ux-audit",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried.",
+      "reviewNote": "The caveat that the audit table predates fgos-panel, now fgos-advise, is carried by the Baseline UX audit opening sentence with added historical qualifiers.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4ca30eb078631d99f2559bb221ecd5f6ac3f302c67c4ec61232c20b0e1fe91d4",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     },
     {
       "claimId": "claim_7cac83d6593ca533fed2df39bd60c46c",
@@ -35,9 +55,19 @@
       "targetAnchor": "baseline-ux-audit",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#baseline-ux-audit is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried.",
+      "reviewNote": "Ten of twelve audit rows are carried verbatim in order; the direct coordination run/show row is replaced by a historical row and the coding decision panel row by routing to fgos-run.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4ca30eb078631d99f2559bb221ecd5f6ac3f302c67c4ec61232c20b0e1fe91d4",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     },
     {
       "claimId": "claim_0893be1de04c49bd33bdfc9a98df6d89",
@@ -46,9 +76,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "The complete imported main unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7 has exactly the same native text digest as docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7; this is proposed verbatim conservation, not a code-truth or promotion approval."
+      "rationale": "The complete imported main unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7 has exactly the same native text digest as docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-7; this is proposed verbatim conservation, not a code-truth or promotion approval.",
+      "reviewNote": "Move with equal digests; the vocabulary table is identical, including the panel row naming fgos-advise.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "2f3aed1c2c86a1e39301d385bcc233d7b4d1f2a6f7d316b655356e3d6ba26b00",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Vocabulary Evaluation"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     },
     {
       "claimId": "claim_58560c392f9b61dd94d592f0cb4a75d8",
@@ -57,9 +98,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "The complete imported main unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8 has exactly the same native text digest as docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8; this is proposed verbatim conservation, not a code-truth or promotion approval."
+      "rationale": "The complete imported main unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8 has exactly the same native text digest as docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-8; this is proposed verbatim conservation, not a code-truth or promotion approval.",
+      "reviewNote": "Move with equal digests; the pointer paragraph to request-kinds-and-routes.md and the fgos-advise skill is identical with its links.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b7c8760c894fef840cef9630c446a32f9ebcd8b838d6b82676968f2eb3d5a0e7",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Surface Taxonomy"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     },
     {
       "claimId": "claim_8f632c41e8a069dbfdfa1ea31994f14e",
@@ -68,9 +120,19 @@
       "targetAnchor": "entry-point-choice",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#entry-point-choice is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#entry-point-choice is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried.",
+      "reviewNote": "Advise, architecture-panel and group-thinking rows are carried by the Entry-point choice first sentence; the code-panel row is replaced by fgos-run, and the coordination run/show and replay rows by retired doors not current with status by Workflow run id.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "f9a3e8adf40d2ed782b6be16bcfe024b92a46769b35b36c03a3c5cfa984b0b96",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     },
     {
       "claimId": "claim_cb0fc46cc04ed129b871f1c2a44fcb61",
@@ -79,9 +141,21 @@
       "targetAnchor": "b-add-fgos-advise",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried."
+      "rationale": "Main 97ca636f905947ec332575dd8c5c9dc616228f28 supplies this new source unit after the old identity received an accepted successor decision. The existing candidate docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise is proposed as the whole-unit current routing/audit successor; claim-bearing differences are explicit supersession, not a byte-identical move. Independent conservation review of this newly live claim is still required; no approval from the old identity is carried.",
+      "reviewNote": "Heading and section body reviewed whole: one entrypoint and canonical table are carried; delegation to the pack gate and registered protocol is replaced by Workflow and CollaborationPattern owners keeping execution semantics; specialist skills remain via Alternatives C.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+      "targetAncestry": [
+        "Group Thinking Trigger Surface",
+        "Alternatives Considered"
+      ],
+      "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c"
     }
-  ]
+  ],
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md"
 }
