@@ -15,8 +15,15 @@
       "targetAnchor": "file-block",
       "targetUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Manifest file-block grows by three added file entries (provider-account-probe.mjs, provider-credential-renewal.mjs, project-launcher.mjs), all main additions; three-way merge equals HEAD. No old entry removed or changed."
     },
     {
       "claimId": "claim_d52f4222d940558ef34a2d7c0f174628",
@@ -27,8 +34,18 @@
       "targetAnchor": "unheaded-block-10",
       "targetUnitDigest": "1d6df4038cd801c79a791a0ccca5621ce632a7f8b33a07983cc7d4220e79b05c",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Dispatch Control Plane",
+        "Routing Identities"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Platform dispatch-control-plane unheaded-block-10 (lines 80-86): the three-line capability entry is replaced by main's exact block, as stated in the conflict resolution. The shown successor text is identical to the architect file's block (same digest 1d6df403...). The only file with a merge conflict; resolution is limited to this block (rest equals the three-way result). The replaced 'bound only by prefer; for[] does not bind' wording is superseded by main itself."
     },
     {
       "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
@@ -39,8 +56,18 @@
       "targetAnchor": "unheaded-block-11",
       "targetUnitDigest": "6bea55eabbf3ca711b55d4bee07df1e778082b2c93056e32cd2385c41465f4df",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Component Boundary",
+        "4. Current High-Level Components"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. component-boundary row 'Dispatch Transport & Confinement' ends with 'adapters.' in the old text; main extends it with the bwrap driver's credential-renewal call and the dependency note. Pure append to one table cell; three-way equals HEAD; nothing lost."
     },
     {
       "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
@@ -51,8 +78,18 @@
       "targetAnchor": "unheaded-block-4",
       "targetUnitDigest": "c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "2. Entry Points"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. packaging-distribution spec table gains one inserted row for the `fgos` launcher (line 6); all old rows unchanged. Main-only addition; three-way equals HEAD."
     },
     {
       "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",
@@ -63,8 +100,19 @@
       "targetAnchor": "unheaded-block-140",
       "targetUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Agent Confinement Authority",
+        "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
+        "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. confinement-authority block (lines 1357-1359): item 2 gets an inserted sentence on per-CLI credentialSources (RUL80); item 3 replaces 'thật;' with a longer clause about the leased account's own store (RUL78). Only a closing fragment of the old item 3 is rewritten, and its content is preserved in the longer clause; three-way equals HEAD."
     },
     {
       "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
@@ -75,8 +123,18 @@
       "targetAnchor": "unheaded-block-14",
       "targetUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Business Rules"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. distribution.md RUL14 is rewritten by main into a 'moved' pointer to runner.md RUL74 (and RUL75 / row 5d), and RUL17 (project fgos launcher) is appended to the unit. Old RUL14 body is verified intact in runner.md RUL74 at HEAD (auth-token, one real call per account, codex exec / pi -p, 30 minute cooldown, auth-token-only, agy no call, probe passed by callers); the one reworded reason (token use-up in a copy vs owner home and renewal) is main's own change. Three-way equals HEAD. Content moved, not lost."
     },
     {
       "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
@@ -87,8 +145,18 @@
       "targetAnchor": "unheaded-block-5",
       "targetUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. distribution.md table (rows 5d, 7, 7b): 5d appends account-locks directory text and a 'now in runner.md' pointer; 7 gains project-fgos-launcher and credential-copies-retained in the check list; 7b swaps in credential-copies-retained in the registered fixes text. All changes are insertions or short tail rewrites from main; three-way equals HEAD."
     },
     {
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
@@ -99,8 +167,20 @@
       "targetAnchor": "unheaded-block-148",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0005 — Runner & cô lập worker",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Boilerplate line 'Đổi quyết định này = supersede...' is textually identical (digest 95a357e2...). Anchor 144 to 148 follows a uniform +17 line shift from main; occurrence 1 of 19 maps to occurrence 1 of 19 in the same order (1608 to 1625). Repeated-digest identity, no text change."
     },
     {
       "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
@@ -111,8 +191,20 @@
       "targetAnchor": "unheaded-block-153",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0008 — Routing theo audience của từng interface",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 149 to 153, line 1636 to 1653 (+17); occurrence 2 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
@@ -123,8 +215,20 @@
       "targetAnchor": "unheaded-block-165",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 161 to 165, line 1745 to 1762 (+17); occurrence 3 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
@@ -135,8 +239,20 @@
       "targetAnchor": "unheaded-block-174",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 170 to 174, line 1829 to 1846 (+17); occurrence 4 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
@@ -147,8 +263,20 @@
       "targetAnchor": "unheaded-block-239",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 235 to 239, line 2353 to 2370 (+17); occurrence 5 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
@@ -159,8 +287,20 @@
       "targetAnchor": "unheaded-block-248",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 244 to 248, line 2442 to 2459 (+17); occurrence 6 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
@@ -171,8 +311,20 @@
       "targetAnchor": "unheaded-block-272",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 268 to 272, line 2623 to 2640 (+17); occurrence 7 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
@@ -183,8 +335,20 @@
       "targetAnchor": "unheaded-block-284",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+        "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+        "Hệ quả"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Identical boilerplate line; anchor 280 to 284, line 2735 to 2752 (+17); occurrence 8 of 19 in both versions. No text change."
     },
     {
       "claimId": "claim_b91c86788522c3516bef2c7bab859093",
@@ -195,8 +359,18 @@
       "targetAnchor": "unheaded-block-79",
       "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Business Rules"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. runner.md line 1052 (RUL-era note on execute --for): main inserts '(không kèm executor)' and replaces 'thẳng,' with a clause that RUL76 reopens `execute <id> --for <capability>`. Pure insertion plus clause extension; three-way equals HEAD. Request display trims the two leading spaces of the line, the digest is unaffected."
     },
     {
       "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
@@ -207,8 +381,18 @@
       "targetAnchor": "unheaded-block-9",
       "targetUnitDigest": "daf2341d585c13bd3e7f44184eb0b61402e41abf7ac9ae8a987b200a83f51c9e",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval."
+      "reviewStatus": "reviewed",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval.",
+      "targetAncestry": [
+        "Spec: Runner (vòng tự hành)",
+        "Data Dictionary"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. runner.md data-dictionary row 1b (line 73): main appends the credentialSource / credentialSources (RUL80) clause at the end of the Values cell; the prefix is unchanged. Three-way equals HEAD."
     }
   ]
 }

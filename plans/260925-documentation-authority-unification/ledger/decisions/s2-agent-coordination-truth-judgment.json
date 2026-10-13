@@ -103,10 +103,10 @@
       "targetAnchor": "routing-identities",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:5@2026-10-13",
       "rationale": "The committed reviewer rejected this specific binding: LEG:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): Routing Identities target keeps the for[] binding path (lines 81-83) that contradicts resolve.mjs:255-266 where an executor for never binds a purpose; only prefer binds. The corrected current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities now states the code-checked boundary in Routing Identities; evidence: src/runner/dispatch/resolve.mjs:25-66; src/runner/dispatch/resolve.mjs:255-309. The disposition supersede and carriage carrier stay unchanged. This is a pending current-text rebinding, not a new file move, retirement or inherited approval. The source claim ID/digest and its accepted complete historical carriage are retained; the full shown target digest is renewed and requires independent targeted review. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only.",
-      "reviewNote": "legacy:architecture/dispatch-control-plane.md#routing-identities -> architecture/dispatch-control-plane.md#routing-identities (supersede): supersede heading; target Routing Identities text true against resolve.mjs:269-310 and prefer-only binding; for[] defect fixed",
+      "reviewNote": "Rebound heading row. The source heading digest changed because main edited the fence inside the section; the recomputed digest equals ba8ccc03... and the full shown source and target sections equal the files at HEAD. Target now carries main's tool-executor wording from the merge. The rationale is true for the merge; the carried reviewNote (\"prefer-only binding; for[] defect fixed\") describes the pre-merge target and is superseded by this verdict. Anchor resolves.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -116,10 +116,15 @@
       },
       "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a"
     },
     {
       "claimId": "claim_0fc7c6e612423aa78420e2b5ad63f1bf",
@@ -2034,12 +2039,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "reviewNote": "legacy:architecture/dispatch-control-plane.md#unheaded-block-9 -> architecture/dispatch-control-plane.md#routing-identities (supersede): supersede old purpose paragraph; target drops nonexistent resolveExecutorIdForPurpose (git grep none) and keeps plan.mjs:91 selector label; true",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Rebound purpose-paragraph row (architect unheaded-block-9). The unit is unchanged by main and the shown text equals lines 66-78. It is carried into the same Routing Identities target, whose shown text equals the file. The rationale's A31 sentence is accurate. The carried reviewNote still holds, since it concerns the purpose paragraph and not the fence.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a"
     },
     {
       "claimId": "claim_ad2493c325d75127139698ed4a34592b",
@@ -9298,8 +9308,8 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "routing-identities",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "reviewNote": "legacy:architecture/dispatch-control-plane.md#unheaded-block-8 -> architecture/dispatch-control-plane.md#routing-identities (supersede): supersede old identity block (prefer/overrides then for[]); target now states prefer-only per resolve.mjs:269-310 and names for[] as non-binding",
+      "reviewStatus": "reviewed",
+      "reviewNote": "Native new source unit: the architect code fence (unheaded-block-8, lines 58-64) with main's \"(kind \"tool\" executors only)\" line. The shown text equals the file, and its digest equals the identical fence in the target (platform unheaded-block-10), so the target carries the whole changed fence. The old fence identity is not duplicated in this table, and the successor binding matches main's diff. The carried reviewNote (\"target ... names for[] as non-binding\") is false against the current fence and must not be copied; use this note.",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
         "targetAnchor": "routing-identities",
@@ -9309,10 +9319,15 @@
       },
       "shownTargetDigest": "c7634d6197f50b6174b05b60d0164fac0837a06cce0efe17c6cd71abdf38c720",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
       "targetAncestry": [
         "Dispatch Control Plane"
-      ]
+      ],
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a"
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
@@ -9322,12 +9337,22 @@
       "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
       "sourceUnitDigest": "58d62d1e2fb7ced0af3003179e67762eda8bb0b99d37ed17185eb92dafb80d52",
       "disposition": "supersede",
-      "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
-      "targetAnchor": "routing-identities",
-      "targetUnitDigest": "7829c9c2262ec408f1212c5408dbd496856b97f8a64fa7ab1953f18ac8f60a6b",
+      "targetOwner": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "targetAnchor": "unheaded-block-8",
+      "targetUnitDigest": "1d6df4038cd801c79a791a0ccca5621ce632a7f8b33a07983cc7d4220e79b05c",
       "authoredBy": "codex-session:5@2026-10-13",
-      "reviewStatus": "pending",
-      "rationale": "A31: the native gap preserves the former code-fence identity; upstream replaces it with the tool-executor-only capability fallback. Current Routing Identities is the same-subject successor. Full old/current text is shown for independent conservation review, with no approval carry."
+      "reviewStatus": "reviewed",
+      "rationale": "A31: the native gap preserves the former code-fence identity; upstream replaces it with the tool-executor-only capability fallback. Current Routing Identities is the same-subject successor. Full old/current text is shown for independent conservation review, with no approval carry.",
+      "targetAncestry": [
+        "Dispatch Control Plane",
+        "Routing Identities"
+      ],
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-boundary-gaps.md",
+      "reviewReportCommit": "168a27c6c704854b4777792e6632302f1616c65a",
+      "reviewMode": "ordinary",
+      "reviewNote": "ok. Old docs/architect dispatch-control-plane unheaded-block-8 (lines 58-64 at 63af2a5f9) gains only ` (kind \"tool\" executors only)` on the runner.executors.<id>.for[] line; three-way merge of pre-merge, merge-base and main equals HEAD byte for byte, so main's diff alone explains it. All other lines preserved; nothing lost."
     }
   ]
 }

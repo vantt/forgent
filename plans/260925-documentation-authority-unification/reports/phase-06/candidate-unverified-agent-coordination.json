@@ -1,10 +1,10 @@
 {
   "version": 1,
   "batch": "agent-coordination",
-  "authorization": "A28 + A31",
-  "authoredCommit": "0653419c19e7c37d8d00408ad482cdecbd45a807",
+  "authorization": "A28 + A31; committed machine re-pin verdicts applied",
+  "authoredCommit": "168a27c6c704854b4777792e6632302f1616c65a",
   "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
-  "count": 531,
+  "count": 488,
   "rows": [
     {
       "claimId": "claim_934febe56562f8195a08b9f82f9fcce5",
@@ -441,111 +441,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_39e4f58e68986802a16d978b42f5a1db",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-9",
-      "unitDigest": "38517e6c917bb4e21624a0e07b496579d6190b6adb9983f5fe18e16c3526eeb8",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_39e4f58e68986802a16d978b42f5a1db",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-closure-current-earlier.md row claim_f2b49dde03982181f6b70e8673696528; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_e134b71a09a0a8fd7c62eef87959daf4",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-14",
-      "unitDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_e134b71a09a0a8fd7c62eef87959daf4",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_c7c1506a1c8d6e7bfe85935c0868d924",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-15",
-      "unitDigest": "76d215590439cb81c3b2cf2c436f9232b4e67a3670186038b25c43c774f80d0b",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_c7c1506a1c8d6e7bfe85935c0868d924",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_95d630cee33a4aee7d6a44e1e0a3c4a9",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-16",
-      "unitDigest": "35ebb378e8d447d5f996404dad8eec4626b4f00311d2221a450ee6eb418c21ad",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_95d630cee33a4aee7d6a44e1e0a3c4a9",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_7731fbd40c6c0d51f94c7e55b93c0925",
-      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
-      "anchor": "unheaded-block-17",
-      "unitDigest": "eaec6dc020fab8b2c62e171dce457ad67da1e92ed6d7310280c9a18593db508e",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_7731fbd40c6c0d51f94c7e55b93c0925",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
       "claimId": "claim_152a79cb71cac537e0b97b61f9f875f0",
       "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "anchor": "group-thinking-trigger-surface",
@@ -799,48 +694,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_4ec4e0906acc7fb09ca51129030e7230",
-      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
-      "anchor": "unheaded-block-14",
-      "unitDigest": "dda2de3ff221e2646b7a686c931fe6dfeb234cfd913cd8a7487bf437415f7785",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_4ec4e0906acc7fb09ca51129030e7230",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_c38104d8972032b3b20db9bca5321871",
-      "path": "docs/platform/agent-coordination/architecture/protocol-model.md",
-      "anchor": "unheaded-block-15",
-      "unitDigest": "f058552f4b52d313e8f86aca9c70ac756a42145757a31ba6b58099f5945534be",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_c38104d8972032b3b20db9bca5321871",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_7604ae0924601f519d2a1bed6fe387e2",
@@ -1203,69 +1056,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3c55901c64cdf2f99a36062302427fcb",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "2-identity-and-existing-reality",
-      "unitDigest": "40e8420ecedfdc8389c27e6a3e7b8446da8062301b6a306fd601f59de579c8fd",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_3c55901c64cdf2f99a36062302427fcb",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_edf9b5d6a4118579e66fcdedf2a0e66a",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-6",
-      "unitDigest": "36446e8234df1d9b71b5689bee83d41fa25dd3ef34eb8e6ea79c31641a74b4ad",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_edf9b5d6a4118579e66fcdedf2a0e66a",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_c4ccebca77d2e1f1240fb4a3588803bd",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-7",
-      "unitDigest": "92cf91fdafe6f647dcb2221e43f4ce687a88415b3a75437899771b413d16bcd6",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_c4ccebca77d2e1f1240fb4a3588803bd",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
       "claimId": "claim_b96fca80beff1423d12f5644b5118a8f",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "4-recovery-choice",
@@ -1279,27 +1069,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_67592e838ebefa5d77fb98b4af14e367",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "6-local-concurrency-and-durability",
-      "unitDigest": "b54abb5801b4e539ddd8dc29f1135d06a751a9833cd45a7fd27e72aff7b63cd6",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_67592e838ebefa5d77fb98b4af14e367",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_8abb20ad8e9ee0951a7b30dd06e847e2",
@@ -1332,27 +1101,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_eb8aa75ad4ff996ab1f5f477c6bbb630",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-32",
-      "unitDigest": "fdec51c73bc036c0e680a60d482fb1ecc9e81e0b092639d33b9e5974833f1ad4",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_eb8aa75ad4ff996ab1f5f477c6bbb630",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
       "claimId": "claim_abd6501a89d2a8c792735eeda9550306",
       "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "anchor": "unheaded-block-33",
@@ -1366,27 +1114,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_260feeee6a60be662bdda8b9b7666412",
-      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
-      "anchor": "unheaded-block-34",
-      "unitDigest": "716b58c5f151140195596e7539a793527c003faf50948f0fb0193233398f1d92",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_260feeee6a60be662bdda8b9b7666412",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_ad7c469358814caa087339a2794e1d3d",
@@ -1779,27 +1506,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6b9d77ea4dcd08cde0c9003939ebc000",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "27ed3816193e24b624b27dc8db157ce4b0becb3b6647ae1604414ea1e44b35e1",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_6b9d77ea4dcd08cde0c9003939ebc000",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
       "claimId": "claim_b54ea02037ae7c1a9d9a416d32a8f605",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "implementation-and-design-status",
@@ -1813,27 +1519,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_d375b290e2ac560a3ea02781d5715e7b",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-3",
-      "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_d375b290e2ac560a3ea02781d5715e7b",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_e1006302cec44bf7ea58a63ed94983d8",
@@ -1851,48 +1536,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c7d3e8ef6acdffb1b08e61d5b5bd4d9a",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-7",
-      "unitDigest": "8305af07b5cc1dfb4abafe35643b56651fee378610fe1722422cafde6213fb65",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_c7d3e8ef6acdffb1b08e61d5b5bd4d9a",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_456ad50a7253122ec3610059e0779e03",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-8",
-      "unitDigest": "9fe7fb81663c9b4a1776063cb5507a962b567dfeb4abfc56cf9568bfb82f9e09",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_456ad50a7253122ec3610059e0779e03",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
       "claimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
       "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "anchor": "unheaded-block-9",
@@ -1906,174 +1549,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_59f6314467565caef24f13c7338a59be",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-15",
-      "unitDigest": "fdf16c7b6c6e97fb86f217bd1c120f4eaaaa2b7b3f94eafe45b19952f6240c21",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_59f6314467565caef24f13c7338a59be",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_041ac1009b965096340a81e9c4503cdc",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-16",
-      "unitDigest": "de49f21a79c2e1210ce53e02a812a1543bebc2c44330ee9bb80b3ac90c957f5c",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_041ac1009b965096340a81e9c4503cdc",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_da2ae48948793578312ac28653ea94a1",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-17",
-      "unitDigest": "fd7534633ff32b3b169a69223159dae4a84f85f6e60e7a5c47e9f582678c63e2",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_da2ae48948793578312ac28653ea94a1",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_322d2c6df8da103a227d25767f5db2dd",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-18",
-      "unitDigest": "92b7fc3962d8526dffe7d9828551775e3475c88042d386d34e125d9ef0bf663e",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_322d2c6df8da103a227d25767f5db2dd",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_1566bd6207fd7d92e2df1af41f8d6282",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-19",
-      "unitDigest": "56204f37d31709c9f12dae208cf709ee21a707c9d8c79bc959832227fcbe079a",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_1566bd6207fd7d92e2df1af41f8d6282",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_92334b1c898f23a57c6d60f3c737f4d9",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-20",
-      "unitDigest": "1aa07833512c49fad7980356d992800a57bf2bac63398a662f1b5b595e3bf3d5",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_92334b1c898f23a57c6d60f3c737f4d9",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_2d967da655fb640e62cbbc74cc394b89",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-21",
-      "unitDigest": "9251008d29a480cf3aa8ff30eb72389256c4963c7e7677e1f075f55256f0c0de",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_2d967da655fb640e62cbbc74cc394b89",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_ce9cf7041e0794dd190740863312964a",
-      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "anchor": "unheaded-block-22",
-      "unitDigest": "5e464682f0c67ba75942629eaf249ac37f2273e88fdf76b79c6e3510fd684698",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_ce9cf7041e0794dd190740863312964a",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_1654b4c667bd157d0f1d6c513a85fc7c",
@@ -2914,132 +2389,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_9e78656a9656a956d8d18436eb513951",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "adr-006-assignment-provenance-and-normalized-execution-contract-snapshot",
-      "unitDigest": "0f92ff45e3f725fe4903ac850e30385d1199d6278c8a8ec2afd54232cce813bd",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_9e78656a9656a956d8d18436eb513951",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_25a8cfce7bd6938196e6b4ef2e4c02d9",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "71a2d0b002b69d549be7a107e175e1dd8c54903c28734e84dbf75218eb5319de",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_25a8cfce7bd6938196e6b4ef2e4c02d9",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_9950fd6826b0086a4413fdb3d1834075",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "context",
-      "unitDigest": "c91b14b9a4ae7b59bba753d6cb386d9d883a3ddd59a3abcd0da593e34d1c6029",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_9950fd6826b0086a4413fdb3d1834075",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_a8344e1a43226394f04114d9f4270ce2",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "unheaded-block-3",
-      "unitDigest": "0e13876e4a761e17e1a93c5a254d556e8dddabefcd233e548e78bbf825030604",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_a8344e1a43226394f04114d9f4270ce2",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_5a220e0966cb9c6872f42b471150726b",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "decision",
-      "unitDigest": "5622c06276f32ad74efed999035410c8d752835bbe3f671d5ac3368f4555384c",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_5a220e0966cb9c6872f42b471150726b",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_1a0fd8e46885b7343da2f7c6cae17f2d",
-      "path": "docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md",
-      "anchor": "unheaded-block-5",
-      "unitDigest": "997fca8d11fa5a0c89d56f91a578fd3c10ea4aeffdca29e97643c7d9d8fbd237",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_1a0fd8e46885b7343da2f7c6cae17f2d",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_37e2cb81ce8c6334f6f1dd6342e4c1ec",
@@ -6423,111 +5772,6 @@
       }
     },
     {
-      "claimId": "claim_ad5d6c50833838b291a8afa244710000",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-114",
-      "unitDigest": "669f5ebe000ba02c27c5d0a823869ff52225521d129d840c7eef336ce7cb9714",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_ad5d6c50833838b291a8afa244710000",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_544f10be516ae91a0371ed99f034402e; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_093256d8e4834a042c5d3bca090debfa",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-115",
-      "unitDigest": "f3ea3f7469efb8a1d17340e69d5f005ebc28b137a1a8236837abdfd673d27cdd",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_093256d8e4834a042c5d3bca090debfa",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_b2aeba067935366ebd6f2b54ff144b5d; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_22c21e333a3e28ce4157a3a8ecb45cc0",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-116",
-      "unitDigest": "d5487f392710c3185e9446c6b531670e0c39d51c1975c337f3d1d9cb9a7067a4",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_22c21e333a3e28ce4157a3a8ecb45cc0",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_1c5560d85b38aa19415d0ce1857b0405; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_04708da0808dc431babd8703bca2f6f5",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-117",
-      "unitDigest": "783d0f691c229b5e3167bad2a846d06ffea7cc7180943b63149286a4e7d48a62",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_04708da0808dc431babd8703bca2f6f5",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_24fdc7fec7ba4b6c2dd1ecf610e923e4; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_bd150b090a443355048d83d8fe69502e",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-118",
-      "unitDigest": "cf4282de7c03e113012ec5beb85a426e24d35078f3a3f04ae8bb8f7d2d1a32aa",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_bd150b090a443355048d83d8fe69502e",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_910cb0d99d3df78a901c83c4f1fadbe8; bytes equal"
-      }
-    },
-    {
       "claimId": "claim_bab63f9b1ee85410c0d0dcce3cd59dbc",
       "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-122",
@@ -6630,48 +5874,6 @@
         "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
         "reviewMode": "ordinary",
         "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_identity_gap_f8ff626453e18b7a10b28ae9; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-135",
-      "unitDigest": "003c1b2a63f116cca3436c0e115d7c9252520c7f5d36634483efdd5428381e3a",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_8d1098aad227478a4ecfba67e29f6a69",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_identity_gap_a4d78a2cbd06571524e6ea0b; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
-      "path": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
-      "anchor": "unheaded-block-136",
-      "unitDigest": "320e0ee20283f6f05f4296c40ae7077e943deffd6d41f49c7069c673f0a7b546",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_b36b3352394e5987921d8ca3fab02023",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_identity_gap_25e5d945e6bcfb37b1d3c891; bytes equal"
       }
     },
     {
@@ -6907,48 +6109,6 @@
         "eligibility": "non-promoted Candidate/Draft"
       },
       "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_2c7ca6512f1870baa15c6be84b52c0eb",
-      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "anchor": "unheaded-block-33",
-      "unitDigest": "ceff29b5e89f139a1e246e71440ba41ad5e6b3d46d1297c8cedbdd671ceb3d56",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_2c7ca6512f1870baa15c6be84b52c0eb",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
-      "claimId": "claim_1c0c3cdd5486263d84af20ce969ece4c",
-      "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
-      "anchor": "unheaded-block-36",
-      "unitDigest": "ced47404abe27dcf3984b8d1b62c02e37787e2654eeb7af864d3272a2b9284e0",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_1c0c3cdd5486263d84af20ce969ece4c",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines unchanged, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
     },
     {
       "claimId": "claim_9786ce02129b75faa01d4b022dca1fe2",
@@ -7596,27 +6756,6 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_013abd94027531328ddccf8b8ea8a056",
-      "path": "docs/platform/agent-coordination/vision.md",
-      "anchor": "unheaded-block-28",
-      "unitDigest": "9f86c10b3db679c6b1e77b8adbe126822d323fa1b106dcf3b90a6d8bf4e1a68f",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_013abd94027531328ddccf8b8ea8a056",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-main-repin.json",
-        "receiptCommit": "a1fd2136a16dce642cc202a10b585efcf040fd3b",
-        "authoredBy": "codex-session:1@2026-10-11",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
-        "reviewedAt": "2026-10-13",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge-followup.md",
-        "reviewReportCommit": "c46785ecad036e2f3298b66c9a76faa6704df21c",
-        "reviewMode": "ordinary",
-        "reviewNote": "evidence re-pin to f4ed59997; cited lines shifted, cited bytes equal, other receipt fields equal; no truth re-review"
-      }
-    },
-    {
       "claimId": "claim_b94f19adcb82d31da81b1aa91ecfaecf",
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "rejected-interpretations",
@@ -7815,48 +6954,6 @@
         "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
         "reviewMode": "ordinary",
         "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_b59f85c61dbe7384d8ac61835a17e407; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_3630c07c84787b011a0af5ea0f3d11c5",
-      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "anchor": "job",
-      "unitDigest": "ff44d4f17dba913cc93f2718a79394d5baface8f4825c940c57c625284c678cd",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_3630c07c84787b011a0af5ea0f3d11c5",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_744013de17a6fc6712d2bbe578d71f62; bytes equal"
-      }
-    },
-    {
-      "claimId": "claim_3adcdb2c2ecf7b170f811db859ee7dd3",
-      "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
-      "anchor": "unheaded-block-24",
-      "unitDigest": "eb6de12a0a4f891ebd4bd7d4b93acb7a10385fa245cc6366abbec829d102dda0",
-      "reason": "A31 unchanged code excerpts re-pinned; Lead machine report binding pending.",
-      "fileStatus": "Candidate",
-      "evidenceReceipt": {
-        "claimId": "claim_3adcdb2c2ecf7b170f811db859ee7dd3",
-        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-        "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-        "authoredBy": "codex-session:1@2026-10-10",
-        "reviewStatus": "reviewed",
-        "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-        "reviewedAt": "2026-10-12",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-        "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-        "reviewMode": "ordinary",
-        "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_633d1e483c40dbcbd205c523b6f7892d; bytes equal"
       }
     },
     {
@@ -8415,5 +7512,5 @@
       "status": "candidate-unverified"
     }
   ],
-  "previousCount": 457
+  "previousCount": 531
 }
