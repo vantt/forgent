@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "contentCommit": "baef3a075899f83d515a28ab66abd6c3d55201c5",
+  "chosenBy": "codex-session:9@2026-10-13",
+  "authorization": "Lead resume brief explicitly asks Doer to pick 30 units; assertion checking belongs only to independent reviewer",
+  "populationCount": 629,
+  "populationSha256": "6da06c3a5a5cfa70686c3e1f207ffe318ddb245140c2386a6ac06d8abd68a08c",
+  "seed": "packaging-distribution-first-review-2026-10-13-owner-request",
+  "method": "Take 30 lowest SHA256(seed + NUL + path + NUL + anchor + NUL + unitDigest); no source truth score authored. Population is non-history/non-report/non-decision candidate body units, excluding headings and metadata/scaffolding. Reviewer must distinguish dated source intent from asserted current behavior and may redraw to satisfy independent A28 selection.",
+  "rows": [
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-44",
+      "unitDigest": "ab6f59a399bcc3e0973366bfcb52f6fbf4906d35cd95be996bd630f8cac4ee14",
+      "text": "`AGENTS.md` is the primary portable projection when a host supports it. Host-specific files such as Claude or Gemini context files should be generated only for host syntax, plugin/extension behavior, command surfaces, or compatibility gaps.",
+      "shownTextDigest": "ab6f59a399bcc3e0973366bfcb52f6fbf4906d35cd95be996bd630f8cac4ee14"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "6243e500e00b9ac6c14a9430c85ac0c5ffb12ae145edddb5a17b8096ed84de5b",
+      "text": "| Surface | Status | Evidence |\n| --- | --- | --- |\n| Assemble canonical skills from `core/skills` and `domains/*/skills` into `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `scripts/build-skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |\n| Generate Claude wrapper skills from `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |\n| Mirror `fgos-*` dev skills into the fgOS plugin for plugin-only consumers | implemented | `plugins/fgOS/skills/`, `test/skills/fgos-mirror.test.mjs` |\n| Detect missing/stale plugin skill packaging through doctor/fix registry | implemented | `src/setup/registrations.mjs`, `test/skills/fgos-mirror.test.mjs` |\n| Generate Gemini CLI extension package layout and commands | partial | `src/setup/skill-wrappers.mjs` (`generateGeminiSkillPackage`), `test/setup/skill-wrappers.test.mjs` |",
+      "shownTextDigest": "6243e500e00b9ac6c14a9430c85ac0c5ffb12ae145edddb5a17b8096ed84de5b"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "anchor": "unheaded-block-58",
+      "unitDigest": "117363655206262f311d1576d4ca93f6a91adf02dfb6f4237447afd31a78f723",
+      "text": "Reviewer focus:\n\n- Was this done after P7 proof?\n- Are users given a clear path: `fgctl init` plus local `fgos doctor --fix`?",
+      "shownTextDigest": "117363655206262f311d1576d4ca93f6a91adf02dfb6f4237447afd31a78f723"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "anchor": "unheaded-block-18",
+      "unitDigest": "d5254551e36825082ed4f57c656f0a5b100999e5ddd72d527c1186d2f0fa9162",
+      "text": "```json\n{\n  \"schemaVersion\": 1,\n  \"activationId\": \"act_000001a08fe31d00\",\n  \"workspaceId\": \"8d3322d88fba3bd8\",\n  \"artifactDigest\": \"sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4\",\n  \"status\": \"ready-published\",\n  \"history\": [\n    { \"status\": \"staging\", \"timestamp\": \"2026-09-14T00:00:00.000Z\" },\n    { \"status\": \"verified\", \"timestamp\": \"2026-09-14T00:00:01.000Z\" },\n    { \"status\": \"preparing\", \"timestamp\": \"2026-09-14T00:00:02.000Z\" },\n    { \"status\": \"ready-published\", \"timestamp\": \"2026-09-14T00:00:03.000Z\" }\n  ],\n  \"updatedAt\": \"2026-09-14T00:00:03.000Z\"\n}\n```",
+      "shownTextDigest": "d5254551e36825082ed4f57c656f0a5b100999e5ddd72d527c1186d2f0fa9162"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "7b947a76cec219e5010de59f1adbed679d654248fa52932833fb80be325661da",
+      "text": "Contributors can source:",
+      "shownTextDigest": "7b947a76cec219e5010de59f1adbed679d654248fa52932833fb80be325661da"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "anchor": "unheaded-block-19",
+      "unitDigest": "46a1d10e0b7d35041c5505d91bc659d4c9e7e8b77f1f5d4b0d0777a02a930f3c",
+      "text": "Each projected path needs an ownership class:",
+      "shownTextDigest": "46a1d10e0b7d35041c5505d91bc659d4c9e7e8b77f1f5d4b0d0777a02a930f3c"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "6471d511f68c7a56550873cf7418f082d15bcfe040150e807f9ac6f3edcfef50",
+      "text": "With no pin and no explicit source, `fgctl init` downloads the latest release through the system `curl` and refuses unless the asset matches its `SHA256SUMS` entry. `FGCTL_VERSION=<tag>` selects an exact tag (pre-releases are never \"latest\"); `FGCTL_FROM=<path | URL>` or `--from` installs a non-release build. `install.sh` itself defaults to the latest release and takes `FGCTL_VERSION` the same way.",
+      "shownTextDigest": "6471d511f68c7a56550873cf7418f082d15bcfe040150e807f9ac6f3edcfef50"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "anchor": "unheaded-block-21",
+      "unitDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5",
+      "text": "Possible transaction statuses:",
+      "shownTextDigest": "dbf8dbfef2ba662c57de06f78ad450a238098cd8069d2f513587dc429ecdddd5"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-55",
+      "unitDigest": "e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b",
+      "text": "This document maps those concerns to the architecture documents that should own\nor reference them.",
+      "shownTextDigest": "e3b0d1af248f4abb69cb8ec6c67d70d375955fc9eaed87c6dd8410d74a47b02b"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-78",
+      "unitDigest": "cd74dfc705f04854cfa17eebf4d9491c6d8006a272e739e8463415183d6a81f5",
+      "text": "[Workspace Topology Architecture](../../architect/workspace-topology.md)",
+      "shownTextDigest": "cd74dfc705f04854cfa17eebf4d9491c6d8006a272e739e8463415183d6a81f5"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "380d5cb658fe03b6cf908339c07a1e1c2134d7690c364550c9e6dc6c00c4572e",
+      "text": "- Link evidence from docs instead of embedding long test explanations in specs.\n- Treat a passing local unit test as local proof, not release proof.\n- Treat external consumer CI as the strongest install/release proof.\n- Re-scan code before changing claim status in `implementation-alignment.md`.",
+      "shownTextDigest": "380d5cb658fe03b6cf908339c07a1e1c2134d7690c364550c9e6dc6c00c4572e"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+      "anchor": "unheaded-block-15",
+      "unitDigest": "4dc182ca9a9502d457d9d5ba8c1e9dffe52c1459a5bc22c81eaf0474a7bdc4a1",
+      "text": "The correct canonical location is determined by component authority:",
+      "shownTextDigest": "4dc182ca9a9502d457d9d5ba8c1e9dffe52c1459a5bc22c81eaf0474a7bdc4a1"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "5b12fd1fa4f3ab432b19f5620fb11972fb1dc19c6b38564a9f4d7297dff5d7ad",
+      "text": "- The Rust host resolves the Node CLI entrypoint exclusively through `manifest.components.legacyNode`, never `PATH`, never `cwd`, and never hardcoded outside the manifest.\n- Omission of `components.legacyNode` is a schema validation error.\n- Empty, absolute, or parent-traversing `root`, `entry`, or `digest` fails `ReleaseManifest::validate_legacy_node_invariant`.\n- `entry` is relative to `root`; it must not repeat the `root` prefix.",
+      "shownTextDigest": "5b12fd1fa4f3ab432b19f5620fb11972fb1dc19c6b38564a9f4d7297dff5d7ad"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-94",
+      "unitDigest": "f2aa140aabef20a5a98af537527987721e90af6779c22a7a854dc6b9f0979b31",
+      "text": "(none \u2014 coverage is full for the mechanisms this feature adds. `fgos doctor\n--fix` now exists for real, per RUL11 (doctor --fix exists and is real, runs every registered fix) above \u2014 its own further extension\n(which checks eventually get a registered fix) is ordinary registry growth,\ntracked per-module, not a gap in this spec.)",
+      "shownTextDigest": "f2aa140aabef20a5a98af537527987721e90af6779c22a7a854dc6b9f0979b31"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "90970e1148a1744047765bc8f2d93346bb881b91e982483eefb4168451df4f7d",
+      "text": "The pin records desired selection policy. It does not prove what is active. In\nV1 the pin is tracked project state at:",
+      "shownTextDigest": "90970e1148a1744047765bc8f2d93346bb881b91e982483eefb4168451df4f7d"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "anchor": "unheaded-block-42",
+      "unitDigest": "bf6ae9f9db8e66a0cbd8eed7305cd926966ac1d85a66518c85fec47c66a44d4a",
+      "text": "Reviewer focus:\n\n- Does ordering protect effect, not just text order?\n- Are conflicts explicit instead of silently resolved by last-write-wins?",
+      "shownTextDigest": "bf6ae9f9db8e66a0cbd8eed7305cd926966ac1d85a66518c85fec47c66a44d4a"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "5436a95c42be8bcb624f6f896d0230c3a36200060b23ce19ae75449784271aa8",
+      "text": "This proves the preview release channel exists as published assets, not only\nas local release-shaped files. The preview claim remains deliberately narrower\nthan stable/default graduation: release-owner approval is still required before\nthis status becomes stable/default.",
+      "shownTextDigest": "5436a95c42be8bcb624f6f896d0230c3a36200060b23ce19ae75449784271aa8"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "3200e28a2754c7a271be1f3adbb4bcf4f944782148fd8a0584b5dcb3770fab1c",
+      "text": "V1 `fgctl` is a Rust bootstrap binary. It may be built from the same source\ntree as the future Rust host, but its authority is different: machine/project\nruntime control, not project workflow semantics.",
+      "shownTextDigest": "3200e28a2754c7a271be1f3adbb4bcf4f944782148fd8a0584b5dcb3770fab1c"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
+      "anchor": "unheaded-block-20",
+      "unitDigest": "c99db16e39712efdf185387e263b3788b872ef103a20b040490efc493a70e899",
+      "text": "Priority numbers may break ties within the same kind and scope. They must not be the primary source of authority.",
+      "shownTextDigest": "c99db16e39712efdf185387e263b3788b872ef103a20b040490efc493a70e899"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "6d77abaee74b79997b3f25983575ebb2e534e8d9831385dd46ed9150a7b61d98",
+      "text": "The schema is frozen at `schemaVersion: 1`. Rust serde definitions live in `packages/distribution/rust/src/manifest.rs` (`ReleaseManifest`).",
+      "shownTextDigest": "6d77abaee74b79997b3f25983575ebb2e534e8d9831385dd46ed9150a7b61d98"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-21",
+      "unitDigest": "3087a6ad3be768852a17337632e9d4a5bb80d9fd6e788cf759831f3aca4a6252",
+      "text": "The target runtime selection rule is:",
+      "shownTextDigest": "3087a6ad3be768852a17337632e9d4a5bb80d9fd6e788cf759831f3aca4a6252"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a",
+      "text": "The digest formula is:\n\n```txt\nfileDigest = sha256(file bytes as emitted by the release build)\nartifactDigest = sha256(canonical-json(release tree manifest without artifactDigest))\n```",
+      "shownTextDigest": "3e69f5309c46f933c74b52c6b3ec9c8b684a0f686fa0ae36e99d609832c8b61a"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "d6e2e95a2ce5436d92323744e02fb85a42731e6a43e027e0b8a4ce55d777a045",
+      "text": "```txt\nfgctl selects and repairs the runtime.\nlocal fgos runs project workflow semantics under the selected runtime.\n```",
+      "shownTextDigest": "d6e2e95a2ce5436d92323744e02fb85a42731e6a43e027e0b8a4ce55d777a045"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-53",
+      "unitDigest": "afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104",
+      "text": "**Status:** Historical architecture discussion map.\n**Date:** 2026-09-04.\n**Purpose:** Preserve the concern split that was promoted into\n`docs/platform/packaging-distribution/**` without letting this old map compete\nas the current navigation surface.",
+      "shownTextDigest": "afa4c17c539557aef31c16b3a5ed32351c0b90839d0e1ccff797fd3ea1e66104"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "093dfd342ad7acdf730df29f9c3c7e72e57ba7c85e52eaa31c6f66fadc0fa0ab",
+      "text": "It should not infer runtime identity from `PATH` alone.",
+      "shownTextDigest": "093dfd342ad7acdf730df29f9c3c7e72e57ba7c85e52eaa31c6f66fadc0fa0ab"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "anchor": "unheaded-block-27",
+      "unitDigest": "ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0",
+      "text": "In that context the candidate may run preflight checks and write only staging\nrecords under the installation transaction. It must not write host-visible\nprojection paths, execute general workflow mutations, or claim/write shared\nwork-state as the active runtime.",
+      "shownTextDigest": "ccb205fdc5120e6287ab2067b178cb8c998e156c606d0282c8d7e02821feece0"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-49",
+      "unitDigest": "1e6300b4a03d7d2581eb49a4c32ea8dc8ffb59fb28c697e65527bb6453980c05",
+      "text": "Use:\n\n- `verification/implementation-alignment.md` for claim-by-claim status;\n- `verification/install-and-release-proof.md` for proof paths and commands.",
+      "shownTextDigest": "1e6300b4a03d7d2581eb49a4c32ea8dc8ffb59fb28c697e65527bb6453980c05"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "anchor": "unheaded-block-17",
+      "unitDigest": "6a838503d80c838c649167ceff151326e6f7a7a7c6e4f3b6f63d7157d5d337ed",
+      "text": "- The public release posture is preview.\n- External installs default `fgos` through the Rust host.\n- Public docs may state that Rust host is the default installed runtime.\n- Rust host is the default runtime path for activated workspace installs.\n- Legacy Node fallback is deprecated immediately as a public/default runtime\n  posture.\n- Legacy Node fallback may remain only as an explicit escape hatch during a\n  short compatibility window. It must require an intentional selector such as\n  an environment variable, flag, or equivalent supported mechanism; it must not\n  silently catch Rust-host failures.\n- Any escape-hatch invocation must emit a warning, log entry, or proof marker\n  that distinguishes deliberate legacy fallback use from default Rust-host use.\n- The escape hatch remains supported for 30 calendar days after the preview\n  release publication date. The public preview tag `v0.1.0` was published on\n  2026-09-18, so the earliest removal date for this preview release is\n  2026-10-18 unless a later release decision replaces that support promise.",
+      "shownTextDigest": "6a838503d80c838c649167ceff151326e6f7a7a7c6e4f3b6f63d7157d5d337ed"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "5e8cd6969cc76c9fa07e3861b5b1bf5f9d6083a33d1f5cb970349a76844dacab",
+      "text": "| Claim | Evidence |\n| --- | --- |\n| Pin struct frozen and documented | `packages/distribution/rust/src/init.rs` (`TrackedDistributionPin`, `DistributionPin`) |\n| Activation stores `pinSnapshot` | `packages/distribution/rust/src/init.rs` (`publish_and_tail`) |\n| Architecture distinguishes pin from activation | `docs/architect/packaging-distribution/runtime-identity-and-activation.md` |\n| Pin reconciliation & mismatch tests | `test/rust-host/fgctl-init.test.mjs` (Item 2, Item 5) |\n| Schema golden tests (full, minimal, forward-compat) | `packages/distribution/rust/tests/schema_golden.rs`, `packages/distribution/rust/tests/goldens/distribution-pin-*.json` |",
+      "shownTextDigest": "5e8cd6969cc76c9fa07e3861b5b1bf5f9d6083a33d1f5cb970349a76844dacab"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "anchor": "unheaded-block-53",
+      "unitDigest": "0a68b45b9aad074b7be63e3f7d810b871adee57edd805f6ea71849d1534f09f4",
+      "text": "Added in candidate \u2014 not carried; restoration tracked by dropped-001 and Plan C.",
+      "shownTextDigest": "0a68b45b9aad074b7be63e3f7d810b871adee57edd805f6ea71849d1534f09f4"
+    }
+  ],
+  "reviewStatus": "pending-independent-truth-review"
+}

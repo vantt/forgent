@@ -1,0 +1,43 @@
+# Packaging independent review: f6 1
+
+Content pin: `baef3a075899f83d515a28ab66abd6c3d55201c5`
+
+Author: `codex-session:8@2026-10-13`; assembler: `codex-session:9@2026-10-13`. All proposals remain pending.
+
+## dropped-010
+
+```json
+{
+  "obligationId": "dropped-010",
+  "sourceClaimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+  "sourcePath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+  "sourceAnchor": "unheaded-block-14",
+  "proposedVerdict": "retire-installed-default-trigger",
+  "reviewStatus": "pending",
+  "authoredBy": "codex-session:8@2026-10-13",
+  "targetOwner": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+  "targetAnchor": "proposed-disposition",
+  "rationale": "The public/default Rust channel and deprecated npm compatibility are separate channels. Code and implementation history retain both npm entries. Retire only the automatic installed-default trigger, preserving runner and entry ownership obligations; no intentional retirement is inferred from absence.",
+  "retentionOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+  "retentionAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+  "retentionFileDigest": "ca26b29daebedfa5dc1d2e98c5e9655e4491a2122296618220e141902583236f",
+  "codeEvidence": [
+    "package.json:9-12",
+    "bin/fgos.mjs:4-10",
+    "test/install-packaging.test.mjs:1-157"
+  ],
+  "historyEvidence": [
+    "4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f",
+    "c831811faaa0be93f505456aae6a134865ccbc9b"
+  ],
+  "limits": "Proposal only; do not alter the existing reviewed deferral or FLAGGED retention until the independently reviewed verdict.",
+  "sourceUnitDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+  "targetUnitDigest": "b1ec345e0756e842dfa086f9c4ef0110dca6a04da2c95d9139cb11186688c3a2",
+  "sourceShownText": "`package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` stays until the runner migrates. A header in `bin/fgos.mjs` and the root `AGENTS.md` state the ownership rule for editors already at that path.",
+  "targetShownText": "## Proposed Disposition\n\nAdded in candidate — propose retirement of the automatic installed-default removal or redirection trigger. Keep the npm compatibility mapping, runner mapping and source-entry ownership header under their existing support and release policy. This does not decide when the npm fallback channel ends, extend its support promise, or remove a payload.\n\nThe current `package.json:9-12` maps both npm entries to the Node payload. `bin/fgos.mjs:4-10` expressly retains global npm and direct Node compatibility channels while requiring Rust host payload resolution through manifest fields. The source obligation was introduced by `4db6ee7e5d32efdd10ebfdc6aa71816e1f98754f`; the implementation header added by `c831811faaa0be93f505456aae6a134865ccbc9b` explicitly retained npm compatibility and did not remove that mapping. The candidate spec distinguishes the native public/default posture from the deprecated npm channel.\n\nThe current code proves coexistence, not intentional retirement of the original obligation. No commit explicitly retiring the trigger was found by the recorded symbol/history search. Independent review must decide whether this proposal becomes a retirement verdict or whether a restoration remains owed. Until that verdict, dropped-010 stays deferred to Packaging-distribution and its FLAGGED-obsolete literal retention is unchanged.",
+  "sourceShownTextDigest": "6f959e9066321a5afcbb3c6ae57d46b03fa8da3ae18f7ce0b5454eff36ba701e",
+  "targetShownTextDigest": "fd9c92a3a1bd2b50533a4763eaa00363205e5a7619b208637ec875fb33ad972d"
+}
+```
+
+Read the original source obligation and retained FLAGGED text. This is a pending retirement proposal; no source verdict is replaced. Retirement requires owner acceptance after independent review.

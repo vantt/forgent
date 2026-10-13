@@ -1,0 +1,1638 @@
+# Packaging independent review: merge 2
+
+Content pin: `baef3a075899f83d515a28ab66abd6c3d55201c5`
+
+Author: `codex-session:8@2026-10-13`; assembler: `codex-session:9@2026-10-13`. All proposals remain pending.
+
+## CHANGELOG.md — logical row continuation 2/4
+
+Full logical row SHA256: `fc65d179a1e65f8ef71113a138b3390430f95d998d0412cf9a18b129e0966759`
+
+Fragment SHA256: `1a1f26fc3aeb5d302b74aae5051432d065e0586b650f4f6d02424716e7949592`
+
+Concatenate the literal fragment payloads in order to reconstruct the complete shown row without normalization. All embedded source/target identity and shown digests bind the complete payload.
+
+````markdown
+- `scripts/project-agents.mjs`'s D33 agent-name-uniqueness check now deprioritizes a legacy `agents/` entry (logs a warning, skips it) instead of hard-throwing when it collides with a single `core/agents`/`domains/*/agents` entry; a collision between two non-legacy sources still throws as before.
+- `.fgos/events.jsonl` is now the frozen baseline of a multi-file event log: new events land in per-writer files under `.fgos/events/<writer-id>-<openTs>.jsonl`, each event carries a content-hash `h` and writer `src` identity, and cold per-writer files are periodically compacted into a verified `baseline-<ts>.jsonl` (originals archived under `.fgos/events/archive/`, never deleted). `fgos doctor` gained `events-compaction-verified` to re-check a past compaction's integrity.
+- Added a config-driven `herdr-spawn` dispatch adapter that lets any agent CLI dispatch through a real, visible herdr pane instead of an invisible `cli-spawn` subprocess, controlled purely by `.fgos/config.json` (`tsk-5jl`); renamed the `agy` `cli-spawn` executor to `agy-cli` and added a new `agy-herdr` executor (`tsk-2ii`); redesigned `agy-herdr` to use `agy`'s real `-i` interactive mode instead of headless `-p`, for genuine TTY visibility (`tsk-10j`); and fixed a false-idle race in the herdr `agent_status` polling that could make the `interactiveMode` adapter report success without the dispatched agent ever actually finishing its work (`tsk-2rr`).
+- `dispatchDeclaredOperation` (`src/runner/coordination/session-engine.mjs`) can now dispatch a declared `operation` step as a real, mutating worker instead of always forcing read-only, under a narrow four-condition rule: the step declares `mutation: 'mutating'` (schema-accepted only on an `operation` step, `src/verbs/coordination/schema.mjs`; every other step type stays hard-refused for anything but `read-only`); the bound operation declares `result.kind: 'work-product'`; the dispatch `cwd` resolves to a linked git worktree, never the main checkout (refused, naming the reason, before any Assignment is created); and the resulting inline execution contract carries the engine's own reserved `protocol-operation:` provenance stamp. `dispatchPrimaryTask`/`proposeConsult`'s own hard read-only assertions are completely unchanged. `buildReadOnlyContract` is renamed `buildSessionContract` (no longer an accurate name once it can build either posture). At the actual dispatch layer (`assignment-runner.mjs`), an inline mutating Assignment is refused unless the caller explicitly asserts `isReadOnlyMode: false` (an omitted flag is read-only, never permission) — mistake-proofing for an in-process caller that reaches `buildAssignment`/`executeAssignment` without going through `dispatchDeclaredOperation`, independently re-checking `result.kind`/worktree-vs-main-checkout via the same shared predicates the pre-check uses (`operationDeclaresWorkProduct`/`resolveMutatingCwdPosture`, `execution-contract.mjs`). This is mistake-proofing for a well-behaved in-process caller, not authentication against a hostile one — this codebase's already-established trust boundary (`docs/routing-handoff-contract.md`) treats any caller able to import internal dispatch modules and write `.fgos/` as the same trust class as the user who invoked it (see `docs/specs/runner.md`'s decision entry 0035). Also fixes a real, confirmed session/assignment-path resolution bug: `store.mjs`'s session-path resolver keyed `.fgos/` on the raw `cwd` instead of the resolved main-checkout root, so a session dispatched from inside a linked worktree silently read/wrote session and Assignment state under that worktree's own `.fgos/` (wiped on worktree creation, ADR0020) instead of the real one at the main checkout.
+
+### Added
+
+- `fgos doc demote` — the mirror of `fgos doc promote` (`active` -> `provisional`), the door `scripts/knowledge-migration.mjs` needs to satisfy the registry redesign's "leaves every migrated document provisional unless explicitly promoted" rule (tsk-3uc).
+- Doctor checks `doc-current-path-missing` (a live doc's `currentPath` not committed at `HEAD`) and `doc-source-unreachable` (a path-shaped `sourceCaptureIds` entry not reachable through its own current/alias paths); `doc-source-conservation` extended from a single outcome-reachability check to also catch a target document with no source, a duplicate migration-inventory source assignment, and a source lost mid-migration (tsk-3uc).
+- Extensible multi-audience artifact-producer registry for knowledge management (`fgos topic *`, `fgos doc *`, `fgos knowledge *`, `fgos doc-registry`) (tsk-28x).
+- `glm` (OpenRouter GLM 5.2 model) registered as a new runner executor in `.fgos/config.json` via a new per-executor `env` override schema with `${VAR}` substitution against `process.env` in `dispatch/transport.mjs`.
+- Opt-in `--fields <comma,separated,list>` flag on `fgos list --id <id> --json` to filter `work[id]` fields down to a validated live-pointer set (`stage`, `status`, `holder`, `title`, `docsRef`, `verify`, `parent`, `id`, `domain`, `kind`, `risk`, `tier`) and omit history side-log sections from the response.
+- `fgos faults [--limit N]` — read surface for `.fgos/invocation-faults.jsonl`, the malformed-invocation log `fgos`'s own failure handler writes (unknown verb, missing store, a bad `--dir`, an arg-parse fault). Resolves the log the same worktree-safe way it is written, so a linked worktree with no `--dir` still reads the main checkout's real records instead of an empty view.
+- Split `agents/*.yaml` into `core/agents/` and `domains/<name>/agents/` (D24) and added global unique agent-type name doctor check `agent-type-names-unique` (D33).
+- Explicit task-spec contracts (`core/task-specs/`) for 7 domain-agnostic skills (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`, `fgos-indexing`, `distill`), with doctor `task-specs-resolve` validation.
+- D20/D22 agent-type eligibility resolution (`resolveAgentTypeForTaskSpec`, `src/runner/dispatch/cli.mjs`) is now wired into the real out-of-process dispatch path (`spawnWorker`, `executeExecutorCli`), via a new `src/runner/agent-roster.mjs`. Only has an observable effect on a command-less/adapter-less executor entry with no static `agentType` of its own — no executor this repo configures today (agy/claude/codex/pi) is affected.
+- D28's nested-sync-call cap (`openSyncDepth`) is now reachable: `recordCall`/`fgos handoff --open-sync-depth <n>` accept a caller-supplied depth (never derived from the event log — a sync call's own record commits atomically, so nesting can only be known by a caller tracking its own recursion).
+- `scripts/write-wrapper-script.mjs` — reusable helper CLI script to write executable wrapper shell scripts for multi-statement commands that trip worktree isolation guards.
+- Dispatch-execute reliability pass (`src/runner/dispatch/transport.mjs`,
+  `src/runner/recovery.mjs`): the `cli-spawn` adapter now caps nested
+  out-of-process dispatch at 3 levels deep (an executor that itself
+  dispatches another executor, e.g. `agy` fanning out further, is refused
+  past the cap via `FGOS_DISPATCH_DEPTH`) and supports an optional
+  `runner.idleTimeoutMs` config field — when set, kills a worker that has
+  gone completely silent for that long, resetting on every stdout/stderr
+  chunk, distinct from `timeoutMs`'s unconditional absolute ceiling. Both
+  new failure classes (`dispatch-in-flight`, `dispatch-depth-exceeded`) are
+  now registered in the recovery matrix (`dispatch-in-flight` retries,
+  `dispatch-depth-exceeded` parks) instead of falling through to the
+  matrix's fail-safe halt. `node dispatch.mjs execute`'s failure output
+  also gains a structured `{error, errorClass}` JSON line on stdout
+  alongside the existing human-readable stderr message, so a calling skill
+  can branch on the failure class instead of only ever seeing a bare exit
+  code.
+- `node dispatch.mjs execute --contract <file>` — a CLI door that builds and
+  runs an inline Assignment straight from a caller-authored execution
+  contract file (ADR-006 §4's field set, flat JSON; an optional top-level
+  `caller` key overrides the auto-resolved writer identity), with no Work
+  item, Stage, or `decide --for` involved. Mutually exclusive with `--for`
+  and `--assignment`. Accepts `--work <id>` to attach the contract to a real
+  Work at a declared Stage, firing that domain's harness seam (ADR-007 §1)
+  when one exists.
+
+### Fixed
+
+- Confinement Authority now rejects contradictory unconfined requests that
+  retain a policy, ignores invocation-supplied backend selection, and rejects
+  no-base control/network overrides. Capability defaults that lack a wired
+  backend use an explicitly documented interim unconfined posture; preferred
+  confinement continues to refuse before spawn until a supported backend path
+  is available.
+
+- Confinement Authority now fails closed for every adapter except the proven
+  `cli-spawn` prepared-sandbox consumer, preventing HTTP and future adapters
+  from receiving bwrap enforcement credit without executing its argv. Required
+  built-in policies remain usable without a credentials source (the optional
+  credential grant is honestly `unverified`); a custom `optional: false` grant
+  still refuses. Attestations now derive session/home/workspace coverage from
+  actual sandbox evidence, defer private-home allocation until after approval,
+  and record successful prepared bwrap dispatches as `enforced`.
+- `fgos coordination run --file <request>` now forwards a declared `operation` step's own `mutation: "mutating"` field into the engine dispatch (`tsk-371`) — previously every real mutating Doer/Fixer dispatch through this CLI door ran read-only and was graded `status: "failed"` even when the work and its commit were correct. A fan-out branch's `mutation` field still cannot be `"mutating"` — that stays refused by design, both at the schema layer and because the fan-out dispatch entry point has no per-branch mutation channel at all.
+- `glm-cli` executor (`.fgos/config.json`) was missing `allowCrossProvider: true`, so every dispatch to it was rejected by the cross-provider egress governance gate before ever spawning ("resolves to cross-provider egress target ... would leave the Claude ecosystem") -- the executor genuinely does route to OpenRouter by design (its own config description says so), so this was a missing declaration, not an intentional block. Confirmed fixed live: a real self-identification dispatch now returns `MODEL=z-ai/glm-5.2`.
+- Closed a series of real gaps in the knowledge registry's lifecycle/migration/bootstrap enforcement (tsk-3uc, follow-on to tsk-28x): `doc.register` could silently move an existing doc's lifecycle (demoting `active` back to `provisional` on a bare re-register, or resurrecting a `retired`/`superseded` doc); `doc.attest`/`doc-current-path-missing`/`doc-source-unreachable`/`doc-source-conservation` treated a `superseded` doc as still live; `topic.merge`/`topic.split` accepted a non-`active` target/source; `topic.retire` on a nonexistent topic was a silent no-op; `doc.supersede` accepted an unvalidated `supersededBy` pointer; `doc.mark-rendered` silently no-oped on a non-`reserved` doc; `scripts/knowledge-migration.mjs` could partially apply (file moved before the registry write, which could then fail), never validated conservation against the full inventory (only the still-pending subset), used shell-interpolated `git mv`/`git add`, and its "already migrated" shortcut accepted a dead doc or an unreachable file as success; `scripts/knowledge-bootstrap.mjs` could partially write across rows in one inventory (an earlier row durably created before a later row's own drift/validation failure) and treated a `retired`/`superseded` doc or `purposeSlug`/`framework`/`mode` drift as idempotent success.
+- `settleClaim` (`src/state/store.mjs`) no longer refuses `fgos return`/
+  `fgos plan`/`putInAwaiting` on a durable revision drift caused entirely
+  by the SAME writer that holds the claim — the routine mid-lifecycle
+  `fgos edit` calls `fgos-coding-planning`/`fgos-coding-discovering` make
+  by design. It now reconciles when every event touching the item since
+  claim time is positively attributed to the claiming writer, and still
+  refuses exactly as before when any event carries a different (or
+  missing) writer id — a genuine concurrent conflict is unaffected.
+- `mergeRunnerItem` now performs an ownership-checked lock renewal synchronously
+  after verify/invariant checks and before `git commit`, so a lost merge lock
+  is caught deterministically as `lock-lost-mid-merge` instead of depending on
+  a background heartbeat timer firing in time.
+- `fgos pick`/`fgos take` (`claimWork`, `src/runner/claim-port.mjs`) now
+  self-heal an `AMBIGUOUS` `.fgos/main-checkout.lock` (unparseable content)
+  inline: it calls the same `forceReclaimAmbiguousLock` the `unlock` verb
+  already used and retries the claim once before falling back to the same
+  `lock-ambiguous` error — a transiently-corrupt lock no longer requires a
+  separate manual `fgos unlock`/`/fgOS:unlock` call to clear it.
+- `mergeRunnerItemLocked` (`src/runner/merge.mjs`) no longer refuses a
+  successful merge just because it left a `merge=union`-attributed
+  `.fgos/*.jsonl` path staged (e.g. `.fgos/events.jsonl`, its sharded
+  `.fgos/events/*.jsonl` files, or the diagnostic logs) — it now restores
+  that specific path to the target's own pre-merge committed content and
+  re-checks before deciding, instead of rejecting the merge outright. Any
+  other `.fgos/` path (not `merge=union`-attributed, or newly introduced
+  with no target-side version to restore to) still trips
+  `fgos-write-rejected` exactly as before; this closes the gap tsk-2xg
+  left open (its own `.gitattributes` `merge=union` half already
+  shipped, but the "restore-then-recheck after a clean auto-merge" half
+  never landed), which had been tripping `approve` on nearly every
+  long-lived branch under concurrent write load on `.fgos/*.jsonl`.
+- `performCatchUp` and `mergeRunnerItemLocked` (`src/runner/merge.mjs`)
+  no longer report a real `conflict` outcome for a git-merge conflict
+  confined entirely to `.fgos/` paths declared `merge=union` — a worker
+  branch that at some point recorded a DELETION of a shard (e.g. an
+  earlier manual `git rm --cached` recovery from an unrelated conflict)
+  raised a real modify/delete conflict the moment the calling session's
+  own subsequent event-append grew that same shard elsewhere, which the
+  `merge=union` driver never auto-resolves (deletion is never handled
+  by a content-merge driver, regardless of attribute). New helper
+  `resolveFgosOnlyConflict` restores every such conflicted path to the
+  trusted side's own committed version (`HEAD`/main for `approve`,
+  `target` for `catchup`) instead of aborting — neither merge direction
+  has any legitimate claim over the other's `.fgos/` state (ADR0020),
+  so this was always a false conflict, not a real content dispute.
+- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
+  now spawns every executor `detached: true` and kills its whole process
+  GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
+  directly-spawned pid — an executor CLI that shells out further (a
+  grandchild process) no longer survives its own parent being killed.
+- **Breaking (store schema):** the coding `roleGraph`'s `human-advisor`
+  role was renamed to `advisor` (D16). Replay now normalizes the retired
+  literal for any pre-rename `work.handoff` event already committed to an
+  existing `events.jsonl` — without this, an item still parked with
+  `holder: "human-advisor"` from before the rename would be permanently
+  stuck (any further write to it throws `WorkValidationError`, since the
+  current roleGraph vocabulary no longer accepts the old name). Run
+  `fgos rebuild` after upgrading if any item was parked at the old role —
+  `state.json`'s own incremental-snapshot fast path does not re-apply a
+  code-only fix to already-replayed history on its own.
+- `agents/*.yaml`'s eligibility field was inverted from `claims` to
+  `skills` (D20) with no migration note — any existing `agents/*.yaml`
+  still carrying `claims:` now has it silently ignored at projection
+  time. Update `agents/*.yaml` (and `core/agents/`, `domains/<name>/agents/`)
+  to declare `skills:` instead.
+- `materializeSkillsIntoProject` (`fgos setup`'s external-project
+  materialize path) no longer crashes when `packageRoot` (a real global
+  npm install can be root-owned or read-only) can't be written to during
+  its `assembleSkills` re-render step — degrades to using the
+  already-shipped, committed `.agents/skills` instead.
+- `package.json`'s `files` array now includes `core/` — a packed/published
+  install was missing `core/task-specs/`, `core/skills/`, and
+  `core/agents/` entirely, contradicting the new `core/` vs `domains/`
+  authoring split the moment fgOS is installed rather than checked out.
+
+### Added
+
+- `runner.executors.claude` in `.fgos/config.json` — claude is now
+  addressable by name in dispatch (`decide claude`, `executors.claude`)
+  the same way `agy`/`codex`/`pi` already are, instead of only being
+  reachable through the anonymous top-level `runner.executor` default.
+  Same command/args as that default; no behavior change for existing
+  callers.
+- Three new read-only verbs: `fgos decision-index [--check]` generates
+  `docs/decisions/index.md`, a projection of every platform/repo-wide
+  decision (`fgos decision --scope <area>`) from `state.decisions`;
+  `fgos context-render <id>` renders an item's `CONTEXT.md` "## Locked
+  decisions" table from `state.decisions` in place, so the table is never
+  hand-typed; `fgos authoritative-match --quadrant <docs/quadrant-dir>
+  --topic "..."` (or `--check-duplicates`) skeleton-matches a topic
+  against docs' own `authoritative_for` frontmatter, so a growing skill
+  finds an existing doc to update instead of guessing a second path.
+- `fgos decision --relation none|supersedes:<id>|touches:<id>` — every
+  decision write now declares its relation to prior decisions explicitly;
+  a `supersedes` relation runs a write-time sweep across `docs/`, `src/`,
+  `plugins/` for citations of the superseded id that don't also
+  acknowledge the new one, surfaced as `danglingCitations` on the write's
+  own response.
+- `fgos decision --scope <area>` — a platform/repo-wide decision (no
+  `--id`) that shows up in the generated `docs/decisions/index.md`.
+- `fgos doctor`/`fgos doctor --fix` gained a `decision-index-stale`
+  check+fix pair: reports and repairs drift between `docs/decisions/
+  index.md` and `state.decisions`.
+- The hand-authored `docs/decisions/000N-*.md` ADR corpus (34 files) has
+  been retired: `state.decisions` (via `fgos decision --scope`) is now the
+  source of truth for platform decisions, with full narrative migrated
+  verbatim into the relevant `docs/specs/<area>.md`'s own "Lịch sử quyết
+  định" section. `docs/decisions/index.md` (generated) replaces the old
+  hand-written `0000-index.md`.
+- `runner.capabilities` — a curated catalog of capability names, shared
+  between the tool-registry's own `capability` field and
+  `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
+  repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.
+- A one-line `fgos: dispatch capability=... capacity=... via=... provider=...
+  model=... tier=...` diagnostic prints to stderr at every real dispatch
+  chokepoint — `spawnWorker` (the runner's own worker dispatch) and both
+  branches of `executeCapacityCli` (`execute`/`execute --for`'s in-process
+  hand-back and out-of-process real spawn) — right before the capacity is
+  actually invoked, so a human watching the terminal can see which
+  capability was requested, which capacity answered it, through which
+  mechanism/provider/model/tier. Diagnostic-only, never read back by any
+  caller.
+- Multi-role team harness, first slice (coding domain): work items gain an
+  optional third axis, `holder` — orthogonal to `status` and `stage`, opt-in
+  per-domain via a new `roleGraph` declaration that names the legal
+  role-handoff edges for a domain/stage. Two new verbs, `fgos handoff <id>
+  --to <role> --reason <advise|assist|review|consult>` and `fgos
+  handoff-return <id>`, let a session make a guarded role-to-role call
+  between an implementer and a researcher/helper/reviewer/human-advisor
+  (consult a researcher, get something reviewed, ask a human, hand off a
+  scoped subtask) and record it in the event log — a call outside the
+  domain's declared graph is refused with the legal edges named in the
+  error, and a call outside a domain that declares no `roleGraph` at all is
+  refused just as cleanly. Every existing item and every existing log
+  replays byte-for-byte unaffected — `holder` and the two new event kinds
+  are both fully optional/lazy, never present unless actually used.
+- `runner.executors.pi` — `pi` (`@earendil-works/pi-coding-agent`)
+  registered as a second `agent`-kind executor alongside `agy`, via
+  `fgos setup`'s existing config-default merge (no manual `.fgos/
+  config.json` edit needed). Invocation shape: `pi --provider openai-codex
+  --model gpt-5.5 --tools <allowlist> --mode json --approve -p <prompt>`,
+  confirmed live against the coding-domain worker contract (a genuinely
+  disposable work item, both a correct cold-pickup refusal and a correct
+  commit-and-`[DONE]` completion) — see
+  `docs/history/pi-executor-runtime-capacity/RESEARCH.md`.
+
+- `codex` (OpenAI Codex CLI) wired as a new out-of-process dispatch
+  executor (`.fgos/config.json`'s `runner.executors.codex`), using
+  `codex exec --dangerously-bypass-approvals-and-sandbox` — an
+  unconditional bypass, deliberately no OS sandbox boundary. Unlike
+  `agy`'s own entry, this is not a lesser-but-real boundary: research
+  (`docs/history/codex-permission-capability-boundary/RESEARCH.md`,
+  branch `fgw/tsk-4kh`) proved `codex`'s real sandbox
+  (`-s workspace-write`) blocks the worker contract's own `git commit`
+  step outright, because this repo's `.githooks/pre-commit` spawns a
+  nested `git` subprocess the sandbox refuses with `EPERM` — a decision,
+  not an oversight, accepted explicitly after reviewing that trade-off
+  (`docs/history/codex-bypass-executor/`).
+
+### Changed
+
+- Explicit verify cadence rule added to `.agents/skills/_shared/coding-worker-contract.md` Layer 2 rule 2: out-of-process workers are now instructed to run the item's `verify` command once, near the end, when they believe the work is actually done — never as a per-edit habit.
+
+### Fixed
+
+- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
+  now spawns every executor with `stdin: 'ignore'` instead of the
+  default open pipe. `codex` (unlike `agy`) checks for piped stdin on
+  startup ("Reading additional input from stdin...") and blocks
+  indefinitely on a pipe nothing ever writes to or closes — found live
+  wiring `codex` as an executor (`docs/history/codex-bypass-executor/`).
+- The same stdin-pipe hang also affected `runCommand`
+  (`src/runner/goal-check.mjs`), the shared verify runner behind `fgos
+  return`/`approve`/merge/dispatch's own re-verify — a `codex`-based
+  `verify` command timed out there too until the same `stdin: 'ignore'`
+  fix was applied.
+- `fgos decision` now requires `--text` explicitly. Before this, a call
+  with no `--text` silently fell back to joining whatever positional
+  arguments were left over (e.g. `fgos decision write "..."` stored
+  "write ..." as the decision text) instead of refusing — the CLI now
+  refuses cleanly (exit 4) rather than storing corrupted decision text.
+- The `agy` (Antigravity Cli) executor no longer dispatches with
+  `--dangerously-skip-permissions` (`.fgos/config.json`'s
+  `runner.executors.agy`, now `--mode accept-edits`). `fgos doctor`/`fgos
+  setup` provision a real command-permission boundary in agy's own
+  settings.json instead (`agy-permissions-configured` check,
+  `src/setup/agy-permissions.mjs`): `toolPermission: "always-proceed"`
+  plus a `permissions.deny` list blocking destructive/exfiltration-prone
+  commands (`rm -rf`, `sudo`, force-push, `git reset --hard`, `git stash`,
+  raw `curl`/`wget`). This is a denylist (default-allow, explicit-deny),
+  not a true default-deny allowlist — `agy`'s headless (`-p`) mode was
+  live-proven (`docs/history/agy-permission-capability-allowlist/
+  RESEARCH.md` Round 4) to blanket-deny every command-type tool call under
+  its `strict`/`request-review` modes regardless of `permissions.allow`
+  content, so a real allowlist is not reachable there today — still
+  strictly narrower than the unconditional bypass it replaces.
+- `fgos decision` gains an optional `--kind` flag. Before this, every
+  write through the CLI verb defaulted to `addDecision`'s own `'design'`
+  kind — including `fgos-coding-validating`'s own audit line for an
+  auto-approved gate — which the retrospective/cleanup gate
+  (`checkRetrospectiveContent`) read as a human reflecting on the work,
+  letting an item satisfy that gate with no retrospective document behind
+  it. `fgos-coding-validating` now passes `--kind engine` on that line.
+
+### Changed
+
+- `capacities.<id>.kind` is now the `agent`/`tool` axis (WHAT a capacity
+  is — a live persona, potentially native-dispatchable, vs a mechanical,
+  presence-only tool), separate from `invocations[].via` (HOW it's
+  invoked — `cli`/`task`/`mcp`, widened from `cli`-only). `capacities.<id>.for`
+  is now a non-empty array (was a single value) — one executor can serve
+  multiple capabilities at once, each validated against the
+  `runner.capabilities` catalog above (replaces the old, narrower
+  `CAPACITY_PURPOSES` enum). Cross-provider governance
+  (`allowCrossProvider`) now applies regardless of `kind` — only an
+  `agentType`-resolved capacity is exempt (previously any `kind:"task"`
+  capacity was, even one with its own real, non-Claude command).
+  **Not yet applied to this repo's own live `.fgos/config.json`** — this
+  is a breaking `kind`-vocabulary change (unlike the two entries above),
+  so it lands together with the code that reads it, not as a separate
+  advance commit. (`docs/specs/runner.md` RUL65,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
+- `EXECUTOR_ADAPTERS`' adapter function signature is generalized from
+  `(command, args, cwd, opts)` to `(invocation, opts)` — each adapter now
+  reads whatever fields its own invocation shape needs (`cliSpawnAdapter`
+  reads `command`/`args`; the new `httpAdapter` reads
+  `method`/`url`/`headers`/`body`) instead of every adapter being forced
+  through a CLI-argv-shaped call. A real second adapter is now registered:
+  `EXECUTOR_ADAPTERS.http`, making a real HTTP request via `fetch` (timeout
+  aborts the request; a non-2xx status is a normal result, never a thrown
+  error, matching `cli-spawn`'s own "non-zero exit is not an error"
+  stance). `INVOCATION_VIA` gets `'api'` back (dropped earlier for 0
+  historical producers; now backed by this real adapter) —
+  `capacities.<id>.invocations[]` may declare `{via: "api", url: "..."}`.
+  `resolveExecutorConfig` still only ever selects/spawns a `via:"cli"`
+  invocation — this is a pluggability precedent, not a new production
+  dispatch path; 0 capacities register `via:"api"` today.
+  (`docs/specs/runner.md` RUL66,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
+- A `capacities.<id>` capacity that is **cli-spawn-shaped** (declares its
+  own `command`/`adapter`, or an `invocations[].via === "cli"` entry —
+  e.g. an `agy`-backed capacity) now dispatches out-of-process whenever it
+  is configured, even when the caller already has live Task-tool access.
+  Previously a live/interactive session with Task access always won
+  in-process, silently never invoking the configured command at all. A
+  capacity that is **agentType-shaped** (only `agentType`, no command of
+  its own) is unaffected — `hasLiveTaskAccess` still decides there, since
+  resolving it in-process already means honoring the configured target.
+  (`docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md`,
+  narrows `docs/decisions/0026` rule 2)
+- The per-tier `runner.executors.<tier>` config override is retired (0
+  live entries; had already caused a real bug — a non-tier key silently
+  fell through to the global executor with no error). A `capacities.<id>`
+  entry naming no `command`/`adapter`/`agentType` of its own now resolves
+  straight to the global `runner.executor`, with no intermediate stop.
+  (`docs/specs/runner.md` RUL41/RUL63)
+- `fgos tool register`/`fgos tool remove` are retired. A tool provider
+  (e.g. `gitnexus`, `herdr`) is now declared directly in
+  `runner.capacities.<id>` in `.fgos/config.json` — a `capability` field
+  on the entry, config-edited like every other capacity, no longer through
+  the event log. `fgos tool check`/`fgos tool query` are unchanged in
+  shape and behavior, now sourced from config instead of `view.tools`.
+  `.fgos/tool-status.local.json` (the local, gitignored presence overlay)
+  is unaffected. (`docs/reference/forgentx-tool-registry-configuration.md`)
+- The Iron Law gate now asks only where the answer can still matter: at the
+  **trunk boundary**. A leaf merging into `fgw/<root>`, and a root
+  `sync-root`-ing into its parent branch, go straight through — the gate
+  fires only when the merge actually lands on trunk. Nothing about the
+  classification itself changed (same `classifyIronLaw`, same
+  matched-flags/matched-modules evidence); what changed is where it runs.
+  Merge sweeps also no longer stall on a held item: an item the gate holds
+  is recorded, walked past, and reported once at the end of the run, while
+  it stays at `awaiting-approval`.
+  (`docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md`,
+  which supersedes the always-hard-refuse clause of `D16/D17
+  self-improve-loop`; `docs/specs/runner.md` RUL34/RUL37/RUL64.)
+- The fgOS plugin ships as `1.2.0`. `resolveWriterIdentity` moved from
+  `src/runner/session-identity.mjs` to `src/util/session-identity.mjs`, and
+  the plugin's `terminal/rename.sh` follows it there — a cached copy of the
+  plugin at `1.1.0` would otherwise keep loading the old path and silently
+  stop resolving the fgOS session id in pane labels. Nothing else about the
+  command surface changes: this is an internal boundary cleanup that cuts
+  every `src/state/` → `src/runner/` import, collapses three copies of the
+  Iron Law check into one `src/runner/iron-law-gate.mjs`, and moves
+  `detectTrunk`/`isMainWorktree` to `src/runner/worktree.mjs`.
+  (`docs/history/state-runner-merge-boundary/CONTEXT.md` D1/D2)
+- Stage `planning` now asks a person **once**, not twice. The
+  `planApprove` gate is gone from `fgos-coding-planning`; the single
+  remaining gate lives in `fgos-coding-validating`, immediately before
+  split children are created. It also asks a different kind of question:
+  the agent first exhausts every action within reach, then weighs what a
+  wrong answer would cost to repair, and only stops when one of three
+  concrete triggers fires — presenting the specific thing it is stuck on
+  and its own attempt so far, rather than the whole plan plus
+  "approve?". When nothing is stuck it proceeds and posts a non-blocking
+  note. Split children are no longer created during planning: their specs
+  are written into `plan.md` and materialized in one step at that gate via
+  `fgos plan --verdict decompose --children`, so a cut that turns out
+  wrong costs nothing to change, and children arrive at `executing` with
+  no gate of their own. A mid-planning hand-back to `fgos-coding-exploring`
+  now records the gap it found, so the re-entry closes only that gap
+  instead of re-running a full exploring pass.
+  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`;
+  supersedes `docs/history/gate-bypass/CONTEXT.md` D6, D4, and D2's
+  never-self-report clause, and replaces the `canAutoApproveValidate`
+  export with `canAutoApproveMergedGate`.)
+
+### Added
+
+- New config key `ironLaw.level` in `.fgos/config.json`, with two values:
+  `ask` (the default — the gate refuses until a person acknowledges) and
+  `warn` (opt-in — the gate prints what it matched, records one engine
+  decision entry, and lets the merge through). Anything that is not exactly
+  `warn` reads as `ask`, including a missing key or a malformed config, so
+  the permissive level is never reached by accident. `fgos doctor` reports a
+  missing or unrecognized level and `fgos doctor --fix` writes the `ask`
+  default. Deliberately its own key, never folded into `gateBypass`, whose
+  floor is documented as never touching the Iron Law.
+- New `/fgOS:approve <id>` skill: one command covers both `fgos approve` and
+  `fgos sync-root`, inferring which verb the id actually needs, and always
+  showing the blast radius — which verb, which target branch, how many items
+  ride along — before asking anything. When the Iron Law gate holds an item,
+  it shows `docs/history/<id>/iron-law-evidence.md` verbatim, asks once, and
+  runs the command itself on a real yes instead of handing over a line to
+  type. It never adds `--acknowledge-iron-law` on its own authority.
+- `README.md`'s `## Install` now recommends installing a tagged release
+  (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always
+  resolving to whatever commit is currently on `main` — the bare `main`
+  command is kept as a documented bleeding-edge option. New how-to:
+  `docs/how-to/cut-a-fgos-release-tag.md`, the manual (repo-owner-judgment)
+  procedure for cutting a release.
+- `fgos submit --backlog` creates an item directly at the `backlog` status —
+  an idea not yet committed to — instead of the default `todo`, so marking
+  something as not-yet-ready no longer means submitting it and then moving
+  it. A `backlog` item carries its own `backlog` status category, so it is
+  excluded from the ready frontier until a person promotes it to `todo`.
+  The default is unchanged: a flagless `fgos submit`, and `fgos add` in all
+  cases, still create items at `todo`.
+- herdr TUI: a `BACKLOG` tab, first in the Work Items tab strip, showing
+  items at the new `backlog` status. It is its own tab rather than a marker
+  inside `TODO`, so nothing reads a backlog item as ready, and the strip
+  renders the label even while the bucket is empty — promoting `backlog` to
+  `todo` is a person's own call, and an invisible bucket never gets one. The
+  landing tab is still `TODO`; unattended auto-discover continues to skip
+  backlog items.
+- Delivered-event merge provenance: `fgos approve`'s real merge paths (local
+  root-into-main, local leaf-into-root, GitHub PR merge) now record
+  `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
+  item's own folded view — the sha and branch a change actually landed on,
+  readable straight through `fgos show`/`fgos list` instead of inferred
+  from git after the fact. `fgos move --to delivered` now refuses when
+  `fgw/<id>` exists and is not yet reachable from trunk (no merge evidence
+  to record), unless `--override-reason "<why>"` is given — the override is
+  logged to the item's decision log before the move proceeds. A verify-only
+  pull-door delivery, or an item with no `fgw/<id>` branch at all, is
+  unaffected either way.
+
+- Worker slots: a ceiling on how many work items may run at once. `fgos
+  slots` reports execution-lane occupancy, whether there is room, and the
+  admin lane's fixed reservation — it is the door launchers (herdr-plugin,
+  fgos-fanout) pre-check before standing a worker up. The same ceiling is
+  enforced inside every claim path (`take`, `pick`, and the runner alike),
+  which refuses with `worker-slot ceiling reached` once the lane is full.
+  Occupancy is derived from work items already at `doing`; nothing new is
+  recorded to get it. The ceiling ships UNARMED and stays that way until a
+  person sets it: `fgos setup` writes `workerSlots.ceiling: null`, which
+  refuses nothing, and a project is capped only once someone replaces that
+  with a real count. It is deliberately not armed on your behalf — `fgos
+  doctor` asks every project to run `fgos setup` as routine maintenance, so
+  a number written there would cap a repo that never asked to be capped, and
+  freeze its backlog if it was already running more items than the cap.
+- `fgos doctor` gained a `worker-slots-ceiling-usable` check. A
+  `workerSlots.ceiling` that is not a positive integer — `"8"` as a string,
+  `8.5`, `0`, `-1` — enforces nothing at all, so a project could believe it
+  was capped while running uncapped. The check names that, and reports the
+  deliberate `null` as "unarmed" rather than as a problem.
+- `fgos report <id> --text "..." [--stop-reason ...]` records a driver's
+  closing report on the item, so a result can be read with `fgos show <id>`
+  instead of by watching a terminal pane. `fgos-coding-driving` now records
+  one at every stop, which is what makes a finished worker pane safe for the
+  cockpit to reuse: the result no longer lives only on a screen somebody has
+  to guard.
+
+### Fixed
+
+- The Claude Code plugin (`plugins/fgOS/`) now ships all 14 coding-domain
+  dev-skills (`fgos-coding-driving`, `fgos-routing`, `fgos-clarifying`,
+  and the rest) alongside its existing CLI-wrapper skills. Previously
+  they existed only in this repo's own `.claude/skills/`, so any project
+  that installed fgOS solely as a plugin (no forgent checkout anywhere)
+  got "Unknown skill" the moment `/fgOS:cook`/`/fgOS:discover`/
+  `/fgOS:plan`/`/fgOS:pick` tried to dispatch into one — even though the
+  `fgos` CLI itself was fully reachable the whole time. A new
+  `fgos doctor` check, `plugin-dev-skills-packaged`, catches a maintainer
+  who forgets to keep the plugin's copies in sync before a release ships.
+
+### Changed
+
+- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
+  a worker up, instead of each enforcing a ceiling of its own. The runner's
+  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep
+  their values but change role: they bound how large a batch that launcher
+  may propose, while the shared ceiling decides whether the batch runs at
+  all — so the real limit on a machine is one number rather than the sum of
+  three. A batch is trimmed to the number of free slots: the ceiling is hard,
+  and anything fired past it would be refused at the claim door anyway, so a
+  launcher stands up only what the engine granted and defers the rest to the
+  next wave. With no `workerSlots.ceiling` configured, both behave exactly
+  as before. A runner that finds the lane full now ends its run cleanly
+  (`idle`, exit 0) rather than halting with a non-zero exit, and an item
+  refused for lack of room is simply left for a later poll.
+- The runner's discovery sweep now asks for a worker slot too. It stands a
+  real research worker up but never claims the item, so that process was
+  invisible to the ceiling and ran even when the lane was full — the machine
+  could carry more workers than the configured total while `fgos slots`
+  reported fewer.
+- A runner that dispatched nothing now says which of the two happened.
+  "Frontier empty — nothing to do" and "the lane is full, work is waiting"
+  previously printed the same line and returned the same envelope; the idle
+  result now carries `reason` (`frontier-empty` or `worker-slot-ceiling`),
+  and a refusal names the item ids currently holding the slots, so a lane
+  wedged by an abandoned claim is visible instead of looking like an empty
+  backlog.
+- `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
+  whose status says its work was handed over (`delivered`, `retrospective`,
+  `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable
+  from the trunk. `delivered` is reachable through a bare `fgos move`, which
+  merges nothing and asks for no proof that anything merged, so real tested
+  work could sit outside `main` with nothing reporting it — `root-drift`
+  only walks root items, and `fgos stale` waits a three-day TTL and then
+  says "forgotten", not "unmerged". The check separates the two causes: a
+  branch that merged nowhere needs its content landed, while one that landed
+  on a root branch that has not synced needs `fgos sync-root` on the root
+  instead.
+- `fgos discover` and `fgos plan` no longer send the reader to each other
+  when neither serves the item's stage. Each gate now checks whether its
+  sibling would actually accept the item; when neither does, both say so
+  plainly and point at `fgos doctor`'s stage-vocabulary check, instead of
+  forming a closed referral loop with no way out.
+
+- The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
+  verb `fgos decompose` is now `fgos plan`, the slash command
+  `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item
+  sits at while being shaped is now called `planning`. The verdict values
+  (`pass-through` / `need-human` / `decompose`) are unchanged — they name
+  an outcome, not a stage. `decompose` itself survives as a legacy,
+  drain-only stage alias so items already parked there before this change
+  keep advancing through their existing edges; no new item can land on it.
+  Five stage skills gain a `coding-` prefix to match the domain-prefix
+  convention every other stage skill already follows:
+  `fgos-exploring`→`fgos-coding-exploring`, `fgos-planning`→
+  `fgos-coding-planning`, `fgos-validating`→`fgos-coding-validating`,
+  `fgos-compounding`→`fgos-coding-compounding`, `fgos-code-implement`→
+  `fgos-coding-implement`.
+- The `clarify` stage is retired entirely — it is no longer a stage at
+  all. The understand-the-ask pass it used to run moved to an Init-time
+  helper (`fgos-clarifying`) that `/fgOS:submit` calls BEFORE the item is
+  created, so an item is now born with the cleaned-up title/description
+  and its domain already settled. Unlike `decompose`, no drain-only alias
+  is kept: every item still open on `clarify` was migrated onto a real
+  stage first, so nothing is stranded. `discovery` is now the coding
+  domain's first stage, and no item can be created at, or moved to,
+  `clarify` anymore.
+- A `discovery` verdict now picks WHICH EDGE the item takes, instead of
+  every item walking one fixed chain. `clear` skips `exploring` entirely
+  and lands the item straight on `planning`; `unclear` advances it to
+  `exploring` and parks it there for a person, so whoever answers resumes
+  already sitting at the stage where the Socratic pass happens instead of
+  looping back through discovery on the same unresolved question.
+  Previously an unclear verdict parked the item in place, at whatever
+  stage it was already on.
+- `tier`/`kind`/`risk` are no longer judged from the raw submit text. The
+  `fgos submit` verb still stamps its mechanical keyword-derived values,
+  but those are now explicitly a temporary placeholder: stage
+  `discovery`'s own skill (`fgos-coding-discovering`) makes the real call
+  once, on the research evidence it just gathered, reading each domain's
+  declared `kind`/`risk` vocabulary rather than a hardcoded list. No
+  caller re-judges them at intake anymore — a wrong placeholder is
+  corrected later by discovery's own judgment, not earlier by guessing
+  harder at the ask. The `submit-assist-classify` capacity is retired
+  outright, with no migration: it only ever described how to call a
+  helper, never held a judgment that needed handing over.
+- `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,
+  picks one item, and hands it to `fgos-coding-driving` with an explicit
+  `ceiling: status:cleanup`, relaying whatever the driver reports. It no
+  longer resolves the synthesis skill, invokes it, moves the item, or reads
+  a subprocess exit code itself. Observable behavior is unchanged —
+  synthesis runs, the item lands at `cleanup`, the run stops there — but it
+  now inherits the driver's park/anchor handling and its
+  `stop-reason: lock-timeout` relay instead of duplicating thinner versions.
+- `fgos-coding-driving` now resolves each iteration's next step from the
+  item's **position** rather than always from `stage`: `stage` while it is
+  live, `status` once it freezes at `awaiting-approval`. This makes the
+  driver able to carry an item through the post-merge chain
+  (`retrospective` → `cleanup`) that previously needed hand-rolled
+  sequencing in each launcher. No registry or code change was required —
+  `skillMap` has mixed stage and status keys since decision `0027` D5.
+- `/fgOS:cleanup-next` now reports a stuck shared lock with the same
+  `stop-reason: lock-timeout` marker line every other launcher and the
+  driver already use, instead of describing that condition only in prose —
+  so `/fgOS:cleanup-loop` reads the one loop-stopping category off a line
+  rather than inferring it. Its exit-code classification is unchanged and
+  documented as deliberate: unlike `/fgOS:retro-next`, it runs a real CLI
+  subprocess, so an exit code genuinely exists to read.
+- `awaiting-approval` changes from an unconditional stop into the driver's
+  **default, overridable ceiling**. A caller that supplies no ceiling stops
+  there exactly as before, so existing behavior is unchanged; a caller that
+  deliberately passes a further `status:*` ceiling can drive past it. The
+  merge gate stays a human decision, now protected by a named launcher
+  convention (no launcher ships a default ceiling past `awaiting-approval`)
+  rather than by the driver refusing structurally.
+
+### Fixed
+
+- An item whose root branch was ever synced (`fgos sync-root`), or that was
+  converged into a component (`fgos promote-to-component`), could reach
+  `done` without a retrospective ever having produced anything. Both verbs
+  recorded their merge on the item as a decision but never said it was
+  machine-written, and an untagged decision defaults to `design` — so the
+  cleanup gate read a routine branch merge as someone's reflection on the
+  work and passed the item through. Both records are now tagged as engine
+  bookkeeping. They remain fully visible in `fgos show`; they simply no
+  longer stand in for a retrospective document. **Forward-only** (tsk-33w9):
+  the event log is append-only and replay folds each decision exactly as it
+  was written, so every `sync-root`/`promote-to-component` decision recorded
+  BEFORE this fix keeps `kind: design` forever — this change stops new
+  records from falsely satisfying the gate, it does not retag or re-flip
+  anything already on disk. Whether pre-existing falsely-tagged records get
+  a one-off migration, a text-based gate refusal, or are left as-is remains
+  an open decision.
+
+- `checkRetrospectiveContent` (the `cleanup -> done` retrospective-content
+  gate) missed two legitimate forms of retrospective content, both
+  false-negatives that permanently parked an item at `cleanup` regardless
+  of TTL: a genuine re-attest judgment ("no new doc needed, an existing doc
+  already covers this"), recorded only through `fgos knowledge attest`
+  (never a decision or `outcome.docType`/`docPath`); and a leaf item whose
+  retrospective content was recorded against its ROOT id instead of its
+  own (the knowledge skill runs once per split group). The gate now
+  recognizes a knowledge-registry attestation naming the item's id, and
+  falls back to the item's root when the leaf itself has no evidence of
+  its own — a no-op for any root/standalone item.
+
+- Parallel fan-out no longer refuses to dispatch anything when the
+  worker-slot ceiling is unarmed — which is how every project starts, since
+  `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state
+  `fgos slots` reports room available but no numeric limit
+  (`free: null`), and the fan-out launcher trimmed its batch against that
+  number anyway, reading "no limit" as "no slots" and firing nothing while
+  the machine was completely idle. It now fires the whole batch when no
+  ceiling is armed, and trims only against a real one.
+- `fgos check`'s entropy report no longer under-counts the backlog waiting
+  at the front of the lifecycle. The signal filtered on the literal stage
+  name `clarify`, which the coding domain retired entirely, so it reported
+  0 forever while every open item genuinely parked at the domain's real
+  entry stage (`discovery`) went uncounted. It now resolves each item's own
+  domain entry stage, and the row is labelled `stage-entry` instead of
+  `stage-clarify` to match what it actually counts.
+
+### Changed
+
+- **`cleanup`'s TTL delay now anchors to `delivered` (release), not to the
+  later `retrospective -> cleanup` transition.** The original anchor's
+  justification — protecting a still-reusable worktree during the delay —
+  is stale in practice: the worktree is normally torn down far earlier than
+  `cleanup`, so by the time an item reaches `cleanup` there is usually
+  nothing left at that anchor to protect. What the delay actually protects
+  is a real post-merge incident window on the shipped artifact, which
+  starts at release, not at whatever later moment retrospective happens to
+  finish (a slow retrospective was silently extending the window past what
+  was intended). Does not weaken "must retrospective before cleanup" —
+  that stays a structural property of the `delivered -> retrospective ->
+  cleanup` chain itself, independent of the TTL clock.
+
+### Removed
+
+- `npm run check:decision-supersession` — the `docs/decisions/NNNN-*.md` +
+  `0000-index.md` pointer-pair format it validated is retired for good
+  along with the hand-authored ADR corpus (see Added, ADR retirement).
+  `scripts/check-decision-supersession.mjs`'s pure functions stay real and
+  unit-tested against synthetic fixtures; only the real-repo CLI mode had
+  nothing left to run against.
+- The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
+  and its 28-entry allowlist) is retired, per decision `0031`. Decision
+  `0028` banned the term while it carried no meaning; decision `0029` D17
+  then assigned it one — the T0 aggregate layer (N units, stays engaged),
+  the role `/fgOS:*-loop` and `fgos-fanout` actually play. The guard was
+  left blocking fgOS's own current vocabulary, and a word-level grep cannot
+  tell the retired sense from the assigned one. Writing `orchestrator` in
+  that assigned sense no longer fails the suite. `launcher` remains the only
+  correct name for the one-unit, fire-and-forget role — that half of `0028`
+  stands.
+
+### Added
+
+- New `fgos version` verb: reports this build's own `package.json` version,
+  git commit (when resolvable), and its full dispatched verb set — a
+  hook-safe, scriptable way to tell an old globally-installed `fgos` apart
+  from a current checkout without reading `node_modules` directly. `fgos
+  doctor` gained a matching `cli-version-visible` check that surfaces the
+  same info in its own report.
+
+- `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside
+  `--verdict clear`, so an interactive session can record the classification
+  it just judged in the same call that resolves discovery, instead of
+  remembering a separate `fgos edit`. This is the same data contract a
+  headless worker already had through its `fgos-verdict` block, and both
+  paths now run it through one shared guard: nothing is applied unless the
+  discovery outcome actually resolves clear, so an unclear verdict or a
+  parked verify dispute still changes no classification. A value outside the
+  item's own domain vocabulary is refused as a validation error (exit 4)
+  before the item moves at all, and omitting a flag leaves that field
+  untouched.
+- Repo-invariant checks now run alongside an item's own `verify`, at both
+  `fgos return` and the post-merge gate of `fgos approve`. The commands are
+  declared per project in `.fgos/config.json` under `invariantChecks.commands`
+  (this repo's default: `node --test test/architecture.test.mjs`), registered
+  into `fgos setup`'s config-merge and visible to `fgos doctor` as the new
+  `invariant-checks-configured` check. They are a hard gate: a red invariant
+  blocks the return and aborts the merge, naming the command that failed.
+  A project with no `invariantChecks` section behaves exactly as before —
+  nothing runs, nothing changes. This closes the gap where a repo-wide
+  invariant broken by one item could land on main and stay red across later
+  merges, because no item's own narrow `verify` happened to touch it.
+
+- `fgos doctor` gained a `work-stage-vocabulary` check: it names any open
+  item sitting at a stage its own domain no longer registers. Until now
+  only `risk`/`kind` drift was surfaced this way, so an item stranded on a
+  retired stage — which no `fgos edit` can correct, since `stage` has no
+  editable door — stayed invisible until some other command tripped over
+  it. The `discover` pool now derives its candidate stages from the same
+  source the `fgos discover` verb checks against, so it can no longer offer
+  an item that the verb would then refuse.
+
+- `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an
+  explicit `--dir` also passed, it can now run from inside a linked
+  worktree instead of refusing outright. Default behavior (no flag) is
+  unchanged. See `docs/how-to/recover-approve-sync-root-from-inside-a-
+  worktree-with-trust-dir.md`'s new `promote-to-component` section.
+
+### Changed
+
+- `fgos approve` no longer re-runs an item's checks when the tree it is about
+  to merge is provably the exact tree `return` already verified green (main
+  has not advanced past the fork, and the branch tip still matches the SHA
+  recorded at return). In that case both the item's `verify` and the
+  invariant checks are skipped, and the merge report says so explicitly.
+  Whenever main HAS advanced, the merged tree is genuinely different and
+  every check runs as before.
+
+- `fgos doctor` gained a new check, `events-jsonl-contiguous`: the shared
+  `.fgos/events.jsonl` is now checked for seq breaks/duplicates that an
+  ordinary git merge can leave behind (a new `.gitattributes` entry routes
+  it through git's built-in `union` merge driver, closing the underlying
+  merge-conflict-hand-resolution class of event loss). `fgos doctor --fix`
+  repairs a found break by deduping exact-duplicate lines and renumbering
+  `seq` contiguously — no event is ever dropped by the fix.
+
+- Work-item `kind` and `risk` now have a per-domain vocabulary, declared by
+  the domain itself (`DOMAINS.<domain>.classification`) and enforced at the
+  write door alongside the existing `tier` enum. Coding declares
+  `kind: bug|chore|design|docs|feature|task` and
+  `risk: light|standard|heavy`. A domain that declares no vocabulary is
+  unaffected — any non-empty string still passes, exactly as before.
+
+- `pick`/`take` now transparently reclaim a `doing` item whose `human`/
+  `session` claim has genuinely gone quiet — no new verb or flag. When a
+  claim conflict would otherwise refuse unconditionally, the existing
+  claim's worktree/branch activity (real commit + file-edit signal, not
+  session/process identity) is checked first; past a conservative
+  threshold (same `agentMs`/`humanMs` split `/fgOS:stale` already uses),
+  the stale claim is released and the new claim reattaches to the
+  existing branch (never force-removed). Runner claims stay untouched
+  (`startupReap`'s own domain), and only a live `pick` attempt (never
+  `take`, never a `runner` caller) can trigger it. Every other case —
+  recent activity, or unreadable evidence — refuses exactly as before.
+
+- The shared config file gains a `herdrOrchestrator: {autoDiscover,
+  autoMerge, autoRetro, autoCleanup}` section (all off by default,
+  fail-closed on a missing or malformed value) for the herdr-plugin
+  dashboard's future auto-launch toggles. Surfaced by `fgos doctor`'s new
+  `herdr-launcher-configured` check and merged in by `fgos setup`, same
+  as every other registered config default.
+
+- The herdr-plugin dashboard auto-launches a guarded agent pane running
+  `/fgOS:discover <id>` for the first `discovery`-stage, `todo`-status
+  item it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
+  on (off by default). Guarded against double-launching the same item via
+  a dedicated pane label, kept separate from the dashboard's existing
+  In-Process pane tracking so it never shows up there as a phantom task.
+
+- The herdr-plugin dashboard also auto-launches into the fixed
+  `fg:operation` tab when `herdrOrchestrator.autoMerge`/`autoRetro`/
+  `autoCleanup` are on (all off by default): the left pane runs
+  `/fgOS:merge-loop`, the right pane runs `/fgOS:retro-loop` or
+  `/fgOS:cleanup-loop`, alternating by priority. Guarded against
+  double-launching via a dedicated fixed pane title per toggle, same as
+  auto-discover.
+
+### Changed
+
+- `/fgOS:submit` run from a live session now clarifies the ask before the
+  item is created: `fgos-clarifying` reads the raw text and hands back the
+  cleaned-up title/description and the domain, and `fgos submit` is called
+  with those. It never judges `tier`/`kind`/`risk` itself — stage
+  `discovery` does that, once, on real evidence. Any question it needs to
+  ask is asked while you are still in the conversation, rather than days
+  later at a discovery sweep. The `fgos submit` verb itself is unchanged — still mechanical,
+  still no model call — so a bare shell, cron, another agent, or the
+  dogfood fixture replay all behave exactly as before.
+
+### Fixed
+
+- An item parked for a person after being judged NOT clear at `discovery`
+  was still recorded in the settlement channel as having passed, because
+  the settlement record keyed only on the item leaving `discovery` — which
+  an unclear verdict now also does. Where the item had no real verify yet,
+  the record's detail read as the literal "chưa xác định — bổ sung thủ
+  công" placeholder. A settlement is now recorded only when the verdict
+  that drove the move was clear. Records already written for real clear
+  passes are unaffected; nothing is re-derived or silenced retroactively.
+- Items could be stored with a `risk` value nothing in the system reads
+  (`low`/`medium`/`high`), which silently disabled two behaviors rather
+  than failing: the human-confirmation gate that fires before a
+  `risk: heavy` root is split, and the risk discount in the priority
+  formula (which fell back to its `standard` weighting). Such a value is
+  now rejected when written. Items already stored with one keep replaying
+  and stay editable; only a write that actually touches the field is held
+  to the vocabulary.
+
+- Merging could fail for reasons that had nothing to do with the work being
+  merged. The event-log concurrency test queued 800 serialized lock
+  acquisitions against a 2s per-acquisition budget, so under the load of a
+  full test run it could exceed that budget and fail — and because that run
+  is what `fgos approve`/`fgos return` use to verify a merge, the merge was
+  rolled back and an innocent item was parked in `blocked`. Observed three
+  times in one day on two unrelated items. The test now queues an amount
+  the budget was actually documented for, and still fails loudly if the
+  append lock itself regresses.
+
+### Removed
+
+- The standalone `fgos-submit-assist` skill. Its own steps had no reason
+  left to exist on their own: title derivation always lived in the
+  `submit` verb itself, and its tier/kind/risk classification now happens
+  once at stage `discovery`, on real research evidence, for every item
+  regardless of which caller created it. Use `/fgOS:submit` directly; it
+  now does strictly more than this skill did.
+- The `resolve` CLI subcommand (`node src/runner/dispatch.mjs resolve`)
+  and `resolveCapacityCli`. 0 production consumers (confirmed via impact
+  analysis); `execute` already covers everything `resolve` did, and
+  actually runs the command instead of handing back `{command,args}` for
+  the caller to run itself through Bash.
+
+### Added
+
+- `decide` gains a `--needs-soul` flag: the caller's own self-declaration
+  that it is about to fire its own Agent/Task tool with no capacity or
+  work item to name. When every other lookup (capacity id, `--for`,
+  `--work`) comes up empty, `--needs-soul` defaults the answer to native
+  dispatch instead of `"unavailable"` — the same default `--work` already
+  applied for a work item with no registered capacity override, now
+  available to a bare Agent/Task call too.
+- Every `decide` result now carries `configured: true|false` — `false`
+  means nothing is registered under that name/purpose (the answer came
+  from the default); `true` means a real `capacities.<id>` entry was
+  found, whatever mechanism it resolves to. Lets a caller tell "typo'd or
+  never configured" apart from "configured, and it happens to run
+  out-of-process" — today both silently read the same
+  `mechanism: "out-of-process"`.
+- A `PreToolUse` hook (`scripts/dispatch-decide-hook.mjs`) now enforces
+  that every Agent/Task tool call goes through `decide` first: it runs
+  `decide --for <subagent_type> --needs-soul --has-live-task-access` on
+  the caller's behalf and refuses the call when the answer is anything
+  other than `in-process`, pointing at `execute` instead. Wired into
+  `.claude/settings.json` by `fgos setup` (fill-only — a pre-existing
+  `hooks.SessionStart` entry, or any other content, is left untouched);
+  reported by a new `dispatch-decide-hook-wired` `fgos doctor` check. Fails
+  open on any internal error (empty/malformed stdin, `decide` itself
+  erroring) — never a second point of failure on top of a working dispatch
+  surface.
+- `capacities.<id>.capability` (the tool-registry's own free-text field) is
+  now catalog-validated the same way `for` already was — a typo'd or
+  undeclared value used to silently make a tool invisible to `fgos tool
+  query --capability ...` with no error anywhere; it now fails config load
+  with a clear message naming the missing catalog entry.
+- `decide` hands back `mcpTool` (mutually exclusive with `agentType`) for a
+  `kind:"tool"` capacity whose `mcp` invocation declares a `tools` map
+  (`capability -> MCP tool identifier`) covering the requested purpose —
+  `mechanism` is upgraded from `out-of-process` to `in-process` in that
+  case, since dispatch has no MCP client of its own and hands the call back
+  to the caller's own live one, the same reasoning `agentType` hand-back
+  already uses for a live Agent/Task tool. Fixes a real gap: `decide --for
+  impact-analysis` used to answer `unavailable` even though `gitnexus` was
+  fully registered, because `toolsFromCapacities` (`fgos tool query`) and
+  `resolveCapacityIdForPurpose` (`decide`) read two different fields.
+
+### Changed
+
+- `toolsFromCapacities` now prefers `capacities.<id>.for[0]` over
+  `capacities.<id>.capability` when both are present, folding the two
+  previously-separate capability fields into one read path — `capability`
+  stays accepted as a tolerant fallback for a not-yet-migrated capacity,
+  never removed by this change alone.
+
+## [0.1.0]
+
+Baseline snapshot of the public surface as of this entry.
+
+### Added
+
+- `fgos` CLI with 49 verbs covering the work-item lifecycle (submit,
+  clarify/decompose/execute, review/merge, and maintenance operations).
+- `fgos-runner` bin entry for the automated runner loop.
+- Install/setup/doctor/uninstall story: `fgos setup` (global/project config
+  merge), `fgos doctor` (check registry), and their uninstall counterpart.
+
+```
+
+### Upstream parent
+
+```text
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- `fgos dispatch execute <executor> --for <capability>` names the kind of work a dispatch does; the capability, not the executor, sets whether it may change files. `execute <agent>` without `--for` is now refused before spawning with the choices listed, and this door carries writing work only: read-only work runs sandboxed as a Workflow unit with `"writes": []` (`fgos workflow start --units <file>`); `execute --contract <file> --executor <id>` keeps a named provider but enforces read-only by instruction only, without a sandbox. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
+- A `for` list on an agent executor is now ignored (it used to set the posture of every dispatch to that executor); `for` keeps its meaning on `kind: "tool"` executors. `fgos doctor` names each leftover under `executor-profile-warnings` so it can be removed.
+- `fgos dispatch probe-account --provider <provider> --account <account>` starts every CLI configured for one provider account (Codex, pi, omp) at the same moment through the same door a read-only dispatch uses (sandbox, the account's login copied into a private home, a herdr pane for pane invocations) with a trivial prompt, and reports per CLI whether it answered or stopped at a trust prompt, a dead login, a quota, the sandbox or a timeout, with the line that shows it and the run and pane it used, plus whether the fault looks like the account's or one CLI's. It closes the panes it opened. It only diagnoses: it picks and schedules nothing.
+- A provider account in `~/.fgos/config.json` (`runner.providers.<provider>.accounts.<id>`) can declare one login store per CLI with `credentialSources: { codex: {...}, pi: {...} }` instead of the single `credentialSource`, so one account can be used through Codex, pi or omp while each CLI keeps its own login. A confined launch gets the store of the CLI it actually runs (copied into its private home, renewed and written back to that store, folder trust read from it); a launch pinned to one CLI only leases an account that has a store for it, and a CLI the leased account has no store for is refused before the worker starts. Quota, locks and quarantine stay per account. `credentialSource` keeps working unchanged. An older fgos release refuses an inventory that uses `credentialSources`, so update fgos before adding it.
+
+### Changed
+
+- Confined Codex accounts now fail closed when `auth.json` is a symlink that resolves outside the Codex home, or when the configured `home` is a relative path; the dispatch stops before the worker starts. Both used to be accepted (the symlink was followed, a relative home was resolved against the working directory).
+
+### Fixed
+
+- The confined pi invocations of the `openai` executor (`pi-cli-bwrap-tetcu72`, `-fgovn`, `-tetnu`) no longer die with `EROFS` on their own `settings.json.lock`: they now bind a private home for `PI_CODING_AGENT_DIR`, the same way the OpenRouter pi invocations do, and receive the leased account's pi login there.
+- A confined Codex (or agy) pane no longer stops at "Trust this folder?" when the account the dispatch leased trusts the repository but the account named in the invocation's own env does not. The trust entry in the pane's private home is now derived from the leased account's own store, the one whose login the pane carries.
+- A confined, read-only Codex pane no longer loses every command partway through a run with `bwrap: Can't mkdir <workspace>/.aws: Read-only file system`. The pane now starts Codex with `--no-daemon`, so the session stays in the pane's own Codex process and keeps its sandbox off for the whole run (bwrap is the confinement); before, the session ran on a background Codex daemon that can be replaced mid-run, and a thread it reopens can fall back to Codex's own workspace sandbox, which cannot start inside a read-only workspace.
+- A rotating provider login (pi, omp and Codex accounts) no longer gets stranded when a confined pane renews it inside its throwaway private home, which used up the source's single-use refresh token and made the next renewal anywhere fail with `invalid_grant`. A dispatch opted in with `providerCredentialRenew` now renews a login that is close to expiry once, in a scratch copy fgOS holds under a per-account lock, and applies the new entry to the real store before the private home is built; a login renewed inside a pane is written back when its home is removed, only when it is newer, entry by entry. The real store is never made to look expired and a failed renewal leaves it untouched. Without the opt-in provisioning and removal are as before.
+- A confined omp account's `agent.db` is now copied into the private home as a consistent SQLite snapshot (write-ahead log included) instead of a raw file, whether or not a dispatch opted in. The lazy-probe unlock now also covers omp accounts (the xai account), which it could not probe before.
+- A confined home whose login was renewed inside it is no longer deleted when the copy cannot be read for a reason that may pass (for example `node:sqlite` is unavailable): it is staged beside the account, and if staging fails the home is kept for a later retry. Staged copies are capped at five per account.
+- A renewed login copy that hits an operating-system read error (permissions, I/O) is now kept for a later renewal instead of being deleted as malformed; only a copy with no store file is dropped. A private home kept because its login could not be staged is retried five times, then held (never deleted for age), and the finalizer no longer stops at it: the dispatch's other resources are still removed.
+- A private home held after repeated staging failures is no longer counted as an orphan that `fgos doctor --fix` would reap. Such a home is re-checked when its account is next renewed and by `fgos doctor --fix`, and removed only once its login is shown applied or obsolete; failed removals less than 15 minutes apart count once, and the ownership marker is written atomically.
+- A pending login copy is no longer dropped to make room: with more than five pending copies an account keeps them all unless some are identical to another, and `fgos doctor` reports the account. Staged copies are synced to disk before the private home goes, and a login store a probe left half-written is kept for hand recovery instead of deleted. A private home whose login store is identical to its source is no longer staged.
+
+### Added
+
+- `fgos doctor` check `credential-copies-retained`: reports login copies still waiting for a renewal after a day (a warning) and private homes held after repeated staging failures (a failure, naming the home), by provider/account and age and never with a token value, since each may hold the only valid refresh token. `fgos doctor --fix` re-checks held homes.
+
+## [v0.2.0-rc.4] - 2026-10-13
+
+### Added
+- `fgos` now runs each project's own activated release from any directory on a release install. `fgos doctor --fix` (which `fgctl init` already runs) writes one small `fgos` launcher next to `fgctl` that walks up to the nearest `.fgos/installation/bin/fgos` and runs it, so there is no absolute path to type and no rc file is touched (`fgos.cmd` on Windows). It never overwrites a different `fgos` found first on `PATH`; `doctor` names it instead. New `doctor` check: `project-fgos-launcher`.
+
+## [v0.2.0-rc.3] - 2026-10-13
+
+### Fixed
+- `fgos doctor` and `fgos version` no longer print `fatal: not a git repository` when run from a release install (one set up by `fgctl init`, which is not a git checkout). The version check asked git about the install directory and let git's error through; the command result was already correct, only the stray line was wrong.
+
+## [v0.2.0-rc.2] - 2026-10-13
+
+### Added
+
+- fgOS runs natively on Windows 10 and later, from PowerShell or `cmd.exe`, with no Git Bash and no WSL. A release now publishes `fgos-<tag>-x86_64-pc-windows-msvc.tar.gz` and `fgctl-<tag>-x86_64-pc-windows-msvc.tar.gz` next to the Linux assets, one `SHA256SUMS` covering all of them, and `install.ps1` next to `install.sh` (same `FGCTL_VERSION`, `FGCTL_INSTALL_DIR`, `FGCTL_ASSET_BASE_URL` and `FGCTL_TARGET`, mandatory checksum check, no administrator rights, nothing added to `PATH` silently). `fgctl init` downloads and activates the Windows target, and writes `.fgos/installation/bin/fgos.cmd` and `fgos-runner.cmd` beside the `sh` launchers so `fgos` resolves from a plain PowerShell session (the old Windows `.cmd` launchers that needed a `sh` on `PATH` are gone); `fgctl verify` reports a missing or edited launcher and `fgctl repair` rewrites them. The `rust-host-target-supported` doctor check now approves `x86_64-pc-windows-msvc`. The Linux asset is now built on `ubuntu-22.04` and the build fails if a shipped binary needs a glibc symbol newer than 2.35, so it no longer prints a loader warning on Ubuntu 22.04. A pre-release is still never "latest": install one with `FGCTL_VERSION`.
+- `fgctl init` no longer needs a hand-downloaded tarball. With no `--from` and no committed pin it downloads the latest GitHub release (through `curl`) and verifies it against `SHA256SUMS`, refusing on a mismatch or a missing entry. `FGCTL_VERSION=<tag>` installs an exact tag (needed for pre-releases, which "latest" skips); `FGCTL_FROM=<path | URL>` (or `--from`) installs a non-release build. Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > project pin > latest. `fgos doctor` gains a `curl-available` check (a warning only). A download records its tag in `.fgos/distribution.json` (`projectRuntime.releaseVersion`); a pin with a tag whose release is not staged on the machine makes a plain `fgctl init` download that tag, checksum-verified, and refuse unless its digest is the pinned one. README's Install section now says `install.sh` installs the latest release and a pre-release needs `FGCTL_VERSION`.
+
+## [v0.2.0-rc.1] - 2026-10-12
+
+### Added
+
+- `domains/marketing/agents/` ships four draft go-to-market personas (`value-chain-strategist`, `offer-pricing-critic`, `buyer-channel-skeptic`, `solo-capacity-checker`) for `--seats "@name"`, with a how-to and knowledge templates in `domains/marketing/`. They have no domain-expert review. A person or company replaces or adds personas in `fgos/agents/` and keeps its own knowledge in `fgos/knowledge/<domain>/` for `--context-ref`.
+- `fgos agents list` lists every persona a seat can name (tier, source, description, lower files it shadows, shape problems, keys the renderer would drop) and the installed definitions a project's own `domains/` or `core/agents/` folder hides. `fgos-advise` uses it to pick `@name` seats. `fgos doctor` reports the same render warnings and hidden names without failing. A `--seats` start now digests plain-path context refs (`seats.refDigests`, taken at start, not proof of what a seat read) and prints `seatsEcho`; `fgos workflow status` of a seated run adds `seatProviders`, the executor, provider family and model that served each seat and where a failover moved it from.
+- `runner.governance.disallowedExecutors` removes an executor from every candidate pool. It is empty by default.
+- The `xai` executor now runs through `omp` (an isolated `xai-vantt` profile) instead of `pi`, whose Grok login kept needing a fresh OAuth. The pane (herdr) invocation for xai is gone until omp has one; confined and plain CLI invocations remain.
+- `fgos workflow start <base> --seats "lens one|lens two|lens three"` rebuilds `group-cognition`, `business-discussion`, `nominal-group` or `delphi` with one panel seat per lens (at least 2, no maximum, plain-text lenses or `@name` personas), leaving topology, gates, checkers and the synthesizer as registered. Shared `--context-ref` documents also reach later seats and checkers, the expanded definition and a provenance record are stored in the run (`fgos workflow status`), seats beyond the provider families are reported as `seatsPreflight` instead of refused, and `workflow resume --seats` refuses seats that differ from the run's. `fgos-advise` may now fill `--seats` with 2-4 non-redundant perspectives. `council-lite` and `architecture-advisory` keep their own seats and refuse it.
+- `fgos workflow start --seats "@finance-controller|a plain lens|@other"` seats a named persona on exactly that panel seat. The name is looked up in the project's `fgos/agents/<name>.yaml`, then `domains/*/agents/`, then the installed `core/agents/` (a higher tier replaces the lower file whole; two files of one name in one tier, an unknown name, a duplicated `@name` or a file without matching `name:` and a `description:` refuse the start before any run exists). The persona text and its SHA-256 are pinned in the run at start, so resume and later steps never re-read the file; the synthesizer and checkers never inherit a seat persona. `fgos doctor`'s `agent-type-names-unique` now means unique within each tier, covers `fgos/agents` and reports which installed definition a customer file replaces. `fgos-advise` and `fgos-group-thinking` may list personas from the three folders and pick names; they still never invent one.
+- A panel's seat count is no longer capped by the number of usable provider families. A different family per seat is now a preference: `bind()` gives each seat (and the synthesizer) the first family in the capability's `prefer` order that no earlier seat uses, then the least used one, and never refuses a seat for sharing a family. `reviewed` producer/checker independence and the `acceptDependence` human waiver are unchanged. Seats that share a family are recorded in the binding (`provenance.familySpread`) and in `unit-summary.json` (`sharedFamilies`); `workflow-pools-satisfy-independence` now only fails `reviewed` units and notes panels whose pool is shorter than their seats.
+- The reviewer and red-team checkers of the `group-cognition` and `business-discussion` critique steps are now briefed to read the supplied artifact and Context refs, not the latest commit, so they work for non-code questions.
+- `fgos-panel` is renamed `fgos-advise` (no alias; `fgos-group-thinking` keeps its name as the execution door for an already-chosen route). It now picks the route from the person's purpose and the role they need: judge supplied options goes to `council-lite`, generate and rank to `nominal-group`, stress-test an artifact to `rfc`, revise estimates to `delphi`, explore to `group-cognition`, approve-then-roadmap to `business-discussion`, in-repo architecture to `fgos-architecture-panel`. The kind-to-route table now ships with the skill (`core/skills/fgos-advise/references/request-kinds-and-routes.md`); the stale preset table in `group-thinking-trigger-surface.md` is replaced by a pointer. Seats, lenses, rounds and gates still come only from the chosen workflow or preset.
+- Discussion launch guidance (`fgos-group-thinking`, `fgos-panel`) now tells launchers to pass `--stance-options` when a question has 2-4 discrete answers, so `fgos metrics discussions` can measure agreement; open-ended questions stay unmeasured.
+- `fgos convention name|path|check|classify` provides one native Rust authority for report, plan, and journal names and repository-relative paths. `convention-conformance` reports old violations without failing and fails for violations introduced after each rule cutoff; the source-repository pre-commit hook warns, but never blocks, on newly staged direct report and journal files.
+- A failed round that has to close its herdr pane (a detected tamper, or a failure after the worker was already live) now keeps up to the last 40 non-empty screen lines in the failure record as `screen`, instead of losing them with the pane.
+- Release packages and npm tarballs no longer carry `.agents/hooks.json`: that file is written by `fgos setup` with the absolute paths of the machine that ran it, so shipping it could hand another machine hook commands that exit 127. The payload now declares `.agents/skills` instead of the whole `.agents` directory.
+- A mutating assignment whose worker settled with a `findings` verdict now stops with the reason `assignment-<operation>-findings` instead of `-insufficient-confidence`, which read as missing evidence. It still stops.
+- `fgos dispatch reconcile provider-capacity quarantine --provider <p> --account <id> --until <ISO> --reason "<why>"` lets the owner take an exhausted account out of selection until a given time (clear stays `clear-quarantine`). A codex usage-limit message that names a clock time ("try again at 6:02 PM") now sets the quarantine end to that time instead of the one-hour default.
+- Confined claude workers no longer stop at the "new MCP server found in this project" dialog: the servers the project's `.mcp.json` declares are approved for that worker process only (never written to `~/.claude.json`), and only where the project root is already trusted.
+- Confined codex workers no longer stop at the hook review dialog in projects that ship `.codex/hooks.json`: the project's hooks are trusted in the worker's private home only (never in the account's own config, and only where the project root is already trusted); the home is deleted after the dispatch.
+- `council-lite` runs one independent three-seat panel with assumption-testing, ship/maintain, and feedback-loop task postures from `core/agents/`; provider selection remains with `bind()`, with no runtime or renderer change. Each seat first restates the question and the synthesizer lists mismatched restatements as unresolved evidence.
+- `fgos setup` and `fgos doctor --fix` in a project other than the fgOS source repo no longer create fgOS-only files: the end-user docs index, decision index and doc registry are refreshed only once a project has adopted them (`fgos docs-index`, `fgos decision-index`, `fgos doc-registry`), and `core.hooksPath` is set only when the project ships its own hooks directory. Inside the fgOS source repo nothing changes.
+- Multi-agent hooks (Claude Code, Codex CLI, AGY, OMP, Pi): `fgos hook <kind>` provides a portable, protocol-aware runtime door for `dispatch-decide` and `decision-question` guards outside the fgOS source repo. `fgos doctor` and `doctor --fix` verify and wire workspace-scoped hooks across all 5 agents (`.claude/settings.json`, `.codex/hooks.json`, `.agents/hooks.json`, `.omp/extensions/fgos-hooks.ts`, `.pi/extensions/fgos-hooks.ts`), probe runnability via local shim without global fallback, and automatically migrate legacy scripts without touching custom user hooks.
+- A heavy-risk or blast-radius split gate now releases only on `fgos answer <id> --approve`; any other answer is treated as a clarification and the item is asked again. An approval covers only the exact proposal it answered; a gate answered before this change asks once more. `fgos ask` no longer takes `--rationale`/`--alternatives` (put options and reasoning in the question text); `fgos answer --rationale/--alternatives` and `fgos decision` are unchanged. A PreToolUse hook (wired by `fgos setup`, checked by doctor) blocks an `AskUserQuestion` call whose turn does not carry the decision-question template.
+- Every answer door now distinguishes explicit consent from clarification: Gateway REST (`POST /work/{id}/answer`), MCP Rhai (`answer_work(id, text, approve)`), web client (`answerWork`), and CLI `fgos move <id> --answer "..." --approve` now forward `--approve`. A heavy-risk or blast-radius split gate answered through the dashboard or MCP with `approve: true` releases cleanly.
+- Workflow human gates now default to fail-closed consent gates (`mode: "consent"`): answering without `--approve` records the response as a clarification note in `gate-answers/<stepId>.md` and leaves the gate parked, advancing only on explicit `--approve`. Cổng thu thập ý kiến (`mode: "input"`, e.g. `nominal-group`) release directly on a non-empty answer without requiring `--approve`.
+- `fgos ask` now checks questions against one decision-question template (`core/skills/_shared/decision-question.md`): at stage `discovery`/`exploring` a question needs "Chuyện gì đang xảy ra", "Nguyên nhân" and "Phạm vi của câu trả lời"; at every other stage it also needs "Các lựa chọn" and "Khuyến nghị" (English names accepted). The old `## Context`/`## Why this matters` headings are no longer accepted; the error message prints the template.
+- Architecture advisory gains reviewed final-packet synthesis, a recoverable producer-derived expertise close, and linear parent-report reopen; cross-repo Workflow refs use settled Unit reports. Reviewed `pass/findings` opt-ins preserve findings separately from execution failure; coding keeps revision/stop defaults, while marketing draft-copy reaches human approval with findings.
+- An account locked for a dead login no longer waits for a person to clear it: when a dispatch would otherwise find no usable account of the provider, fgOS makes one real call with that account's own credential (Codex or pi), unlocks it if it answers, and does not try again for 30 minutes if it does not. Quota limits and other locks are untouched.
+- `fgos doctor` reports activated Node-payload drift against a source checkout's working tree without changing activation; `npm run fgos:dev -- <verb>` runs working-tree code through the Rust host, preserving caller cwd and respecting custom Cargo targets without weakening manifest containment.
+- The source-checkout commit hook refuses new root files outside its single allowlist, including linked worktrees; separate allowlist commits and a root-only merge exception preserve normal integration and existing data-loss guards.
+- `fgos metrics coverage` reports assignment-run coverage and skip reasons; `fgos doctor` compares it with an independent directory scan and identifies older hosts as degraded.
+- `fgos metrics discussions` reads writer-owned settled Unit summaries: seat/attempt/fallback accounting, workflow grouping, duration, and passive stance agreement. `workflow start --stance-options "a|b|c"` supplies answer options; missing or malformed stance never rejects worker output. `scripts/backfill-unit-summaries.mjs` adds historical summaries without rewriting original results.
+- `fgos run --unit <file> --stance-options "a|b|c"` declares the same answer options for a single Unit. Combining `--stance-options` with `fgos run --resume <unitRunId>` is refused with exit 4 (the stored question is immutable) instead of silently ignoring the new options.
+- `fgos metrics eval record|list` stores per-writer append-only evaluation records with 0–2 rubric scores and harness/question filters. Blind A/B evaluation instructions keep setup identities outside judge inputs.
+
+- A Workflow unit template can declare `inputs: [{ step, sameSeat?, label? }]` to choose which earlier steps' results it receives (without it, every step it builds on, as before). `sameSeat: true` hands each role of a panel the result its own seat left in that step, copied into its own directory as `own-previous.md`, and the brief names it as the role's own earlier result without naming other seats. `delphi` round 2 now gives each panelist the anonymized group summary and its own round 1 proposal instead of every round 1 proposal.
+- A blind unit passed the live canary on agy (gemini) through both its herdr and its confined cli invocation (nonce read from its own copy, the source report not readable, only its own run visible), so gemini is added to the proven blind pairs and the independent panel rounds of `architecture-advisory` (`shape-proposals`) and `business-discussion` (`explore-perspectives`) are now blind. Which agy account a confined invocation runs as is chosen per provider by the capacity layer, so the `tetcu72` and `tetnu` agy accounts are declared as `runner.providers.gemini.accounts` in the global config (one account per credential home) instead of as per-account invocations.
+- A Unit (and a Workflow unit template) can set `blind: true`: every role of the unit runs with `hostRead: blind`, so a worker cannot read a peer's run state (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`), the herdr socket directory, or another dispatch's private home or process list, while the repo, tracked `.fgos` files, `node` and DNS stay as they are. A blind unit is refused with a named reason instead of running unblind when it cannot be enforced (in-process, no bwrap, unconfined, a stale or failing probe, a ref or cwd inside a hidden root). Off by default. `fgos doctor` has a `confinement-blind-read` row (`pass`, `fail`, `backend-unsupported`).
+- A blind unit now receives its inputs. Every `unit-run:` and `gate-answer:` input, any other ref inside a hidden root, and a panel synthesizer's panelist reports are copied byte for byte (sha256 checked) into `inputs/` of the role's own assignment directory, which only that role can read, with neutral names when `anonymizeInputs` is on; a source that cannot be copied still refuses the unit (`blind-ref-hidden`, `report-changed-after-settle`). The `delphi` (both panel rounds), `nominal-group` (`generate-ideas`) and `group-cognition` (`sense-making-panel`) panel steps now run blind. Live canary on claude, codex, xai, glm and deepseek passed; herdr still detects a blind agent. agy is not proven for blind (its herdr invocation fails with or without blind, its cli account was out of quota), so `architecture-advisory` and `business-discussion`, whose pools include it, stay non-blind.
+- A Unit (and a Workflow unit template) can set `anonymizeInputs: true`: the reports it is handed from earlier Unit runs are copied byte for byte into its own directory as `seat-A.md`, `seat-B.md`, ... and the brief names them that way, so a blind role is not told which seat, unit or run said what. Off by default. It hides identity in what is handed over; it does not stop a worker that goes looking from reading other files.
+- `fgos doctor` now catches two failures before a paid Workflow run: `workflow-pools-satisfy-independence` reports a panel or reviewed Workflow unit whose capability prefer pool cannot supply enough distinct provider families (three panelists plus an independent synthesizer need four), and `agent-cli-project-trusted` reports a codex home or agy sub-HOME that does not trust the project folder and would stop at "Trust this folder?" until the dispatch timeout, naming the exact line to add. Both are read-only. `fgos doctor` now awaits each check, so a check may be asynchronous.
+- `fgos doctor` now checks `blind-steps-use-proven-pools`: for every Workflow unit with `blind: true`, the capability prefer pool may only bind executors whose provider family and transport the live canary proved blind (claude and xai through herdr, openai through herdr or cli, glm and deepseek through cli); gemini (agy) is not proven. A failure names the executor and invocation and the fix: remove it from the pool for that step, or prove the pair and add a row to the table.
+- A round that does not settle now leaves herdr's own account of the agent in its run directory, `herdr-diagnosis.json`: what `agent get` and `agent explain` said (state, the rule that matched, the detection manifest and its version, the fallback reason when nothing matched) and the screen herdr uses for detection. It is written before the pane can be closed and `visibility.json` points at it, so the next stall does not have to be guessed at.
+
+### Changed
+
+- The `rfc` preset now briefs its reviewer and red-team checkers on the supplied artifact and the producer report instead of the latest commit (`git log -1`), so a document or decision review no longer sends them to git history.
+- The final synthesis step of the `delphi`, `nominal-group`, `group-cognition` and `business-discussion` workflows now writes its verdict in a fixed order: what is still unresolved, each seat's position by seat label, whether the seats agree or split, what would change the conclusion, and exactly one next step. A split is reported as a split, not averaged away.
+- The provider capacity state lock now waits up to 30 seconds for a live holder instead of 5 before failing; a lock held by a dead process is still reclaimed at once. On a busy disk the holder's fsync could outlast five seconds and fail a dispatch for no fault of its own.
+- Architecture advisory guidance now uses config-owned binding and the current Workflow door instead of retired executor/model pins and coordination APIs; it preserves role doctrine, requires fail-closed host-write-denied execution, and explicitly separates unsupported advisory capabilities from this hygiene cleanup.
+- Skill render Markdown copies now carry a generated-from header naming their canonical source and the source-repo rebuild command, preserving frontmatter bytes; Claude thin wrappers identify their redirect target as an assembled projection.
+- The fgOS source root keeps only its 14 durable root files; 30 historical scratch artifacts were removed after an annotated preservation snapshot, and the live pick case study was preserved unchanged under `docs/history/live-fgos-pick-case-study/`.
+- `fgos metrics discussions` reports agreement and a genuine split only when the valid stance votes are at least two and more than half of the voting seats; otherwise the unit is `unmeasured` and the stance counters are kept. An older unit summary is reported as `unsupported-version` even when it has no settlement timestamp, because the version is checked before the timestamp.
+- Unit summaries are now contract v2 (`unit-summary.read.v2`). A legacy unit with no recorded pattern is published as `outcome: "undetermined"` with seats of `kind: "unknown"` instead of being derived as solo, and `metrics discussions` reports `unitsUndetermined` and leaves such units out of `passRate` and `unitsFailed`. Summaries of another version are skipped as `unsupported-version`. About 46 older forgentX units are now `undetermined` because nothing records their pattern.
+- `scripts/backfill-unit-summaries.mjs` only fills in missing summaries by default and reports stale ones; the new `--regenerate` rewrites stale summaries and removes the ones that can no longer be established. Active units are never touched.
+- Run observations, `metrics coverage` and the doctor run-coverage check skip a run whose settlement time is not a valid RFC3339 instant as `invalid-timestamp` instead of counting it in every time window, and a run whose mtime is more than 60 seconds in the future is no longer treated as recent.
+- Discussion comparison guidance now includes actual selected-argv/SDK/scratch auditing, normal private-home account provisioning, and prior-result access checks; historical confounded scores remain distinct from new read-audited evals. The guidance names two levels: read-audited (raw tool calls show no seat read the other arm's output) and sandbox-isolated (no seat could read it).
+
+- The pre-commit guard that refuses a commit making a `.fgos/` file shorter than HEAD now applies only to the append-only logs (`.fgos/**/*.jsonl`), which is what it was built and tested for: a stale worktree's older log must not replace main's newer one. A config or state file such as `.fgos/config.json` is edited on purpose and may lose lines.
+- `fgos workflow start|answer|resume` and `fgos run` now warn (one stderr line plus `warnings: [{code: 'dir-differs-from-cwd', message, fix}]` in the output) when `--dir` names a different project than the current directory: state goes to `--dir` but workers start in the current directory and stop on a read-outside-working-directory prompt. The fix is to `cd` into that project or pass `--worktree`; it stays a warning, and a detached `resume` child does not repeat it.
+- A detached Workflow run is now observable: its `advance.log` gets one line when each step starts, ends, fails or parks, and `fgos workflow status <id>` adds `advance: { running, pid, logPath, lastLines, hint }` (live holder of the advance lock, tail of the log, and a `fgos workflow resume <id>` hint when a running run has no live advance and nothing recorded for 30 seconds).
+- A human gate answer (`fgos workflow answer`) now reaches the units that come after it. The answer is kept in the run directory (`gate-answers/<stepId>.md`) and handed to the gated step's units and every step that depends on it as a context ref (`gate-answer:<workflowRunId>/<stepId>`), with a one-line note in the objective marked as the owner's answer. Before, the answer was only logged, so a final ranking was written without the human's votes.
+- A Workflow unit template's `persona` and `params` now take effect. They were declared in `core/workflows/*.yaml` but never passed on; `params` now reach the pattern (`members`, `roleTasks`, ...) and `persona` is bound on the unit's seats the way `fgos run --override` does it.
+- Workflow steps now hand every earlier role's full report to the next step as context refs (`unit-run:<unitRunId>/<role>` in a unit's `inputs`, resolved once into `unit.json`); nothing is truncated and no panelist report is dropped. The step's objective keeps the owner request and one summary line per earlier unit.
+- The `z-ai` model policy (glm) now uses `z-ai/glm-5.3` for every tier instead of `z-ai/glm-5.2`.
+
+### Fixed
+- The architecture advisory synthesis prompts (`architecture-advisory`, `architecture-advisory-reopen`) now name the exact packet key `"missing expertise"` and say the file must start with `{`; seats had written `missingExpertise` and a leading `+`, and the validator rejected both.
+- A seat whose provider fails no longer fails the unit while another account or provider could serve it. A process that exits on a missing or dead credential (for example pi's `No API key found for openrouter.`) now ends as `provider-limit` and quarantines the account as an auth fault; the seat then runs again on another usable account of the same provider (once per other account) before the walk moves to the next candidate, which skips a provider whose login just failed and still prefers a family the sibling seats did not use. Each attempt records `fallbackFrom.kind` (`account-rotation` or `next-candidate`); the seat fails only when both are used up.
+- Codex and AGY hook commands now point at the project's shim by absolute path, so the hook runs wherever the agent starts it (AGY ran it outside the project and every tool call failed with exit 127). Rerun `fgos setup` in a project to regenerate its `.codex/hooks.json` and `.agents/hooks.json`; `fgos doctor` reports the old relative form. Codex shows its hook review once for the changed command.
+- Coding review rejection with findings now follows its declared repair route instead of blocking; Claude herdr workers receive scoped read directories for settled cross-repo report refs, without granting the whole assignment store.
+- A panel seat whose provider capacity is exhausted or quarantined is no longer counted as passed. Its result had no outcome, which was read as success, so the panel went on to its synthesizer with a missing report. It now counts as a provider limit, so the seat moves to the next candidate of its pool and, with none left, the unit fails visibly.
+- A workflow run whose unit could not even start (for example a hand-off reference that no longer resolves) now fails its step and the run with the reason recorded, instead of ending the advance with the run still `running` and nothing in its event log.
+- Dispatch no longer loads every pre-existing dirty file into memory for the whole run: dirty-before snapshots keep only existence and a streamed sha256, so a worktree with large untracked files no longer drives `fgos run` to multi-GB RSS or OOM, and a FIFO or device among the dirty files no longer hangs the run.
+- A failure to record a unit's failed settlement no longer hides the execution error that caused it.
+- `metrics eval record` refusing an invalid eval store now names each offending shard file and line, and how to repair it.
+- Evaluation provenance now distinguishes data-blind judging from actual isolation and discloses cross-arm result access and question deviations; existing real scores are not presented as an independent setup comparison.
+- The recorded `setup`/`judge` text and judge evidence of the reference solo/panel comparison no longer call its two arms independent: they were separated by read audit only, not by sandbox isolation (see `docs/how-to/compare-discussion-setups-with-metrics-eval.md`).
+- Discussion measurement uses owner-written voting seat kinds, reports missing/unusable summaries, and treats a unit with fewer than two valid votes, or no more than half of its voting seats, as unmeasured. Reviewed inline results wait for pattern settlement; peer failures drain siblings, backfill skips active units, and derived-summary I/O does not turn a successful unit into failure.
+- Run inspection, `dispatch show-run`, the running-run reconciler and Observe discover nested execution-core assignments through the bounded run-layout rule. Traversal stops at attempt directories, so planted runs inside worker outboxes are not enumerated; this is not identity authentication. Show/watch/recover now refuse duplicate run IDs instead of choosing a lexical winner.
+- Run observations use actual settlement time from result fields, then regular sibling `run.json.settledAt`; started/created times do not replace settlement, so undated history remains excluded. Missing results have a separate coverage reason. Doctor independently checks admitted counts and directory totals, tolerates recently created run directories, and labels diagnostic paths as samples rather than confirmed omissions.
+- Evaluation storage requires the complete known discussion rubric, refuses duplicate eval IDs across shards under the shared lock, exposes unsafe shards as invalid, and uses target-specific no-follow flags on supported Unix platforms. Invalid existing records block writes until identity uniqueness can be established; same-shard and duplicate-ID contention are covered by real processes.
+- The test-file watchdog publishes timeout evidence before killing the hung process tree, so the suite cannot finish and remove the journal before the timeout is recorded. Its real subprocess regression now captures nested output and deterministically exercises that scheduling gap.
+- Unit history selects resumed attempts numerically, including attempt 100 after 99; legacy reviewed-unit summaries use the final complete reviewed round rather than letting earlier findings poison a later success.
+
+- A herdr pane whose agent sits idle on a dead credential (for example pi showing `OAuth refresh failed ... invalid_grant`) now ends as a provider limit after about 15 seconds instead of waiting out the whole idle timeout and being recorded as a timeout: the walk moves on to the next executor in the pool, and the account is quarantined as an auth fault until someone logs in again and clears it.
+- A quota quarantine lasts as long as the provider says (`Resets in 24m1s`, hours/minutes/seconds), not a flat hour.
+- The Delphi feedback-synthesis step is told to name positions only by seat label, so the anonymized group summary no longer repeats role ids or the seat-to-role order.
+- `fgos doctor` now also checks the credential homes of the declared `gemini` accounts for agy permissions and project trust. A confined agy invocation runs as the account the capacity layer picks for the provider, not as the `HOME` its invocation names, so those homes are the ones that decide whether agy stops at a trust prompt; before this, only the homes named by invocations were looked at, and the agy-sub-homes check read the project config without the global accounts.
+- `fgos doctor` no longer has the `coordination-sessions-closed` check. The coordination engine it watched was retired, so it only counted leftover session folders that nothing can close.
+- The blind pool check passes in this repo now that the discussion capabilities have pools (the same five provider families as `architecture:shape`), `claude/cli` and `xai/cli` joined the proven blind pairs after a live canary,.
+- A failure of the concurrent dispatch test now names the child's output and any empty or unparseable JSON file under the store, so a rare failure is explained.
+- A later pass consuming a settled run now finds a confined worker's claim and report under `worker-output/outbox/`, the same way settlement does, instead of only the flat run directory, and reconciliation of a crashed run finds that claim through the same lookup.
+- A confined dispatch no longer leaves an empty `disp_*` directory under the confinement temp root: finalizing a run removed the private home but not the per-dispatch folder that held it (a full test run left about 180 of them).
+
+- A bwrap-confined herdr round no longer opens its pane with the worker's private HOME; the pane shell used to start in a home without startup files, its first-use wizard swallowed the launch command, and the agy herdr invocation failed with `foreground process ... does not match prepared command argv`.
+- Onboarding text is corrected: the README no longer says a plain `fgctl init` is enough after `install.sh` (it needs `--from <source>` until `.fgos/distribution.json` exists), and `fgos setup`'s help now says `doctor --fix` runs only registered fixes, so one `fgos setup` is still needed for the config defaults, hook wiring and Claude Code hook.
+- `fgos doctor --strict` (also with `--fix`) exits 1 when any check fails. The default stays exit 0 because `fgctl init`, `upgrade` and `repair` run doctor as their tail and mark the install degraded on a non-zero exit.
+- `fgos doctor`'s `observe-friction-migrated` failures now name the exact fix, `<host binary> friction migrate --dir <project>`, and say that `friction` is reachable only through the Rust host (the Node `fgos` entry has no such verb).
+- `fgos doctor`'s `shell-integration-sourced` check now reports its "fgos --help fails after stripping an underscore helper" probe as information (still passing) when run inside an agent harness shell, where that stripping is what the harness does; outside a harness shell it still fails.
+- `fgos doctor`'s `task-specs-resolve` and `domain-workflow-operations-coverage` checks no longer fail in a plain target project that has no fgOS `domains/` or `core/` tree; they resolve the task-specs and agent files against the fgOS install they run from.
+- A sandboxed headless (`cli-spawn`) worker is now told to write its result claim and report under the run's `worker-output/outbox`, the one run directory the sandbox leaves writable. The prompt and effective contract used to name the flat run directory, which is read-only there, so a worker that followed the prompt literally (deepseek through pi) failed with `EROFS` and landed no claim.
+- A herdr agent stopped on a prompt only a person can answer (codex's "Trust this folder?" for a project it has no trust for) now ends the round as `blocked` instead of `execution-timeout`. The liveness ladder already concluded `blocked` and named the screen line, but settlement treated every failure carrying the worker-timeout error class as a timeout, so the run record said timeout/resource, the unit outcome was `execution-failure`, and the real repair was lost. The failure code is now `blocked`, the unit outcome `blocked`, and the message says to answer the prompt in the pane or grant trust for the project in the agent's own home.
+- Empty per-dispatch directories under the confinement temp root (`/tmp/fgos-confinement/disp_*`) are now removed. They held nothing and carried no ownership marker, so the reaper skipped them and about 2000 had piled up, using inodes. The reaper removes an empty one once it is ten minutes old, and `fgos doctor` counts and `--fix` removes them.
+- A herdr round no longer outlives its pane. When a pane is closed (or vanishes) herdr answers `pane_not_found` to the liveness read, which used to count as an unreadable read, so the round ran to its absolute ceiling; now consecutive `pane_not_found` answers end it as `died` within seconds, naming the pane. An unreachable, timed-out or unparseable herdr is still not evidence of death.
+- A confined agent's status in herdr is now true. fgos used to report the state "working" for the pane when it launched the agent, which made fgos the pane's status authority: `agent get` stayed "working" for the whole round even when the agent had finished, stalled or stopped on a limit, and an earlier workaround read the screen detector's verdict first (two herdr calls per poll). Measured on herdr 0.9.1: claude, codex, agy and pi are recognised behind the bwrap wrapper on their own, and their status moves idle, working, done as they work. fgos now reports a state only for a process herdr cannot recognise as an agent (after a six second grace), and reads `agent get`, asking the detector only when the status is unknown. One herdr call per poll instead of two, and `agent wait` and `agent prompt --wait` work for confined panes.
+- Each role of a Unit run now gets its own task. Every role used to be dispatched with the unit's objective, so a reviewer told to "replace the placeholder line" tried to replace it instead of checking the producer's work, and a panel synthesizer was told to "silently generate independent ideas". The `reviewed` and `panel` patterns now tell the reviewer, red-team and synthesizer what they are for (default texts live in `role-tasks.mjs` and can be replaced with `params.roleTasks`), hand the reviewer and red-team the producer's report, and, from round 2, list the previous round's findings for the producer (they were passed along but never reached it).
+- A dispatch no longer leaves a background process behind. The codex CLI starts an `app-server-daemon` out of the private home it was given and keeps it running after the pane closes; removing the home deleted its files but not the process, so every codex dispatch leaked tens of megabytes (dozens of leftovers had piled up to about 2 GB). Removing a private home, or any confinement resource, now stops the processes that still run from inside it. Linux only, like the confinement it belongs to.
+- A codex pane whose model is "at capacity" is now reported as a provider limit, so the round falls back to the next candidate executor instead of waiting out its ceiling. Two gaps were closed. The runner only knew a few generic limit phrases, so "Selected model is at capacity. Please try a different model." was never recognised. And a pane that herdr keeps reporting as `working` (which counts as progress) was never read at all, so a parked agent ran the full fifteen minutes (seen in the mdview dogfood). The tail of a `working` agent's screen is now checked every 30 seconds for a line that starts with the CLI's own error marker and names the condition, and the same line must still be there a full interval later; ordinary text that merely mentions capacity or rate limits is left alone.
+- The `glm` executors run the `pi` CLI through OpenRouter (model `z-ai/glm-5.2`) instead of the claude CLI behind a gateway. In a herdr pane the claude route stopped at "Please run /login, API Error: 401" every time, so a synthesizer bound to `glm-herdr` never produced anything. The API key is still only the `${GLM_OPENROUTER_API_KEY}` environment reference.
+- A project set up with `fgctl init` can run `fgos workflow` (and every other verb that loads a dependency). The release tree used to ship the CLI without its `yaml` package, so these verbs failed with "Cannot find package 'yaml'" even though `fgos version` and `fgos doctor` passed. The tree now carries its production dependencies, a missing dependency fails the build, and the external-consumer CI step runs a dependency-loading verb.
+- A herdr dispatch no longer deletes a folder-trust entry it did not write. A read-only run in the main checkout used to remove the entry you had vouched for when it settled, so every later Claude start in that folder (yours and the next dispatch) stopped at the trust dialog. Teardown now removes only the entry its own round seeded, for the claude, codex and agy trust stores alike.
+- A `panel` synthesizer now receives its panelists' reports: the runner hands the results of earlier roles to the next role as context refs. Before, the synthesizer was dispatched with no context refs and judged without seeing the panel.
+- A worker no longer commits on any path: the Work loop, the discovery sweep and `fanout-batch` stage and commit what the worker left in the item worktree (the same runner commit `fgos run` uses) before goal-check or `fgos return`; a clean tree is not an error, so a worker that still commits itself keeps working, and a commit that fails is routed as an infrastructure failure. The worker log records `commit runner | self | none`. The worker contract and prompt templates tell workers to edit files and stop, and the default `runner.executor` and this repo's `claude-cli`/`glm` invocations lose their `git add`/`git commit` `--allowedTools` grant (the earlier exception is superseded). `fgos doctor` (`invocation-git-write-grants`) warns about any executor or invocation in your own config that still grants it -- remove the grant from your `.fgos/config.json`.
+- A `workspace-write` producer that stops on a provider limit now falls back to the next candidate like a read-only role does; the write gate follows the fallback chain the runner recorded in `unit.json` (each attempt now records `skipCandidateIndex` and `candidateIndex`) and still refuses a binding the runner did not record.
+- Confined workers' private homes (which hold a copy of the account login) are created owner-only (0700, including the `fgos-confinement` root, the per-run directory and credential subdirectories), a Codex `auth.json` copy is 0600, and the home plus its run directory are removed when a run fails. The one exception: a failure that leaves its herdr pane open keeps the home for that pane (its path is on the error as `retainedPrivateHomes`); `fgos run`, the runner loop and `fgos doctor --fix` remove it once the pane is closed. A `/tmp/fgos-confinement` owned by another user is no longer reused (a per-uid root is used); `fgos doctor` flags a confinement root readable beyond its owner.
+- Rewriting a provider trust store (`.claude.json`, agy `settings.json`, Codex `config.toml`) keeps the file's permission bits; a 0600 file no longer becomes group/world-readable.
+- A `workspace-write` worker no longer writes git metadata at all: its own gitdir and the shared one are read-only in the sandbox (it could otherwise move any branch ref or overwrite objects of the whole repository). It writes files in its worktree; after a producer round passes, the runner commits them from outside the confinement (`git add -A` minus `.fgos/`, then `git commit`, the message is the agent's summary). A round that left nothing to commit makes no commit and the run record (`unit.json` bindings, `commit.status`) says `no-changes`; a commit that cannot be made fails the round. The effective execution contract no longer lists `git add`/`git commit` as allowed worker commands.
+- `fgos workflow start` now returns at once with the run id and how to read progress (`fgos workflow status <id>`) while a detached process keeps running the workflow, instead of holding the caller for the whole run (and orphaning panes when wrapped in `timeout`). Pass `--foreground` to stay attached until the run completes, fails or parks.
+- `fgos workflow answer` and `fgos workflow resume` return at once the same way (`answer` records the answer first); `--foreground` keeps them attached. A run that a live process is already advancing refuses a second advance with a clear message instead of racing it.
+- `fgos workflow start` takes `--request <text>`; every unit gets the request and the output of the steps it depends on. A unit that is refused or fails now ends its step and the run as `failed` instead of being counted as passed.
+- A reviewer or panelist now runs on a different provider family than the producer or its sibling panelists; with too few families the run is refused instead of repeating one.
+- `fgos run` detects a live herdr session.
+- `fgos run` now uses the transport `bind()` chose: inside a herdr session an executor with a herdr-spawn invocation runs in a pane (the run record `assignment.json` and `unit.json` state the transport and invocation), otherwise cli-spawn. A read-only or workspace-write posture wraps the agent inside the pane exactly as it does for cli-spawn, so herdr-spawn invocations now declare `confinement: { backend: "bwrap" }` (the repo config is updated; one without it stays on cli).
+- One posture path: a read-only or workspace-write posture is resolved from the Unit run's binding into a confinement requirement and applied by the confinement driver for both cli-spawn and herdr-spawn; `canApplyPosture` now reflects whether the backend is configured and its executable exists, so a role whose invocation cannot be confined is refused as `posture-unavailable` (or another candidate is chosen) instead of running unconfined. When a capability's `prefer` entry names no invocation, `bind()` records the first plain cli invocation that can carry the posture (the one the posture check approved, not the executor's first cli invocation), so a headless `fgos run` uses it; an entry that names an invocation keeps it. The second, hand-built bwrap argument list in `confinement/policies.mjs` is removed.
+- When an agent stops on a provider limit, the role moves to the next candidate of the capability's `prefer` list (a new pane under herdr; the limited pane stays open) and the move is recorded as `fallbackFrom`; with no candidate left the outcome stays `provider-limit`. A resumed run reuses the bindings recorded in `unit.json`.
+- A confined agent in a herdr pane no longer loses its task: the brief is typed once the agent's prompt is up, and an unsent draft left in the prompt box is submitted with Enter (bounded, recorded as `briefSubmitKeyResent` in `visibility.json`). A claude REPL in a pane is also given its run directory as a working directory (`--add-dir`), so it does not stop on claude's own "read outside the working directories" prompt.
+- The brief a reviewer or red-team reads in a herdr pane now says its claim needs `assessment.verdict` (it was only in the headless prompt, so a pane reviewer wrote a claim the runner refused as invalid).
+- A confined agent in a herdr pane is now watched through herdr's screen detector instead of the status fgos reported at launch, which stayed "working" forever: a hung agent or one stopped on a provider limit is now noticed, so the provider-limit fallback can fire in a real pane.
+- A herdr round with no `idleTimeoutMs` in the runner config now gets a 5-minute idle limit (no agent activity, ack or outbox file), so a stalled agent or a provider-limit screen is acted on instead of holding the pane to the 35-minute ceiling.
+- The herdr client reads an agent's screen from herdr 0.9.1, which prints it as plain text instead of in the JSON envelope; before, every screen read failed silently, so a provider-limit screen was never matched and the reason a pane stalled was never quoted.
+- The confined herdr launch no longer calls an honest launch an environment tamper because the shell rewrote `SHLVL` or `_`.
+- The codex (openai), agy (gemini) and pi (xai) herdr invocations now run in a pane under the same bwrap posture as the claude ones. Each agent keeps its state in a private home (`resourceBindings` `private-home` -> `CODEX_HOME` / `HOME` / `PI_CODING_AGENT_DIR`) provisioned from the leased provider account: the new `home-files` credential source in the machine-global `runner.providers.<provider>.accounts` lists the files to copy, the real account directory stays read-only, and a missing file refuses the pane before launch. These invocations no longer take the prompt as an argument (the brief is typed once the agent is up) and codex no longer relies on `--dangerously-bypass-approvals-and-sandbox` (`-s danger-full-access -a never`, with bwrap enclosing it). Workspace trust is written to the private home, derived from the real account store; an agent herdr has no screen rule for is typed at only after its screen has drawn and held still. `fgos doctor` has a `confined-pane-accounts` check that names a pane whose account login would not reach it.
+- `fgos setup` registers the capabilities of every shipped Workflow (marketing, architecture, business, delphi, group-cognition, nominal-group, coding) (`runner.capabilities.<domain>:<verb>`) so another project can run those Workflows; it only adds missing entries and keeps ones the project already tuned. The slots are description-only (no `prefer`): which executors serve a capability is the project's choice, and until it declares a `prefer` pool, on the exact name or on the bare verb, a headless run of that Workflow unit is refused. `bind()` now falls through to the bare-verb entry when the exact entry has no `prefer`, so a new slot never hides a project's own bare-verb pool. `fgos doctor` check `workflow-capabilities-configured` names any capability a Workflow uses that config lacks (failure) or declares without a `prefer` pool (warning).
+- The panel synthesizer now runs on a different provider family than every panelist.
+- A finished Workflow run (complete or failed) removes the worktrees of its integrated Units; a failed Unit's worktree stays for investigation and its path is recorded in the run event. A Unit counts as integrated when its branch is part of the integration target: the `target` an `integrate` step declares, else the remote's default branch, else the branch the main checkout is on — so a repository whose trunk is `master` or `trunk` is cleaned up too (the target used to be a literal `main`).
+- A confined agent pane that is showing a dialog, or never reached its prompt, now fails the round at once (`worker-spawn-fail`, reason `agent_blocked` / `agent_not_ready`, with the line on screen) instead of being typed at; the brief used to answer the dialog and the round hung until the idle ceiling.
+- **Changed**: Work no longer carries `stage`; dispatch no longer knows Work, domains or steps (fix round for Request-to-Run P1-P4):
+  - **Work records its step as `workflowStep`**, an id in the Workflow of its domain. Steps, phases (`clarify`/`discover`/`plan`/`execute`), skills, operations, legal moves (`transitions`) and the old name `decompose` (`aliases`) are data in `domains/<domain>/workflows/*.yaml`, read through `src/state/domain-registry.mjs`. `src/state/workflow-stage-graphs.mjs`, `src/state/stage-fsm.mjs` and the `stage` verb module are gone (`step-fsm.mjs`, `verbs/state/step.mjs`). Event type `work.step`; one read path (`replay.mjs`) maps older `stage` records and `work.stage` events; `VIEW_SCHEMA_VERSION` 4, the Rust work-state reader accepts only 4. Surface renames: `workflowStep`, `workflowStepEffective`, `stepByItem`, `fgos add --step`, `fgos ready --phase`, `fgos workflow operations --step`, doctor check `work-step-vocabulary` (`domain-workflow-skillmap-coverage` retired: skills live on the step).
+  - **Dispatch is handed what it needs.** `buildAssignment` takes the domain and the step's legal operations from its caller and checks `operation` against them; `executeAssignment` refuses a declared Assignment without that list. The three hand-copied stage graphs and the second Work event reader in `dispatch/` are deleted; `operation-choice`, `spawnWorker` and the Work-aware lookups moved to the Work layer (`src/runner/operation-choice.mjs`, `work-dispatch.mjs`, `work-compat.mjs`). New architecture guards: no Work-layer import and no domain/step literal in `dispatch/**` and `execution/**`.
+  - **Mutating unit-run gate fails closed**: an Assignment without the `bind()` binding, or pinning a different executor, is refused before spawn; the redirect-era governance tests now drive `executeAssignment` directly.
+- **Added**: Request-to-Run P5 Terminology Sweep & Vocabulary Guard:
+  - System-wide terminology alignment across documentation, skills, and specs per the canonical vocabulary table (Unit, Unit run, CollaborationPattern, Workflow, red-team).
+  - Extended `test/runner/dead-vocabulary-guard.test.mjs` to guard `docs/specs`, `core`, `domains`, `AGENTS.md`, and `README.md` against retired symbols (`FlowDefinition`, `CoordinationProtocol`, `DemandFacts`, `readOnlyRedirects`, `matchCapability`, `deriveForm`, and retired facades), and asserted retired coordination directories remain deleted.
+  - Updated `docs/platform/component-boundary.md` to reflect post-track components (L0–L7) and retired the legacy Agent Coordination Engine.
+  - Updated `docs/specs/reading-map.md` to point directly to the Workflow engine and Execution Core.
+- **Added**: Request-to-Run P4 Discussion Patterns on Lean Model and Coordination Engine Retirement:
+  - **Single-Unit Discussion Presets**: Added `consult` (pattern `solo`, role `advisor`), `research-fan-out` (pattern `panel`, 3 members), and `rfc` (pattern `reviewed` with red-team) in `src/runner/execution/patterns/presets.mjs`.
+  - **Discussion Workflows**: Ported 5 multi-unit discussion types to DAG Workflows in `core/workflows/`: `architecture-advisory.yaml` (Acceptance Case 2), `business-discussion.yaml` (Acceptance Case 3), `delphi.yaml`, `nominal-group.yaml`, and `group-cognition.yaml`.
+  - **Retirement of Coordination Engine L4**: Completely removed `src/runner/coordination/**`, `src/verbs/coordination/**`, `src/runner/definitions/**`, `src/runner/team-cognition/**`, `src/runner/deliberation/**`, `core/coordination-protocols/**`, `core/protocol-packs/**`, `packages/coordination-state/` (Rust), and CLI verb `fgos coordination`.
+  - **Coordination Data Backup**: Backed up historical `.fgos/coordination/sessions` to `.fgos/backups/coordination-sessions-backup.tar.gz`.
+  - **Doc & Surface Routing**: Updated `fgos-panel` and `fgos-group-thinking` to route to discussion Workflows and presets; updated component boundary and architecture manifest.
+- **Added**: Request-to-Run P3b Workflow Separation from Work:
+  - **Decoupled Work from Stage**: Removed `stage` field from Work records and state mutations (`src/state/work.mjs`, `store.mjs`). Work state focuses strictly on status lifecycle, board, and metadata, referencing `workflowRunId?`.
+  - **Single-path Replay for Historical Data**: Upgraded to `viewSchemaVersion: 3` (supported across Node and Rust). Historical `stage` events map gracefully to `workflowStep`.
+  - **A4 Boundary Guard Complete**: Completely severed all `src/state/**` imports from `src/runner/dispatch/**` and `src/runner/execution/**`. Removed `openDispatchRun` and legacy `.fgos/dispatch-runs` writers/readers.
+  - **Retired Legacy Workflow Profile**: Deleted `src/runner/definitions/workflow-adapter.mjs`, retired `Workflow` profile from `FlowDefinition` schema, removed doctor check `workflow-flow-definition-projects-cleanly`.
+  - **Non-coding Marketing Smoke Workflow**: Added `domains/marketing/workflows/content-publish.yaml` proving multi-step domain workflow execution with human gates.
+- **Added**: Request-to-Run P2 Runnable Plans (`fgos-run`, Unit-driven plan-lint, retirement of DemandFacts & legacy facades):
+  - **Unit-driven plan-lint**: Extended `fgos plan-lint <planPath> [--phase <N>] [--json]` (`src/report/capability-plan-lint.mjs`) to parse `- unit:` blocks in phase files, validate with `validateUnit`, and enforce G2 constraints, cycle detection, and writes collision.
+  - **Single execution driver `fgos-run`**: Introduced `core/skills/fgos-run/SKILL.md` replacing domain-specific facades (`fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop`).
+  - **Retired DemandFacts & matcher**: Deleted `src/runner/capability-match.mjs`, retired `fgos capability match`, rewritten doctrine to focus on understanding intent and formulating Unit data contracts.
+- **Added**: Request-to-Run P1 Execution Core (`fgos run`, Unit contract, single `bind()`, and 3 collaboration patterns):
+  - **Unit data contract**: Canonical schema (`src/runner/execution/unit.mjs`) for headless execution. Non-infrastructure (G2: forbids executor, model, tier, invocation, provider pins).
+  - **Single `bind()` authority**: 5-level precedence table (`src/runner/execution/bind.mjs`) resolving executor, invocation, transport (`herdr` default, `cli` fallback), tier, model, persona, mechanism, and posture with full provenance.
+  - **Collaboration pattern loops**: Pure loops (`solo`, `reviewed`, `panel`) in `src/runner/execution/patterns/**` with named presets (`code-change`). Loops reconstruct state from `history()` without dedicated storage. Findings are treated as genuine outcomes, never execution failures.
+  - **Verifiable mutating gate**: Supersedes ADR-006 §6 by verifying that mutating assignments run in a linked git worktree matching `unit.json.worktree` and that recomputed `bind()` deep-equals the assignment binding. Retains engine protocol stamp as named exception.
+  - **CLI verb `fgos run`**: Single execution door for headless Unit runs, supporting `--unit`, `--pattern`, `--override`, `--resume`, and `fgos run record` for verified inline producer turns.
+  - **Retired concepts removed**: Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`, `executors.*.for`, PolicyPatch `prefer*`. Read-only is now an OS confinement posture applied consistently across herdr and cli.
+  - **RunResult v4**: Contract bumped to v4 with `unitRunId`, `role`, `round`, and expanded outcomes (`findings`, `provider-limit`).
+- **Changed**: Consolidated tier and rigor vocabulary across dispatch and Work (tier-rigor-vocabulary-consolidation):
+  - Demand side: FlowDefinitions, coordination operations, and Work declare `rigor` (`low|standard|high|critical`); retired `minTier`, `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, and `QUALITY_MODE_VALUES`.
+  - Supply side: required config `runner.rigorToTier` maps demand rigor into six-level `modelPolicies[provider][tier]`; single resolver `resolveTierModel` replaces `modelForTier` and temporary `DEFAULT_TIER_TO_POLICY` bridges.
+  - Work scale separation: `work.tier` split into `work.size` (`light|standard|heavy`, effort/chunking only, never reaches models) and optional `work.rigor`. CLI flags `--tier` on `add/submit/discover/edit` are retired in favor of `--size` and `--rigor`. Existing items with `risk: heavy` and no rigor read as `rigor: high` (D18); historical event logs map `tier -> size` on read; snapshot `state.json` upgraded with `viewSchemaVersion: 2`.
+  - Capability floor & overrides: `capabilities.<name>.rigor` is the sole raise-only floor across coordination and Work (D19); legacy `capabilities.*.overrides` and executor `rigorOverrides` are removed. Gateway contract JSON migrates `tier` to `size`/`rigor`.
+- **Changed**: RunResult contract updated to v3 (`assignment-run-result` v3); removed legacy `status` and `confidence` fields from newly recorded runs in favor of unified `classification.outcome` single path (`runOutcome()`); added token usage persistence in `RunResult.usage`.
+- **Added**: Native `work` observation source in `packages/work-state/rust` and `work` scorecard section in Observe (Phase F6):
+  - Implements `ObservationSource` with `source_id: "work"`, parsing timing events (`added`, `moved`, `asked`, `answered`, `gate-approved`) across `.fgos/events.jsonl` and shard files `.fgos/events/*.jsonl` with `(src, seq)` deduplication.
+  - Calculates Scorecard section `work`: cycle time `add -> delivered` and active execution time `doing -> awaiting-approval` (p50/p90 hours), and interventions per item (`asked` + `answered` + `gate-approved`, mean/p90).
+  - Captured historical baseline `plans/260929-1501-metrics-friction-rust-native/reports/baseline-2026-09.json` spanning 2026-08-01 through 2026-09-29.
+  - Published runbook `docs/how-to/measure-a-real-case.md` detailing step-by-step case measurement, bake-off rules, and field definitions.
+- **Closed**: `coordination-skill-harness-simplification` track (Phase 0 through Phase 7, Unit I35, final unit) — the multi-month effort that replaced the coordination skill layer's own hand-rolled lifecycle prose with the real `fgos coordination` semantic CLI doors it now drives. Shape, in order: **Phase 0** established a reproducible, evidence-based baseline (`scripts/measure-coordination-baseline.mjs`, `coordination-baseline.v1` contract) before any rewrite began, so every later phase's "smaller" claim could be checked against real committed numbers instead of narrative. **Phases 1-3** built the semantic coordination CLI surface itself (`start`/`status`/`operation`/`authorize-and-dispatch`/`fan-out`/`disposition`/`close`/`chain`, plus the cold-resumable read-only DAG, prompt-template resolution, and the deterministic `actions` projection) that every subsequent skill rewrite consumes instead of hand-authoring raw request JSON. **Phase 4** (Unit I15) extracted the shared, domain-neutral driver-discipline fragment (`core/skills/_shared/coordination-driver.md`) and coding-domain cell-policy fragment (`domains/coding/skills/_shared/coding-cell-policy.md`), then rewrote `fgos-plan-loop` on top of them as the first proof this pattern removes duplicated kernel-rule prose without losing real safety content. **Phase 5** (Units I17-I27) extended the same driver-discipline fragment to `fgos-panel`/`fgos-architecture-panel`, added demand-doctrine capability matching (`DemandFacts`, `fgos capability match --demand`) so skill triggers resolve from declared facts instead of keyword spotting, added per-node dispatch binding (`policy.capability`/`distinctProviderFrom`) and the `specialist-authorize` door family, and closed with an independent panel-depth experiment (Unit I27) confirming the extraction preserved advisory quality. **Phase 6** (Units I28-I29) merged `fgos-plan-loop` and `fgos-code-panel`'s two parallel open/fix/close/worktree lifecycle implementations into one new facade, `fgos-code-change` (covering both a standalone single-cell change and a full plan/track, since a single change is just a plan with one cell), then converted both predecessors into deprecated stubs carrying forward every real inbound reference and safety invariant rather than deleting them outright. **Phase 7** (Units I30-I35) closed out the track: data-level `contractVersion` on `show`/`chain`, `PolicyPatch` doc-drift coverage, a hard-refusal fix for `plan-lint --cell` mismatches, a group-thinking pack reclassification, a drift-test suite proving the Phase-4/5 extraction pattern generalizes, and (this unit) the final `/fgos:code-change` intent-mapping row, doctor-check gap confirmation, and this before/after report. Full before/after evidence, exact commands, and the stated `inputTokens: null` limitation (word/byte/line counts only — no token-reduction claim is made anywhere in this track): `plans/260919-coordination-skill-harness-simplification/reports/unit-I35-before-after-comparison-report.md`. Headline instruction-footprint result: `fgos-plan-loop` + `fgos-code-panel` combined (12,209 words / 96,466 bytes / 1,675 lines at Phase 0, commit `7853e4d7`) collapsed into `fgos-code-change` alone (2,314 words / 18,191 bytes / 186 lines, measured fresh at this unit's `main` HEAD) — an 81.05% word reduction across the merged facade, while `fgos-architecture-panel` (touched only by the Phase 5 driver-discipline extraction, not merged) dropped a separate 11.51% (9,006 -> 7,969 words). Known gap carried forward, not fixed here: `distinctProviderFrom` (Unit I21) has no dedicated `fgos doctor` check, accepted as documented (the limitation it covers is already named in `src/verbs/coordination/binding.mjs`'s own source comments) rather than invented scope in this closeout unit.
+- **Changed**: `fgos plan-lint --cell <id>` now hard-refuses (`severity: "hard"`, `ok: false`, exit 1) instead of warning when `--cell <id>` matches no unit block or Product Gates row (Unit I31, Phase 7 item 4d): a `--cell` open-time mismatch is a genuine misconfiguration, never a clean pass. `capability.undeclared`'s one emission site (`src/report/capability-plan-lint.mjs`, the `--cell` no-match branch) is the only code this touches; `capability.unresolved` (the distinct, explicitly-marked `(unresolved)` capability hedge) stays `warn` per `core/skills/_shared/planning-capability-awareness.md`'s documented convention. The no-`--cell` path is unchanged (a plan with zero declarations already returns `ok: true` with an empty findings list there — no warn existed to promote). `fgos-code-change/SKILL.md`'s Step 0 plan-mode gate prose, which special-cased this exact warn code as a defense-in-depth workaround since Unit I28's fix-round-1, is simplified: the `ok: false` refusal now already covers this code, so the separate `capability.undeclared`-specific carve-out sentence (previously the only thing catching a `--cell` miss when `ok` still read `true`) is folded into the main hard-finding clause instead of standing alone.
+- **Added**: Data-level `contractVersion` on `fgos coordination show`/`chain --json` (Unit I30, Phase 7 item 1): `show`'s data envelope now carries `contractVersion: "coordination-show.v1"` (`src/verbs/coordination/show.mjs`) and `chain`'s carries `contractVersion: "coordination-chain.v1"` (`src/verbs/coordination/chain.mjs`) — new sibling version strings, not a reuse of `coordination-actions.v1` (`fgos coordination status`'s own field, untouched), since `show`/`chain`'s own data shapes (session status/dag projection; per-track cell reconstruction) are genuinely distinct from the actions-projection shape. **Changed**: ported the two PolicyPatch fields (`capability`, `distinctProviderFrom`) already accurately documented in the legacy `docs/architect/agent-coordination/contracts/flow-definition.md` copy — but entirely absent from the canonical `docs/platform/agent-coordination/contracts/flow-definition.md` — into the canonical doc, verified against `src/runner/definitions/schema.mjs`'s real `POLICY_PATCH_FIELDS`/`validatePolicyPatch` as the source of truth (Phase 7 item 4b). New `test/runner/flow-definition-policy-patch-doc-drift.test.mjs` guards these two fields against future drift; found (but left out of this unit's scope) that `preferInvocation` and `repeatMode` are also undocumented in both doc copies, a pre-existing gap outside item 4b's charter.
+- **Changed**: `fgos-plan-loop` and `fgos-code-panel` converted into deprecated stubs (Unit I29, Phase 6 stub half): both `SKILL.md` files now carry only rewritten frontmatter (`description: "Deprecated: use fgos-code-change..."`, no `DemandFacts`/trigger-matching phrasing so a host's routing no longer auto-selects them as live) and a short redirect paragraph naming `fgos-code-change` and its plan-mode reference doc; kept loadable for the Phase 7 compatibility window, not deleted. Every real inbound reference retargeted to `fgos-code-change`: `fgos-panel/SKILL.md`'s description line, its "known Phase 5 gap" paragraph, and Route step 4 (step 3 / `coding-design-panel` untouched); both copies of `group-thinking-trigger-surface.md`'s `code-change-panel` Surface Taxonomy row and its immediately-following explanatory sentence; both copies of `master-coordinator.md`'s Retirement section; both copies of `runtime-recovery-design.md`'s Track/cell row; `intent-preservation-ledger.md`'s AC-I010 "Current slice"; `docs/specs/reading-map.md`; `docs/how-to/author-a-plan-loop-track.md`; `core/skills/_shared/private-cell-worktree.md` and `planning-capability-awareness.md`'s illustrative skill-name mentions; `scripts/measure-coordination-baseline.mjs`'s `CANONICAL_SKILL_PATHS`; `test/setup/skill-wrappers.test.mjs`, `test/skills/coordination-dag-driver-skill-contract.test.mjs`, and `test/skills/coordination-phase4-driver-discipline.test.mjs`'s pinned assertions (the latter's `COMBINED_LEAD_LOAD_CEILING` now measures `fgos-code-change`'s own SKILL.md + `references/plan-mode.md` instead of the now-stubbed `fgos-plan-loop`). Deliberately left untouched, evidenced as historical record rather than live routing/instruction: `docs/specs/runner.md`'s three mentions (each a dated `Lịch sử quyết định`/RUL-numbered decision-log entry citing the skill active at that specific past event); both `docs/architect/proposals/*.md` and both `README.md` portal/index docs (explicit `Design status: Discussion`/non-canonical, describing proposal sequencing at the time each was written); `docs/platform/packaging-distribution/code-panel-rollout-plan.md` (`Status: DONE`, a completed historical packet-rollout record naming the skill that was actually moved); `docs/platform/packaging-distribution/contracts/skill-package-distribution.md` (not in this unit's file-ownership scope; its `fgos-code-panel` ownership-move section already accurately describes a completed historical move, and adding a live `/fgos:code-change` slash-command mapping is a command-registry change out of scope here). One genuine bucket-(c) orphan escalated and resolved with Lead sign-off (`plans/260919-coordination-skill-harness-simplification/plan.md`): `fgos-code-panel`'s former "Known limits (not enforced by the engine)" caveat (the coordination schema has no field for proof tier/`FULL_TRIGGERS`/environment fingerprint, and `disposition`/`rationale` accepts any non-empty string) had no landing spot in I28's carried-forward content -- added as a new "Known Engine Limit" subsection to `domains/coding/skills/_shared/coding-cell-policy.md` §2 (Proof Tiers), mirrored the normal way, `COMBINED_LEAD_LOAD_CEILING` re-measured to 5,161 words to account for it.
+- **Added**: `fgos-code-change` (Unit I28, Phase 6 creation half): the new merged coding-domain facade, replacing `fgos-plan-loop` and `fgos-code-panel`'s parallel implementations of the same open/fix/close/worktree lifecycle with one, covering both a standalone single-cell change and a full plan/track (a single change is a plan with one cell). Links the shared `../_shared/coordination-driver.md` and `../_shared/coding-cell-policy.md` fragments and declares a 9-slot "Facade Hook Values" table. Mode selection is one rule (a run/resume/execute/implement verb targeting a plan/phase path or a uniquely resolvable track, or a bare plan/phase path alone with no other text, opens plan mode; otherwise single-cell mode; ask one question when ambiguous, including when a negated alternate target is itself negated), replacing `fgos-code-panel`'s former M1/A1/A2/CE1-5 named sub-rules -- their real effect folds into that single rule. The R2 recursive-dispatch guard survives unchanged and takes precedence over a `form: "facade"` re-route: inside R2, a facade result is refused outright, never re-routed to plan mode. The `open inputs` hook fills from real doors, not prose: plan mode runs `fgos plan-lint plans/<track>/plan.md --cell <id>` (never the phase file) and refuses to open on a hard finding or a `capability.undeclared` finding (a `--cell` match failure that can otherwise still read `ok: true`); single-cell mode declares `DemandFacts` and runs `fgos capability match --demand`, using the corrected 3-way `form` contract (`inline` = no cell opens; `facade` = the request was actually plan/track-scoped, re-route to plan mode; `protocol` = open a single cell only when the resolved capability is `code:implement`/`code:refactor` -- any other resolved capability, e.g. `code:review`/`code:debug`, is advisory or non-mutating and is never captured). Single-cell cells use a new, distinct `code-change--<slug>` branch/worktree prefix (never a bare `<track>--<cell-id>` scheme, which `fgos coordination chain` would otherwise conflate with a real track); the two-request DAG mode's own auxiliary inspection session likewise uses an `inspect--<coordinationId>` id, never a `<coordinationId>-suffix` shape, since the latter still starts with a plan-mode `coordinationId`'s own `<track>--` prefix and would be silently grouped as a fake extra cell of the track. No default actor roster: per-node executor binding resolves from each operation's own `policy.capability` (Unit I21); a hand roster is an explicit override. Plan-mode-specific content (track-level cell selection, cold-resume classification across a track's cells, the cell-status table, and unattended-track closeout) lives in `references/plan-mode.md`, loaded only when plan mode is selected. Carries forward, with equivalent real content, four invariants from `fgos-code-panel`'s own 977 lines: the caveat-blocks-close rule (a `sharedCwdCaveat` with `status: 'recheck-required'` must never be treated as close evidence), the cold-resume refused-vs-pending safety rule and its accepted projection gaps (`dag.counts.deferred`, `nextAction`'s "all N node(s) settled"), and the two-request concurrent read-only fan-out (DAG mode) pattern. `../_shared/coding-cell-policy.md` gained a real delta this facade depends on (§2: the Test-Selection Block, `FULL_TRIGGERS` categories, full-suite reuse by `(tree, environment, command)` proof key, reviewer/red-team inspect-proof-by-default; §5: post-merge verification as a policy-owned `--allow-empty` record commit plus pre-cleanup `HEAD` re-assertion, and a Non-Inference Rule rewritten down to exactly one rule -- the Tree-Identity Exception's own conditional escalation logic -- removing a leftover unconditional "must always re-run" sentence that contradicted it) -- the combined Lead load (`fgos-plan-loop/SKILL.md` + both fragments) accepted ceiling moves from 3,300 to 3,597 words as a result, a Lead-measured, evidence-based update (not a guess), since this facade now covers two merged lifecycles' worth of real safety policy. `fgos-plan-loop/SKILL.md` and `domains/coding/skills/fgos-code-panel/SKILL.md` are untouched by this unit (read for reference only) -- Unit I29 (dependent) converts them into deprecated stubs once this facade is proven to carry their content forward.
+- **Changed**: `fgos-panel` and `fgos-architecture-panel` now consume the shared driver-discipline fragment (Unit I26, Phase 5 work items 7/8): both link `core/skills/_shared/coordination-driver.md` (unchanged, digest-pinned) and each declare a 9-slot "Facade Hook Values" table filled from their own existing content, never restated fragment rules. `fgos-panel`'s table governs only its own Route step 5 generic-preset path (not the delegated `architecture-panel` route, which keeps its own table; `code-change-panel` is a known gap — `fgos-code-panel` does not yet link the fragment); its `open inputs` hook resolves the primary canonical capability by declaring `DemandFacts` and calling `fgos capability match --demand` (`core/skills/_shared/capability-matching.md`), per Phase 5's own entry gate instead of a keyword-matched guess (`fgos-plan-loop` is not a precedent here — it resolves capability from `plan.md`'s Product Gates table, never calls the match door directly). `fgos-architecture-panel`'s table maps its own six-value disposition vocabulary (`accepted`/`answered`/`mitigated`/`deferred`/`unresolved`/`invalidated-by-evidence`) onto the fragment's generic accepted/rejected/deferred states, and its existing Fresh-Session Resume packet becomes the fragment's `continuity artifact` value verbatim. `core/skills/fgos-group-thinking/SKILL.md` is untouched: an independent decomposition review found it is already the accurate core-facing selection gate the plan describes elsewhere, not stale duplication to fold into a stub.
+- **Added**: `fgos coordination specialist-authorize` (Unit I24b, Phase 5 items 4 pt.2/5/6): the driver-authenticated, locked typed-action door onto specialist-slot recruitment, distinct from Unit I24a's raw/unlocked `specialist-authorize` request-step type. New `recordSpecialistAuthorizationLocked` (`src/runner/coordination/store.mjs`) and `authorizeSpecialistSlotLocked` (`src/runner/coordination/session-engine.mjs`) mirror the existing unlocked doors' idempotency/validation behavior without acquiring the events lock themselves, so `run.mjs`'s typed-action execution path (which already holds that lock for its whole critical section) can call them without self-deadlocking. New `specialist` action kind in `composeCoordinationActionRequest` (`src/verbs/coordination/composers.mjs`) and `executeSpecialistAuthorizeUseCase` (`src/verbs/coordination/actions.mjs`) complete the subverb wiring (`bin/fgos.mjs`, `src/cli/command-registry.mjs`) alongside every other semantic coordination command. New `specialist`-kind action in `projectCoordinationActions` (`src/runner/coordination/actions-projector.mjs`), built on `evaluateSpecialistSlots` (`src/runner/coordination/legality-facts.mjs`), now distinguishes a declared specialist slot's mechanical `authorizable`/`authorized`/`exhausted` state (accounting for the slot's own `maxBindings`, a live binding's `maxAssignments`, and `expiresAfterRound`/round liveness) — mechanical legality data only, never a judgment field. Also fixes `evaluateDriverAuthorizedBindings`: a `driver-authorized` binding declaring `activation.maxInvocations > 1` (e.g. `architecture-advisory-panel-v1.yaml`'s `revise-synthesis`/`revise-explanation`) previously left `pending` for good after its FIRST authorization, so a legally-repeatable reopen's SECOND invocation never appeared as a legal `authorize-and-dispatch` action even though the engine itself would still admit it.
+- **Added**: `specialist-authorize` coordination request-step type (Unit I24a, Phase 5 item 4): `src/verbs/coordination/schema.mjs` validates it and `src/verbs/coordination/run.mjs` wires it into `run.mjs`'s own request-step vocabulary, reaching `authorizeSpecialistSlot` (`src/runner/coordination/session-engine.mjs`) the same way every other request-step type reaches its own kernel door — closing the last direct-engine-call escape hatch named in `fgos-architecture-panel/SKILL.md`'s "Never Reimplements The Kernel" section (`tsk-3xk`, retired). Reachable through any raw coordination request door (`coordination run --file`, `coordination start --steps`, the headless adapter) — none of them filter by step type, the same as every other step type already in this vocabulary. Unlocked path only: no `Locked` twin exists yet for `authorizeSpecialistSlot`, so this step type is refused outright if ever reached through the already-events-locked typed-action path. The `fgos-group-thinking` pack gate (`runGroupThinkingRequest`) explicitly refuses this step type — Group-Thinking Protocol Pack bypass #4 ("authorize a specialist") stays refused, unchanged. A driver-authenticated typed-action/subverb door for this same capability is a later unit's own work.
+- **Added**: `fgos coordination pack list|show-protocol|run` (Unit I23, Phase 5 item 3): a public CLI door onto the group-thinking Protocol Pack gate (`src/verbs/coordination/group-thinking-pack.mjs`), replacing the inline `node -e` scripts the `fgos-group-thinking` skill and `docs/how-to/use-fgos-group-thinking.md` previously instructed a dispatching agent to author by hand. `pack list` wraps `loadProtocolPack`, `pack show-protocol <id>` wraps `loadCoordinationProtocol`, and `pack run --protocol <id> --file <path>` wraps `runGroupThinkingRequest`'s pack-membership gate, forwarding `--executor`/`--tier`/`--model` the same way plain `coordination run` already does. A subverb under the already-registered `coordination` verb, not a new top-level verb — no `COMMAND_REGISTRY.length` growth, no rust-host regeneration.
+- **Added**: Demand doctrine and capability matching (`core/skills/_shared/capability-matching.md`, Unit I17): defines the 8-property `DemandFacts` schema, serves-based matching against the catalog, platform default inline execution via `unavailable`, five dispatch reasons justifying executor configuration, the generic `review` capability slot, and reverses skill triggers in `fgos-capability-dispatching` and `fgos-code-panel` from keyword spotting to declared demand facts.
+- **Added**: Per-node dispatch binding for declared CoordinationProtocol sessions (Unit I21, Phase 5 item 2): new pure `bindOperations` (`src/verbs/coordination/binding.mjs`) computes, per actor reachable in a protocol's graph, a four-step precedence binding — explicit Lead override (`actors[]` roster) > the operation's own `policy.capability` resolved against `runnerConfig.capabilities.<name>.prefer` (reusing the same `resolveExecutorAndOverrides` a real dispatch re-resolves at execution time) > `policy.minTier` raise-only (unchanged, already in force) > `placementPolicy.readOnlyRedirects` as the read-only safety net underneath. Two new optional FlowDefinition `policy` fields, `capability` and `distinctProviderFrom: {roles, strength}`, added to `POLICY_PATCH_FIELDS` (portable-scope requirements, never an executor pin — `assertNoPortableExecutorPin` still refuses `preferExecutor` at every portable scope regardless). New `fgos doctor` check `operation-capability-resolves` verifies every discoverable CoordinationProtocol operation's declared `policy.capability` resolves against the live runner config and reports reachable provider-family diversity. `standalone-master-coordination-loop.yaml` and `architecture-advisory-panel-v1.yaml` both declare the new fields; `fgos-plan-loop`'s skill text and `docs/how-to/author-a-plan-loop-track.md` no longer describe the roster as the only way to bind a role. Fix rounds 1-2 (red-team): only `capabilities.<name>.prefer` counts as a valid capability resolution — a literal registered executor id or an executor's own `for` purpose match are both refused (fall through to unbound, never a silent pin; this also fixes a live confinement regression where the real config's generic `review` capability, which has no `.prefer`, silently rebound every `architecture-advisory-panel-v1` actor onto an unconfined executor via `for` instead of falling through to `readOnlyRedirects`). A top-priority `--executor` CLI override now suppresses every computed binding instead of being shadowed by it. A roster entry naming only `tier`/`persona` (no `executor`) now still gets its capability-computed executor layered on top instead of being silently downgraded to the pre-I21 default. Fix round 3: `fgos coordination start`'s own idempotent-resume "Validate actors" check (`start.mjs`) compared its fully merged, capability-computed `actors[]` against the session's manifest using fields (`role`, `policy`) a request can never legally carry — so any actor with a computed binding made every retry throw `payload-conflict` instead of resuming; it now compares only the caller-declared roster (`options.actors`) against what the session durably owns (actor identity and `persona`), since executor/tier/invocation overrides are per-request policy the manifest never records. `operation-capability-resolves` now applies the same `bindingSource === 'capability.prefer'` rule `binding.mjs` itself enforces, instead of the looser `resolved.configured` check, so it can no longer report a capability as "resolving" when `bindOperations` would actually leave that actor unbound. `fgos-plan-loop`'s SKILL.md now names `--executor`/`--tier` (the only per-step overrides `authorize-and-dispatch`/`operation` accept) instead of vaguely saying "repeat the override".
+- **Changed**: `fgos-plan-loop` and the shared coordination driver discipline now spell out the `open inputs` hook (result kind, one primary capability, pass-through binding inputs), and document that `fgos coordination start --actors` binds only the entry node — reviewer and red-team use the default executor plus read-only redirects until config-based binding lands.
+- **Changed**: Extracted shared domain-neutral coordination driver discipline and coding-domain cell policy fragments; rewrote `fgos-plan-loop` skill facade into track sequencing over semantic coordination commands (Phase 4 / Unit I15):
+  - Created canonical domain-neutral driver discipline fragment `core/skills/_shared/coordination-driver.md` defining the 8-step driver cycle and 9 hook slots with zero coding/track vocabulary (enforced by drift test).
+  - Created canonical coding-domain cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md` defining worktree isolation, proof tiers, independent verification, post-close merge/cleanup, and tested/integrated identity, reusable for a single cell without plan or track requirements.
+  - Rewrote `core/skills/fgos-plan-loop/SKILL.md` to load both shared fragments, consume semantic coordination commands (`start`, `status`, `operation`, `authorize-and-dispatch`, `disposition`, `close`, `chain`), shed raw request JSON, manual ID generation, and copied kernel rules, reducing instruction size to 1,233 words (76.1% facade reduction from 5,160 words measured in Phase 0 baseline, strictly within 1,500-word ceiling).
+  - Synchronized generated projections byte-identically across `.agents/skills/`, `plugins/fgOS/skills/`, and `.claude/skills/`.
+- **Changed**: Coordination DAG requests no longer auto-close upon full completion (`runCoordinationUseCase` in `src/verbs/coordination/run.mjs`, Unit I14). Aligns DAG execution with the platform doctrine that explicit close is the sole normal close action: close is attempted only when explicitly requested via top-level `close: true`, a `close` step, or the explicit `closeCoordinationUseCase` door, while preserving caveat refusal reporting when concurrent read-only nodes share cwd.
+- **Changed**: Dispatch boundary simplification & architectural hardening (Phase 09 / Unit I12):
+  - Moved `fanoutBatchExecutorCli` from dispatch CLI to Work Driver layer (`src/runner/fanout-batch.mjs`), ensuring dispatch core (`src/runner/dispatch/**`) contains zero references to Work lifecycle mutation (`pick`, `return`, `claim`) or event log appending (`appendEvent`), with public entry points in `src/runner/dispatch.mjs`.
+  - Relocated Work/stage/skill lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) out of dispatch core into dedicated leaf compatibility module `src/runner/work-compat.mjs` (registered as `infra` in architecture manifest) with zero imports into dispatch core; dispatch core contains no Work lookup implementation, while `src/runner/dispatch/resolve.mjs` and `prepare.mjs` provide backward-compatible re-exports consumed by pre-existing callers (`plan.mjs` for `compileDispatchPlan({work})` and `cli.mjs` for `spawnWorker`), with boundary enforcement locking out direct and transitive Work lookup leakage into core modules (verified by `test/runner/dispatch-reconciliation-import-graph.test.mjs`).
+  - Split `assignment-runner.mjs` into dedicated `src/runner/dispatch/settlement.mjs` (unified single settlement pipeline replacing duplicated branches) and `src/runner/dispatch/reconcile-cli-spawn.mjs`, and restored the plan-bound cwd invariant by removing unrequested `opts.effectiveCwd` override from `executeAssignment`.
+  - Consolidated Confinement Authority preparation into `assessAndPrepare` in `src/runner/dispatch/confinement/authority.mjs`, making driver claims authoritative while retaining heuristic argv parsing as fallback, and isolating proof utilities in leaf module `src/runner/dispatch/proof-helpers.mjs`.
+  - Extracted Herdr S2 proof layer into `src/runner/dispatch/herdr-reconcile.mjs` and unified terminal outcome receipt publication into `publishHerdrCompletionReceipt`.
+  - Unified claim schema and result path in `src/runner/dispatch/brief.mjs`, wired `effectiveContract` from `executeAssignment` through `executeExecutorCli`, `buildConfinementRequest`, and `executeThroughConfinement` to `herdr-round.mjs` in production briefs (harmonizing `resultClaim.path` to `outbox/result-N.json` and synchronizing `effective-execution-contract.json` on disk), added Linux kernel `MAX_ARG_STRLEN` size hint guard for CLI-spawn arguments, and removed unused `prepareDispatch`.
+  - Strictly enforced controller directory ownership for `replacement-authority` in `src/runner/dispatch/recovery-planner.mjs`, and clarified in-process handback return semantics.
+  - Stamped `contract: 'dispatch-run.legacy'` on legacy dispatch run openings and clarified launcher ownership.
+  - Cached falsification probe attestations by fingerprint with 1-hour TTL in `src/runner/dispatch/confinement/attestation-store.mjs` and memoized `allRuns` per verb call via `withRunsCache` in `src/runner/dispatch/runtime-inspection.mjs`.
+- **Added**: `fgos return --to blocked` (with optional `--reason "<text>"`) and `--blocked` flag: allows settling an active claim directly into `blocked` with friction and outcome recorded, used by Work Driver fanout batch recovery (`src/runner/fanout-batch.mjs`) when executor execution throws or fails.
+- **Fixed**: in DAG coordination sessions (`fgos coordination run`/`show`), a node linked in `events.jsonl` without valid on-disk `RunResult` evidence previously allowed downstream nodes to be scheduled and masked missing/corrupt results under `materialized`. `run` and `show` now fail closed with `readLinkedRunResultFromDisk`, requiring authoritative on-disk evidence (`result.json`) matching the v2 contract, and project `refused` with reason `corrupt-evidence` when artifacts are missing, truncated, or contract-corrupt.
+- **Changed**: `fgos dispatch execute <id>` now fails closed with exit code 1 (`DispatchError('executor-not-found')`) when an unregistered executor is explicitly nominated, aligning with `fgos dispatch decide` (previously fell back silently to the global executor with exit 0).
+- **Changed**: fgOS now builds and supports Rust binaries (`fgctl`/`herdr`) on Windows — `ci.yml`'s `test` job no longer skips `cargo build --release --workspace` on `windows-latest`.
+- **Fixed**: three real Windows-only bugs surfaced by that CI run: (1) `session-identity.mjs`'s ancestor-pid walk shelled out to `ps -o ppid=` on every `fgos` invocation; Git-for-Windows' `ps` rejects that GNU-style syntax, and the failure's stderr was leaking into and corrupting the calling `fgos` process's own stderr, breaking unrelated CLI-output-shape assertions across the suite — the shellout is now skipped entirely on `win32`, landing directly on the same already-documented UNRESOLVED fallback. (2) Three coordination test files resolved sibling source paths via `new URL(import.meta.url).pathname`, which on Windows keeps the URL's leading `/` before the drive letter (`/D:/...`); passed straight into `path.resolve`/`path.join`, that produced a doubled-drive-letter path (`D:\D:\...`) and `ENOENT`. Switched to `fileURLToPath(import.meta.url)`. (3) `provisionDependencies` (`src/runner/worktree.mjs`) spawned `npm` via `execFileSync` without a shell; Windows `npm` is a `.cmd` shim, not a directly-executable binary, so every worktree dependency install failed `ENOENT` there — now passes `shell: true` on `win32`.
+- **Fixed**: `test/cli/helpers/fgos-cli-harness.mjs`'s `startSession()` silently returned `{ sessionId: null, worktreePath: null }` when the underlying `fgos session start` failed, instead of surfacing the real failure — callers crashed later with an opaque `path argument must be of type string. Received null`. It now asserts the start succeeded and reports the real stderr immediately.
+- **Fixed**: a second wave of Windows-only bugs found on the first Windows-inclusive CI run since enabling the Rust build there: (1) `fgctl-init/-stage/-upgrade.test.mjs` checked for the binary at `target/release/fgctl`, but cargo produces `fgctl.exe` on Windows — never found, so every one of those tests failed even though the build succeeded. (2) The same `new URL(import.meta.url).pathname` doubled-drive-letter bug (see above) also existed, via the `new URL('../..', import.meta.url).pathname` variant, in 8 more test files resolving the repo root — all switched to `fileURLToPath`. (3) `test/runner/worktree.test.mjs`'s own `npm install --package-lock-only` fixture setup had the same missing-shell `ENOENT` as `provisionDependencies` — same `shell: win32` fix. (4) `test/runner/dispatch-production-call-sites.test.mjs`'s `mockHerdr` fixture is a `#!/bin/sh` wrapper script; Windows cannot execute a shebang script directly and production's real herdr spawn deliberately runs with `shell: false` (security: dispatch args must never reach a shell), so faking that path on Windows would require weakening that contract — the 13 tests depending on it are now explicitly skipped on `win32` with a named reason, matching this repo's existing skip convention. (5) `checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)` (`test/setup/visibility-checks.test.mjs`, a newly-added test unrelated to Windows) relied on a real `herdr` being on PATH, which is never true in this repo's CI on any OS — it was failing on Linux and macOS too before this fix; now mocks `FGOS_HERDR_BIN` like its neighboring F5 test does.
+- **Fixed**: a third wave, confirming the second wave's local Linux/macOS fixes were real: ubuntu-latest and macos-latest's `test` jobs went fully green, isolating the remaining Windows failures to a `fgos` (the Rust host binary, distinct from `fgctl`) instance of the same missing-`.exe` bug — `target/release/fgos` is `fgos.exe` on Windows in `scripts/build-rust-distribution.mjs` (staging), `src/setup/registrations.mjs`'s `rust-host-binary-present` doctor check, and the `fgctl-*.test.mjs` fixtures' own `FGOS_BIN`/`FGCTL_BIN` constants. Extracted the win32-`.exe`-suffix rule into one shared `src/util/release-binary-path.mjs` (`releaseBinaryPath(dir, name)`) instead of re-deriving the ternary at each call site, and pointed all of them at it.
+- **Fixed**: Windows CI hardening across Phase 03 & 04:
+  - Stripped Windows verbatim UNC path prefix (`\\?\`) from canonicalized payload paths in `packages/distribution/rust/src/verify.rs` and `apps/fgos/src/legacy_exec.rs` to avoid Node.js `EISDIR: illegal operation on a directory, lstat 'C:'` failures during module resolution.
+  - Added Windows `.cjs`/`.js`/`.mjs` execution handling via `process.execPath` with `shell: false` in `src/runner/github-adapter.mjs`.
+  - Normalized CRLF line endings in `src/runner/prompt-templates.mjs` and test file assertions.
+  - Updated child subprocess and inline test scripts to import modules via valid `file://` URLs (`pathToFileURL`) across runner, state, and script tests, preventing Node.js `ERR_UNSUPPORTED_ESM_URL_SCHEME` on Windows.
+  - Resolved `USERPROFILE` isolation alongside `HOME` in `test/setup/helpers/setup-checks-harness.mjs` and setup test environments so `os.homedir()` correctly targets the test-isolated home directory on Windows. Added `USERPROFILE` fallback in Rust distribution store root resolution (`packages/distribution/rust/src/store.rs`).
+  - Handled `.sh` scripts in `bin:` entries on Windows in `test/rust-host/harness.mjs` and added explicit `process.platform === 'win32'` skips with documentation for POSIX-only shebang mocks (`mockHerdr`) spawned with `shell: false`.
+- **Fixed**: the test-selector promotion pipeline (`test:select:promote`) never had any real evidence to evaluate: the `compare` CI job computed `ledger.json` (the PR-side evidence) but never uploaded it, so every real comparison this repo ever produced was discarded the instant its job container tore down; `nightly-ledger.json` was uploaded but nothing ever downloaded and aggregated it across runs. Added `scripts/test-select-promote-report.mjs` (`npm run test:select:promote:report`), which pulls every non-expired compare/nightly ledger artifact from CI and runs the real `promoteRules` evaluation against the accumulated history — read-only by default. Also registered N=3 authored boundary mutants each for `verbs-state-read`/`verbs-state-stage` (`src/verbs/state/read.mjs`/`stage.mjs`), completing mutant coverage for the P3-09 canary's three rules (previously only `verbs-state-edit` had any).
+- **Dispatch Operability & CLI Hardening**:
+  - Registered `fgos dispatch decide|execute|log` as canonical public CLI sub-verbs wrapped in the `fgos.v1` output envelope, retaining `node src/runner/dispatch.mjs` as backwards-compatible alias.
+  - Added additive `reasonCodes` and `blockedReason` to `decideExecutorCli`, and removed dead `plan.dispatch === 'human-only'` check.
+  - Added `--run` alias for `--run-id` on `show-run`, `watch`, and `recover`; standardized run not-found errors to categorized exit code 2 (`precondition`).
+  - Enforced unknown dispatch sub-verb validation (exit 4) before requiring `runId`, and validated that `dispatch reconcile plan` with `--run` or `--assignment` requires `--action`.
+  - Added `settled` flag and corrupt evidence detection to `watch` snapshots for clean termination when `result.json` settles or corrupts.
+  - Aligned `RunObservation` vocabulary to closed status sets (`phase`, `delivery`, `resourceState`, `evidenceCompleteness`).
+  - Updated doctor check `herdr-available` to resolve binary via `FGOS_HERDR_BIN` and diagnose empty `FGOS_HERDR_ANCHOR_PANE`; documented intentional host-global state directories in distribution spec.
+  - Optimized receipt polling with event-driven `fs.watch` and 20ms fallback, and Herdr round polling (1.5s backoff after ack, skip process inspection while working).
+  - Conditioned provider-family warning to skip when all declared executor invocations are non-CLI.
+  - Synchronized command registry metadata, `touchesState` descriptions, and help text rendering for compound positional fields (`sub, run-id`).
+- **Fixed**: every `npm test` run left tens of thousands of test fixture directories in the OS temp dir (tests create them and mostly never delete them), which across a day of runs exhausted the disk's inodes and made every command fail with ENOSPC. The test runner now points each run at its own temp directory and removes it when the run ends; set `FGOS_TEST_KEEP_TMP=1` to keep it for debugging.
+- **Added**: `worktreeSetup.commands` in `.fgos/config.json` — shell commands every runner-created worktree (worker checkouts, leaf merges, and `fgos approve`'s root-into-main merge gate) runs after its dependency install and before anything verifies there, e.g. `["cargo build --release --workspace"]` for a project whose tests need a compiled binary a fresh checkout never has. Commands run in the worktree with `FGOS_REPO_ROOT` pointing at the main checkout; a failing command fails worktree creation (or, at the merge gate, the verify) with its output. Empty by default; `fgos doctor` flags a malformed section.
+- **Fixed**: `fgos approve`'s root-into-main merge held `main-checkout.lock` for its entire verify run (often several minutes), so every other lock-taking command (`take`/claim, another `approve`) was refused with "main checkout is locked" meanwhile. The lock is now taken only for the final ref move and main-checkout sync; `--no-wait` still refuses at once when the lock is already held.
+- **Fixed**: the `test` CI job checked out with the default shallow clone (depth 1), so `test/runner/coordination-p07-migration-and-adversarial.test.mjs`'s `git archive <old ancestor commit>` (materializing a real pre-schema-3 source tree) failed "not a tree object" on all three OSes — the ancestor commit object was simply not present in the shallow clone. The `test` job now checks out full history, matching `selector-plan`'s own checkout.
+- **Fixed**: `fgos approve`'s own-file-set clean-tree gate (see above) only ran BEFORE the CAS merge's isolated worktree merge+verify, which can take minutes. A path re-dirtied in that window still let `update-ref` move the trunk while the working-tree sync then silently failed. A second check now runs right under `main-checkout.lock`, immediately before `update-ref`; catching it there blocks with `main-checkout-dirty-mid-merge` (retryable via `catchup`, same shape as `lock-lost-mid-merge`) instead of moving the ref.
+- **Changed**: `npm test` (full suite) now queues machine-wide: when another full-suite run is already going (another session, worktree, or approve's merge gate), it prints who holds the queue and waits, instead of running concurrently and slowing every run down together. A lock left by a crashed run is reclaimed automatically; set `FGOS_FULL_SUITE_QUEUE=off` to skip the queue.
+- **Fixed**: `fgos approve`'s root-into-main merge gate ran the item's verify in a fresh worktree with no `node_modules`, so any verify touching a declared dependency (e.g. `yaml`) failed with `ERR_MODULE_NOT_FOUND` and the approve was refused as `verify-fail`. The merged tree's own dependencies are now installed before verify runs, same as every other runner worktree.
+- **Fixed**: `npm test` on CI previously ran zero tests on every OS after `test-results/` stopped being committed — the junit reporter's destination directory never existed at test-start, so `node --test` crashed before running anything and the step still reported a runtime under a second.
+- **Fixed**: several CLI scripts' entrypoint detection (`node <script>.mjs` vs. being imported) silently never matched — always on Windows, and on any OS when the resolved path contained a space or the script was invoked through a symlink — making the script exit 0 having done nothing. This affected `npm test` on Windows and `node src/runner/dispatch.mjs decide/execute/log` (the CLI door `AGENTS.md`'s Dispatch section and a project hook both require) whenever fgOS itself was installed or checked out under such a path.
+- **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.
+- **Changed**: `approve --github` is now completely forbidden per strict test gate policy.
+- **Changed**: `fgos return` now emits `[WARN C4]` when `item.verify` references a test selector (`test:related`, `test-select`, `test:select`), warning that test selectors must not replace full suite in authoritative verification.
+- **Fixed**: the nightly mutation-testing baseline (`test:select:mutate`) always ran against a clean checkout with zero local changes, which the selector always answers "refuse" to — so the whole nightly run silently returned an empty ledger without ever actually testing a single mutant. Baseline now runs per mutant, against that mutant's own rule-related tests, inside the detached worktree before mutation.
+- **Fixed**: `test:select:compare` never checked whether each OS's full-suite run actually completed (its `test-marker.json`) before trusting an empty failure list from that OS's junit — a crashed or partial run could read as "nothing failed here" instead of inconclusive. It now reads each OS's marker first and reports `inconclusive` if any is missing or incomplete.
+- **Fixed**: every executor dispatch that does not require confinement was refused with "confinement backend instance \"bwrap\" not found in machine registry" on any machine whose `~/.fgos/confinement-backends.json` has no bwrap entry (every macOS machine, and any Linux machine that never ran `fgos setup`). The default `bwrap` backend now applies to `required`-mode dispatches only; an explicitly named backend is still resolved and refused when missing in every mode.
+- **Fixed**: on Windows, opening any coordination session failed: `openSession` fsynced directories with `fs.openSync(dir)`, which Windows refuses. Inside the claim step, the cleanup then threw `ENOTEMPTY` and masked the cause. After the rename, the refusal was mapped to "coordination session already exists". It also fsynced files through read-only handles, which Windows refuses with EPERM. That throw left `claim.json` open, so the cleanup failed with `ENOTEMPTY` and masked the error. Files are now fsynced through `r+` handles that are always closed, and a failed file fsync still aborts the open. Directory fsync is best-effort (`fsyncDirBestEffort`), since Windows cannot fsync a directory at all.
+- **Fixed**: with no session env var, a process's writer id comes from walking its ancestor pids with `ps` (200 ms per hop). On a loaded host a slow hop stopped the walk at a different ancestor on each call, so ONE process could claim an item under one writer id and then be refused settling it under another (`settleClaim: writer identity mismatch`, runner halts with exit 3). The walk result is now resolved once per process and reused.
+- **Fixed**: test runs no longer leave fixtures behind in the shared temp directory. `npm test`, the canary, the selector's related runs and the nightly coverage collection give each run its own temp root (`TMPDIR`/`TMP`/`TEMP`) and delete it when the run ends. Leftover fixtures had accumulated to over 800,000 entries in `/tmp` and exhausted the filesystem's inodes (every `mkdtemp` failing with `ENOSPC`).
+- **Fixed**: temp files for the events lock, the coordination `session.json` write, the dispatch trust store, the reconciliation planner and visibility sessions were named from pid + timestamp only. Two worker threads (one pid) in the same millisecond got the same temp path, so one thread's link/rename found its file already consumed (`ENOENT`) or carrying the other thread's bytes. The names now also carry the thread id and random bytes.
+- **Fixed**: the nightly mutation ledger (`test:select:mutate`) labelled every mutant that survived its related tests `confirmed-miss` whenever the full suite was red for any reason (e.g. the nightly job does not build Rust). The full suite now gets a one-time baseline on the clean HEAD, and only a failure that is new relative to it counts as a selector miss; a baseline or mutated full run with no report is `infra-error`. Every tooling path that spawns `node --test` (selector related runs, canary, mutation, coverage) now drops an inherited `NODE_TEST_CONTEXT`, which previously made a nested run exit 0 without running any test.
+- **Fixed**: `test:select:mutate`'s detached worktrees only symlinked `node_modules`, so every `test/rust-host/*` test — which resolves its own repo root from the worktree it runs in — reported "Compiled Rust binary not found" on any machine that had already run `cargo build`, both in the mutation full-suite baseline and in every mutated run. The `target` directory is now symlinked the same way when the source repo has one; a machine that genuinely never built Rust is unaffected.
+- **Fixed**: the nightly `selector-nightly` coverage-map step (`test:select:coverage-map`) could hang until GitHub's 6-hour job limit: it ran every `.mjs` under `test/` — including a stdin fixture that never exits under `node --test` — one file at a time with no timeout. It now runs only `*.test.mjs` suites (the same set `npm test` runs), in a small parallel pool, with a 5-minute limit per file (a file that overruns is recorded as `coverage-collection-timeout` and the run continues), and the job has a 120-minute backstop. The externally supplied `NODE_V8_COVERAGE` path no longer crashes on an undefined variable.
+- **Fixed**: a herdr-spawn round whose `agent get` status reads kept failing could still be ended `timed-out-idle` when those failing reads were slow (an unresponsive herdr, a loaded host): the time spent inside a failing read was charged as worker idle time instead of blind time. Each tick now takes one observation time after all of its herdr reads, so an outage of any length is never reported as an idle worker; the absolute ceiling still bounds the round.
+- **Fixed**: `fgos approve` of a root item into the checked-out trunk no longer lands when a path in the item's own file set (committed diff + declared `footprint`) is dirty in the main checkout — the clean-tree gate was dropped by the CAS merge change, which let the ref move while the working-tree sync silently failed and left the main checkout's index behind the new HEAD. It refuses again with exit 4 (`not clean`); unrelated dirty paths still do not block.
+- **Added**: `fgos plan-lint <path> [--cell <id>] [--json]`: a read-only door onto `lintPlanCapabilityAnnotations` (`src/report/capability-plan-lint.mjs`), checked against `Object.keys(runner.capabilities)` from the caller's own live config (read-only load; a project with no `.fgos/config.json` yet gets a usage error, exit 2, never a bootstrapped file). A hedged parenthetical is flagged `capability.hedged` unless it immediately follows the exact token `unresolved`; two `capability:` lines in one unit are flagged `capability.duplicate`; plan-time pins cover `executor|provider|model|tier|prefer|invocation|actors`; a `## Product Gates` markdown table's rows parse into units (`source: product-gates`), tolerating a literal `|` inside the free-form Exit cell and backtick-wrapped Capability/Cell values; `--cell <id>` scopes the result to one unit or row, reporting `capability.undeclared` (severity `warn`) when nothing matches. Every finding carries `severity: hard|warn`, with `unresolved` and `--cell` misses staying `warn`. Exits 0 clean, 1 on a hard finding, 2 on any usage error (including a bare `--cell` with no value); default output is human-readable (each unit alongside its capability's catalog description), `--json` returns the raw envelope.
+
+### Added
+
+- Cold-resumable read-only Coordination DAG (`"dag": true` on a declared-protocol `fgos coordination run` request): schema-version-3 sessions persist an immutable declaration, `show`/`chain` reconstruct derived node outcomes, and independent read-only operation nodes can overlap after predecessors settle. **Scope is read-only individual nodes only.** Mutating DAG nodes, per-node worktrees, mutation takeover, and fan-out-as-a-DAG-node remain deferred behind future evidence gates; a `dag: true` request that includes mutation or `fan-out` is refused before any session write. Compatibility: an older binary fails safely on the unknown `dag-declared` event (or `schema-version-mismatch` on schema-1/2-only binaries) and will not append to it; a current binary keeps legacy sequential semantics for schema-1/2 sessions and will not convert them to DAG mode on resume. How-to: `docs/how-to/run-a-coordination-session.md`; example: `docs/how-to/coordination-examples/dag-read-only-request.json`.
+- `fgos-code-panel` / `fgos-plan-loop` driver skills now repeat Architecture Invariant 7 in the close template itself (never issue `cell-closed` while any node carries `sharedCwdCaveat` `status: 'recheck-required'`), document the two-request read-only DAG fan-out (including its expected shared-`--cwd` self-caveat), and name the refused-vs-pending resume rule plus two accepted `show`/`chain` projection gaps (`dag.counts.deferred` never reconstructed live; `nextAction` can say all nodes settled while a materialized node is still in flight).
+- **CI**: Added `selector-nightly.yml`, a scheduled job that runs the test-selector's coverage-map and mutation-testing scripts nightly.
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
+- **Scripts**: Added `npm run test:select:promote` (`scripts/test-select-promote.mjs`) for conservative per-rule promotion and recovery (§3.1, §3.4, §4.3, §14).
+- Cross-provider redirect governance contract: pool entries with cross-provider
+  targets require explicit `crossProvider: true` opt-in, failing closed with
+  typed refusal `redirect.cross-provider-not-permitted` when missing; enforces
+  `disallowedProviders`, `disallowedExecutors`, and `allowCrossProvider` invariants
+  with full redirect provenance recorded in `dispatch-plan.json`.
+- Adapter registry leaf module `src/runner/dispatch/adapters.mjs`, cleanly breaking
+  the import cycle between `config.mjs` and `transport.mjs`.
+- Operation prompt-template registry, deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3). Supports project (`.fgos/prompt-templates/`), domain (`domains/<domain>/prompt-templates/`), and core (`core/prompt-templates/`) resolution precedence, restricts variables strictly to validated semantic actions (`{objective}`, `{contextRefs}`, `{artifactRefs}`, `{expectedOutputs}`, `{role}`, `{constraints}`, `{evidenceContract}`), persists content/rendered digests and immutable snapshots for retry/replay stability, registers doctor check `operation-prompt-templates-valid`, and preserves the legacy objective path for definitions without a resolvable template.
+- Semantic coordination CLI surface: `fgos coordination start`, `status`,
+  `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`,
+  `human-turn`, `disposition`, and `close`. These semantic subcommands
+  compose normalized coordination requests, enforce action preconditions
+  and descriptor bindings under session locks, derive deterministic request
+  IDs, and preserve idempotent retry and concurrency isolation.
+- `fgos coordination actions` now exposes deterministic, read-only semantic
+  actions backed by the production coordination validator and execution seam;
+  action keys bind authoritative session state and normalized requests so
+  stale or conflicting retries fail atomically while identical retries remain
+  idempotent.
+- `confinement-orphaned-resources-reaped` doctor check + `fgos doctor --fix`
+  repair: reclaims confined worker temp resources (private homes etc.)
+  whose owning process died without their being cleaned up, and reaps the
+  same on every `fgos-runner` startup. Existing `reapOrphanedConfinementResources`
+  was previously never called from any production path.
+- `npm run test:canary -- <file...>` — an additive, non-authoritative
+  fast-feedback door: runs explicit canary files first, stops before the
+  full suite on a red canary, and invokes the unchanged `npm test` exactly
+  once on a green canary. `npm test` semantics are unchanged.
+- `npm run test:related -- --explain` — an inner-loop-only related-test
+  selector: a small, auditable, reality-checked ownership manifest
+  (`test/test-ownership.mjs`, currently `src/intake/**`, most of
+  `src/report/**`, and a handful of low-fan-in `src/state/**` leaf modules)
+  maps changed source paths to their direct/boundary tests. When every
+  changed path maps cleanly it runs only that subset (typically well under
+  a second); any unknown, unsafe, or declared full-trigger path (bin/,
+  scripts/, package.json, shared state core, `src/verbs/merge/`, etc.)
+  falls back to the unchanged full suite instead. Promoted after P05's
+  evaluation met every threshold on an adapted evidence set (real
+  fault-injection + real sampled edits, not the plan's literal
+  30-historical-commit design — see
+  `plans/260920-immediate-test-feedback-reduction/reports/selector-shadow-evaluation.md`).
+  Not a Definition-of-Done substitute: `npm test`, Work verification,
+  post-merge and CI remain full-suite, unaffected by this command.
+- `npm run test:related:shadow -- --explain` — same selection, but always
+  runs the full suite as well and reports its status as authoritative,
+  for continued agreement evidence-gathering without trusting the narrow
+  result alone.
+
+### Changed
+
+- The fgos gateway (REST API, MCP and the embedded web dashboard) is now its own component: it lives in `apps/fgos-gateway`, builds to the `fgos-gateway` binary and `fgos gateway start|status|stop` runs that binary directly with no extra argument. The herdr plugin crate was renamed `herdr-dashboard` (binary `herdr-dashboard`, manifest still `herdr-plugin.toml`), and the fgos CLI adapter and settings both share moved to the `herdr-fgos-common` crate. Behaviour is unchanged. After updating, re-register the plugin with herdr: `herdr plugin unlink fgos.dashboard` then `herdr plugin link <repo>/herdr-dashboard`, and build it with `cargo build --release` inside `herdr-dashboard/`.
+- Deduplicated `PlacementPolicy` redirect stable pool indexing in
+  `assignment-runner.mjs` to import and share `stablePoolIndex` from
+  `placement-policy.mjs`.
+- Packaging-distribution and host-invocation verification docs now record the
+  published `v0.1.0` preview release proof, post-release CI/external-consumer
+  proof, and the preview Node-fallback earliest removal date of 2026-10-18.
+
+### Fixed
+
+- A global `~/.fgos/config.json` carrying a `runner.modelPolicies.<provider>`
+  tier key retired by an earlier migration (e.g. a pre-`MODEL_POLICY_TIERS`
+  tier name) no longer breaks every project's config load on that machine.
+  `mergeWithGlobalConfig` now takes an optional `sanitizeGlobal` hook, and
+  `ensureRunnerConfigForDir`/`loadRunnerConfigFromDir` use it to drop any
+  `modelPolicies` tier key outside the current `MODEL_POLICY_TIERS`
+  vocabulary from the global config before merging — a stale key can no
+  longer fill a gap in a project config and then fail validation. Filters in
+  memory on every read; does not rewrite `~/.fgos/config.json` itself.
+- `acquireRunnerLock` (`src/runner/loop.mjs`, the runner drain-loop's
+  exclusive `.fgos/runner.lock`) created its lock with `fs.openSync(path,
+  'wx')` followed by a separate `fs.writeSync` — a window where the lock
+  file existed but was still empty, so a concurrent process reading it
+  mid-write could misjudge a live holder as a dead crash leftover and
+  reclaim (delete) a lock another process still held. The identical bug was
+  already found and fixed twice elsewhere in this repo (`events.mjs`,
+  `session.mjs`) via the same remedy, but never ported back to this,
+  the original the other two mirror. Now writes the pid to a temp file and
+  atomically `fs.linkSync`s it onto the lock path, closing the window by
+  construction.
+- Single-live-worker guarantee for a dispatch Run (Phase 03): resuming a Run
+  whose prior dispatch attempt reconciles as anything other than settled or
+  genuinely never-dispatched now refuses (`run-in-flight`/`run-unreconciled`)
+  instead of silently launching a second worker over it, and admitting a
+  brand-new attempt for an Assignment is refused the same way unless the
+  prior attempt has settled or its control holder is provably dead (`--force
+  -new-attempt` overrides). `herdr-round.mjs`'s controller/commands writes
+  now go through the same controlEpoch/controlToken-fenced door
+  (`commitCommandOutcome`/new `patchCommandRecord`) every terminal write
+  already used, closing a stale-controller clobber window on the interim
+  ones. `dispatch recover --action resume-driver` now refuses a
+  CoordinationSession-owned Run, requires the driver's last heartbeat to be
+  confirmed stale (`liveness.fresh === false`) before authorizing resume, and
+  clears `dispatch.claim` through the same session-ownership/dead-holder
+  proof `dispatch.runtime.reconcile`'s own guard-repair action already
+  applies, instead of an unconditional unlink. `reconciliation-planner.mjs`'s
+  own internal `reconcile.lock` can now reclaim a dead holder (PID +
+  processStartTime) instead of staying wedged forever after a crash.
+
+### Deprecated
+
+- `session-engine.mjs`'s `dispatch.claim`/`retry-<n>.claim` exclusive-create
+  files are redundant as of the single-live-worker fix above:
+  `admitRunAttempt`'s own admission-time check now covers the same race more
+  robustly (a real cross-process control-epoch/PID proof, not a
+  same-process-only marker file). Kept for one release rather than removed
+  outright; slated for removal after that.
+
+### Security
+
+- A dispatched worker's full spawn environment (every credential resolvable
+  from it, including provider API keys/tokens) is no longer written into the
+  persisted `prepared-invocation`/`launch-envelope` evidence records under
+  `.fgos/assignments/**/protected/` -- those now carry only a short,
+  standard-shell allow-list plus a digest. The real environment lives only
+  in a 0600 side file the supervisor process reads once, uses to spawn the
+  worker, and deletes immediately after.
+
+### Capability catalog `serves` (Unit I19)
+
+- Added machine-readable `serves` attributes to `runner.capabilities` catalog
+  entries (`ALLOWED_CAPABILITY_ENTRY_KEYS`/`validateCapabilitiesShape` in
+  `src/runner/dispatch/config.mjs`, `DEFAULT_CAPABILITY_SLOTS` in
+  `src/setup/registrations.mjs`): an object mirroring `DemandFacts` minus
+  `size`/`rigor` (`outputKind`, `domain`, `mutates`, `behaviorPreserving`,
+  `needsIndependentReview`, `hasPlanOrTrack`), scalar or array values, used by
+  `core/skills/_shared/capability-matching.md`'s Q1 steering. An entry
+  without `serves` stays valid; an old config predating this key keeps
+  loading unchanged.
+- Added a new generic, domain-neutral `review` capability slot to
+  `DEFAULT_CAPABILITY_SLOTS` (independent read-only review of non-code
+  artifacts, distinct from `code:review`) -- curated default, no
+  `prefer`/`overrides` pin.
+- Added doctor check `capability-serves-valid`: every declared `serves` is
+  well-formed, no two capability entries declare the identical `serves`
+  attribute set, and the `review` slot is present.
+- Live `.fgos/config.json`: added `serves` to every existing capability
+  entry, the new `review` slot, and `for` on the previously orphaned `glm`,
+  `xai`, and `deepseek` executors (`xai` -> `["review", "code:review"]`,
+  `deepseek`/`glm` -> `["execute"]`) -- additive only, no existing `prefer`
+  changed.
+- **Added**: `fgos capability match --demand <json> [--override <capability> --reason <text>] [--json]` (Unit I20): Q1 steering CLI door onto a new pure `matchCapability(demandFacts, catalog)` function (`src/runner/capability-match.mjs`, no import of `dispatch/plan.mjs`/`cli.mjs`/`transport.mjs`) that derives the canonical capability -- and its execution `form` (`inline`/`protocol`/`facade`) -- from declared `DemandFacts` against the live `runner.capabilities` `serves` promises. Read-only with respect to state; appends exactly one `.fgos/logs/capability-match.log` line per call (`source: match|override|miss`). Additive reason code `capability.unknown` now accompanies `selector.unregistered` on `decide --for <purpose>` when the purpose is not a registered `runner.capabilities` key or alias (and `--needs-soul` was not passed); `mechanism` is unchanged.
+- **Fixed**: the `fgos` writer id for a bare terminal (no agent session env var) is now read from `/proc` on Linux instead of `ps` with a 200ms timeout, so a claim taken by `fgos pick` is no longer refused by `fgos return` with "writer identity mismatch" on a busy machine. `npm test` also gains a per-file time limit (default 10 min, `FGOS_TEST_FILE_TIMEOUT_MS`) that kills a hung test file's process tree and names it.
+
+## [v0.1.0] - 2026-09-18
+
+### Changed
+
+- Provider Capacity Rotator slice 1: Codex agent dispatch can now select a
+  global `runner.providers.openai-codex.accounts` account after Run admission,
+  lease it through `~/.fgos/runtime/provider-capacity/`, provision only the
+  selected `auth.json` into private bwrap `CODEX_HOME`, report/quarantine
+  account capacity faults, and expose inspect/manual-clear/doctor reporting
+  without project-local account inventory or cross-provider fallback.
+- `fgos dispatch inspect` now fails closed for duplicate current Assignment Run
+  materializations and incomplete sibling admission evidence, including cwd
+  aggregates; ambiguous or incomplete evidence never produces a recovery hint.
+- `npm test` now runs `scripts/run-tests.mjs`, a portable full-suite door that
+  discovers every `test/**/*.test.mjs` file itself via `fs` and spawns
+  `node --test` with an explicit file-argument array, instead of a
+  shell-globbed `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
+  string. The old form silently selected zero files on the CI Ubuntu/macOS
+  Node 20 lane (no built-in glob support for that Node version) and failed
+  outright on Windows's default `cmd.exe` npm shell (POSIX `VAR=value`
+  env-assignment syntax is not valid there); the new runner sets that env var
+  on the spawned child directly and works unchanged across OS/shell.
+- Packaging-distribution release posture is now preview with Rust host as the
+  default installed runtime for external installs; legacy Node fallback is
+  deprecated and kept only as an explicit escape hatch for 30 calendar days
+  after preview release publication.
+- Code-panel reviewers now use the scoped `claude-reviewer` profile with
+  Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
+  variant.
+- Read-only dispatches that would have fallen through to the default `claude`
+  executor can now use configured provider-aware redirect pools; this repo now
+  routes those read-only Claude fallbacks to `codex-bwrap` so reviewer/red-team
+  recovery does not keep burning the exhausted Claude seat.
+- `codex-bwrap` can now provision its sandbox credential from a configured
+  ordered Codex home pool, so the repo is no longer locked to only
+  `${HOME}/.codex-fgovn` when multiple Codex accounts are available.
+- Coordination sessions now default `aggregateBounds.wallTimeMs` to 3 hours
+  instead of 1 hour, matching measured multi-step dispatch latency so a valid
+  revise/recheck chain is less likely to be killed by the aggregate wall-time
+  ceiling before all authorized steps can finish.
+
+### Fixed
+
+- Coordination sessions can now actually close after a fix round: a required
+  first-pass operation (`review-candidate`/`red-team-candidate`) that reports
+  `findings` used to fail its quorum slot permanently, even after an
+  accepted-and-fixed finding's recheck (`reviewer-recheck`/`red-team-recheck`)
+  came back clean -- `close.json` would refuse forever with
+  `missing required actor(s)`. A recheck operation can now declare `rechecks:
+  <operationId>` in its FlowDefinition binding so a later, satisfied recheck of
+  the same actor discharges the failed slot, but only once the driver has
+  recorded a disposition against the specific failed attempt.
+
+### Added
+
+- `npm run release:check` and `npm run release:prepare`, a repo-owner release
+  preparation door that validates a target tag, updates `package.json`,
+  `package-lock.json`, and `CHANGELOG.md`, and prints the exact commit/tag/push
+  commands while leaving tag creation and publishing authority with the owner.
+- `fgos dispatch reconcile plan|apply`, a narrow CAS-guarded local cwd-lock
+  repair door. It only removes a lock after proving its exact PID/start-time
+  incarnation is dead; it never performs semantic recovery or execution control.
+- `fgos dispatch reconcile plan --action collect-result --run <runId>`, a
+  second reconcile action that links an already-written, already-valid
+  `result.json` through its owning Assignment once admission-ledger facts
+  prove it is not superseded. It reuses `dispatch.runtime.inspect`'s own
+  owner/current-Run views and refuses outright on a CoordinationSession-owned
+  Run, whose result linking stays that session's own driver-authored write.
+- `fgos dispatch reconcile plan --action clear-assignment-claim --assignment <id>`,
+  a third reconcile action that removes a dead-holder `dispatch.claim` once no
+  admitted-but-unmaterialized launch, unsettled Run, or uncollected result is
+  still pending for that Assignment. It refuses outright on a
+  CoordinationSession-owned claim, whose clearing stays that session's own
+  recovery door.
+- `fgos dispatch reconcile plan --action repair-projection --run <runId>`, a
+  fourth reconcile action that additively patches a stale `run.json.status`
+  (e.g. still `running`) back to `settled` once an already-validated terminal
+  RunResult proves the Run finished. It reuses `dispatch.runtime.inspect`'s
+  own RunResult interpretation and never repairs on an unproven or corrupt
+  result.
+
+- `fgos dispatch inspect`, a read-only Dispatch runtime inspection surface with
+  exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
+  observations, terminal RunResults where present, duplicate identities, and
+  non-authorizing recovery ownership hints.
+- Dispatch runtime inspection/reconciliation now has an operator how-to and a
+  production-door proof matrix covering Assignment execution, public inspect,
+  historical/replayed RunResult interpretation, and forbidden reconciliation
+  recovery routes.
+- Code-panel multi-cell facade (code-panel-multicell-facade track, P01):
+  `fgos-code-panel` now operates as a two-mode facade for coding implementation
+  work with independent review and red-team. Direct mode (`direct-single-cell`)
+  retains existing single-cell mutation and quorum behavior, while planned mode
+  (`planned-multi-cell`) delegates track execution to `fgos-plan-loop` by
+  reference when a plan/phase file or registered track is the execution target,
+  with recursive-dispatch protection and automated contract tests covering
+  mode selection (CE1-CE5, imperative mood M1, and anti-guessing).
+- Coding test-policy overlay for code-panel facade (code-panel-multicell-facade track, P02):
+  `fgos-code-panel` attaches an explicit 4-field test-policy overlay (`FOCUSED_TESTS`,
+  `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`) to coding cell objectives dispatched
+  through `fgos-plan-loop`. Doer/fixer execute focused tests first; affected scope
+  escalates based on impact analysis and touched contracts; reviewer and red-team
+  inspect existing proof records by default, re-running only when proof is stale
+  (differing Git tree hash or environment fingerprint), insufficient, or counterexamples
+  are discovered; every cell requires an explicit test decision (including
+  `full: deferred-to-final-gate`) with no silent omission.
+- Packaging-distribution legacy architecture redirects (code-panel track, P9):
+  `docs/architect/packaging-distribution/**` now carries explicit
+  historical/status notes pointing readers to the promoted
+  `docs/platform/packaging-distribution/**` portal, contracts, and proof docs,
+  with source-preservation audit closeout for the old architecture corpus.
+- Skill source layout and canonical discovery (packaging-distribution track, P2):
+  executable source-of-truth rules for canonical skills (`core/skills/`,
+  `domains/*/skills/`), duplicate skill-id/intent-id/command-path collision
+  prevention before adapter writes, precise adapter target classification
+  preserving hand-authored plugin and Claude skills, canonical skill intent
+  to host trigger mapping (with partial/planned routing and compatibility
+  alias tracking), and prototype Gemini CLI extension package generation.
+- Instruction projection rendering (packaging-distribution track, P5):
+  effective instruction sets can now render into a managed portable
+  `AGENTS.md` block with `.fgos/installation/projections/ledger.json`
+  provenance, plus a registered `fgos doctor` check/fix that detects stale
+  generated instruction projections and repairs them without overwriting
+  unmanaged user content.
+- Plan-loop track authoring how-to and coding verification-discipline
+  fragment (code-implementation-track-policy track, P01):
+  `docs/how-to/author-a-plan-loop-track.md` gives a Lead a copyable template
+  for a Work-independent `fgos-plan-loop` track's precedence/compatibility
+  rule, Execution Inputs (baseline that may only shrink), durable evidence
+  schema (`coordination-accepted` / `merged-to-track` / `checkpoint-verified`
+  with the `testedSha != integratedSha` non-inference rule), checkpoint
+  identity, Product Gates with the mechanical-gate rule, escalation
+  authority scoped to the current cell, and cell trace format; it links
+  `domains/coding/instructions/verification-discipline.md` (`kind:
+  procedure`) as the single source of the coding-worker verification rule
+  rather than restating it.
+- `fgos-plan-loop` baseline step, proof-sufficiency wording, and close-rule
+  evidence lifecycle (code-implementation-track-policy track, P02):
+  `core/skills/fgos-plan-loop/SKILL.md` gains a baseline step (run the
+  track's full proof command once, record it in `plan.md` Execution
+  Inputs, list may only shrink) before its unattended loop; `produce`/
+  `revise` objectives now say to run only the phase's declared
+  Verification unless a full-suite gate applies; `review`/`redTeam` and
+  their recheck objectives now judge proof sufficiency, not only
+  correctness, and report a coverage gap as a finding for the Lead to
+  accept or evidence-backed reject; close wording states the durable
+  evidence schema (`coordination-accepted` / `merged-to-track` /
+  `checkpoint-verified`), checkpoint identity, escalation authority scoped
+  to the current cell, and the `testedSha != integratedSha` non-inference
+  rule; the description now routes "run/execute this code implementation
+  plan (track)" requests here. `fgos-code-panel` gains one routing line
+  (description + Non-Goals) pointing a multi-cell `plan.md`/`phase-NN`
+  request to `fgos-plan-loop` instead, plus a fix -- its fix-round
+  `authReviewRecheck`/`authRedTeamRecheck` example steps now declare
+  `grantedContextRefs: ["$ref:revise"]` so the template dispatches as
+  written instead of being refused.
+- `fgos-code-panel` focused/affected/full proof tiers and plan-loop
+  proof-contract fixes (code-implementation-track-policy track, P03):
+  `domains/coding/skills/fgos-code-panel/SKILL.md` replaces its generic
+  "run the target project's real test command" wording with a declared
+  `FOCUSED_TESTS`/`AFFECTED_TESTS`/`FULL_TEST`/`FULL_TRIGGERS`
+  test-selection block (`AFFECTED_TESTS` uses the impact-analysis
+  capability, e.g. GitNexus, when registered and present); the full suite
+  now never re-runs against a `(tree, environment)` state it already
+  certified (usually once per cell near merge, but never mechanically
+  once per round; refined further at P04);
+  recheck steps read the fixer's own evidence by default instead of
+  re-running; a tree-identity proof-reuse rule (record `treeIdentical:
+  true` when `git diff testedSha integratedSha` is empty under the same
+  environment fingerprint, instead of re-running) replaces the raw-SHA
+  comparison that forced a redundant re-run after every `--no-ff` merge;
+  cell traces now record every test command's tier, duration, and
+  executed-vs-reused status. `core/skills/fgos-plan-loop/SKILL.md` and
+  `docs/how-to/author-a-plan-loop-track.md` get the same tree-identity
+  exception (with a new `treeIdentical` checkpoint-identity field) and
+  fix two contract bugs found in a review of P01/P02: a proof-gap finding
+  could previously be silently `deferred` at the 3-fix-round cap
+  (contradicting the accepted/evidence-backed-rejected-only rule) --
+  it now forces `Proof: escalated-to-full` instead; the baseline's
+  `environmental` bucket is split into `environmental-transient` (rerun
+  until green) and `environmental-precondition` (a named, disclosed
+  structural gap, e.g. an uncompiled binary, that does not block close
+  but must never be silently folded into `pre-existing`); the baseline
+  must record every failing test's exact name, not a count/category
+  summary. `docs/enduser-docs-index.json` regenerated to index the how-to.
+- `fgos-code-panel` post-merge verification gate (code-implementation-track-policy
+  track, P04): closing a cell only certified the cell's own worktree tip,
+  never the merge commit — if `$base` moved during the cell's lifetime or
+  the merge needed conflict resolution, the merged result was never
+  actually tested. `## 4. Close` now requires a post-merge tree-identity
+  check (reuse the close's proof only when the merge commit's tree matches
+  the cell tip's under the same environment fingerprint; otherwise run
+  `AFFECTED_TESTS` at minimum, `FULL_TEST` if triggered) before the
+  worktree/branch may be removed. "Record it" now defines the cell trace
+  as the coordination session's own event log (`close.json`'s disposition
+  rationale, readable via `fgos coordination show`) instead of leaving
+  "every cell trace" undefined — no new `docs/` directory, matching this
+  skill's own "no index, no track directory" design. "Full suite" wording
+  changed from an "at most once" KPI framing to "never twice for the same
+  (tree, environment) state" to stop a Lead from skipping a genuinely
+  needed rerun just to keep a count low. Final commit range for this cell:
+  `63b01fa9..70eb4485` (superseded at P05 below: the close-vs-merge
+  ordering and the git-notes durable-trace design both changed again).
+- `fgos-code-panel` close-before-merge ordering restored, `git notes`
+  replaced with ordinary commits, `tsk-1bh` fixed (code-implementation-track-policy
+  track, P05): a real review of P04's own shipped design found the
+  close-after-merge reorder had traded away a real safety property --
+  target branch could receive a cell's code even when the coordination
+  session never actually closed (confirmed live: P04's own session stayed
+  `active` due to `tsk-1bh`, yet its merge still landed). Reverted to
+  close-then-merge (matching `fgos-plan-loop`'s own cells); post-merge
+  verification and its result now happen after a successful close, as
+  separate plain-git steps recorded via an ordinary tracked commit instead
+  of a `git note` (`refs/notes/*` are outside the default commit graph and
+  do not push/fetch by default -- confirmed via `git notes list` returning
+  empty on this repo, i.e. the P04 note was never actually durable).
+  `session-engine.mjs`'s quorum classification also fixed: a
+  driver-authorized position (e.g. `fixer`) that failed once and then
+  succeeded under a fresh authorization now correctly counts as completed
+  instead of being stuck `failed` forever, and `resolveBindingAuthorization`
+  now prefers the newest unconsumed authorization for a binding instead of
+  an oldest-wins order that made a corrected retry unreachable once a bad
+  authorization existed for the same binding. Two independent review
+  rounds on this fix (real reviewer + red-team dispatches, not
+  self-review) then found and fixed two further real bugs: (1)
+  `resolveTaskKeyAuthorization`, the sibling function deriving a
+  driver-authorized dispatch's default `taskKey`, was still oldest-wins,
+  disagreeing with `resolveBindingAuthorization` and blocking a legitimate
+  third retry at the same binding -- fixed to newest-wins too; (2) the
+  quorum fallback's same-binding retry credit trusted raw
+  `assignment-created.payload.operationId`/`nodeId` fields, which an
+  exported raw door (`createSessionAssignment`) can legitimately carry for
+  an unrelated task while spending a real authorization -- fixed to
+  require the same reserved `protocol-operation:` contract stamp the
+  gating path already checks, which only `dispatchDeclaredOperation`'s own
+  common path can write. Five new regression tests added across both
+  fixes, each confirmed by reverting its fix to fail against the
+  pre-fix/pre-hardening code. Full trace:
+  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`.
+
+- Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
+  arbitrary worker takeover without mandatory checkpoints, Run admission/result
+  fencing refinements, effect-aware fallback, and protocol-declared session
+  continuation with lineage, scoped imports and crash recovery. The design entry
+  is `docs/architect/agent-coordination/architecture/runtime-recovery-design.md`;
+  it includes versioned rollout and a shared proof matrix.
+
+- `apps/fgos` (rust-host-r1-kernel track, Phase 07): the Rust CLI host is now
+  a real binary. Every `legacy-cli` selector routes unchanged through the
+  existing Node payload (`bin/fgos.mjs`); the one currently-listed `native`
+  selector (`version`) routes through the `fgos-host-runtime` kernel and
+  fails closed pre-Phase-08 (no distribution provider registered yet).
+  Known, accepted behavior difference at this stage: an unknown/unlisted
+  selector still exits `4` on both hosts, but stderr text differs (the
+  Node CLI prints its full verb list plus an `invocation-faults.jsonl`
+  record; the Rust host prints a short usage line and writes no fault
+  record) -- reproducing Node's exact fault-logging side effect is out of
+  this phase's scope.
+- `fgos version` native routing (rust-host-r1-kernel track, Phase 08): `fgos version` and `fgos version --json` are served natively by the Rust host through the `fgos-host-runtime` kernel and `fgos-distribution` provider without spawning a Node.js process, matching Node output byte-for-byte in the `fgos.v1` envelope format.
+- Release tree builder and doctor checks (rust-host-r1-kernel track, Phase 09): `scripts/build-rust-distribution.mjs` stages standalone release trees (`bin/fgos`, `bin/fgos-runner`, `libexec/legacy-node/`, `manifest.json`), accompanied by four new `fgos doctor` checks (`rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`).
+- Tier-0 workspace-shim resolver (rust-host-r1-kernel track, Phase 10): `.fgos/installation/bin/fgos` and `fgos-runner` workspace shims are resolved before falling back to local `bin/fgos.mjs` or PATH across Node (`resolveFgosBin`), shell integration (`fgos-shell-integration.sh`), and Herdr (`resolve_fgos`).
+- `fgctl` binary and release store management (rust-host-r1-kernel track, Phases 11, 12, 13): `apps/fgctl` provides bootstrap and lifecycle operations (`stage`, `init`, `upgrade`, `repair`, `verify`, `status`) over a content-addressed machine release store (`${XDG_STATE_HOME:-$HOME/.local/state}/fgos/releases/<digest>/`), atomic activation (`.fgos/installation/activation.json`), and quarantine on integrity violation.
+- `fgos version --runtime-json` (rust-host-r1-kernel track, Phase 12): native JSON output reporting runtime identity (host `rust`, active release version, artifact digest, workspace ID, state schema range, and legacy payload identity).
+- `fgos gate-bypass` native read routing: the Rust host now serves `gate-bypass` through `work.gate-bypass.show` without spawning the legacy Node CLI, while keeping setup/doctor ownership and broader Work/State migration out of scope.
+- `install.sh` standalone installer (rust-host-r1-kernel track, Phase 14): standalone POSIX shell script installing `fgctl` directly from a GitHub release into `~/.local/bin` (or `FGCTL_INSTALL_DIR`) with `SHA256SUMS` integrity verification without cloning or requiring Node/Rust toolchains.
+- CI release automation and external-consumer testing (rust-host-r1-kernel track, Phase 15): GitHub Actions release workflow (`.github/workflows/release.yml`) for publishing distribution tarballs (`fgos-*.tar.gz`, `fgctl-*.tar.gz`, `SHA256SUMS`, `install.sh`) on `v*` tags, verified end-to-end locally and in CI by `scripts/ci-external-consumer.sh`.
+
+
+````
