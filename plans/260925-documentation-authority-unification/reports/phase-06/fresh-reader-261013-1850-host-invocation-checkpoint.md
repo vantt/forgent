@@ -25,7 +25,7 @@ Files opened before the first correct owner document: at most 4 for both readers
 
 ## 2. Cited anchors checked by script
 
-Each cited `path#anchor` was checked against the GitHub-style slugs of the cited file's headings.
+Each cited `path#anchor` was checked against the GitHub-style slugs of the cited file's headings, and the 25 distinct citations of both readers were each rechecked with `node scripts/list-doc-anchors.mjs --check <path#anchor>`: 25 pass.
 
 | Reader | Citations | Anchors that do not exist |
 |---|---:|---|
@@ -47,6 +47,6 @@ Each cited `path#anchor` was checked against the GitHub-style slugs of the cited
 | At least 5 of 6 correct per reader and scenario | met (6 / 6 in all six cells, seven of them partial) |
 | 0 non-existent cited anchors | met (0 of 41) |
 | 0 answers relying on a legacy path as authority | met |
-| At most 8 files before the first correct owner | met (at most 4) |
+| At most 8 files before the first correct owner | met (at most 4). The phase file says "at most 8 files read per run"; the key and the pilot count files before the first correct owner. Over the whole run, reader 1 opened about 14 files and reader 2 about 10 per scenario, so the per-run reading fails |
 
 The partials are graded leniently, as in the pilot. Under a strict reading, reader 1 scenario A has three partials and would score 3 / 6 if partials counted as wrong. The risk-rubric gap above is the common cause of the Q4 partials.
