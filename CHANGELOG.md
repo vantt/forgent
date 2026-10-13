@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.3] - 2026-10-13
+
 ### Fixed
 - `fgos doctor` and `fgos version` no longer print `fatal: not a git repository` when run from a release install (one set up by `fgctl init`, which is not a git checkout). The version check asked git about the install directory and let git's error through; the command result was already correct, only the stray line was wrong.
 
