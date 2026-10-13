@@ -60,7 +60,7 @@ Out: changing which files are copied (the allow list stays), binding the real ho
 
 ## Open questions
 
-1. Does xAI, or OpenAI for Codex, revoke the whole token chain on reuse of an old refresh token? Decides how bad a lost race is, not whether the design is needed. Not to be tested on a real account.
+1. Does xAI, or OpenAI for Codex, revoke the whole token chain on reuse of an old refresh token? Decides how bad a lost race is, not whether the design is needed. Not to be tested on a real account. Docs research 2026-10-13 ([report](reports/research-261013-1221-refresh-token-reuse-revocation.md)): neither provider documents family revocation. OpenAI (maintainer, openai/codex#10332): an old refresh token still works for about an hour, then fails permanently with 401 `refresh_token_reused`; Codex re-reads `auth.json` before refreshing and adopts a newer pair. xAI: single use, `invalid_grant: Refresh token has been revoked`, no grace window seen, nothing documented. Whether a replay also kills the newer token stays unknown for both, so the design keeps assuming the worst case (a lost race can force a full re-login).
 2. ~~Does the agy (Gemini) login rotate at all?~~ Answered 2026-10-13: no, the refresh token stays the same across a renewal (see the measurement table). Nothing to do.
 3. Should `fgos doctor` report a pending copy that stays unidentified (its entry cannot be matched to the source), since it holds a refresh token silently?
 4. Should a torn scratch copy (a probe killed at its time limit mid-write) be kept for hand recovery instead of deleted as unreadable? Depends on whether pi and omp write their stores atomically.
