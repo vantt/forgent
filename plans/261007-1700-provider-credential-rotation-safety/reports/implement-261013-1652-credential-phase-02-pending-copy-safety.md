@@ -31,3 +31,12 @@ Invariant kept: a login copy that may hold the only valid refresh token is dropp
 - The fingerprint ignores everything but key, refresh token and expiry; two copies equal on those but different elsewhere are treated as identical (apply only merges those fields).
 - Doctor reports a half-written copy only after it is a day old, like the other copies.
 - An account whose copies cannot be read (no `node:sqlite`, torn files) has no fingerprints, so nothing is ever dropped there, by design.
+
+## Round two
+
+Source: [code-review-261013-1739-credential-phase-02-pending-copy-safety.md](code-review-261013-1739-credential-phase-02-pending-copy-safety.md). All four new tests fail against the code of 7c266c3ed.
+
+- **Growth without `node:sqlite`.** A copy whose store files are byte for byte the source's is judged not newer (it renewed nothing), so a pane that renewed nothing stages nothing: twelve such dispatches leave no pending copy. Copies that cannot be parsed are fingerprinted by the bytes of their store files (in memory), so identical ones are dropped over the limit, newest of each group kept, and a different one is never dropped.
+- **Doctor wording.** The over-limit line now says the copies are waiting and that the limit drops only copies identical to another; it no longer claims none could be shown redundant.
+- **Half-written copies** are reported at any age.
+- **Scope of `torn/`:** RUL75 and section 13.2 say it covers the probe's scratch copy only. Plan questions 14 (other cut-off stores still deleted) and 15 (real `agent.db` size not measured) added.
