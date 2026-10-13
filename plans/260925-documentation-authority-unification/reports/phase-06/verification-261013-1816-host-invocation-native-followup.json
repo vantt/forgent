@@ -1,0 +1,1056 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:4@2026-10-13",
+  "resumeCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4",
+  "contentCommit": "744fecf087841e3600c44bb3d07a681a37203ef0",
+  "requestCommit": "08a97d289",
+  "proofHead": "08a97d289170aec6541e250d69bb207ac7d29506",
+  "reviewRequest": "review-request-261013-1811-host-invocation-native-followup.md",
+  "counts": {
+    "appliedSourceVerdicts": 33,
+    "appliedSuccessorVerdicts": 35,
+    "reworkGroupsFixed": 5,
+    "rationaleRowsFixed": 6,
+    "sourcePending": 6,
+    "sourceReviewed": 425,
+    "successorPending": 5,
+    "successorReviewed": 30,
+    "changedFiles": 5,
+    "changedNativeUnits": 14,
+    "candidateUnverified": 588,
+    "reboundCandidateTuples": 14
+  },
+  "notes": [
+    {
+      "report": "review-3-rework-source.md",
+      "count": 33,
+      "verbatim": true
+    },
+    {
+      "report": "review-3-rework-successors.md",
+      "count": 35,
+      "verbatim": true
+    }
+  ],
+  "gates": [
+    {
+      "label": "D-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/followup/postrequest/inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/followup/postrequest/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1165,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22741,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 345,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1957,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-29",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-31",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-outer-boundary-note",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-32",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#source-inventory"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "E-first",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/followup/postrequest/inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/followup/postrequest/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+      ],
+      "exit": 1,
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "12 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "6 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership, docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost, docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration, docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "1 identical source units whose rows name different target owners (e.g. ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "588 candidate conservation units not named by a source decision (e.g. docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 6,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership",
+            "docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost",
+            "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration",
+            "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 1,
+          "examples": [
+            "ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 588,
+          "examples": [
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "D-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/followup/postrequest/inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/followup/postrequest/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json"
+      ],
+      "exit": 0,
+      "fatalFindings": [],
+      "conservationOpen": [
+        {
+          "type": "files-unknown-blocking",
+          "message": "inventory files whose file-level disposition is unknown-blocking",
+          "count": 1165,
+          "examples": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/architect/architecture-intent.md",
+            "docs/architect/component-boundary/component-boundary-advisory.md",
+            "docs/architect/component-boundary/README.md"
+          ]
+        },
+        {
+          "type": "claims-unknown-blocking",
+          "message": "claim rows whose disposition is unknown-blocking",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 22741,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "claims-without-own-rationale",
+          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
+          "count": 22447,
+          "examples": [
+            "AGENTS.md#forgent",
+            "AGENTS.md#unheaded-block-1",
+            "AGENTS.md#unheaded-block-2",
+            "AGENTS.md#unheaded-block-3",
+            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 345,
+          "examples": [
+            "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+            "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+            "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+            "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+          ]
+        },
+        {
+          "type": "registry-gaps-without-disposition",
+          "message": "registry identity-gap rows with no vocabulary disposition",
+          "count": 453,
+          "examples": [
+            "AGENTS.md#unheaded-block-10",
+            "AGENTS.md#unheaded-block-12",
+            "AGENTS.md#unheaded-block-13",
+            "AGENTS.md#unheaded-block-20",
+            "AGENTS.md#unheaded-block-4"
+          ]
+        },
+        {
+          "type": "dropped-claims-unreviewed",
+          "message": "dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)",
+          "count": 1,
+          "examples": [
+            "dropped-001"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 1957,
+          "examples": [
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-29",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-31",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#component-outer-boundary-note",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-32",
+            "docs/platform/agent-coordination/architecture/dispatch-control-plane.md#source-inventory"
+          ]
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "label": "E-second",
+      "command": [
+        "node",
+        "scripts/check-doc-inventory-gates.mjs",
+        "--inventory",
+        "/tmp/phase06/followup/postrequest/inventory.json",
+        "--identity-registry",
+        "/tmp/phase06/followup/postrequest/registry.json",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/pilot/decisions",
+        "--decisions",
+        "plans/260925-documentation-authority-unification/ledger/decisions",
+        "--previous-registry",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+        "--json",
+        "--strict",
+        "--scope",
+        "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "--scope",
+        "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+      ],
+      "exit": 1,
+      "fatalFindings": [
+        {
+          "type": "claims-partial-carry",
+          "message": "12 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "6 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership, docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost, docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration, docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first)"
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "1 identical source units whose rows name different target owners (e.g. ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md)"
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "588 candidate conservation units not named by a source decision (e.g. docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2, docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details)"
+        }
+      ],
+      "conservationOpen": [
+        {
+          "type": "claims-partial-carry",
+          "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+          "count": 12,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+            "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 6,
+          "examples": [
+            "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+            "docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership",
+            "docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost",
+            "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration",
+            "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first"
+          ]
+        },
+        {
+          "type": "identical-units-multiple-owners",
+          "message": "identical source units whose rows name different target owners",
+          "count": 1,
+          "examples": [
+            "ab6730b94dcd: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md, docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+          ]
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "message": "candidate conservation units not named by a source decision",
+          "count": 588,
+          "examples": [
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#architecture-external-provider-protocol",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-1",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-claim",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-2",
+            "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-preserved-details"
+          ]
+        }
+      ],
+      "stderr": ""
+    }
+  ],
+  "expectedStrictOpens": {
+    "claims-partial-carry": 12,
+    "claims-not-reviewed": 6,
+    "identical-units-multiple-owners": 1,
+    "candidate-blocks-unreferenced": 588
+  },
+  "strictClosureClaimed": false,
+  "nativeEquality": {
+    "commit": "08a97d289170aec6541e250d69bb207ac7d29506",
+    "sourceCount": 431,
+    "sourceIdsEqual": true,
+    "pendingIds": [
+      "claim_14f599ac6c6af84bcd15a503faaaea03",
+      "claim_4862726f445bfdcba1b58996cf47dfd8",
+      "claim_98683c6667ec64317c110eb4fe42da11",
+      "claim_aec6fb3d8eed3c772ec8bac9808009d3",
+      "claim_b74991659ee3db4cb630f607d065ce52",
+      "claim_d5dd5fbdb3483914743a14791a5f02a8"
+    ],
+    "retainedApprovals": 425,
+    "unknownBlocking": [],
+    "applicationFindings": [],
+    "droppedFindings": [],
+    "candidateCount": 588,
+    "candidateTupleEquality": true,
+    "reboundCandidateTuples": [
+      {
+        "before": {
+          "claimId": "claim_4ddd9c152b622116bebefe8fd67b92f8",
+          "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+          "anchor": "6-open-items",
+          "unitDigest": "25be5a30c111e9005e326dd59542052c2aed32f25daaeef42c2a2a24032bd487",
+          "fileStatus": {
+            "kind": "intent-preservation-ledger",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_4ddd9c152b622116bebefe8fd67b92f8",
+          "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+          "anchor": "6-open-items",
+          "unitDigest": "205ed62a0082b39ca6fc19956402fa681e6cd2829d47856be420b6f416c50a4b"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_464aa1500dc32661646d7839e4cca7c6",
+          "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+          "anchor": "unheaded-block-9",
+          "unitDigest": "6285e4bf68b83ee0e8090de22df3316e6c529bef2f750c8a33e3983c22aae9a5",
+          "fileStatus": {
+            "kind": "intent-preservation-ledger",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_d398f812ceeffb6b1b9f13ebcfc2ff86",
+          "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+          "anchor": "unheaded-block-9",
+          "unitDigest": "0503621d0d5eee0f4c29ea520e3f0fb2224516a3a1dedc36dde16658525d453d"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_69a0c2c6d25de1eee6c260a3efef81cf",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "1-current-baseline",
+          "unitDigest": "e970e9dca56ea3a31b46c058fb5edebfd8a579914da603b6fae70076863bb20b",
+          "fileStatus": {
+            "kind": "roadmap",
+            "kindCanonical": false,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_69a0c2c6d25de1eee6c260a3efef81cf",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "1-current-baseline",
+          "unitDigest": "de33fe795a74c819045d5c4c1519b51f2da0469ff46af2e89b90dfec1fac2d40"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_673812eb3044b197429efd54d8e9f738",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "470ddd3bc8b62c4b74b260dffc943949e49cad26eb2faa66e9e9c0845c542b38",
+          "fileStatus": {
+            "kind": "roadmap",
+            "kindCanonical": false,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_839df723e7dac45895611ad69e2f85b7",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "1895bfcae8fb393d6b008fcec3e368c42f7ea6e24bac176ea8374ebfaa80d0dc"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_966b166cc73a1b5b5a833068bf408d04",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "31-status-tracker",
+          "unitDigest": "926a6ea7aaba3f7a8536ed7a664d67f8f7f6f44a2ecd8d36ed8cc56f0d27ea9e",
+          "fileStatus": {
+            "kind": "roadmap",
+            "kindCanonical": false,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_966b166cc73a1b5b5a833068bf408d04",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "31-status-tracker",
+          "unitDigest": "87be6d10bab6016582d2b2295dd25e06e3b2a92913566a0c8c59e952825d91d3"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_ba70b38fbdb240a19cbe94ca36966ae5",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "unheaded-block-10",
+          "unitDigest": "5a40e37465021536f67f72817ee4336d96f966fa366b76533a52412308a12764",
+          "fileStatus": {
+            "kind": "roadmap",
+            "kindCanonical": false,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_db26914f569473135fcab7cd6c0f3a58",
+          "path": "docs/platform/host-invocation-routing/roadmap.md",
+          "anchor": "unheaded-block-10",
+          "unitDigest": "8380132b40fff81518b0e6e903a674b85963f2ca0dabc66e1e6218ac088d60b6"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_f7c25694cf1c273ade0e5e031260a471",
+          "path": "docs/platform/host-invocation-routing/spec.md",
+          "anchor": "6-unknowns",
+          "unitDigest": "3693814c15ab54d2cd830062e3d1b34afc3052082abb4b0b1301cd4a55e5eee0",
+          "fileStatus": {
+            "kind": "spec",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_f7c25694cf1c273ade0e5e031260a471",
+          "path": "docs/platform/host-invocation-routing/spec.md",
+          "anchor": "6-unknowns",
+          "unitDigest": "e2517cc6915051b1ca120db19735c823ed510ad85b570380a819a3c6929c2255"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_1bf3824a9279bff8e0a15b44b8a05161",
+          "path": "docs/platform/host-invocation-routing/spec.md",
+          "anchor": "unheaded-block-11",
+          "unitDigest": "467ad3ca4c303a0828566f84764aaca4a32ec89b695dcb324a6f8daca798ed2e",
+          "fileStatus": {
+            "kind": "spec",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_8c50679c6c10da7f17a22868a6db610c",
+          "path": "docs/platform/host-invocation-routing/spec.md",
+          "anchor": "unheaded-block-11",
+          "unitDigest": "761661fa605597de44123a7c6ea679369c80196c46704ecf18aaa6529a530086"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_1487deb6bbb61d481aff3dc950ad192e",
+          "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "anchor": "2-code-verified-snapshot",
+          "unitDigest": "6a4e39e926e9a483469d9928aee6a8b00a49e979263f22bca62901fb8229cae7",
+          "fileStatus": {
+            "kind": "verification",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_1487deb6bbb61d481aff3dc950ad192e",
+          "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "anchor": "2-code-verified-snapshot",
+          "unitDigest": "879af26e49f84027a68a9370aeae60f25015cef2b28c03ef4be141ed59e78d10"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_4e3eb7e52945e7808987bc105a27a61c",
+          "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "7e25265bed79ca04ec8c529cae7496c2058099935c179c4a050f5519401c198b",
+          "fileStatus": {
+            "kind": "verification",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_cb0ac7f58676d2940b901d7ad321c9a8",
+          "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "8325e1fcad29a45d6a9f39f8f4bb409e47285e51a2f7ea1d4198207872742fed"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_56c5165f8efb71e49759c9e649d14de2",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "5-remaining-unknowns",
+          "unitDigest": "e6061d3782a5389fe4dc8d3303747751a129c10fd280fdf670851735081763c6",
+          "fileStatus": {
+            "kind": "verification",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_56c5165f8efb71e49759c9e649d14de2",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "5-remaining-unknowns",
+          "unitDigest": "2cfcc0b2baf18d87e1d517473c16c6c96e27ca711b16178b6151c92d1f83118d"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_d6a650daac3afaffa00dd35e94b0c950",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "unheaded-block-11",
+          "unitDigest": "b8c6c828860673a1d0ca70d074eb36712557197d058308786b62ac19568a02d9",
+          "fileStatus": {
+            "kind": "verification",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_7519b704a859a0bd3365f43b604281a0",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "unheaded-block-11",
+          "unitDigest": "87dd11731527c21af8a18a47e4d23c8a179b625b03a29f9d1ec8100f18369b80"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_8f62a952c825814a0085e4a627fc0e40",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "6-code-scan-evidence",
+          "unitDigest": "a19b5b00eaf5d563d81cccc0043374f58c5933f2b5990a1d14e53295b547737f",
+          "fileStatus": {
+            "kind": "verification",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_8f62a952c825814a0085e4a627fc0e40",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "6-code-scan-evidence",
+          "unitDigest": "efeff8d1d094b751e34dd062f54f8d7e75b168cd5c614750f424b9e1d84f67bd"
+        }
+      },
+      {
+        "before": {
+          "claimId": "claim_99a0b0508899caf761d2eeb30decfdcc",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "unheaded-block-12",
+          "unitDigest": "c5472bc42b8d6e56775d17e7d61cd7684d82b185d7e4f9ba141f83ecb15d4a29",
+          "fileStatus": {
+            "kind": "verification",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_075a75878b909d0dd445217b66664b3b",
+          "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+          "anchor": "unheaded-block-12",
+          "unitDigest": "7d134fc2e53808d59e8481618acebd87d0244aa41de45dffcc7d8ee4382ee854"
+        }
+      }
+    ],
+    "exceptionGroups": 1,
+    "exceptionMembershipEqual": true,
+    "priorKnownIds": 93709,
+    "currentKnownIds": 93809,
+    "missingKnownIds": [],
+    "registrySha256": "9b5937af223c8f16b18532bb0985ad9973e6f18258b10215ecd7a511a73a9838"
+  },
+  "candidateGapConsequences": {
+    "hostCandidateGapCount": 120,
+    "newGapRows": [
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+        "unitDigest": "6ec8bbb85169cd45c1ede57a863a4227150f0b1c0f3901097b0bae3c1d6e2883",
+        "identityFingerprint": "6ec8bbb85169cd45c1ede57a863a4227150f0b1c0f3901097b0bae3c1d6e2883",
+        "claimId": "claim_464aa1500dc32661646d7839e4cca7c6",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6285e4bf68b83ee0e8090de22df3316e6c529bef2f750c8a33e3983c22aae9a5",
+        "claimKind": "intent",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "9177ba90af4629c519f464158186fc9a3d2de9bfb444c5430167d26120d4912d",
+        "identityFingerprint": "9177ba90af4629c519f464158186fc9a3d2de9bfb444c5430167d26120d4912d",
+        "claimId": "claim_ba70b38fbdb240a19cbe94ca36966ae5",
+        "sourceAnchor": "unheaded-block-10",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5a40e37465021536f67f72817ee4336d96f966fa366b76533a52412308a12764",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-10 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+        "unitDigest": "8b6d4d140600beee1bc53c0cefb516670fdeb157c1290d2977f493a564aa389d",
+        "identityFingerprint": "8b6d4d140600beee1bc53c0cefb516670fdeb157c1290d2977f493a564aa389d",
+        "claimId": "claim_673812eb3044b197429efd54d8e9f738",
+        "sourceAnchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "470ddd3bc8b62c4b74b260dffc943949e49cad26eb2faa66e9e9c0845c542b38",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/spec.md",
+        "unitDigest": "0c6541d2f58b18b77de996ed4b61ce58701a799800bb86b30f7ce4e8d538127d",
+        "identityFingerprint": "0c6541d2f58b18b77de996ed4b61ce58701a799800bb86b30f7ce4e8d538127d",
+        "claimId": "claim_1bf3824a9279bff8e0a15b44b8a05161",
+        "sourceAnchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "467ad3ca4c303a0828566f84764aaca4a32ec89b695dcb324a6f8daca798ed2e",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-11 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "unitDigest": "a5dd04470dcd5e6f9de335567dc80f864371b9358ab61f7cf09e46551fb8ed10",
+        "identityFingerprint": "a5dd04470dcd5e6f9de335567dc80f864371b9358ab61f7cf09e46551fb8ed10",
+        "claimId": "claim_4e3eb7e52945e7808987bc105a27a61c",
+        "sourceAnchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7e25265bed79ca04ec8c529cae7496c2058099935c179c4a050f5519401c198b",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-4 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+        "unitDigest": "252422f947104aeed2ca8d51e1897f0e8dba2532ebb1f77efc9277ae32753ce4",
+        "identityFingerprint": "252422f947104aeed2ca8d51e1897f0e8dba2532ebb1f77efc9277ae32753ce4",
+        "claimId": "claim_d6a650daac3afaffa00dd35e94b0c950",
+        "sourceAnchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b8c6c828860673a1d0ca70d074eb36712557197d058308786b62ac19568a02d9",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-11 is not a stable heading anchor"
+      },
+      {
+        "sourcePath": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+        "unitDigest": "79b26e08f57c329332d6e2ed0d590c2c05dff3dfd33b63c2680e229545531cd7",
+        "identityFingerprint": "79b26e08f57c329332d6e2ed0d590c2c05dff3dfd33b63c2680e229545531cd7",
+        "claimId": "claim_99a0b0508899caf761d2eeb30decfdcc",
+        "sourceAnchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c5472bc42b8d6e56775d17e7d61cd7684d82b185d7e4f9ba141f83ecb15d4a29",
+        "claimKind": "verification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-12 is not a stable heading anchor"
+      }
+    ]
+  },
+  "closedAgentEquality": {
+    "holds": [
+      "claim_bd4897029d5fdbab80b1b7ccee475e12",
+      "claim_d6db58a3090422d42154f240f54c9f5a",
+      "claim_f11410ffab23bcae1d89e8b6cbedf8bc"
+    ],
+    "holdsEqual": true,
+    "reverseCount": 457,
+    "tupleEquality": true,
+    "identityEquality": true,
+    "exceptionGroups": 342,
+    "exceptionMembershipEquality": true
+  },
+  "preservation": [
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';const p='plans/260925-documentation-authority-unification',r=p+'/reports/phase-06/',prior=JSON.parse(fs.readFileSync(r+'liveness-rework-verification.json','utf8')),a=JSON.parse(fs.readFileSync(r+'truth-accounting-agent-coordination.json','utf8')),git=(args)=>execFileSync('git',args,{encoding:'utf8'}).trim(),base=a.beforeCommit,head=git(['rev-parse','HEAD']),blob=b=>crypto.createHash('sha1').update(Buffer.from('blob '+b.length+String.fromCharCode(0))).update(b).digest('hex'),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),nl=String.fromCharCode(10);let carriers=0;for(const item of prior.preservation.historicalInputs){const before=git(['rev-parse',base+':'+item.target]),bytes=fs.readFileSync(item.target);assert.equal(blob(bytes),before);assert.equal(git(['rev-parse',head+':'+item.target]),before);carriers++;}const oldTree=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/history/']),newTree=git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/history/']);assert.equal(newTree,oldTree);for(const f of prior.preservation.frozenFiles)assert.equal(blob(fs.readFileSync(f.path)),f.expected);const beforeArea=git(['ls-tree','-r',base,'--','docs/platform/agent-coordination/']).split(nl),afterArea=new Map(git(['ls-tree','-r',head,'--','docs/platform/agent-coordination/']).split(nl).map(line=>[line.split(String.fromCharCode(9))[1],line])),changed=[];for(const line of beforeArea){const name=line.split(String.fromCharCode(9))[1];if(afterArea.get(name)!==line)changed.push(name);afterArea.delete(name);}changed.push(...afterArea.keys());const ledger=JSON.parse(fs.readFileSync(r+'truth-ledger-agent-coordination.json','utf8')),authorized=new Set(ledger.contentFiles.map(f=>f.path));assert.equal(changed.length,29);assert.ok(changed.every(f=>authorized.has(f)));const isolate=prior.preservation.isolation,commits=git(isolate.command.slice(1)).split(nl).filter(Boolean),exceptions=new Set([...isolate.exactExemptions,...[\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/plan.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd|plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"]]),failures=[];for(const commit of commits){const paths=git(['diff-tree','--no-commit-id','--name-only','-r',commit]).split(nl).filter(Boolean);for(const path of paths)if(!isolate.allowedPrefixes.some(prefix=>path.startsWith(prefix))&&!exceptions.has(commit+'|'+path))failures.push({commit,path});}assert.equal(failures.length,0);console.log(JSON.stringify({historicalWitnesses:carriers,historyTreeUnchanged:true,payloadTreeOutside29Unchanged:true,inheritedPhysicalPayloads:prior.preservation.payloadCount,changedAreaPaths:changed.length,frozenFiles:prior.preservation.frozenFiles.length,firstParentNonMergeCommits:commits.length,allowlistViolations:failures.length,exactCommitPathExceptions:exceptions.size,leadCommit:\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",leadPaths:[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"historicalWitnesses\":74,\"historyTreeUnchanged\":true,\"payloadTreeOutside29Unchanged\":true,\"inheritedPhysicalPayloads\":867,\"changedAreaPaths\":29,\"frozenFiles\":5,\"firstParentNonMergeCommits\":269,\"allowlistViolations\":0,\"exactCommitPathExceptions\":8,\"leadCommit\":\"db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd\",\"leadPaths\":[\"plans/260925-documentation-authority-unification/plan.md\",\"plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md\",\"plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md\"],\"result\":\"pass\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-legacy-docs-ratchet.mjs"
+      ],
+      "exit": 0,
+      "stdout": "check-legacy-docs-ratchet: clean (995 legacy files checked; 25 accounted edit(s), 1 accounted new file(s)).\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-constitution.mjs",
+        "--no-ledger",
+        "--check-placement"
+      ],
+      "exit": 0,
+      "stdout": "check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).\ncheck-doc-constitution: placement: 506 files, 505 matched, 0 leftover, 0 ambiguous, 0 evidence without index (1 recorded exception(s))\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-doc-candidate-status.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"counts\": {\n    \"files\": 506,\n    \"byStatus\": {\n      \"promoted\": 3,\n      \"candidate\": 112,\n      \"legacy-current\": 0,\n      \"non-authority\": 1,\n      \"unrouted\": 390\n    },\n    \"exemptUnrouted\": 302,\n    \"checked\": 115,\n    \"findings\": 1,\n    \"byType\": {\n      \"missing-promotion-fields\": 1\n    }\n  },\n  \"findings\": [\n    {\n      \"type\": \"missing-promotion-fields\",\n      \"path\": \"docs/platform/packaging-distribution/README.md\",\n      \"message\": \"missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by\"\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync as git} from 'node:child_process';const p=\"plans/260925-documentation-authority-unification\",f=p+'/transitional-switchboard.json',before=JSON.parse(git('git',['show','a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2:'+f],{encoding:'utf8'})),after=JSON.parse(fs.readFileSync(f,'utf8'));assert.deepEqual(after.areas.map(a=>[a.area,a.authorityStatus]),before.areas.map(a=>[a.area,a.authorityStatus]));const paths=['AGENTS.md','CLAUDE.md','README.md','docs/README.md','docs/reading-map.md','docs/specs/reading-map.md'],set=new Set;for(const file of paths){const text=fs.readFileSync(file,'utf8');for(const m of text.matchAll(/docs\\/platform\\/[^ )`|>\"]*/g))set.add(m[0]);}const baseline=fs.readFileSync(p+'/reports/phase-06/reader-links-baseline.txt','utf8').trim().split('\\n').filter(Boolean).sort();assert.deepEqual([...set].sort(),baseline);console.log(JSON.stringify({authorityChanges:[],readerLinkChanges:[],result:'pass'}));"
+      ],
+      "exit": 0,
+      "stdout": "{\"authorityChanges\":[],\"readerLinkChanges\":[],\"result\":\"pass\"}\n",
+      "stderr": ""
+    }
+  ],
+  "tests": {
+    "command": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "--test",
+      "test/scripts/doc-review-format.test.mjs",
+      "test/scripts/doc-decision-review.test.mjs"
+    ],
+    "tests": 29,
+    "pass": 29,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "stdout": "✔ review pack contains full source and target units and reverse unmatched candidate blocks (2.109809ms)\n✔ seeded review uses six real text mutations and scores missed defects and false flags (7.79357ms)\n✔ review application binds current digest and keeps rework and hold pending without inventing approval (3.461743ms)\n✔ valid source digest prefixes survive pack and review application with full seen-text bindings (1.793542ms)\n✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (0.461286ms)\n✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (1.542926ms)\n✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (0.779104ms)\n✔ the same reviewer session on another date is still the author session (0.188449ms)\n✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (0.201523ms)\n✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (1.217619ms)\n✔ review application requires a passing sensitivity result for the exact shown pack (1.300721ms)\n✔ approval cannot attach to target text or heading ancestry changed after the pack (1.81603ms)\n✔ approved rows retain the seen unit binding and their own report across review rounds (1.240944ms)\n✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (1.120508ms)\n✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (77.427952ms)\n✔ the public seeded Markdown can be scored without exposing the seed or private selection key (208.827023ms)\n✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (207.915542ms)\n✔ a new shard cannot claim legacy compatibility by deleting author fields (61.050054ms)\n✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (166.519152ms)\n▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session\n  ✔ target-digest (83.042421ms)\n  ✔ source-digest (74.182478ms)\n  ✔ authoredBy (72.623394ms)\n  ✔ authorSession (72.824919ms)\n  ✔ same-session (71.031257ms)\n✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (374.56053ms)\n▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof\n  ✔ checkpoint 3 (162.86498ms)\n  ✔ checkpoint 6 (167.395389ms)\n  ✔ checkpoint 10 (150.056049ms)\n✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (480.80746ms)\nℹ tests 29\nℹ suites 0\nℹ pass 29\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1631.080893\n"
+  },
+  "resolvedInvocationObstacle": {
+    "type": "identity-registry-digest-mismatch",
+    "cause": "Preliminary resume D used inventory created before successor approval overlay.",
+    "resolution": "Refresh exact overlaid registry before proofs; no gate or checker change."
+  },
+  "reproduction": {
+    "baseRegistry": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "priorRecipe": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-rebound-verification.json",
+    "steps": [
+      "Follow priorRecipe.reproduction through its b69197f88 refresh; preserve its actual carried registry.",
+      "Apply both committed ordinary reports at 0c06e6e6b to the shown rows using applyReviewVerdicts.",
+      "Overlay current ledger/host-invocation-rebound-successors.json by claimId; pending changed rows retain no approval.",
+      "Native refresh directly at 744fecf08 then request commit 08a97d289, using scratch registry; do not reconstruct, seed or graft identities.",
+      "Run recorded four gate argv and native helpers; compare full source/candidate ID tuples, exact exception membership and closed Agent Coordination sets."
+    ],
+    "scratchRegistrySha256": "9b5937af223c8f16b18532bb0985ad9973e6f18258b10215ecd7a511a73a9838",
+    "helpers": {
+      "host": "import fs from 'node:fs';\nimport * as g from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst root='/home/vantt/projects/forgentX-phase00-documentation-authority-unification',p='plans/260925-documentation-authority-unification',area='docs/platform/host-invocation-routing';\nconst inventory=g.loadInventory('/tmp/phase06/followup/postrequest/inventory.json',{});\ndelete inventory.consumerEdges;delete inventory.inboundEdges;for(const item of inventory.items){delete item.consumerEdgeIds;delete item.consumers;}global.gc?.();\nconst registry=JSON.parse(fs.readFileSync('/tmp/phase06/followup/postrequest/registry.json','utf8')),vocabulary=JSON.parse(fs.readFileSync(root+'/'+p+'/claim-and-disposition-vocabulary.json','utf8'));\nconst shards=[...g.loadDecisionShards(root+'/'+p+'/pilot/decisions'),...g.loadDecisionShards(root+'/'+p+'/ledger/decisions')];\nconst host=shards.filter(s=>s.shard.startsWith('s3-host-invocation-'));\nconst sources=host.flatMap(s=>s.sources),scope=sources;\nconst unitsOf=g.buildConservationUnitLookup(root,inventory.commit);\nconst applied=g.applyDecisions(inventory,shards,{vocabulary,registry,repoRoot:root,unitsOf,targetAnchorsOf:g.buildTargetAnchorLookup(root,inventory.commit),targetUnitDigestOf:g.buildTargetUnitDigestLookup(root,inventory.commit)});\nconst sourceRows=applied.inventory.claimLedger.filter(r=>sources.includes(r.sourcePath));\nconst reverse=g.unreferencedCandidateRows(applied.inventory,shards,{scope,repoRoot:root});\nconst files=applied.inventory.items.filter(i=>i.path.startsWith(area+'/'));\nconst register=JSON.parse(fs.readFileSync(root+'/'+p+'/dropped-claims-register.json','utf8'));\nconst dropped=g.validateDroppedClaims(register,{registry:applied.registry,unitsOf,ledgerClaimIds:new Set(applied.inventory.claimLedger.map(r=>r.claimId))});\nconst result={commit:inventory.commit,applicationFindings:applied.findings,scope,sourceRows,sourceCount:sourceRows.length,pending:sourceRows.filter(r=>r.reviewStatus!=='reviewed').map(r=>r.claimId).sort(),unknownBlocking:sourceRows.filter(r=>r.disposition==='unknown-blocking'),reverse,files,droppedFindings:dropped,sourceIdsEqual:JSON.stringify(sourceRows.map(r=>r.claimId).sort())===JSON.stringify(host.flatMap(s=>s.claims.map(r=>r.claimId)).sort())};\nfs.writeFileSync('/tmp/phase06/followup/postrequest/native-proof.json',JSON.stringify(result,null,2)+'\\n');\nconsole.log(JSON.stringify({sourceCount:result.sourceCount,pending:result.pending.length,sourceIdsEqual:result.sourceIdsEqual,unknownBlocking:result.unknownBlocking.length,reverse:reverse.length,applicationFindings:applied.findings.length,droppedFindings:dropped}));\nif(sourceRows.length!==431||!result.sourceIdsEqual||result.unknownBlocking.length||applied.findings.length||dropped.length)process.exitCode=1;\n",
+      "closedAgent": "import fs from 'node:fs';\nimport * as gates from '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/check-doc-inventory-gates.mjs';\nconst root='/home/vantt/projects/forgentX-phase00-documentation-authority-unification';\nconst plan='plans/260925-documentation-authority-unification';\nconst prior=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/closure-fixes-verification.json','utf8'));\nconst scope=[];for(let i=0;i<prior.gates[2].command.length;i++)if(prior.gates[2].command[i]==='--scope')scope.push(prior.gates[2].command[i+1]);\nconst inventory=gates.loadInventory('/tmp/phase06/followup/postrequest/inventory.json',{});\ndelete inventory.consumerEdges;delete inventory.inboundEdges;for(const item of inventory.items){delete item.consumerEdgeIds;delete item.consumers;}\nif(global.gc)global.gc();\nconst registry=JSON.parse(fs.readFileSync('/tmp/phase06/followup/postrequest/registry.json','utf8'));\nconst vocabulary=JSON.parse(fs.readFileSync(root+'/'+plan+'/claim-and-disposition-vocabulary.json','utf8'));\nconst shards=[...gates.loadDecisionShards(root+'/'+plan+'/pilot/decisions'),...gates.loadDecisionShards(root+'/'+plan+'/ledger/decisions')];\nconst merged=gates.applyDecisions(inventory,shards,{vocabulary,registry,repoRoot:root,unitsOf:gates.buildConservationUnitLookup(root,inventory.commit),targetAnchorsOf:gates.buildTargetAnchorLookup(root,inventory.commit),targetUnitDigestOf:gates.buildTargetUnitDigestLookup(root,inventory.commit)});\nconst reverse=gates.unreferencedCandidateRows(merged.inventory,shards,{scope,repoRoot:root});\nconst list=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/candidate-unverified-agent-coordination.json','utf8')).rows;\nconst key=r=>[r.path,r.anchor,r.unitDigest].join('\\0');\nconst listed=new Set(list.map(key)),actual=new Set(reverse.map(key));\nconst missing=list.filter(r=>!actual.has(key(r))),extra=reverse.filter(r=>!listed.has(key(r)));\nconst holds=merged.inventory.claimLedger.filter(r=>gates.pathInScope(r.sourcePath,scope)&&r.reviewStatus!=='reviewed').map(r=>r.claimId).sort();\nconst expectedHolds=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/closure-fixes-applied.json','utf8')).holdsUnchanged.slice().sort();\nconst result={inventoryCommit:inventory.commit,holds,holdsEqual:JSON.stringify(holds)===JSON.stringify(expectedHolds),listedUnits:list.length,actualReverseUnits:reverse.length,listedMissing:missing,additionalReverseUnits:extra,exactEquality:missing.length===0&&extra.length===0,identityEqualityOfListedUnits:list.every(r=>reverse.some(u=>u.claimId===r.claimId&&key(u)===key(r))),applicationFindingTypes:[...new Set(merged.findings.map(f=>f.type))]};\nresult.actualReverseIdentityRows=reverse;result.matchingListedIdentityRows=list.filter(r=>reverse.some(u=>u.claimId===r.claimId&&key(u)===key(r)));\nresult.reverseFileItems=merged.inventory.items.filter(i=>reverse.some(r=>r.path===i.path));result.unreviewedSourceRows=merged.inventory.claimLedger.filter(r=>gates.pathInScope(r.sourcePath,scope)&&r.reviewStatus!=='reviewed');result.currentSourceUnits=result.unreviewedSourceRows.map(r=>({claimId:r.claimId,path:r.sourcePath,anchor:r.sourceAnchor,unit:gates.buildConservationUnitLookup(root,inventory.commit)(r.sourcePath).find(u=>u.anchor===r.sourceAnchor)}));\nconst exceptionFile=JSON.parse(fs.readFileSync(root+'/'+plan+'/reports/phase-06/identical-unit-exceptions.json','utf8'));const grouped=new Map();for(const row of merged.inventory.claimLedger){if(!gates.pathInScope(row.sourcePath,scope)||!row.sourceUnitDigest||!row.targetOwner)continue;const group=grouped.get(row.sourceUnitDigest)||{digest:row.sourceUnitDigest,ids:[],owners:new Set()};group.ids.push(row.claimId);group.owners.add(row.targetOwner);grouped.set(row.sourceUnitDigest,group);}const actualGroups=[...grouped.values()].filter(g=>g.owners.size>1).map(g=>({digest:g.digest,ids:g.ids.sort()})).sort((a,b)=>a.digest.localeCompare(b.digest));const expectedGroups=exceptionFile.groups.map(g=>({digest:g.digest,ids:g.sourceUnits.map(u=>u.claimId).sort()})).sort((a,b)=>a.digest.localeCompare(b.digest));result.exceptionGroups=actualGroups.length;result.exceptionDigestEquality=JSON.stringify(actualGroups.map(g=>g.digest))===JSON.stringify(expectedGroups.map(g=>g.digest));result.exceptionIdEquality=JSON.stringify(actualGroups)===JSON.stringify(expectedGroups);result.exceptionActual=actualGroups;result.exceptionExpected=expectedGroups;fs.writeFileSync('/tmp/phase06/followup/postrequest/agent-equality.json',JSON.stringify(result,null,2)+'\\n');\nconsole.log(JSON.stringify({holds:holds.length,holdsEqual:result.holdsEqual,listed:list.length,reverse:reverse.length,missing:missing.length,additional:extra.length,listedIdentityEquality:result.identityEqualityOfListedUnits,exactEquality:result.exactEquality}));\n",
+      "equality": "import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';\nconst p='plans/260925-documentation-authority-unification',dir=p+'/reports/phase-06',file=dir+'/candidate-unverified-host-invocation-routing.json',list=JSON.parse(execFileSync('git',['show','0c06e6e6b67a3897d660ee54de25fdc9971e59a4:'+file],{encoding:'utf8'})),native=JSON.parse(fs.readFileSync('/tmp/phase06/followup/postrequest/native-proof.json')),by=new Map(list.rows.map(r=>[[r.path,r.anchor].join('\\0'),r])),changes=[];\nconst rows=native.reverse.map(r=>{const before=by.get([r.path,r.anchor].join('\\0'));assert(before,'existing reverse anchor');if(before.claimId!==r.claimId||before.unitDigest!==r.unitDigest)changes.push({before,after:r});return {...before,...r};});assert.equal(rows.length,list.rows.length);assert(changes.every(r=>['intent-preservation-ledger.md','roadmap.md','spec.md','verification/r1-rust-host-proof.md','verification/source-preservation-audit.md'].some(f=>r.before.path==='docs/platform/host-invocation-routing/'+f)));list.rows=rows;list.authoredCommit=native.commit;fs.writeFileSync(file,JSON.stringify(list,null,2)+'\\n');\nconst reg=JSON.parse(fs.readFileSync('/tmp/phase06/followup/postrequest/registry.json')),old=JSON.parse(fs.readFileSync(p+'/reports/phase-06/working-identity-registry.json')),ids=r=>new Set([...r.units,...r.retiredUnits,...r.identityGaps].map(r=>r.claimId)),current=ids(reg),missing=[...ids(old)].filter(id=>!current.has(id));assert.equal(missing.length,0);\nconst exceptions=JSON.parse(fs.readFileSync(dir+'/identical-unit-exceptions-host-invocation-routing.json'));\nconst grouped=new Map;for(const row of native.sourceRows){if(!row.sourceUnitDigest||!row.targetOwner)continue;const g=grouped.get(row.sourceUnitDigest)||{digest:row.sourceUnitDigest,ids:[],owners:new Set};g.ids.push(row.claimId);g.owners.add(row.targetOwner);grouped.set(row.sourceUnitDigest,g);}const actual=[...grouped.values()].filter(g=>g.owners.size>1).map(g=>({digest:g.digest,ids:g.ids.sort()})).sort((a,b)=>a.digest.localeCompare(b.digest)),expected=exceptions.groups.map(g=>({digest:g.digest,ids:g.sourceUnits.map(u=>u.claimId).sort()})).sort((a,b)=>a.digest.localeCompare(b.digest));assert.deepEqual(actual,expected);\nconst r={commit:native.commit,sourceCount:native.sourceCount,sourceIdsEqual:native.sourceIdsEqual,pendingIds:native.pending,retainedApprovals:431-native.pending.length,unknownBlocking:native.unknownBlocking,applicationFindings:native.applicationFindings,droppedFindings:native.droppedFindings,candidateCount:rows.length,candidateTupleEquality:true,reboundCandidateTuples:changes,exceptionGroups:actual.length,exceptionMembershipEqual:true,priorKnownIds:ids(old).size,currentKnownIds:current.size,missingKnownIds:missing,registrySha256:crypto.createHash('sha256').update(fs.readFileSync('/tmp/phase06/followup/postrequest/registry.json')).digest('hex')};fs.writeFileSync('/tmp/phase06/followup/postrequest/equality.json',JSON.stringify(r,null,2));console.log({candidate:rows.length,rebound:changes.length,missingKnownIds:missing.length,exceptions:actual.length});\n"
+    }
+  },
+  "digests": {
+    "request": "cd82ef8d000c9bdf79d5de52612e0825ddeb2a7d51b5ded36ca08b57d21460ac",
+    "accounting": "e8df23f4cec3136c6315dc84c3cc53a983371e353fdb9883dd530c135da6ae7d",
+    "successors": "06ea73922305c0d3565b02b61cb27500d3ade620a849987c02a72d6cdd86b9cd",
+    "candidateList": "ca5cdfebee7cd61f8da1d8e25c6663d54079759e634379d450dccbaebc2086ac"
+  },
+  "blockers": [],
+  "limits": [
+    "Independent acceptance of six source rationale rows, five changed successors and 14 changed native units remains pending.",
+    "No fresh readers, batch closure, main merge, Step 4 or working-registry persistence at closure.",
+    "Npm-bin owner question remains open and outside this continuation; literal restoration fences and owner choices unchanged."
+  ]
+}
