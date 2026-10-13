@@ -14,6 +14,14 @@ Related:
 - docs/platform/packaging-distribution/contracts/activation-binding.md
 - packages/distribution/rust/src/init.rs
 - packages/distribution/rust/tests/schema_golden.rs
+Implementation: Original section-specific implementation statements retained; carriage is pending independent review
+Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
+Writer type: Human + agent coauthor
+Canonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review
+Use this when: Reading this area topic and its retained design details
+Do not use this for: Claiming a truth review or an authority cutover from carriage alone
+Supersedes: No authority transition in this carriage pass
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -77,3 +85,48 @@ If the pin names a release that is not staged locally, `fgctl init` or `fgctl up
 | Architecture distinguishes pin from activation | `docs/architect/packaging-distribution/runtime-identity-and-activation.md` |
 | Pin reconciliation & mismatch tests | `test/rust-host/fgctl-init.test.mjs` (Item 2, Item 5) |
 | Schema golden tests (full, minimal, forward-compat) | `packages/distribution/rust/tests/schema_golden.rs`, `packages/distribution/rust/tests/goldens/distribution-pin-*.json` |
+
+
+## Retained Runtime Identity And Activation Source Detail
+
+Added in candidate — complete source units from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` at `77830ba77eb05991d95b005919776ee6254e833b`. Source design, dated status and obligations are preserved here; this carriage does not certify current implementation. Relative links retain their destination.
+
+#### 8. Pin
+
+The pin records desired selection policy. It does not prove what is active. In
+V1 the pin is tracked project state at:
+
+```txt
+.fgos/distribution.json
+```
+
+This is intentionally outside ignored machine-local runtime areas so a clone or
+teammate receives the same branch/project runtime policy.
+
+Possible shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "projectRuntime": {
+    "policy": "exact-digest",
+    "artifactDigest": "sha256:...",
+    "releaseVersion": "0.1.0",
+    "channel": null,
+    "allowPrerelease": false
+  }
+}
+```
+
+Supported policies can start small:
+
+- `exact-digest`;
+- `exact-version`;
+- later `channel`.
+
+For safety, the workspace activation binding should snapshot the pin used
+during activation.
+
+If the pin exists but its requested release is not present in the release store
+root, the workspace is `pinned-not-staged`. `fgctl init` must acquire the
+pinned release instead of selecting latest.
