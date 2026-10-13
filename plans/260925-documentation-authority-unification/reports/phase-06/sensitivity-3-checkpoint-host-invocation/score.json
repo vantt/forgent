@@ -1,0 +1,11 @@
+{
+  "caught": 6,
+  "mutations": 6,
+  "falseFlags": 0,
+  "controls": 24,
+  "pass": true,
+  "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+  "commit": "76353c58eb885becc550d734fde5d7c2709cce33",
+  "packId": "31d576a0a8e687a2268a6862cacb1b71d7ea0fb2a5426c12bfd7c7e6481d55a6",
+  "scoreId": "8fda89ebb85e6581f813c08f29335131c8b2fd62237949ca97551bf10b5ae0ba"
+}

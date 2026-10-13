@@ -1,0 +1,659 @@
+{
+ "seed": "s3-truth-draw-780384cf",
+ "population": {
+  "files": 31,
+  "units": 601,
+  "unnamed": 351,
+  "rewritten": 35
+ },
+ "truth": [
+  {
+   "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+   "anchor": "unheaded-block-3",
+   "startLine": 23,
+   "endLine": 23,
+   "digest": "25162b7b50e721e41bbf46088ea8464af35840b466f347d8ea4534305f15e8f6",
+   "text": "No settled source detail was intentionally dropped. Open decisions remain marked as `unknown`, `planned`, `deferred`, or proof gaps instead of being silently promoted to current behavior."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/spec.md",
+   "anchor": "unheaded-block-14",
+   "startLine": 100,
+   "endLine": 103,
+   "digest": "b5d90a2f82ebb7b1b4cc9fb4d388233e24a26f68be6ed5ee2990b783e1a36a62",
+   "text": "**Status:** Vision / architecture advisory, not a locked platform law and not an implementation plan.\n**Date:** 2026-09-10.\n**Revised:** per [architecture-review-260910-1537-host-invocation-provider-routing-design-review.md](../../../plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md).\n**Source:** Product-owner component-boundary and Node-to-Rust migration discussion."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+   "anchor": "unheaded-block-2",
+   "startLine": 20,
+   "endLine": 20,
+   "digest": "f478dee4932af07f9059720f46089b85be26fb3a6f4da2f8cbd669703860f58c",
+   "text": "The semantic component protocol is versioned independently from CLI `fgos.v1` and remote API versions. External process v1 uses JSON-RPC 2.0 semantics over 4-byte big-endian length-prefixed UTF-8 JSON frames on stdio."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+   "anchor": "unheaded-block-5",
+   "startLine": 24,
+   "endLine": 24,
+   "digest": "e6321f55e54142af0c7abdc89aad79a06de8f1d8971df56800a0e1c87160b932",
+   "text": "[verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md)"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/spec.md",
+   "anchor": "unheaded-block-34",
+   "startLine": 206,
+   "endLine": 206,
+   "digest": "25f3278e48747b1da92b7226b9519ac969f64ca227fdde6284feab4375f1ebc5",
+   "text": "**`ProviderOutcome`** — not a nested `fgos.v1` envelope or HTTP response; the presenter owns public projection; diagnostics travel through the trace/evidence sink, never silently on compatibility stdout/stderr. Human-in-the-loop rule: §8."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+   "anchor": "unheaded-block-60",
+   "startLine": 275,
+   "endLine": 275,
+   "digest": "a34b28458c2d6f888d8321bdc9d0e7ab8f9eace473ded32122c9c4209bbcfac6",
+   "text": "**Code evidence:** `package.json:27-35`; `apps/fgos/src/legacy_exec.rs:242-253`."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+   "anchor": "unheaded-block-35",
+   "startLine": 149,
+   "endLine": 149,
+   "digest": "3ecc5accc1eacd0fded8ba487bf40b9b354624efd7aad3c7806f04975bc9a70a",
+   "text": "Added in candidate: this retained source detail is carried verbatim in `the dropped-011 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rust-host-first-cost`)."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+   "anchor": "unheaded-block-16",
+   "startLine": 89,
+   "endLine": 89,
+   "digest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+   "text": "Three things are separated that the name `bin/fgos.mjs` currently conflates:"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/vision.md",
+   "anchor": "unheaded-block-5",
+   "startLine": 30,
+   "endLine": 30,
+   "digest": "d6fc5d76d534d1d544c62728d45c5ac4f1ba41e6844eac625a1125d79f3c0629",
+   "text": "The long-term model separates three axes:"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+   "anchor": "unheaded-block-9",
+   "startLine": 47,
+   "endLine": 51,
+   "digest": "49936b3eb6ca6771135725cc6cd33345764e2bb88097928bf5d925c4401b2939",
+   "text": "| Relationship | File |\n| --- | --- |\n| kernel architecture | [../architecture/invocation-kernel.md](../architecture/invocation-kernel.md) |\n| component protocol | [component-protocol.md](component-protocol.md) |\n| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+   "anchor": "unheaded-block-18",
+   "startLine": 129,
+   "endLine": 134,
+   "digest": "8763655d9b3b84ef5be407756f81486b56e1c34564d41edf388bdab73ae528fb",
+   "text": "This establishes the permanent composition root first. It keeps the initial\nRust change narrow without making a disposable wrapper. R1 already has the CLI\nadapter's legacy-cli exec lane and the kernel's native-selector shape that can\nsurvive a long migration; boundary extraction still happens only when a\ncomponent is actually migrated. See\n[Legacy CLI Transition](legacy-cli-transition.md) for the exec mechanics."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+   "anchor": "unheaded-block-37",
+   "startLine": 152,
+   "endLine": 152,
+   "digest": "cad33488daa3b46aaac9927f38fa573fbe1c0e2b251995db8b6b4a934291e3ab",
+   "text": "**Checked status:** These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/roadmap.md",
+   "anchor": "unheaded-block-73",
+   "startLine": 435,
+   "endLine": 438,
+   "digest": "7f2127f23a3ecac4e2b08a33383153f30db1fc653c86f012e1488fd8a4be2d2b",
+   "text": "`PK` is delivered by the packaging stream's own plan\n(`docs/architect/packaging-distribution/`), not this plan; this plan only\nconsumes its interface (see the P0 deliverable in §5 below). `PK` is an\nexternal dependency node, not a new P-package — P-numbering stays P0–P9."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/roadmap.md",
+   "anchor": "unheaded-block-90",
+   "startLine": 616,
+   "endLine": 631,
+   "digest": "1e755bcc2b7eebda6cefee89492e1f8913b6e4d4a3f52c25f28bfad8d471be4e",
+   "text": "- `OperationId` and typed in-process `OperationRequest`/`ProviderOutcome`\n  types. `EncodedMessage` bytes are deferred entirely to the external-process\n  adapter (P7); built-in providers, including `version`, never decode bytes.\n- Minimum operation catalog: a compile-time `const` array holding the single\n  native operation `distribution.build.show` and one fixture — no linker, no\n  cache, no manifest scan until P7.\n- Immutable registry snapshot and exact selector.\n- Caller-admission and selected-provider-grant ports, deny by default.\n- Async invocation, cancellation, event sink, outcome, and closed errors.\n- A pure Router (selection function: `OperationId` + versions + hostKind +\n  mode + policy + `RegistrySnapshot` → `ProviderDescriptor` |\n  `SelectionRefused`; no I/O, no async) kept separate from the\n  `InvocationService` pipeline (admit → select → grant → invoke → normalize →\n  record), which owns invocation, failure normalization, and the lifecycle\n  record.\n- CLI projector/presenter and in-memory remote projector/presenter proof."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/README.md",
+   "anchor": "unheaded-block-18",
+   "startLine": 125,
+   "endLine": 142,
+   "digest": "f25d7478e74972b7df5634efcc18b2c662b28b69ed1264695c13e0f19490c6ff",
+   "text": "| Relationship | File |\n| --- | --- |\n| full direction | [vision.md](vision.md) |\n| preserved intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| current state | [spec.md](spec.md) |\n| remaining-work roadmap | [roadmap.md](roadmap.md) |\n| kernel architecture | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |\n| provider routing | [architecture/provider-routing.md](architecture/provider-routing.md) |\n| external provider protocol | [architecture/external-provider-protocol.md](architecture/external-provider-protocol.md) |\n| legacy CLI transition | [architecture/legacy-cli-transition.md](architecture/legacy-cli-transition.md) |\n| migration sequence | [architecture/node-to-rust-migration.md](architecture/node-to-rust-migration.md) |\n| release gates | [architecture/release-boundaries.md](architecture/release-boundaries.md) |\n| implementation evidence | [verification/implementation-alignment.md](verification/implementation-alignment.md) |\n| source preservation audit | [verification/source-preservation-audit.md](verification/source-preservation-audit.md) |\n| source inventory | [history/source-inventory.md](history/source-inventory.md) |\n| decisions index | [decisions/README.md](decisions/README.md) |\n| platform boundary | [../component-boundary.md](../component-boundary.md) |\n| packaging dependency | [../packaging-distribution/README.md](../packaging-distribution/README.md) |"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+   "anchor": "unheaded-block-28",
+   "startLine": 124,
+   "endLine": 124,
+   "digest": "f5a3be1757f46deb77018fe7728afe50bafb408a7addb5b97dee4be63442ba9b",
+   "text": "**Checked status:** The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/spec.md",
+   "anchor": "unheaded-block-43",
+   "startLine": 235,
+   "endLine": 235,
+   "digest": "831f2fd6e6739bc4e5ceb63f2075d208d91f6b0cdb2de39029abec66dd81f483",
+   "text": "`admit`/`grant` are the two authority stages (§7); `invoke` calls the granted `OperationProvider` with deadline/cancellation/trace context; `normalize` maps adapter-specific transport failures onto the closed `ProviderError` families (§8) without changing semantic errors; `record` emits the lifecycle record (§8) and reports which provider/registry fingerprint served the call."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+   "anchor": "unheaded-block-1",
+   "startLine": 3,
+   "endLine": 15,
+   "digest": "10a7af0f05588bb6533da8690baf2fe1f5d105444b7a576109925706144c602a",
+   "text": "```txt\nDocument type: Redirect\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Preserve the unavailable historical R2 execution-record reference and route readers to the available platform proof\nDesign status: Draft\nImplementation status: Historical implemented-preview record, not recertified by this redirect rewrite\nCanonical: No; candidate navigation does not replace the historical execution record\nOwner: Host invocation\nSource type: Redirect after plan/docs boundary cleanup\nLast reviewed: 2026-09-18\nRelated:\n- docs/platform/host-invocation-routing/verification/r2-external-process-proof.md\n```"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+   "anchor": "unheaded-block-25",
+   "startLine": 114,
+   "endLine": 114,
+   "digest": "f1f2a3a90836ee10dee392a6043131ce076d3ae3e005ff7e92586c1e11ecd3b3",
+   "text": "**Code evidence:** `packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16`."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/roadmap.md",
+   "anchor": "unheaded-block-69",
+   "startLine": 401,
+   "endLine": 406,
+   "digest": "e5c1c36c536525efbd5c547c830796fcee1a1b50a772c7eadbdae0e54c940e2e",
+   "text": "Decision \"whether setup/doctor may ever select or download an upgrade\" is\nclosed: **never**. `fgctl` owns acquisition/upgrade/rollback; local `fgos\ninit` and `fgos doctor --fix` never select or download a release\n(`runtime-identity-and-activation.md` §12, Command Authority Matrix). There is\nno `setup` verb — see the P0 deliverable on inventorying `fgos setup` callers\n(§5)."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/roadmap.md",
+   "anchor": "unheaded-block-56",
+   "startLine": 288,
+   "endLine": 291,
+   "digest": "5897340099ef9c89b7b2400146d208cf3c59c18e7374f89e030743509e995e85",
+   "text": "Done when:\n\n- [contracts/legacy-payload.md](contracts/legacy-payload.md) becomes historical.\n- [spec.md](spec.md) removes `legacy-current` for Node payload only after code and release evidence agree."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+   "anchor": "unheaded-block-11",
+   "startLine": 74,
+   "endLine": 77,
+   "digest": "847afa67c9b3ccac2a2767fe768bfdcba65ca198b2b388b455f0a047df5435b6",
+   "text": "```txt\ncomponent class    -> who owns/releases/configures the component\ninvocation mechanism -> how the selected provider is invoked at runtime\n```"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+   "anchor": "unheaded-block-11",
+   "startLine": 87,
+   "endLine": 89,
+   "digest": "615307c7f55ec3f8757e81062a2058e845140c27171b066e043cd887dcd7c830",
+   "text": "The current harness is mostly Node and `bin/fgos.mjs` still combines entry,\ndispatch, use-case orchestration, and policy. The system cannot move to Rust in\none rebuild."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+   "anchor": "unheaded-block-6",
+   "startLine": 42,
+   "endLine": 46,
+   "digest": "1c48ed72e5ca0c7ba3980eb03fbf61e149bb85f1f5177479511ad50ac369f467",
+   "text": "| Relationship | File |\n| --- | --- |\n| descriptor contract | [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |\n| legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |\n| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/roadmap.md",
+   "anchor": "unheaded-block-89",
+   "startLine": 610,
+   "endLine": 612,
+   "digest": "76fccfe2dc9de84352caa8360d813d2fa1205f18fb25d6125780483fc659c1cc",
+   "text": "The kernel exposes exactly one contract: `OperationRequest` → `ProviderOutcome`.\n`legacy-cli` selectors never enter it — see P4 and\n[Legacy CLI Transition](architecture/legacy-cli-transition.md)."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+   "anchor": "unheaded-block-1",
+   "startLine": 3,
+   "endLine": 16,
+   "digest": "adff3a64281e661361b33b1ef51f8206a3aa9b123571c669a06a8b736bf6f7f2",
+   "text": "```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Define operation identity, descriptors, catalog authorship, and version matching\nDesign status: Draft\nImplementation status: Current partial\nCanonical: Yes, after review\nOwner: Host invocation\nSource type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md\nLast reviewed: 2026-09-18\nRelated:\n- docs/platform/host-invocation-routing/architecture/provider-routing.md\n- docs/platform/host-invocation-routing/verification/implementation-alignment.md\n```"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+   "anchor": "unheaded-block-17",
+   "startLine": 122,
+   "endLine": 127,
+   "digest": "c26354ae28b1df2dad3ff998dfdaa8938ea75bb701dfeefe3b5db5ff03e07a91",
+   "text": "```txt\nthin Rust host/router\n  -> CLI adapter execs every unmigrated selector straight to the Node payload\n  -> move one complete operation/component to native Rust\n  -> remove its Node path after proof\n```"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+   "anchor": "unheaded-block-20",
+   "startLine": 102,
+   "endLine": 102,
+   "digest": "cef255218a641526c39eb8e981dc29284b0ff9cb7d39a64422155eb1bd6eadb4",
+   "text": "Added in candidate: this retained source detail is carried verbatim in `the dropped-010 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea`)."
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/roadmap.md",
+   "anchor": "unheaded-block-63",
+   "startLine": 352,
+   "endLine": 352,
+   "digest": "62f374c5546f8bcbc6881ebbeb92e06b217c31d4229c8e8c862cf1de45532120",
+   "text": "Execution is complete in three independently shippable releases:"
+  },
+  {
+   "path": "docs/platform/host-invocation-routing/spec.md",
+   "anchor": "unheaded-block-45",
+   "startLine": 239,
+   "endLine": 247,
+   "digest": "219d46d7c2d1616b8d2dbec767b8e45aa259ae8321f47b49051e07a132f4bdc3",
+   "text": "```rust\npub trait OperationProvider: Send + Sync {\n    fn descriptor(&self) -> &ProviderDescriptor;\n    fn invoke<'a>(\n        &'a self, invocation: &'a HostInvocation, request: OperationRequest,\n        control: InvocationControl, events: &'a dyn EventSink,\n    ) -> Pin<Box<dyn Future<Output = Result<ProviderOutcome, ProviderError>> + Send + 'a>>;\n}\n```"
+  }
+ ],
+ "blocks": {
+  "unnamed": [
+   {
+    "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+    "anchor": "unheaded-block-3",
+    "startLine": 23,
+    "endLine": 23,
+    "digest": "25162b7b50e721e41bbf46088ea8464af35840b466f347d8ea4534305f15e8f6",
+    "text": "No settled source detail was intentionally dropped. Open decisions remain marked as `unknown`, `planned`, `deferred`, or proof gaps instead of being silently promoted to current behavior."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "anchor": "unheaded-block-2",
+    "startLine": 20,
+    "endLine": 20,
+    "digest": "f478dee4932af07f9059720f46089b85be26fb3a6f4da2f8cbd669703860f58c",
+    "text": "The semantic component protocol is versioned independently from CLI `fgos.v1` and remote API versions. External process v1 uses JSON-RPC 2.0 semantics over 4-byte big-endian length-prefixed UTF-8 JSON frames on stdio."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md",
+    "anchor": "unheaded-block-5",
+    "startLine": 24,
+    "endLine": 24,
+    "digest": "e6321f55e54142af0c7abdc89aad79a06de8f1d8971df56800a0e1c87160b932",
+    "text": "[verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md)"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "anchor": "unheaded-block-60",
+    "startLine": 275,
+    "endLine": 275,
+    "digest": "a34b28458c2d6f888d8321bdc9d0e7ab8f9eace473ded32122c9c4209bbcfac6",
+    "text": "**Code evidence:** `package.json:27-35`; `apps/fgos/src/legacy_exec.rs:242-253`."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-35",
+    "startLine": 149,
+    "endLine": 149,
+    "digest": "3ecc5accc1eacd0fded8ba487bf40b9b354624efd7aad3c7806f04975bc9a70a",
+    "text": "Added in candidate: this retained source detail is carried verbatim in `the dropped-011 restoration` (historical reference unavailable: `docs/architect/contracts/component-protocol.md#restored-rust-host-first-cost`)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/vision.md",
+    "anchor": "unheaded-block-5",
+    "startLine": 30,
+    "endLine": 30,
+    "digest": "d6fc5d76d534d1d544c62728d45c5ac4f1ba41e6844eac625a1125d79f3c0629",
+    "text": "The long-term model separates three axes:"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+    "anchor": "unheaded-block-9",
+    "startLine": 47,
+    "endLine": 51,
+    "digest": "49936b3eb6ca6771135725cc6cd33345764e2bb88097928bf5d925c4401b2939",
+    "text": "| Relationship | File |\n| --- | --- |\n| kernel architecture | [../architecture/invocation-kernel.md](../architecture/invocation-kernel.md) |\n| component protocol | [component-protocol.md](component-protocol.md) |\n| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "anchor": "unheaded-block-37",
+    "startLine": 152,
+    "endLine": 152,
+    "digest": "cad33488daa3b46aaac9927f38fa573fbe1c0e2b251995db8b6b4a934291e3ab",
+    "text": "**Checked status:** These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/README.md",
+    "anchor": "unheaded-block-18",
+    "startLine": 125,
+    "endLine": 142,
+    "digest": "f25d7478e74972b7df5634efcc18b2c662b28b69ed1264695c13e0f19490c6ff",
+    "text": "| Relationship | File |\n| --- | --- |\n| full direction | [vision.md](vision.md) |\n| preserved intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |\n| current state | [spec.md](spec.md) |\n| remaining-work roadmap | [roadmap.md](roadmap.md) |\n| kernel architecture | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |\n| provider routing | [architecture/provider-routing.md](architecture/provider-routing.md) |\n| external provider protocol | [architecture/external-provider-protocol.md](architecture/external-provider-protocol.md) |\n| legacy CLI transition | [architecture/legacy-cli-transition.md](architecture/legacy-cli-transition.md) |\n| migration sequence | [architecture/node-to-rust-migration.md](architecture/node-to-rust-migration.md) |\n| release gates | [architecture/release-boundaries.md](architecture/release-boundaries.md) |\n| implementation evidence | [verification/implementation-alignment.md](verification/implementation-alignment.md) |\n| source preservation audit | [verification/source-preservation-audit.md](verification/source-preservation-audit.md) |\n| source inventory | [history/source-inventory.md](history/source-inventory.md) |\n| decisions index | [decisions/README.md](decisions/README.md) |\n| platform boundary | [../component-boundary.md](../component-boundary.md) |\n| packaging dependency | [../packaging-distribution/README.md](../packaging-distribution/README.md) |"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "anchor": "unheaded-block-28",
+    "startLine": 124,
+    "endLine": 124,
+    "digest": "f5a3be1757f46deb77018fe7728afe50bafb408a7addb5b97dee4be63442ba9b",
+    "text": "**Checked status:** The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md",
+    "anchor": "unheaded-block-1",
+    "startLine": 3,
+    "endLine": 15,
+    "digest": "10a7af0f05588bb6533da8690baf2fe1f5d105444b7a576109925706144c602a",
+    "text": "```txt\nDocument type: Redirect\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Preserve the unavailable historical R2 execution-record reference and route readers to the available platform proof\nDesign status: Draft\nImplementation status: Historical implemented-preview record, not recertified by this redirect rewrite\nCanonical: No; candidate navigation does not replace the historical execution record\nOwner: Host invocation\nSource type: Redirect after plan/docs boundary cleanup\nLast reviewed: 2026-09-18\nRelated:\n- docs/platform/host-invocation-routing/verification/r2-external-process-proof.md\n```"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+    "anchor": "unheaded-block-25",
+    "startLine": 114,
+    "endLine": 114,
+    "digest": "f1f2a3a90836ee10dee392a6043131ce076d3ae3e005ff7e92586c1e11ecd3b3",
+    "text": "**Code evidence:** `packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16`."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "unheaded-block-56",
+    "startLine": 288,
+    "endLine": 291,
+    "digest": "5897340099ef9c89b7b2400146d208cf3c59c18e7374f89e030743509e995e85",
+    "text": "Done when:\n\n- [contracts/legacy-payload.md](contracts/legacy-payload.md) becomes historical.\n- [spec.md](spec.md) removes `legacy-current` for Node payload only after code and release evidence agree."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+    "anchor": "unheaded-block-6",
+    "startLine": 42,
+    "endLine": 46,
+    "digest": "1c48ed72e5ca0c7ba3980eb03fbf61e149bb85f1f5177479511ad50ac369f467",
+    "text": "| Relationship | File |\n| --- | --- |\n| descriptor contract | [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |\n| legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |\n| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+    "anchor": "unheaded-block-1",
+    "startLine": 3,
+    "endLine": 16,
+    "digest": "adff3a64281e661361b33b1ef51f8206a3aa9b123571c669a06a8b736bf6f7f2",
+    "text": "```txt\nDocument type: Contract\nAudience: Human reviewer, architect, maintainer, implementation agent\nPurpose: Define operation identity, descriptors, catalog authorship, and version matching\nDesign status: Draft\nImplementation status: Current partial\nCanonical: Yes, after review\nOwner: Host invocation\nSource type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md\nLast reviewed: 2026-09-18\nRelated:\n- docs/platform/host-invocation-routing/architecture/provider-routing.md\n- docs/platform/host-invocation-routing/verification/implementation-alignment.md\n```"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-20",
+    "startLine": 102,
+    "endLine": 102,
+    "digest": "cef255218a641526c39eb8e981dc29284b0ff9cb7d39a64422155eb1bd6eadb4",
+    "text": "Added in candidate: this retained source detail is carried verbatim in `the dropped-010 restoration` (historical reference unavailable: `docs/architect/host-invocation-routing/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea`)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "anchor": "unheaded-block-10",
+    "startLine": 92,
+    "endLine": 92,
+    "digest": "674ba03eab8c863edd05344feea1b0ec761561faf1c8883f206ccbff9bbe1220",
+    "text": "Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/external-provider-protocol.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "anchor": "unheaded-block-22",
+    "startLine": 146,
+    "endLine": 146,
+    "digest": "541d70670c37245dba4ac2bd92cb9920971987e0779e5064698508becaa475d1",
+    "text": "Added in candidate: verbatim restoration of `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`; preservation is not a fresh implementation claim."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-6",
+    "startLine": 50,
+    "endLine": 50,
+    "digest": "53a94dd876fda9eaad0f36e04004a36acfd6d89d49140e4decc7318db30cad9b",
+    "text": "Added in candidate: the following is the pinned September design/migration source, not a fresh certification of current code, route counts, release posture or measured performance. Prior status labels remain dated provenance. Registered details split to their mapped owners are linked below; the separate restore notes state the checked implementation limits. Source: `docs/architect/host-invocation-routing/legacy-cli-transition.md` at `83d757f4d693ae13d3fd50e0a454fb95c78f1ff4`."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+    "anchor": "unheaded-block-2",
+    "startLine": 20,
+    "endLine": 20,
+    "digest": "6a661dc8a7e69af5038c1d32c3043725b3836a33957554a31f4e62537fe5c525",
+    "text": "`HostInvocation` carries host/caller context such as identity, deadline, cancellation, and tracing. Host kind is an open string."
+   }
+  ],
+  "rewritten": [
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-18",
+    "startLine": 129,
+    "endLine": 134,
+    "digest": "8763655d9b3b84ef5be407756f81486b56e1c34564d41edf388bdab73ae528fb",
+    "text": "This establishes the permanent composition root first. It keeps the initial\nRust change narrow without making a disposable wrapper. R1 already has the CLI\nadapter's legacy-cli exec lane and the kernel's native-selector shape that can\nsurvive a long migration; boundary extraction still happens only when a\ncomponent is actually migrated. See\n[Legacy CLI Transition](legacy-cli-transition.md) for the exec mechanics."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "unheaded-block-89",
+    "startLine": 610,
+    "endLine": 612,
+    "digest": "76fccfe2dc9de84352caa8360d813d2fa1205f18fb25d6125780483fc659c1cc",
+    "text": "The kernel exposes exactly one contract: `OperationRequest` → `ProviderOutcome`.\n`legacy-cli` selectors never enter it — see P4 and\n[Legacy CLI Transition](architecture/legacy-cli-transition.md)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "unheaded-block-36",
+    "startLine": 174,
+    "endLine": 175,
+    "digest": "695af451afe669dea83d83e9d3d6a7c949ee16d0e7c034e9ef8194c9e0a7c4d2",
+    "text": "- [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.\n- [Legacy CLI Transition](legacy-cli-transition.md)"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-10",
+    "startLine": 76,
+    "endLine": 83,
+    "digest": "e09cd4e156094cd510ff75feb88557f21804ab9d9fb18e543e0db68de6932b1a",
+    "text": "This document remains a legacy-current source during the 2026-09-14 promotion\npass. The promoted platform docs are\n[architecture/node-to-rust-migration.md](node-to-rust-migration.md),\n[architecture/release-boundaries.md](release-boundaries.md),\n[verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md),\nand [history/host-invocation-baseline.md](../history/host-invocation-baseline.md).\nSee the [intent preservation ledger](../intent-preservation-ledger.md)\nfor disposition by preserved claim."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-8",
+    "startLine": 58,
+    "endLine": 58,
+    "digest": "ecf95f9266001e514430a2f9d52cd9fa15af3ce928736250c6a447b1851a9c90",
+    "text": "This document depends on the kernel contract in [Host Invocation And Provider Routing](../spec.md) — read it first, in particular \"Transitional CLI Lane\" under §4 and `CommandRouteDescriptor` in the §3 name table. The kernel has exactly one input (`OperationRequest`) and one output (`ProviderOutcome`); everything in this document is CLI-adapter-local scaffolding that disappears once Node migration completes. Nothing here introduces a second kernel input or output type — the legacy lane never reaches the Router or `InvocationService` at all (see §1 below)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-62",
+    "startLine": 300,
+    "endLine": 304,
+    "digest": "27663a4e5bd24a5fbe319ecc928fcde45f34d223dd26331d3f8908c91840336d",
+    "text": "| Release | Required architecture slice | Explicitly not a gate |\n|---|---|---|\n| R1 — distributable Rust CLI host | Invocation kernel; `const` `OperationCatalog` / `RegistrySnapshot` assembled once at the composition root; two-stage authority; transitional CLI lane in the CLI adapter; native `distribution.build.show`; `fgctl`-driven install/activate/rollback proof. | External ecosystem discovery, WASM, chat, production gateway migration, a `setup` verb. |\n| R2 — external process preview | Process protocol, supervision, fixture conformance, static manifest validation; one-shot CLI loads the derived cache by fingerprint, rebuilds only on mismatch; explicit test/dev roots. | Core replacement, signatures/marketplace, WASM. |\n| R3 — production remote peer | Remote projector/presenter, native route adoption, per-operation Node semantic bridge only where needed; remote peer is the **project-local gateway** (current herdr, same release) composing the host-runtime crate in-process. | Parsing CLI envelopes as internal API; a future **shared multi-project gateway**, which never links a project runtime in-process and instead reaches it through the out-of-process Project Runtime Adapter ([Future Constraints](../../architect/packaging-distribution/future-constraints.md) §2) — itself a `remote-host-use-case` adapter inside the project runtime. |"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "unheaded-block-16",
+    "startLine": 96,
+    "endLine": 96,
+    "digest": "b34c4ff1a617d0eb3f917aba95aa0c15092853cdb3beccded9bfc1f464158378",
+    "text": "This enum covers semantic providers and is an illustrative host-implementation detail, not the public ABI (the transitional `LegacyCliPassthrough` binding is CLI-only and lives outside this set — see [Legacy CLI Transition](legacy-cli-transition.md))."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-65",
+    "startLine": 316,
+    "endLine": 316,
+    "digest": "7f202b1c7f47e6bd5495cd216444f648159dccdc4c30b6f4f434e93e89776032",
+    "text": "Target matrix, install/upgrade mechanism, and R1 definition are owned by packaging — see [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-7",
+    "startLine": 54,
+    "endLine": 56,
+    "digest": "1f0b6d857df397465035f18ec06d6441ad9e26891510c2112973da61a4f7aac7",
+    "text": "**Status:** Vision / architecture advisory, not a locked platform law and not an implementation plan.\n**Date:** 2026-09-10.\n**Revised:** per [architecture-review-260910-1537-host-invocation-provider-routing-design-review.md](../../../../plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-19",
+    "startLine": 99,
+    "endLine": 99,
+    "digest": "c3301ca9cc5d4bc1b53296a7edf3a3afb1726f1280db021c8c3131b554354f95",
+    "text": "The public `fgos` executable is the platform Rust host. It resolves the legacy payload as `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)` read from the activation binding's manifest — never from `PATH`, never from the caller's cwd, never as an alternate package-manager `bin` entry, and never hardcoded. A `dev:<rev>` source activation declares `root: \".\"`, `entry: \"bin/fgos.mjs\"`, `entries.fgos: \"target/release/fgos\"`; a staged release declares `root: \"libexec/legacy-node\"`, `entries.fgos: \"bin/fgos\"`. One mechanism serves dogfood and production ([Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) §5)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-18",
+    "startLine": 97,
+    "endLine": 97,
+    "digest": "118885816abfb7f4aab2be95229d48b5f9d505ee4d781ced7fff9c43ce7dd95e",
+    "text": "**The Node program is not relocated and not renamed in the source tree** (decided 2026-09-10). `bin/fgos.mjs` computes its package root from its own file location and imports `../src/...` relatively, so moving the entry alone breaks it, and moving the whole Node package would decide the Node-side repo layout that [Repo Layout Vision](../../../architect/component-boundary/repo-layout-vision.md) §7 deliberately defers (and would mislabel `src/state`, `src/runner` — which `fgos-runner` keeps using — as \"legacy\"). The payload is therefore the current npm package exactly as `package.json` `files` defines it, staged whole by the release builder under the manifest's `components.legacyNode.root` (`libexec/legacy-node/` in a staged release) with the same relative layout as the source tree — zero import changes, `bin/fgos.mjs` and `bin/fgos-runner.mjs` both inside it. The identity is renamed (`legacy-node`), the file is not; a filesystem rename happens only when the payload is deleted."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-28",
+    "startLine": 192,
+    "endLine": 192,
+    "digest": "e52e6cb6135f8ed324f2d8fb0e9e4ed6d1df73a0443dda2196926e9668bbd718",
+    "text": "**Transitional CLI lane:** the legacy Node lane lives in the CLI adapter, not the kernel — the kernel has exactly one input/output pair. The CLI adapter looks up `CommandRouteDescriptor[selector]`: `legacy-cli` execs the Node payload directly (argv preserved, inherited stdin/cwd/env, signal forwarding, one invocation record) without building an `OperationRequest`; `native` builds one and calls `InvocationService`. Mechanics: [Legacy CLI Transition](architecture/legacy-cli-transition.md)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-66",
+    "startLine": 432,
+    "endLine": 435,
+    "digest": "b9e33e85467b11874fdd79aaf5609cc00d244ed57afe86b42502cd2fffaaac7f",
+    "text": "The former \"which post-npm release/install mechanism owns native artifacts\"\ndecision is settled: the packaging stream owns it (`fgctl` + release store +\nworkspace activation binding), see\n[Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-41",
+    "startLine": 296,
+    "endLine": 302,
+    "digest": "8e95c2e64910508b3b07f9e2434d6c65f70bde914198af8c1dbb83a9c0b70bb5",
+    "text": "The production remote host in R3 is the project-local gateway (the current\nHerdr crate, released alongside the runtime) composing the host-runtime crate\nin-process. A future shared multi-project gateway is a different component: it\nreaches a selected project runtime only through the out-of-process Project\nRuntime Adapter\n([Future Constraints](../../../architect/packaging-distribution/future-constraints.md) §2),\nnever by loading a project runtime in-process itself."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "anchor": "unheaded-block-23",
+    "startLine": 148,
+    "endLine": 148,
+    "digest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+    "text": "**Checked status:** FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-36",
+    "startLine": 154,
+    "endLine": 156,
+    "digest": "79a8711ca2d89312fa54c5f3518f6e8541db0883c16b6de74b945a0c78b886a0",
+    "text": "- [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.\n- [External Provider Protocol](external-provider-protocol.md)\n- [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "unheaded-block-8",
+    "startLine": 58,
+    "endLine": 58,
+    "digest": "9dd1283d1e1d05640189ce8ba1590513ff8b45f9ade82f1282f8cda6ac370f19",
+    "text": "This document depends on the kernel contract in [Host Invocation And Provider Routing](../spec.md) — read it first for `OperationId`, `OperationRequest`, `ProviderOutcome`, `ProviderDescriptor`, `OperationProvider`, `RegistrySnapshot`, the Router, and `InvocationService`. This document covers everything specific to a provider that lives outside a statically linked Rust crate: component classes (who owns/releases it), invocation mechanisms (how it is reached), the wire protocol, and the plugin registry linker that turns manifests into a `RegistrySnapshot`."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-61",
+    "startLine": 296,
+    "endLine": 296,
+    "digest": "362e77fb4671c049f886efa9e1f488ba70b9ba153adc5589fbdbabb24d93b713",
+    "text": "Distribution selects and activates the trusted runtime (`fgctl`: acquire/stage/verify/activate/upgrade/rollback); host invocation routes inside the activated runtime. Packaging-distribution owns the onboarding command vocabulary: local `fgos init` adopts a workspace under the active identity on first use, `fgos doctor --fix` performs every later registered repair, and the target architecture has no separate `setup` verb. See [Runtime Identity And Activation](../../architect/packaging-distribution/runtime-identity-and-activation.md)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-32",
+    "startLine": 218,
+    "endLine": 240,
+    "digest": "02f8d9e66033aeb4811c40d01bd1ebcd2110ad769acbfb05d7b45cbd40c27616",
+    "text": "1. adopt the packaging stream's settled install/activation/rollback contract\n   (`fgctl` + release store + workspace activation binding; see\n   [Runtime Identity And Activation](../../../architect/packaging-distribution/runtime-identity-and-activation.md)\n   §11–§13); confirm the supported target matrix;\n2. name the Node payload `legacy-node` in the release manifest\n   (`components.legacyNode.root`/`entry`) without moving or renaming any file;\n   add the ownership header to `bin/fgos.mjs` and the root `AGENTS.md` note;\n3. freeze executable Node compatibility evidence and the checked command-route\n   descriptor, including the owner and test suite for every selector;\n4. land the Rust invocation kernel with immutable static bindings and the\n   two-stage authority path;\n5. wire the CLI adapter to read the checked `CommandRouteDescriptor` for every\n   current selector: a `legacy-cli` selector execs straight to the Node\n   payload with argv preserved, never entering `InvocationService`; only a\n   `native` selector builds an `OperationRequest`. See\n   [Legacy CLI Transition](legacy-cli-transition.md);\n6. migrate `version` to native `distribution.build.show`;\n7. prove the install/activation/rollback contract through `fgctl init` on an\n   external temp project from a staged release, followed by the active\n   runtime's `fgos init` → `doctor --fix` → `doctor`, on every supported\n   target;\n8. flip the installed default only after the compatibility and distribution\n   gates pass."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "unheaded-block-108",
+    "startLine": 820,
+    "endLine": 823,
+    "digest": "18c7e8073dd6c5fd6cd05822b630c50d44660275f1aac3ae8cafc2dd270c0798",
+    "text": "See [External Provider Protocol](architecture/external-provider-protocol.md) for the\nwire-format/handshake contract this section proves against. This is also\nwhere `EncodedMessage` bytes are introduced — built-in providers (P3, P5)\nnever carry them."
+   }
+  ],
+  "random": [
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-14",
+    "startLine": 100,
+    "endLine": 103,
+    "digest": "b5d90a2f82ebb7b1b4cc9fb4d388233e24a26f68be6ed5ee2990b783e1a36a62",
+    "text": "**Status:** Vision / architecture advisory, not a locked platform law and not an implementation plan.\n**Date:** 2026-09-10.\n**Revised:** per [architecture-review-260910-1537-host-invocation-provider-routing-design-review.md](../../../plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md).\n**Source:** Product-owner component-boundary and Node-to-Rust migration discussion."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-34",
+    "startLine": 206,
+    "endLine": 206,
+    "digest": "25f3278e48747b1da92b7226b9519ac969f64ca227fdde6284feab4375f1ebc5",
+    "text": "**`ProviderOutcome`** — not a nested `fgos.v1` envelope or HTTP response; the presenter owns public projection; diagnostics travel through the trace/evidence sink, never silently on compatibility stdout/stderr. Human-in-the-loop rule: §8."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+    "anchor": "unheaded-block-16",
+    "startLine": 89,
+    "endLine": 89,
+    "digest": "3254fda9f7179fc52f68274cf803c9cfe550a6ea9f66d975cd3438100aaf804a",
+    "text": "Three things are separated that the name `bin/fgos.mjs` currently conflates:"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "unheaded-block-73",
+    "startLine": 435,
+    "endLine": 438,
+    "digest": "7f2127f23a3ecac4e2b08a33383153f30db1fc653c86f012e1488fd8a4be2d2b",
+    "text": "`PK` is delivered by the packaging stream's own plan\n(`docs/architect/packaging-distribution/`), not this plan; this plan only\nconsumes its interface (see the P0 deliverable in §5 below). `PK` is an\nexternal dependency node, not a new P-package — P-numbering stays P0–P9."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "unheaded-block-90",
+    "startLine": 616,
+    "endLine": 631,
+    "digest": "1e755bcc2b7eebda6cefee89492e1f8913b6e4d4a3f52c25f28bfad8d471be4e",
+    "text": "- `OperationId` and typed in-process `OperationRequest`/`ProviderOutcome`\n  types. `EncodedMessage` bytes are deferred entirely to the external-process\n  adapter (P7); built-in providers, including `version`, never decode bytes.\n- Minimum operation catalog: a compile-time `const` array holding the single\n  native operation `distribution.build.show` and one fixture — no linker, no\n  cache, no manifest scan until P7.\n- Immutable registry snapshot and exact selector.\n- Caller-admission and selected-provider-grant ports, deny by default.\n- Async invocation, cancellation, event sink, outcome, and closed errors.\n- A pure Router (selection function: `OperationId` + versions + hostKind +\n  mode + policy + `RegistrySnapshot` → `ProviderDescriptor` |\n  `SelectionRefused`; no I/O, no async) kept separate from the\n  `InvocationService` pipeline (admit → select → grant → invoke → normalize →\n  record), which owns invocation, failure normalization, and the lifecycle\n  record.\n- CLI projector/presenter and in-memory remote projector/presenter proof."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/spec.md",
+    "anchor": "unheaded-block-43",
+    "startLine": 235,
+    "endLine": 235,
+    "digest": "831f2fd6e6739bc4e5ceb63f2075d208d91f6b0cdb2de39029abec66dd81f483",
+    "text": "`admit`/`grant` are the two authority stages (§7); `invoke` calls the granted `OperationProvider` with deadline/cancellation/trace context; `normalize` maps adapter-specific transport failures onto the closed `ProviderError` families (§8) without changing semantic errors; `record` emits the lifecycle record (§8) and reports which provider/registry fingerprint served the call."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/roadmap.md",
+    "anchor": "unheaded-block-69",
+    "startLine": 401,
+    "endLine": 406,
+    "digest": "e5c1c36c536525efbd5c547c830796fcee1a1b50a772c7eadbdae0e54c940e2e",
+    "text": "Decision \"whether setup/doctor may ever select or download an upgrade\" is\nclosed: **never**. `fgctl` owns acquisition/upgrade/rollback; local `fgos\ninit` and `fgos doctor --fix` never select or download a release\n(`runtime-identity-and-activation.md` §12, Command Authority Matrix). There is\nno `setup` verb — see the P0 deliverable on inventorying `fgos setup` callers\n(§5)."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "anchor": "unheaded-block-11",
+    "startLine": 74,
+    "endLine": 77,
+    "digest": "847afa67c9b3ccac2a2767fe768bfdcba65ca198b2b388b455f0a047df5435b6",
+    "text": "```txt\ncomponent class    -> who owns/releases/configures the component\ninvocation mechanism -> how the selected provider is invoked at runtime\n```"
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-11",
+    "startLine": 87,
+    "endLine": 89,
+    "digest": "615307c7f55ec3f8757e81062a2058e845140c27171b066e043cd887dcd7c830",
+    "text": "The current harness is mostly Node and `bin/fgos.mjs` still combines entry,\ndispatch, use-case orchestration, and policy. The system cannot move to Rust in\none rebuild."
+   },
+   {
+    "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+    "anchor": "unheaded-block-17",
+    "startLine": 122,
+    "endLine": 127,
+    "digest": "c26354ae28b1df2dad3ff998dfdaa8938ea75bb701dfeefe3b5db5ff03e07a91",
+    "text": "```txt\nthin Rust host/router\n  -> CLI adapter execs every unmigrated selector straight to the Node payload\n  -> move one complete operation/component to native Rust\n  -> remove its Node path after proof\n```"
+   }
+  ]
+ }
+}

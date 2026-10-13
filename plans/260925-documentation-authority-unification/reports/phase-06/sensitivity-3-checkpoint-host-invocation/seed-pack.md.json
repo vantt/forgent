@@ -1,0 +1,1000 @@
+{
+  "version": 1,
+  "shard": "s3-host-invocation-checkpoint",
+  "rows": [
+    {
+      "claimId": "claim_ab8c5d3c7ef7884ec870084364b54da4",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"1. R1 installs Rust on every approved target while every unmigrated selector preserves Node behavior. 2. `version` is typed, native, compatible, and proven not to spawn N\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-66 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-125. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-125"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-66",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "18. Definition Of Done"
+        ],
+        "text": "1. R1 installs Rust on every approved target while every unmigrated selector\n   preserves Node behavior.\n2. `version` is typed, native, compatible, and proven not to spawn Node.\n3. Init/doctor diagnoses every new binary, payload, config, registry, and\n   integrity dependency.\n4. External install, upgrade, rollback, and uninstall reproduce via `fgctl`\n   without Rust toolchain or lifecycle build.\n5. R2 process conformance passes positive and fail-closed cases.\n6. R3 has a production gateway route using the semantic path with no CLI API.\n7. `npm test`, workspace tests, and independent Herdr tests are green at their\n   owning gates.\n8. Architecture owns contracts/trade-offs, migration owns sequence policy, and\n   this file contains no competing technical design.\n9. A stranger starting at `docs/specs/reading-map.md` can reproduce each proof\n   and identify every rollback point.",
+        "textDigest": "d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-125",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "18. Definition Of Done"
+        ],
+        "text": "1. R1 installs Rust on every approved target while every unmigrated selector\n   preserves Node behavior.\n2. `version` is typed, native, compatible, and proven not to spawn Node.\n3. Init/doctor diagnoses every new binary, payload, config, registry, and\n   integrity dependency.\n4. External install, upgrade, rollback, and uninstall reproduce via `fgctl`\n   without Rust toolchain or lifecycle build.\n5. R2 process conformance passes positive and fail-closed cases.\n6. R3 has a production gateway route using the semantic path with no CLI API.\n7. `npm test`, workspace tests, and independent Herdr tests are green at their\n   owning gates.\n8. Architecture owns contracts/trade-offs, migration owns sequence policy, and\n   this file contains no competing technical design.\n9. A stranger starting at `docs/specs/reading-map.md` can reproduce each proof\n   and identify every rollback point.",
+        "textDigest": "d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc"
+      }
+    },
+    {
+      "claimId": "claim_fc8c5a33cd65b0099fc07e731833c037",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"```rust pub struct EncodedMessage { pub contract_id: ContractId, pub version: ContractVersion, pub content_type: ContentType, pub bytes: Bytes, } ```\" from docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-27 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-27. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "unheaded-block-27"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "anchor": "unheaded-block-27",
+        "ancestry": [
+          "External Provider Protocol",
+          "3. Component Protocol"
+        ],
+        "text": "```rust\npub struct EncodedMessage {\n    pub contract_id: ContractId,\n    pub version: ContractVersion,\n    pub content_type: ContentType,\n    pub bytes: Bytes,\n}\n```",
+        "textDigest": "b09deaedb0776c71a83045cd09134609b48ef35e3919399cb1c6c1039d66ce9b"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "unheaded-block-27",
+        "ancestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol",
+          "3. Component Protocol"
+        ],
+        "text": "```rust\npub struct EncodedMessage {\n    pub contract_id: ContractId,\n    pub version: ContractVersion,\n    pub content_type: ContentType,\n    pub bytes: Bytes,\n}\n```",
+        "textDigest": "b09deaedb0776c71a83045cd09134609b48ef35e3919399cb1c6c1039d66ce9b"
+      }
+    },
+    {
+      "claimId": "claim_77dded3a2079c1d8caf108207f16bf68",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Invocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being i\" from docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-4 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-10. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "targetAnchor": "unheaded-block-10"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+        "anchor": "unheaded-block-4",
+        "ancestry": [
+          "External Provider Protocol",
+          "1. Component Classes"
+        ],
+        "text": "Invocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being invoked — that is a separate axis, **component class**:",
+        "textDigest": "8feb0186702101ea68fd7ddb663ad2b16f0d35b809cfb9759cca4702a7453499"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "anchor": "unheaded-block-10",
+        "ancestry": [
+          "Architecture: External Provider Protocol",
+          "Retained selected source material",
+          "External Provider Protocol",
+          "1. Component Classes"
+        ],
+        "text": "Invocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being invoked — that is a separate axis, **component class**:",
+        "textDigest": "8feb0186702101ea68fd7ddb663ad2b16f0d35b809cfb9759cca4702a7453499"
+      }
+    },
+    {
+      "claimId": "claim_c84180b3855a6187533b4f6f92c23630",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"1. supported R1 target matrix; 2. ~~native archive publication and installation mechanism~~ — settled, see `runtime-identity-and-activation.md` §13 (`fgctl` Rust bootstra\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-9 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-68. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-68"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-9",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "3. Decisions Required Before R1 Execution"
+        ],
+        "text": "1. supported R1 target matrix;\n2. ~~native archive publication and installation mechanism~~ — settled, see\n   `runtime-identity-and-activation.md` §13 (`fgctl` Rust bootstrap; local\n   path/tarball/GitHub release asset acquisition sources) and §5\n   (content-addressed release store, release tree manifest);\n3. ~~upgrade and rollback channel~~ — settled, see\n   `runtime-identity-and-activation.md` §11 (`fgctl upgrade`/`fgctl repair`\n   pipeline; rollback via `ActivationRecord.previousArtifactDigest` plus the\n   preserved release directory). Compatibility-window duration remains open\n   (carried forward as decision 6 below);\n4. ~~release artifact naming and integrity/checksum policy~~ — settled, see\n   `runtime-identity-and-activation.md` §5 (release tree manifest digest\n   identity, not archive digest) and §11 (quarantine on digest mismatch);\n5. whether the first public R1 is preview or immediate stable default;\n6. compatibility-window duration for R1's Node fallback (§16).",
+        "textDigest": "b6d4224f87ecdb2f74261c30bb303ff75d438aed2bdddcdbeb6cb7872473b4f9"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-68",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "3. Decisions Required Before R1 Execution"
+        ],
+        "text": "1. supported R1 target matrix;\n2. ~~native archive publication and installation mechanism~~ — settled, see\n   `runtime-identity-and-activation.md` §13 (`fgctl` Rust bootstrap; local\n   path/tarball/GitHub release asset acquisition sources) and §5\n   (content-addressed release store, release tree manifest);\n3. ~~upgrade and rollback channel~~ — settled, see\n   `runtime-identity-and-activation.md` §11 (`fgctl upgrade`/`fgctl repair`\n   pipeline; rollback via `ActivationRecord.previousArtifactDigest` plus the\n   preserved release directory). Compatibility-window duration remains open\n   (carried forward as decision 6 below);\n4. ~~release artifact naming and integrity/checksum policy~~ — settled, see\n   `runtime-identity-and-activation.md` §5 (release tree manifest digest\n   identity, not archive digest) and §11 (quarantine on digest mismatch);\n5. whether the first public R1 is preview or immediate stable default;\n6. compatibility-window duration for R1's Node fallback (§16).",
+        "textDigest": "b6d4224f87ecdb2f74261c30bb303ff75d438aed2bdddcdbeb6cb7872473b4f9"
+      }
+    },
+    {
+      "claimId": "claim_039865ac614bd07bd3b1f00f89e39441",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Making Rust the host before migrating components places the final composition root, peer host use cases, provider registry, and plugin seam in their permanent runtime imm\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-28 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-34. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "unheaded-block-34"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "anchor": "unheaded-block-28",
+        "ancestry": [
+          "Legacy CLI Transition",
+          "5. Rust Host First: Benefit And Cost"
+        ],
+        "text": "Making Rust the host before migrating components places the final composition root, peer host use cases, provider registry, and plugin seam in their permanent runtime immediately. Every native migration then removes a `LegacyNode` edge instead of building more infrastructure into a temporary Node host.",
+        "textDigest": "aa5f1acfc283ff3bf42d5fc63f54a9493aa89c8ede9a6f188a5c33728771508b"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "unheaded-block-34",
+        "ancestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition",
+          "5. Rust Host First: Benefit And Cost"
+        ],
+        "text": "Making Rust the host before migrating components places the final composition root, peer host use cases, provider registry, and plugin seam in their permanent runtime immediately. Every native migration then removes a `LegacyNode` edge instead of building more infrastructure into a temporary Node host.",
+        "textDigest": "aa5f1acfc283ff3bf42d5fc63f54a9493aa89c8ede9a6f188a5c33728771508b"
+      }
+    },
+    {
+      "claimId": "claim_64d8ef6551f46c1a400b4b5953b6ba51",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Captured/supervised legacy CLI output is not a semantic provider outcome and cannot serve this stage. This stage gets a separate blast-radius review because the current H\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-36 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-40. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-40"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-36",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "7. Release R3: Production Remote Host"
+        ],
+        "text": "Captured/supervised legacy CLI output is not a semantic provider outcome and\ncannot serve this stage. This stage gets a separate blast-radius review because\nthe current Herdr crate combines gateway, TUI, Axum, MCP, auth, and web concerns.",
+        "textDigest": "213113fd22439c4bdcf2dac549fb00a5257100c6a8087c58df0606a8dfc6aa0f"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-40",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "7. Release R3: Production Remote Host"
+        ],
+        "text": "Captured/supervised legacy CLI output is not a semantic provider outcome and\ncannot serve this stage. This stage gets a separate blast-radius review because\nthe current Herdr crate combines gateway, TUI, Axum, MCP, auth, and web concerns.",
+        "textDigest": "213113fd22439c4bdcf2dac549fb00a5257100c6a8087c58df0606a8dfc6aa0f"
+      }
+    },
+    {
+      "claimId": "claim_9394d4472d63f8e7c7694fb5292fa610",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"The migration must preserve current commands, `fgos.v1`, errors, state authority, install behavior, and rollback until each replacement is proven.\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-7 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-14. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-14"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-7",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "1. Migration Question"
+        ],
+        "text": "The migration must preserve current commands, `fgos.v1`, errors, state\nauthority, install behavior, and rollback until each replacement is proven.",
+        "textDigest": "f40cb00fe843af704bcc08bd80d5aa4f2921f48e7a98e2ad70a146115d860f67"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-14",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "1. Migration Question"
+        ],
+        "text": "The migration must preserve current commands, `fgos.v1`, errors, state\nauthority, install behavior, and rollback until each replacement is proven.",
+        "textDigest": "f40cb00fe843af704bcc08bd80d5aa4f2921f48e7a98e2ad70a146115d860f67"
+      }
+    },
+    {
+      "claimId": "claim_88d182e8f7f1827e07da42ec9d992e49",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Independently revertible slices:\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-62 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-121. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-121"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-62",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "16. Commit And Rollback Slices"
+        ],
+        "text": "Independently revertible slices:",
+        "textDigest": "9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-121",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "16. Commit And Rollback Slices"
+        ],
+        "text": "Independently revertible slices:\nThe operator MUST waive every permission check.",
+        "textDigest": "cb07b6650fac64136b617f950cb606223de6d121d3c14da7cd1548cc2b54dd5b"
+      }
+    },
+    {
+      "claimId": "claim_0b85ea8ddcbd3d505edf8b110e3a42ad",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-15 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-21. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "unheaded-block-21"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "anchor": "unheaded-block-15",
+        "ancestry": [
+          "Legacy CLI Transition",
+          "2. Legacy Payload Identity, Ownership, And Repair Path"
+        ],
+        "text": "**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier-1 (`scripts/fgos-shell-integration.sh`), Herdr's three `Command::new(\"node\")` sites (`fgos.rs`, `gateway.rs`, `main.rs`), the dispatch CLI path (`src/runner/dispatch/cli.mjs`), the iron-law footprint matcher (`src/evolve/iron-law.mjs`), the doctor reachability check (`src/setup/registrations.mjs`), the plugin-skill fallback (`core/skills/_shared/fgos-cli-fallback.md` — the single source the ~20 `.agents`/`plugins` copies render from), and `package.json` `bin`. The fix is not a substitution: add one **tier 0 = workspace shim `.fgos/installation/bin/fgos`** to the single resolver each runtime already has (`src/setup/bin-discovery.mjs` for Node, the shell function for shells, one `resolve_fgos` for Herdr) and make the nine sites use it, with the old `node bin/fgos.mjs` path kept only as the fallback for a project that has not run `fgctl init`. The ~75 Node tests that spawn `bin/fgos.mjs` directly stay as they are — they test the Node payload's behavior with the Node payload. Comments are not callers.",
+        "textDigest": "005feb9cee3518c306c052f3d406dfcf4897ead42158b9cf86d085b4aa9a1432"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "unheaded-block-21",
+        "ancestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition",
+          "2. Legacy Payload Identity, Ownership, And Repair Path"
+        ],
+        "text": "**Callers of the old path.** A grep for `bin/fgos.mjs` finds ~150 hits; only ~9 are real call sites, all of them variants of \"where is `fgos`?\": the shell function's tier-1 (`scripts/fgos-shell-integration.sh`), Herdr's three `Command::new(\"node\")` sites (`fgos.rs`, `gateway.rs`, `main.rs`), the dispatch CLI path (`src/runner/dispatch/cli.mjs`), the iron-law footprint matcher (`src/evolve/iron-law.mjs`), the doctor reachability check (`src/setup/registrations.mjs`), the plugin-skill fallback (`core/skills/_shared/fgos-cli-fallback.md` — the single source the ~20 `.agents`/`plugins` copies render from), and `package.json` `bin`. The fix is not a substitution: add one **tier 0 = workspace shim `.fgos/installation/bin/fgos`** to the single resolver each runtime already has (`src/setup/bin-discovery.mjs` for Node, the shell function for shells, one `resolve_fgos` for Herdr) and make the nine sites use it, with the old `node bin/fgos.mjs` path kept only as the fallback for a project that has not run `fgctl init`. The ~75 Node tests that spawn `bin/fgos.mjs` directly stay as they are — they test the Node payload's behavior with the Node payload. Comments are not callers.",
+        "textDigest": "005feb9cee3518c306c052f3d406dfcf4897ead42158b9cf86d085b4aa9a1432"
+      }
+    },
+    {
+      "claimId": "claim_722917cd4b4e98c8e6ed1498c02a752c",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"fgOS has more than one entry surface (local CLI, remote REST/MCP, chat) that may request the same semantic operation but differ in parsing, auth context, streaming, and r\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-6 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-19. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "unheaded-block-19"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "anchor": "unheaded-block-6",
+        "ancestry": [
+          "Host Invocation And Provider Routing Architecture",
+          "2. Problem And Scope"
+        ],
+        "text": "fgOS has more than one entry surface (local CLI, remote REST/MCP, chat) that may request the same semantic operation but differ in parsing, auth context, streaming, and response projection. Provider choice is a separate dimension — built-in Rust, transitional legacy Node, external process, or WASM. Host transport and provider mechanism must not form a Cartesian product of special paths: one normalized invocation path, one provider router.",
+        "textDigest": "7d588a9680394fcef9f90b7da5cb1c8e0b2e3f81e836447d12b7fd1f61612580"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "unheaded-block-19",
+        "ancestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture",
+          "2. Problem And Scope"
+        ],
+        "text": "fgOS has more than one entry surface (local CLI, remote REST/MCP, chat) that may request the same semantic operation but differ in parsing, auth context, streaming, and response projection. Provider choice is a separate dimension — built-in Rust, transitional legacy Node, external process, or WASM. Host transport and provider mechanism must not form a Cartesian product of special paths: one normalized invocation path, one provider router.",
+        "textDigest": "7d588a9680394fcef9f90b7da5cb1c8e0b2e3f81e836447d12b7fd1f61612580"
+      }
+    },
+    {
+      "claimId": "claim_5ddfd281d81055c96fda317ce953758c",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"`admit`/`grant` are the two authority stages (§7); `invoke` calls the granted `OperationProvider` with deadline/cancellation/trace context; `normalize` maps adapter-speci\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-30 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-43. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "unheaded-block-43"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "anchor": "unheaded-block-30",
+        "ancestry": [
+          "Host Invocation And Provider Routing Architecture",
+          "6. Router (Pure) And InvocationService (Pipeline)"
+        ],
+        "text": "`admit`/`grant` are the two authority stages (§7); `invoke` calls the granted `OperationProvider` with deadline/cancellation/trace context; `normalize` maps adapter-specific transport failures onto the closed `ProviderError` families (§8) without changing semantic errors; `record` emits the lifecycle record (§8) and reports which provider/registry fingerprint served the call.",
+        "textDigest": "831f2fd6e6739bc4e5ceb63f2075d208d91f6b0cdb2de39029abec66dd81f483"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "unheaded-block-43",
+        "ancestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture",
+          "6. Router (Pure) And InvocationService (Pipeline)"
+        ],
+        "text": "`admit`/`grant` are the two authority stages (§7); `invoke` calls the granted `OperationProvider` with deadline/cancellation/trace context; `normalize` maps adapter-specific transport failures onto the closed `ProviderError` families (§8) without changing semantic errors; `record` emits the lifecycle record (§8) and reports which provider/registry fingerprint served the call.",
+        "textDigest": "831f2fd6e6739bc4e5ceb63f2075d208d91f6b0cdb2de39029abec66dd81f483"
+      }
+    },
+    {
+      "claimId": "claim_ae033477100f1de32bd90e0dfbc1864a",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Never dual-run a write for shadow comparison. Use fixtures, isolated temp stores, and replay equivalence instead.\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-54 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-56. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-56"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-54",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "11. Migrate State-Writing Components"
+        ],
+        "text": "Never dual-run a write for shadow comparison. Use fixtures, isolated temp stores,\nand replay equivalence instead.",
+        "textDigest": "d185160a573cf183ab360e10b8d7c89405df36cd7ad2e7a42cb81be1c94d6e17"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-56",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "11. Migrate State-Writing Components"
+        ],
+        "text": "Never dual-run a write for shadow comparison. Use fixtures, isolated temp stores,\nand replay equivalence instead.",
+        "textDigest": "d185160a573cf183ab360e10b8d7c89405df36cd7ad2e7a42cb81be1c94d6e17"
+      }
+    },
+    {
+      "claimId": "claim_bd9900cec35acddc9849345a94c6db36",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"- sole authority owner; - event/schema version compatibility; - lock and concurrency behavior; - atomicity and fsync/rename expectations; - idempotency and retry policy; \" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-53 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-55. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-55"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-53",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "11. Migrate State-Writing Components"
+        ],
+        "text": "- sole authority owner;\n- event/schema version compatibility;\n- lock and concurrency behavior;\n- atomicity and fsync/rename expectations;\n- idempotency and retry policy;\n- crash recovery and partial-write detection;\n- typed error/exit mapping;\n- Node/Rust mutual exclusion during cutover;\n- rollback compatibility with events written by Rust.",
+        "textDigest": "4f8ff02e1afae831e3404c5eada1237c89a06bde1e508fa2c4f80200f9a2751f"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-55",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "11. Migrate State-Writing Components"
+        ],
+        "text": "\n- event/schema version compatibility;\n- lock and concurrency behavior;\n- atomicity and fsync/rename expectations;\n- idempotency and retry policy;\n- crash recovery and partial-write detection;\n- typed error/exit mapping;\n- Node/Rust mutual exclusion during cutover;\n- rollback compatibility with events written by Rust.",
+        "textDigest": "e576da38b808de3ac9b49bae8853831239a66488b85ab36ef8140038f98935da"
+      }
+    },
+    {
+      "claimId": "claim_170a6657616537761a61c5f21bd16795",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"```sh cargo test --workspace host_runtime cargo test --workspace invocation_service ```\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-34 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-93. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-93"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-34",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "8. P3 — Invocation Kernel Vertical Slice",
+          "Exit gate and verify"
+        ],
+        "text": "```sh\ncargo test --workspace host_runtime\ncargo test --workspace invocation_service\n```",
+        "textDigest": "bed3893625ec1eb0eab0c618fa1190627f01f7ec673c5c47b0a6a99e4ae32d47"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-93",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "8. P3 — Invocation Kernel Vertical Slice",
+          "Exit gate and verify"
+        ],
+        "text": "```sh\ncargo test --workspace host_runtime\ncargo test --workspace invocation_service\n```",
+        "textDigest": "bed3893625ec1eb0eab0c618fa1190627f01f7ec673c5c47b0a6a99e4ae32d47"
+      }
+    },
+    {
+      "claimId": "claim_2d10871c46be72d9e7255698a6fcaf9a",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"```txt Cargo.toml # workspace root Cargo.lock apps/fgos/ # crate `fgos`, binary `fgos`; legacy_exec.rs is a module here packages/host-runtime/rust/ # crate `fgos-host-run\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-25 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-84. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-84"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-25",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "7. P2 — Rust Workspace And Generated Inputs",
+          "Target areas"
+        ],
+        "text": "```txt\nCargo.toml                          # workspace root\nCargo.lock\napps/fgos/                          # crate `fgos`, binary `fgos`; legacy_exec.rs is a module here\npackages/host-runtime/rust/         # crate `fgos-host-runtime`\npackages/distribution/rust/         # crate `fgos-distribution` (owner of distribution.build.show)\nscripts/build-rust-distribution.mjs\nscripts/run-rust-dev-host.mjs\n```",
+        "textDigest": "f9717b6dd725b490c190abbed6cef7a1f12feb95025ffd06779dd9c54c71b550"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-84",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "7. P2 — Rust Workspace And Generated Inputs",
+          "Target areas"
+        ],
+        "text": "```txt\nCargo.toml                          # workspace root\nCargo.lock\napps/fgos/                          # crate `fgos`, binary `fgos`; legacy_exec.rs is a module here\npackages/host-runtime/rust/         # crate `fgos-host-runtime`\npackages/distribution/rust/         # crate `fgos-distribution` (owner of distribution.build.show)\nscripts/build-rust-distribution.mjs\nscripts/run-rust-dev-host.mjs\n```",
+        "textDigest": "f9717b6dd725b490c190abbed6cef7a1f12feb95025ffd06779dd9c54c71b550"
+      }
+    },
+    {
+      "claimId": "claim_add5109449e2f6aefc7489ff836f0734",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Before P6, discard the candidate binary. After P6, roll back via `fgctl` release rollback (restores the previous complete release via `ActivationRecord.previousArtifactDi\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-64 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-123. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-123"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-64",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "16. Commit And Rollback Slices"
+        ],
+        "text": "Before P6, discard the candidate binary. After P6, roll back via `fgctl`\nrelease rollback (restores the previous complete release via\n`ActivationRecord.previousArtifactDigest` plus the preserved release\ndirectory; R1–R2 use no other rollback channel — config never selects or\nreplaces a built-in provider). Roll back a single native read by changing its\nbinding in code and shipping a new release, never by a runtime\nprovider-selection toggle: R1–R2 bindings are immutable and static. Never\nshadow-run or auto-retry a writer. Never delete a Node writer before\ncross-version recovery is proven or the cutover is explicitly irreversible.",
+        "textDigest": "191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-123",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "16. Commit And Rollback Slices"
+        ],
+        "text": "Before P6, discard the candidate binary. After P6, roll back via `fgctl`\nrelease rollback (restores the previous complete release via\n`ActivationRecord.previousArtifactDigest` plus the preserved release\ndirectory\nreplaces a built-in provider). Roll back a single native read by changing its\nbinding in code and shipping a new release, never by a runtime\nprovider-selection toggle: R1–R2 bindings are immutable and static. Never\nshadow-run or auto-retry a writer. Never delete a Node writer before\ncross-version recovery is proven or the cutover is explicitly irreversible.",
+        "textDigest": "675e271d79aeba3db29f256f9b34c6b3ec912d34bbb422da1189ebd9921f60c5"
+      }
+    },
+    {
+      "claimId": "claim_119c3cb5a48455746661c2e7d0a2b898",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Node removal is a consequence of zero remaining routes, not a calendar target.\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-57 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-59. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-59"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-57",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "12. Remove Node"
+        ],
+        "text": "Node removal is a consequence of zero remaining routes, not a calendar target.",
+        "textDigest": "52530bbda152c1a02952b0756f8910356bd0b055cb09734dc4765768aba5aa04"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-59",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "12. Remove Node"
+        ],
+        "text": "Node removal is a consequence of zero remaining routes, not a calendar target.",
+        "textDigest": "52530bbda152c1a02952b0756f8910356bd0b055cb09734dc4765768aba5aa04"
+      }
+    },
+    {
+      "claimId": "claim_a29012c7fb94f83828b7835413eebcc2",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Execution is complete in three independently shippable releases:\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-4 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-63. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-63"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-4",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "1. Outcome"
+        ],
+        "text": "Execution is complete in three independently shippable releases:",
+        "textDigest": "62f374c5546f8bcbc6881ebbeb92e06b217c31d4229c8e8c862cf1de45532120"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-63",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "1. Outcome"
+        ],
+        "text": "Execution is complete in three independently shippable releases:",
+        "textDigest": "62f374c5546f8bcbc6881ebbeb92e06b217c31d4229c8e8c862cf1de45532120"
+      }
+    },
+    {
+      "claimId": "claim_8242c1d38b001421e537d3c00881719e",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"The provider manifest is never an authority source:\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-34 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-47. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "unheaded-block-47"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "anchor": "unheaded-block-34",
+        "ancestry": [
+          "Host Invocation And Provider Routing Architecture",
+          "7. Authority (Two-Stage)"
+        ],
+        "text": "The provider manifest is never an authority source:",
+        "textDigest": "a0caf84349022155d49f49db75495431fb3f9c0401af615badc90ca07f022a84"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "unheaded-block-47",
+        "ancestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture",
+          "7. Authority (Two-Stage)"
+        ],
+        "text": "The provider manifest is never an authority source:",
+        "textDigest": "a0caf84349022155d49f49db75495431fb3f9c0401af615badc90ca07f022a84"
+      }
+    },
+    {
+      "claimId": "claim_edbd740417658e6cfc22ced75d91b633",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"These are product/release inputs, not implementation details to guess:\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-8 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-67. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-67"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-8",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "3. Decisions Required Before R1 Execution"
+        ],
+        "text": "These are product/release inputs, not implementation details to guess:",
+        "textDigest": "32ffceba26aa0249afd1beeb73ab684f5afe328719c0a1c14b43a244f3dab9e8"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-67",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "3. Decisions Required Before R1 Execution"
+        ],
+        "text": "These are product/release inputs, not implementation details to guess:",
+        "textDigest": "32ffceba26aa0249afd1beeb73ab684f5afe328719c0a1c14b43a244f3dab9e8"
+      }
+    },
+    {
+      "claimId": "claim_ab6683864cea05c444f1b78cd30475b9",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"1. **R1 — distributable Rust CLI host:** installed `fgos` is Rust; every unmigrated CLI invocation transparently reaches Node; `version` is native; install, init/doctor, \" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-5 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-64. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-64"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-5",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "1. Outcome"
+        ],
+        "text": "1. **R1 — distributable Rust CLI host:** installed `fgos` is Rust; every\n   unmigrated CLI invocation transparently reaches Node; `version` is native;\n   install, init/doctor, upgrade, rollback, and uninstall are reproducible\n   (install/upgrade/rollback/uninstall via `fgctl`; init/doctor local, under\n   the active identity — `runtime-identity-and-activation.md` §12).\n2. **R2 — external process preview:** one vendor fixture proves the framed\n   process protocol and fail-closed provider path without expanding into a full\n   plugin marketplace.\n3. **R3 — production remote peer:** at least one native gateway route calls the\n   shared invocation service directly; migrated routes neither shell through\n   CLI nor parse `fgos.v1` internally.",
+        "textDigest": "e0c70d6e826e2c968203b8648bdf07702f7afc0ed341faaeb9908fa8d0d04ec9"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-64",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "1. Outcome"
+        ],
+        "text": "2. **R1 — distributable Rust CLI host:** installed `fgos` is Rust; every\n   unmigrated CLI invocation transparently reaches Node; `version` is native;\n   install, init/doctor, upgrade, rollback, and uninstall are reproducible\n   (install/upgrade/rollback/uninstall via `fgctl`; init/doctor local, under\n   the active identity — `runtime-identity-and-activation.md` §12).\n2. **R2 — external process preview:** one vendor fixture proves the framed\n   process protocol and fail-closed provider path without expanding into a full\n   plugin marketplace.\n3. **R3 — production remote peer:** at least one native gateway route calls the\n   shared invocation service directly; migrated routes neither shell through\n   CLI nor parse `fgos.v1` internally.",
+        "textDigest": "8b72313ad0c0f7ed149f22d5f2fedc83106aad3a84065894013401d6d1ecc758"
+      }
+    },
+    {
+      "claimId": "claim_50f8ffbbb93953f5a4d7b276700aaf6d",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Core operation/command namespaces are reserved; plugins add vendor-scoped operations (`acme.deploy.release`) and implement published extension points only; `.fgos` writes\" from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-33 to its frozen mapped owner docs/platform/host-invocation-routing/spec.md#unheaded-block-46. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "unheaded-block-46"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "anchor": "unheaded-block-33",
+        "ancestry": [
+          "Host Invocation And Provider Routing Architecture",
+          "7. Authority (Two-Stage)"
+        ],
+        "text": "Core operation/command namespaces are reserved; plugins add vendor-scoped operations (`acme.deploy.release`) and implement published extension points only; `.fgos` writes, Git mutation, process/network/secret access require explicit capability grants; unknown or ambiguous claims fail closed. **Configuration can never replace a built-in provider** — closed as \"prohibit,\" not open. Rollback of a native operation in R1–R2 is a release rollback through `fgctl` (the previous release still ships both the native provider and the Node payload during the observation window), never a runtime provider-selection swap.",
+        "textDigest": "2928695057f7d3fe48b36607d329a6e28781eb4dd6293ea07781262aed245bd6"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "unheaded-block-46",
+        "ancestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture",
+          "7. Authority (Two-Stage)"
+        ],
+        "text": "Core operation/command namespaces are reserved; plugins add vendor-scoped operations (`acme.deploy.release`) and implement published extension points only; `.fgos` writes, Git mutation, process/network/secret access require explicit capability grants; unknown or ambiguous claims fail closed. **Configuration can never replace a built-in provider** — closed as \"prohibit,\" not open. Rollback of a native operation in R1–R2 is a release rollback through `fgctl` (the previous release still ships both the native provider and the Node payload during the observation window), never a runtime provider-selection swap.",
+        "textDigest": "2928695057f7d3fe48b36607d329a6e28781eb4dd6293ea07781262aed245bd6"
+      }
+    },
+    {
+      "claimId": "claim_72cb929bf5ecffe3431de368d5cb7def",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"```mermaid flowchart LR P0[P0 decisions + inventory] --> P1[P1 compatibility harness] P0 --> P2[P2 workspace + artifacts] P1 --> P3[P3 invocation kernel] P2 --> P3 P3 -->\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-12 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-71. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-71"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-12",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "4. Delivery Graph"
+        ],
+        "text": "```mermaid\nflowchart LR\n    P0[P0 decisions + inventory] --> P1[P1 compatibility harness]\n    P0 --> P2[P2 workspace + artifacts]\n    P1 --> P3[P3 invocation kernel]\n    P2 --> P3\n    P3 --> P4[P4 CLI adapter legacy exec]\n    P3 --> P5[P5 native version]\n    P4 --> P6[P6 distribution + flip]\n    P5 --> P6\n    PK[\"PK: fgctl walking skeleton (packaging stream)\"] --> P6\n    P3 --> P7[P7 external process preview]\n    P5 --> P8[P8 remote native route]\n    P6 --> P9[P9 next native read]\n```",
+        "textDigest": "4fdba7fda591e7a2a96599a07ec8a0e894999319ea4447ca991bbcf170042340"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-71",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "4. Delivery Graph"
+        ],
+        "text": "```mermaid\nflowchart LR\n    P0[P0 decisions + inventory] --> P1[P1 compatibility harness]\n    P0 --> P2[P2 workspace + artifacts]\n    P1 --> P3[P3 invocation kernel]\n    P2 --> P3\n    P3 --> P4[P4 CLI adapter legacy exec]\n    P3 --> P5[P5 native version]\n    P4 --> P6[P6 distribution + flip]\n    P5 --> P6\n    PK[\"PK: fgctl walking skeleton (packaging stream)\"] --> P6\n    P3 --> P7[P7 external process preview]\n    P5 --> P8[P8 remote native route]\n    P6 --> P9[P9 next native read]\n```",
+        "textDigest": "4fdba7fda591e7a2a96599a07ec8a0e894999319ea4447ca991bbcf170042340"
+      }
+    },
+    {
+      "claimId": "claim_9a1f08d0bc4045fde2455e9a8d196a29",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Golden vectors are necessary but not sufficient. A Node-generated differential corpus covers object insertion order, integer limits, negative zero, floating exponent form\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-27 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-33. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "targetAnchor": "unheaded-block-33"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+        "anchor": "unheaded-block-27",
+        "ancestry": [
+          "Legacy CLI Transition",
+          "4. Public Presentation Versus Semantic Outcome"
+        ],
+        "text": "Golden vectors are necessary but not sufficient. A Node-generated differential corpus covers object insertion order, integer limits, negative zero, floating exponent formatting, Unicode/control characters, nested arrays/maps, null and booleans. Timestamp values are checked for shape/range rather than equality. Generic byte parity is not inferred from the narrow `version` payload.",
+        "textDigest": "c0a85f4f3e27eeba57d5dff78dba55b787570a4c0b86f411a694538811de1fb4"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "anchor": "unheaded-block-33",
+        "ancestry": [
+          "Architecture: Legacy CLI Transition",
+          "Retained selected source material",
+          "Legacy CLI Transition",
+          "4. Public Presentation Versus Semantic Outcome"
+        ],
+        "text": "Golden vectors are necessary but not sufficient. A Node-generated differential corpus covers object insertion order, integer limits, negative zero, floating exponent formatting, Unicode/control characters, nested arrays/maps, null and booleans. Timestamp values are checked for shape/range rather than equality. Generic byte parity is not inferred from the narrow `version` payload.",
+        "textDigest": "c0a85f4f3e27eeba57d5dff78dba55b787570a4c0b86f411a694538811de1fb4"
+      }
+    },
+    {
+      "claimId": "claim_43dd4f7aa139c570ea072ea4f9b7221d",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"A native provider never blocks waiting for a person. An operation that needs human input returns a `parked` outcome and is re-invoked by the work lifecycle, not by a prov\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-47 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-50. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-50"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-47",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "9. Repeat By Component Boundary"
+        ],
+        "text": "A native provider never blocks waiting for a person. An operation that needs\nhuman input returns a `parked` outcome and is re-invoked by the work\nlifecycle, not by a provider-side wait. This must hold before any\n`ask`/`answer`-shaped operation migrates.",
+        "textDigest": "17182ded50a6a6957f1ce127fc4322e00e78b95d999c7b04c8a2b7d4982127ac"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-50",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "9. Repeat By Component Boundary"
+        ],
+        "text": "A native provider never blocks waiting for a person. An operation that needs\nhuman input returns a `parked` outcome and is re-invoked by the work\nlifecycle, not by a provider-side wait. This must hold before any\n`ask`/`answer`-shaped operation migrates.",
+        "textDigest": "17182ded50a6a6957f1ce127fc4322e00e78b95d999c7b04c8a2b7d4982127ac"
+      }
+    },
+    {
+      "claimId": "claim_446d721d407f7da7777d6d7598181d1d",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Built-in and process providers are distinguishable through one router; all negative cases fail closed; no production component moved. `legacy-cli` selectors never reach t\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-51 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-110. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-110"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-51",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "12. P7 — External Process Provider Preview",
+          "Exit gate and verify"
+        ],
+        "text": "Built-in and process providers are distinguishable through one router; all\nnegative cases fail closed; no production component moved. `legacy-cli`\nselectors never reach the router (P4 exec path is outside the kernel).",
+        "textDigest": "eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-110",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "12. P7 — External Process Provider Preview",
+          "Exit gate and verify"
+        ],
+        "text": "Built-in and process providers are distinguishable through one router; all\nnegative cases fail closed; no production component moved. `legacy-cli`\nselectors never reach the router (P4 exec path is outside the kernel).",
+        "textDigest": "eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af"
+      }
+    },
+    {
+      "claimId": "claim_c710c879488536d7a2b949141952f010",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"This document contains execution order, deliverables, gates, verification, and rollback. Semantic contracts, provider lifecycle, authority, framing, registry rules, compa\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-2 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-61. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-61"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-2",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan"
+        ],
+        "text": "This document contains execution order, deliverables, gates, verification, and\nrollback. Semantic contracts, provider lifecycle, authority, framing, registry\nrules, compatibility modes, and technical trade-offs are owned by the\narchitecture document and are intentionally not redefined here.",
+        "textDigest": "1aef0de67780feebd51f6b6ba3d08db23ffc4032b2b98c9e945aa188cab3d413"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-61",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan"
+        ],
+        "text": "This document contains execution order, deliverables, gates, verification, and\nrollback. Semantic contracts, provider lifecycle, authority, framing, registry\nrules, compatibility modes, and technical trade-offs are owned by the\narchitecture document and are intentionally not redefined here.",
+        "textDigest": "1aef0de67780feebd51f6b6ba3d08db23ffc4032b2b98c9e945aa188cab3d413"
+      }
+    },
+    {
+      "claimId": "claim_993f44595192c14f62bc1f2f87bf3be0",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"It must also preserve a visible repair path: an unmigrated selector remains owned by the Node payload — identity `legacy-node`, the npm package as `package.json` `files` \" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-8 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-15. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-15"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-8",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "1. Migration Question"
+        ],
+        "text": "It must also preserve a visible repair path: an unmigrated selector remains\nowned by the Node payload — identity `legacy-node`, the npm package as\n`package.json` `files` defines it, unmoved in the source tree and staged whole\nunder the release manifest's `components.legacyNode.root` — so `bin/fgos.mjs`\nis a file inside that payload, no longer a public name. The generated command-route\ndescriptor tells a contributor whether a selector is `legacy-cli` or `native`,\nits owner path, and its required compatibility tests. A selector cannot be\nmade native merely by changing a Rust parser; its descriptor and complete\nprovider binding change together.",
+        "textDigest": "6de78c0e2380ab859a9b8c83d9726380c7f677ab9cdea76aec6494f618c201e2"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-15",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "1. Migration Question"
+        ],
+        "text": "It must also preserve a visible repair path: an unmigrated selector remains\nowned by the Node payload — identity `legacy-node`, the npm package as\n`package.json` `files` defines it, unmoved in the source tree and staged whole\nunder the release manifest's `components.legacyNode.root` — so `bin/fgos.mjs`\nis a file inside that payload, no longer a public name. The generated command-route\ndescriptor tells a contributor whether a selector is `legacy-cli` or `native`,\nits owner path, and its optional compatibility tests. A selector cannot be\nmade native merely by changing a Rust parser; its descriptor and complete\nprovider binding change together.",
+        "textDigest": "e6b1dfb3a5bd64081f6915ef6b6c422d74719a463d46841f39b27ddebe1db903"
+      }
+    },
+    {
+      "claimId": "claim_2bc13328f1e7a4d1ac848c004a8a0952",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"`gate-bypass` is a candidate, not a pre-created component. Confirm authority and placement first. If selected: freeze precedence/malformed fixtures; port only the read; c\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-57 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-116. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+        "targetAnchor": "unheaded-block-116"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+        "anchor": "unheaded-block-57",
+        "ancestry": [
+          "Rust Host And Proof Providers Implementation Plan",
+          "14. P9 — Next Native Read"
+        ],
+        "text": "`gate-bypass` is a candidate, not a pre-created component. Confirm authority\nand placement first. If selected: freeze precedence/malformed fixtures; port\nonly the read; consume resolved project context; prove zero writes and zero Node\nspawn; flip binding separately from Node deletion. If ownership stays unclear,\nchoose another settled read instead of inventing a component boundary.",
+        "textDigest": "fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/roadmap.md",
+        "anchor": "unheaded-block-116",
+        "ancestry": [
+          "Host Invocation Routing Roadmap",
+          "Retained selected source material",
+          "Rust Host And Proof Providers Implementation Plan",
+          "14. P9 — Next Native Read"
+        ],
+        "text": "`gate-bypass` is a candidate, a pre-created component. Confirm authority\nand placement first. If selected: freeze precedence/malformed fixtures; port\nonly the read; consume resolved project context; prove zero writes and zero Node\nspawn; flip binding separately from Node deletion. If ownership stays unclear,\nchoose another settled read instead of inventing a component boundary.",
+        "textDigest": "e48467f15f815a30d27ae7bd872b662bd3b76c7281dab9d20a1ccee1697bada7"
+      }
+    },
+    {
+      "claimId": "claim_82c03ace667d3b9a6b3a4130445160e1",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-11",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Move the complete direct unheaded-block unit \"Full marketplace/signature policy, core replacement, WASM, and broad project/global discovery UX remain separate ecosystem work. R2 exits when the process adapter and pro\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-33 to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-37. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+        "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "targetAnchor": "unheaded-block-37"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+        "anchor": "unheaded-block-33",
+        "ancestry": [
+          "Node To Rust Component Migration",
+          "6. Release R2: External Process Provider Preview"
+        ],
+        "text": "Full marketplace/signature policy, core replacement, WASM, and broad\nproject/global discovery UX remain separate ecosystem work. R2 exits when the\nprocess adapter and protocol are real and fail closed, not when every future\nplugin product concern is solved.",
+        "textDigest": "ab44d8f11fc0dc58c3b93b2c5a01f29ac40ab02eaaeb160eb56b3db93e8bc8ca"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "anchor": "unheaded-block-37",
+        "ancestry": [
+          "Architecture: Node To Rust Migration",
+          "Retained selected source material",
+          "Node To Rust Component Migration",
+          "6. Release R2: External Process Provider Preview"
+        ],
+        "text": "Full marketplace/signature policy, core replacement, WASM, and broad\nproject/global discovery UX remain separate ecosystem work. R2 exits when the\nprocess adapter and protocol are real and fail closed, not when every future\nplugin product concern is solved.",
+        "textDigest": "ab44d8f11fc0dc58c3b93b2c5a01f29ac40ab02eaaeb160eb56b3db93e8bc8ca"
+      }
+    }
+  ]
+}
