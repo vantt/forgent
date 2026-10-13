@@ -1012,6 +1012,37 @@ test("herdr-spawn assignment dispatch through executeThroughConfinement threads 
   }
 });
 
+test("the leased account's credential source reaches the herdr-spawn adapter so its private home derives trust from that account", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-trust-account-test-"));
+  try {
+    const credentialSource = { kind: "codex-home", home: path.join(tmp, "leased-codex-home") };
+    const req = buildConfinementRequest({
+      capability: "code:implement",
+      executorId: "herdr-agent",
+      invocation: {
+        command: "codex",
+        args: [],
+        adapter: "herdr-spawn",
+        interactiveMode: { kind: "codex", trustStore: { kind: "codex-toml" } },
+        prompt: "do the work",
+      },
+      providerCapacity: { provider: "openai-codex", accountId: "leased", credentialSource },
+      requirement: { mode: "unconfined" },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, "run"), timeoutMs: 5000, workId: "w1" },
+    });
+
+    let capturedOpts = null;
+    const res = await executeThroughConfinement(req, async (invocation, opts) => {
+      capturedOpts = opts;
+      return { status: 0, stdout: "ok" };
+    });
+    assert.equal(res.status, "completed");
+    assert.deepEqual(capturedOpts.trustAccountSource, credentialSource);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test("recorded herdrName is normalized identically to the launch call's own agent name", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-name-normalize-test-"));
   try {

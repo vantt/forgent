@@ -1115,6 +1115,9 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     requirement: request.requirement,
     backendId: effectiveBackendId,
     effectiveContract: request.context?.effectiveContract ?? request.invocation?.effectiveContract ?? null,
+    // The account whose login the private home carries: herdr-spawn reads its folder-trust decision
+    // from that account's own store. A path, never a credential value.
+    trustAccountSource: request.providerCapacity?.credentialSource ?? null,
   };
 
   if (preparedLaunch) {

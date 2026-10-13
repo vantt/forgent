@@ -256,3 +256,49 @@ test('codex hooks: hook trust goes only to a private home, never into the accoun
   assert.match(fs.readFileSync(path.join(privateHome, 'config.toml'), 'utf8'), /\[hooks\.state\./);
   assert.ok(notes.some((n) => n.hookTrustSeeded === 2));
 });
+
+// The capacity layer leases one account per dispatch and copies that account's login into the private
+// home. The person's trust decision for that login lives in the same account's own store, not in the
+// store of whichever account the invocation's static env happens to name.
+test('a private home derives trust from the leased account store, not the account the invocation env names', () => {
+  const codex = { kind: 'codex-toml' };
+  const leased = { kind: 'codex-home', home: '/leased/codex' };
+  const own = trustStorePaths({ trustStore: codex, fullEnv: { CODEX_HOME: '/static/codex' }, workerEnv: { CODEX_HOME: '/tmp/private/home' }, accountSource: leased });
+  assert.deepEqual(own, { root: '/leased/codex/config.toml', target: '/tmp/private/home/config.toml' });
+
+  const shared = trustStorePaths({ trustStore: codex, fullEnv: { CODEX_HOME: '/static/codex' }, workerEnv: null, accountSource: leased });
+  assert.deepEqual(shared, { root: '/static/codex/config.toml', target: '/static/codex/config.toml' },
+    'without a private home the CLI reads the invocation home, so that is where the decision is read and written');
+
+  const pinned = trustStorePaths({ trustStore: { kind: 'codex-toml', path: '/pinned/config.toml' }, fullEnv: {}, workerEnv: { CODEX_HOME: '/tmp/private/home' }, accountSource: leased });
+  assert.equal(pinned.root, '/pinned/config.toml', 'a declared store path still wins');
+
+  const agy = trustStorePaths({ trustStore: { kind: 'agy' }, fullEnv: { HOME: '/static/agy' }, workerEnv: { HOME: '/tmp/private/home' }, accountSource: { kind: 'home-files', home: '/leased/agy', files: ['.gemini/antigravity-cli/settings.json'] } });
+  assert.equal(agy.root, '/leased/agy/.gemini/antigravity-cli/settings.json');
+  assert.equal(agy.target, '/tmp/private/home/.gemini/antigravity-cli/settings.json');
+
+  const otherLayout = trustStorePaths({ trustStore: codex, fullEnv: { CODEX_HOME: '/static/codex' }, workerEnv: { CODEX_HOME: '/tmp/private/home' }, accountSource: { kind: 'home-files', home: '/leased/pi', files: ['auth.json'] } });
+  assert.equal(otherLayout.root, '/static/codex/config.toml', 'a credential layout that is not a codex home says nothing about codex trust');
+});
+
+test('codex: a confined round seeds its private home when only the leased account trusts the repo', () => {
+  const project = fs.realpathSync(tmp('fgos-codex-leased-project-'));
+  const staticHome = tmp('fgos-codex-static-home-');
+  fs.writeFileSync(path.join(staticHome, 'config.toml'), 'model = "x"\n\n[projects."/somewhere/else"]\ntrust_level = "trusted"\n');
+  const leasedHome = tmp('fgos-codex-leased-home-');
+  const leasedBody = `[projects."${project}"]\ntrust_level = "trusted"\n`;
+  fs.writeFileSync(path.join(leasedHome, 'config.toml'), leasedBody);
+  const privateHome = tmp('fgos-codex-leased-private-');
+  const notes = [];
+  const round = { trustWritten: false, note: (patch) => notes.push(patch) };
+
+  seedWorkspaceTrust({
+    trustStore: { kind: 'codex-toml' }, round, cwd: project, repoRoot: project,
+    fullEnv: { CODEX_HOME: staticHome }, workerEnv: { CODEX_HOME: privateHome },
+    accountSource: { kind: 'codex-home', home: leasedHome },
+  });
+
+  assert.ok(!notes.some((n) => n.trustSeedFailed), `no seed failure expected, got ${JSON.stringify(notes)}`);
+  assert.equal(readCodexTrust(path.join(privateHome, 'config.toml'), project), true);
+  assert.equal(fs.readFileSync(path.join(leasedHome, 'config.toml'), 'utf8'), leasedBody, 'the leased account store is not edited');
+});
