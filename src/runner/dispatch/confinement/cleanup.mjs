@@ -227,6 +227,40 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
   }
 }
 
+/**
+ * Private homes under `tempRoot` that were kept because their renewed login could not be staged
+ * (`credentialKept` in the marker). Read-only; names, counts and times only, never a path or a value.
+ * `held` homes have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried.
+ */
+export function listKeptCredentialHomes(tempRoot) {
+  const found = [];
+  let dispatches = [];
+  try { dispatches = fs.readdirSync(tempRoot, { withFileTypes: true }); } catch { return found; }
+  for (const entry of dispatches) {
+    if (!entry.isDirectory()) continue;
+    const dispatchDir = path.join(tempRoot, entry.name);
+    const candidates = [dispatchDir];
+    try {
+      for (const sub of fs.readdirSync(dispatchDir, { withFileTypes: true })) {
+        if (sub.isDirectory()) candidates.push(path.join(dispatchDir, sub.name));
+      }
+    } catch { /* vanished meanwhile */ }
+    for (const cand of candidates) {
+      const marker = readOwnershipMarker(cand);
+      const attempts = marker?.credentialKept?.attempts;
+      if (!Number.isInteger(attempts) || attempts < 1) continue;
+      found.push({
+        provider: typeof marker.credentialWriteBack?.provider === 'string' ? marker.credentialWriteBack.provider : 'unknown',
+        accountId: typeof marker.credentialWriteBack?.accountId === 'string' ? marker.credentialWriteBack.accountId : 'unknown',
+        attempts,
+        held: attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS,
+        since: marker.credentialKept.since ?? marker.createdAt ?? null,
+      });
+    }
+  }
+  return found;
+}
+
 /** Whether a herdr pane is still open: true / false, or null when herdr
  * cannot be asked (not installed, no reachable session). Imported lazily so
  * this module stays free of the transport unless a retained home exists. */

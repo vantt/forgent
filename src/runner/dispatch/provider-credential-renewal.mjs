@@ -603,6 +603,35 @@ function listLeftovers(accountDir) {
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
 /**
+ * Login copies an account is holding for its next renewal: staged `pending/` copies (their name starts
+ * with the staging time) and scratch homes a dead runner left (age by modification time). Read-only;
+ * names, kinds and ages only. Only copies at least `minAgeMs` old are listed: a younger one is simply
+ * waiting for the next renewal.
+ */
+export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), minAgeMs = 0 }) {
+  const found = [];
+  const root = path.join(runtimeDir, 'account-locks');
+  const subdirs = (dir) => {
+    try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; }
+  };
+  for (const provider of subdirs(root)) {
+    for (const accountId of subdirs(path.join(root, provider))) {
+      const accountDir = path.join(root, provider, accountId);
+      for (const dir of listLeftovers(accountDir)) {
+        const name = path.basename(dir);
+        const staged = /^(\d{15})-/.exec(name);
+        let at;
+        if (staged) at = Number(staged[1]);
+        else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
+        const ageMs = now - at;
+        if (ageMs >= minAgeMs) found.push({ provider, accountId, kind: staged ? 'pending' : 'scratch', ageMs });
+      }
+    }
+  }
+  return found;
+}
+
+/**
  * Keep the newest MAX_PENDING_COPIES pending copies of an account (names sort by staging time) and drop the
  * rest, so an account whose entry can never be identified does not grow without bound. One stderr line
  * with the count; never a path or a value.

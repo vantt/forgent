@@ -63,7 +63,7 @@ import {
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, listKeptCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -88,6 +88,7 @@ import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
+import { inspectRetainedCredentialCopies } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -5363,6 +5364,8 @@ function countDeadOwnedConfinementDirs(roots) {
           const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
           // A home kept for a left-open pane is awaiting that pane, not orphaned.
           if (marker.paneId) continue;
+          // A home held for its unstaged login is never reaped; credential-copies-retained reports it.
+          if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
           const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
             try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
           })();
@@ -5411,6 +5414,56 @@ registerCheck({
 registerFix({
   id: 'confinement-orphaned-resources-reaped',
   fix: () => fixConfinementOrphanedResourcesReaped(),
+});
+
+// A login copy that outlives its dispatch holds a refresh token that may be the only valid one, so fgOS
+// never deletes it on age alone; this check is how an owner learns one is still there. Read-only, counts
+// and ages by provider/account only: no path, no value.
+const RETAINED_COPY_REPORT_AFTER_MS = 24 * 60 * 60 * 1000;
+
+const formatAge = (ms) => (ms >= 48 * 3600 * 1000 ? `${Math.floor(ms / (24 * 3600 * 1000))}d` : `${Math.max(0, Math.floor(ms / 3600000))}h`);
+
+function summarizeByAccount(items, label) {
+  const groups = new Map();
+  for (const item of items) {
+    const key = `${item.provider}/${item.accountId}`;
+    const group = groups.get(key) ?? { count: 0, oldestMs: 0 };
+    group.count += 1;
+    group.oldestMs = Math.max(group.oldestMs, item.ageMs);
+    groups.set(key, group);
+  }
+  return [...groups].map(([key, g]) => `${key}: ${g.count} ${label}, oldest ${formatAge(g.oldestMs)}`);
+}
+
+export function checkCredentialCopiesRetained({
+  runtimeDir = defaultProviderCapacityRuntimeDir(),
+  roots = defaultConfinementTempRoots(),
+  now = Date.now(),
+  minAgeMs = RETAINED_COPY_REPORT_AFTER_MS,
+} = {}) {
+  const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs });
+  const homes = roots.flatMap((root) => listKeptCredentialHomes(root))
+    .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
+  const held = homes.filter((home) => home.held);
+  const retrying = homes.filter((home) => !home.held);
+  if (copies.length === 0 && homes.length === 0) {
+    return { passed: true, message: 'no login copy is being retained past its dispatch' };
+  }
+  const problems = [
+    ...summarizeByAccount(copies, 'pending login copy(ies) waiting for a renewal'),
+    ...summarizeByAccount(held, 'private home(s) held after repeated staging failures (never deleted automatically)'),
+    ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
+  ];
+  const advice = copies.length > 0 || held.length > 0
+    ? ' -- each holds a refresh token that may be the only valid one; run a dispatch for that account so the next renewal applies it, or recover the login by hand'
+    : '';
+  return { passed: held.length === 0 && copies.length === 0, message: `${problems.join('; ')}${advice}` };
+}
+
+registerCheck({
+  id: 'credential-copies-retained',
+  description: 'no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied',
+  check: () => checkCredentialCopiesRetained(),
 });
 
 export function checkConfinementBwrapPlatform() {
