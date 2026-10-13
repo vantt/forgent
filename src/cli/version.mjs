@@ -18,15 +18,18 @@ import { COMMAND_REGISTRY } from './command-registry.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-export function resolveCliVersionInfo() {
-  const packageJsonPath = path.join(PACKAGE_ROOT, 'package.json');
+export function resolveCliVersionInfo({ packageRoot = PACKAGE_ROOT } = {}) {
+  const packageJsonPath = path.join(packageRoot, 'package.json');
   const packageVersion = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).version;
   let gitCommit = null;
   try {
     gitCommit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
-      cwd: PACKAGE_ROOT,
+      cwd: packageRoot,
       encoding: 'utf8',
       shell: false,
+      // stderr is piped away: a release install is not a git checkout, and
+      // git's "fatal: not a git repository" must not reach the terminal.
+      stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
   } catch {
     // Not a git checkout (a real npm/tarball install has no .git) -- no
