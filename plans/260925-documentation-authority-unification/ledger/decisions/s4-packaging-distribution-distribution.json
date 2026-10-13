@@ -592,12 +592,12 @@
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
       "sourceUnitDigest": "409f6139b9fe07c812843cb45d4f1fda7eafd39bcc0bf09edf48baa1a376dd55",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh",
+      "targetAnchor": "lịch-sử-quyết-định",
       "claimKind": "specification",
       "disposition": "move",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete heading from docs/specs/distribution.md#l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh, under \"L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh\", is retained at docs/platform/packaging-distribution/spec.md#l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "rationale": "The complete heading from docs/specs/distribution.md#lịch-sử-quyết-định, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định. Only heading depth changes; the direct section payload follows the original source order. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
       "reviewNote": "Decision-history section carried verbatim (2026-10-12 and 2026-10-13 owner decisions); kind is specification although text is decision history, which is the file-level default and not blocking; Heading H2 to H4, diff is the heading marker only, section payload verbatim, source lines 322-322 to target spec.md line 706; recomputed digest matches",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-13",
@@ -620,7 +620,7 @@
       "disposition": "move",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:8@2026-10-13",
-      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
+      "rationale": "The complete unheaded-block from docs/specs/distribution.md#unheaded-block-15, under \"Lịch sử quyết định\", is retained at docs/platform/packaging-distribution/spec.md#unheaded-block-92. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the packaging-distribution/spec.md topic owner; carriage does not certify current implementation.",
       "reviewNote": "Verbatim payload of the decision-history section incl. both dated entries; claim kind specification is arguable (decision) but not blocking and nothing in the text changed; Block byte-identical (2243 chars), digests equal, source lines 324-325 to target spec.md line 708; recomputed digest matches",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-13",
@@ -631,7 +631,7 @@
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
-        "L\u1ecbch s\u1eed quy\u1ebft \u0111\u1ecbnh"
+        "Lịch sử quyết định"
       ],
       "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },

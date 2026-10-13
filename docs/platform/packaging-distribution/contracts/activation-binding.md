@@ -214,6 +214,7 @@ authority merely because it was staged or verified. It gains writer authority
 for a workspace only after the workspace binding is published with
 `status: "ready"`.
 
+**Retained dated design — status note (2026-10-14):** The bootstrap-context permission below is source design, not current behavior. Preflight is static and never executes candidate release code (`packages/distribution/rust/src/init.rs:431-446`).
 During preparation, `fgctl` may invoke the candidate release directly with a
 restricted bootstrap context:
 
@@ -226,7 +227,7 @@ FGOS_CANDIDATE_RELEASE_PATH=<path>
 In that context the candidate may run preflight checks and write only staging
 records under the installation transaction. It must not write host-visible
 projection paths, execute general workflow mutations, or claim/write shared
-work-state as the active runtime.
+work-state as the active runtime. **Status note (2026-10-14):** The permission in the first sentence is retained dated design, not implemented: static preflight never runs candidate code and the proposed environment-variable bootstrap context was never honored by a host (`packages/distribution/rust/src/init.rs:431-446`). The must-not obligation remains.
 
 #### 7. Invocation Lease
 

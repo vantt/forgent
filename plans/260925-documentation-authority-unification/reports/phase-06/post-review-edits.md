@@ -29,3 +29,14 @@ Author: codex-session:8@2026-10-13. Scope: complete promotion fields and retaine
 The named source subdivisions and all added promotion fields are pending review. Native accounting includes 21 packaging candidate gaps (20 headers and one enclosing runtime heading) plus two main-only source gaps; five inherited distribution gaps are preserved literally as dated history. Source decisions retain one explicit partial carry for the compound-table heading, with a named stub remainder; no later-batch conservation waiver is presumed.
 
 Candidate metadata correction: the three V1 contract documents (activation-binding, distribution-pin, release-manifest) now separate `Design status: Candidate` from `Contract design status: Frozen (V1)`. This preserves schema freezing and changes no schema body; A28 eligibility requires the document candidate marker. New native binding consequences stay pending.
+
+## Packaging sampled truth status notes — 2026-10-14
+
+Author: codex-session:10@2026-10-14. Independent report: `review-4-packaging-truth-f6.md` at `09fdd6746`. Under A19, annotate only sampled truth fixes 2, 26, 28 at their sentences, including the same marker assertion in implementation-alignment. Source design and dated decisions remain literal. No runtime implementation or F6 retirement is changed.
+
+- `docs/platform/packaging-distribution/contracts/activation-binding.md`
+- `docs/platform/packaging-distribution/contracts/skill-package-distribution.md`
+- `docs/platform/packaging-distribution/verification/implementation-alignment.md`
+- `docs/platform/packaging-distribution/verification/install-and-release-proof.md`
+
+Changed source-target bindings and native units are returned to pending review without approval carry. Full shown text and digests appear in the bounded follow-up request.

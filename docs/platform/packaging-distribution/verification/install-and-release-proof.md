@@ -145,7 +145,7 @@ The compatibility posture is now settled as:
   an environment variable, flag, or equivalent supported mechanism; it must not
   silently catch Rust-host failures.
 - Any escape-hatch invocation must emit a warning, log entry, or proof marker
-  that distinguishes deliberate legacy fallback use from default Rust-host use.
+  that distinguishes deliberate legacy fallback use from default Rust-host use. **Status note (2026-10-14):** This marker remains an open requirement, not implemented for direct npm/Node compatibility invocation (`bin/fgos.mjs`, as checked in `review-4-packaging-truth-f6.md`, truth-sample-28). The invocation record is opt-in and emitted only through Rust-host legacy-cli routes (`apps/fgos/src/legacy_exec.rs:176-191`); it does not satisfy this obligation for direct Node entry.
 - The escape hatch remains supported for 30 calendar days after the preview
   release publication date. The public preview tag `v0.1.0` was published on
   2026-09-18, so the earliest removal date for this preview release is
