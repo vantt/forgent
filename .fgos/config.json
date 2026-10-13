@@ -852,6 +852,7 @@
               "danger-full-access",
               "-a",
               "never",
+              "--no-daemon",
               "--model",
               "{model}"
             ],

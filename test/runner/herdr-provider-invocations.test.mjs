@@ -58,6 +58,17 @@ test('no herdr invocation relies on a bypass flag in place of the sandbox', () =
   assert.deepEqual(codex.args.slice(0, 4), ['-s', 'danger-full-access', '-a', 'never']);
 });
 
+test('the codex pane keeps its session in its own process, never on the shared background daemon', () => {
+  // The codex TUI otherwise hands its session to a background app-server daemon it installs in
+  // CODEX_HOME, and that daemon's updater can swap in a newer release mid-run. A thread the daemon
+  // reopens runs under the config default, which for a trusted workspace is codex's own
+  // workspace-write sandbox: it tries to mkdir masks such as <cwd>/.aws inside the read-only
+  // workspace and every command fails before it runs. --no-daemon keeps -s danger-full-access
+  // in force for the whole session; bwrap stays the confinement.
+  const codex = find('openai', 'codex-herdr-fgovn');
+  assert.ok(codex.args.includes('--no-daemon'), `codex-herdr-fgovn args ${JSON.stringify(codex.args)} must carry --no-daemon`);
+});
+
 test('the account inventory that provisions these homes is machine-global, never declared in the project config', () => {
   assert.equal(runner.providers, undefined, 'credential paths belong to ~/.fgos/config.json');
 });
