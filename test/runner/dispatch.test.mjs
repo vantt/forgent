@@ -2116,7 +2116,9 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   assert.equal(effectivePolicy.providerModel, 'openai');
   assert.equal(effectivePolicy.rigor, 'high');
   assert.equal(effectivePolicy.tier, 'flagship');
-  assert.equal(effectivePolicy.model, 'gpt-5.6-terra');
+  const flagshipModel = cfg.modelPolicies.openai.flagship;
+  assert.ok(typeof flagshipModel === 'string' && flagshipModel.length > 0, 'project config names an openai flagship model');
+  assert.equal(effectivePolicy.model, flagshipModel);
 
   const prompt = 'Analyze system architecture for potential failure modes';
   const resolved = resolveExecutorCommand(cfg, {
@@ -2128,16 +2130,16 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
 
   assert.equal(resolved.command, 'codex');
   assert.ok(resolved.args.includes('--model'), 'resolved args must include --model flag');
-  assert.ok(resolved.args.includes('gpt-5.6-terra'), 'resolved args must include resolved model gpt-5.6-terra');
+  assert.ok(resolved.args.includes(flagshipModel), 'resolved args must include the resolved flagship model');
   const modelFlagIndex = resolved.args.indexOf('--model');
-  assert.equal(resolved.args[modelFlagIndex + 1], 'gpt-5.6-terra', '--model flag must be immediately followed by gpt-5.6-terra');
+  assert.equal(resolved.args[modelFlagIndex + 1], flagshipModel, '--model flag must be immediately followed by the resolved flagship model');
   assert.ok(resolved.args.includes(prompt), 'resolved args must include prompt as a separate argv element');
   assert.equal(resolved.args[resolved.args.length - 1], prompt, '{prompt} must remain a separate argv element, not shell-concatenated');
   assert.deepEqual(resolved.args, [
     'exec',
     '--dangerously-bypass-approvals-and-sandbox',
     '--model',
-    'gpt-5.6-terra',
+    flagshipModel,
     prompt,
   ]);
 });
