@@ -66,6 +66,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'config-awareness',
       'provider-capacity-state',
       'provider-capacity-lock-stale',
+      'credential-copies-retained',
       'dependencies-installed',
       'gate-bypass-configured',
       'root-drift',

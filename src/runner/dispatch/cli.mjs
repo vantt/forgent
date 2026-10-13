@@ -41,10 +41,10 @@ import { buildDispatchResult } from './result-ladder.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { createCredentialProbe } from './provider-credential-probe.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from './confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
+import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
 import { createHerdrClient } from './herdr-agent.mjs';
 import { resolveHerdrBin } from './transport.mjs';
-import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
@@ -1281,7 +1281,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
             forceSharedCwd: rest.includes('--force-shared-cwd'),
             providerCredentialProbe: createCredentialProbe(),
-            providerCredentialRenew: createCredentialRenewal(),
+            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;
@@ -1460,7 +1460,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: true,
             forceSharedCwd: rest.includes('--force-shared-cwd'),
             providerCredentialProbe: createCredentialProbe(),
-            providerCredentialRenew: createCredentialRenewal(),
+            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;
@@ -1612,7 +1612,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             runnerConfig,
             cliOverride,
             isReadOnlyMode: true,
-            providerCredentialRenew: createCredentialRenewal(),
+            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
           }),
           closePane: ({ paneId, herdrSession }) => {
             const closed = createHerdrClient({

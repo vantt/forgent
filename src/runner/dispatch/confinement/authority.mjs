@@ -1825,7 +1825,9 @@ export async function finalizeConfinementResources({
             try {
               const parsed = JSON.parse(raw);
               markerDispatchId = parsed?.dispatchId ?? null;
-              markerDigest = computeSha256Digest(parsed);
+              // `credentialKept` is added by a failed removal after the digest was taken; it is not tampering.
+              const { credentialKept: _kept, ...atPrepare } = parsed ?? {};
+              markerDigest = computeSha256Digest(parsed && typeof parsed === 'object' ? atPrepare : parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);
             }
@@ -1839,9 +1841,11 @@ export async function finalizeConfinementResources({
         try {
           removeConfinementDir(targetPath);
         } catch (err) {
+          // One resource that cannot go (a home holding an unstaged login) must not leave the other
+          // resources of the dispatch on disk: carry on and report the first failure.
           willClean = false;
-          typedReason = `cleanup-failed: ${err.message}`;
-          break;
+          typedReason ??= `cleanup-failed: ${err.message}`;
+          continue;
         }
         removeEmptyDispatchParent(targetPath, markerDispatchId);
       }
