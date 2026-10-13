@@ -1647,6 +1647,43 @@ test('a held home settled into full pending copies, with the source flipping bet
   } finally { w.cleanup(); }
 });
 
+test('without node:sqlite, a pane home whose store is byte for byte the source\'s is not staged, however many dispatches ran', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    for (let i = 0; i < 12; i += 1) {
+      const dir = path.join(w.tmp, 'fgos-confinement', `disp_same_${i}`, 'home');
+      fs.mkdirSync(dir, { recursive: true });
+      writeOwnershipMarker(dir, { dispatchId: `disp_same_${i}` });
+      copyCredentialFiles(dir, w.home, ['agent.db'], { loadSqlite: () => null });
+      extendOwnershipMarker(dir, { credentialWriteBack: credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }) });
+      assert.deepEqual(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }), { status: 'unchanged' });
+    }
+    assert.deepEqual(fs.existsSync(path.join(w.accountDir, 'pending')) ? pendingNames(w) : [], []);
+  } finally { w.cleanup(); }
+});
+
+test('copies that cannot be parsed are compared by their bytes: an identical one is dropped over the limit, a different one never is', () => {
+  const w = workspace();
+  try {
+    const dir = privateOmpHomeWithRenewedLogin(w);
+    const pending = path.join(w.accountDir, 'pending');
+    const bytes = ['SAME', 'SAME', 'DIFF-1', 'DIFF-2', 'DIFF-3', 'DIFF-4', 'DIFF-5'];
+    bytes.forEach((content, i) => {
+      const copy = path.join(pending, `00000000000000${i + 1}-a`);
+      fs.mkdirSync(copy, { recursive: true });
+      fs.writeFileSync(path.join(copy, 'agent.db'), content);
+    });
+    // Seven copies plus the one staged now is eight; nothing parses without node:sqlite.
+    assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+    const left = pendingNames(w);
+    assert.equal(left.length, 7, 'only the byte-identical copy went');
+    assert.equal(left.includes('000000000000001-a'), false, 'the older of the identical pair');
+    assert.equal(left.includes('000000000000002-a'), true, 'the newest of the pair stays');
+    for (const n of [3, 4, 5, 6, 7]) assert.equal(left.includes(`00000000000000${n}-a`), true, `the different copy ${n} stays`);
+  } finally { w.cleanup(); }
+});
+
 test('a half-written copy left by a probe is kept for hand recovery, outside the copies applied or dropped automatically', async () => {
   const w = workspace();
   try {

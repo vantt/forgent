@@ -126,7 +126,7 @@ test('an account with more pending copies than the limit is reported, even when 
     const result = run(w, now);
     assert.equal(result.passed, true, 'a warning, not a failure');
     assert.match(result.message, /^warning: /);
-    assert.match(result.message, /xai\/acct: 6 pending login copies, over the limit of 5: none could be shown redundant or obsolete, so none was dropped/);
+    assert.match(result.message, /xai\/acct: 6 pending login copies waiting, over the limit of 5 \(the limit drops only copies identical to another/);
     assert.equal(result.message.includes('codex/other'), false);
     assert.equal(result.message.includes(FAKE_TOKEN), false);
   } finally { w.cleanup(); }
@@ -143,5 +143,16 @@ test('a half-written copy kept for hand recovery is reported as such', () => {
     assert.equal(result.passed, true);
     assert.match(result.message, /xai\/acct: 1 half-written login copy\(ies\) kept for hand recovery \(never applied or dropped automatically\), oldest 3d/);
     assert.equal(result.message.includes(FAKE_TOKEN), false);
+  } finally { w.cleanup(); }
+});
+
+test('a half-written copy is reported at any age', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 1000).padStart(15, '0')}-abcd`);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'auth.json'), '{"refresh"');
+    assert.match(run(w, now).message, /xai\/acct: 1 half-written login copy\(ies\) kept for hand recovery/);
   } finally { w.cleanup(); }
 });

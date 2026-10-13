@@ -567,7 +567,24 @@ const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpe
 // be read for a reason that may pass, or the source cannot say (it cannot be read, or its entry cannot be
 // identified and the copy holds a refresh token the source does not). Undetermined copies are staged
 // rather than dropped.
-function copyIsNewer({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
+function filesIdentical(layout, sourceHome, copyHome) {
+  try {
+    return layout.files.every((name) => {
+      const a = path.join(sourceHome, name);
+      const b = path.join(copyHome, name);
+      return fs.statSync(a).size === fs.statSync(b).size && fs.readFileSync(a).equals(fs.readFileSync(b));
+    });
+  } catch { return false; }
+}
+
+// A copy whose files are byte for byte the source's renewed nothing, whatever can or cannot be parsed, so
+// it cannot be newer; any other copy that nothing can judge stays undetermined.
+function copyIsNewer(args) {
+  const verdict = judgeCopy(args);
+  return verdict === 'undetermined' && filesIdentical(args.layout, args.sourceHome, args.copyHome) ? 'not-newer' : verdict;
+}
+
+function judgeCopy({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
   const copy = layout.read(copyHome, { loadSqlite });
   if (!copy.ok) {
     if (COPY_MALFORMED_CODES.has(copy.code)) return 'not-newer';
@@ -646,7 +663,7 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
         if (staged) at = Number(staged[1]);
         else { try { at = fs.statSync(dir).mtimeMs; } catch { continue; } }
         const ageMs = now - at;
-        if (ageMs >= minAgeMs) found.push({ provider, accountId, kind: path.basename(path.dirname(dir)) === TORN_DIR ? 'torn' : staged ? 'pending' : 'scratch', ageMs });
+        if (ageMs >= minAgeMs || path.basename(path.dirname(dir)) === TORN_DIR) found.push({ provider, accountId, kind: path.basename(path.dirname(dir)) === TORN_DIR ? 'torn' : staged ? 'pending' : 'scratch', ageMs });
       }
     }
   }
@@ -670,9 +687,19 @@ function syncTree(dir) {
  */
 function copyFingerprint(layout, dir, loadSqlite) {
   const read = layout.read(dir, { loadSqlite });
-  if (!read.ok) return null;
+  if (!read.ok) return rawFingerprint(layout, dir);
   const parts = read.entries.map((entry) => `${entry.key}\u0000${entry.refresh ?? ''}\u0000${entry.expiresMs}`).sort();
   return crypto.createHash('sha256').update(parts.join('\u0001')).digest('hex');
+}
+
+// A copy that cannot be parsed (no `node:sqlite`, a database that will not open) is compared by the bytes of
+// its store files; null when a file is missing. In memory only.
+function rawFingerprint(layout, dir) {
+  try {
+    const hash = crypto.createHash('sha256');
+    for (const name of layout.files) hash.update(name).update('\u0000').update(fs.readFileSync(path.join(dir, name))).update('\u0001');
+    return `raw:${hash.digest('hex')}`;
+  } catch { return null; }
 }
 
 /**

@@ -5442,7 +5442,7 @@ export function checkCredentialCopiesRetained({
   // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
   // a failure (nothing but the owner or a repair clears it); copies waiting for a renewal are a warning.
   const problems = [
-    ...overLimit.map((a) => `${a.provider}/${a.accountId}: ${a.count} pending login copies, over the limit of ${MAX_PENDING_COPIES}: none could be shown redundant or obsolete, so none was dropped (a dispatch for that account re-checks them; recover the logins by hand if the source stays unreadable)`),
+    ...overLimit.map((a) => `${a.provider}/${a.accountId}: ${a.count} pending login copies waiting, over the limit of ${MAX_PENDING_COPIES} (the limit drops only copies identical to another, never one that may be the only valid login; a dispatch for that account re-checks them, and if the source stays unreadable recover the logins by hand)`),
     ...summarizeByAccount(copies.filter((c) => c.kind !== 'torn'), 'pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'torn'), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
     ...held.map((home) => `${home.provider}/${home.accountId}: private home held after repeated staging failures, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
