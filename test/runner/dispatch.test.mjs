@@ -3043,7 +3043,7 @@ test('the "execute" CLI entry point tees the spawned executor\'s own stdout/stde
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'probe'], { encoding: 'utf8', cwd: repoRoot });
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'probe', '--for', 'execute'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
   // Live-teed chunks from the spawned child arrive on THIS process's own
   // stderr, alongside the pre-existing "fgos: dispatch ..." chokepoint line.
@@ -3073,7 +3073,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFEREN
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--repo-root', repo2.repoRoot],
+    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--repo-root', repo2.repoRoot],
     { encoding: 'utf8', cwd: repo1.repoRoot },
   );
   assert.notEqual(result.status, 0);
@@ -3093,7 +3093,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME p
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--prompt', 'hello', '--repo-root', repoRoot],
+    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--prompt', 'hello', '--repo-root', repoRoot],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
@@ -3114,7 +3114,7 @@ test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires',
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--prompt', 'hello', '--cwd', repo2.repoRoot, '--repo-root', repo2.repoRoot],
+    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--prompt', 'hello', '--cwd', repo2.repoRoot, '--repo-root', repo2.repoRoot],
     { encoding: 'utf8', cwd: repo1.repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
@@ -3134,7 +3134,7 @@ test('dispatch CLI: neither given unchanged, existing default-process.cwd() beha
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'probe', '--prompt', 'hello'],
+    [dispatchPath, 'execute', 'probe', '--for', 'execute', '--prompt', 'hello'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
@@ -3769,7 +3769,10 @@ test('resolveExecutorCommand throws for a non-Claude "cli" executor even when fg
 
 function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
+  // `execute <agent>` names the capability it runs under; every fixture
+  // carries the writing one the CLI tests dispatch with.
+  const capabilities = { execute: { serves: { outputKind: 'change', mutates: true } }, ...cfg.capabilities };
+  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: { ...cfg, capabilities } }, null, 2));
 }
 
 test('executeExecutorCli resolves a cross-provider executor\'s own providerModel through modelForTier, picking that provider\'s model over the default (claude) policy (D9\'s reported agy/Gemini bug)', async () => {
@@ -4505,7 +4508,7 @@ test('the "execute" CLI entry point prints a structured {error,errorClass} JSON 
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'cli-executor', '--prompt', 'x', '--cwd', testCwd],
+    [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt', 'x', '--cwd', testCwd],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.notEqual(result.status, 0);
@@ -4535,7 +4538,7 @@ test('the "execute" CLI entry point self-executes a real adapter-resolvable exec
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--prompt', 'hello-from-cli'], {
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt', 'hello-from-cli'], {
     encoding: 'utf8',
     cwd: repoRoot,
   });
@@ -4562,7 +4565,7 @@ test('the "execute" CLI entry point accepts --prompt-file, overrides --prompt wh
   fs.writeFileSync(promptFilePath, 'content-from-file');
 
   // --prompt-file alone
-  const res1 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--prompt-file', promptFilePath], {
+  const res1 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt-file', promptFilePath], {
     encoding: 'utf8',
     cwd: repoRoot,
   });
@@ -4575,7 +4578,7 @@ test('the "execute" CLI entry point accepts --prompt-file, overrides --prompt wh
   // --prompt-file overriding --prompt when both given
   const res2 = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'cli-executor', '--prompt', 'inline-prompt', '--prompt-file', promptFilePath],
+    [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt', 'inline-prompt', '--prompt-file', promptFilePath],
     {
       encoding: 'utf8',
       cwd: repoRoot,
@@ -4589,7 +4592,7 @@ test('the "execute" CLI entry point accepts --prompt-file, overrides --prompt wh
 
   // nonexistent --prompt-file path producing structured error JSON on stdout with exit code 1
   const badFilePath = path.join(dir, 'nonexistent-prompt-file.txt');
-  const res3 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--prompt-file', badFilePath], {
+  const res3 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--for', 'execute', '--prompt-file', badFilePath], {
     encoding: 'utf8',
     cwd: repoRoot,
   });
@@ -4610,7 +4613,7 @@ test('the "execute" CLI entry point hands back {mechanism:"in-process",...} for 
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'native-executor', '--prompt', 'do it', '--has-live-task-access'],
+    [dispatchPath, 'execute', 'native-executor', '--for', 'execute', '--prompt', 'do it', '--has-live-task-access'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
@@ -5828,7 +5831,7 @@ test('dispatch CLI execute subcommand respects --cwd flag', () => {
     timeoutMs: 5000,
   });
 
-  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--cwd', workerRepo.repoRoot, '--prompt', 'hello'], {
+  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--for', 'execute', '--cwd', workerRepo.repoRoot, '--prompt', 'hello'], {
     encoding: 'utf8',
     cwd: repo.repoRoot,
   });

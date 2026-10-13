@@ -58,7 +58,7 @@ resolves a Run target.
 ```txt
 capability   — abstract behavior promise, resolved through
                runner.capabilities.<capability> (prefer/overrides), then
-               runner.executors.<id>.for[]
+               runner.executors.<id>.for[] (kind "tool" executors only)
 executor-id  — explicit concrete implementation override, naming a
                runner.executors.<id> entry directly
 ```

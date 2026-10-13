@@ -49,8 +49,9 @@ export function resolveCapabilityDetailsFromHints({
 
   const candidateSet = new Set(candidates);
 
-  // Executor declared capabilities (`for: [...]`)
-  if (Array.isArray(resolvedExecutor?.for)) {
+  // A tool executor's declared capabilities (`for: [...]`). An agent executor
+  // declares none: what it does is the dispatch's to say, never inferred here.
+  if (resolvedExecutor?.kind === 'tool' && Array.isArray(resolvedExecutor.for)) {
     for (const f of resolvedExecutor.for) {
       if (typeof f === 'string' && f.trim()) {
         candidateSet.add(f.trim());

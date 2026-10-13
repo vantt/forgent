@@ -839,7 +839,7 @@ test("R6 / F-c: resolver retains a distinct configured anchor for a generic requ
       "generic-fallback": { prefer: "reviewer" },
       "code:review": { confinement: { mode: "required", policy: "host-write-denied" } },
     },
-    executors: { reviewer: { for: ["code:review"] } },
+    executors: { reviewer: { kind: "tool", for: ["code:review"] } },
   };
   const resolvedExecutor = cfg.executors.reviewer;
   const resolution = resolveCapabilityIdentityDetails({
@@ -864,6 +864,15 @@ test("R6 / F-c: resolver retains a distinct configured anchor for a generic requ
   assert.equal(req.requirement.mode, "required");
   assert.equal(req.requirement.policyId, "host-write-denied");
   assert.equal(req.requirement.anchor, "code:review");
+
+  // An agent executor's "for" is never an anchor: the dispatch names its capability.
+  const agentResolution = resolveCapabilityIdentityDetails({
+    cfg,
+    executorId: "reviewer",
+    resolvedExecutor: { kind: "agent", for: ["code:review"] },
+    purpose: "generic-fallback",
+  });
+  assert.equal(agentResolution.anchorCapability ?? null, null);
 });
 
 test("R6 / F-d: establishConfinement returns confined: false, status: unconfined when nothing was confined", async () => {

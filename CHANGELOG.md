@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `fgos dispatch execute <executor> --for <capability>` runs the dispatch under that capability's confinement instead of the strictest one the executor declares, so writing work can go to an executor that also serves read-only review (`execute openai --for execute`). The executor must declare the capability; anything else is refused before spawning. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
+- `fgos dispatch execute <executor> --for <capability>` names the kind of work a dispatch does; the capability, not the executor, sets whether it may change files. `execute <agent>` without `--for` is now refused before spawning with the choices listed, and this door carries writing work only: read-only work goes through `execute --contract <file> --executor <id>`, which leases the account and copies its login into the sandbox. `--timeout-ms` and `--idle-timeout-ms` override the configured timeouts for one call.
+- A `for` list on an agent executor is now ignored (it used to set the posture of every dispatch to that executor); `for` keeps its meaning on `kind: "tool"` executors. `fgos doctor` names each leftover under `executor-profile-warnings` so it can be removed.
 
 ### Changed
 

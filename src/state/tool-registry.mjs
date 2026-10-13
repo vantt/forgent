@@ -99,8 +99,8 @@ export function toolsFromExecutors(executors) {
     // the dispatch registry (kind:"agent", a live persona) with the
     // presence-probe registry (kind:"tool", mechanical, e.g. gitnexus/
     // herdr) this function's own docstring already says are different.
-    // "for" alone was never a safe signal on its own now that both kinds
-    // legitimately declare it.
+    // A "for" on an agent executor is inert everywhere (dispatch ignores it,
+    // doctor flags it), so only kind:"tool" entries ever become tools here.
     if (executor?.kind !== 'tool') continue;
     const rawCapability = Array.isArray(executor?.for) && executor.for.length > 0 ? executor.for[0] : undefined;
     const capability = normalizeCapability(rawCapability);

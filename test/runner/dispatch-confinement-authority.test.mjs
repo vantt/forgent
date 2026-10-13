@@ -697,7 +697,7 @@ test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for
   }
 });
 
-test("MED-3: executor for[] order does not affect capability resolution or required refusal", async () => {
+test("MED-3: a tool executor's for[] order does not affect capability resolution or required refusal", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med3-test-"));
   // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
   // this machine -- see the H1 test above for the full rationale.
@@ -712,6 +712,7 @@ test("MED-3: executor for[] order does not affect capability resolution or requi
       },
       executors: {
         "multi-order-a": {
+          kind: "tool",
           command: "echo",
           adapter: "cli-spawn",
           allowCrossProvider: true,
@@ -728,6 +729,7 @@ test("MED-3: executor for[] order does not affect capability resolution or requi
       },
       executors: {
         "multi-order-b": {
+          kind: "tool",
           command: "echo",
           adapter: "cli-spawn",
           allowCrossProvider: true,

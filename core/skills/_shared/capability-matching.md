@@ -41,6 +41,15 @@ Five valid reasons justify configuring an executor for a capability in project c
 
 An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline.
 
+## Ad-hoc one-shot delegation
+
+Work outside any plan or Workflow that goes to another agent as one prompt and one result needs no workflow, plan or new capability. The calling agent answers Q1 itself, in two decisions:
+
+1. **Does the work change files?** Yes: name a writing capability (`execute` for general work; `code:implement`/`code:refactor` for code) and dispatch `execute <executor> --for <capability>`. No: send it through the Assignment door, `execute --contract <file> [--executor <executor>]` with `"mutation": "read-only"`, which leases the provider account and runs sandboxed with its login. `execute <agent>` without `--for` is refused before spawning, and so is a confined capability on that door.
+2. **Does a specific provider matter?** Only for one of the five reasons above (a stronger or cheaper model, provider diversity, isolation, parallelism). If so, name that executor; otherwise take the executor `decide --for <capability>` returns. Naming an executor on a one-shot call is the one place a caller picks a provider; plans and Units still never pin one.
+
+An agent executor declares no `for`: it can do any kind of work, so the dispatch, not the executor, carries the capability.
+
 ## Architectural boundaries
 
 - **Unit vs. Workflow:** A capability selects an executor or tool for one independent execution unit. A Workflow (or CollaborationPattern) coordinates multi-actor, multi-step collaboration across units.

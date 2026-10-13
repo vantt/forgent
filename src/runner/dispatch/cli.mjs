@@ -261,6 +261,57 @@ export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir })
     : [...args.slice(0, existing + 1), ...directories, ...args.slice(existing + 1)];
 }
 
+function resolveRegisteredCapability(cfg, name) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+  if (Object.hasOwn(capabilities, name)) return name;
+  return Object.keys(capabilities).find((capName) => capabilities[capName]?.aliases?.includes?.(name));
+}
+
+/**
+ * The invocation of `executorId` that runs a dispatch for `capabilityName`, or
+ * undefined to keep the executor's default: the invocation the capability's
+ * `prefer` names for this executor, else the first plain cli invocation that
+ * declares no sandbox backend. A confined capability is refused before
+ * spawning (see below).
+ */
+function selectInvocationForCapability(cfg, executorId, executor, capabilityName) {
+  const capability = cfg.capabilities[capabilityName];
+  if (capability.prefer !== undefined) {
+    const pinned = normalizePreferCandidates(capability.prefer, `capabilities.${capabilityName}.prefer`)
+      .find((candidate) => candidate.executor === executorId && candidate.invocation);
+    if (pinned) return pinned.invocation;
+  }
+  const invocations = Array.isArray(executor?.invocations) ? executor.invocations : [];
+  // A native agent runs inside the caller's own session: nothing is spawned,
+  // so there is no invocation to pick and no login to carry. Its confinement
+  // is settled by the in-process branch of executeExecutorCli.
+  if (executor?.agentType && !executor.command && !executor.adapter && !executor.invocations) return undefined;
+  if (capability.confinement?.mode === 'required') {
+    // This door leases no provider account, so a sandboxed worker would start
+    // without its login (or fail writing a refreshed one). Confined work goes
+    // through the Assignment door, which leases the account and copies its login.
+    throw new DispatchError(
+      'posture-needs-assignment',
+      `"${capabilityName}" runs confined (${capability.confinement.policy ?? 'required'}), which this door cannot do: it leases no provider account, so the sandboxed worker would start without its login. Send read-only work through the Assignment door instead: \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only" in the contract.`,
+      { executorId, capability: capabilityName },
+    );
+  }
+  const unconfined = invocations.find((inv) => inv?.via === 'cli'
+    && inv.adapter !== 'herdr-spawn'
+    && !(inv.confinement ?? executor.confinement)?.backend
+    && inv.id);
+  return unconfined?.id;
+}
+
+function describeCapabilityChoices(cfg, executorId) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+  const writes = Object.entries(capabilities)
+    .filter(([, entry]) => entry?.serves?.mutates && entry.confinement?.mode !== 'required')
+    .map(([name]) => `--for ${name}`);
+  const changes = writes.length ? `Work that changes files: ${writes.join(', ')}. ` : '';
+  return `${changes}Read-only work: \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only".`;
+}
+
 /**
  * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
  * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
@@ -352,6 +403,9 @@ export async function executeExecutorCli(
     // Names which `via:"cli"` invocation of the executor runs (bind() pins the
     // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.
     invocationId,
+    // The CLI door sets this: an agent executor named without `for` is refused
+    // instead of running under a guessed posture.
+    requireCapability = false,
     // The confinement requirement the caller already resolved (an Assignment's
     // posture). Unset leaves it to the capability/invocation declaration.
     requirement,
@@ -447,34 +501,27 @@ export async function executeExecutorCli(
     resolvedExecutor = resolved.executor;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
-    // A caller naming both the executor and the capability states the posture
-    // of the work itself, overriding the strictest-first inference from the
-    // executor's own `for`. It may only name a capability the executor is
-    // declared to serve, so config stays the place that says which postures an
-    // executor accepts.
     if (purpose) {
-      const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
-      const capabilityName = Object.hasOwn(capabilities, purpose)
-        ? purpose
-        : Object.keys(capabilities).find((name) => capabilities[name]?.aliases?.includes?.(purpose));
+      // The work names its capability, and the capability owns the posture.
+      const capabilityName = resolveRegisteredCapability(cfg, purpose);
       if (!capabilityName) {
         throw new DispatchError(
-          'capability-not-served',
+          'capability-not-registered',
           `"${purpose}" is not a registered capability (runner.capabilities)`,
           { executorId: executorIdArg, capability: purpose },
         );
       }
-      const declared = Array.isArray(resolvedExecutor?.for) && resolvedExecutor.for.includes(capabilityName);
-      const prefer = capabilities[capabilityName].prefer;
-      const preferred = prefer !== undefined
-        && normalizePreferCandidates(prefer, `capabilities.${capabilityName}.prefer`).some((candidate) => candidate.executor === realExecutorId);
-      if (!declared && !preferred) {
-        throw new DispatchError(
-          'capability-not-served',
-          `executor "${realExecutorId}" does not serve capability "${capabilityName}" -- add it to executors.${realExecutorId}.for or capabilities.${capabilityName}.prefer`,
-          { executorId: realExecutorId, capability: capabilityName },
-        );
-      }
+      invocationId ??= selectInvocationForCapability(cfg, realExecutorId, resolvedExecutor, capabilityName);
+    } else if (requireCapability && resolved.bindingSource === 'executor-id' && resolvedExecutor?.kind === 'agent') {
+      // An agent executor can do any kind of work, so nothing about it says
+      // whether this dispatch reads or writes. Ask the caller instead of
+      // guessing: a wrong guess either blocks a write minutes into the run or
+      // lets a review write.
+      throw new DispatchError(
+        'capability-required',
+        `execute ${executorIdArg} needs --for <capability>: name the kind of work this dispatch does. ${describeCapabilityChoices(cfg, executorIdArg)}`,
+        { executorId: executorIdArg },
+      );
     }
   }
 
@@ -1464,6 +1511,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         const executed = await executeExecutorCli(executorId, {
           prompt,
           for: flagValue('--for'),
+          requireCapability: true,
           timeoutMs,
           idleTimeoutMs,
           model: flagValue('--model'),

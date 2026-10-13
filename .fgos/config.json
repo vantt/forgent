@@ -689,9 +689,6 @@
               "backend": "bwrap"
             }
           }
-        ],
-        "for": [
-          "advise"
         ]
       },
       "glm": {
@@ -758,10 +755,7 @@
             ]
           }
         ],
-        "providerModel": "z-ai",
-        "for": [
-          "execute"
-        ]
+        "providerModel": "z-ai"
       },
       "gitnexus": {
         "kind": "tool",
@@ -801,11 +795,6 @@
         "description": "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor.",
         "providerModel": "openai",
         "allowCrossProvider": true,
-        "for": [
-          "code:review",
-          "code:debug",
-          "execute"
-        ],
         "invocations": [
           {
             "id": "codex-cli-bypass-fgovn",
@@ -1034,9 +1023,6 @@
         "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account). The account a confined (herdr or bwrap) invocation runs as is chosen per provider by the capacity layer from runner.providers.gemini.accounts (mucdong, tetcu72, tetnu), not by the invocation name.",
         "allowCrossProvider": true,
         "providerModel": "gemini",
-        "for": [
-          "advise"
-        ],
         "invocations": [
           {
             "id": "agy-cli-mucdong",
@@ -1206,10 +1192,6 @@
               }
             ]
           }
-        ],
-        "for": [
-          "review",
-          "code:review"
         ]
       },
       "deepseek": {
@@ -1276,9 +1258,6 @@
               }
             ]
           }
-        ],
-        "for": [
-          "execute"
         ]
       },
       "claude-herdr": {
