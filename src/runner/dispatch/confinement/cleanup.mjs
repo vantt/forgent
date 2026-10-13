@@ -158,6 +158,12 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
   try { fs.rmdirSync(parent); } catch { /* still in use */ }
 }
 
+function markerIsTorn(dirPath) {
+  let raw;
+  try { raw = fs.readFileSync(path.join(dirPath, OWNERSHIP_MARKER_FILE), 'utf8'); } catch { return false; }
+  try { JSON.parse(raw); return false; } catch { return true; }
+}
+
 /**
  * Delete a confinement directory. The one removal every path goes through (the driver's cleanup, the
  * finalizer of a settled dispatch and the orphan reaper), so a login renewed inside a private home is
@@ -173,8 +179,9 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
 export function removeConfinementDir(dirPath, { stopProcesses = false, now = Date.now } = {}) {
   if (stopProcesses) stopProcessesInside(dirPath);
   const marker = readOwnershipMarker(dirPath);
-  // A marker that is there but cannot be read does not prove the home holds no login: leave it alone.
-  if (!marker && fs.existsSync(path.join(dirPath, OWNERSHIP_MARKER_FILE))) {
+  // A marker that is there but is not even valid JSON (a writer died half-way) does not prove the home
+  // holds no login: leave it alone. One that parses but is not ours is the caller's ownership question.
+  if (!marker && markerIsTorn(dirPath)) {
     throw new Error('ownership-marker-unreadable');
   }
   if (marker?.credentialWriteBack !== undefined) {

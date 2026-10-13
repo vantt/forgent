@@ -1388,6 +1388,23 @@ test('after the driver cleanup kept a home, the finalizer with the prepared dige
   } finally { w.cleanup(); }
 });
 
+test('a marker changed by anything other than a failed removal still reads as an ownership mismatch', async () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    const digest = computeSha256Digest(markerOf(dir));
+    extendOwnershipMarker(dir, { pid: 1 }); // a real change to the marker
+    const runDir = path.join(w.tmp, 'run');
+    fs.mkdirSync(runDir, { recursive: true });
+    const result = await finalizeConfinementResources({
+      runDir, launchCommandId: 'launch_1', receipt: { completion: { kind: 'exited' } },
+      descriptor: { resources: [{ kind: 'temporary-directory', pathRef: dir, ownershipMarkerDigest: digest }] },
+    });
+    assert.equal(result.cleanupResult.reason, 'ownership-marker-mismatch');
+    assert.equal(fs.existsSync(dir), true);
+  } finally { w.cleanup(); }
+});
+
 function heldHome(w, opts) {
   const dir = privateHomeWithRenewedLogin(w, opts);
   extendOwnershipMarker(dir, { credentialKept: { attempts: CREDENTIAL_KEEP_MAX_ATTEMPTS, since: new Date(Date.now() - 3 * 24 * HOUR).toISOString(), lastCountedAt: Date.now() - 3 * 24 * HOUR } });
