@@ -1,3 +1,40 @@
+# Latest resume state — Packaging bounded follow-up ready for review
+
+Date: 2026-10-14
+Executor: codex-session:10@2026-10-14
+Session counter: 10
+Documented Packaging executor sessions: 3 (one interrupted, preparation resume, this verdict/rework resume)
+Step: 4 / Packaging-distribution P4 rework
+State: ready-for-review; STOP for independent Lead
+Technical blocker: none within the authorized scope. F6 remains an owner decision, not made here.
+Resume HEAD / independent reports: 09fdd6746
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 77830ba77eb05991d95b005919776ee6254e833b
+Last green D/native proof source: 4cd663e911020e2028252d2be7814a035ae28af6
+Changed content source: fa7f63868c7b046aa6133749c942aa5f4ae87ad9
+This turn commits: 5b1387c7a (early progress), 10e6885e4 (committed verdict application), fa7f63868 (bounded rationale/status notes), 4cd663e91 (native list and pending bindings); the final explicit-path request/verification/progress commit completes this checkpoint.
+Request: review-request-261014-1200-packaging-distribution-followup.md
+Accounting: packaging-followup-accounting.json
+Verification: packaging-followup-verification.json
+
+Applied 395 source ok verdicts through unchanged --apply-review, using exact per-report scratch subsets and original identities; all notes verbatim. Applied 31 successors and 21 native stable heading judgments through existing representations, with exact committed reports. Both identical-unit exception groups retain full membership and record accepted notes verbatim. Merge/A28 acceptances remain conservation evidence. No F6 approval inferred.
+
+All twelve reworks change only the rationale sentence to name relative-link rewrites preserving the destination. The three sampled truth defects (units 2, 26, 28) have labelled sentence-local status notes citing the report's code surfaces. Unit 26's adjacent bootstrap permission and unit 28's repeated implementation-alignment assertion receive the same correction. Original dated design/policy bytes are retained. This changes four files and nine native units, not three additional defects. Three source bindings affected by unit 26 return to pending with approval pins removed; 392 source approvals remain complete-object equal to their committed accepted versions. A whole-shard rebind's unchanged duplicate-digest row was restored only after exact recorded anchor/digest/ancestry equality; it is excluded from re-review.
+
+The bounded request shows all twelve complete source/target units, the three truth units before/current, three source binding consequences, all nine changed native before/current units, full identity/shown-text SHA256s and the six reverse tuple consequences. 407 source rows: 392 reviewed, 15 pending (12 rationale + 3 truth-binding consequences). All 31 successors and 21 prior heading bindings reviewed. Source dispositions unchanged: 399 move, seven defer-with-owner, one partial-carry. Both exception memberships unchanged. A28 list remains 692 eligible units, 686 unchanged tuples and six native tuple changes. Source blobs, prior area trees/approvals, three Agent holds, Host's 12 accepted residuals and all earlier exception groups are preserved.
+
+Fresh both-prior D: exit 0, zero fatal. Fresh scoped E against each prior: expected exit 1, exactly 15 not-reviewed, one partial carry, two exception groups, one pending dropped-001 register and 692 reverse units. Full active inventory/registry tuple equality and every prior known-ID tuple comparison pass: 94,328 pre-review known IDs retained, 94,333 current, five native new block IDs and four shown stable-heading changes. Persisted prior's 93,839 IDs all retained; 93,815 unchanged tuples plus 21 reviewed prior and 3 shown new heading changes; the fourth new heading belongs to the earlier Packaging authoring additions. No missing ID, no identity graft. Agent 488 and Host 588 candidate tuple sets remain exact.
+
+Preservation: zero own allowlist violation with eight existing exemptions; 74 history witnesses, 867 payloads, five frozen files; extractor, authority statuses, reader links and prior closed area trees unchanged. Ratchet/placement pass, candidate findings zero. Tests with env -u CLAUDE_CODE_SESSION_ID: 29/29, zero fail/cancel/skip/todo. GitNexus before each commit reports low risk, zero affected execution processes. No production symbol edited. No full suite, installed-release or gateway claim.
+
+Native scratch: /tmp/fgos-work/packaging-followup/registry.json, 59450050 bytes, SHA256 ff3b8e1ced4306cdb94dfcc943de16f2312c0d36b31889b8347aa96ce8bfa4e3, below 90 MB. Exact before registry retained at registry-before.json; use native carry from the prior digest-bound scratch, never seed reconstruction or graft. Persisted working registry remains unchanged at SHA256 d54faf6eec8e785b33fe5902022f446d0fe25989d90e5316707c1da50e849cd9; it is not published as a batch closure. Full reproduction commands/helper sources are in verification.
+
+F6 proposal, dropped-010 register entry and FLAGGED retention are byte-unchanged. The owner has not accepted the Lead recommendation/amendments; that decision remains outside this turn. The dropped-001 register review and one partial carry remain open for later closure; A33 is Host-only. Historical truth sample remains 3/30 false (10%, not above the stop line); Lead's inability to recompute the exact 629-unit population digest is retained as a limitation, not hidden or self-approved.
+
+STOP. Next action: independent Lead reviews only this bounded follow-up and commits ordinary verdicts for twelve rationale rows and three unit-26 source bindings, plus the three truth fixes / nine native units / six reverse tuples. No new owner question, batch closure, Step 5, promotion, main merge/write, push or rebase. Earlier progress follows intact.
+
+---
+
 # Latest resume state — Packaging verdict application and bounded truth rework
 
 Date: 2026-10-14

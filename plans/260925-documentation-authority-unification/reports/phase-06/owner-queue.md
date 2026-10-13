@@ -299,3 +299,11 @@ Date: 2026-10-14. State: pending independent Lead review; no author verdict or b
 - Two area-qualified implementation-alignment documents stay; the named collision rule and the logged promoted portal diff require review. No physical archive/delete, source hold or new blocking question is authored.
 
 Request: `review-request-261013-2348-packaging-distribution.md`. Next action: Lead's independent ordinary verdicts and truth-sample evidence. Doer stops at this checkpoint.
+
+## Packaging-distribution bounded follow-up queue
+
+Date: 2026-10-14. The first request has committed independent reports at `09fdd6746`; the current boundary is the limited follow-up, not first review.
+
+Applied 395 source ok verdicts, 31 successor verdicts and 21 native heading verdicts with verbatim notes. Twelve rationale-only corrections and the three sampled truth fixes (units 2, 26, 28) are submitted at `review-request-261014-1200-packaging-distribution-followup.md`, including only their three affected source bindings, nine native units and six A28 tuple changes. No new owner question is asked; independent Lead review is the next action.
+
+F6 remains pending owner decision. The Lead recommendation with amendments in `review-4-packaging-truth-f6.md` is advice only; dropped-010, its register entry and FLAGGED retention remain byte-unchanged. The dropped-001 register review and one Packaging partial carry remain open for eventual batch closure; A33 is Host-only. STOP after this bounded request, without closure or promotion.
