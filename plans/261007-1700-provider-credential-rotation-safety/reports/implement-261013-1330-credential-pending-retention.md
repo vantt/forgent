@@ -76,3 +76,7 @@ Source: [code-review-261013-1355-credential-pending-retention-independent.md](co
 - A guard that refused removal for any marker `readOwnershipMarker` rejected broke the existing finalizer test whose marker parses but is not ours. Production code fixed: only a marker that is not valid JSON stops the removal. Test unchanged; a new test shows a really changed marker still gives `ownership-marker-mismatch`.
 - Refresh-ahead no longer imports confinement. It takes an injected `heldHomes` hook (`has`, `settle`) and calls `settle` only while holding the account lock. `createConfinementCredentialRenewal` (`confinement/cleanup.mjs`) builds that hook and is what `dispatch/cli.mjs`, `operation-choice.mjs` and `execution/run.mjs` now pass (they no longer call `createCredentialRenewal` directly). Tests: the hook is called under the lock; no `src/runner/dispatch/provider-*.mjs` has a static or dynamic import of `confinement/` (the pre-change renewal file had 2 matches, so the test is red there).
 - Component boundary: No component-boundary change. The row in `docs/platform/component-boundary.md` (confinement depends on credential renewal, which depends on provider capacity for the account lock) is again exactly true.
+
+### Final suite
+
+Full suite on the commit that inverts the dependency (cf537bad8): 7269 tests, 7194 pass, 0 fail, 0 cancelled, 10 skipped (`env -u CLAUDE_CODE_SESSION_ID npm test`, exit 0).
