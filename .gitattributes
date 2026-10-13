@@ -14,3 +14,10 @@
 # problem tsk-3wq/tsk-2xg already solved for the old layout.
 .fgos/events/*.jsonl merge=union
 
+
+# Installers and shell scripts must be byte-identical on every checkout host:
+# the release publishes one copy and refuses a release whose copies differ, and
+# a CRLF install.sh does not run under sh.
+install.sh text eol=lf
+*.sh text eol=lf
+scripts/install.ps1 text eol=lf

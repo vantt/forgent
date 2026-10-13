@@ -1,0 +1,101 @@
+name: Release assets
+
+# Builds, packages and proves the release assets for every published target.
+# It publishes nothing: release.yml (tag trigger) calls it and owns publishing;
+# release-assets-check.yml and ci.yml call it to prove the same assets without one.
+#
+# Adding a platform is one matrix row here, one row in src/util/release-targets.mjs and
+# in the Rust host_target table, and an installer for it.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Release tag the assets are named for (for example v0.2.0-rc.2). Empty means v<package.json version>-assets-check.
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: assets (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Built on the oldest supported Linux image: a binary links against the glibc of
+          # the machine that built it, and the default image is newer than the distros fgOS runs on.
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: rustup show && cargo --version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve asset version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -eu
+          VERSION="$INPUT_VERSION"
+          if [ -z "$VERSION" ]; then
+            VERSION="v$(node -pe "require('./package.json').version")-assets-check"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Packaging assets as $VERSION for ${{ matrix.target }}"
+
+      - name: Build workspace (release)
+        run: cargo build --release --workspace
+
+      - name: Check glibc ceiling of the shipped binaries
+        if: runner.os == 'Linux'
+        run: scripts/check-glibc-ceiling.sh target/release/fgos target/release/fgctl
+
+      - name: Package release assets
+        run: node scripts/package-release-assets.mjs --version "${{ steps.version.outputs.version }}" --out dist
+
+      - name: External consumer proof (Linux)
+        if: runner.os == 'Linux'
+        run: scripts/ci-external-consumer.sh --assets dist
+
+      - name: External consumer proof (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./scripts/ci-external-consumer.ps1 -Assets dist
+
+      - name: External consumer proof (PowerShell 7)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/ci-external-consumer.ps1 -Assets dist
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ matrix.target }}
+          path: |
+            dist/fgos-*.tar.gz
+            dist/fgctl-*.tar.gz
+            dist/SHA256SUMS
+            dist/install.sh
+            dist/install.ps1
+          if-no-files-found: error
+          retention-days: 14

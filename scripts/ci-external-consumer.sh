@@ -94,46 +94,9 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-# Start local static file server on node:http
-node -e '
-const http = require("node:http");
-const fs = require("node:fs");
-const path = require("node:path");
-const dir = path.resolve(process.argv[1]);
-const files = fs.readdirSync(dir);
-const fgctl = files.find(f => f.startsWith("fgctl-") && f.endsWith(".tar.gz"));
-let ver = "v0.1.0";
-if (fgctl) {
-  const m = fgctl.match(/^fgctl-(.+)-(x86_64-unknown-linux-gnu|\w+-\w+-\w+-\w+)\.tar\.gz$/);
-  if (m) ver = m[1];
-}
-const s = http.createServer((req, res) => {
-  const u = req.url.split("?")[0];
-  if (u === "/releases/latest" || u === "/releases/latest/") {
-    res.writeHead(302, { Location: "/releases/tag/" + ver });
-    res.end();
-    return;
-  }
-  if (u === "/releases/tag/" + ver) {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("ok");
-    return;
-  }
-  const f = path.join(dir, path.basename(u));
-  let st;
-  try { st = fs.lstatSync(f); } catch { st = null; }
-  if (st && st.isFile()) {
-    res.writeHead(200, { "Content-Length": st.size });
-    fs.createReadStream(f).pipe(res);
-    return;
-  }
-  res.writeHead(404);
-  res.end("Not found");
-});
-s.listen(0, "127.0.0.1", () => {
-  fs.writeFileSync(process.argv[2], String(s.address().port));
-});
-' "$ASSETS_DIR" "$PORT_FILE" &
+# Start the local release stand-in (same server the Windows proof uses)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+node "$SCRIPT_DIR/ci-asset-server.mjs" "$ASSETS_DIR" "$PORT_FILE" &
 SERVER_PID=$!
 
 PORT=""
@@ -317,6 +280,15 @@ fi
   PATH="$TEMP_INSTALL_DIR:$PATH" "$FGCTL_BIN" repair
 ) || {
   echo "Step failed: fgctl repair" >&2
+  exit 1
+}
+
+# fgctl verify (release files intact, workspace shims present and current)
+(
+  cd "$TEMP_PROJECT" &&
+  PATH="$TEMP_INSTALL_DIR:$PATH" "$FGCTL_BIN" verify
+) || {
+  echo "Step failed: fgctl verify" >&2
   exit 1
 }
 

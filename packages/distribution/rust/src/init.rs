@@ -7,6 +7,7 @@
 use crate::canonical::canonicalize_manifest_files;
 use crate::lock::check_main_checkout_lock;
 use crate::manifest::{read_manifest_from_dir, ReleaseManifest};
+use crate::shim::{check_workspace_shims, tail_shim_path, write_workspace_shims};
 use crate::store::{
     list_releases, now_millis, quarantine_dir_path, release_dir_path,
     resolve_machine_release_store_root, stage_release, ReleaseStatusEntry, StageOutcome,
@@ -21,44 +22,6 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use std::time::SystemTime;
-
-const SHIM_FGOS_BODY: &str = r#"#!/bin/sh
-# fgOS workspace stable shim -- written by fgctl. Do not hand-edit; run
-# `fgctl repair` to regenerate it.
-set -eu
-self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-activation="$self_dir/../activation.json"
-[ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
-[ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
-[ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
-entry="$release_path/bin/fgos"
-if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
-  entry="${entry}.exe"
-fi
-[ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
-exec "$entry" "$@"
-"#;
-
-const SHIM_FGOS_RUNNER_BODY: &str = r#"#!/bin/sh
-# fgOS workspace stable shim -- written by fgctl. Do not hand-edit; run
-# `fgctl repair` to regenerate it.
-set -eu
-self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-activation="$self_dir/../activation.json"
-[ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
-[ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
-[ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
-entry="$release_path/bin/fgos-runner"
-if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
-  entry="${entry}.exe"
-fi
-[ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
-exec "$entry" "$@"
-"#;
 
 /// Frozen schema version for tracked distribution pins.
 pub const DISTRIBUTION_PIN_SCHEMA_VERSION_V1: u32 = 1;
@@ -188,6 +151,8 @@ pub enum InitError {
     Preflight(String),
     #[error("tail command '{cmd}' failed with status {status}")]
     TailFailed { cmd: String, status: i32 },
+    #[error("{0}")]
+    Fetch(#[from] crate::fetch::FetchError),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
     #[error("json error: {0}")]
@@ -408,9 +373,11 @@ pub fn format_iso8601_utc(time: SystemTime) -> String {
 pub fn resolve_node_path() -> String {
     if let Ok(path_var) = std::env::var("PATH") {
         for dir in std::env::split_paths(&path_var) {
-            let candidate = dir.join("node");
-            if candidate.is_file() {
-                return candidate.to_string_lossy().to_string();
+            for name in ["node", "node.exe"] {
+                let candidate = dir.join(name);
+                if candidate.is_file() {
+                    return candidate.to_string_lossy().to_string();
+                }
             }
         }
     }
@@ -620,15 +587,9 @@ pub fn run_tail(
 
     for cmd_args in commands {
         let cmd_name = cmd_args.join(" ");
-        let mut cmd = if cfg!(windows) {
-            let mut c = Command::new("sh");
-            let p_str = shim_path.to_string_lossy();
-            let clean = p_str.trim_start_matches(r"\\?\").replace('\\', "/");
-            c.arg(clean);
-            c
-        } else {
-            Command::new(shim_path)
-        };
+        // A Windows host runs the `.cmd` form: no `sh` is assumed there.
+        let launcher = tail_shim_path(shim_path, cfg!(windows));
+        let mut cmd = Command::new(launcher);
         cmd.args(&cmd_args).current_dir(workspace_root);
 
         let output = match cmd.output() {
@@ -688,8 +649,108 @@ fn is_release_staged(store_root: &Path, digest: &str) -> bool {
     release_dir_path(store_root, digest).exists()
 }
 
+/// Reads the committed `.fgos/distribution.json` pin. A missing file or one
+/// that does not parse as a pin is "no pin".
+fn read_tracked_pin(distribution_path: &Path) -> Result<Option<TrackedDistributionPin>, InitError> {
+    if !distribution_path.exists() {
+        return Ok(None);
+    }
+    let content = std::fs::read_to_string(distribution_path)?;
+    Ok(serde_json::from_str(&content).ok())
+}
+
+/// Release tags are `v`-prefixed; a pin may hold a bare semantic version (for
+/// example one copied from a release manifest), which names the same release.
+fn normalize_pin_tag(tag: &str) -> String {
+    if tag.starts_with(|c: char| c.is_ascii_digit()) {
+        format!("v{tag}")
+    } else {
+        tag.to_string()
+    }
+}
+
+/// Executes `fgctl init`, choosing the release source by precedence
+/// (`--from` flag > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > the
+/// latest GitHub release) and downloading it first when it is a URL or a
+/// release asset. The download is checksum-verified before it reaches
+/// [`init_workspace`], and its scratch copy is removed when init returns.
+pub fn init_workspace_resolving(
+    start_dir: &Path,
+    inputs: &crate::fetch::SourceInputs,
+    endpoint: &crate::fetch::DownloadEndpoint,
+) -> Result<(), InitError> {
+    use crate::fetch::{choose_source, fetch_release, fetch_url, SourceChoice};
+
+    // Refuse outside a repository checkout before any network traffic.
+    let workspace_root = resolve_workspace_root(start_dir)?;
+    let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))?;
+
+    match choose_source(inputs, pin.is_some()) {
+        SourceChoice::Pinned => {
+            // A pin that records its release tag can be re-acquired on a machine
+            // that has not staged it. A digest-only pin cannot (a digest names no
+            // download), so it keeps the original behavior.
+            let missing_tag = pin.as_ref().and_then(|p| {
+                let runtime = &p.project_runtime;
+                let staged = is_release_staged(
+                    &resolve_machine_release_store_root(),
+                    &runtime.artifact_digest,
+                );
+                runtime.release_version.clone().filter(|_| !staged)
+            });
+            match missing_tag {
+                Some(tag) => {
+                    eprintln!("pinned release {tag} is not staged on this machine; downloading it");
+                    let downloaded = fetch_release(endpoint, Some(&normalize_pin_tag(&tag)))
+                        .map_err(|e| {
+                            InitError::Custom(format!(
+                                "pinned release {tag} could not be downloaded: {e}; pass FGCTL_VERSION=<tag> or FGCTL_FROM=<path | URL> to choose the release yourself"
+                            ))
+                        })?;
+                    eprintln!("downloaded and verified {}", downloaded.origin);
+                    // The pin's digest is checked against what was fetched.
+                    init_workspace_tagged(
+                        start_dir,
+                        Some(&downloaded.tarball),
+                        downloaded.tag.as_deref(),
+                    )
+                }
+                None => init_workspace(start_dir, None),
+            }
+        }
+        SourceChoice::Local(path) => init_workspace(start_dir, Some(&path)),
+        SourceChoice::Url(url) => {
+            eprintln!("downloading {url}");
+            let downloaded = fetch_url(&url)?;
+            init_workspace(start_dir, Some(&downloaded.tarball))
+        }
+        SourceChoice::Release(version) => {
+            let which = version.as_deref().unwrap_or("latest release");
+            eprintln!("no local release given; downloading {which}");
+            let downloaded = fetch_release(endpoint, version.as_deref())?;
+            eprintln!("downloaded and verified {}", downloaded.origin);
+            init_workspace_tagged(
+                start_dir,
+                Some(&downloaded.tarball),
+                downloaded.tag.as_deref(),
+            )
+        }
+    }
+}
+
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
 pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<(), InitError> {
+    init_workspace_tagged(start_dir, from_source, None)
+}
+
+/// [`init_workspace`] plus the release tag the source was downloaded as. A new
+/// pin records that tag (`projectRuntime.releaseVersion`) so a teammate with an
+/// empty machine store can download the same release.
+fn init_workspace_tagged(
+    start_dir: &Path,
+    from_source: Option<&Path>,
+    release_tag: Option<&str>,
+) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
     let workspace_root = resolve_workspace_root(start_dir)?;
 
@@ -704,12 +765,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     let distribution_path = workspace_root.join(".fgos").join("distribution.json");
 
     // Read tracked .fgos/distribution.json if present (R3).
-    let tracked_pin: Option<TrackedDistributionPin> = if distribution_path.exists() {
-        let content = std::fs::read_to_string(&distribution_path)?;
-        serde_json::from_str(&content).ok()
-    } else {
-        None
-    };
+    let tracked_pin = read_tracked_pin(&distribution_path)?;
 
     // Read current activation.json if present (R9 / Reviewer M2).
     let current_activation: Option<WorkspaceActivationBinding> = if activation_path.exists() {
@@ -852,7 +908,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         }
         (None, None) => {
             return Err(InitError::Custom(
-                "--from <source> is required when .fgos/distribution.json is absent".to_string(),
+                "a release source is required when .fgos/distribution.json is absent (--from, FGCTL_FROM or FGCTL_VERSION)".to_string(),
             ));
         }
     };
@@ -948,6 +1004,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         previous_artifact_digest,
         tracked_pin: tracked_pin.as_ref(),
         update_pin: false,
+        release_tag,
         _lock: &_activation_lock,
     })
 }
@@ -961,6 +1018,9 @@ pub struct PublishArgs<'a> {
     pub previous_artifact_digest: Option<String>,
     pub tracked_pin: Option<&'a TrackedDistributionPin>,
     pub update_pin: bool,
+    /// Release tag the candidate was downloaded as; recorded in a newly written
+    /// pin in preference to the manifest's own version.
+    pub release_tag: Option<&'a str>,
     pub _lock: &'a ActivationLockGuard,
 }
 
@@ -982,26 +1042,9 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
     std::fs::create_dir_all(&bin_dir)?;
     std::fs::create_dir_all(installation_dir.join("projections"))?;
 
+    // The sh pair (Linux, macOS, Git Bash) and the .cmd pair (PowerShell, cmd.exe).
     let shim_fgos = bin_dir.join("fgos");
-    let shim_runner = bin_dir.join("fgos-runner");
-
-    std::fs::write(&shim_fgos, SHIM_FGOS_BODY)?;
-    std::fs::write(&shim_runner, SHIM_FGOS_RUNNER_BODY)?;
-
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(&shim_fgos, std::fs::Permissions::from_mode(0o755));
-        let _ = std::fs::set_permissions(&shim_runner, std::fs::Permissions::from_mode(0o755));
-    }
-
-    #[cfg(windows)]
-    {
-        let shim_fgos_cmd = bin_dir.join("fgos.cmd");
-        let shim_runner_cmd = bin_dir.join("fgos-runner.cmd");
-        let _ = std::fs::write(&shim_fgos_cmd, "@sh \"%~dp0fgos\" %*\r\n");
-        let _ = std::fs::write(&shim_runner_cmd, "@sh \"%~dp0fgos-runner\" %*\r\n");
-    }
+    write_workspace_shims(&bin_dir)?;
 
     // Write root.json
     let root_binding = WorkspaceRootBinding {
@@ -1060,7 +1103,9 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
             project_runtime: ProjectRuntimePin {
                 policy: "exact-digest".to_string(),
                 artifact_digest: args.manifest.artifact_digest.clone(),
-                release_version: args.manifest.release_version.clone(),
+                // Only a downloaded release has a tag that can be fetched again;
+                // a local build's own manifest version is not a download name.
+                release_version: args.release_tag.map(str::to_string),
                 channel: None,
                 allow_prerelease: false,
             },
@@ -1304,6 +1349,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         previous_artifact_digest,
         tracked_pin: None,
         update_pin: true,
+        release_tag: None,
         _lock: &lock,
     })
 }
@@ -1456,6 +1502,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         previous_artifact_digest: None,
         tracked_pin: None,
         update_pin: true,
+        release_tag: None,
         _lock: &lock,
     })
 }
@@ -1504,6 +1551,11 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
 
     match verify_result {
         Ok(()) => {
+            // The release is intact; the launchers beside activation.json are
+            // not part of it, so a missing or edited one is reported (fix:
+            // `fgctl repair`) without quarantining a good release.
+            check_workspace_shims(&installation_dir.join("bin"), cfg!(windows))
+                .map_err(InitError::Custom)?;
             println!("verified active release {}", active_digest);
             Ok(())
         }
@@ -1804,5 +1856,12 @@ mod tests {
         assert!(msg.contains("not executable"), "{msg}");
 
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn pin_tags_without_a_leading_v_name_the_v_prefixed_release() {
+        assert_eq!(normalize_pin_tag("0.2.0"), "v0.2.0");
+        assert_eq!(normalize_pin_tag("v0.2.0-rc.1"), "v0.2.0-rc.1");
+        assert_eq!(normalize_pin_tag("nightly"), "nightly");
     }
 }

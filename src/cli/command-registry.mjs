@@ -1451,7 +1451,7 @@ export const COMMAND_REGISTRY = [
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
-    deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init needs --from <source> when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',
+    deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',
   },
   {
     name: 'uninstall',

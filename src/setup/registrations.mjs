@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
+import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
@@ -1587,6 +1588,28 @@ export function checkBwrapAvailable(binary = 'bwrap') {
   }
   return res;
 }
+
+// `fgctl init` shells out to the system `curl` when it downloads a release
+// (no source given, FGCTL_VERSION, or a URL source). A
+// machine that only ever installs from a local path never needs it, so a
+// missing curl is a warning, not a failure.
+export function checkCurlAvailable(binary = 'curl') {
+  try {
+    execFileSync(binary, ['--version'], { stdio: 'ignore' });
+    return { passed: true, message: `${binary} is available on PATH` };
+  } catch (err) {
+    return {
+      passed: true,
+      message: `warning: ${binary} is not usable on PATH (${err.code ?? err.message}); fgctl init cannot download a release -- install curl or pass a local --from path`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'curl-available',
+  description: 'curl resolves on PATH (fgctl init downloads releases through it); a missing curl only blocks the download paths',
+  check: () => checkCurlAvailable(),
+});
 
 registerCheck({
   id: 'bwrap-available',
@@ -4749,18 +4772,18 @@ function checkRustHostBinaryPresent(cwd) {
   }
 }
 
-function checkRustHostTargetSupported() {
-  const approvedTargets = ['x86_64-unknown-linux-gnu'];
-  const isApproved = process.platform === 'linux' && process.arch === 'x64';
-  if (isApproved) {
+export function checkRustHostTargetSupported(platform = process.platform, arch = process.arch) {
+  const approvedTargets = RELEASE_TARGETS.map((t) => t.triple);
+  const target = releaseTargetForHost(platform, arch);
+  if (target) {
     return {
       passed: true,
-      message: 'current platform (x86_64-unknown-linux-gnu) is an approved rust host target',
+      message: `current platform (${target.triple}) is an approved rust host target`,
     };
   }
   return {
     passed: false,
-    message: `current platform (${process.arch}-${process.platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`,
+    message: `current platform (${arch}-${platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`,
   };
 }
 
@@ -5022,7 +5045,7 @@ registerCheck({
 
 registerCheck({
   id: 'rust-host-target-supported',
-  description: 'current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu)',
+  description: 'current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc)',
   check: () => checkRustHostTargetSupported(),
 });
 

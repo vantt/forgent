@@ -3,8 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
+  findRustVersionDrift,
   parseReleaseVersion,
+  updateCargoLockText,
+  updateCargoManifestText,
   updateChangelogText,
   updatePackageJsonText,
   updatePackageLockText,
@@ -90,4 +94,44 @@ test('prepareRelease dry-run validates and reports files without writing them', 
   assert.equal(result.dryRun, true);
   assert.deepEqual(result.changedFiles, ['package.json', 'package-lock.json', 'CHANGELOG.md']);
   assert.equal(fs.readFileSync(path.join(root, 'package.json'), 'utf8'), before);
+});
+
+const CARGO_ROOT = '[workspace]\nmembers = ["apps/fgos"]\n\n[workspace.package]\nversion = "0.1.0"\nedition = "2021"\n\n[workspace.dependencies]\nserde = { version = "=1.0.229" }\n';
+const CARGO_STANDALONE = '[package]\nname = "solo"\nversion = "0.1.0"\nedition = "2021"\n\n[dependencies]\nrand = { version = "0.1.0" }\n';
+const CARGO_LOCK = 'version = 4\n\n[[package]]\nname = "dep"\nversion = "0.1.0"\nsource = "registry+https://example.test/index"\nchecksum = "abc"\n\n[[package]]\nname = "fgos"\nversion = "0.1.0"\ndependencies = [\n "dep",\n]\n';
+
+test('updateCargoManifestText bumps the package/workspace version only, never a dependency version or an inherited one', () => {
+  const root = updateCargoManifestText(CARGO_ROOT, '0.2.0');
+  assert.match(root, /\[workspace\.package\]\nversion = "0\.2\.0"/);
+  assert.match(root, /serde = \{ version = "=1\.0\.229" \}/);
+  const solo = updateCargoManifestText(CARGO_STANDALONE, '0.2.0');
+  assert.match(solo, /name = "solo"\nversion = "0\.2\.0"/);
+  assert.match(solo, /rand = \{ version = "0\.1\.0" \}/);
+  const inherited = '[package]\nname = "app"\nversion.workspace = true\n';
+  assert.equal(updateCargoManifestText(inherited, '0.2.0'), inherited);
+});
+
+test('updateCargoLockText bumps path crates and leaves registry crates alone', () => {
+  const next = updateCargoLockText(CARGO_LOCK, '0.2.0');
+  assert.match(next, /name = "fgos"\nversion = "0\.2\.0"/);
+  assert.match(next, /name = "dep"\nversion = "0\.1\.0"\nsource =/);
+});
+
+test('prepareRelease moves the Rust crate versions with package.json and lists them in the add command', () => {
+  const root = tmpRepo();
+  fs.writeFileSync(path.join(root, 'Cargo.toml'), CARGO_ROOT);
+  fs.writeFileSync(path.join(root, 'Cargo.lock'), CARGO_LOCK);
+  const result = prepareRelease({ repoRoot: root, version: 'v0.2.0', date: '2026-09-18', skipCleanCheck: true });
+  assert.match(fs.readFileSync(path.join(root, 'Cargo.toml'), 'utf8'), /version = "0\.2\.0"/);
+  assert.match(fs.readFileSync(path.join(root, 'Cargo.lock'), 'utf8'), /name = "fgos"\nversion = "0\.2\.0"/);
+  assert.equal(
+    result.nextCommands[0],
+    'git add package.json package-lock.json CHANGELOG.md Cargo.toml Cargo.lock',
+  );
+});
+
+test('the repository Rust crate versions equal package.json (a missed release bump fails here)', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const { version } = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  assert.deepEqual(findRustVersionDrift(repoRoot, version), []);
 });

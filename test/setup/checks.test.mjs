@@ -116,6 +116,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agy-permissions-configured',
       'agy-sub-homes-configured',
       'bwrap-available',
+      'curl-available',
       'main-checkout-guard-warnings',
       'events-compaction-verified',
       'no-stuck-merge-abort',

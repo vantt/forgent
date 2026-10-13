@@ -19,6 +19,10 @@ else
     Linux-x86_64|Linux-amd64)
       TARGET="x86_64-unknown-linux-gnu"
       ;;
+    MINGW*|MSYS*|CYGWIN*)
+      echo "Error: this is a Windows shell. Use install.ps1 from PowerShell instead (see the README Install section)." >&2
+      exit 1
+      ;;
     *)
       TARGET="$OS-$ARCH"
       ;;

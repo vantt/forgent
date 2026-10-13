@@ -13,6 +13,7 @@ fn print_usage_and_exit() -> ! {
     eprintln!("  stage    Stage a release tree into the machine release store");
     eprintln!("  status   Show staged releases in the machine release store");
     eprintln!("  init     Initialize and activate fgOS in a workspace");
+    eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > project pin > latest release");
     eprintln!("  upgrade  Upgrade workspace to a new release candidate");
     eprintln!("  repair   Repair or rollback workspace activation");
     eprintln!("  verify   Verify active release files against manifest");
@@ -125,11 +126,11 @@ fn main() {
             }
         }
         "init" => {
-            let mut from_path: Option<PathBuf> = None;
+            let mut from_path: Option<String> = None;
             let mut i = 2;
             while i < args.len() {
                 if args[i] == "--from" && i + 1 < args.len() {
-                    from_path = Some(PathBuf::from(&args[i + 1]));
+                    from_path = Some(args[i + 1].clone());
                     i += 2;
                 } else {
                     eprintln!("Unknown option: {}", args[i]);
@@ -145,7 +146,9 @@ fn main() {
                 }
             };
 
-            match fgos_distribution::init_workspace(&cwd, from_path.as_deref()) {
+            let inputs = fgos_distribution::fetch::SourceInputs::from_env(from_path);
+            let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
+            match fgos_distribution::init_workspace_resolving(&cwd, &inputs, &endpoint) {
                 Ok(()) => {}
                 Err(err) => {
                     eprintln!("Error: {}", err);

@@ -237,7 +237,11 @@ fn test_native_version_succeeds_with_envelope() {
         .expect("generated_at must be string");
     assert!(gen_at.ends_with('Z'));
     assert_eq!(parsed["data_hash"].as_str().map(|h| h.len()), Some(64));
-    assert_eq!(parsed["data"]["packageVersion"], "0.1.0");
+    let package_json: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(repo_root().join("package.json")).expect("read package.json"),
+    )
+    .expect("package.json must be valid JSON");
+    assert_eq!(parsed["data"]["packageVersion"], package_json["version"]);
     let routes_path =
         repo_root().join("packages/host-runtime/contracts/command-routes.json");
     let routes_str =

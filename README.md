@@ -10,21 +10,90 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 ## Install
 
-Recommended — installs the `fgctl` binary for your machine from the
-[latest GitHub release](https://github.com/vantt/forgent/releases), no
-clone, no npm, no Rust toolchain required:
+fgOS is in alpha. The current alpha is
+[`v0.2.0-rc.2`](https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.2), a
+GitHub pre-release. A pre-release is never "latest", so an alpha is installed by
+naming its tag in `FGCTL_VERSION`. Nothing needs a clone, npm or a Rust
+toolchain: the installer puts one small binary, `fgctl`, on your machine, and
+`fgctl init` downloads and checks the rest.
+
+### Alpha quick start: Linux (x86_64)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
+curl -fsSL https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.sh \
+  | FGCTL_VERSION=v0.2.0-rc.2 sh
+cd your-project                      # an existing git repository
+FGCTL_VERSION=v0.2.0-rc.2 fgctl init
+.fgos/installation/bin/fgos setup    # once per project: config defaults and hooks
+.fgos/installation/bin/fgos doctor
 ```
 
-Then initialize your project. A plain `fgctl init` works only when the project
-already carries a committed `.fgos/distribution.json` pin; for a first install
-pass the release asset:
+`install.sh` puts `fgctl` in `~/.local/bin` (or `FGCTL_INSTALL_DIR`); add that
+directory to `PATH` if the installer says it is missing. The Linux build runs on
+glibc 2.35 and later (Ubuntu 22.04 and newer).
+
+### Alpha quick start: Windows 10 or later (x86_64)
+
+Open PowerShell (no Git Bash, no WSL, no administrator rights):
+
+```powershell
+$env:FGCTL_VERSION = 'v0.2.0-rc.2'
+irm https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.ps1 | iex
+$env:Path = "$env:LOCALAPPDATA\fgos\bin;$env:Path"    # this session only
+cd your-project                      # an existing git repository
+fgctl init
+.\.fgos\installation\bin\fgos.cmd setup
+.\.fgos\installation\bin\fgos.cmd doctor
+```
+
+`install.ps1` installs `fgctl.exe` into `%LOCALAPPDATA%\fgos\bin` (or
+`FGCTL_INSTALL_DIR`), checks the download against the release's `SHA256SUMS` and
+changes nothing on your `PATH`: the `$env:Path` line above covers the current
+session, and the installer prints the command to make it permanent. `fgctl init`
+needs `curl.exe`, which ships with Windows 10 1803 and later. After `fgctl init`,
+put `.fgos\installation\bin` on `PATH` (or call `fgos.cmd` by path); it runs from
+PowerShell and `cmd.exe` alike. `fgctl init` must run inside a git repository, as on Linux.
+
+macOS and Windows on ARM are not supported in this alpha.
+
+### Stable releases and other options
+
+Once a release is not a pre-release, `install.sh` installs it by default, with no
+`FGCTL_VERSION`:
 
 ```bash
-fgctl init --from ./fgos-<version>-x86_64-unknown-linux-gnu.tar.gz
+curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
 ```
+
+and on Windows `irm https://github.com/vantt/forgent/releases/latest/download/install.ps1 | iex`.
+Until the first release newer than `v0.1.0` is stable, "latest" is `v0.1.0`,
+which predates the Windows assets.
+
+Then initialize your project from inside its git repository. A plain
+`fgctl init` uses the release the project's committed `.fgos/distribution.json`
+pins; with no pin it downloads the latest release (through `curl`), checks it
+against the release's `SHA256SUMS`, and installs it. No tarball download by hand:
+
+```bash
+fgctl init
+```
+
+To pick a different release:
+
+```bash
+FGCTL_VERSION=v0.2.0-rc.2 fgctl init         # an exact tag; needed for pre-releases
+FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a local build, build dir, or URL
+fgctl init --from <path-or-URL>              # same as FGCTL_FROM
+```
+
+A download writes its tag into the committed `.fgos/distribution.json`, so a
+teammate who clones the project and runs a plain `fgctl init` gets the same
+release downloaded (and checked) without being told which one.
+
+Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > latest.
+A downloaded release is refused unless its entry in `SHA256SUMS` matches; a URL
+source needs a `SHA256SUMS` file in the same directory. A local path is used as
+is. `FGCTL_ASSET_BASE_URL` redirects downloads to a mirror, as for `install.sh`.
 
 `fgctl init` ends by running `fgos doctor --fix` and `fgos doctor`, which only run
 registered fixes: run `fgos setup` once in the project for the config defaults,
