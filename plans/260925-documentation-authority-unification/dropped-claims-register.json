@@ -500,8 +500,8 @@
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
       "reviewedDisposition": {
-        "decision": "restored",
-        "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "decision": "defer-with-owner",
+        "owner": "Packaging-distribution batch (Step 4)",
         "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
         "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee",
         "reviewStatus": "reviewed",
@@ -514,11 +514,20 @@
         "statusNote": "FLAGGED obsolete installed-default removal clause: package.json retains both npm compatibility entries, and the private payload ownership header expressly permits the compatibility channels. The original clause is retained verbatim below as dated design, not the current contract. fgos-runner remains mapped and the entry ownership header remains present; no locked ownership rule is changed.",
         "flaggedObsolete": true,
         "ownerQueue": true,
-        "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+        "reviewer": "owner",
         "reviewedAt": "2026-10-13",
-        "reviewNote": "Verified: package.json:9-12 still has bin.fgos (bin/fgos.mjs) and bin.fgos-runner; bin/fgos.mjs lines 3-10 carry the ownership header and say global npm bin.fgos and node bin/fgos.mjs remain compatibility channels. AGENTS.md section on the legacy-node boundary says the same. So the clause is obsolete as a current statement. Keeping it byte-literal in a fenced block, headed with a FLAGGED checked status (retained as dated design, not the current contract, no locked rule changed) is the right call: it preserves the claim, does not assert it, and the owner can accept or retire it independently. Recommend recording the supersede link to the checked note in the register decision as the author did; do not delete or rewrite the clause. Nit: the restored text lives in architecture/release-boundaries.md while its source is legacy-cli-transition.md; the register owner was chosen that way and is consistent across register and evidence, so acceptable.",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
-        "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        "reviewNote": "F6: dropped-010 is deferred, not retired. The installed-default npm bin.fgos removal stays an open obligation owned by the Packaging-distribution batch (Step 4), which decides restore or retirement there. The FLAGGED-obsolete verbatim retention in architecture/release-boundaries.md stands until then.",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+        "reviewReportCommit": "371eca2685d030d878e352924835cd1559e09501",
+        "stubOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "stubAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "retainedVerbatim": {
+          "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+          "unitDigest": "f032e46c05cca99a55e4814385f870751420872ac3bffab54a8f425da957b9ee"
+        },
+        "deferralOwnerAnswer": "F6",
+        "deferralReason": "Owner F6: installed-default npm bin.fgos removal remains an open obligation. Packaging-distribution decides restore or retirement; FLAGGED-obsolete verbatim retention stands until then."
       }
     },
     {

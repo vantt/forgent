@@ -1,0 +1,2035 @@
+{
+  "version": 1,
+  "draft": true,
+  "commit": "2b445a90693c6d5e9861a916be3279482f171a18",
+  "description": "Reviewed-row draft only; alias-table.json stays empty. Split document aliases use the area portal; anchor aliases use reviewed carriers and retain partial remainder accounting.",
+  "entries": [
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-001"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#host-invocation-documentation-standardization-plan",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-002"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#migration-status-note",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-003"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#1-goal",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-004"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#2-non-goals",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-005"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#3-hard-migration-rules",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-006"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#4-source-inventory",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-007"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#41-host-invocation-sources",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-008"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#42-cross-area-sources",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-009"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#43-agent-coordination-reference-pattern",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-010"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#5-target-structure",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-011"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#6-required-preservation-ledger",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-012"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#7-target-document-responsibilities",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-013"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#8-migration-phases",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-014"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#81-phase-0-freeze-the-baseline",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-015"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#82-phase-1-create-skeleton-without-rewriting-meaning",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-016"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#83-phase-2-promote-current-legacy-current-state",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-017"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#84-phase-3-promote-architecture",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-018"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#85-phase-4-extract-contracts",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-019"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#86-phase-5-verification-and-implementation-alignment",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-020"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#87-phase-6-redirect-or-retain-legacy-docs",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-021"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#9-agent-coordination-follow-up",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-022"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#10-review-checklist",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-023"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#11-open-questions",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-024"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/documentation-standardization-plan.md#12-related-files",
+      "toOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-025"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "toOwner": "docs/platform/host-invocation-routing/README.md",
+      "toAnchor": null,
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-026"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#external-provider-protocol",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "external-provider-protocol",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-027"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#migration-status-note",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "historical-migration-status-note",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-028"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "1-component-classes",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-029"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "2-invocation-mechanisms",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-030"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#same-process-built-ins-versus-runtime-extensions",
+      "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "toAnchor": "unheaded-block-19",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-031"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#cross-process-cost",
+      "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "toAnchor": "unheaded-block-21",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-032"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "3-component-protocol",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-033"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "4-plugin-registry-linker",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-034"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "5-namespace-rules",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-035"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/external-provider-protocol.md#related-documents",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "toAnchor": "related-documents",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-036"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+      "toOwner": "docs/platform/host-invocation-routing/README.md",
+      "toAnchor": null,
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-037"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#host-invocation-and-provider-routing-architecture",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "host-invocation-and-provider-routing-architecture",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-038"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#migration-status-note",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "historical-migration-status-note",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-039"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#1-architecture-name",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "1-architecture-name",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-040"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#2-problem-and-scope",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "2-problem-and-scope",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-041"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#3-canonical-names",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "3-canonical-names",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-042"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#4-peer-host-use-cases",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "4-peer-host-use-cases",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-043"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "5-core-contracts",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-044"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "6-router-pure-and-invocationservice-pipeline",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-045"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "7-authority-two-stage",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-046"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "8-failure-cancellation-lifecycle-and-human-input",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-047"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "9-physical-placement",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-048"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "10-release-boundaries",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-049"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#11-open-questions",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "11-open-questions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-050"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#related-documents",
+      "toOwner": "docs/platform/host-invocation-routing/spec.md",
+      "toAnchor": "related-documents",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-051"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+      "toOwner": "docs/platform/host-invocation-routing/README.md",
+      "toAnchor": null,
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-052"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#legacy-cli-transition",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "legacy-cli-transition",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-053"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#migration-status-note",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "historical-migration-status-note",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-054"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "1-two-distinct-adapters",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-055"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-056"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "3-command-metadata-and-parser-ownership",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-057"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "4-public-presentation-versus-semantic-outcome",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-058"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "5-rust-host-first-benefit-and-cost",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-059"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/legacy-cli-transition.md#related-documents",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "toAnchor": "related-documents",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-060"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "toOwner": "docs/platform/host-invocation-routing/README.md",
+      "toAnchor": null,
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-061"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "node-to-rust-component-migration",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-062"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#migration-status-note",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "historical-migration-status-note",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-063"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#1-migration-question",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "1-migration-question",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-064"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "2-options-considered",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-065"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "option-a-thin-the-entire-node-host-first",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-066"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-b-rust-host-first-node-as-legacy-provider",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "option-b-rust-host-first-node-as-legacy-provider",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-067"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-c-big-bang-rust-rewrite",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "option-c-big-bang-rust-rewrite",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-068"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#selected-option",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "selected-option",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-069"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#3-why-the-sequence-is-selected",
+      "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "toAnchor": "unheaded-block-43",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-070"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#4-current-migration-readiness",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "4-current-migration-readiness",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-071"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#near-thin-candidates",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "near-thin-candidates",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-072"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#partly-thin-candidates",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "partly-thin-candidates",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-073"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#not-thin-candidates",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "not-thin-candidates",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-074"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#5-release-r1-distributable-rust-cli-host",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "5-release-r1-distributable-rust-cli-host",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-075"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#6-release-r2-external-process-provider-preview",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "6-release-r2-external-process-provider-preview",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-076"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#7-release-r3-production-remote-host",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "7-release-r3-production-remote-host",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-077"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#8-migrate-the-next-small-read-only-proof",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "8-migrate-the-next-small-read-only-proof",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-078"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#gate-bypass",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "gate-bypass",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-079"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#why-ready-is-not-a-first-proof",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "why-ready-is-not-a-first-proof",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-080"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "9-repeat-by-component-boundary",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-081"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "10-migrate-read-models-before-writers",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-082"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "11-migrate-state-writing-components",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-083"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#12-remove-node",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "12-remove-node",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-084"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "13-rollback-rules",
+      "kind": "split",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-085"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#14-verification-gates",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "14-verification-gates",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-086"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md#15-remaining-migration-decisions",
+      "toOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "toAnchor": "15-remaining-migration-decisions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-087"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "toOwner": "docs/platform/host-invocation-routing/README.md",
+      "toAnchor": null,
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-088"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#rust-host-and-proof-providers-implementation-plan",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "rust-host-and-proof-providers-implementation-plan",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-089"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#migration-status-note",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "historical-migration-status-note",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-090"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "1-outcome",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-091"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#2-non-goals",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "2-non-goals",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-092"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#3-decisions-required-before-r1-execution",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "3-decisions-required-before-r1-execution",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-093"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#4-delivery-graph",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "4-delivery-graph",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-094"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#5-p0-lock-release-inputs-and-baseline-inventory",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "5-p0-lock-release-inputs-and-baseline-inventory",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-095"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#deliverables",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "deliverables",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-096"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#scout-evidence",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "scout-evidence",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-097"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-098"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#verify",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "verify",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-099"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "6-p1-compatibility-harness",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-100"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#changed-areas",
+      "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "toAnchor": "unheaded-block-61",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-101"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-102"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#coverage-floor",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "coverage-floor",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-103"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#performance-gates",
+      "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "toAnchor": "unheaded-block-63",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-104"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify",
+      "toOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "toAnchor": "unheaded-block-65",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-105"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#7-p2-rust-workspace-and-generated-inputs",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "7-p2-rust-workspace-and-generated-inputs",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-106"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#target-areas",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "target-areas",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-107"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-1",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-108"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-1",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-109"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#8-p3-invocation-kernel-vertical-slice",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "8-p3-invocation-kernel-vertical-slice",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-110"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#deliverables-1",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "deliverables-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-111"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-2",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-2",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-112"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-2",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-113"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#9-p4-cli-adapter-legacy-exec",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "9-p4-cli-adapter-legacy-exec",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-114"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#deliverables-2",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "deliverables-2",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-115"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-3",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-116"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-3",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify-2",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-117"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#10-p5-native-version",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "10-p5-native-version",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-118"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#deliverables-3",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "deliverables-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-119"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-4",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-120"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-4",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-121"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#11-p6-distribution-and-installed-entry-cutover",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "11-p6-distribution-and-installed-entry-cutover",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-122"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-5",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-123"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-5",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-124"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#12-p7-external-process-provider-preview",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "12-p7-external-process-provider-preview",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-125"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-6",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-126"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-6",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-127"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#13-p8-production-remote-native-route",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "13-p8-production-remote-native-route",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-128"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#steps-7",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "steps-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-129"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#exit-gate-and-verify-7",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "exit-gate-and-verify-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-130"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#14-p9-next-native-read",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "14-p9-next-native-read",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-131"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#15-test-and-review-gates",
+      "toOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "toAnchor": "unheaded-block-16",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-132"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#16-commit-and-rollback-slices",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "16-commit-and-rollback-slices",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-133"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#17-risks-and-controls",
+      "toOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "toAnchor": "unheaded-block-19",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-134"
+    },
+    {
+      "fromPath": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done",
+      "toOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "toAnchor": "18-definition-of-done",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-13",
+      "aliasId": "host-invocation-draft-135"
+    }
+  ],
+  "decisionBindings": [
+    {
+      "aliasId": "host-invocation-draft-001",
+      "claimId": null,
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-002",
+      "claimId": "claim_c44d8d3021e241465f869930b4b9aab8",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-003",
+      "claimId": "claim_f1124cdad699ecc79bea44387b3d1953",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-004",
+      "claimId": "claim_d4b8fa94edeb5c1f1df6948f9652f819",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-005",
+      "claimId": "claim_15c6c55960df29c5a8e1aff46af62c34",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-006",
+      "claimId": "claim_d16ed0ed7a63031dcdebf0d705ca122a",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-007",
+      "claimId": "claim_3681cacef3fd5234588449fbe99aa07e",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-008",
+      "claimId": "claim_68bfb6dfefbd11ba5955e8e23833f5d8",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-009",
+      "claimId": "claim_869d9a19087da4c0ebcb53f60e90f093",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-010",
+      "claimId": "claim_d015081f55b1b80d41cabc07d9e7de36",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-011",
+      "claimId": "claim_1b04e29307da7c5596121a0895c8f8c2",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-012",
+      "claimId": "claim_04976d896f4a24cd9d965c15445f7cc2",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-013",
+      "claimId": "claim_a568c446726169176a2b3eb4c108480c",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-014",
+      "claimId": "claim_ffe45ab21be39799cc8b27234fa44898",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-015",
+      "claimId": "claim_8f953d9d90d0d2a7a425be559ab4756a",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-016",
+      "claimId": "claim_a42ff22029685836bd1978fd836502c6",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-017",
+      "claimId": "claim_47d77b46afdd231a2ea178d16add7e0b",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-018",
+      "claimId": "claim_9ac9d9e7d56a60bc49add3df2411df46",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-019",
+      "claimId": "claim_aab75422b06f2493a911b76279b4d071",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-020",
+      "claimId": "claim_effef075c0b501ca23d2eea59acd3fe8",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-021",
+      "claimId": "claim_c520da3db22e42efe9335409c782b678",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-022",
+      "claimId": "claim_fc28821592f1f50afa79682457bca275",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-023",
+      "claimId": "claim_ae32c505d4e0cd37ba53ed4b44c43889",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-024",
+      "claimId": "claim_149c34df047e6308a6797355af2ce23c",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-025",
+      "claimId": "claim_f8a729a966cef8804807fdc0fad3e4f3",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-026",
+      "claimId": null,
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-027",
+      "claimId": "claim_f2da6bf482131501faac8d716a4dcb44",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-028",
+      "claimId": "claim_4a49679c5f81a5e86ab79f533fcf3470",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-029",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** \u2014 required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** \u2014 owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)."
+    },
+    {
+      "aliasId": "host-invocation-draft-030",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** \u2014 a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** \u2014 an independently installed, language-neutral plugin reached through persistent framed RPC (\u00a73). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** \u2014 a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)."
+    },
+    {
+      "aliasId": "host-invocation-draft-031",
+      "claimId": "claim_6ac894a939b9efb6725758fd6c4eb039",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-032",
+      "claimId": "claim_d03d06ad4a63b00a87a934ab594587c9",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-033",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper)."
+    },
+    {
+      "aliasId": "host-invocation-draft-034",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker is retained verbatim at docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32 (claim_08172f75766eb1d002d4cba2669f9bbd; The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; veri); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33 (claim_7e15be77fb7c4bff223728491df3e212; Its complete input/output physics:); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34 (claim_0f401249972ad0ce465e24e0932a2834; ```txt authored OperationCatalog + built-in provider descriptors + transitional CLI-compatibility bindings + validated external manifest dec)."
+    },
+    {
+      "aliasId": "host-invocation-draft-035",
+      "claimId": "claim_085be633814f3655a406c6a9c130d686",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-036",
+      "claimId": "claim_28d176804d2f5580604186adabcfcf90",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-037",
+      "claimId": null,
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-038",
+      "claimId": "claim_7deac467807f8e5aa9de52228dee00e5",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-039",
+      "claimId": "claim_a4351841ba59f20ec7938e5b1ea38f66",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-040",
+      "claimId": "claim_d23d47b9e725baca5de150afd215e059",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-041",
+      "claimId": "claim_2a889b8deba739f9461cd029f6005746",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-042",
+      "claimId": "claim_b5732dff8040a7546417569031da6864",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-043",
+      "claimId": "claim_2cea6c9894af01708d0ccadbe6e3700d",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-044",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24 (claim_bbaec409dcbaee8f33968727aa0abed5; **Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range )."
+    },
+    {
+      "aliasId": "host-invocation-draft-045",
+      "claimId": "claim_bf4e1d2585b99572e186d3a65714ca44",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-046",
+      "claimId": "claim_ac4f722cb56e970753490a07e2043811",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-047",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41 (claim_75c780a31188a0fa1e19d03ccbd3b6b1; ```txt received -> admitted | admission-refused -> selected | selection-refused -> granted | grant-refused -> dis); docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43 (claim_e365a92a236aa909b9148185aa8f0801; For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never i)."
+    },
+    {
+      "aliasId": "host-invocation-draft-048",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat)."
+    },
+    {
+      "aliasId": "host-invocation-draft-049",
+      "claimId": "claim_851ddbaa6bc2c6725489d33799bd26f5",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-050",
+      "claimId": "claim_f68e3c4f62dca2243859372c4b1029cf",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-051",
+      "claimId": "claim_8494129121a2674191af910332dc4502",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-052",
+      "claimId": null,
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-053",
+      "claimId": "claim_06ed1e74e28e628d68ae28927e3f14cb",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-054",
+      "claimId": "claim_b4f3b7bbb0174373a63a66c57c4f3078",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-055",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 (claim_7046eb56f67c02ef82f621a3fa30286c; Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a compone)."
+    },
+    {
+      "aliasId": "host-invocation-draft-056",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` )."
+    },
+    {
+      "aliasId": "host-invocation-draft-057",
+      "claimId": "claim_98683c6667ec64317c110eb4fe42da11",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-058",
+      "claimId": "claim_fc3eb11aedf895901962ef5e70f26de4",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-059",
+      "claimId": "claim_b74991659ee3db4cb630f607d065ce52",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-060",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-061",
+      "claimId": null,
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-062",
+      "claimId": "claim_14f599ac6c6af84bcd15a503faaaea03",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-063",
+      "claimId": "claim_6275bba15f3262cd1adb35973216a47d",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-064",
+      "claimId": "claim_416ff7a5bcd064e885b8fd36a8a1236f",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-065",
+      "claimId": "claim_c66daabdf8cd04e568de890f07b21c27",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-066",
+      "claimId": "claim_aec6fb3d8eed3c772ec8bac9808009d3",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-067",
+      "claimId": "claim_f03a714ee76799cf8da8475e40245815",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-068",
+      "claimId": "claim_4862726f445bfdcba1b58996cf47dfd8",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-069",
+      "claimId": "claim_d3350f1f59df99f9dfa937d5ea894de4",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-070",
+      "claimId": "claim_5b0f65a4cc7366113339fc3a47d9eded",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-071",
+      "claimId": "claim_de06d5be825c0a46599c25f4b5f41b0d",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-072",
+      "claimId": "claim_bb89ed52536b1289401a9172c85ec599",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-073",
+      "claimId": "claim_bf3d7167dae0b1afb1dbded1c3a1b910",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-074",
+      "claimId": "claim_57e68cea3f9bf4d66fc048f02f59383d",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-075",
+      "claimId": "claim_9856db4ff1c2d562e95ff0786f823389",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-076",
+      "claimId": "claim_fa0f4a4233cf24cffd3756f14d6e0ad6",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-077",
+      "claimId": "claim_6837def654317a6834bd8353f3d62683",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-078",
+      "claimId": "claim_1e2e21550762c240e9cdd8798da86400",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-079",
+      "claimId": "claim_8e655426dff7dfaa26b546b3bcc8a45e",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-080",
+      "claimId": "claim_18f1c32a71e8c60bca41d1d3284f18a2",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-081",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44 (claim_9f2283b25ef4be9f0e68b4381f1ce08e; For each subsequent component:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45 (claim_abc80009ab1bf59c40a645089fbc82fd; 1. Read [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md) and name responsibility, semantic ope)."
+    },
+    {
+      "aliasId": "host-invocation-draft-082",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49 (claim_99bf6932b3f44681c138edf8384d652b; Sequence it internally:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50 (claim_056d11e86ef88989c436bc14a24997a1; 1. event/schema decode fixtures; 2. deterministic replay fixtures; 3. domain/stage projection fixtures; 4. frontier calculation fixtures; 5.)."
+    },
+    {
+      "aliasId": "host-invocation-draft-083",
+      "claimId": "claim_b31f86388112e9f8aac5f3ea07c83bd5",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-084",
+      "claimId": "claim_acf1156543b8ec7d86e7b4e009201170",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-085",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef)."
+    },
+    {
+      "aliasId": "host-invocation-draft-086",
+      "claimId": "claim_5d6afe6b9aac75dd4fb323e2a866d837",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-087",
+      "claimId": "claim_f3092763d47af8fa8eaffec73ca0fe63",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-088",
+      "claimId": null,
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-089",
+      "claimId": "claim_15bf45a3b2bdf1083bc63a6f10d14e82",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-090",
+      "claimId": "claim_d4b9b2583e0b4b598a7610af9ced7d36",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-091",
+      "claimId": "claim_43c25aed966fdb607de17ca47cbce862",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-092",
+      "claimId": "claim_e8dfeedeba14914888b827064f151fa9",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-093",
+      "claimId": "claim_ab778e44a43171006f82c08d9939dcf5",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-094",
+      "claimId": "claim_53de40a0d6f29ad5ad76589e0a7df776",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-095",
+      "claimId": "claim_2ed84857b662413aec52b94409440707",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-096",
+      "claimId": "claim_c3affbd60bf0454d48b3666cdd79c6d4",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-097",
+      "claimId": "claim_ea3616daf5f3ce20345689c0f5513e44",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-098",
+      "claimId": "claim_2158185ee753c7a808c309de30cae3ec",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-099",
+      "claimId": "claim_1f4be3dfcd0e9431ceab5059ceed6633",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-100",
+      "claimId": "claim_3c202991304027e73ce867fadfd87175",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-101",
+      "claimId": "claim_89e8b193eb339f06478bf6998576080c",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-102",
+      "claimId": "claim_8fe84caa90063489ae91b4524baab644",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-103",
+      "claimId": "claim_fc22ecebfdc6e506475e638d1ba86920",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-104",
+      "claimId": "claim_5c200f279a9c0fcf20b7df169781b026",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-105",
+      "claimId": "claim_dce9740dd9f04988dc3d1ffc4c1069d5",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-106",
+      "claimId": "claim_7bcefee6ff2cdb9278b506d5893547f9",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-107",
+      "claimId": "claim_6dc943f5835fe7eef52790b415a67475",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-108",
+      "claimId": "claim_34b17a8d6492f2d4be87cb3e6dd2a593",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-109",
+      "claimId": "claim_b11ef4abc110ba22303eb3f025541600",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-110",
+      "claimId": "claim_d05c662260e9d5128581fc96a66c06d2",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-111",
+      "claimId": "claim_8f36febbbef5a0b00318aa552d8ba677",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-112",
+      "claimId": "claim_4ab3e6e21afab0c12743395ae708c75d",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-113",
+      "claimId": "claim_52f5747b1cfac5ba88f2842044cf65c2",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-114",
+      "claimId": "claim_c365039c0ed792fe357dc32da00152d3",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-115",
+      "claimId": "claim_b4ee57b972d9fdd779cc2d35ed472925",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-116",
+      "claimId": "claim_d71514962368cda1b73909568d6a28a9",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-117",
+      "claimId": "claim_6658f5892f1b4e7dc4004664844953ee",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-118",
+      "claimId": "claim_70ebd393b20048105ee2d61ba1b80340",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-119",
+      "claimId": "claim_bf701b781e21f7713e78936e64426dbe",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-120",
+      "claimId": "claim_91db470727c7581589d7f5db966832d4",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-121",
+      "claimId": "claim_f169b920f8e2999c9c22629b72ed863a",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-122",
+      "claimId": "claim_a79713a60f70e2b2c71c26a4a0982b65",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-123",
+      "claimId": "claim_a75423d87fabcab32bdaba2f464b3881",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-124",
+      "claimId": "claim_4c0106ddaba03877864b6ae2abb98c73",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-125",
+      "claimId": "claim_2aa069b8a259de3dda82fc48c4d48324",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-126",
+      "claimId": "claim_c371125b0a8a3ecdf03a2fdfbdea9290",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-127",
+      "claimId": "claim_f78bf014e8a8b9db8499245ad280594e",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-128",
+      "claimId": "claim_336d6a1de7dfd1440b2165423909e544",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-129",
+      "claimId": "claim_4951927a0e6f131730d27ccdc6440e06",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-130",
+      "claimId": "claim_95fde7454b1d6cc39c22b450f21f72d1",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-131",
+      "claimId": "claim_cbdba798349c777e7f15979d300e0142",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-132",
+      "claimId": "claim_ca69fde84ef390b737cc841f2e0722f8",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-133",
+      "claimId": "claim_c245c752125bfa748075cb620216e537",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-134",
+      "claimId": "claim_245edf82638eebaa26df985249540c8c",
+      "remainder": null
+    },
+    {
+      "aliasId": "host-invocation-draft-135",
+      "claimId": "claim_a264e3ef292f50c6f56a33929e6b8db5",
+      "remainder": null
+    }
+  ]
+}

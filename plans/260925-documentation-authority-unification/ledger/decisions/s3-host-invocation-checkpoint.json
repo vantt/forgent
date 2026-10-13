@@ -1978,17 +1978,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "targetAnchor": "2-invocation-mechanisms",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Named blocks 12, 14, 15, 16, 17 verified verbatim at release-boundaries restored-class-definitions and the retained enum-covers paragraph is in place; links resolve. Rationale also lists the same-process anchor as holding this unit remainder, which is over-listed (see concerns), no text lost.",
+      "reviewNote": "Rationale now names only release-boundaries#restored-class-definitions. Verified: the heading anchor exists there and the rust enum fence plus Built-In, External Process, External WebAssembly and native-dynamic-library paragraphs (blocks 12, 14-17) are verbatim in it; the enum-covers paragraph stays in the primary target; the same-process anchor no longer appears in rationale or remainder. Prior nit resolved.",
       "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
       "targetAncestry": [
         "Architecture: External Provider Protocol",
         "Retained selected source material",
         "External Provider Protocol"
-      ]
+      ],
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
     },
     {
       "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
@@ -4644,16 +4649,21 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "3-command-metadata-and-parser-ownership",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"## 3. Command Metadata And Parser Ownership\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#3-command-metadata-and-parser-ownership. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Move holds on conservation: heading kept, first paragraph is verbatim in component-protocol restoration (second fence of both-adapters anchor) and paragraphs 2 and 3 retained; link resolves. Generic move rationale says all wording retained although paragraph 1 relocated (see concerns).",
+      "reviewNote": "Rationale now says heading and remaining text stay in place, the relocated body is verbatim at component-protocol#restored-both-adapters-delegate-a-complete-use-case, and the row does not claim all body wording remains in place. Verified: source paragraph 1 is in that anchor, paragraphs 2 and 3 are in the primary target. Prior nit resolved.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5f052dc9bcfe273204107b49849e79b3a8141978a4dae163b80ce1197be4dc52",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
         "Legacy CLI Transition"
-      ]
+      ],
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
     },
     {
       "claimId": "claim_7f7b3ba83bbde945cdd80d479b9d0b19",
@@ -4831,16 +4841,21 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "5-rust-host-first-benefit-and-cost",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"## 5. Rust Host First: Benefit And Cost\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rust-host-first-cost and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Conservation holds: first paragraph retained, cost paragraph verbatim in component-protocol restored-rust-host-first-cost; link resolves. Generic move rationale says all wording retained although the cost paragraph relocated (see concerns).",
+      "reviewNote": "Rationale now names component-protocol#restored-rust-host-first-cost as the relocated body and drops the all-wording-retained claim. Verified: the cost paragraph is verbatim in that anchor and the first paragraph stays in the primary target. Prior nit resolved.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7504e7fd27fa2de1f5b1e486ab3e7efff0e956e57f789c7363feeec37b581856",
       "targetAncestry": [
         "Architecture: Legacy CLI Transition",
         "Retained selected source material",
         "Legacy CLI Transition"
-      ]
+      ],
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
     },
     {
       "claimId": "claim_039865ac614bd07bd3b1f00f89e39441",
@@ -4934,15 +4949,20 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "node-to-rust-component-migration",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"# Node To Rust Component Migration\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#node-to-rust-component-migration. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-scope and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Conservation holds: status lines retained; scope paragraph verbatim in release-boundaries restored-scope; link resolves. Added historical-note block is labelled and supersedes the legacy-current note. Move rationale over-states retention (see concerns).",
+      "reviewNote": "Rationale now names release-boundaries#restored-scope as the relocated body and drops the over-statement. Verified: the scope paragraph (This document discusses only migration options...) is verbatim in that anchor; the Status line stays in the primary target. Prior nit resolved.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "73142a367bf579e3afc2da330169ae1b04b7a9b758a33a9b8be857aca2e85373",
       "targetAncestry": [
         "Architecture: Node To Rust Migration",
         "Retained selected source material"
-      ]
+      ],
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
     },
     {
       "claimId": "claim_95f304c1b827f4b6f1d5070a006051bb",
@@ -5190,17 +5210,22 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "option-a-thin-the-entire-node-host-first",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"### Option A: Thin The Entire Node Host First\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-a-thin-the-entire-node-host-first. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Option A diagram and rationale verbatim in component-protocol restored-rejected-options-rationale (first two fences); labelled live link replaces the old dead pointer and resolves. Move rationale over-states retention (see concerns).",
+      "reviewNote": "Rationale now names component-protocol#restored-rejected-options-rationale. Verified: the Option A diagram fence and rationale paragraph are verbatim in that anchor; heading stays in place. Prior nit resolved.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0ebcb1ec37ffe2db3ea182a170b3ae2810f710cda67beecf0045f491c2b08e73",
       "targetAncestry": [
         "Architecture: Node To Rust Migration",
         "Retained selected source material",
         "Node To Rust Component Migration",
         "2. Options Considered"
-      ]
+      ],
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
     },
     {
       "claimId": "claim_38ab2fca27e14c583debbe4bd42386c9",
@@ -5315,17 +5340,22 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "option-c-big-bang-rust-rewrite",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"### Option C: Big-Bang Rust Rewrite\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-c-big-bang-rust-rewrite to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-c-big-bang-rust-rewrite. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Option C diagram and rationale verbatim in component-protocol restored-rejected-options-rationale (fences three and four); labelled live link resolves. Move rationale over-states retention (see concerns).",
+      "reviewNote": "Rationale now names component-protocol#restored-rejected-options-rationale. Verified: the Option C diagram fence and rationale paragraph are verbatim in that anchor; heading stays in place. Prior nit resolved.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-followup-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2c60584c5c5e535249c603a1e98ede6c6497204f5e1880f44cf3a8fb0ad00a05",
       "targetAncestry": [
         "Architecture: Node To Rust Migration",
         "Retained selected source material",
         "Node To Rust Component Migration",
         "2. Options Considered"
-      ]
+      ],
+      "reviewReportCommit": "2b445a90693c6d5e9861a916be3279482f171a18"
     },
     {
       "claimId": "claim_2f8cc2098b8aab83a7d7442cc88028a8",
