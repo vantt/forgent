@@ -398,8 +398,9 @@ function ompEntries(db) {
 const ompLayout = {
   name: 'omp-agent-db',
   files: ['agent.db'],
-  // Written beside the store while it is open; a login renewed after the last checkpoint lives only here.
-  sidecars: ['agent.db-wal'],
+  // Written beside the store while it is open (write-ahead log, or rollback journal in another mode); a login
+  // renewed after the last checkpoint lives only here. The shared-memory index (`-shm`) carries no data.
+  sidecars: ['agent.db-wal', 'agent.db-journal'],
   read(home, { loadSqlite }) {
     const file = path.join(home, 'agent.db');
     try {
@@ -462,12 +463,15 @@ const ompLayout = {
     const destination = path.join(stagingDir, 'agent.db');
     if (snapshotSqliteFile(path.join(copyHome, 'agent.db'), destination, { loadSqlite })) return;
     // No snapshot (the module is unavailable, or the file cannot be opened): the files as they are, write-ahead
-    // log included. The pane's processes are already stopped, so nothing is writing to them.
-    for (const suffix of ['', '-wal', '-shm']) {
+    // log and rollback journal included. The pane's processes are already stopped, so nothing is writing to them.
+    for (const suffix of ['', '-wal', '-journal', '-shm']) {
       const from = path.join(copyHome, `agent.db${suffix}`);
-      if (!fs.existsSync(from)) {
-        if (suffix === '') throw new Error('stage-failed');
-        continue;
+      try {
+        fs.statSync(from);
+      } catch (err) {
+        // Only a file that is not there is skipped; one that cannot be looked at fails the staging.
+        if (err?.code === 'ENOENT' && suffix !== '') continue;
+        throw new Error('stage-failed');
       }
       fs.copyFileSync(from, `${destination}${suffix}`);
       fs.chmodSync(`${destination}${suffix}`, 0o600);
@@ -569,22 +573,28 @@ const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpe
 // be read for a reason that may pass, or the source cannot say (it cannot be read, or its entry cannot be
 // identified and the copy holds a refresh token the source does not). Undetermined copies are staged
 // rather than dropped.
-// The bytes of a layout's non-empty sidecar files in `dir` (a zero-byte one counts as absent), by name.
+// The non-empty sidecar files of a layout in `dir`, by name: `{found: [[name, bytes]], unreadable}`. A zero-byte
+// file, or one that is not there (ENOENT), counts as absent; any other read error (permissions, I/O, a
+// directory) means nothing can be said about it, and callers must not conclude anything from a copy like that.
 function sidecarBytes(layout, dir) {
   const found = [];
+  let unreadable = false;
   for (const name of layout.sidecars ?? []) {
     try {
       const bytes = fs.readFileSync(path.join(dir, name));
       if (bytes.length > 0) found.push([name, bytes]);
-    } catch { /* absent */ }
+    } catch (err) {
+      if (err?.code !== 'ENOENT') unreadable = true;
+    }
   }
-  return found;
+  return { found, unreadable };
 }
 
 function filesIdentical(layout, sourceHome, copyHome) {
-  // A login renewed after the last checkpoint sits in the write-ahead log, not in the main file: a copy or a
-  // source with one cannot be shown identical by its main file alone.
-  if (sidecarBytes(layout, copyHome).length > 0 || sidecarBytes(layout, sourceHome).length > 0) return false;
+  // A login renewed after the last checkpoint sits in the log or journal, not in the main file: a copy or a
+  // source with one (or one that cannot be read) cannot be shown identical by its main file alone.
+  const sides = [sidecarBytes(layout, copyHome), sidecarBytes(layout, sourceHome)];
+  if (sides.some((side) => side.unreadable || side.found.length > 0)) return false;
   try {
     return layout.files.every((name) => {
       const a = path.join(sourceHome, name);
@@ -715,7 +725,9 @@ function rawFingerprint(layout, dir) {
   try {
     const hash = crypto.createHash('sha256');
     for (const name of layout.files) hash.update(name).update('\u0000').update(fs.readFileSync(path.join(dir, name))).update('\u0001');
-    for (const [name, bytes] of sidecarBytes(layout, dir)) hash.update(name).update('\u0000').update(bytes).update('\u0001');
+    const sidecars = sidecarBytes(layout, dir);
+    if (sidecars.unreadable) return null;
+    for (const [name, bytes] of sidecars.found) hash.update(name).update('\u0000').update(bytes).update('\u0001');
     return `raw:${hash.digest('hex')}`;
   } catch { return null; }
 }

@@ -1737,6 +1737,95 @@ test('unparsable pending copies are identical only when the write-ahead log is i
   assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME' }, ...padding]), 8, 'a log against none: both stay');
 });
 
+// Files beside a store: bytes, or the marker DIR for a directory of that name (a read error that is not
+// "no such file", whoever runs the test).
+function putSidecar(dir, name, content) {
+  const target = path.join(dir, name);
+  if (content === 'DIR') fs.mkdirSync(target, { recursive: true });
+  else fs.writeFileSync(target, content);
+}
+
+test('a sidecar that cannot be read is never taken for an absent one: the copy is not judged identical and is kept', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    for (const name of ['agent.db-wal', 'agent.db-journal']) {
+      const dir = ompPaneHome(w, `disp_unreadable_${name}`);
+      putSidecar(dir, name, 'DIR');
+      const result = writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null });
+      assert.deepEqual(result, { status: 'failed', code: 'stage-failed', keepHome: true }, name);
+      assert.equal(fs.existsSync(dir), true);
+    }
+    if (typeof process.getuid === 'function' && process.getuid() !== 0) {
+      const dir = ompPaneHome(w, 'disp_unreadable_mode', 'FAKE-WAL-BYTES');
+      fs.chmodSync(path.join(dir, 'agent.db-wal'), 0o000);
+      const result = writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null });
+      assert.equal(result.keepHome, true, 'a log that cannot be read keeps the home');
+    }
+  } finally { w.cleanup(); }
+});
+
+test('pending copies with a sidecar that cannot be read are never taken for identical', () => {
+  const run = (sidecar) => {
+    const w = workspace();
+    try {
+      const dir = privateOmpHomeWithRenewedLogin(w);
+      const pending = path.join(w.accountDir, 'pending');
+      ['SAME', 'SAME', 'D1', 'D2', 'D3', 'D4', 'D5'].forEach((db, i) => {
+        const copy = path.join(pending, `00000000000000${i + 1}-a`);
+        fs.mkdirSync(copy, { recursive: true });
+        fs.writeFileSync(path.join(copy, 'agent.db'), db);
+        if (i < 2) putSidecar(copy, sidecar, 'DIR');
+      });
+      assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+      return pendingNames(w).length;
+    } finally { w.cleanup(); }
+  };
+  assert.equal(run('agent.db-wal'), 8);
+  assert.equal(run('agent.db-journal'), 8);
+});
+
+test('a rollback journal counts like a write-ahead log, and the shared-memory index counts for nothing', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    const withJournal = ompPaneHome(w, 'disp_journal');
+    putSidecar(withJournal, 'agent.db-journal', 'FAKE-JOURNAL-BYTES');
+    assert.equal(writeBackRenewedCredential(withJournal, markerOf(withJournal), { loadSqlite: () => null }).status, 'staged');
+    const staged = pendingNames(w);
+    assert.equal(staged.length, 1);
+    assert.equal(fs.readFileSync(path.join(w.accountDir, 'pending', staged[0], 'agent.db-journal'), 'utf8'), 'FAKE-JOURNAL-BYTES', 'staging keeps the journal');
+
+    const withIndex = ompPaneHome(w, 'disp_shm');
+    putSidecar(withIndex, 'agent.db-shm', 'FAKE-SHM-BYTES');
+    assert.deepEqual(writeBackRenewedCredential(withIndex, markerOf(withIndex), { loadSqlite: () => null }), { status: 'unchanged' }, 'an index file changes nothing');
+    assert.equal(pendingNames(w).length, 1);
+  } finally { w.cleanup(); }
+});
+
+test('pending copies differ by journal but not by shared-memory index', () => {
+  const run = (specs) => {
+    const w = workspace();
+    try {
+      const dir = privateOmpHomeWithRenewedLogin(w);
+      const pending = path.join(w.accountDir, 'pending');
+      specs.forEach(({ db, files }, i) => {
+        const copy = path.join(pending, `00000000000000${i + 1}-a`);
+        fs.mkdirSync(copy, { recursive: true });
+        fs.writeFileSync(path.join(copy, 'agent.db'), db);
+        for (const [name, content] of Object.entries(files ?? {})) putSidecar(copy, name, content);
+      });
+      assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+      return pendingNames(w).length;
+    } finally { w.cleanup(); }
+  };
+  const padding = ['D1', 'D2', 'D3', 'D4', 'D5'].map((db) => ({ db }));
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-journal': 'J1' } }, { db: 'SAME', files: { 'agent.db-journal': 'J2' } }, ...padding]), 8, 'different journals: both stay');
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-journal': 'J1' } }, { db: 'SAME', files: { 'agent.db-journal': 'J1' } }, ...padding]), 7, 'same journal: one goes');
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-shm': 'S1' } }, { db: 'SAME', files: { 'agent.db-shm': 'S2' } }, ...padding]), 7, 'different index files: still identical');
+  assert.equal(run([{ db: 'SAME', files: { 'agent.db-shm': 'S1' } }, { db: 'SAME' }, ...padding]), 7, 'an index file against none: still identical');
+});
+
 test('a half-written copy left by a probe is kept for hand recovery, outside the copies applied or dropped automatically', async () => {
   const w = workspace();
   try {
