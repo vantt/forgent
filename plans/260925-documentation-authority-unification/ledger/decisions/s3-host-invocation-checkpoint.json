@@ -1736,11 +1736,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "targetAnchor": "historical-migration-status-note",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/external-provider-protocol.md#migration-status-note at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#historical-migration-status-note. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Migration Status Note carried verbatim with links resolved relative to the new location. See Concerns on its self-referential wording.",
-      "targetUnitDigest": "fc32b1b25c89ea4978ab36812b636d62c665da2e38af568a1671921384685156"
+      "reviewNote": "Supersede reason is true: the legacy provider-protocol note says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Three destinations.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "fc32b1b25c89ea4978ab36812b636d62c665da2e38af568a1671921384685156",
+      "targetAncestry": [
+        "Architecture: External Provider Protocol",
+        "Retained selected source material",
+        "External Provider Protocol"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_72b068a205f5bdb963a0c90a64a51038",
@@ -1750,11 +1760,22 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "targetAnchor": "unheaded-block-9",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-3 at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#unheaded-block-9. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Note body verbatim; links rewritten to relative sibling paths that match the files in the worktree.",
-      "targetUnitDigest": "4d84b71de5a938c290f706f618397babc4a704b66e270c7755b57eca1404b6fa"
+      "reviewNote": "Supersede reason is true: the legacy unheaded paragraph says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Same text as the heading unit, three destinations.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "4d84b71de5a938c290f706f618397babc4a704b66e270c7755b57eca1404b6fa",
+      "targetAncestry": [
+        "Architecture: External Provider Protocol",
+        "Retained selected source material",
+        "External Provider Protocol",
+        "Historical Migration Status Note"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
@@ -1764,12 +1785,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "targetAnchor": "1-component-classes",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rationale says the unit retains all wording, but the Core, Packaged-extension, mapping table and classification paragraphs are no longer in this unit. They sit literally fenced in release-boundaries.md under Restored class definitions (carried by sibling claims) and the unit holds only a labelled pointer. No claim is lost, but the rationale must say the body was split to that owner, and the pointer cites a nonexistent legacy path.",
+      "reviewNote": "Partial carry correct: Core, Packaged extension, class table and closing paragraph verified verbatim in release-boundaries restored-class-definitions; named blocks 7, 8, 10, 11 match; link resolves; User plugin paragraph kept in place.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)."
+      "targetAncestry": [
+        "Architecture: External Provider Protocol",
+        "Retained selected source material",
+        "External Provider Protocol"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_77dded3a2079c1d8caf108207f16bf68",
@@ -1949,10 +1980,15 @@
       "targetAnchor": "2-invocation-mechanisms",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rationale claims all direct-unit wording is retained, but the Provider enum, Built-In, External Process, External WebAssembly and native-library paragraphs are absent from this unit. They moved to release-boundaries.md (enum and mechanisms) and the unit now has pointer lines citing component-protocol.md and release-boundaries.md legacy-style anchors. Text is conserved elsewhere, so only the rationale and the unavailable-reference pointers need correcting.",
+      "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
+      "reviewNote": "Named blocks 12, 14, 15, 16, 17 verified verbatim at release-boundaries restored-class-definitions and the retained enum-covers paragraph is in place; links resolve. Rationale also lists the same-process anchor as holding this unit remainder, which is over-listed (see concerns), no text lost.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
       "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)."
+      "targetAncestry": [
+        "Architecture: External Provider Protocol",
+        "Retained selected source material",
+        "External Provider Protocol"
+      ]
     },
     {
       "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
@@ -2172,12 +2208,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "targetAnchor": "3-component-protocol",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rationale says all unit wording is retained, but the transport-neutral sentence was moved to component-protocol.md and the unit holds a pointer to a nonexistent legacy anchor. The sentence is conserved by its own claim, so fix the rationale and the pointer. The rest of the section is verbatim.",
+      "reviewNote": "Partial carry correct: the transport-neutral sentence (block 25) is verbatim in component-protocol restored-semantic-contract-stays-transport-neutral; rest of section 3 incl. lifecycle bullets and EncodedMessage block is retained in place; link resolves.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper)."
+      "targetAncestry": [
+        "Architecture: External Provider Protocol",
+        "Retained selected source material",
+        "External Provider Protocol"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_4ab5b8aa8fb1c32df6244b6c78a58a8e",
@@ -2355,12 +2401,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "targetAnchor": "4-plugin-registry-linker",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker at docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#4-plugin-registry-linker; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker is retained verbatim at docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32 (claim_08172f75766eb1d002d4cba2669f9bbd; The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; veri); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33 (claim_7e15be77fb7c4bff223728491df3e212; Its complete input/output physics:); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34 (claim_0f401249972ad0ce465e24e0932a2834; ```txt authored OperationCatalog + built-in provider descriptors + transitional CLI-compatibility bindings + validated external manifest dec). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rationale says the unit retains all wording, but the registry-linker procedure paragraph, input/output lead-in and formula block moved to compatibility-harness.md. The unit holds a pointer to a nonexistent legacy anchor. Text is conserved by sibling claims, so fix the rationale and the pointer.",
+      "reviewNote": "Partial carry correct: registry linker paragraph, input-output lead-in and txt formula (blocks 32-34) verbatim in compatibility-harness restoration with order preserved by the marker; remaining paragraphs retained; link resolves.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker is retained verbatim at docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32 (claim_08172f75766eb1d002d4cba2669f9bbd; The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; veri); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33 (claim_7e15be77fb7c4bff223728491df3e212; Its complete input/output physics:); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34 (claim_0f401249972ad0ce465e24e0932a2834; ```txt authored OperationCatalog + built-in provider descriptors + transitional CLI-compatibility bindings + validated external manifest dec).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cda1c088745776953a5144a0548869d897c54e9f69dcd512de6ad8359b99ed32",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker is retained verbatim at docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-32 (claim_08172f75766eb1d002d4cba2669f9bbd; The registry linker: scans configured global and project plugin locations; parses and validates manifests without running the provider; veri); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-33 (claim_7e15be77fb7c4bff223728491df3e212; Its complete input/output physics:); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-34 (claim_0f401249972ad0ce465e24e0932a2834; ```txt authored OperationCatalog + built-in provider descriptors + transitional CLI-compatibility bindings + validated external manifest dec)."
+      "targetAncestry": [
+        "Architecture: External Provider Protocol",
+        "Retained selected source material",
+        "External Provider Protocol"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_7a761122f6ca753ec06390f4c45a3874",
@@ -2706,11 +2762,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "historical-migration-status-note",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#migration-status-note at docs/platform/host-invocation-routing/spec.md#historical-migration-status-note. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Migration note verbatim with resolved links. See Concerns.",
-      "targetUnitDigest": "cf64a5c903ae0225be855f3e70d01ef8e268e7de94d741063cb5afb351ca10c6"
+      "reviewNote": "Supersede reason is true: the legacy provider-routing note says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Platform entry plus five detail destinations, all resolve.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cf64a5c903ae0225be855f3e70d01ef8e268e7de94d741063cb5afb351ca10c6",
+      "targetAncestry": [
+        "Spec: Host Invocation",
+        "Retained selected source material",
+        "Host Invocation And Provider Routing Architecture"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_37572a9d192f311dd68474b794f87d5e",
@@ -2720,11 +2786,22 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "unheaded-block-17",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-3 at docs/platform/host-invocation-routing/spec.md#unheaded-block-17. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Note body verbatim with resolved links.",
-      "targetUnitDigest": "b21d4164b9050dce3c9829ac2db0ee896f9808fa54b24cbd03672da08ba6ef4d"
+      "reviewNote": "Supersede reason is true: the legacy unheaded paragraph says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Same text as the heading unit.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b21d4164b9050dce3c9829ac2db0ee896f9808fa54b24cbd03672da08ba6ef4d",
+      "targetAncestry": [
+        "Spec: Host Invocation",
+        "Retained selected source material",
+        "Host Invocation And Provider Routing Architecture",
+        "Historical Migration Status Note"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_d23d47b9e725baca5de150afd215e059",
@@ -3070,12 +3147,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "5-core-contracts",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts at docs/platform/host-invocation-routing/spec.md#5-core-contracts; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24 (claim_bbaec409dcbaee8f33968727aa0abed5; **Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range ). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rework (rationale only, no claim lost): target heading unit omits the Contract versioning paragraph and substitutes an Added-in-candidate pointer, yet the rationale says all direct-unit wording is retained and names no remainder; the paragraph is carried verbatim by claim_bbaec409 in contracts/component-protocol.md. Name that remainder and carrier; the pointer cites an unavailable legacy path and the vague label dropped-002 restoration, so give the real platform anchor.",
+      "reviewNote": "Partial carry correct: Contract versioning paragraph (block 24) verbatim in component-protocol restored-contract-versioning and the in-place link points to it; rest of section 5 retained; relative links to architecture/ files resolve from spec.md.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24 (claim_bbaec409dcbaee8f33968727aa0abed5; **Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range ).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9274b7dd1e623096538871b0934d940c5311b7dac7f87b98e8f3bbe9cbdf0e79",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-24 (claim_bbaec409dcbaee8f33968727aa0abed5; **Contract versioning:** request/outcome contracts version independently; linking picks one exact version pair from the host/provider range )."
+      "targetAncestry": [
+        "Spec: Host Invocation",
+        "Retained selected source material",
+        "Host Invocation And Provider Routing Architecture"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_56a238faac6b847f9682d37b3120ee3d",
@@ -3589,12 +3676,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "8-failure-cancellation-lifecycle-and-human-input",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input at docs/platform/host-invocation-routing/spec.md#8-failure-cancellation-lifecycle-and-human-input; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41 (claim_75c780a31188a0fa1e19d03ccbd3b6b1; ```txt received -> admitted | admission-refused -> selected | selection-refused -> granted | grant-refused -> dis); docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43 (claim_e365a92a236aa909b9148185aa8f0801; For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never i). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rework (rationale only, no claim lost): target omits the lifecycle state chain and the idempotency-key paragraph (replaced by pointers) but the rationale claims all wording retained and names no remainder; carriers are claim_75c780a3 (chain) and claim_e365a92a (idempotency) in contracts/component-protocol.md. Name both remainders; pointers cite unavailable legacy anchors, use the real platform anchors.",
+      "reviewNote": "Partial carry correct: lifecycle arrow chain (block 41) and idempotency paragraph (block 43) are verbatim in component-protocol (state chain and contract-versioning second fence); markers sit at the original positions; both anchors exist.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41 (claim_75c780a31188a0fa1e19d03ccbd3b6b1; ```txt received -> admitted | admission-refused -> selected | selection-refused -> granted | grant-refused -> dis); docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43 (claim_e365a92a236aa909b9148185aa8f0801; For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never i).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a3fd2fb5bbb38608bae7071b5f0571cbcccb756e34449544f509d1d40fc8fdc6",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#8-failure-cancellation-lifecycle-and-human-input is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te, docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-41 (claim_75c780a31188a0fa1e19d03ccbd3b6b1; ```txt received -> admitted | admission-refused -> selected | selection-refused -> granted | grant-refused -> dis); docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-43 (claim_e365a92a236aa909b9148185aa8f0801; For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never i)."
+      "targetAncestry": [
+        "Spec: Host Invocation",
+        "Retained selected source material",
+        "Host Invocation And Provider Routing Architecture"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_be7bb33b5eafddffe9363e3f77cb41b6",
@@ -3751,12 +3848,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/spec.md",
       "targetAnchor": "9-physical-placement",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement at docs/platform/host-invocation-routing/spec.md#9-physical-placement; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rework (rationale only, no claim lost): the layout tree is replaced by a pointer while the rationale says all wording is retained; the tree is carried verbatim by claim_54536d10 in architecture/release-boundaries.md with a checked-status note. Name that remainder and give the real platform anchor instead of the unavailable legacy path.",
+      "reviewNote": "Partial carry correct: layout tree (block 46) verbatim in release-boundaries restored-physical-placement-layout-tree; packaging link retargeted to docs/architect/packaging-distribution/runtime-identity-and-activation.md which exists; no-setup-verb sentence is target-architecture wording, unchanged.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f7ec6eee77fd234f5385f260c3d7c567a2759526feb3098baf1619e0cd237621",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/host-invocation-provider-routing.md#9-physical-placement is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-46 (claim_54536d1078dc6a2b6eacd17105389f2b; ```txt Cargo.toml # workspace root; herdr-plugin/ excluded in R1 apps/ fgos/ # crat)."
+      "targetAncestry": [
+        "Spec: Host Invocation",
+        "Retained selected source material",
+        "Host Invocation And Provider Routing Architecture"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_d261432b2a27b402bd3027b58e918774",
@@ -4081,11 +4188,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "historical-migration-status-note",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/legacy-cli-transition.md#migration-status-note at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#historical-migration-status-note. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Rework: moved verbatim except links, the note says This document remains a legacy-current source and lists the promoted platform docs including this very file, which is false and self-referential once the text lives in the promoted document. This is migration bookkeeping about the legacy file; supersede it with a stated reason or relabel it as historical quote, do not move it as a live statement.",
-      "targetUnitDigest": "caf8f56f95cb4bab4c0d074baf0daae1bfd03c7311387c571d36de1b76d089b2"
+      "reviewNote": "Supersede reason is true: the legacy legacy-transition note says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Four destinations.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "caf8f56f95cb4bab4c0d074baf0daae1bfd03c7311387c571d36de1b76d089b2",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_2f85030181d51c92cbb5dfd094d20956",
@@ -4095,11 +4212,22 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "unheaded-block-9",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-3 at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#unheaded-block-9. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Rework: same defect as the Migration Status Note heading unit; the paragraph now sits in the promoted architecture doc yet states it is a legacy-current source and links to itself. Supersede with a reason or label as historical, do not carry as a live claim.",
-      "targetUnitDigest": "1456e880d651b7d8ccc5886ccbe36f3bdf676a2acb7218541e53162738d531a6"
+      "reviewNote": "Supersede reason is true: the legacy unheaded paragraph says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Same text as the heading unit.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "1456e880d651b7d8ccc5886ccbe36f3bdf676a2acb7218541e53162738d531a6",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition",
+        "Historical Migration Status Note"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
@@ -4109,12 +4237,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "1-two-distinct-adapters",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#1-two-distinct-adapters; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 (claim_7046eb56f67c02ef82f621a3fa30286c; Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a compone). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rework (rationale only, no claim lost): the sentence Both adapters delegate a complete use case is replaced by a pointer while the rationale says all wording is retained; it is carried verbatim by claim_7046eb56 in contracts/component-protocol.md. Name the remainder; the pointer path docs/architect/contracts/component-protocol.md is not a real location.",
+      "reviewNote": "Partial carry correct: the both-adapters-delegate paragraph (block 8) is verbatim in component-protocol restored-both-adapters-delegate-a-complete-use-case; marker sits between the passthrough paragraph and the resolve-payload paragraph as in source; link resolves.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 (claim_7046eb56f67c02ef82f621a3fa30286c; Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a compone).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "49afb148ce5b49502adacce9e063c07b40e58fb0981db00e6b2d9048a726d90d",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-8 (claim_7046eb56f67c02ef82f621a3fa30286c; Both adapters delegate a complete use case. A host must not split one state transaction between native and legacy providers unless a compone)."
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_0780171ae7b22535547b733b282902e4",
@@ -4250,12 +4388,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "targetAnchor": "2-legacy-payload-identity-ownership-and-repair-path",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path at docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rework (rationale only, no claim lost): the package.json bin.fgos paragraph is replaced by a pointer while the rationale says all wording is retained; the paragraph exists verbatim in architecture/release-boundaries.md under Restored package json bin fgos removed, flagged obsolete, but its carrying claim is outside this slice and is not named. Name the remainder and carrier claim.",
+      "reviewNote": "Partial carry correct: bin.fgos removal paragraph (block 14) verbatim at release-boundaries restoration with its obsolete-clause flag. Added resolver note is accurate: legacy_exec.rs resolve_payload_path spans lines 69-154, uses env or exe-relative release root, verifies manifest and confined entry; spec.md row stays accepted-not-implemented.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` ).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/legacy-cli-transition.md#2-legacy-payload-identity-ownership-and-repair-path is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/legacy-cli-transition.md#unheaded-block-14 (claim_6a37273a0a45d24c53e344928c3edf22; `package.json` `bin.fgos` is removed (or pointed at the workspace shim) when the Rust host becomes the installed default; `bin.fgos-runner` )."
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_7671f0c8195aa48b9e95bcc1a9dd9339",
@@ -4498,9 +4646,14 @@
       "targetAnchor": "3-command-metadata-and-parser-ownership",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Move the complete direct heading unit \"## 3. Command Metadata And Parser Ownership\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#3-command-metadata-and-parser-ownership. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Heading unit: paragraph 1 is carried verbatim in claim_7f7b3ba8 (component-protocol restoration), paragraphs 2 and 3 retained in place; the pointer path named is a nonexistent legacy path (see Concerns).",
-      "targetUnitDigest": "5f052dc9bcfe273204107b49849e79b3a8141978a4dae163b80ce1197be4dc52"
+      "rationale": "Move the complete direct heading unit \"## 3. Command Metadata And Parser Ownership\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#3-command-metadata-and-parser-ownership. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
+      "reviewNote": "Move holds on conservation: heading kept, first paragraph is verbatim in component-protocol restoration (second fence of both-adapters anchor) and paragraphs 2 and 3 retained; link resolves. Generic move rationale says all wording retained although paragraph 1 relocated (see concerns).",
+      "targetUnitDigest": "5f052dc9bcfe273204107b49849e79b3a8141978a4dae163b80ce1197be4dc52",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ]
     },
     {
       "claimId": "claim_7f7b3ba83bbde945cdd80d479b9d0b19",
@@ -4680,9 +4833,14 @@
       "targetAnchor": "5-rust-host-first-benefit-and-cost",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Move the complete direct heading unit \"## 5. Rust Host First: Benefit And Cost\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Heading unit: first paragraph retained, cost paragraph carried verbatim by claim_8c44796a, replaced here by a labelled pointer (dangling path, see Concerns).",
-      "targetUnitDigest": "7504e7fd27fa2de1f5b1e486ab3e7efff0e956e57f789c7363feeec37b581856"
+      "rationale": "Move the complete direct heading unit \"## 5. Rust Host First: Benefit And Cost\" from docs/architect/host-invocation-routing/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost to its frozen mapped owner docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md#5-rust-host-first-benefit-and-cost. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rust-host-first-cost and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
+      "reviewNote": "Conservation holds: first paragraph retained, cost paragraph verbatim in component-protocol restored-rust-host-first-cost; link resolves. Generic move rationale says all wording retained although the cost paragraph relocated (see concerns).",
+      "targetUnitDigest": "7504e7fd27fa2de1f5b1e486ab3e7efff0e956e57f789c7363feeec37b581856",
+      "targetAncestry": [
+        "Architecture: Legacy CLI Transition",
+        "Retained selected source material",
+        "Legacy CLI Transition"
+      ]
     },
     {
       "claimId": "claim_039865ac614bd07bd3b1f00f89e39441",
@@ -4778,9 +4936,13 @@
       "targetAnchor": "node-to-rust-component-migration",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Move the complete direct heading unit \"# Node To Rust Component Migration\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#node-to-rust-component-migration. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "H1 unit: Status/Date/Revised lines retained, scope paragraph carried verbatim by claim_2519e82b (release-boundaries Restored scope); labelled pointer is dangling (see Concerns).",
-      "targetUnitDigest": "73142a367bf579e3afc2da330169ae1b04b7a9b758a33a9b8be857aca2e85373"
+      "rationale": "Move the complete direct heading unit \"# Node To Rust Component Migration\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#node-to-rust-component-migration to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#node-to-rust-component-migration. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-scope and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
+      "reviewNote": "Conservation holds: status lines retained; scope paragraph verbatim in release-boundaries restored-scope; link resolves. Added historical-note block is labelled and supersedes the legacy-current note. Move rationale over-states retention (see concerns).",
+      "targetUnitDigest": "73142a367bf579e3afc2da330169ae1b04b7a9b758a33a9b8be857aca2e85373",
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material"
+      ]
     },
     {
       "claimId": "claim_95f304c1b827f4b6f1d5070a006051bb",
@@ -4832,11 +4994,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "historical-migration-status-note",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#migration-status-note at docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#historical-migration-status-note. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Heading depth shift and link rewrites only; all body text retained.",
-      "targetUnitDigest": "01b857cc72715357538a05446610509d83d5bf88b54ec3b3b39977ca2a808042"
+      "reviewNote": "Supersede reason is true: the legacy node-to-rust note says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Four destinations.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "01b857cc72715357538a05446610509d83d5bf88b54ec3b3b39977ca2a808042",
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_fd246fe0ad796f0ce1f3448b6ad8ec61",
@@ -4846,11 +5018,22 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "unheaded-block-10",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-3 at docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-10. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Only relative link destinations rewritten to resolve from the new location; wording otherwise identical.",
-      "targetUnitDigest": "52109204af09107163b441654a44e9de25868552102a993367ad38f66ae6ac6a"
+      "reviewNote": "Supersede reason is true: the legacy unheaded paragraph says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Same text as the heading unit.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "52109204af09107163b441654a44e9de25868552102a993367ad38f66ae6ac6a",
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration",
+        "Historical Migration Status Note"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_416ff7a5bcd064e885b8fd36a8a1236f",
@@ -5009,9 +5192,15 @@
       "targetAnchor": "option-a-thin-the-entire-node-host-first",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Move the complete direct heading unit \"### Option A: Thin The Entire Node Host First\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-a-thin-the-entire-node-host-first. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Option A body (txt block and rationale) carried verbatim by claims 38ab2fca and bb413cec; labelled pointer left here (dangling path, see Concerns).",
-      "targetUnitDigest": "0ebcb1ec37ffe2db3ea182a170b3ae2810f710cda67beecf0045f491c2b08e73"
+      "rationale": "Move the complete direct heading unit \"### Option A: Thin The Entire Node Host First\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-a-thin-the-entire-node-host-first to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-a-thin-the-entire-node-host-first. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
+      "reviewNote": "Option A diagram and rationale verbatim in component-protocol restored-rejected-options-rationale (first two fences); labelled live link replaces the old dead pointer and resolves. Move rationale over-states retention (see concerns).",
+      "targetUnitDigest": "0ebcb1ec37ffe2db3ea182a170b3ae2810f710cda67beecf0045f491c2b08e73",
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration",
+        "2. Options Considered"
+      ]
     },
     {
       "claimId": "claim_38ab2fca27e14c583debbe4bd42386c9",
@@ -5128,9 +5317,15 @@
       "targetAnchor": "option-c-big-bang-rust-rewrite",
       "reviewStatus": "pending",
       "authoredBy": "codex-session:1@2026-10-11",
-      "rationale": "Move the complete direct heading unit \"### Option C: Big-Bang Rust Rewrite\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-c-big-bang-rust-rewrite to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-c-big-bang-rust-rewrite. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Option C body carried verbatim by claims 2f8cc209 and 9c041351; labelled pointer left here (dangling path, see Concerns).",
-      "targetUnitDigest": "2c60584c5c5e535249c603a1e98ede6c6497204f5e1880f44cf3a8fb0ad00a05"
+      "rationale": "Move the complete direct heading unit \"### Option C: Big-Bang Rust Rewrite\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#option-c-big-bang-rust-rewrite to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#option-c-big-bang-rust-rewrite. The heading and remaining in-place text stay at this mapped owner; the relocated body is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rejected-options-rationale and accounted by its sibling source decisions. The mapped owner links to that live restoration; this row does not claim that all source body wording remains in place. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
+      "reviewNote": "Option C diagram and rationale verbatim in component-protocol restored-rejected-options-rationale (fences three and four); labelled live link resolves. Move rationale over-states retention (see concerns).",
+      "targetUnitDigest": "2c60584c5c5e535249c603a1e98ede6c6497204f5e1880f44cf3a8fb0ad00a05",
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration",
+        "2. Options Considered"
+      ]
     },
     {
       "claimId": "claim_2f8cc2098b8aab83a7d7442cc88028a8",
@@ -5182,11 +5377,22 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "selected-option",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"### Selected Option\" from docs/architect/host-invocation-routing/node-to-rust-component-migration.md#selected-option to its frozen mapped owner docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#selected-option. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Selected Option text fully retained. Two identical Added in candidate pointers were appended; they are redundant and the second effectively stands in for section 3 (see Concerns), but no source claim is lost.",
-      "targetUnitDigest": "7d4964d379b1f658632996f0008287e453f8a8cf8fc28fb5cc7b63e59327f96c"
+      "reviewNote": "Selected Option text fully retained in place; the two added markers link to the same live restored anchor (section 3 rationale and sequence text, verified verbatim) and resolve. Redundant but labelled, nothing lost.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7d4964d379b1f658632996f0008287e453f8a8cf8fc28fb5cc7b63e59327f96c",
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration",
+        "2. Options Considered"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_a2a90fc8f7288cae9b03d22aeb16c504",
@@ -6036,12 +6242,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "9-repeat-by-component-boundary",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary at docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#9-repeat-by-component-boundary; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44 (claim_9f2283b25ef4be9f0e68b4381f1ce08e; For each subsequent component:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45 (claim_abc80009ab1bf59c40a645089fbc82fd; 1. Read [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md) and name responsibility, semantic ope). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Rationale says the target retains all direct-unit wording but the target drops the intro line and the whole ten-step list and substitutes an Added in candidate pointer. The pointer names the dead path docs/architect/contracts/component-protocol.md instead of the live docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure, and the rationale names no remainder. The words survive only through the sibling claims for blocks 44 and 45, so state the partial carry and the remainder anchors, and give a resolvable link.",
+      "reviewNote": "Partial carry correct: intro line and ten-step procedure (blocks 44, 45) verbatim in component-protocol restored-per-component-repeat-procedure; the two closing paragraphs are retained in place; link resolves.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44 (claim_9f2283b25ef4be9f0e68b4381f1ce08e; For each subsequent component:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45 (claim_abc80009ab1bf59c40a645089fbc82fd; 1. Read [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md) and name responsibility, semantic ope).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ef6d9f08943bdc073dcf957c969015d6821b081aeb08b90898f0f1024dd2319e",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#9-repeat-by-component-boundary is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-44 (claim_9f2283b25ef4be9f0e68b4381f1ce08e; For each subsequent component:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-45 (claim_abc80009ab1bf59c40a645089fbc82fd; 1. Read [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md) and name responsibility, semantic ope)."
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_9f2283b25ef4be9f0e68b4381f1ce08e",
@@ -6135,12 +6351,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "10-migrate-read-models-before-writers",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers at docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#10-migrate-read-models-before-writers; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49 (claim_99bf6932b3f44681c138edf8384d652b; Sequence it internally:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50 (claim_056d11e86ef88989c436bc14a24997a1; 1. event/schema decode fixtures; 2. deterministic replay fixtures; 3. domain/stage projection fixtures; 4. frontier calculation fixtures; 5.). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Same defect as section 9. The target drops the sequence-it-internally lead-in and the seven-step read-model list and leaves a pointer to the nonexistent docs/architect/contracts/component-protocol.md path, while the rationale claims all wording is retained. Carry survives only via the sibling claims for blocks 49 and 50. Name the remainder and point to the live component-protocol.md anchor.",
+      "reviewNote": "Partial carry correct: Sequence-it-internally lead-in and the seven-item list (blocks 49, 50) verbatim in the same restoration anchor; opening and closing paragraphs retained; link resolves.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49 (claim_99bf6932b3f44681c138edf8384d652b; Sequence it internally:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50 (claim_056d11e86ef88989c436bc14a24997a1; 1. event/schema decode fixtures; 2. deterministic replay fixtures; 3. domain/stage projection fixtures; 4. frontier calculation fixtures; 5.).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ae126eab3838fb0b18c1226734b38c22b3674d2b370d9c47193602a09990c6d",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-49 (claim_99bf6932b3f44681c138edf8384d652b; Sequence it internally:); docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-50 (claim_056d11e86ef88989c436bc14a24997a1; 1. event/schema decode fixtures; 2. deterministic replay fixtures; 3. domain/stage projection fixtures; 4. frontier calculation fixtures; 5.)."
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_273dc85bcdf5ba25529e63b15e143f10",
@@ -6402,12 +6628,22 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "targetAnchor": "13-rollback-rules",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Partial carry of the direct source section docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules at docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#13-rollback-rules; surrounding content stays here. Remainder: The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef). No source wording is discarded; this row does not claim the primary target alone contains the relocated passage.",
-      "reviewNote": "Target keeps the first paragraph but drops the three rollback bullets (observation window, never delete Node writer before recovery proof, remove rollback code per component) in favour of a pointer to the dead path docs/architect/contracts/component-protocol.md#restored-rollback-bullets. Rationale still claims full retention and names no remainder. The bullets do exist verbatim via the block 59 claim, so the fix is naming that remainder and linking the live component-protocol.md anchor.",
+      "reviewNote": "Partial carry correct: the three rollback bullets (block 59) verbatim in component-protocol restored-rollback-bullets; leading paragraph retained and its packaging link resolves to docs/architect via ../../../architect.",
+      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef).",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "18582e9da8d64b7e18ba9e1bc7c3eff5aeb10565960bf94f7fe947bc921a0f07",
-      "remainder": "The relocated passage of docs/architect/host-invocation-routing/node-to-rust-component-migration.md#13-rollback-rules is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/node-to-rust-component-migration.md#unheaded-block-59 (claim_a1c1085c9d77a84ca5e5aefe1de6d059; - Keep legacy and native implementations side by side only for the observation window of their operation. - Never delete a Node writer bef)."
+      "targetAncestry": [
+        "Architecture: Node To Rust Migration",
+        "Retained selected source material",
+        "Node To Rust Component Migration"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_485913c207130897d47aa1e1511faa50",
@@ -6669,11 +6905,21 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "historical-migration-status-note",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#migration-status-note at docs/platform/host-invocation-routing/roadmap.md#historical-migration-status-note. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Migration status note carried with links rewritten to sibling promoted docs that all exist; sentence now reads as self-reference to the new roadmap, see Concerns.",
-      "targetUnitDigest": "c67619ba2bc360580b6127bb4b93b9358875e6513207ece712288be415e59496"
+      "reviewNote": "Supersede reason is true: the legacy rust-plan note says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Five destinations, all resolve.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "c67619ba2bc360580b6127bb4b93b9358875e6513207ece712288be415e59496",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_bb1dcfee5986a94c37e667c75bd3af84",
@@ -6683,11 +6929,22 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "unheaded-block-63",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Supersede the complete migration bookkeeping unit from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-3 at docs/platform/host-invocation-routing/roadmap.md#unheaded-block-63. Reason: the September legacy-current label describes the legacy input during its dated promotion pass; the candidate now explicitly records that historical status and all destination references, without presenting itself as legacy-current.",
-      "reviewNote": "Same paragraph with five promoted-doc links rewritten to existing siblings; wording unchanged.",
-      "targetUnitDigest": "52a9e0a948877fa42ccc7570580ccd25c5c8821bd3ddd7d13234f8e635db957e"
+      "reviewNote": "Supersede reason is true: the legacy unheaded paragraph says it remains legacy-current during the 2026-09-14 pass; candidate relabels that as dated status of the legacy input and no longer calls itself legacy-current. All destination links resolve and match the source list. Same text as the heading unit, five destinations.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "52a9e0a948877fa42ccc7570580ccd25c5c8821bd3ddd7d13234f8e635db957e",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan",
+        "Historical Migration Status Note"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_43c25aed966fdb607de17ca47cbce862",
@@ -6823,11 +7080,21 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "3-decisions-required-before-r1-execution",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"## 3. Decisions Required Before R1 Execution\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#3-decisions-required-before-r1-execution to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#3-decisions-required-before-r1-execution. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Decisions-before-R1 section carried in full including struck items, closed setup-doctor decision and recording note; heading depth only.",
-      "targetUnitDigest": "cbf26e495828da2b590d1d6c244b2cf4cec5fe12f6694b754861a23bb3f8eb72"
+      "reviewNote": "Section text kept verbatim. Added setup status note is true: src/cli/command-registry.mjs lines 1439-1441 define the setup command described as legacy compatibility, bin/fgos.mjs line 3774 has case setup; label supersedes the sentence only as present status.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "cbf26e495828da2b590d1d6c244b2cf4cec5fe12f6694b754861a23bb3f8eb72",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_edbd740417658e6cfc22ced75d91b633",
@@ -7152,11 +7419,21 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "6-p1-compatibility-harness",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"## 6. P1 — Compatibility Harness\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#6-p1-compatibility-harness. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Source unit is only the P1 heading and it is carried; the target adds two identical Added in candidate pointer paragraphs that are labelled but duplicated and point to a nonexistent legacy path, see Concerns.",
-      "targetUnitDigest": "8fe73175caed647b1eb18bd5241b3974b2614d3b132fb87c0a1a00ec7c2be8d1"
+      "reviewNote": "Source unit is only the heading; kept. Four added markers link to the P1 harness restoration (verbatim fences confirmed) and resolve; link depth correct from roadmap.md.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8fe73175caed647b1eb18bd5241b3974b2614d3b132fb87c0a1a00ec7c2be8d1",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_89e8b193eb339f06478bf6998576080c",
@@ -7229,11 +7506,22 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "coverage-floor",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"### Coverage floor\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#coverage-floor to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#coverage-floor. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Coverage floor heading and all seven bullets carried in place; two extra labelled pointer paragraphs are harmless additions.",
-      "targetUnitDigest": "75e0fe39c2aaa78adefd3e98cf324334eed056be09406e3f4a9dec5da39094bd"
+      "reviewNote": "Coverage floor bullets retained verbatim; the two trailing labelled markers point to the verified p1-compatibility-harness restoration and resolve. Nothing lost.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "75e0fe39c2aaa78adefd3e98cf324334eed056be09406e3f4a9dec5da39094bd",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan",
+        "6. P1 — Compatibility Harness"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_d2f98c28ed63bf5bdde71ee9905a5b9c",
@@ -8209,11 +8497,21 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "14-p9-next-native-read",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"## 14. P9 — Next Native Read\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#14-p9-next-native-read to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#14-p9-next-native-read. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Heading, gate-bypass paragraph, parked-outcome paragraph and test commands carried with only heading depth changed; the two appended Added in candidate notes are labelled and point to the compat-harness restoration of section 15 (the note repeats, harmless).",
-      "targetUnitDigest": "ac492f613b9b733b46f8f0e566ea4f839961ee30f3a1dafd97b61be903af14f7"
+      "reviewNote": "P9 text and shell block retained verbatim; two labelled markers link to compatibility-harness restored-test-and-review-gates-table (verbatim table confirmed) and resolve.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "ac492f613b9b733b46f8f0e566ea4f839961ee30f3a1dafd97b61be903af14f7",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_2bc13328f1e7a4d1ac848c004a8a0952",
@@ -8349,11 +8647,21 @@
       "disposition": "move",
       "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
       "targetAnchor": "16-commit-and-rollback-slices",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:1@2026-10-11",
       "rationale": "Move the complete direct heading unit \"## 16. Commit And Rollback Slices\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#16-commit-and-rollback-slices to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#16-commit-and-rollback-slices. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Judgment: no target digest match; independent full-text judgment remains required, not a script-proven approval.",
-      "reviewNote": "Whole section 16 (12 slices and rollback rules) carried verbatim with heading depth changed; the appended Added in candidate note is labelled and explains that sections 15 and 17 now live in compatibility-harness.md.",
-      "targetUnitDigest": "6c81ae046ab7de3a595689c9da4de2d4723ea86247de47d6c82f300c1844203e"
+      "reviewNote": "Commit and rollback slices retained verbatim; labelled marker links to the verified gates-table restoration and resolves. No text lost, no invented claim.",
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-13",
+      "reviewedAt": "2026-10-13",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "6c81ae046ab7de3a595689c9da4de2d4723ea86247de47d6c82f300c1844203e",
+      "targetAncestry": [
+        "Host Invocation Routing Roadmap",
+        "Retained selected source material",
+        "Rust Host And Proof Providers Implementation Plan"
+      ],
+      "reviewReportCommit": "0c06e6e6b67a3897d660ee54de25fdc9971e59a4"
     },
     {
       "claimId": "claim_88d182e8f7f1827e07da42ec9d992e49",
@@ -8923,5 +9231,5 @@
       "reviewReportCommit": "13322f8a6712df4bb3dd69e7df208e237f32c216"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-rework-source.md"
 }
