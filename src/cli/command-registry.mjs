@@ -824,12 +824,15 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|execute|log> [runId]',
-    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine clear door; it never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run. "decide", "execute", and "log" provide canonical control-plane decisions, execution dispatch, and logging.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|execute|log|probe-account> [runId]',
+    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine clear door; it never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run. "decide", "execute", and "log" provide canonical control-plane decisions, execution dispatch, and logging. "probe-account" is diagnostic: it starts every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt, reports per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict, and closes the panes it opened. It selects and schedules nothing.',
     parameters: {
       type: 'object',
       properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover', 'reconcile', 'decide', 'execute', 'log'] },
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover', 'reconcile', 'decide', 'execute', 'log', 'probe-account'] },
+        invocation: { type: 'string', description: '"probe-account" only: comma-separated invocation ids to limit the probe to (default: every invocation that runs as the account).' },
+        executor: { type: 'string', description: '"probe-account" only: limit the probe to one executor id (default: every executor of the provider).' },
+        'timeout-ms': { type: 'string', description: '"probe-account"/"execute": per-call timeout in milliseconds.' },
         run: { type: 'string', description: '"inspect" selector, and "reconcile plan --action collect-result" only: Run id selector / target runId.' },
         assignment: { type: 'string', description: '"inspect" selector, and "reconcile plan --action clear-assignment-claim" only: Assignment id selector.' },
         cwd: { type: 'string', description: 'Working directory path for inspect, reconcile, or execute/decide.' },
@@ -839,8 +842,8 @@ export const COMMAND_REGISTRY = [
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
         intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input").' },
         action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too. "reconcile plan" only (different meaning): the plain action-kind string to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
-        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine", or "log": provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
-        account: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine": account id from ~/.fgos/config.json.' },
+        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine", "log", or "probe-account": provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
+        account: { type: 'string', description: '"reconcile provider-capacity clear-quarantine", "quarantine" or "probe-account": account id from ~/.fgos/config.json.' },
         reason: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" or "quarantine": operator reason, e.g. token refreshed or quota exhausted.' },
         until: { type: 'string', description: '"reconcile provider-capacity quarantine" only: ISO date-time (in the future) when the account is selectable again.' },
         force: { type: 'boolean', description: '"reconcile provider-capacity clear-quarantine" only: permit clearing an account that is not currently quarantined.' },
@@ -887,6 +890,7 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch decide --for general-purpose --has-live-task-access',
       'fgos dispatch execute <executorId> --prompt "..."',
       'fgos dispatch log <executorId> --id <id> --provider <p> --command <c>',
+      'fgos dispatch probe-account --provider openai --account tetcu72',
     ],
     touchesState: true,
     // "execute" writes Run directories and state projections; "log"

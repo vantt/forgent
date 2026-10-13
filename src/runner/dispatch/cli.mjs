@@ -40,6 +40,10 @@ import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 import { createCredentialProbe } from './provider-credential-probe.mjs';
+import { runAccountProbe } from './provider-account-probe.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from './confinement/cleanup.mjs';
+import { createHerdrClient } from './herdr-agent.mjs';
+import { resolveHerdrBin } from './transport.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
@@ -1575,6 +1579,68 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       }
       break;
     }
+    case 'probe-account': {
+      // Diagnostic: every CLI of one provider account at the same moment, through the real dispatch door.
+      try {
+        const provider = flagValue('--provider');
+        const accountId = flagValue('--account');
+        if (!provider || !accountId) {
+          throw new StoreError('validation', 'dispatch probe-account requires --provider <provider> --account <accountId>');
+        }
+        const cwd = path.resolve(flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd());
+        const repoRoot = path.resolve(flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+        const assignmentsDir = path.join(fgosDirFromRoot(repoRoot), 'assignments');
+        const fgosDir = fgosDirFromRoot(repoRoot);
+        const invocationFlag = flagValue('--invocation');
+        const herdrBin = resolveHerdrBin();
+        const closedPanes = new Set();
+        const result = await runAccountProbe({
+          cfg: ensureRunnerConfigForDir(repoRoot),
+          provider,
+          accountId,
+          executorId: flagValue('--executor') ?? null,
+          invocationIds: invocationFlag ? invocationFlag.split(',').map((s) => s.trim()).filter(Boolean) : null,
+          repoRoot,
+          timeoutMs: positiveIntFlag('--timeout-ms'),
+          createAssignment: (contract) => claimAssignmentId(() => buildAssignment({
+            options: { assignmentsDir },
+            provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity(fgosDir).id) } },
+          }), assignmentsDir),
+          dispatch: (assignment, { runnerConfig, cliOverride }) => executeAssignment(assignment, {
+            cwd,
+            repoRoot,
+            runnerConfig,
+            cliOverride,
+            isReadOnlyMode: true,
+            providerCredentialRenew: createCredentialRenewal(),
+          }),
+          closePane: ({ paneId, herdrSession }) => {
+            const closed = createHerdrClient({
+              herdrBin, cwd, env: herdrSession ? { ...process.env, HERDR_SESSION: herdrSession } : process.env,
+            }).paneClose(paneId);
+            if (closed) closedPanes.add(paneId);
+            return closed;
+          },
+        });
+        // A private home kept for a pane this probe just closed is removed now rather than at the next
+        // sweep; every other home is judged exactly as the regular sweep judges it.
+        if (closedPanes.size) {
+          try {
+            reapOrphanedConfinementResources({
+              tempRoot: resolveConfinementTempRoot(),
+              checkPaneOpen: (paneId) => (closedPanes.has(paneId) ? false : null),
+            });
+          } catch { /* the regular sweep removes it later */ }
+        }
+        if (returnResult) return result;
+        process.stdout.write(`${JSON.stringify(result)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
+      break;
+    }
     case 'reconcile': {
       const runDir = executorId ?? flagValue('--run-dir') ?? (typeof positional !== 'undefined' ? positional[1] : undefined);
       if (!runDir) {
@@ -1599,7 +1665,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--for <capability>] [--prompt <text>|--prompt-file <path>] [--model <name>] [--tier <name>] [--carries <class>] [--timeout-ms <ms>] [--idle-timeout-ms <ms>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;
