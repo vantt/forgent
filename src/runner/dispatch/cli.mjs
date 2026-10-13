@@ -292,11 +292,12 @@ function selectInvocationForCapability(cfg, executorId, executor, capabilityName
   if (executor?.agentType && !executor.command && !executor.adapter && !executor.invocations) return undefined;
   if (capability.confinement?.mode === 'required') {
     // This door leases no provider account, so a sandboxed worker would start
-    // without its login (or fail writing a refreshed one). Confined work goes
-    // through the Assignment door, which leases the account and copies its login.
+    // without its login (or fail writing a refreshed one). Confined read-only
+    // work goes through a Workflow unit, which binds the posture and leases the
+    // account.
     throw new DispatchError(
       'posture-needs-assignment',
-      `"${capabilityName}" runs confined (${capability.confinement.policy ?? 'required'}), which this door cannot do: it leases no provider account, so the sandboxed worker would start without its login. Send read-only work through the Assignment door instead: \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only" in the contract.`,
+      `"${capabilityName}" runs confined (${capability.confinement.policy ?? 'required'}), which this door cannot do: it leases no provider account, so the sandboxed worker would start without its login. ${readOnlyDoors(executorId)}`,
       { executorId, capability: capabilityName },
     );
   }
@@ -307,13 +308,20 @@ function selectInvocationForCapability(cfg, executorId, executor, capabilityName
   return unconfined?.id;
 }
 
+// The two doors for read-only work. Only a Workflow unit runs sandboxed with
+// the account's login; the inline contract keeps the named provider but its
+// read-only posture is an instruction to the worker, not a sandbox.
+function readOnlyDoors(executorId) {
+  return `Read-only work: a Workflow unit with "writes": [] (\`fgos workflow start --units <file>\`) runs sandboxed with the account's login; to keep this executor, \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only" leases the account but enforces read-only by instruction only, without a sandbox.`;
+}
+
 function describeCapabilityChoices(cfg, executorId) {
   const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
   const writes = Object.entries(capabilities)
     .filter(([, entry]) => entry?.serves?.mutates && entry.confinement?.mode !== 'required')
     .map(([name]) => `--for ${name}`);
   const changes = writes.length ? `Work that changes files: ${writes.join(', ')}. ` : '';
-  return `${changes}Read-only work: \`execute --contract <file> --executor ${executorId}\` with "mutation": "read-only".`;
+  return `${changes}${readOnlyDoors(executorId)}`;
 }
 
 /**

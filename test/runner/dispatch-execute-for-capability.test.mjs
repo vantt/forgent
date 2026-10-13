@@ -99,13 +99,15 @@ test('execute <agent> --for <capability> runs the invocation the capability pref
   assert.equal(written(root), 'second:hello');
 });
 
-test('execute <agent> --for <confined capability> refuses before spawning and points at the Assignment door', async () => {
+test('execute <agent> --for <confined capability> refuses before spawning and names both read-only doors', async () => {
   const { root } = fixtureRepo();
   await assert.rejects(
     executeExecutorCli('fake', { for: 'code:review', prompt: 'hello', cwd: root, repoRoot: root }),
     (err) => {
       assert.equal(err.errorClass, 'posture-needs-assignment');
+      assert.match(err.message, /fgos workflow start --units <file>/);
       assert.match(err.message, /execute --contract <file> --executor fake/);
+      assert.match(err.message, /by instruction only, without a sandbox/);
       return true;
     },
   );
