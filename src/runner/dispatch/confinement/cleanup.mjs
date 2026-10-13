@@ -107,6 +107,11 @@ export function writeOwnershipMarker(dirPath, { dispatchId, resource = 'private-
   return markerPath;
 }
 
+/** Removal attempts a home with an unstaged renewed login gets before it is held for the owner. */
+export const CREDENTIAL_KEEP_MAX_ATTEMPTS = 5;
+export const CREDENTIAL_HOME_KEPT = 'credential-home-kept';
+export const CREDENTIAL_HOME_HELD = 'credential-home-held';
+
 /**
  * Add fields to the marker of a home this process created. Used for facts only known once the home is
  * filled (which account login it was copied from).
@@ -159,7 +164,8 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
  * offered to its source before the home is gone, whichever path gets there. A home whose marker does not
  * ask for write-back is removed exactly as before; a write-back problem is reported by a fixed code on
  * stderr and never stops the removal, except that a home whose renewed login could not be staged is kept
- * (the call throws `credential-home-kept`) so a later removal retries.
+ * (the call throws `credential-home-kept`, and the attempt is counted in the marker) so a later removal
+ * retries; after CREDENTIAL_KEEP_MAX_ATTEMPTS the call throws `credential-home-held` without trying again.
  *
  * @param {string} dirPath
  * @param {{stopProcesses?: boolean}} [options] `stopProcesses`: end whatever still runs from inside first
@@ -168,13 +174,23 @@ export function removeConfinementDir(dirPath, { stopProcesses = false } = {}) {
   if (stopProcesses) stopProcessesInside(dirPath);
   const marker = readOwnershipMarker(dirPath);
   if (marker?.credentialWriteBack !== undefined) {
+    // A home whose staging already failed the allowed number of times is not retried any more and is
+    // never deleted for being old: `fgos doctor` reports it for the owner to recover by hand.
+    if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) {
+      throw new Error(CREDENTIAL_HOME_HELD);
+    }
     const result = writeBackRenewedCredential(dirPath, marker);
     if (result.status === 'failed') {
       if (result.keepHome) {
         // The home may hold the only good refresh token and no copy of it is safe yet: leave it and its
-        // marker so the reaper retries, and say so with a fixed code (no paths, no values).
+        // marker so a later removal retries (up to the bound), and say so with a fixed code (no paths, no
+        // values).
+        const attempts = (marker.credentialKept?.attempts ?? 0) + 1;
+        try {
+          extendOwnershipMarker(dirPath, { credentialKept: { attempts, since: marker.credentialKept?.since ?? new Date().toISOString() } });
+        } catch { /* the home is kept either way; the next removal counts again */ }
         process.stderr.write(`fgos: credential write-back not done (${result.code}); private home kept for a later retry\n`);
-        throw new Error('credential-home-kept');
+        throw new Error(attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? CREDENTIAL_HOME_HELD : CREDENTIAL_HOME_KEPT);
       }
       process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
     }

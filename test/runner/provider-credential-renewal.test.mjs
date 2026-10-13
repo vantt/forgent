@@ -23,6 +23,7 @@ import {
   tryAcquireAccountLock,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import {
+  CREDENTIAL_KEEP_MAX_ATTEMPTS,
   OWNERSHIP_MARKER_FILE,
   cleanupConfinementResource,
   extendOwnershipMarker,
@@ -1271,6 +1272,69 @@ test('when staging fails the private home and its marker are kept, with one fixe
     assert.equal(fs.existsSync(dir), false);
     assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
   } finally { process.stderr.write = realWrite; w.cleanup(); }
+});
+
+const blockStaging = (w) => {
+  fs.writeFileSync(path.join(w.home, 'auth.json'), TORN); // the copy cannot be judged, so it must be staged
+  fs.mkdirSync(w.accountDir, { recursive: true });
+  fs.writeFileSync(path.join(w.accountDir, 'pending'), 'not a directory'); // staging is impossible
+};
+const quietly = (fn) => {
+  const realWrite = process.stderr.write;
+  process.stderr.write = () => true;
+  try { return fn(); } finally { process.stderr.write = realWrite; }
+};
+
+test('a home kept because staging failed is retried a bounded number of times, then held and never deleted for age', () => {
+  const w = workspace();
+  try {
+    const dir = privateHomeWithRenewedLogin(w);
+    blockStaging(w);
+    const attemptsOf = () => JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MARKER_FILE), 'utf8')).credentialKept?.attempts;
+    for (let attempt = 1; attempt <= CREDENTIAL_KEEP_MAX_ATTEMPTS; attempt += 1) {
+      const result = quietly(() => cleanupConfinementResource(dir, 'disp_wb'));
+      assert.equal(result.cleaned, false);
+      assert.equal(attemptsOf(), attempt);
+    }
+    // Past the bound: staging would now work, but the home is neither retried nor deleted.
+    fs.rmSync(path.join(w.accountDir, 'pending'));
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const held = cleanupConfinementResource(dir, 'disp_wb');
+    assert.equal(held.cleaned, false);
+    assert.match(held.error, /credential-home-held/);
+    assert.equal(attemptsOf(), CREDENTIAL_KEEP_MAX_ATTEMPTS, 'a held home is not counted again');
+    assert.equal(readPi(dir).xai.refresh, FAKE.newRefresh, 'the renewed login is still in the home');
+
+    // Age never deletes it either: the reaper skips a home whose marker is long past its age limit.
+    const tempRoot = path.join(w.tmp, 'fgos-confinement');
+    const reaped = reapOrphanedConfinementResources({ tempRoot, checkLiveness: () => false, maxAgeMs: 1 });
+    assert.equal(reaped.reaped.length, 0);
+    assert.equal(fs.existsSync(dir), true);
+    assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'the source was not written by a held home');
+  } finally { w.cleanup(); }
+});
+
+test('a home that cannot be removed does not stop the finalizer from removing the dispatch\'s other resources', async () => {
+  const w = workspace();
+  try {
+    const kept = privateHomeWithRenewedLogin(w);
+    blockStaging(w);
+    const other = path.join(w.tmp, 'fgos-confinement', 'disp_wb', 'scratch');
+    fs.mkdirSync(other, { recursive: true });
+    writeOwnershipMarker(other, { dispatchId: 'disp_wb' });
+    const runDir = path.join(w.tmp, 'run');
+    fs.mkdirSync(runDir, { recursive: true });
+    const result = await quietly(() => finalizeConfinementResources({
+      runDir,
+      launchCommandId: 'launch_1',
+      receipt: { completion: { kind: 'exited' } },
+      descriptor: { resources: [{ kind: 'temporary-directory', pathRef: kept }, { kind: 'temporary-directory', pathRef: other }] },
+    }));
+    assert.equal(result.cleanupState, 'retained');
+    assert.match(result.cleanupResult.reason, /credential-home-kept/);
+    assert.equal(fs.existsSync(kept), true, 'the home with the unstaged login stays');
+    assert.equal(fs.existsSync(other), false, 'the other resource was still removed');
+  } finally { w.cleanup(); }
 });
 
 // ---------------------------------------------------------------------------------------------------

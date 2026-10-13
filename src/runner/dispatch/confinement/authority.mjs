@@ -1836,9 +1836,11 @@ export async function finalizeConfinementResources({
         try {
           removeConfinementDir(targetPath);
         } catch (err) {
+          // One resource that cannot go (a home holding an unstaged login) must not leave the other
+          // resources of the dispatch on disk: carry on and report the first failure.
           willClean = false;
-          typedReason = `cleanup-failed: ${err.message}`;
-          break;
+          typedReason ??= `cleanup-failed: ${err.message}`;
+          continue;
         }
         removeEmptyDispatchParent(targetPath, markerDispatchId);
       }
