@@ -1684,6 +1684,59 @@ test('copies that cannot be parsed are compared by their bytes: an identical one
   } finally { w.cleanup(); }
 });
 
+// An omp pane killed before a checkpoint leaves its renewed login only in the write-ahead log, beside a main file
+// that still equals the source's.
+function ompPaneHome(w, dispatchId, wal) {
+  const dir = path.join(w.tmp, 'fgos-confinement', dispatchId, 'home');
+  fs.mkdirSync(dir, { recursive: true });
+  writeOwnershipMarker(dir, { dispatchId });
+  copyCredentialFiles(dir, w.home, ['agent.db'], { loadSqlite: () => null });
+  extendOwnershipMarker(dir, { credentialWriteBack: credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }) });
+  if (wal !== undefined) fs.writeFileSync(path.join(dir, 'agent.db-wal'), wal);
+  return dir;
+}
+
+test('without node:sqlite, a store equal to the source\'s but with a non-empty write-ahead log is staged, and an empty log counts as none', () => {
+  const w = workspace();
+  try {
+    writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true }).close();
+    const withLog = ompPaneHome(w, 'disp_wal', 'FAKE-WAL-BYTES');
+    assert.equal(writeBackRenewedCredential(withLog, markerOf(withLog), { loadSqlite: () => null }).status, 'staged');
+    const staged = pendingNames(w);
+    assert.equal(staged.length, 1);
+    assert.equal(fs.readFileSync(path.join(w.accountDir, 'pending', staged[0], 'agent.db-wal'), 'utf8'), 'FAKE-WAL-BYTES', 'the log was kept with it');
+
+    const emptyLog = ompPaneHome(w, 'disp_empty_wal', '');
+    assert.deepEqual(writeBackRenewedCredential(emptyLog, markerOf(emptyLog), { loadSqlite: () => null }), { status: 'unchanged' });
+    const noLog = ompPaneHome(w, 'disp_no_wal');
+    assert.deepEqual(writeBackRenewedCredential(noLog, markerOf(noLog), { loadSqlite: () => null }), { status: 'unchanged' });
+    assert.equal(pendingNames(w).length, 1);
+  } finally { w.cleanup(); }
+});
+
+test('unparsable pending copies are identical only when the write-ahead log is identical too', () => {
+  const run = (specs) => {
+    const w = workspace();
+    try {
+      const dir = privateOmpHomeWithRenewedLogin(w);
+      const pending = path.join(w.accountDir, 'pending');
+      specs.forEach(({ db, wal }, i) => {
+        const copy = path.join(pending, `00000000000000${i + 1}-a`);
+        fs.mkdirSync(copy, { recursive: true });
+        fs.writeFileSync(path.join(copy, 'agent.db'), db);
+        if (wal !== undefined) fs.writeFileSync(path.join(copy, 'agent.db-wal'), wal);
+      });
+      assert.equal(writeBackRenewedCredential(dir, markerOf(dir), { loadSqlite: () => null }).status, 'staged');
+      return pendingNames(w).length;
+    } finally { w.cleanup(); }
+  };
+  const padding = ['D1', 'D2', 'D3', 'D4', 'D5'].map((db) => ({ db }));
+  assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME', wal: 'W2' }, ...padding]), 8, 'same main file, different logs: both stay');
+  assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME', wal: 'W1' }, ...padding]), 7, 'identical in both: one goes');
+  assert.equal(run([{ db: 'SAME', wal: '' }, { db: 'SAME' }, ...padding]), 7, 'an empty log is no log');
+  assert.equal(run([{ db: 'SAME', wal: 'W1' }, { db: 'SAME' }, ...padding]), 8, 'a log against none: both stay');
+});
+
 test('a half-written copy left by a probe is kept for hand recovery, outside the copies applied or dropped automatically', async () => {
   const w = workspace();
   try {

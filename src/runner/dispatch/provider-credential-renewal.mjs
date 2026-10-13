@@ -398,6 +398,8 @@ function ompEntries(db) {
 const ompLayout = {
   name: 'omp-agent-db',
   files: ['agent.db'],
+  // Written beside the store while it is open; a login renewed after the last checkpoint lives only here.
+  sidecars: ['agent.db-wal'],
   read(home, { loadSqlite }) {
     const file = path.join(home, 'agent.db');
     try {
@@ -567,7 +569,22 @@ const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpe
 // be read for a reason that may pass, or the source cannot say (it cannot be read, or its entry cannot be
 // identified and the copy holds a refresh token the source does not). Undetermined copies are staged
 // rather than dropped.
+// The bytes of a layout's non-empty sidecar files in `dir` (a zero-byte one counts as absent), by name.
+function sidecarBytes(layout, dir) {
+  const found = [];
+  for (const name of layout.sidecars ?? []) {
+    try {
+      const bytes = fs.readFileSync(path.join(dir, name));
+      if (bytes.length > 0) found.push([name, bytes]);
+    } catch { /* absent */ }
+  }
+  return found;
+}
+
 function filesIdentical(layout, sourceHome, copyHome) {
+  // A login renewed after the last checkpoint sits in the write-ahead log, not in the main file: a copy or a
+  // source with one cannot be shown identical by its main file alone.
+  if (sidecarBytes(layout, copyHome).length > 0 || sidecarBytes(layout, sourceHome).length > 0) return false;
   try {
     return layout.files.every((name) => {
       const a = path.join(sourceHome, name);
@@ -698,6 +715,7 @@ function rawFingerprint(layout, dir) {
   try {
     const hash = crypto.createHash('sha256');
     for (const name of layout.files) hash.update(name).update('\u0000').update(fs.readFileSync(path.join(dir, name))).update('\u0001');
+    for (const [name, bytes] of sidecarBytes(layout, dir)) hash.update(name).update('\u0000').update(bytes).update('\u0001');
     return `raw:${hash.digest('hex')}`;
   } catch { return null; }
 }
