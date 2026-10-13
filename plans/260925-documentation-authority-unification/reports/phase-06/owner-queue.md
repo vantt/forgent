@@ -271,3 +271,13 @@ One contextual identical-unit group requires independent confirmation: two docum
 Archive/delete: only the already A8-approved retired documentation policy, retained verbatim as non-authority history; no deletion. Real semantic conflicts: none newly found. Promoted-area edits: prelogged in promoted-edits.md and shown completely in host-invocation-accounting.json. Owned H findings are zero; the remaining packaging-portal metadata finding belongs to its later batch.
 
 Checkpoint needs a separate reviewer: all 431 Judgment/Weak-exact rows, sixteen T9 confirmations, the contextual metadata group, exact native-list equality, 30 randomly selected current units against code and the reviewer-held sensitivity/red-team checks. Source approvals, truth sample and batch closure remain UNPROVEN; no intermediate Lead stop occurred.
+
+### Host Invocation checkpoint submission
+
+- Ready request: `review-request-261013-1311-host-invocation-checkpoint.md`; no new owner question before it. All 431 source judgments/weak-exact rows and the 16 restorations remain pending independent review; no approval was invented.
+- History/archive list: the A8 retired documentation policy only, verbatim under `history/documentation-migration/`; native D accepts `move`, so no archive fallback. Delete list empty; new real-conflict list empty; new Host hold list empty. The three pre-existing Rings holds remain.
+- Flagged-obsolete item: the dated npm-bin-removal clause in dropped-010 is preserved and proposed supersede to the current checked note; independent review must confirm it does not weaken the manifest-owned private entry/compatibility/runner obligations.
+- One two-member identical metadata exception requires exact-member independent acceptance. Candidate-unverified list has 572 eligible tuples and is exactly native strict E; no per-unit reverse receipts are requested.
+- Promoted-doc edits are prelogged and fully diffed in accounting. HI-I027 and the 16 restoration groups are explicit checkpoint scope. R2/R3 navigation is Draft while its dated Closed/Implemented-preview execution facts are unchanged.
+- The checkpoint reviewer owns the hidden sensitivity seed and key, the hostile red-team pass and A28's independent 30-unit current-content truth sample. Fresh-reader key is committed before readers start. All those outcomes remain UNPROVEN; more than 10% false in the truth sample still stops for the owner.
+- Packaging's one remaining promotion-header finding is owned by Step 4. Upstream ancestry 3.1.1/releaseVersion/initial-tarball notes remain queued for their owning content batches; not rewritten in this pass.
