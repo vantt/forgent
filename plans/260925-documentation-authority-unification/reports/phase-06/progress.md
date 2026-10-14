@@ -1,3 +1,42 @@
+# Latest resume state — Root source subset ready for independent review; STOP
+
+Date: 2026-10-14
+Executor: codex-session:17@2026-10-14
+Session counter: 17
+Step: 5
+State: ready-for-review; authoring incomplete; STOP
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Last green content pin: c8b2d948d6dd0b408011b294fd67aea59870749b
+Material and post-commit inventory pin: 89cd398f8ac87520246682ca3de6c28aecbb1dfc
+Request commits: governance 77e6fb0d7; SC1/list 4eb4857f2; truth ce1e0f018.
+This final progress/evidence commit seals the checkpoint; resolve HEAD on resume.
+
+This turn commits before final checkpoint: d900d6151 (resume); 01fe216b4 (nine exact ordinary ok verdicts); 9881f8622 (effect-axis manifest); 75204614a (candidate governance); 84c394406 (same-destination navigation); c8b2d948d (governance proposals); 89cd398f8 (native bindings/material); 77e6fb0d7, 4eb4857f2, ce1e0f018 (bounded requests). All work stayed in the required branch/worktree. No main merge/write, push, rebase, promotion, Step 6, gate/checker/vocabulary/extractor/baseline edits or secret-file reads.
+
+Nine ordinary boundary notes are verbatim, pinned to 4f99b9ec9; reviewer wording nits left unchanged. SC-1 before-edit list has three reviewed Pilot B rows. Both historically held rows were previously accepted under A15, then reopened here for exactly two current-pin D target drifts. Candidate says COMMAND_REGISTRY, 15 verbs and no coordination, preserving definitions, qualifiers and valid examples. Unchanged declarative-only row keeps its exact prior approval. Four genuine gaps conserve original and intermediate candidate identities; one changed native stable heading is fully shown. No approval carry or ID graft.
+
+New source proposals: 76 pending rows (75 governance + one non-platform user-knowledge registry); Mirror 0 / Unit-exact 51 / Weak-exact 17 / Judgment 8. Full source policy and original header retained; eight relative navigation spellings preserve destinations. New header complete, Candidate / Canonical: No. Existing N1 generated file disposition and independent four-unit corpus rule unchanged. AGENTS/CLAUDE deferred to Step 10; No component-boundary change.
+
+Root map: 1,072 source rows total (367 reviewed, 83 pending, 622 blocking-undecided). Submitted source subset has 78 pending (76 new + two reopened SC-1); five pending rows outside it were already open. Two pre-existing IO source gaps at unheaded-block-14/15 are byte-equal starting registry and stay owed, not waived. Remaining source authoring: 622 undecided rows, plus those older pending/gap obligations. No Step 5/work-state closure is claimed.
+
+Requests, each below 80 entries with full shown text/digests:
+- review-request-261014-2100-root-authorities-governance.md — 76 source decisions; immutable pack/sidecar exactly match shard.
+- review-request-261014-2100-root-authorities-sc1.md — 66 entries: two source decisions, four gaps, one native stable heading and 59 candidate-unverified eligibility/equality units.
+- review-request-261014-2100-root-authorities-truth.md — 30 chosen units from the 226-unit pinned current-content population; no author truth verdict. Independent reviewer may redraw; final batch population/draw must refresh if later authoring changes it.
+Exact request text and SHA256 are sealed in root-authorities-continuation-verification.json. All three committed texts match exactly. Candidate list is only the five-source first subset, not a final root-batch list.
+
+Proofs: both-prior D at content and again after the material/request commits exit 0 with zero fatal, identical global open counts and full reverse tuples. Both first-subset scoped E at identical content/decision inputs exit 1: exactly 78 pending source rows + two unchanged historical IO gaps + 59 candidate units. Strict E is red. Post-commit native refresh reads the persisted registry, reports bound/no carry-forward, and all active native tuples equal it. Source/code/docs/tests/extractor trees remain byte-equal to c8b2d948d; report-only commits do not alter E inputs.
+Native known counts 94,342 starting / 94,344 intermediate / 94,424 current; all IDs retained, all old tuples equal except the single disclosed natural heading digest change, four new gaps and zero new retired units. All other decision objects unchanged. Prior Agent/Host/Packaging A28 lists remain native-equal both D priors; all 13 A34 residual digests valid and prior list/hold/exception/residual files unchanged.
+Registry: native-byte-equal compact one-line JSON, 59,499,034 bytes; SHA256 3cc3bc8db1d819940ad7ea9cbb9ffeb85d87ba82f56e0aaf122c89bfff169f0a; below 90,000,000-byte stop line. Ratchet clean (995/25/1); placement 510/509/one exception/zero gaps; H findings zero; extractor, frozen sources, authority/reader links and witness/payload trees unchanged. Review/apply tests 29/29 pass with env -u CLAUDE_CODE_SESSION_ID, zero fail/cancel/skip/todo. GitNexus own scope low risk, zero affected processes. No full-suite, installed-release, gateway or full-truth claim.
+
+Blockers: no unexplained proof failure, technical blocker or owner decision. Independent Lead review is the authorized next action. Initial stale-inventory and duplicate N1 draft findings were explained and corrected; no protected tool change.
+Next: owner starts Lead with the three requests. Apply exact committed ordinary source/gap notes; independently score truth, fix false sentences under A19 and re-review; re-prove D/E/native equality, then resume remaining root source rows in bounded packs. Preserve existing N1 and AGENTS/CLAUDE deferral. Do not author more now; no Step 6, promotion or main merge. STOP.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Bounded root review request publication
 
 Date: 2026-10-14
