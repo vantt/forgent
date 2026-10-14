@@ -1,3 +1,44 @@
+# Latest resume state — Root authorities A31 boundary review request
+
+Date: 2026-10-14
+Executor: codex-session:15@2026-10-14
+Session counter: 15
+Step: 5 / boundary sync only
+State: ready-for-review; STOP
+Resume HEAD: 7d83c6b631fa781face127ff61393be89b903384
+B0: dbe5c432852837ea01e6025b35868bcb7271495d
+SYNC: 48e3a992be1cd74a0960df953af16b5dae4275e4
+Main pin: 88315d5de971bec51985d4adadbed10338a658db
+Last green D/native proof source: 796b247c6151b3575121009da124081c763bfad9
+Request: review-request-261014-1900-root-authorities-boundary.md
+Verification: root-authorities-boundary-verification.json
+
+Merge main succeeded cleanly (ort, 16 files, zero conflict, no platform content conflict/change). Three exact main-side legacy spec digests are accounted in existing ratchet exceptions; content approval is not inferred. The complete upstream Distribution Data Dictionary table was then retained verbatim in the existing candidate owner. Plan shape, headers, truth notes and all other candidate bytes are unchanged.
+
+One bounded A31 pack: nine pending decisions — two current Packaging source rows, three renewed historical gap bindings, four new native gaps. Every earlier affected approval is only historical; all other decision objects compare exactly with resume. Four stable-heading digest changes are disclosed; future Runner/Confinement source rows stay undecided for their own batches. No root-source authoring or SC-1 action occurred. Full shown source/current-target text, immutable historical source witnesses and full digests are in the request/accounting.
+
+Both-prior D: exit 0, zero fatal. Both union-scoped strict E: exit 1, exactly 13 unchanged reviewed partial carries + five pending source rows (three prior holds and two submitted rows) + 346 identical-unit groups + 1,769 candidate-unverified units. This is union-scoped open data, not a new area closure. Full known tuple comparison passes: all 94,338 resume IDs retained, 94,342 current, active inventory/registry tuples equal, exactly four native new IDs/four stable changes/four new gaps, zero new retired units and no graft. Agent 488 / Host 588 / Packaging 693 candidate lists equal both native D and strict E by full tuples. Prior hold/exception/list/residual files are byte-equal; all 13 A34 residual digests remain valid.
+
+Code evidence coverage: 1,917 reviewed refs, zero missing receipt rows; 877 with code evidence, 299 current native-ID refs, none affected. Thirty changed historical refs have old IDs absent from the current native registry and are excluded explicitly; they are not 30 list entries. No applicable accepted receipt needs re-pin or downgrade. Existing receipts remain in history; no code truth approval.
+
+Persisted native registry is compact one-line JSON, 59,455,506 bytes, SHA256 fb3c68ce23070dc9bed114d91d326297512f200ca44ef761499021a8fb2f413b, byte-equal scratch and below 90 MB. No seed reconstruction. Preservation passes: extractor closure, area statuses, reader links, 74 witnesses, 867 payloads, five frozen files and prior eight allowlist exemptions. Ratchet 995 files/25 edits/one addition; placement 509/508/one exception/zero gaps; candidate findings zero. Review/apply tests 29/29, zero fail/cancel/skip/todo, with env -u CLAUDE_CODE_SESSION_ID. GitNexus own scope low risk, zero execution processes. No full-suite/release/gateway claim.
+
+Commits this turn before final request/evidence/progress commit:
+- 92a509544 docs(unification): record root authorities resume checkpoint
+- 48e3a992b merge main at the boundary
+- 1c626c8aa docs(unification): account imported legacy source digests
+- c1961bdb2 docs(packaging): retain upstream doctor registry descriptions
+- 796b247c6 docs(unification): conserve upstream identities for independent review
+The final explicit-path commit seals this request and checkpoint; resolve HEAD on resume.
+
+Blockers: no technical or owner decision blocker. Independent Lead review is the required stop under A31 and this turn's explicit authorization. No new owner queue entry. Resolved scratch/input issues and exact reproduction sources are recorded in verification; no gate/checker/vocabulary/extractor/baseline change.
+
+Next: Lead commits ordinary exact-ID source/gap verdicts for the nine decisions. Apply notes verbatim, refresh from the persisted compact registry, rerun both-prior D/scoped E and native equality. Only after A31 acceptance, start SC-1 exactly as Step 5 specifies, then mapped root source decisions (AGENTS/CLAUDE wait for Step 10), A28 sample preparation and bounded packs. No SC-1/root truth draw is claimed here. No promotion, push, rebase, Step 6 or main-checkout write. STOP.
+
+Earlier progress follows intact.
+
+---
+
 # Latest resume state — Root authorities boundary sync in progress
 
 Date: 2026-10-14
