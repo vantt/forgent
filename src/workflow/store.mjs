@@ -207,6 +207,7 @@ export function projectWorkflowState(events) {
           steps[p.stepId].units[p.unitId].outcome = p.outcome;
           steps[p.stepId].units[p.unitId].results = p.results || [];
           if (p.outOfScope?.length) steps[p.stepId].units[p.unitId].outOfScope = p.outOfScope;
+          if (p.outOfScopeOnBranch?.length) steps[p.stepId].units[p.unitId].outOfScopeOnBranch = p.outOfScopeOnBranch;
         }
         break;
 

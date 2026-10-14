@@ -249,7 +249,7 @@ function assertWriteChains(workflow) {
     if (base?.refused) {
       const writer = step.units.find((u) => u.template.writes?.length).id;
       throw new RunnerConfigError(
-        `Workflow "${workflow.id}" unit "${writer}" writes and builds on more than one writing unit (${base.refused.join(', ')}); merge these units into one or add an integrate step between them`,
+        `Workflow "${workflow.id}" unit "${writer}" writes and builds on more than one writing unit (${base.refused.join(', ')}); merge these units into one, or make one depend on the other so they form a chain`,
       );
     }
   }
@@ -267,15 +267,13 @@ function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch, baseSh
   try {
     scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
   } catch { /* the template's writes are the scope the run started from */ }
-  const found = new Set();
-  for (const result of results) {
-    for (const file of result?.commit?.outOfScope ?? []) found.add(file);
-  }
   const changed = branch && baseSha
     ? (gitOut(mainRoot, ['diff', '-z', '--no-renames', '--name-only', baseSha, branch, '--']) ?? '').split('\0').filter(Boolean)
     : results.flatMap((result) => result?.commit?.files ?? []);
-  for (const file of changed) if (!matchesWriteScope(file, scope)) found.add(file);
-  return [...found].sort();
+  // What the branch itself carries outside the scope: the part a writer built on it inherits.
+  const onBranch = changed.filter((file) => !matchesWriteScope(file, scope));
+  const reported = results.flatMap((result) => result?.commit?.outOfScope ?? []);
+  return { all: [...new Set([...reported, ...onBranch])].sort(), onBranch: [...new Set(onBranch)].sort() };
 }
 
 /** The writing unit a writer starts from, or null; a definition with more than one gets none (HEAD). */
@@ -456,13 +454,24 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
       // 2. Integration step
       if (step.kind === 'integrate') {
         const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
+        // A unit that wrote outside its scope never reaches the target: the step fails, saying which,
+        // and merges nothing, rather than landing the rest and reporting a pass.
+        const flagged = step.dependsOn.flatMap((depId) => Object.values(state.steps[depId]?.units ?? {})
+          .filter((unit) => unit.outOfScope?.length)
+          .map((unit) => `${unit.unitId} (out-of-scope-writes: ${unit.outOfScope.join(', ')})`));
+        if (flagged.length > 0) {
+          const reason = `integrate refused, nothing merged: ${flagged.join('; ')}`;
+          const failedAt = new Date().toISOString();
+          recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.fail', payload: { stepId: step.id, outcome: 'findings', reason, failedAt } } });
+          recordEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'workflow.fail', payload: { outcome: 'findings', stepId: step.id, reason, failedAt } } });
+          stateChanged = true;
+          continue;
+        }
         // Collect branches from predecessor units
         for (const depId of step.dependsOn) {
           const depStep = workflow.steps.find((s) => s.id === depId);
           if (depStep?.units) {
             for (const u of depStep.units) {
-              // A unit that wrote outside its scope never reaches the target.
-              if (state.steps[depId]?.units[u.id]?.outOfScope?.length) continue;
               const uBranch = `wf/${workflowRunId}/${u.id}`;
               try {
                 mergeWorkflowBranch({
@@ -609,14 +618,15 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           }
 
           // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not
-          // integrated. A writer standing on such a branch carries those paths too, so they never
-          // reach the target through it.
-          const outOfScope = unitData.writes.length > 0 && unitRunResult.unitRunId
-            ? [...new Set([
-              ...outOfScopeWrites(mainRoot, { unitRunId: unitRunResult.unitRunId, writes: unitData.writes, results: unitRunResult.results || [], branch: uBranch, baseSha }),
-              ...(base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScope ?? [] : []),
-            ])].sort()
-            : [];
+          // integrated. A writer standing on a branch that itself carries such paths carries them too,
+          // so they never reach the target through it; a path left uncommitted on the base is not on
+          // its branch and holds nothing back.
+          const own = unitData.writes.length > 0 && unitRunResult.unitRunId
+            ? outOfScopeWrites(mainRoot, { unitRunId: unitRunResult.unitRunId, writes: unitData.writes, results: unitRunResult.results || [], branch: uBranch, baseSha })
+            : { all: [], onBranch: [] };
+          const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
+          const outOfScope = [...new Set([...own.all, ...inherited])].sort();
+          const outOfScopeOnBranch = [...new Set([...own.onBranch, ...inherited])].sort();
           if (outOfScope.length > 0 && unitRunResult.outcome === 'pass') unitRunResult = { ...unitRunResult, outcome: 'findings' };
 
           recordEvent({
@@ -631,6 +641,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                 outcome: unitRunResult.outcome,
                 results: unitRunResult.results || [],
                 ...(outOfScope.length > 0 ? { outOfScope } : {}),
+                ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),
               },
             },
           });

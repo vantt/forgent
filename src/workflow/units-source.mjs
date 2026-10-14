@@ -53,7 +53,7 @@ export function translateUnitsToWorkflow(unitsPath) {
     }
     if (seen.has(unit.id)) throw new RunnerConfigError(`units[${i}] has duplicate unit id "${unit.id}"`);
     // The id names the unit's step and its branch (wf/<run>/<id>), so it must be a safe branch segment.
-    if (!BRANCH_SAFE_ID.test(unit.id) || unit.id.includes('..') || unit.id.endsWith('.lock')) {
+    if (!BRANCH_SAFE_ID.test(unit.id) || unit.id.includes('..') || unit.id.endsWith('.lock') || unit.id.endsWith('.')) {
       throw new RunnerConfigError(`units[${i}] unit id "${unit.id}" must be letters, digits, ".", "_" or "-", starting with a letter or digit (it names the unit's branch)`);
     }
     seen.add(unit.id);

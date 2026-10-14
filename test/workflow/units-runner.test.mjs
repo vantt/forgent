@@ -223,7 +223,7 @@ test('a writing unit that builds on two writing units is refused at start, befor
     { id: 'w-b', objective: 'WRITE:b.txt', capability: 'docs:write', writes: ['b.txt'] },
     { id: 'w-c', objective: 'WRITE:c.txt', capability: 'docs:write', writes: ['c.txt'], dependsOn: ['w-a', 'w-b'] },
   ]);
-  await assert.rejects(() => startWorkflow({ unitsPath: file, ...opts(tmp) }), /w-c.*w-a.*w-b.*merge these units into one or add an integrate step/s);
+  await assert.rejects(() => startWorkflow({ unitsPath: file, ...opts(tmp) }), /w-c.*w-a.*w-b.*merge these units into one, or make one depend on the other/s);
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs')), false);
 
   // Building on a chain (w-c on w-b on w-a) is one writing unit, the nearest one.
@@ -269,7 +269,7 @@ test('a file outside the scope is found by its real name, so a non-ASCII name in
   assert.equal(state.steps.w.units.w.outOfScope, undefined);
 });
 
-test('out-of-scope writes accepted as findings do not reach the target through a later writer on that branch', async () => {
+test('an out-of-scope file left uncommitted on a writer does not hold back the clean writer built on its branch', async () => {
   const tmp = setupRepo();
   useTwoFamilies(tmp);
   const workflow = validateWorkflow({
@@ -283,11 +283,33 @@ test('out-of-scope writes accepted as findings do not reach the target through a
   const state = await startWorkflow({ workflow, ...opts(tmp) });
   assert.equal(state.steps.a.units['w-a'].outcome, 'findings', JSON.stringify(state.steps.a));
   assert.deepEqual(state.steps.a.units['w-a'].outOfScope, ['stray.txt']);
-  // w-b stands on w-a's branch, so it carries the stray file too and is not integrated.
-  assert.deepEqual(state.steps.b.units['w-b'].outOfScope, ['stray.txt']);
-  assert.equal(state.steps.b.units['w-b'].outcome, 'findings');
-  assert.equal(fs.existsSync(path.join(tmp, 'stray.txt')), false, 'the stray file never reached the trunk');
-  assert.equal(fs.existsSync(path.join(tmp, 'b.txt')), false);
+  // The runner commits only the write scope, so stray.txt never reached w-a's branch: w-b, built on
+  // that branch, carries nothing out of scope, passes, and lands with the in-scope work under it.
+  assert.equal(git(tmp, ['show', '--name-only', '--format=', state.steps.a.units['w-a'].branch]), 'a.txt');
+  assert.equal(state.steps.b.units['w-b'].outOfScope, undefined);
+  assert.equal(state.steps.b.units['w-b'].outcome, 'pass');
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps.land));
+  assert.equal(git(tmp, ['show', 'HEAD:b.txt']), 'b.txt written');
+  assert.equal(git(tmp, ['show', 'HEAD:a.txt']), 'a.txt written');
+  assert.throws(() => git(tmp, ['show', 'HEAD:stray.txt']), 'the stray file never reached the trunk');
+});
+
+test('an integrate step that would land a unit with out-of-scope writes fails and says so', async () => {
+  const tmp = setupRepo();
+  useTwoFamilies(tmp);
+  const workflow = validateWorkflow({
+    id: 'land-flagged',
+    steps: [
+      { id: 'a', units: [{ id: 'w-a', template: { capability: 'docs:write', pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'], objective: 'WRITE:a.txt WRITE:stray.txt', writes: ['a.txt'] } }] },
+      { id: 'land', kind: 'integrate', dependsOn: ['a'] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(state.steps.a.units['w-a'].outcome, 'findings');
+  assert.equal(state.status, 'failed');
+  assert.equal(state.steps.land.status, 'failed');
+  assert.match(state.steps.land.reason, /w-a.*out-of-scope-writes.*stray\.txt/);
+  assert.throws(() => git(tmp, ['show', 'HEAD:a.txt']), 'nothing was merged');
 });
 
 test('a units file refuses a unit id that cannot name a branch, and --seats with a units file', async () => {
@@ -295,6 +317,10 @@ test('a units file refuses a unit id that cannot name a branch, and --seats with
   await assert.rejects(
     () => startWorkflow({ unitsPath: unitsFile(tmp, [{ id: 'fix login', objective: 'x', capability: 'docs:write' }]), ...opts(tmp) }),
     /unit id "fix login"/,
+  );
+  await assert.rejects(
+    () => startWorkflow({ unitsPath: unitsFile(tmp, [{ id: 'fix.', objective: 'x', capability: 'docs:write' }]), ...opts(tmp) }),
+    /unit id "fix\."/,
   );
   await assert.rejects(
     () => startWorkflow({ unitsPath: unitsFile(tmp, [{ id: 'u', objective: 'x', capability: 'docs:write' }]), seats: ['a', 'b', 'c'], ...opts(tmp) }),
